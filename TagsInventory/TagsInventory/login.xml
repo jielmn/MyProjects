@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window>
+	<Font id = "0" name="字体索引0" size="28" bold="false" italic="false" bold="true" />
+    <VerticalLayout bkcolor="#FF727E8C" bkcolor2="#FFFFFFFF">
+        <HorizontalLayout height="100" >
+			<Label text="请扫卡登录" align="center" font="0"/>
+		</HorizontalLayout>
+		<HorizontalLayout>		
+			<VerticalLayout width="100" />
+			<Button name="btnCenter" bkimage="Images/card.jpg" />
+			<VerticalLayout width="100" />
+        </HorizontalLayout>		
+		<HorizontalLayout height="75" />
+		<HorizontalLayout height="25" padding="5">
+			<Label name="lblStatusDb" text="数据库没有连接上" width="150" />
+			<Label name="lblStatusReader" text="读卡器没有连接上" />
+		</HorizontalLayout>
+    </VerticalLayout>
+</Window>

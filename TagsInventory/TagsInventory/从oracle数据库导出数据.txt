@@ -1,0 +1,6 @@
+1. 导出proceinfo表
+   select id, procetype, proceman,to_char(procetime,'YYYY-MM-DD HH24-MI-SS'),tagbaseid,proce_batch_id  from proceinfo;
+   在结果集合中，右键选择导出
+   导出的文件中的有些地方需要修改，例如EXPORT_TABLE, to_char等
+   
+2. 导出tagsinfo表
