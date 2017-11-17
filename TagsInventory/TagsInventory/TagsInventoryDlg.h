@@ -14,6 +14,14 @@ public:
 	virtual CDuiString GetSkinFile();
 	virtual CDuiString GetSkinFolder() { return _T(""); }
 
+	virtual UILIB_RESOURCETYPE GetResourceType() const {
+		return UILIB_ZIPRESOURCE;
+	}
+
+	virtual LPCTSTR GetResourceID() const {
+		return MAKEINTRESOURCE(IDR_ZIPRES1);
+	}
+
 	//CButtonUI* m_btnClose;
 
 	virtual void       InitWindow()

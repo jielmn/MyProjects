@@ -225,6 +225,7 @@
     <ResourceCompile Include="TagsInventory.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\res.zip" />
     <None Include="res\TagsInventory.rc2" />
   </ItemGroup>
   <ItemGroup>

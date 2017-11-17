@@ -215,9 +215,11 @@ void CDuiFrameWnd1::SetControlText(const char * szControlName, CDuiString strTex
 
 // CMainDlg ¶Ô»°¿ò
 CDuiString  CDuiFrameWnd1::GetSkinFile() {
-	char buf[8192];
-	g_cfg->GetConfig("main xml file", buf, sizeof(buf), "main.xml");
-	return buf;
+	//char buf[8192];
+	//g_cfg->GetConfig("main xml file", buf, sizeof(buf), "main.xml");
+	//return buf;
+
+	return "main.xml";
 }
 
 void CDuiFrameWnd1::SetStatus(int nStatus, int nType) {

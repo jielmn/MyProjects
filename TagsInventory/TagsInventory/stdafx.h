@@ -214,3 +214,5 @@ void ClearVector(vector<T> & v) {
 	}
 	v.clear();
 }
+
+#define DEBUG_FLAG           0
