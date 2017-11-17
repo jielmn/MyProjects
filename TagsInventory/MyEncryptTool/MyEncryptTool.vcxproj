@@ -97,7 +97,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>;LmnCommonXD.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -150,7 +150,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>;LmnCommonX.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -220,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\MyEncryptTool.rc2" />
+    <None Include="res\res.zip" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\MyEncryptTool.ico" />
