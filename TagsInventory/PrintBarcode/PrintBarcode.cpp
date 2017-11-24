@@ -70,6 +70,10 @@ BOOL CPrintBarcodeApp::InitInstance()
 	// 例如修改为公司或组织名
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
+	CPaintManagerUI::SetInstance(AfxGetInstanceHandle());                    // 指定duilib的实例
+	CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath());    // 指定duilib资源的路径，这里指定为和exe同目录
+	::CoInitialize(NULL);
+
 	CPrintBarcodeDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();

@@ -95,7 +95,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>qrencoded.lib</AdditionalDependencies>
+      <AdditionalDependencies>qrencoded.lib;duilibd.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -144,7 +144,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>qrencode.lib</AdditionalDependencies>
+      <AdditionalDependencies>qrencode.lib;duilib.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -208,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\PrintBarcode.rc2" />
+    <None Include="res\res.zip" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\PrintBarcode.ico" />

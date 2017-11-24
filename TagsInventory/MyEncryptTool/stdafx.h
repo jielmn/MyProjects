@@ -52,4 +52,4 @@
 #endif
 
 
-#define ENABLE_DECRYPT      0
+#define ENABLE_DECRYPT      1
