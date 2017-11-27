@@ -429,6 +429,7 @@ void  CMainDlg::StartInventory() {
 	m_duiFrame.ClearList();
 
 	m_duiFrame.SetControlText("package_id", "");
+	m_duiFrame.SetCount(0);
 	SetTimer(TIMER_UPDATE_TAGS, INTEVAL_UPDATE_TAGS, 0);
 }
 
