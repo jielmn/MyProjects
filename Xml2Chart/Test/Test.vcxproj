@@ -96,7 +96,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>Xml2ChartD.lib</AdditionalDependencies>
+      <AdditionalDependencies>Xml2ChartD.lib;tinyxml.lib;LmnCommonXD.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>../Debug/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>

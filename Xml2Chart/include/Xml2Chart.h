@@ -5,6 +5,9 @@
 
 #include <Windows.h>
 #include <vector>
+#include <map>
+
+#include "tinyxml.h"  
 
 /*
 某某医院
@@ -91,8 +94,8 @@ protected:
 
 	HGDIOBJ    m_BorderPen[4];   // 边线Pen(包括线条粗细，颜色)
 
-	std::vector<SplitPen>    m_vHSplitLines;   // 矩形的水平内部划分线，从小到大排序
-	std::vector<SplitPen>    m_vVSplitLines;   // 矩形的垂直内部划分线，从小到大排序
+	std::vector<SplitPen>    m_vHSplitLines;   // 矩形的水平内部划分线，从大到小排序
+	std::vector<SplitPen>    m_vVSplitLines;   // 矩形的垂直内部划分线，从大到小排序
 
 	CXml2ChartUI *                m_parent;
 	LayoutType                    m_eChildrenLayout;       // 子项布局
@@ -134,6 +137,9 @@ public:
 	void  SetPadding(const RECT &rect);
 	RECT  GetPadding() const;
 
+	void  SetPosition(const RECT &rect);
+	RECT  GetPosition() const;
+
 	void  SetRect(const RECT & rect);
 	void  SetRect(int nLeft, int nTop, int nRight, int nBottom);
 	RECT  GetRect( ) const;
@@ -153,8 +159,9 @@ public:
 	void SetChildrenLayout(LayoutType eLayoutType);
 	LayoutType  GetChildrenLayout() const;
 
-	void SetSplitLine(BOOL bVertical, const SplitPen & splitPen);
+	void SetSplitLine(BOOL bVertical, const SplitPen & splitPen);             // 把矩形划分为小格子的线条
 	SplitPen GetSplitLine(BOOL bVertical, int nIndex) const;
+	int GetSplitLineCount(BOOL bVertical) const;
 
 	void AddChild(CXml2ChartUI * child);
 	CXml2ChartUI * GetChild(int nIndex) const;
@@ -177,6 +184,28 @@ public:
 
 
 	void  RecacluteLayout();                             //重新计算布局和子UI布局
+};
+
+class  CXml2ChartFile {
+public:
+	CXml2ChartFile();
+	~CXml2ChartFile();
+	CXml2ChartUI * ReadXmlChartFile(const char * szFilePath);
+	CXml2ChartUI *             m_ChartUI;
+
+protected:
+	std::map<int,HGDIOBJ>      m_mapFonts;
+	std::map<int,HGDIOBJ>      m_mapPens;	
+
+	void ReadXmlChartFile(TiXmlElement* pElement, CXml2ChartUI * pParentUI );
+	void ParseSplitPen(CXml2ChartUI * pUI, const char * szAttr, BOOL bVertical);
+
+	void SetBorder(TiXmlElement* pEle, CXml2ChartUI * pUI);
+	void SetSplit(TiXmlElement* pEle, CXml2ChartUI * pUI);
+	void SetFixed(TiXmlElement* pEle, CXml2ChartUI * pUI);
+	void SetFloat(TiXmlElement* pEle, CXml2ChartUI * pUI);
+	void SetPadding(TiXmlElement* pEle, CXml2ChartUI * pUI);
+	void SetText(TiXmlElement* pEle, CXml2ChartUI * pUI);
 };
 
 

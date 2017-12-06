@@ -67,7 +67,6 @@ BOOL CTestDlg::OnInitDialog()
 
 
 
-
 	// TODO: 在此添加额外的初始化代码
 	m_pen1.CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
 	m_pen2.CreatePen(PS_SOLID, 2, RGB(0, 0, 255));
@@ -156,9 +155,17 @@ BOOL CTestDlg::OnInitDialog()
 	pChild1->SetVAlignType(VALIGN_TOP);
 	pChild1->SetBorderPen(m_pen2.m_hObject, DIRECTION_BOTTOM);
 
+	SplitPen splitPen;
+	splitPen.HPen = m_pen1.m_hObject;
+	splitPen.nSplitNum = 3;
 
+	pChild1->SetSplitLine(TRUE, splitPen);
+	splitPen.nSplitNum = 4;
+	pChild1->SetSplitLine(FALSE, splitPen);
+
+
+	m_XmlChartFile.ReadXmlChartFile("d:\\体温表设计.xml");
 	
-
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -189,7 +196,8 @@ void CTestDlg::OnPaint()
 	{
 		//CDialogEx::OnPaint();
 		CPaintDC dc(this);
-		DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
+		//DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
+		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI);
 	}
 }
 

@@ -32,6 +32,8 @@ protected:
 	CPen             m_pen1;
 	CPen             m_pen2;
 
+	CXml2ChartFile   m_XmlChartFile;
+
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
