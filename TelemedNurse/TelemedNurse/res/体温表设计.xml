@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window width="960" height="930" >
+	<Font   id="0" bold="true" italic="false" facename="宋体" height="24" />
+	<Font   id="1" bold="false" italic="false" facename="宋体" height="16" />
+	<Thread id="5" width="2" color="#000000" />
+	<Thread id="6" width="1" color="#000000" />
+	
+	<!-- <VerticalLayout VSplit="num='3',pen='5'" HSplit="num='3',pen='6'" > -->
+	<VerticalLayout border="6,6,6,6">
+		<VerticalLayout height="85">	
+			<Item text="某某医院" align="center" valign="center" font="0"  />
+			<Item text="体温单" align="center" valign="center" font="1" />
+			<HorizontalLayout border="6,6,6,6" padding="15,0,15,0">
+				<Item text="姓名：张三" align="left" font="1"/><Item text="入院日期：2017-7-1" align="left" font="1"/><Item text="科室：外科" align="left" font="1"/><Item text="床号：901" align="left" font="1"/><Item text="住院号：A0098112" align="left" font="1"/>
+			</HorizontalLayout>
+		</VerticalLayout>
+		
+		<HorizontalLayout >
+			<VerticalLayout width="120" border="0,0,5,0" >
+				<VerticalLayout HSplit="num='5',pen='6'" height="125" border="0,0,0,6">
+					<Item text="住院天数"  font="1" /><Item text="手术后天数" font="1" /><Item text="日期" font="1"/><Item text="时间" font="1"/><Item text="体温" font="1"/>
+				</VerticalLayout>
+				
+				<VerticalLayout padding="5,5,5,5"  >
+					<Item text="42°" align="right" valign="top" font="1"/>
+					<Item text="41°" align="right" valign="top" font="1"/>
+					<Item text="40°" align="right" valign="top" font="1"/>
+					<Item text="39°" align="right" valign="top" font="1"/>
+					<Item text="38°" align="right" valign="top" font="1"/>
+					<Item text="37°" align="right" valign="top" font="1"/>
+					<Item text="36°" align="right" valign="top" font="1"/>
+					<Item text="35°" align="right" valign="top" font="1"/>
+				</VerticalLayout>
+				
+				<VerticalLayout HSplit="num='8',pen='6'" height="200" border="0,6,0,0" test=";;;">
+					<Item text="呼吸" font="1"/><Item text="尿量 ml" font="1"/><Item text="入量 ml" font="1"/><Item text="出量 ml" font="1"/><Item text="大便次数" font="1"/>
+					<Item text="血压" font="1"/><Item text="体重" font="1"/><Item text="身高" font="1"/>
+				</VerticalLayout>			
+			</VerticalLayout>
+			
+			<VerticalLayout>
+				<VerticalLayout HSplit="num='5',pen='6'" VSplit="num='7',pen='5'" height="125">
+					<HorizontalLayout>
+						<Item text="1" font="1"/><Item text="2" font="1"/><Item text="3" font="1"/><Item text="4" font="1"/>
+						<Item text="5" font="1"/><Item text="6" font="1"/><Item text="7" font="1"/>
+					</HorizontalLayout>
+					
+					<HorizontalLayout>
+					</HorizontalLayout>
+					
+					<HorizontalLayout>
+						<Item text="2017-10-01" font="1"/><Item text="2017-10-02" font="1"/><Item text="2017-10-03" font="1"/><Item text="2017-10-04" font="1"/>
+						<Item text="2017-10-05" font="1"/><Item text="2017-10-06" font="1"/><Item text="2017-10-07" font="1"/>
+					</HorizontalLayout>
+					
+					<HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+						<HorizontalLayout VSplit="num='6',pen='6'" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+						<HorizontalLayout VSplit="num='6',pen='6'">
+							<Item text="2" font="1"/><Item text="6" font="1"/><Item text="10" font="1"/><Item text="14" font="1"/><Item text="18" font="1"/><Item text="22" font="1"/>
+						</HorizontalLayout>
+					</HorizontalLayout>
+				</VerticalLayout>
+				
+				<VerticalLayout HSplit="num='40',pen='6'" VSplit="num='42',pen='6'"  VSplit1="num='7',pen='5'" border="0,5,0,5"  HSplit1="num='8',pen='5'" >
+				</VerticalLayout>
+				
+				<VerticalLayout  HSplit="num='8',pen='6'" VSplit="num='7',pen='5'" height="200">
+					<HorizontalLayout >
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+						<HorizontalLayout VSplit="num='6',pen='6'"/>
+					</HorizontalLayout>
+					<HorizontalLayout />
+					<HorizontalLayout />
+					<HorizontalLayout />
+					<HorizontalLayout />
+					<HorizontalLayout />
+					<HorizontalLayout />
+					<HorizontalLayout />
+				</VerticalLayout>			
+			</VerticalLayout>
+		</HorizontalLayout>
+		
+		
+
+		
+
+	</VerticalLayout>
+	
+	
+</Window>

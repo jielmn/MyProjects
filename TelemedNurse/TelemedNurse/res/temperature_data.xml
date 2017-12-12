@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<HorizontalLayout inset="1,1,1,1" >
+		<VerticalLayout width="230">
+			<List name="patients_list_short" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFE2DDDF" itemaltbk="true" hscrollbar="false" menu="true">
+				<ListHeader height="24" menu="true">
+					<ListHeaderItem text="编号"   font="2" width="50" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="姓名"   font="2" width="50" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="床位号" font="2"            textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+				</ListHeader>
+			</List>
+		</VerticalLayout>
+		
+		<VerticalLayout width="1" bkimage="sep.png" />
+		
+		<VerticalLayout>
+			<HorizontalLayout height="30" padding="10,5,10,5" >
+				<Label text="七天温度曲线" font="3" textcolor="#FF386382" align="center" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="30" padding="10,5,10,5">
+				<Label text="起始时间：" width="80" height="30" font="2" textcolor="#FF386382" /><DateTime name="DateTime1" width="170" height="30" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="1" textpadding="5,0,5,0"  />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="30" padding="10,5,10,5"  >
+				<Button text="手动选择采样点" font="2" textcolor="#FF386382" width="120" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+			</HorizontalLayout>
+			
+			<HorizontalLayout padding="10,5,10,5" vscrollbar="true" sepheight="4" >
+				<ChartImage bordercolor="#FF768D9B" bordersize="1" height="1000" />
+			</HorizontalLayout>
+			
+		</VerticalLayout>
+	</HorizontalLayout>
+</Window>
