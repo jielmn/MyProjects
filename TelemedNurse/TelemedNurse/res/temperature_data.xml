@@ -13,7 +13,7 @@
 		
 		<VerticalLayout width="1" bkimage="sep.png" />
 		
-		<VerticalLayout>
+		<VerticalLayout name="VerticalLayout_Temp" visible="true" height="1090">
 			<HorizontalLayout height="30" padding="10,5,10,5" >
 				<Label text="七天温度曲线" font="3" textcolor="#FF386382" align="center" />
 			</HorizontalLayout>
@@ -28,8 +28,13 @@
 			
 			<HorizontalLayout padding="10,5,10,5" vscrollbar="true" sepheight="4" >
 				<ChartImage bordercolor="#FF768D9B" bordersize="1" height="1000" />
-			</HorizontalLayout>
+			</HorizontalLayout>			
 			
 		</VerticalLayout>
+		
+		<VerticalLayout name="VerticalLayout_Temp_none" visible="false"  inset="5,0,5,0" >
+			<Label name="lblTipBanding" text="请先绑定温度贴" font="4" textcolor="#FF386382" />
+		</VerticalLayout>
+		
 	</HorizontalLayout>
 </Window>

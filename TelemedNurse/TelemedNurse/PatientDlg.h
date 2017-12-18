@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Business.h"
 #include "UIlib.h"
 using namespace DuiLib;
 
@@ -15,6 +16,7 @@ public:
 	virtual void  Notify(TNotifyUI& msg);
 	virtual void   InitWindow();
 
+	PatientInfo    m_tPatientInfo;
 private:
 	BOOL    m_bAdd;                    // 是添加新病人信息，还是修改病人信息
 };

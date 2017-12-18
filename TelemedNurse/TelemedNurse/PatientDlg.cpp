@@ -1,11 +1,12 @@
-#include <windows.h>
+//#include <windows.h>
+#include <afx.h>   
 #include <time.h>
 #include "PatientDlg.h"
 #include "sigslot.h"
 #include "Business.h"
 
 CPatientWnd::CPatientWnd (BOOL  bAdd) : m_bAdd(bAdd) {
-
+	memset(&m_tPatientInfo, 0, sizeof(PatientInfo));
 }
 
 void  CPatientWnd::Notify(TNotifyUI& msg) {
@@ -93,8 +94,14 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 			tInfo.tInDate = tInDate;
 
 			int ret = 0;
-			CBusiness::GetInstance()->sigAMPatient.emit( &tInfo, OPERATION_ADD, &ret );
 
+			if (m_bAdd) {
+				CBusiness::GetInstance()->sigAMPatient.emit(&tInfo, OPERATION_ADD, &ret);
+			}
+			else {
+				CBusiness::GetInstance()->sigAMPatient.emit(&tInfo, OPERATION_MODIFY, &ret);
+			}
+			
 			if ( 0 == ret )
 				::PostMessage( m_hWnd, WM_CLOSE, 0, 0 );
 			else {
@@ -108,6 +115,7 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 
 void  CPatientWnd::InitWindow()
 {
+	char buf[8192];
 	CControlUI * pControl = 0;
 	if (m_bAdd) {
 		pControl = m_PaintManager.FindControl("txtTitle");
@@ -125,7 +133,69 @@ void  CPatientWnd::InitWindow()
 		if (pControl) {
 			CEditUI * pEdit = (CEditUI *)pControl;
 			pEdit->SetReadOnly(true);
+			pEdit->SetText(m_tPatientInfo.szId);
+			pEdit->SetBkColor(0xFFCCCCCC);
+			pEdit->SetNativeEditBkColor(0xFFCCCCCC);
 		}
+
+		pControl = m_PaintManager.FindControl("edPatientInId");
+		if (pControl) {
+			pControl->SetText(m_tPatientInfo.szInNo);
+		}
+
+		pControl = m_PaintManager.FindControl("edPatientName");
+		if (pControl) {
+			pControl->SetText(m_tPatientInfo.szName);
+		}
+
+		pControl = m_PaintManager.FindControl("edPatientOffice");
+		if (pControl) {
+			pControl->SetText(m_tPatientInfo.szOffice);
+		}
+
+		pControl = m_PaintManager.FindControl("edBedId");
+		if (pControl) {
+			pControl->SetText(m_tPatientInfo.szBedNo);
+		}
+
+		pControl = m_PaintManager.FindControl("edCardNo");
+		if (pControl) {
+			pControl->SetText(m_tPatientInfo.szCardNo);
+		}
+
+		COptionUI * pMale   = (COptionUI *)m_PaintManager.FindControl("btnMale");
+		COptionUI * pFemale = (COptionUI *)m_PaintManager.FindControl("btnFemale");
+
+		if (m_tPatientInfo.bMale) {
+			if (pMale)
+				pMale->Selected(true);
+		}
+		else {
+			if (pFemale) {
+				pFemale->Selected(true);
+			}
+		}
+
+		pControl = m_PaintManager.FindControl("edPatientAge");
+		if (pControl) {
+			_snprintf_s(buf, sizeof(buf), "%d", m_tPatientInfo.nAge);
+			pControl->SetText(buf);
+		}
+		
+		pControl = m_PaintManager.FindControl("dtIndate");
+		if (pControl) {
+			CDateTimeUI * p = (CDateTimeUI *)pControl;
+			SYSTEMTIME s;
+			struct tm t;
+			localtime_s( &t, &m_tPatientInfo.tInDate);
+			memset(&s, 0, sizeof(s));
+			s.wYear = t.tm_year + 1900;
+			s.wMonth = t.tm_mon + 1;
+			s.wDay = t.tm_mday;
+			p->SetTime(&s);
+			p->SetText( ConvertDate( buf, sizeof(buf), &m_tPatientInfo.tInDate ) );
+		}
+
 	}
 
 	
