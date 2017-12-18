@@ -223,3 +223,25 @@ int  CMyDatabase::DeletePatient(const char * szId) {
 	}
 	return ret;
 }
+
+int  CMyDatabase::GetPatientTags(const char * szId, std::vector<std::string> & vTags) {
+	assert(szId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	char  sql[8192];
+	char buf[8192];
+
+	_snprintf_s(sql, sizeof(sql), "select * from %s where PatientID='%s'", TAGS_TABLE_NAME, ConvertSqlField(buf, sizeof(buf), szId));
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (nrow > 0) {
+		int i = 0;
+		std::string  sTagId = azResult[(i + 1)*ncolumn + 0];
+		vTags.push_back(sTagId);
+	}
+	sqlite3_free_table(azResult);
+
+	return 0;
+}

@@ -171,6 +171,62 @@ public:
 		}
 	}
 
+	void  OnItemSelected(CDuiString name) {
+		if (name == "patients_list_short") {
+			CListUI * pListShort = (CListUI *)m_PaintManager.FindControl(name);
+			if (0 == pListShort) {
+				return;
+			}
+
+			CControlUI * pBlock0 = m_PaintManager.FindControl("VerticalLayout_Temp");
+			CControlUI * pBlock1 = m_PaintManager.FindControl("VerticalLayout_Temp_none");
+
+			int nIndex = pListShort->GetCurSel();
+			if (nIndex < 0) {
+				if (pBlock0) {
+					pBlock0->SetVisible(false);
+				}
+				if (pBlock1) {
+					pBlock1->SetVisible(false);
+				}
+				return;
+			}
+
+			CListTextElementUI* pItem = (CListTextElementUI*)pListShort->GetItemAt(nIndex);
+			char * szId = (char *)pItem->GetTag();
+
+			PatientInfo tPatientInfo;
+			int ret = CBusiness::GetInstance()->GetPatient(szId, &tPatientInfo);
+			if (0 != ret) {
+				return;
+			}
+
+			std::vector<std::string> vTags;
+			ret = CBusiness::GetInstance()->GetPatientTags(szId, vTags);
+			if (0 != ret) {
+				return;
+			}
+
+			// Ã»ÓÐ°ó¶¨tag
+			if (0 == vTags.size()) {
+				if (pBlock0) {
+					pBlock0->SetVisible(false);
+				}
+				if (pBlock1) {
+					pBlock1->SetVisible(true);
+				}
+			}
+			else {
+				if (pBlock0) {
+					pBlock0->SetVisible(true);
+				}
+				if (pBlock1) {
+					pBlock1->SetVisible(false);
+				}
+			}
+		}
+	}
+
 
 	virtual void  Notify(TNotifyUI& msg) {
 		CDuiString name = msg.pSender->GetName();
@@ -180,9 +236,25 @@ public:
 			if (pControl)
 			{
 				if (name == _T("temperature"))
+				{
 					pControl->SelectItem(0);
+					CListUI* pListShort = static_cast<CListUI*>(m_PaintManager.FindControl(_T("patients_list_short")));
+					if (pListShort) {
+						if (pListShort->GetCurSel() < 0 && pListShort->GetCount() > 0) {
+							pListShort->SelectItem(0);
+						}						
+					}
+				}
 				else if (name == _T("patients_info"))
+				{
 					pControl->SelectItem(1);
+					CListUI* pList = static_cast<CListUI*>(m_PaintManager.FindControl(_T("patients_list")));
+					if (pList) {
+						if (pList->GetCurSel() < 0 && pList->GetCount() > 0) {
+							pList->SelectItem(0);
+						}
+					}
+				}					
 				return;
 			}			
 		}
@@ -228,17 +300,8 @@ public:
 			}
 		}
 		else if (msg.sType == "itemselect") {
-			if (name == "patients_list_short") {
-				CControlUI * pBlock0 = m_PaintManager.FindControl("VerticalLayout_Temp");
-				CControlUI * pBlock1 = m_PaintManager.FindControl("VerticalLayout_Temp_none");
-				if (pBlock0) {
-					pBlock0->SetVisible(false);
-				}
-				if (pBlock1) {
-					pBlock1->SetVisible(true);
-				}
-				return;
-			}			
+			OnItemSelected(name);
+			return;
 		}
 		else if (msg.sType == "itemactivate") {
 			ModifyPatient();
@@ -317,6 +380,10 @@ public:
 				strncpy_s(szId, sizeof(pInfo->szId),  pInfo->szId, sizeof(pInfo->szId) );
 				pListElement->SetTag((UINT_PTR)szId);
 			}
+
+			if (pListShort->GetCount() > 0) {
+				pListShort->SelectItem(0);
+			}
 		}
 
 		if (pList) {
@@ -339,6 +406,10 @@ public:
 				char * szId = new char[sizeof(pInfo->szId)];
 				strcpy_s(szId, sizeof(pInfo->szId), pInfo->szId);
 				pListElement->SetTag((UINT_PTR)szId);
+			}
+
+			if (pList->GetCount() > 0) {
+				pList->SelectItem(0);
 			}
 		}
 
@@ -425,6 +496,19 @@ public:
 					if (0 == strcmp(szId, pInfo->szId)) {
 						pListShort->RemoveAt(i);
 						break;
+					}
+				}
+
+				CControlUI * pBlock0 = m_PaintManager.FindControl("VerticalLayout_Temp");
+				CControlUI * pBlock1 = m_PaintManager.FindControl("VerticalLayout_Temp_none");
+
+				int nIndex = pListShort->GetCurSel();
+				if (nIndex < 0) {
+					if (pBlock0) {
+						pBlock0->SetVisible(false);
+					}
+					if (pBlock1) {
+						pBlock1->SetVisible(false);
 					}
 				}
 			}

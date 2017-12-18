@@ -56,6 +56,7 @@ public:
 	int  GetPatient(const char * szId, PatientInfo * pPatient);
 	int  DeletePatient(const char * szId);
 	int  ImportExcel(const char * szFilePath);
+	int  GetPatientTags(const char * szId, std::vector<std::string> & vTags );
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;           // add or modify a patient
 	sigslot::signal2<PatientInfo *, OperationType >        sigAMPatientRet;        // success to add, modify or delete a patient

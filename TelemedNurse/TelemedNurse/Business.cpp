@@ -79,6 +79,10 @@ int   CBusiness::DeletePatient(const char * szId) {
 	return CMyDatabase::GetInstance()->DeletePatient(szId);
 }
 
+int  CBusiness::GetPatientTags(const char * szId, std::vector<std::string> & vTags) {
+	return CMyDatabase::GetInstance()->GetPatientTags(szId, vTags);
+}
+
 int  CBusiness::ImportExcel(const char * szFilePath) {
 	CString sDriver = GetExcelDriver();
 	if (sDriver.GetLength() == 0) {

@@ -15,6 +15,7 @@ public:
 	int  GetAllPatients(std::vector<PatientInfo *> & vPatients);
 	int  GetPatient(const char * szId, PatientInfo * pPatient);
 	int  DeletePatient(const char * szId);
+	int  GetPatientTags(const char * szId, std::vector<std::string> & vTags);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;             // add or modify a patient
 	sigslot::signal1< int *>                                     sigInitDb;          // 初始化数据库（检查表是否存在）
