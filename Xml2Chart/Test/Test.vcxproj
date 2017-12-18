@@ -147,7 +147,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Xml2Chart.lib</AdditionalDependencies>
+      <AdditionalDependencies>Xml2Chart.lib;tinyxml.lib;LmnCommonX.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>../Release/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
