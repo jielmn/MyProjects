@@ -451,6 +451,10 @@ public:
 				char * szId = new char[sizeof(pInfo->szId)];
 				strcpy_s(szId, sizeof(pInfo->szId), pInfo->szId);
 				pListElement->SetTag((UINT_PTR)szId);
+
+				if (pList->GetCurSel() < 0) {
+					pList->SelectItem(0);
+				}
 			}
 		}
 		else if (eType == OPERATION_MODIFY) {
