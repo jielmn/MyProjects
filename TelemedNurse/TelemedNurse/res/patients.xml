@@ -2,7 +2,7 @@
 <Window>	
 	<VerticalLayout inset="1,1,1,1"  >
 		<HorizontalLayout  >
-			<List name="patients_list" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFE2DDDF" itemaltbk="true" hscrollbar="false" menu="true" bordercolor="#FF768D9B" bordersize="1">
+			<List name="patients_list" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1">
 				<ListHeader height="24" menu="true">
 					<ListHeaderItem text="编号"      font="2" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					<ListHeaderItem text="住院号"    font="2" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
@@ -13,7 +13,7 @@
 					<ListHeaderItem text="床号"      font="2" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					<ListHeaderItem text="入院日期"  font="2" width="150" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					<ListHeaderItem text="就诊卡"    font="2" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
-					<ListHeaderItem text="绑定的温度贴"  font="2"         textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="绑定的温度贴" font="2"         textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 				</ListHeader>
 			</List>
 		</HorizontalLayout>

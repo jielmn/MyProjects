@@ -16,6 +16,16 @@ typedef struct tagPatientInfo {
 	char     szCardNo[32];
 }PatientInfo;
 
+typedef struct tagTagId {
+	BYTE     Id[8];
+}TagId;
+
+typedef struct tagTagInfo {
+	TagId    tagId;
+	char     szPatientId[32];
+	time_t   tBindingDate;
+}TagInfo;
+
 enum OperationType {
 	OPERATION_ADD = 0,
 	OPERATION_MODIFY,
@@ -35,15 +45,21 @@ enum  GlobalErrorNo {
 	ERROR_EXCEL_DRIVER_NOT_FOUND,
 	ERROR_PARTIALLY_FAILED_TO_IMPORT_EXCEL,
 	ERROR_FAILED_TO_EXECUTE_EXCEL,
+	ERROR_FAILED_TO_LOAD_FUNCTION_DLL,
+	ERROR_NOT_FOUND_TAG,
+	ERROR_BINDING_READER_FAILED_TO_INVENTORY,
+	ERROR_BINDING_READER_FAILED_TOO_MANY_CARDS,
 };
 
 const char * GetErrDescription(GlobalErrorNo e);
 const char * GetSex(BOOL bMale);
 char * GetInt(char * buf, DWORD dwSize, int n);
 char * ConvertDate(char * szDest, DWORD dwDestSize, time_t * t);
-char * ConvertDateTime(char * szDest, DWORD dwDestSize, time_t * t);
+char * ConvertDateTime(char * szDest, DWORD dwDestSize, const time_t * t);
 time_t  ConvertDateTime(const char * szDatetime);
 CString GetExcelDriver();
+char *  ConvertTagId( char * buf, DWORD dwBufSize, const TagId * pTagId);
+int     ConvertTagId( TagId * pTagId, const char * szTagId );
 
 class CBusiness : public sigslot::has_slots<> {
 public:
@@ -51,18 +67,22 @@ public:
 	void OnPatientEvent(PatientInfo * pPatientInfo, OperationType eType, int * ret);
 	void OnInit( int * ret );
 	void OnDeinit(int * ret );
+	int  InitBindingReader();
 	
 	int  GetAllPatients( std::vector<PatientInfo *> & vPatients );
 	int  GetPatient(const char * szId, PatientInfo * pPatient);
 	int  DeletePatient(const char * szId);
 	int  ImportExcel(const char * szFilePath);
-	int  GetPatientTags(const char * szId, std::vector<std::string> & vTags );
+	int  GetPatientTags(const char * szId, std::vector<TagInfo *> & vTags );
+	int  GetPatientByTag(const TagId * pTagId, PatientInfo * pPatient );
+	int  BindingTag(const TagInfo * pTagInfo);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;           // add or modify a patient
 	sigslot::signal2<PatientInfo *, OperationType >        sigAMPatientRet;        // success to add, modify or delete a patient
 
 	sigslot::signal1< int *>                               sigInit;                // 初始化数据库（检查表是否存在）
 	sigslot::signal1< int *>                               sigDeinit;              // 去初始化数据库
+	sigslot::signal1<TagInfo *>                            sigBinding;             // 绑定Tag成功
 	static CBusiness *  GetInstance();
 
 private:

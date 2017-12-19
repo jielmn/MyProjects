@@ -12,9 +12,17 @@ using namespace DuiLib;
 #include "Xml2Chart.h"
 #include "PatientDlg.h"
 #include "Business.h"
+#include "LmnContainer.h"
+#include "LmnConfig.h"
+#include "LmnLog.h"
+#include "LmnThread.h"
+#include "BindingReader.h"
+#include "UiMessage.h"
 
 #pragma comment(lib,"User32.lib")
 
+
+HWND    g_hWnd = 0;
 
 class CTempChartUI : public CControlUI
 {
@@ -115,6 +123,10 @@ public:
 
 class CDuiFrameWnd : public WindowImplBase, public sigslot::has_slots<>
 {
+protected:
+	TagId             m_tTagId;
+	int               m_nInventoryError;
+
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
 	virtual CDuiString GetSkinFile() { return _T("main.xml"); }
@@ -171,6 +183,35 @@ public:
 		}
 	}
 
+	void BindingPatient() {
+		CListUI * pList = (CListUI *)m_PaintManager.FindControl("patients_list");
+		if (0 == pList) {
+			return;
+		}
+
+		int nIndex = pList->GetCurSel();
+		if (nIndex < 0) {
+			::MessageBox(m_hWnd, "没有选中病人信息", "绑定病人温度贴", 0);
+			return;
+		}
+
+		CListTextElementUI* pItem = (CListTextElementUI*)pList->GetItemAt(nIndex);
+		char * szId = (char *)pItem->GetTag();
+
+		TagInfo tTagInfo;
+		memcpy( &tTagInfo.tagId, &m_tTagId, sizeof(TagId));
+		strncpy_s(tTagInfo.szPatientId, szId, sizeof(tTagInfo.szPatientId));
+		tTagInfo.tBindingDate = time(0);
+		int ret = CBusiness::GetInstance()->BindingTag(&tTagInfo);
+
+		if (0 == ret) {
+			CBusiness::GetInstance()->sigBinding.emit(&tTagInfo);
+			::MessageBox(m_hWnd, "绑定Tag成功！", "绑定Tag", 0);
+		}
+		else
+			::MessageBox(m_hWnd, GetErrDescription((GlobalErrorNo)ret), "绑定Tag", 0);
+	}
+
 	void  OnItemSelected(CDuiString name) {
 		if (name == "patients_list_short") {
 			CListUI * pListShort = (CListUI *)m_PaintManager.FindControl(name);
@@ -201,7 +242,7 @@ public:
 				return;
 			}
 
-			std::vector<std::string> vTags;
+			std::vector<TagInfo *> vTags;
 			ret = CBusiness::GetInstance()->GetPatientTags(szId, vTags);
 			if (0 != ret) {
 				return;
@@ -224,6 +265,8 @@ public:
 					pBlock1->SetVisible(false);
 				}
 			}
+
+			ClearVector(vTags);
 		}
 	}
 
@@ -298,13 +341,22 @@ public:
 				}
 				return;
 			}
+			else if (name == "btnBinding") {
+				BindingPatient();
+				return;
+			}
 		}
 		else if (msg.sType == "itemselect") {
 			OnItemSelected(name);
 			return;
 		}
 		else if (msg.sType == "itemactivate") {
-			ModifyPatient();
+			CTabLayoutUI* pTab = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(_T("switch")));
+			if (pTab) {
+				if (pTab->GetCurSel() == 1) {
+					ModifyPatient();
+				}
+			}			
 			return;
 		}
 		else if (msg.sType == _T("menu"))
@@ -356,6 +408,9 @@ public:
 
 	virtual void   InitWindow()
 	{
+		memset(&m_tTagId, 0, sizeof(TagId));
+		m_nInventoryError = 0;
+
 		SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 		char buf[8192];
@@ -402,6 +457,14 @@ public:
 				pListElement->SetText(6, pInfo->szBedNo);
 				pListElement->SetText(7, ConvertDate( buf, sizeof(buf), &pInfo->tInDate ) );
 				pListElement->SetText(8, pInfo->szCardNo);
+
+				std::vector<TagInfo *> vTags;
+				CBusiness::GetInstance()->GetPatientTags(pInfo->szId, vTags);
+				if (vTags.size() > 0) {
+					CDuiString strText = GetPatientTagsText(vTags);
+					pListElement->SetText(9, strText);
+				}				
+				ClearVector(vTags);
 
 				char * szId = new char[sizeof(pInfo->szId)];
 				strcpy_s(szId, sizeof(pInfo->szId), pInfo->szId);
@@ -530,7 +593,194 @@ public:
 				}
 			}
 		}
-		
+	}
+
+	CDuiString  GetPatientTagsText(std::vector<TagInfo *> & vTags) {
+		char buf[8192];
+		CDuiString strText;
+		strText.Format("个数 %lu：", vTags.size());
+
+		std::vector<TagInfo *>::iterator it;
+		int i = 0;
+		for (it = vTags.begin(), i = 0; it != vTags.end(); it++, i++) {
+			TagInfo * p = *it;
+			if (i > 0) {
+				strText += ";";
+			}
+			ConvertTagId(buf, sizeof(buf), &p->tagId);
+			strText += buf;
+			strText += " ";
+			ConvertDate(buf, sizeof(buf), &p->tBindingDate);
+			strText += buf;
+		}
+		return strText;
+	}
+
+	// 绑定成功一个Tag后
+	void OnBindingEvent(TagInfo * pTagInfo) {
+		CListUI* pList = static_cast<CListUI*>(m_PaintManager.FindControl(_T("patients_list")));
+		if (0 == pList) {
+			return;
+		}
+
+		int n = pList->GetCount();
+		for (int i = 0; i < n; i++) {
+			CListTextElementUI* pItem = (CListTextElementUI*)pList->GetItemAt(i);
+			char * szId = (char *)pItem->GetTag();
+			// 找到病人，更新其绑定的温度贴数据
+			// 格式为：温度贴个数：XX-XX-XX-XX-XX-XX-XX-XX 日期;XX-XX-XX-XX-XX-XX-XX-XX 日期......
+			if (0 == strcmp(szId, pTagInfo->szPatientId)) {
+				std::vector<TagInfo *> vTags;
+				CBusiness::GetInstance()->GetPatientTags(pTagInfo->szPatientId, vTags);
+				CDuiString strText = GetPatientTagsText(vTags);				
+				pItem->SetText(9,strText);
+				ClearVector(vTags);
+				break;
+			}
+		}
+	}
+
+	// 病人信息长列表和短列表，都当前选中一个病人
+	void SelectPatient(const char * szPatientId) {
+		CListUI* pListShort = static_cast<CListUI*>(m_PaintManager.FindControl(_T("patients_list_short")));
+		CListUI* pList = static_cast<CListUI*>(m_PaintManager.FindControl(_T("patients_list")));
+
+		if (pListShort) {
+			int n = pListShort->GetCount();
+			for (int i = 0; i < n; i++) {
+				CListTextElementUI* pItem = (CListTextElementUI*)pListShort->GetItemAt(i);
+				char * szId = (char *)pItem->GetTag();
+				if (0 == strcmp(szId, szPatientId)) {
+					int nSel = pListShort->GetCurSel();
+					if (nSel != i) {
+						pListShort->SelectItem(i);
+					}
+					break;
+				}
+			}
+		}
+
+		if (pList) {
+			int n = pList->GetCount();
+			for (int i = 0; i < n; i++) {
+				CListTextElementUI* pItem = (CListTextElementUI*)pList->GetItemAt(i);
+				char * szId = (char *)pItem->GetTag();
+				if (0 == strcmp(szId, szPatientId)) {
+					int nSel = pList->GetCurSel();
+					if (nSel != i) {
+						pList->SelectItem(i);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		if (UM_INVENTORY_RET == uMsg) {
+			int nResult = (int)wParam;
+			TagId * pTagId = (TagId *)lParam;			
+
+			CTabLayoutUI* pTab = static_cast<CTabLayoutUI*>(m_PaintManager.FindControl(_T("switch")));
+			if (0 == pTab) {
+				delete pTagId;
+				return 0;
+			}			
+
+			CLabelUI * pLblBinding = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("lblBindingReader")));
+			CLabelUI * pLblOther   = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("lblOther")));
+			CButtonUI * pBtn = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("btnBinding")));
+
+			if (nResult == ERROR_NOT_FOUND_TAG) {
+				if (m_nInventoryError != nResult) {
+					if (pLblOther) {
+						pLblOther->SetText("");
+					}
+
+					if (pLblBinding) {
+						pLblBinding->SetText("绑定温度贴的读卡器OK");
+						pLblBinding->SetTextColor(0xFFFFFFFF);
+					}
+
+					if (pBtn) {
+						pBtn->SetEnabled(false);
+					}
+				}				
+			}
+			else if (nResult == ERROR_BINDING_READER_FAILED_TO_INVENTORY) {
+				if (m_nInventoryError != nResult) {
+					if (pLblOther) {
+						pLblOther->SetText("");
+					}
+
+					if (pLblBinding) {
+						pLblBinding->SetText("绑定温度贴的读卡器没有连上");
+						pLblBinding->SetTextColor(0xFFCAF100);
+					}
+
+					if (pBtn) {
+						pBtn->SetEnabled(false);
+					}
+				}
+			}
+			else if (nResult == ERROR_BINDING_READER_FAILED_TOO_MANY_CARDS) {
+				if (m_nInventoryError != nResult) {
+					if (pLblOther) {
+						pLblOther->SetText("读到太多的温度贴");
+						pLblOther->SetTextColor(0xFFCAF100);
+					}
+
+					if (pLblBinding) {
+						pLblBinding->SetText("绑定温度贴的读卡器OK");
+						pLblBinding->SetTextColor(0xFFFFFFFF);
+					}
+
+					if (pBtn) {
+						pBtn->SetEnabled(false);
+					}
+				}
+			}
+			else if (0 == nResult) {
+				if (m_nInventoryError != nResult) {
+					if (pLblOther) {
+						pLblOther->SetText("");
+					}
+
+					if (pLblBinding) {
+						pLblBinding->SetText("绑定温度贴的读卡器OK");
+						pLblBinding->SetTextColor(0xFFFFFFFF);
+					}
+				}
+
+				// 如果是病人信息管理tab页
+				if (1 == pTab->GetCurSel()) {
+					PatientInfo tPatient;
+					memset(&tPatient, 0, sizeof(PatientInfo));
+					int ret = CBusiness::GetInstance()->GetPatientByTag(pTagId, &tPatient);
+
+					// 该Tag已经绑定
+					if (0 == ret) {
+						// 选中已经绑定的病人
+						SelectPatient(tPatient.szId);
+						if (pBtn) {
+							pBtn->SetEnabled(false);
+						}
+					}
+					else {
+						memcpy(&m_tTagId, pTagId, sizeof(TagId));
+						if (pBtn) {
+							pBtn->SetEnabled(true);
+						}
+					}
+				}
+			}
+			m_nInventoryError = nResult;
+
+			delete pTagId;
+			return 0;
+		}
+		return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 	}
 
 };
@@ -543,7 +793,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	int ret = 0;
 	CBusiness::GetInstance()->sigInit.emit(&ret);
 	if (0 != ret) {
-		::MessageBox(0, GetErrDescription((GlobalErrorNo)ret), "初始化数据库错误", 0);
+		::MessageBox(0, GetErrDescription((GlobalErrorNo)ret), "应用程序初始化错误", 0);
 		return -1;
 	}
 
@@ -553,18 +803,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	CDuiFrameWnd duiFrame;
 	CBusiness::GetInstance()->sigAMPatientRet.connect(&duiFrame, &CDuiFrameWnd::OnPatientEvent);
+	CBusiness::GetInstance()->sigBinding.connect(&duiFrame, &CDuiFrameWnd::OnBindingEvent);
 
 	duiFrame.Create(NULL, _T("DUIWnd"), UI_WNDSTYLE_FRAME, WS_EX_WINDOWEDGE, 0, 0, 800, 600);
 	duiFrame.CenterWindow();
 
-	HWND hWnd = duiFrame.GetHWND();
-	::SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
-	::SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-	
-	duiFrame.ShowModal();
-	delete duiFrame;
+	g_hWnd = duiFrame.GetHWND();
+	::SendMessage(g_hWnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+	::SendMessage(g_hWnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+
+	duiFrame.ShowModal();	
 
 	CBusiness::GetInstance()->sigDeinit.emit(&ret);
+
 	return 0;
 
 }

@@ -88,7 +88,8 @@ void CMyDatabase::OnInitDb(int * ret) {
 	if (0 == nrow) {
 		sql = "CREATE TABLE " TAGS_TABLE_NAME "("  \
 			  "Id             CHAR(32)    PRIMARY KEY     NOT NULL," \
-			  "PatientID      CHAR(32)    NOT NULL" \
+			  "PatientID      CHAR(32)    NOT NULL," \
+			  "BindingTime    DATETIME    NOT NULL" \
 			");";
 
 		*ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
@@ -178,6 +179,7 @@ int  CMyDatabase::GetPatient(const char * szId, PatientInfo * pInfo) {
 	assert(szId);
 	assert(pInfo);
 
+	int ret = -1;
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
 	char *zErrMsg = 0;            // 错误描述
@@ -198,10 +200,11 @@ int  CMyDatabase::GetPatient(const char * szId, PatientInfo * pInfo) {
 		strncpy_s(pInfo->szBedNo, azResult[(i + 1)*ncolumn + 6], sizeof(pInfo->szBedNo));
 		pInfo->tInDate = ConvertDateTime(azResult[(i + 1)*ncolumn + 7]);
 		strncpy_s(pInfo->szCardNo, azResult[(i + 1)*ncolumn + 8], sizeof(pInfo->szCardNo));
+		ret = 0;
 	}
 	sqlite3_free_table(azResult);
 
-	return 0;
+	return ret;
 }
 
 int  CMyDatabase::DeletePatient(const char * szId) {
@@ -215,16 +218,23 @@ int  CMyDatabase::DeletePatient(const char * szId) {
 
 	_snprintf_s(sql, sizeof(sql), "DELETE FROM %s where Id='%s'", PATIENTS_TABLE_NAME, tmp );
 
-
 	/* Execute SQL statement */
 	int ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 	if ( ret != 0) {
 		ret = ERROR_FAILED_TO_EXECUTE_SQL;
 	}
+
+	_snprintf_s(sql, sizeof(sql), "DELETE FROM %s where PatientID='%s'", TAGS_TABLE_NAME, tmp);
+	/* Execute SQL statement */
+	ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	if (ret != 0) {
+		ret = ERROR_FAILED_TO_EXECUTE_SQL;
+	}
+
 	return ret;
 }
 
-int  CMyDatabase::GetPatientTags(const char * szId, std::vector<std::string> & vTags) {
+int  CMyDatabase::GetPatientTags(const char * szId, std::vector<TagInfo *> & vTags) {
 	assert(szId);
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
@@ -233,15 +243,73 @@ int  CMyDatabase::GetPatientTags(const char * szId, std::vector<std::string> & v
 	char  sql[8192];
 	char buf[8192];
 
-	_snprintf_s(sql, sizeof(sql), "select * from %s where PatientID='%s'", TAGS_TABLE_NAME, ConvertSqlField(buf, sizeof(buf), szId));
+	_snprintf_s(sql, sizeof(sql), "select Id,BindingTime from %s where PatientID='%s'", TAGS_TABLE_NAME, ConvertSqlField(buf, sizeof(buf), szId));
 
 	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
 	if (nrow > 0) {
-		int i = 0;
-		std::string  sTagId = azResult[(i + 1)*ncolumn + 0];
-		vTags.push_back(sTagId);
+		for (int i = 0; i < nrow; i++) {
+			TagInfo * pTagInfo = new TagInfo;
+			memset(pTagInfo, 0, sizeof(TagInfo));
+
+			ConvertTagId( &pTagInfo->tagId, azResult[(i + 1)*ncolumn + 0] );
+			pTagInfo->tBindingDate = ConvertDateTime(azResult[(i + 1)*ncolumn + 1]);
+
+			vTags.push_back(pTagInfo);
+		}
 	}
 	sqlite3_free_table(azResult);
 
 	return 0;
+}
+
+int  CMyDatabase::GetPatientByTag(const TagId * pTagId, PatientInfo * pPatient) {
+	assert(pTagId);
+
+	int ret = -1;
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	char  sql[8192];
+	char buf[8192];
+
+	_snprintf_s(sql, sizeof(sql), "select PatientID from %s where Id='%s'", TAGS_TABLE_NAME, ConvertTagId(buf, sizeof(buf), pTagId));
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (nrow > 0) {
+		int i = 0;
+		strncpy_s(pPatient->szId, azResult[(i + 1)*ncolumn + 0], sizeof(pPatient->szId));
+		ret = 0;
+	}
+	sqlite3_free_table(azResult);
+
+	return ret;
+}
+
+int  CMyDatabase::BindingTag(const TagInfo * pTagInfo) {
+	PatientInfo  tPatient;
+	// 查看patient是否存在
+	int ret = GetPatient(pTagInfo->szPatientId, &tPatient);
+	if (0 != ret)
+		return ret;
+
+	char sql[8192];
+	char *zErrMsg = 0;
+
+	char tmp[256];
+	ConvertSqlField(tmp, 256, pTagInfo->szPatientId);
+
+	char szTagId[256];
+	ConvertTagId( szTagId, sizeof(szTagId), &pTagInfo->tagId );
+
+	char szTime[256];
+	ConvertDateTime(szTime, sizeof(szTime), &pTagInfo->tBindingDate);
+
+	_snprintf_s(sql, sizeof(sql), "INSERT INTO %s values ('%s','%s','%s')", TAGS_TABLE_NAME, szTagId, tmp, szTime );
+
+	/* Execute SQL statement */
+	ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	if (ret != 0) {
+		ret = ERROR_FAILED_TO_EXECUTE_SQL;
+	}
+	return ret;
 }

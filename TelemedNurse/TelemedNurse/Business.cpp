@@ -5,6 +5,7 @@
 #include <time.h>
 #include "Business.h"
 #include "MyDatabase.h"
+#include "BindingReader.h"
 
 #define  PATIENTS_TABLE_NAME              "Patients"
 #define  TAGS_TABLE_NAME                  "Tags"
@@ -27,11 +28,43 @@ CBusiness::CBusiness() {
 void  CBusiness::OnInit(int * ret) {
 	assert(ret);
 	CMyDatabase::GetInstance()->sigInitDb.emit(ret);
+	if (*ret != 0) {
+		return;
+	}
+
+	*ret = InitBindingReader();
+	if (*ret != 0) {
+		return;
+	}
+
+	// 初始化一些线程
+
+	LmnToolkits::ThreadManager::GetInstance();
+	// 创建绑定温度贴的线程
+	g_thrd_binding_reader = new LmnToolkits::Thread();
+	g_thrd_binding_reader->Start();
+
+	// 创建message handler
+	g_handler_binding_reader = new MessageHandlerBindingReader();
+
+	g_thrd_binding_reader->PostDelayMessage(DELAY_INVENTORY_TIME, g_handler_binding_reader, MSG_INVENTORY);
+}
+
+int  CBusiness::InitBindingReader() {	
+	CBindingReader::GetInstance()->Init();
+	return 0;
 }
 
 void  CBusiness::OnDeinit(int * ret) {
 	assert(ret);
 	CMyDatabase::GetInstance()->sigDeinitDb.emit(ret);
+
+	// 销毁线程
+	g_thrd_binding_reader->Stop();
+	delete g_thrd_binding_reader;
+
+	// 销毁message handler
+	delete g_handler_binding_reader;
 }
 
 void  CBusiness::OnPatientEvent(PatientInfo * pPatientInfo, OperationType eType, int * ret) {
@@ -79,8 +112,16 @@ int   CBusiness::DeletePatient(const char * szId) {
 	return CMyDatabase::GetInstance()->DeletePatient(szId);
 }
 
-int  CBusiness::GetPatientTags(const char * szId, std::vector<std::string> & vTags) {
+int  CBusiness::GetPatientTags(const char * szId, std::vector<TagInfo *> & vTags) {
 	return CMyDatabase::GetInstance()->GetPatientTags(szId, vTags);
+}
+
+int   CBusiness::GetPatientByTag(const TagId * pTagId, PatientInfo * pPatient) {
+	return CMyDatabase::GetInstance()->GetPatientByTag(pTagId, pPatient);
+}
+
+int   CBusiness::BindingTag(const TagInfo * pTagInfo) {
+	return CMyDatabase::GetInstance()->BindingTag(pTagInfo);
 }
 
 int  CBusiness::ImportExcel(const char * szFilePath) {
@@ -210,6 +251,9 @@ const char * GetErrDescription(GlobalErrorNo e) {
 	case ERROR_FAILED_TO_EXECUTE_EXCEL:
 		szDescription = "执行Excel出现错误";
 		break;
+	case ERROR_FAILED_TO_LOAD_FUNCTION_DLL:
+		szDescription = "加载function.dll失败";
+		break;
 	default:
 		szDescription = "未知错误";
 	}
@@ -238,7 +282,7 @@ char * ConvertDate(char * szDest, DWORD dwDestSize, time_t * t) {
 	return szDest;
 }
 
-char * ConvertDateTime(char * szDest, DWORD dwDestSize, time_t * t) {
+char * ConvertDateTime(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
 	localtime_s(&tmp, t);
 
@@ -255,6 +299,41 @@ time_t  ConvertDateTime(const char * szDatetime) {
 	tmp.tm_year -= 1900;
 	tmp.tm_mon--;
 	return mktime(&tmp);
+}
+
+char *  ConvertTagId(char * buf, DWORD dwBufSize, const TagId * pTagId) {	
+	int nSize = sizeof(pTagId->Id);
+	assert((int)dwBufSize >= 3 * nSize);
+
+	for (int i = 0; i < nSize; i++) {
+		_snprintf_s(buf + 3 * i, dwBufSize - 3 * i, _TRUNCATE, "%02X", pTagId->Id[i]);
+		if (i < nSize - 1) {
+			buf[3*i+2] = '-';
+		}
+	}
+	buf[nSize * 3] = '\0';
+	return buf;
+}
+
+int ConvertTagId(TagId * pTagId, const char * szTagId) {
+	assert(szTagId);
+	int nLen = strlen(szTagId);
+	if ((nLen + 1) % 3 != 0) {
+		return -1;
+	}
+
+	int nNum = (nLen + 1) / 3;
+	int nSize = sizeof(pTagId->Id);
+	if (nSize < nNum ) {
+		return -1;
+	}
+
+	for (int i = 0; i < nNum; i++) {
+		int nTmp;
+		sscanf_s(szTagId + 3 * i, "%02X", &nTmp );
+		pTagId->Id[i] = nTmp;
+	}
+	return 0;
 }
 
 

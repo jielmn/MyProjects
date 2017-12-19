@@ -45,8 +45,9 @@
 		</VerticalLayout>
 		
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
-			<Label text="绑定温度贴的读卡器" width="200" font="5" textcolor="#FFFFFFFF"  /><Control width="1" bkimage="sep.png" /><Control width="10" />
-			<Label text="同步温度贴数据的读卡器" font="5" textcolor="#FFFFFFFF" /><Control /><Control width="1" bkimage="sep.png" />
+			<Label name="lblBindingReader" text="绑定温度贴的读卡器没有连上" width="200" font="5" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />
+			<Label name="lblSyncReader"    text="同步温度贴数据的读卡器" width="200" font="5" textcolor="#FFFFFFFF" /><Control width="1" bkimage="sep.png" /><Control width="10" />
+			<Label name="lblOther"         text="" font="5" textcolor="#FFFFFFFF" /><Control width="1" bkimage="sep.png" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

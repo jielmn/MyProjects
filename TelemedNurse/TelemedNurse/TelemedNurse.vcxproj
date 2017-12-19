@@ -161,16 +161,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BindingReader.cpp" />
     <ClCompile Include="Business.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="PatientDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BindingReader.h" />
     <ClInclude Include="Business.h" />
+    <ClInclude Include="mi.h" />
     <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="PatientDlg.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="UiMessage.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="TelemedNurse.rc" />
