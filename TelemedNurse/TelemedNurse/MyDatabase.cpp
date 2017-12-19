@@ -313,3 +313,20 @@ int  CMyDatabase::BindingTag(const TagInfo * pTagInfo) {
 	}
 	return ret;
 }
+
+int  CMyDatabase::DeleteTag(const TagId * pTagId) {
+	char sql[8192];
+	char *zErrMsg = 0;
+
+	char szTagId[256];
+	ConvertTagId( szTagId, sizeof(szTagId), pTagId);
+
+	_snprintf_s(sql, sizeof(sql), "DELETE FROM %s where Id='%s'", TAGS_TABLE_NAME, szTagId);
+	/* Execute SQL statement */
+	int ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	if (ret != 0) {
+		ret = ERROR_FAILED_TO_EXECUTE_SQL;
+	}
+
+	return ret;
+}

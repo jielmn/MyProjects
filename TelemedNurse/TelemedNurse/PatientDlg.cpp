@@ -99,6 +99,39 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 				CBusiness::GetInstance()->sigAMPatient.emit(&tInfo, OPERATION_ADD, &ret);
 			}
 			else {
+				// 先删除Tag
+				std::vector<TagInfo *> vTags;
+				CBusiness::GetInstance()->GetPatientTags(m_tPatientInfo.szId, vTags);
+				std::vector<TagInfo *>::iterator it;
+
+				CListUI * pList = (CListUI *)m_PaintManager.FindControl("patient_tags");
+				if (pList) {
+					int nCount = pList->GetCount();
+					for (int i = 0; i < nCount; i++) {
+						TagId tagId;
+						CListTextElementUI* pItem = (CListTextElementUI*)pList->GetItemAt(i);
+						ConvertTagId( &tagId, pItem->GetText(0) );
+
+						for (it = vTags.begin(); it != vTags.end(); it++) {
+							TagInfo * p = *it;
+							// 如果找到，则从vector中删除
+							if (0 == memcmp(&p->tagId, &tagId, sizeof(TagId))) {
+								delete p;
+								vTags.erase(it);
+								break;
+							}
+						}
+					}
+				}
+
+				// vector中的item是要删除的tag!
+				for (it = vTags.begin(); it != vTags.end(); it++) {
+					TagInfo * p = *it;
+					CBusiness::GetInstance()->DeleteTag(&p->tagId);
+				}
+				ClearVector(vTags);
+
+				// 再删除病人信息
 				CBusiness::GetInstance()->sigAMPatient.emit(&tInfo, OPERATION_MODIFY, &ret);
 			}
 			
@@ -107,6 +140,21 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 			else {
 				::MessageBox(m_hWnd, GetErrDescription((GlobalErrorNo)ret), "添加/修改病人信息", 0);
 			}
+			return;
+		} 
+		else if (name == "btnDelTag") {
+			CListUI * pList = (CListUI *)m_PaintManager.FindControl("patient_tags");
+			if (0 == pList) {
+				return;
+			}
+
+			int nSel = pList->GetCurSel();
+			if (nSel < 0) {
+				::MessageBox(m_hWnd, "没有选中要删除的Tag", "删除Tag", 0);
+				return;
+			}
+
+			pList->RemoveAt(nSel);
 			return;
 		}
 	}
@@ -195,6 +243,30 @@ void  CPatientWnd::InitWindow()
 			p->SetTime(&s);
 			p->SetText( ConvertDate( buf, sizeof(buf), &m_tPatientInfo.tInDate ) );
 		}
+
+		pControl = m_PaintManager.FindControl("patient_tags");
+		if (pControl) {
+			CListUI * pList = (CListUI *)pControl;
+
+			std::vector<TagInfo *> vTags;
+			CBusiness::GetInstance()->GetPatientTags(m_tPatientInfo.szId, vTags);
+			std::vector<TagInfo *>::iterator it;
+			for (it = vTags.begin(); it != vTags.end(); it++) {
+				TagInfo * pTag = *it;
+				ConvertTagId(buf, sizeof(buf), &pTag->tagId );
+
+				CListTextElementUI* pListElement = new CListTextElementUI;
+				pList->Add(pListElement);
+				pListElement->SetText(0, buf);
+			}
+
+			if (pList->GetCount() > 0) {
+				pList->SelectItem(0);
+			}
+
+			ClearVector(vTags);
+		}
+		
 
 	}
 

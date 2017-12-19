@@ -124,6 +124,10 @@ int   CBusiness::BindingTag(const TagInfo * pTagInfo) {
 	return CMyDatabase::GetInstance()->BindingTag(pTagInfo);
 }
 
+int   CBusiness::DeleteTag(const TagId * pTagId) {
+	return CMyDatabase::GetInstance()->DeleteTag(pTagId);
+}
+
 int  CBusiness::ImportExcel(const char * szFilePath) {
 	CString sDriver = GetExcelDriver();
 	if (sDriver.GetLength() == 0) {
@@ -142,7 +146,7 @@ int  CBusiness::ImportExcel(const char * szFilePath) {
 		database.Open(NULL,false,false,sDsn);
 		CRecordset recset(&database);
 		//read sql   
-		sSql = "SELECT * from [demo$]";
+		sSql = "SELECT * from [≤°»À–≈œ¢$]";
 		recset.Open(CRecordset::forwardOnly,sSql,CRecordset::readOnly);
 
 		//int n = recset.GetODBCFieldCount();

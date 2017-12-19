@@ -2,7 +2,7 @@
 <Window>	
 	<HorizontalLayout inset="1,1,1,1" >
 		<VerticalLayout width="230">
-			<List name="patients_list_short" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" hscrollbar="false" menu="true">
+			<List name="patients_list_short" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" itemfont="6" itemtextcolor="#FF386382" >
 				<ListHeader height="24" menu="true">
 					<ListHeaderItem text="编号"   font="2" width="50" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					<ListHeaderItem text="姓名"   font="2" width="50" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>

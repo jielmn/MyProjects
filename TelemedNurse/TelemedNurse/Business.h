@@ -76,6 +76,7 @@ public:
 	int  GetPatientTags(const char * szId, std::vector<TagInfo *> & vTags );
 	int  GetPatientByTag(const TagId * pTagId, PatientInfo * pPatient );
 	int  BindingTag(const TagInfo * pTagInfo);
+	int  DeleteTag(const TagId * pTagId);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;           // add or modify a patient
 	sigslot::signal2<PatientInfo *, OperationType >        sigAMPatientRet;        // success to add, modify or delete a patient

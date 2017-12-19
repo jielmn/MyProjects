@@ -24,6 +24,23 @@ using namespace DuiLib;
 
 HWND    g_hWnd = 0;
 
+#define  INDEX_PATIENT_ID            0
+#define  INDEX_PATIENT_INNO          1
+#define  INDEX_PATIENT_NAME          2
+#define  INDEX_PATIENT_SEX           3
+#define  INDEX_PATIENT_AGE           4
+#define  INDEX_PATIENT_OFFICE        5
+#define  INDEX_PATIENT_BEDNO         6
+#define  INDEX_PATIENT_INDATE        7
+#define  INDEX_PATIENT_CARDNO        8
+#define  INDEX_PATIENT_TAGS          9
+
+#define  SHORT_INDEX_PATIENT_ID            0
+#define  SHORT_INDEX_PATIENT_NAME          1
+#define  SHORT_INDEX_PATIENT_BEDNO         2
+
+
+
 class CTempChartUI : public CControlUI
 {
 public:
@@ -283,9 +300,13 @@ public:
 					pControl->SelectItem(0);
 					CListUI* pListShort = static_cast<CListUI*>(m_PaintManager.FindControl(_T("patients_list_short")));
 					if (pListShort) {
-						if (pListShort->GetCurSel() < 0 && pListShort->GetCount() > 0) {
-							pListShort->SelectItem(0);
-						}						
+						if (pListShort->GetCurSel() < 0 ) {
+							if ( pListShort->GetCount() > 0 )
+								pListShort->SelectItem(0);
+						}
+						else {
+							OnItemSelected("patients_list_short");
+						}
 					}
 				}
 				else if (name == _T("patients_info"))
@@ -409,9 +430,9 @@ public:
 	virtual void   InitWindow()
 	{
 		memset(&m_tTagId, 0, sizeof(TagId));
-		m_nInventoryError = 0;
+		m_nInventoryError = -1;
 
-		SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+		PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 		char buf[8192];
 		std::vector<PatientInfo *> v;
@@ -427,9 +448,9 @@ public:
 
 				CListTextElementUI* pListElement = new CListTextElementUI;
 				pListShort->Add(pListElement);
-				pListElement->SetText(0, pInfo->szId);
-				pListElement->SetText(1, pInfo->szName);
-				pListElement->SetText(2, pInfo->szBedNo);
+				pListElement->SetText(SHORT_INDEX_PATIENT_ID, pInfo->szId);
+				pListElement->SetText(SHORT_INDEX_PATIENT_NAME, pInfo->szName);
+				pListElement->SetText(SHORT_INDEX_PATIENT_BEDNO, pInfo->szBedNo);
 
 				char * szId = new char[sizeof(pInfo->szId)];
 				strncpy_s(szId, sizeof(pInfo->szId),  pInfo->szId, sizeof(pInfo->szId) );
@@ -448,21 +469,21 @@ public:
 
 				CListTextElementUI* pListElement = new CListTextElementUI;
 				pList->Add(pListElement);
-				pListElement->SetText(0, pInfo->szId);
-				pListElement->SetText(1, pInfo->szInNo);
-				pListElement->SetText(2, pInfo->szName);
-				pListElement->SetText(3, GetSex(pInfo->bMale) );
-				pListElement->SetText(4, GetInt( buf, sizeof(buf), pInfo->nAge ) );
-				pListElement->SetText(5, pInfo->szOffice);
-				pListElement->SetText(6, pInfo->szBedNo);
-				pListElement->SetText(7, ConvertDate( buf, sizeof(buf), &pInfo->tInDate ) );
-				pListElement->SetText(8, pInfo->szCardNo);
+				pListElement->SetText(INDEX_PATIENT_ID, pInfo->szId);
+				pListElement->SetText(INDEX_PATIENT_INNO, pInfo->szInNo);
+				pListElement->SetText(INDEX_PATIENT_NAME, pInfo->szName);
+				pListElement->SetText(INDEX_PATIENT_SEX, GetSex(pInfo->bMale) );
+				pListElement->SetText(INDEX_PATIENT_AGE, GetInt( buf, sizeof(buf), pInfo->nAge ) );
+				pListElement->SetText(INDEX_PATIENT_OFFICE, pInfo->szOffice);
+				pListElement->SetText(INDEX_PATIENT_BEDNO, pInfo->szBedNo);
+				pListElement->SetText(INDEX_PATIENT_INDATE, ConvertDate( buf, sizeof(buf), &pInfo->tInDate ) );
+				pListElement->SetText(INDEX_PATIENT_CARDNO, pInfo->szCardNo);
 
 				std::vector<TagInfo *> vTags;
 				CBusiness::GetInstance()->GetPatientTags(pInfo->szId, vTags);
 				if (vTags.size() > 0) {
 					CDuiString strText = GetPatientTagsText(vTags);
-					pListElement->SetText(9, strText);
+					pListElement->SetText(INDEX_PATIENT_TAGS, strText);
 				}				
 				ClearVector(vTags);
 
@@ -489,9 +510,9 @@ public:
 			if (pListShort) {
 				CListTextElementUI* pListElement = new CListTextElementUI;
 				pListShort->Add(pListElement);
-				pListElement->SetText(0, pInfo->szId);
-				pListElement->SetText(1, pInfo->szName);
-				pListElement->SetText(2, pInfo->szBedNo);
+				pListElement->SetText(SHORT_INDEX_PATIENT_ID, pInfo->szId);
+				pListElement->SetText(SHORT_INDEX_PATIENT_NAME, pInfo->szName);
+				pListElement->SetText(SHORT_INDEX_PATIENT_BEDNO, pInfo->szBedNo);
 
 				char * szId = new char[sizeof(pInfo->szId)];
 				strcpy_s(szId, sizeof(pInfo->szId), pInfo->szId);
@@ -501,15 +522,15 @@ public:
 			if (pList) {
 				CListTextElementUI* pListElement = new CListTextElementUI;
 				pList->Add(pListElement);
-				pListElement->SetText(0, pInfo->szId);
-				pListElement->SetText(1, pInfo->szInNo);
-				pListElement->SetText(2, pInfo->szName);
-				pListElement->SetText(3, GetSex(pInfo->bMale));
-				pListElement->SetText(4, GetInt(buf, sizeof(buf), pInfo->nAge));
-				pListElement->SetText(5, pInfo->szOffice);
-				pListElement->SetText(6, pInfo->szBedNo);
-				pListElement->SetText(7, ConvertDate(buf, sizeof(buf), &pInfo->tInDate));
-				pListElement->SetText(8, pInfo->szCardNo);
+				pListElement->SetText(INDEX_PATIENT_ID, pInfo->szId);
+				pListElement->SetText(INDEX_PATIENT_INNO, pInfo->szInNo);
+				pListElement->SetText(INDEX_PATIENT_NAME, pInfo->szName);
+				pListElement->SetText(INDEX_PATIENT_SEX, GetSex(pInfo->bMale));
+				pListElement->SetText(INDEX_PATIENT_AGE, GetInt(buf, sizeof(buf), pInfo->nAge));
+				pListElement->SetText(INDEX_PATIENT_OFFICE, pInfo->szOffice);
+				pListElement->SetText(INDEX_PATIENT_BEDNO, pInfo->szBedNo);
+				pListElement->SetText(INDEX_PATIENT_INDATE, ConvertDate(buf, sizeof(buf), &pInfo->tInDate));
+				pListElement->SetText(INDEX_PATIENT_CARDNO, pInfo->szCardNo);
 
 				char * szId = new char[sizeof(pInfo->szId)];
 				strcpy_s(szId, sizeof(pInfo->szId), pInfo->szId);
@@ -527,8 +548,8 @@ public:
 					CListTextElementUI* pItem = (CListTextElementUI*)pListShort->GetItemAt(i);
 					char * szId = (char *)pItem->GetTag();
 					if (0 == strcmp(szId, pInfo->szId)) {
-						pItem->SetText(1, pInfo->szName);
-						pItem->SetText(2, pInfo->szBedNo);
+						pItem->SetText(SHORT_INDEX_PATIENT_NAME, pInfo->szName);
+						pItem->SetText(SHORT_INDEX_PATIENT_BEDNO, pInfo->szBedNo);
 						break;
 					}
 				}
@@ -541,14 +562,25 @@ public:
 					char * szId = (char *)pItem->GetTag();
 
 					if (0 == strcmp(szId, pInfo->szId)) {
-						pItem->SetText(1, pInfo->szInNo);
-						pItem->SetText(2, pInfo->szName);
-						pItem->SetText(3, GetSex(pInfo->bMale));
-						pItem->SetText(4, GetInt(buf, sizeof(buf), pInfo->nAge));
-						pItem->SetText(5, pInfo->szOffice);
-						pItem->SetText(6, pInfo->szBedNo);
-						pItem->SetText(7, ConvertDate(buf, sizeof(buf), &pInfo->tInDate));
-						pItem->SetText(8, pInfo->szCardNo);
+						pItem->SetText(INDEX_PATIENT_INNO, pInfo->szInNo);
+						pItem->SetText(INDEX_PATIENT_NAME, pInfo->szName);
+						pItem->SetText(INDEX_PATIENT_SEX, GetSex(pInfo->bMale));
+						pItem->SetText(INDEX_PATIENT_AGE, GetInt(buf, sizeof(buf), pInfo->nAge));
+						pItem->SetText(INDEX_PATIENT_OFFICE, pInfo->szOffice);
+						pItem->SetText(INDEX_PATIENT_BEDNO, pInfo->szBedNo);
+						pItem->SetText(INDEX_PATIENT_INDATE, ConvertDate(buf, sizeof(buf), &pInfo->tInDate));
+						pItem->SetText(INDEX_PATIENT_CARDNO, pInfo->szCardNo);
+
+						std::vector<TagInfo *> vTags;
+						CBusiness::GetInstance()->GetPatientTags(pInfo->szId, vTags);
+						if (vTags.size() > 0) {
+							CDuiString strText = GetPatientTagsText(vTags);
+							pItem->SetText(INDEX_PATIENT_TAGS, strText);
+						}
+						else {
+							pItem->SetText(INDEX_PATIENT_TAGS, "");
+						}
+						ClearVector(vTags);
 						break;
 					}
 				}
@@ -561,6 +593,7 @@ public:
 					CListTextElementUI* pItem = (CListTextElementUI*)pListShort->GetItemAt(i);
 					char * szId = (char *)pItem->GetTag();
 					if (0 == strcmp(szId, pInfo->szId)) {
+						delete[] szId;
 						pListShort->RemoveAt(i);
 						break;
 					}
@@ -587,6 +620,7 @@ public:
 					char * szId = (char *)pItem->GetTag();
 
 					if (0 == strcmp(szId, pInfo->szId)) {
+						delete[] szId;
 						pList->RemoveAt(i);
 						break;
 					}
@@ -633,7 +667,7 @@ public:
 				std::vector<TagInfo *> vTags;
 				CBusiness::GetInstance()->GetPatientTags(pTagInfo->szPatientId, vTags);
 				CDuiString strText = GetPatientTagsText(vTags);				
-				pItem->SetText(9,strText);
+				pItem->SetText(INDEX_PATIENT_TAGS,strText);
 				ClearVector(vTags);
 				break;
 			}
