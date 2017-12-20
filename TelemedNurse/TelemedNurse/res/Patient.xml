@@ -58,7 +58,7 @@
 				<Label text="就诊卡：" width="100" font="2" textcolor="#FF386382" /><Edit text="" name="edCardNo" bordercolor="#FF768D9B" bordersize="1"font="2" textcolor="#FF386382" />
 			</HorizontalLayout>
 			
-			<HorizontalLayout inset="0,5,0,5" height="100">
+			<HorizontalLayout inset="0,5,0,5" height="100" name="layoutTags" >
 				<Label text="绑定的温度贴：" width="100" font="2" textcolor="#FF386382" />
 				<List name="patient_tags" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="2" itemtextcolor="#FF386382" >
 					<ListHeader height="24" menu="true">

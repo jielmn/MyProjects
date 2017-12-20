@@ -169,7 +169,12 @@ void  CPatientWnd::InitWindow()
 		pControl = m_PaintManager.FindControl("txtTitle");
 		if (pControl) {
 			pControl->SetText("添加病人信息");
-		}		
+		}
+
+		pControl = m_PaintManager.FindControl("layoutTags");
+		if (pControl) {
+			pControl->SetVisible(false);
+		}
 	}
 	else {
 		pControl = m_PaintManager.FindControl("txtTitle");

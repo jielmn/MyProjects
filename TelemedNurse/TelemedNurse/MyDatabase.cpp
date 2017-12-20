@@ -8,6 +8,7 @@
 #define  DB_NAME                          "telemed_nurse.db"
 #define  PATIENTS_TABLE_NAME              "Patients"
 #define  TAGS_TABLE_NAME                  "Tags"
+#define  TEMP_TABLE_NAME                  "Temperature"
 
 
 char * ConvertSqlField( char * szDest, DWORD dwDestSize, const char * filed_value ) {
@@ -90,6 +91,29 @@ void CMyDatabase::OnInitDb(int * ret) {
 			  "Id             CHAR(32)    PRIMARY KEY     NOT NULL," \
 			  "PatientID      CHAR(32)    NOT NULL," \
 			  "BindingTime    DATETIME    NOT NULL" \
+			");";
+
+		*ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+		if (*ret != 0) {
+			*ret = (int)ERROR_FAILED_TO_EXECUTE_SQL;
+			sqlite3_free_table(azResult);
+			return;
+		}
+	}
+	sqlite3_free_table(azResult);
+
+
+	// 查看温度数据表是否存在，如果不存在，则创建
+	sql = "select name from sqlite_master where name = '" TEMP_TABLE_NAME "';";
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+
+	// 表不存在，则创建表
+	if (0 == nrow) {
+		sql = "CREATE TABLE " TEMP_TABLE_NAME "("  \
+			  "PatientID      CHAR(32)    NOT NULL," \
+			  "GenTime        DATETIME    NOT NULL," \
+			  "Data           int         NOT NULL," \
+			  "PRIMARY KEY(PatientID, GenTime)" \
 			");";
 
 		*ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
@@ -225,6 +249,13 @@ int  CMyDatabase::DeletePatient(const char * szId) {
 	}
 
 	_snprintf_s(sql, sizeof(sql), "DELETE FROM %s where PatientID='%s'", TAGS_TABLE_NAME, tmp);
+	/* Execute SQL statement */
+	ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	if (ret != 0) {
+		ret = ERROR_FAILED_TO_EXECUTE_SQL;
+	}
+
+	_snprintf_s(sql, sizeof(sql), "DELETE FROM %s where PatientID='%s'", TEMP_TABLE_NAME, tmp);
 	/* Execute SQL statement */
 	ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 	if (ret != 0) {
