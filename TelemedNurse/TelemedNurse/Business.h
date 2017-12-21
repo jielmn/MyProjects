@@ -62,6 +62,7 @@ enum  GlobalErrorNo {
 	ERROR_NOT_FOUND_TAG,
 	ERROR_BINDING_READER_FAILED_TO_INVENTORY,
 	ERROR_BINDING_READER_FAILED_TOO_MANY_CARDS,
+	ERROR_TAG_NOT_BINDING,
 };
 
 const char * GetErrDescription(GlobalErrorNo e);
@@ -90,6 +91,7 @@ public:
 	int  GetPatientByTag(const TagId * pTagId, PatientInfo * pPatient );
 	int  BindingTag(const TagInfo * pTagInfo);
 	int  DeleteTag(const TagId * pTagId);
+	int  SaveTempData(std::vector<TagData*> & v);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;           // add or modify a patient
 	sigslot::signal2<PatientInfo *, OperationType >        sigAMPatientRet;        // success to add, modify or delete a patient

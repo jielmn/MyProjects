@@ -19,6 +19,7 @@ public:
 	int  GetPatientByTag(const TagId * pTagId, PatientInfo * pPatient);
 	int  BindingTag(const TagInfo * pTagInfo);
 	int  DeleteTag(const TagId * pTagId);
+	int  SaveTempData(std::vector<TagData*> & v);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;             // add or modify a patient
 	sigslot::signal1< int *>                                     sigInitDb;          // 初始化数据库（检查表是否存在）

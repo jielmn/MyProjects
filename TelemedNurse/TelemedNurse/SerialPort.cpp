@@ -313,6 +313,46 @@ int   CSerialPort::ReadPrepareRet() {
 	return -1;
 }
 
+int   CSerialPort::Clear() {
+	DWORD dwWrited = 0;
+	BOOL bRet = WriteUartPort(m_hComm, CLEAR_COMMAND.abyCommand, CLEAR_COMMAND.dwCommandLength, &dwWrited);
+
+	if (bRet) {
+		return 0;
+	}
+	else {
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to Clear \n");
+		return -1;
+	}
+}
+
+int   CSerialPort::ReadClearRet() {
+	DWORD dwReceived = 0;
+
+	do
+	{
+		Sleep(SERIAL_PORT_SLEEP_TIME);
+		Receive(dwReceived);
+		// 如果再无数据了
+		if (0 == dwReceived) {
+			break;
+		}
+	} while (TRUE);
+
+	BYTE pData[8192];
+	SkipInstantResp();
+
+	if (m_received_data.GetDataLength() >= 20) {
+		m_received_data.Read(pData, 20);
+		// 如果最后两个字节是0D 0A，则OK
+		if (0 == memcmp(pData + 18, READER_TAIL, 2)) {
+			return 0;
+		}
+	}
+
+	return -1;
+}
+
 int   CSerialPort::Sync() {
 	DWORD dwWrited = 0;
 	BOOL bRet = WriteUartPort(m_hComm, SYNC_COMMAND.abyCommand, SYNC_COMMAND.dwCommandLength, &dwWrited);
@@ -330,6 +370,8 @@ int   CSerialPort::ReadSyncRet(std::vector<TagData*> & v) {
 	DWORD dwReceived = 0;
 	int ret = -1;
 
+	
+
 	do
 	{
 		Sleep(SERIAL_PORT_SLEEP_TIME);
@@ -340,21 +382,23 @@ int   CSerialPort::ReadSyncRet(std::vector<TagData*> & v) {
 		}
 	} while (TRUE);
 
-	BYTE pData[8192];
-
-	SkipInstantResp();
-
+	BYTE pData[8192];	
 	int nCount = -1;
 	int nIndex = 0;
 	// 必须要有一个20字节的item
 	do 
 	{
+		SkipInstantResp();
+
 		if (m_received_data.GetDataLength() >= 20) {
 			m_received_data.Read(pData, 20);
 			// 如果最后两个字节不是是0D 0A，则FAIL
 			if (0 != memcmp(pData + 18, READER_TAIL, 2)) {
 				break;
 			}
+		}
+		else {
+			break;
 		}
 
 		BYTE * pBuf = pData;
@@ -513,6 +557,11 @@ void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::M
 		int   ret       = 0;
 		std::vector<std::string>  vCom;
 		GetAllSerialPortName(vCom);
+
+		// 如果已经连接
+		if ( CSerialPort::GetInstance()->IfOpened() ) {
+			break;
+		}
 		
 		g_cfg->GetConfig("serial port", buf, sizeof(buf), "" );
 
@@ -609,6 +658,11 @@ void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::M
 		int ret = CSerialPort::GetInstance()->Sync();
 		if (0 != ret) {
 			CSerialPort::GetInstance()->NotifySerialPortSyncRet(SERIAL_PORT_SYNC_ERROR_FAILED_TO_SYNC);
+
+			// 连接，重新连接
+			CSerialPort::GetInstance()->CloseUartPort();
+			CSerialPort::GetInstance()->NotifySerialPortStatus(SERIAL_PORT_STATUS_CLOSED);
+			g_thrd_serial_port->PostDelayMessage(DELAY_RECONNECT_SERIAL_PORT, g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
 			break;
 		}
 
@@ -618,10 +672,37 @@ void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::M
 			ClearVector(*pVec);
 			delete pVec;
 			CSerialPort::GetInstance()->NotifySerialPortSyncRet(SERIAL_PORT_SYNC_ERROR_FAILED_TO_RECEIVE_RET);
+
+			// 连接，重新连接
+			CSerialPort::GetInstance()->CloseUartPort();
+			CSerialPort::GetInstance()->NotifySerialPortStatus(SERIAL_PORT_STATUS_CLOSED);
+			g_thrd_serial_port->PostDelayMessage(DELAY_RECONNECT_SERIAL_PORT, g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
 			break;
 		}
 
 		CSerialPort::GetInstance()->NotifySerialPortSyncRet(SERIAL_PORT_SYNC_ERROR_OK, pVec );
+	}
+	break;
+
+	case MSG_SERIAL_PORT_CLEAR:
+	{
+		int ret = CSerialPort::GetInstance()->Clear();
+		if (0 != ret) {
+			// 连接，重新连接
+			CSerialPort::GetInstance()->CloseUartPort();
+			CSerialPort::GetInstance()->NotifySerialPortStatus(SERIAL_PORT_STATUS_CLOSED);
+			g_thrd_serial_port->PostDelayMessage(DELAY_RECONNECT_SERIAL_PORT, g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
+			break;
+		}
+
+		ret = CSerialPort::GetInstance()->ReadClearRet(); 
+		if (0 != ret) {
+			// 连接，重新连接
+			CSerialPort::GetInstance()->CloseUartPort();
+			CSerialPort::GetInstance()->NotifySerialPortStatus(SERIAL_PORT_STATUS_CLOSED);
+			g_thrd_serial_port->PostDelayMessage(DELAY_RECONNECT_SERIAL_PORT, g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
+			break;
+		}
 	}
 	break;
 
@@ -635,4 +716,8 @@ void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::M
 void  SyncReader() {
 	g_thrd_serial_port->PostMessage(g_handler_serial_port, MSG_SERIAL_PORT_SYNC );
 	
+}
+
+void  ClearReader() {
+	g_thrd_serial_port->PostMessage(g_handler_serial_port, MSG_SERIAL_PORT_CLEAR);
 }

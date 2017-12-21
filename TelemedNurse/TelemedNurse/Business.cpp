@@ -148,6 +148,10 @@ int   CBusiness::DeleteTag(const TagId * pTagId) {
 	return CMyDatabase::GetInstance()->DeleteTag(pTagId);
 }
 
+int   CBusiness::SaveTempData(std::vector<TagData*> & v) {
+	return CMyDatabase::GetInstance()->SaveTempData(v);
+}
+
 int  CBusiness::ImportExcel(const char * szFilePath) {
 	CString sDriver = GetExcelDriver();
 	if (sDriver.GetLength() == 0) {

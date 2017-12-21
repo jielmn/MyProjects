@@ -40,6 +40,73 @@ HWND    g_hWnd = 0;
 #define  SHORT_INDEX_PATIENT_NAME          1
 #define  SHORT_INDEX_PATIENT_BEDNO         2
 
+class CMyProgress : public CProgressUI
+{
+public:
+	CMyProgress(CPaintManagerUI *p, CDuiString sForeImage) :m_pManager(p), m_nPos(0), m_sForeImage(sForeImage) {
+	}
+	~CMyProgress() {}
+
+	void DoEvent(TEventUI& event) {
+		if (event.Type == UIEVENT_TIMER && event.wParam == 10)
+		{
+			const int MARGIN = 3;
+			const int STEP = 4;
+			CDuiString imageProp;
+			const int PROGRESS_WIDTH = 36;
+			const int PROGRESS_HEIGHT = 7;
+			const int HORIZONTAL_MARGIN = 3;
+
+			int width = this->GetWidth();
+			int height = this->GetHeight();
+
+			width -= 2 * HORIZONTAL_MARGIN;
+
+			if (m_nPos < PROGRESS_WIDTH) {
+				imageProp.Format("file='%s' source='%d,%d,%d,%d' dest='%d,%d,%d,%d'", (const char *)m_sForeImage,
+					PROGRESS_WIDTH - m_nPos, 0, PROGRESS_WIDTH, PROGRESS_HEIGHT, HORIZONTAL_MARGIN,
+					MARGIN, HORIZONTAL_MARGIN + m_nPos, height - MARGIN);
+			}
+			else if (m_nPos > width) {
+				imageProp.Format("file='%s' source='%d,%d,%d,%d' dest='%d,%d,%d,%d'", (const char *)m_sForeImage,
+					0, 0, PROGRESS_WIDTH + width - m_nPos, PROGRESS_HEIGHT,
+					m_nPos - PROGRESS_WIDTH + HORIZONTAL_MARGIN, MARGIN, width + HORIZONTAL_MARGIN, height - MARGIN);
+			}
+			else {
+				imageProp.Format("file='%s' source='%d,%d,%d,%d' dest='%d,%d,%d,%d'", (const char *)m_sForeImage, 0, 0, PROGRESS_WIDTH, PROGRESS_HEIGHT,
+					m_nPos - PROGRESS_WIDTH + HORIZONTAL_MARGIN, MARGIN, m_nPos + HORIZONTAL_MARGIN, height - MARGIN);
+			}
+
+			this->SetForeImage(imageProp);
+
+			m_nPos += STEP;
+			if (m_nPos > width + PROGRESS_WIDTH) {
+				m_nPos = 0;
+			}
+			return;
+		}
+
+		CProgressUI::DoEvent(event);
+	}
+
+	void Stop() {
+		if (m_pManager) {
+			m_pManager->KillTimer(this, 10);
+		}
+	}
+
+	void Start() {
+		if (m_pManager) {
+			m_pManager->SetTimer(this, 10, 50);
+		}
+		m_nPos = 0;
+	}
+private:
+	CPaintManagerUI * m_pManager;
+	int               m_nPos;
+	CDuiString        m_sForeImage;
+};
+
 
 
 class CTempChartUI : public CControlUI
@@ -373,6 +440,18 @@ public:
 				CButtonUI * pBtn = (CButtonUI *)m_PaintManager.FindControl(name);
 				assert(pBtn);
 				pBtn->SetEnabled(false);
+
+				CMyProgress * pProgress = (CMyProgress*)m_PaintManager.FindControl("sync_progresss");
+				if (0 != pProgress ) {
+					pProgress->SetVisible( true );
+					pProgress->Start();
+				}
+
+				CLabelUI * pLbl = (CLabelUI*)m_PaintManager.FindControl("sync_text");
+				if (0 != pLbl) {
+					pLbl->SetVisible(true);
+				}
+
 				return;
 			}
 		}
@@ -432,6 +511,9 @@ public:
 			CDialogBuilderCallbackEx cb;
 			CControlUI * pUI = builder.Create(_T("patients.xml"), (UINT)0, &cb, &m_PaintManager);
 			return pUI;
+		}
+		else if (0 == _stricmp("MyProgress", pstrClass)) {
+			return new CMyProgress(&m_PaintManager, "progress_fore.png");
 		}
 		return 0;
 	}
@@ -851,7 +933,7 @@ public:
 
 			CButtonUI * pBtn = (CButtonUI *)m_PaintManager.FindControl("btnSync");
 			assert(pBtn);
-			pBtn->SetEnabled(true);
+			pBtn->SetEnabled(true);			
 
 			if (eError == SERIAL_PORT_SYNC_ERROR_NOT_OPENED) {
 				::MessageBox(m_hWnd, "同步读卡器没有连接上", "同步温度数据", 0);
@@ -860,8 +942,37 @@ public:
 				::MessageBox(m_hWnd, "同步温度数据失败！请检查同步读卡器", "同步温度数据", 0);
 			}
 			else if (eError == SERIAL_PORT_SYNC_ERROR_FAILED_TO_RECEIVE_RET) {
-				::MessageBox(m_hWnd, "接收或解析同步温度数据失败！", "同步温度数据", 0);
-			}			
+				::MessageBox(m_hWnd, "接收或解析同步温度数据失败！请检查同步读卡器", "同步温度数据", 0);
+			}
+
+			CMyProgress * pProgress = (CMyProgress*)m_PaintManager.FindControl("sync_progresss");
+			if (0 != pProgress) {
+				pProgress->Stop();
+				pProgress->SetVisible(false);
+			}
+
+			CLabelUI * pLbl = (CLabelUI*)m_PaintManager.FindControl("sync_text");
+			if (0 != pLbl) {
+				pLbl->SetVisible(false);
+			}
+
+			// 保存温度数据
+			if (eError == SERIAL_PORT_SYNC_ERROR_OK && 0 != pVRet) {
+				int ret = CBusiness::GetInstance()->SaveTempData(*pVRet);
+				BOOL bRemoveData = FALSE;
+				if (0 != ret) {
+					if (IDYES == ::MessageBox(m_hWnd, "同步过程中，部分Tag没有绑定！要清空该读卡器存储的温度数据吗？", "同步数据", MB_YESNO | MB_DEFBUTTON2)) {
+						bRemoveData = TRUE;
+					}
+				}
+				else {
+					bRemoveData = TRUE;
+				}
+
+				if (bRemoveData) {
+					ClearReader();
+				}
+			}
 
 			if (pVRet) {
 				ClearVector(*pVRet);

@@ -29,6 +29,9 @@ public:
 	int   Sync();
 	int   ReadSyncRet( std::vector<TagData*> & v );
 
+	int   Clear();
+	int   ReadClearRet();
+
 	void  NotifySerialPortStatus( SerialPortStatus eStatus );
 	void  NotifySerialPortSyncRet(SerialPortSyncError eError, std::vector<TagData*> * pVRet = 0 );
 
@@ -77,6 +80,8 @@ extern MessageHandlerSerialPort * g_handler_serial_port;
 #define  DELAY_SERIAL_PORT_HEART_BEAT   10000
 
 #define  MSG_SERIAL_PORT_SYNC           102
+#define  MSG_SERIAL_PORT_CLEAR          103
 
 
 void  SyncReader();
+void  ClearReader();

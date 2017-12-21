@@ -4,6 +4,7 @@
 #include "LmnString.h"
 #include "Business.h"
 #include "MyDatabase.h"
+#include "LmnTemplates.h"
 
 #define  DB_NAME                          "telemed_nurse.db"
 #define  PATIENTS_TABLE_NAME              "Patients"
@@ -357,6 +358,38 @@ int  CMyDatabase::DeleteTag(const TagId * pTagId) {
 	int ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 	if (ret != 0) {
 		ret = ERROR_FAILED_TO_EXECUTE_SQL;
+	}
+
+	return ret;
+}
+
+int  CMyDatabase::SaveTempData(std::vector<TagData*> & v) {
+	char sql[8192];
+	char *zErrMsg = 0;
+	int  ret = 0;
+
+	std::vector<TagData*>::iterator it;
+	for (it = v.begin(); it != v.end(); it++) {
+		TagData* pData = *it;
+
+		PatientInfo tPatient;
+		int nGetPatientRet = GetPatientByTag(&pData->tTagId, &tPatient);
+		// 没有获取到病人
+		if (0 != nGetPatientRet) {
+			ret = ERROR_TAG_NOT_BINDING;
+			continue;
+		}
+
+		char szTime[256];
+		ConvertDateTime(szTime, sizeof(szTime), &pData->tTime);
+
+		char szPatientId[256];
+		ConvertSqlField(szPatientId, sizeof(szPatientId), tPatient.szId );
+
+		_snprintf_s(sql, sizeof(sql), "INSERT INTO %s values ('%s','%s',%d)", TEMP_TABLE_NAME, szPatientId, szTime, (int)pData->dwTemperature );
+
+		/* Execute SQL statement */
+		sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);		
 	}
 
 	return ret;
