@@ -74,6 +74,7 @@ time_t  ConvertDateTime(const char * szDatetime);
 CString GetExcelDriver();
 char *  ConvertTagId( char * buf, DWORD dwBufSize, const TagId * pTagId);
 int     ConvertTagId( TagId * pTagId, const char * szTagId );
+BOOL    GetBoolean(const char * szStr);
 
 class CBusiness : public sigslot::has_slots<> {
 public:

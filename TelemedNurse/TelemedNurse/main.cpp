@@ -24,6 +24,7 @@ using namespace DuiLib;
 
 
 HWND    g_hWnd = 0;
+BOOL    g_bUseUtf8 = FALSE;
 
 #define  INDEX_PATIENT_ID            0
 #define  INDEX_PATIENT_INNO          1
@@ -116,6 +117,11 @@ public:
 	{
 		m_XmlChartFile = new CXml2ChartFile;		
 		m_XmlChartFile->ReadXmlChartFile(CPaintManagerUI::GetInstancePath() + "res\\体温表设计.xml");
+
+		m_tInDate    = 0;
+		m_tFistDay   = 0;                            // 第一天日期
+		m_nWeekIndex = 0;                            // 第几周
+		memset(m_TempData, 0, sizeof(m_TempData));   // 温度数据
 	}
 
 	~CTempChartUI() {
@@ -130,7 +136,10 @@ public:
 	}
 
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+		char buf[8192];
+		CDuiString tmp;
 		RECT r = this->GetPos();
+
 		if ( m_XmlChartFile->m_ChartUI ) {
 			int a = ( (r.right - r.left - 1) - 120 ) / 42;
 			int b = ((1000 - 1) - 85 - 125 - 200) / 40;
@@ -140,6 +149,79 @@ public:
 
 			m_XmlChartFile->m_ChartUI->SetRect( r.left, r.top, right, r.top + h );
 			m_XmlChartFile->m_ChartUI->RecacluteLayout();
+
+			char szHospitalName[256];
+			g_cfg->GetConfig( "hospital name", buf, sizeof(buf), "某某医院" );
+			if (g_bUseUtf8) {
+				Utf8ToAnsi( szHospitalName, sizeof(szHospitalName), buf );
+			}
+			else {
+				strncpy_s(szHospitalName, buf, sizeof(szHospitalName));
+			}
+
+			CXml2ChartUI * pUI = m_XmlChartFile->FindChartUIByName("hospital_name");
+			if (pUI) {
+				pUI->SetText(szHospitalName);
+			}
+
+			pUI = m_XmlChartFile->FindChartUIByName("patient_name");
+			if (pUI) {
+				tmp = "姓名：";
+				tmp += m_sPatientName;
+				pUI->SetText((const char *)tmp);
+			}
+
+			CXml2ChartUI * pIndate = m_XmlChartFile->FindChartUIByName("indate");
+			if (pIndate) {
+				tmp = "入院日期：";
+				tmp += ConvertDate(buf, sizeof(buf), &m_tInDate);
+				pIndate->SetText((const char *)tmp);
+			}
+
+			pUI = m_XmlChartFile->FindChartUIByName("office");
+			if (pUI) {
+				tmp = "科室：";
+				tmp += m_sOffice;
+				pUI->SetText((const char *)tmp);
+			}
+
+			pUI = m_XmlChartFile->FindChartUIByName("bed_no");
+			if (pUI) {
+				tmp = "床号：";
+				tmp += m_sBedNo;
+				pUI->SetText((const char *)tmp);
+			}
+
+			pUI = m_XmlChartFile->FindChartUIByName("inno");
+			if (pUI) {
+				tmp = "住院号：";
+				tmp += m_sInNo;
+				pUI->SetText((const char *)tmp);
+			}
+
+			for (int i = 0; i < 7; i++) {
+				CDuiString name;
+				name.Format("no%d", i+1);
+				pUI = m_XmlChartFile->FindChartUIByName( (const char *)name );
+				if (pUI) {
+					CDuiString tmpStr;
+					tmpStr.Format("%d", m_nWeekIndex * 7 + i + 1);
+					pUI->SetText( (const char *)tmpStr );
+				}
+			}
+
+			for (int i = 0; i < 7; i++) {
+				CDuiString name;
+				name.Format("day%d", i + 1);
+				pUI = m_XmlChartFile->FindChartUIByName((const char *)name);
+				if (pUI) {
+					time_t t = m_tFistDay + 3600 * 24 * i;
+					ConvertDate(buf, sizeof(buf), &t);
+					pUI->SetText(buf);
+				}
+			}
+			
+
 			DrawXml2ChartUI( hDC, m_XmlChartFile->m_ChartUI);
 		}
 		//return CControlUI::DoPaint(hDC, rcPaint, pStopControl);
@@ -147,6 +229,17 @@ public:
 	}
 
 	CXml2ChartFile *  m_XmlChartFile;
+
+	CDuiString        m_sPatientName;                // 病人名字
+	time_t            m_tInDate;                     // 住院日期
+	CDuiString        m_sOffice;                     // 科室
+	CDuiString        m_sBedNo;                      // 床号
+	CDuiString        m_sInNo;                       // 住院号
+
+	time_t            m_tFistDay;                     // 第一天日期
+	int               m_nWeekIndex;                   // 第几周
+
+	int               m_TempData[7][6];               // 温度数据
 };
 
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
@@ -990,11 +1083,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	char buf[8192];
+
 	g_cfg = new FileConfig;
 	g_cfg->Init("TelemedNurse.cfg");
 
 	g_log = new FileLog;
 	g_log->Init("TelemedNurse.log");
+
+	g_cfg->GetConfig("use utf8", buf, sizeof(buf), "true");
+	g_bUseUtf8 = GetBoolean(buf);
 
 	int ret = 0;
 	CBusiness::GetInstance()->sigInit.emit(&ret);

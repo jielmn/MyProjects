@@ -7,6 +7,7 @@
 #include "MyDatabase.h"
 #include "BindingReader.h"
 #include "SerialPort.h"
+#include "LmnString.h"
 
 #define  PATIENTS_TABLE_NAME              "Patients"
 #define  TAGS_TABLE_NAME                  "Tags"
@@ -389,4 +390,14 @@ CString GetExcelDriver()
 	} while (pszBuf[1] != '\0');
 
 	return sDriver;
+}
+
+BOOL GetBoolean(const char * szStr) {
+	if (0 == szStr) {
+		return FALSE;
+	}
+	if (0 == StrICmp(szStr, "true")) {
+		return TRUE;
+	}
+	return FALSE;
 }
