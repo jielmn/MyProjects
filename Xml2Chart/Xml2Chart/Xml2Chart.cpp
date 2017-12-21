@@ -21,6 +21,8 @@ CXml2ChartUI::CXml2ChartUI() {
 	m_nFixedWidth = -1;
 	m_nFixedHeight = -1;
 	m_TextColor = RGB(0, 0, 0);
+
+	m_strName = "";
 }
 
 CXml2ChartUI::~CXml2ChartUI() {
@@ -157,12 +159,15 @@ RECT  CXml2ChartUI::GetAbsoluteRect() const {
 		rect = m_parent->GetAbsoluteRect();
 	}
 
-	rect.left   += m_tRect.left;
-	rect.top    += m_tRect.top;
-	rect.right  += m_tRect.right;
-	rect.bottom += m_tRect.bottom;
+	RECT tmp;
+	memcpy(&tmp, &m_tRect, sizeof(RECT));
 
-	return rect;
+	tmp.left   += rect.left;
+	tmp.right  += rect.left;
+	tmp.top    += rect.top;
+	tmp.bottom += rect.top;
+
+	return tmp;
 }
 
 void  CXml2ChartUI::SetBorderPen(HGDIOBJ HPen, DirectionType eBorderType) {
@@ -605,6 +610,13 @@ COLORREF  CXml2ChartUI::GetTextColor() const {
 	return m_TextColor;
 }
 
+void CXml2ChartUI::SetName(const std::string & sName) {
+	m_strName = sName;
+}
+
+std::string CXml2ChartUI::GetName() const {
+	return m_strName;
+}
 
 
 
@@ -1031,7 +1043,11 @@ void CXml2ChartFile::ReadXmlChartFile(TiXmlElement* pEleParent, CXml2ChartUI * p
 			SetFloat(pChild, pChildUI);
 			SetFixed(pChild, pChildUI);
 			SetBorder(pChild, pChildUI);
-				
+			
+			szAttr = pChild->Attribute("name");
+			if (szAttr) {
+				pChildUI->SetName(szAttr);
+			}
 		}
 		else {
 			BOOL  bVertical = FALSE;
@@ -1059,6 +1075,11 @@ void CXml2ChartFile::ReadXmlChartFile(TiXmlElement* pEleParent, CXml2ChartUI * p
 			SetSplit(pChild, pChildUI);
 			SetBorder(pChild, pChildUI);
 			SetPadding(pChild, pChildUI);
+
+			szAttr = pChild->Attribute("name");
+			if (szAttr) {
+				pChildUI->SetName(szAttr);
+			}
 
 			ReadXmlChartFile(pChild, pChildUI);
 
@@ -1250,6 +1271,11 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 				}
 			}
 
+			sAttr = pElmChild->Attribute("name");
+			if (sAttr) {
+				m_ChartUI->SetName(sAttr);
+			}
+
 			m_ChartUI->SetRect(0, 0, nWidth, nHeight);
 
 			if (bVertical)
@@ -1273,3 +1299,35 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 	return m_ChartUI;
 }
 
+CXml2ChartUI *  CXml2ChartFile::FindChartUIByName(CXml2ChartUI * pUI, const char * szName) {
+	assert(pUI);
+	assert(szName);
+
+	std::string sName = pUI->GetName();
+	if (0 == strcmp(sName.c_str(), szName)) {
+		return pUI;
+	}
+
+	int nChildrenCount = pUI->GetChildrenCount();
+	for (int i = 0; i < nChildrenCount; i++) {
+		CXml2ChartUI * pChild = pUI->GetChild(i);
+		CXml2ChartUI * pFind = FindChartUIByName(pChild, szName);
+		if (0 != pFind) {
+			return pFind;
+		}
+	}
+
+	return 0;
+}
+
+CXml2ChartUI * CXml2ChartFile::FindChartUIByName(const char * szName) {
+	if (0 == m_ChartUI) {
+		return 0;
+	}
+
+	if (0 == szName) {
+		return 0;
+	}
+
+	return FindChartUIByName(m_ChartUI, szName);	
+}

@@ -109,7 +109,7 @@ protected:
 	AlignType                     m_eAlign;                // 水平排列
 	VAlignType                    m_eVAlign;               // 垂直排列
 
-	
+	std::string                   m_strName;               // 名字
 
 public:
 	int   GetWidth() const;
@@ -182,6 +182,9 @@ public:
 	void SetTextColor(COLORREF color);
 	COLORREF  GetTextColor() const;
 
+	void SetName( const std::string & sName);
+	std::string GetName( ) const;
+
 
 	void  RecacluteLayout();                             //重新计算布局和子UI布局
 };
@@ -192,6 +195,8 @@ public:
 	~CXml2ChartFile();
 	CXml2ChartUI * ReadXmlChartFile(const char * szFilePath);
 	CXml2ChartUI *             m_ChartUI;
+
+	CXml2ChartUI * FindChartUIByName(const char * szName);
 
 protected:
 	std::map<int,HGDIOBJ>      m_mapFonts;
@@ -206,6 +211,8 @@ protected:
 	void SetFloat(TiXmlElement* pEle, CXml2ChartUI * pUI);
 	void SetPadding(TiXmlElement* pEle, CXml2ChartUI * pUI);
 	void SetText(TiXmlElement* pEle, CXml2ChartUI * pUI);
+
+	CXml2ChartUI *  FindChartUIByName(CXml2ChartUI * pUI, const char * szName);
 };
 
 

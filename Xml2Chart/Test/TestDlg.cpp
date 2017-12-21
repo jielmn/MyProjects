@@ -165,6 +165,8 @@ BOOL CTestDlg::OnInitDialog()
 
 
 	m_XmlChartFile.ReadXmlChartFile("d:\\体温表设计.xml");
+
+	
 	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -198,6 +200,24 @@ void CTestDlg::OnPaint()
 		CPaintDC dc(this);
 		//DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
 		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI);
+
+		CXml2ChartUI * p = m_XmlChartFile.FindChartUIByName("MainBlock");
+		if (p != 0) {
+			RECT r1 = p->GetAbsoluteRect();
+			int w = r1.right - r1.left;
+			int h = r1.bottom - r1.top;
+
+			int h1 = h / 40;
+			int w1 = w / 42;
+
+			RECT r2;
+			r2.left = r1.left;
+			r2.right = r2.left + w1;
+			r2.top = r1.top + h1 * 39;
+			r2.bottom = r1.bottom;
+
+			::TextOut(dc.m_hDC, r2.left, r2.top, "1111", 4 );
+		}
 	}
 }
 
