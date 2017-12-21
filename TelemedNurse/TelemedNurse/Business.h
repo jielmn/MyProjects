@@ -3,6 +3,12 @@
 #include <vector>
 #include "sigslot.h"
 #include "sqlite3.h"
+#include "LmnContainer.h"
+#include "LmnConfig.h"
+#include "LmnLog.h"
+
+extern IConfig *  g_cfg;
+extern ILog *     g_log;
 
 typedef struct tagPatientInfo {
 	char     szId[32];
@@ -25,6 +31,13 @@ typedef struct tagTagInfo {
 	char     szPatientId[32];
 	time_t   tBindingDate;
 }TagInfo;
+
+// 温度贴数据
+typedef struct tagTagData {
+	time_t     tTime;                  // 时间
+	TagId      tTagId;                 // id
+	DWORD      dwTemperature;          // 温度数据，如3500表示35.00
+}TagData;
 
 enum OperationType {
 	OPERATION_ADD = 0,

@@ -18,6 +18,7 @@ using namespace DuiLib;
 #include "LmnThread.h"
 #include "BindingReader.h"
 #include "UiMessage.h"
+#include "SerialPort.h"
 
 #pragma comment(lib,"User32.lib")
 
@@ -143,6 +144,7 @@ class CDuiFrameWnd : public WindowImplBase, public sigslot::has_slots<>
 protected:
 	TagId             m_tTagId;
 	int               m_nInventoryError;
+	SerialPortStatus  m_eSerialPortStatus;
 
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
@@ -366,6 +368,13 @@ public:
 				BindingPatient();
 				return;
 			}
+			else if (name == "btnSync") {
+				SyncReader();
+				CButtonUI * pBtn = (CButtonUI *)m_PaintManager.FindControl(name);
+				assert(pBtn);
+				pBtn->SetEnabled(false);
+				return;
+			}
 		}
 		else if (msg.sType == "itemselect") {
 			OnItemSelected(name);
@@ -431,6 +440,7 @@ public:
 	{
 		memset(&m_tTagId, 0, sizeof(TagId));
 		m_nInventoryError = -1;
+		m_eSerialPortStatus = (SerialPortStatus)-1;
 
 		PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
@@ -749,7 +759,7 @@ public:
 					}
 
 					if (pLblBinding) {
-						pLblBinding->SetText("绑定温度贴的读卡器没有连上");
+						pLblBinding->SetText("绑定温度贴的读卡器连接失败");
 						pLblBinding->SetTextColor(0xFFCAF100);
 					}
 
@@ -761,7 +771,7 @@ public:
 			else if (nResult == ERROR_BINDING_READER_FAILED_TOO_MANY_CARDS) {
 				if (m_nInventoryError != nResult) {
 					if (pLblOther) {
-						pLblOther->SetText("读到太多的温度贴");
+						pLblOther->SetText("读到两个或两个以上的温度贴");
 						pLblOther->SetTextColor(0xFFCAF100);
 					}
 
@@ -813,6 +823,51 @@ public:
 
 			delete pTagId;
 			return 0;
+		} else if (UM_SERIAL_PORT_STATUS == uMsg){
+			SerialPortStatus eStatus = (SerialPortStatus)wParam;
+			if (eStatus != m_eSerialPortStatus) {
+				CLabelUI * pLblSyncReader = (CLabelUI *)m_PaintManager.FindControl("lblSyncReader");
+				if (0 != pLblSyncReader) {
+					if (eStatus == SERIAL_PORT_STATUS_CLOSED) {
+						pLblSyncReader->SetText("同步温度贴数据的读卡器连接失败");
+						pLblSyncReader->SetTextColor(0xFFCAF100);
+					}
+					else if (eStatus == SERIAL_PORT_STATUS_OPENING) {
+						pLblSyncReader->SetText("同步温度贴数据的读卡器正在连接");
+						pLblSyncReader->SetTextColor(0xFFCAF100);
+					}
+					else if (eStatus == SERIAL_PORT_STATUS_OPEND) {
+						pLblSyncReader->SetText("同步温度贴数据的读卡器连接OK");
+						pLblSyncReader->SetTextColor(0xFFFFFFFF);
+					}
+				}
+			}
+			m_eSerialPortStatus = eStatus;
+			return 0;
+		}
+		else if (UM_SERIAL_PORT_SYNC_RET == uMsg) {
+			SerialPortSyncError eError = (SerialPortSyncError)wParam;
+			std::vector<TagData*> * pVRet = (std::vector<TagData*> *)lParam;
+
+			CButtonUI * pBtn = (CButtonUI *)m_PaintManager.FindControl("btnSync");
+			assert(pBtn);
+			pBtn->SetEnabled(true);
+
+			if (eError == SERIAL_PORT_SYNC_ERROR_NOT_OPENED) {
+				::MessageBox(m_hWnd, "同步读卡器没有连接上", "同步温度数据", 0);
+			}
+			else if (eError == SERIAL_PORT_SYNC_ERROR_FAILED_TO_SYNC) {
+				::MessageBox(m_hWnd, "同步温度数据失败！请检查同步读卡器", "同步温度数据", 0);
+			}
+			else if (eError == SERIAL_PORT_SYNC_ERROR_FAILED_TO_RECEIVE_RET) {
+				::MessageBox(m_hWnd, "接收或解析同步温度数据失败！", "同步温度数据", 0);
+			}			
+
+			if (pVRet) {
+				ClearVector(*pVRet);
+				delete pVRet;
+			}
+			return 0;
 		}
 		return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 	}
@@ -824,12 +879,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	g_cfg = new FileConfig;
+	g_cfg->Init("TelemedNurse.cfg");
+
+	g_log = new FileLog;
+	g_log->Init("TelemedNurse.log");
+
 	int ret = 0;
 	CBusiness::GetInstance()->sigInit.emit(&ret);
 	if (0 != ret) {
 		::MessageBox(0, GetErrDescription((GlobalErrorNo)ret), "应用程序初始化错误", 0);
+
+		g_cfg->Deinit();
+		g_log->Deinit();
+
+		delete g_cfg;
+		delete g_log;
 		return -1;
 	}
+
+	
 
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 
@@ -850,6 +919,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	CBusiness::GetInstance()->sigDeinit.emit(&ret);
 
+	g_cfg->Deinit();
+	g_log->Deinit();
+
+	delete g_cfg;
+	delete g_log;
 	return 0;
 
 }

@@ -166,6 +166,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="PatientDlg.cpp" />
+    <ClCompile Include="SerialPort.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BindingReader.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="PatientDlg.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SerialPort.h" />
     <ClInclude Include="UiMessage.h" />
   </ItemGroup>
   <ItemGroup>

@@ -6,9 +6,13 @@
 #include "Business.h"
 #include "MyDatabase.h"
 #include "BindingReader.h"
+#include "SerialPort.h"
 
 #define  PATIENTS_TABLE_NAME              "Patients"
 #define  TAGS_TABLE_NAME                  "Tags"
+
+IConfig *  g_cfg = 0;
+ILog *     g_log = 0;
 
 CBusiness *  CBusiness::pInstance = 0;
 
@@ -48,6 +52,17 @@ void  CBusiness::OnInit(int * ret) {
 	g_handler_binding_reader = new MessageHandlerBindingReader();
 
 	g_thrd_binding_reader->PostDelayMessage(DELAY_INVENTORY_TIME, g_handler_binding_reader, MSG_INVENTORY);
+
+
+	// 创建串口线程
+	g_thrd_serial_port = new LmnToolkits::Thread();
+	g_thrd_serial_port->Start();
+
+	// 创建message handler
+	g_handler_serial_port = new MessageHandlerSerialPort();
+
+	g_thrd_serial_port->PostMessage(g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
+
 }
 
 int  CBusiness::InitBindingReader() {	
@@ -65,6 +80,11 @@ void  CBusiness::OnDeinit(int * ret) {
 
 	// 销毁message handler
 	delete g_handler_binding_reader;
+
+	g_thrd_serial_port->Stop();
+	delete g_thrd_serial_port;
+
+	delete g_handler_serial_port;
 }
 
 void  CBusiness::OnPatientEvent(PatientInfo * pPatientInfo, OperationType eType, int * ret) {
