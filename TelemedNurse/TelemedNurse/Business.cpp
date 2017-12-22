@@ -153,6 +153,10 @@ int   CBusiness::SaveTempData(std::vector<TagData*> & v) {
 	return CMyDatabase::GetInstance()->SaveTempData(v);
 }
 
+int   CBusiness::GetLatestTempData(const char * szPatientId, std::vector<TagData*> & vRet) {
+	return CMyDatabase::GetInstance()->GetLatestTempData(szPatientId, vRet);
+}
+
 int  CBusiness::ImportExcel(const char * szFilePath) {
 	CString sDriver = GetExcelDriver();
 	if (sDriver.GetLength() == 0) {
@@ -400,4 +404,14 @@ BOOL GetBoolean(const char * szStr) {
 		return TRUE;
 	}
 	return FALSE;
+}
+
+time_t  TrimDatetime(time_t t) {
+	struct tm tmp;
+	localtime_s( &tmp, &t);
+	tmp.tm_hour = 0;
+	tmp.tm_min = 0;
+	tmp.tm_sec = 0;
+
+	return mktime(&tmp);
 }

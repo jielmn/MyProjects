@@ -90,7 +90,7 @@
 					</HorizontalLayout>
 				</VerticalLayout>
 				
-				<VerticalLayout HSplit="num='40',pen='6'" VSplit="num='42',pen='6'"  VSplit1="num='7',pen='5'" border="0,5,0,5"  HSplit1="num='8',pen='5'" >
+				<VerticalLayout HSplit="num='40',pen='6'" VSplit="num='42',pen='6'"  VSplit1="num='7',pen='5'" border="0,5,0,5"  HSplit1="num='8',pen='5'" name="MainBlock" >
 				</VerticalLayout>
 				
 				<VerticalLayout  HSplit="num='8',pen='6'" VSplit="num='7',pen='5'" height="200">

@@ -394,3 +394,54 @@ int  CMyDatabase::SaveTempData(std::vector<TagData*> & v) {
 
 	return ret;
 }
+
+int   CMyDatabase::GetLatestTempData(const char * szPatientId, std::vector<TagData*> & vRet) {
+	int ret = -1;
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	char  sql[8192];
+
+	char szId[256];
+	ConvertSqlField(szId, sizeof(szId), szPatientId);
+
+	// 查找最后的温度数据，得出最后的时间
+	_snprintf_s(sql, sizeof(sql), "select GenTime from %s where PatientID='%s' ORDER BY GenTime desc LIMIT 1", TEMP_TABLE_NAME, szId);
+
+	char szLatestTime[256];
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (nrow > 0) {
+		int i = 0;
+		strncpy_s(szLatestTime, azResult[(i + 1)*ncolumn + 0], sizeof(szLatestTime));
+	}
+	sqlite3_free_table(azResult);
+
+	// 没有温度数据
+	if (0 == nrow) {
+		return 0;
+	}
+
+	time_t tMaxTime = ConvertDateTime(szLatestTime);
+	time_t tMinTime = TrimDatetime (tMaxTime - 3600 * 6);
+
+	char szMinTime[256];
+	ConvertDateTime(szMinTime, sizeof(szMinTime), &tMinTime);
+
+	_snprintf_s(sql, sizeof(sql), "select GenTime,Data from %s where PatientID='%s' AND GenTime >= '%s' AND GenTime <= '%s' ORDER BY GenTime", TEMP_TABLE_NAME, szId, szMinTime, szLatestTime);
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (nrow > 0) {
+		for (int i = 0; i < nrow; i++) {
+			TagData* pData = new TagData;
+			memset(pData, 0, sizeof(TagData));
+
+			pData->tTime = ConvertDateTime(azResult[(i + 1)*ncolumn + 0]);
+			sscanf_s(azResult[(i + 1)*ncolumn + 1], "%lu", &pData->dwTemperature);	
+
+			vRet.push_back(pData);
+		}
+	}
+	sqlite3_free_table(azResult);
+
+	return 0;
+}

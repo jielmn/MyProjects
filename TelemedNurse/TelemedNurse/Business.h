@@ -75,6 +75,8 @@ CString GetExcelDriver();
 char *  ConvertTagId( char * buf, DWORD dwBufSize, const TagId * pTagId);
 int     ConvertTagId( TagId * pTagId, const char * szTagId );
 BOOL    GetBoolean(const char * szStr);
+// 选中时间的00:00:00
+time_t  TrimDatetime(time_t t);
 
 class CBusiness : public sigslot::has_slots<> {
 public:
@@ -93,6 +95,10 @@ public:
 	int  BindingTag(const TagInfo * pTagInfo);
 	int  DeleteTag(const TagId * pTagId);
 	int  SaveTempData(std::vector<TagData*> & v);
+
+	// 获取有数据的7天内的温度数据
+	// 温度数据按照时间排序
+	int  GetLatestTempData(const char * szPatientId, std::vector<TagData*> & vRet);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;           // add or modify a patient
 	sigslot::signal2<PatientInfo *, OperationType >        sigAMPatientRet;        // success to add, modify or delete a patient

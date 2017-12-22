@@ -122,6 +122,12 @@ public:
 		m_tFistDay   = 0;                            // 第一天日期
 		m_nWeekIndex = 0;                            // 第几周
 		memset(m_TempData, 0, sizeof(m_TempData));   // 温度数据
+
+		for (int i = 0; i < 7; i++) {
+			for (int j = 0; j < 6; j++) {
+				m_TempData[i][j] = GetRand( 3700, 4100);
+			}
+		}
 	}
 
 	~CTempChartUI() {
@@ -223,9 +229,107 @@ public:
 			
 
 			DrawXml2ChartUI( hDC, m_XmlChartFile->m_ChartUI);
+
+			// 画温度点 
+			CXml2ChartUI * pMainBlock = m_XmlChartFile->FindChartUIByName("MainBlock");
+			if (pMainBlock != 0) {
+				RECT rectBlock = pMainBlock->GetAbsoluteRect();
+				int w = rectBlock.right - rectBlock.left;
+				int h = rectBlock.bottom - rectBlock.top;
+
+				int grid_h = h / 40;
+				int grid_w = w / 42;
+
+				//给出合理的画点的园半径
+				int m = grid_h < grid_w ? grid_h : grid_w;
+				int RADIUS = 6;
+				if (m >= 14) {
+					RADIUS = 6;
+				}
+				else {
+					RADIUS = 4;
+				}
+
+				BOOL bFistPoint = TRUE;
+				for (int i = 0; i < 7; i++) {
+					for (int j = 0; j < 6; j++) {
+						int nTemp = m_TempData[i][j];
+
+						// 不在35-42度范围内
+						if ( !(nTemp >= 3400 && nTemp <= 4200) ) {
+							continue;
+						}
+
+						// 高度比例
+						double h_ratio = (nTemp - 3400.0) / (4200.0 - 3400.0);
+						int    nTempHeight = (int)(h_ratio * h);
+
+						CPoint pt;
+						pt.x = grid_w * (i * 6 + j) + grid_w / 2 + rectBlock.left;
+						pt.y = rectBlock.bottom - nTempHeight;
+
+						DrawTempPoint(pt, hDC, RADIUS);
+
+						// 是否第一个点
+						if (bFistPoint) {
+							::MoveToEx(hDC, pt.x, pt.y, 0);
+							bFistPoint = FALSE;
+						}
+						else {
+							::LineTo(hDC, pt.x, pt.y);
+						}
+					}
+				}
+			}
 		}
 		//return CControlUI::DoPaint(hDC, rcPaint, pStopControl);
 		return true;
+	}
+
+	void DrawTempPoint(CPoint point, HDC hDc, int RADIUS = 6)
+	{
+		::Ellipse(hDc, point.x - RADIUS, point.y - RADIUS, point.x + RADIUS, point.y + RADIUS);
+
+		int nTmp = (int)(0.707 * RADIUS);
+
+		POINT points[2] = { { point.x - nTmp, point.y - nTmp },{ point.x + nTmp, point.y + nTmp } };
+		::Polyline(hDc, points, 2);
+
+		POINT points1[2] = { { point.x + nTmp, point.y - nTmp },{ point.x - nTmp, point.y + nTmp } };
+		::Polyline(hDc, points1, 2);
+	}
+
+	void SetTempData( std::vector<TagData*> & vTempData ) {
+		std::vector<TagData*>::iterator it = vTempData.begin();
+
+		memset(m_TempData, 0, sizeof(m_TempData));
+		for (int i = 0; i < 7; i++) {
+			time_t  t = m_tFistDay + 3600 * 24 * i;
+			for (int j = 0; j < 6; j++) {
+				BOOL bFind = FALSE;
+				for (; it != vTempData.end(); it++) {
+					TagData* pData = *it;
+					// 如果数据时间小于格子的时间
+					if ( pData->tTime < t ) {
+						continue;
+					}
+					// 时间差小于一天
+					if ( pData->tTime - t < 3600 * 24) {
+						m_TempData[i][j] = pData->dwTemperature;
+						it++;
+						bFind = TRUE;
+						break;
+					}
+					else {
+						break;
+					}
+				}
+				// 数据时间的最小的都比当前格子时间大
+				if (!bFind) {
+					break;
+				}
+			}
+		}
 	}
 
 	CXml2ChartFile *  m_XmlChartFile;
@@ -302,9 +406,11 @@ public:
 class CDuiFrameWnd : public WindowImplBase, public sigslot::has_slots<>
 {
 protected:
-	TagId             m_tTagId;
-	int               m_nInventoryError;
-	SerialPortStatus  m_eSerialPortStatus;
+	TagId                  m_tTagId;
+	int                    m_nInventoryError;
+	SerialPortStatus       m_eSerialPortStatus;
+	std::vector<TagData*>  m_vTempetatureData;                   // 温度数据，用于温度曲线绘图
+	PatientInfo            m_tPatient;                           // 病人信息，用于温度曲线绘图
 
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
@@ -392,6 +498,8 @@ public:
 	}
 
 	void  OnItemSelected(CDuiString name) {
+		char buf[8192];
+
 		if (name == "patients_list_short") {
 			CListUI * pListShort = (CListUI *)m_PaintManager.FindControl(name);
 			if (0 == pListShort) {
@@ -436,16 +544,146 @@ public:
 					pBlock1->SetVisible(true);
 				}
 			}
+			// 绑定了Tag;
 			else {
+				ClearVector(m_vTempetatureData);
+				memset(&m_tPatient, 0, sizeof(m_tPatient));
+
+				CBusiness::GetInstance()->GetLatestTempData(szId, m_vTempetatureData);
+				CBusiness::GetInstance()->GetPatient(szId, &m_tPatient);
+
+				time_t  tFirstDay = 0;
+				if (m_vTempetatureData.size() > 0) {
+					TagData* pData = m_vTempetatureData.at( m_vTempetatureData.size() - 1 );
+					time_t  tMaxTime = TrimDatetime( pData->tTime );
+
+					pData = m_vTempetatureData.at(0);
+					time_t tMinTime = TrimDatetime( pData->tTime );
+
+					// 时间跨度小于一周
+					if (tMaxTime - tMinTime < 3600 * 24 * 6 ) {
+						tFirstDay = tMinTime;
+					}
+				}
+				else {
+					tFirstDay = TrimDatetime( time(0) - 3600 * 24 * 6 );
+				}
+
+				CDateTimeUI * pDateTime = (CDateTimeUI *)m_PaintManager.FindControl("DateTime1");
+				if (0 != pDateTime) {
+					SYSTEMTIME s;
+					struct tm t;
+					localtime_s(&t, &tFirstDay);
+					memset(&s, 0, sizeof(s));
+					s.wYear  = t.tm_year + 1900;
+					s.wMonth = t.tm_mon + 1;
+					s.wDay   = t.tm_mday;
+
+					pDateTime->SetText(ConvertDate(buf, sizeof(buf), &tFirstDay) );
+					pDateTime->SetTime(&s);
+				}
+				
+
+				CTempChartUI * pChart0 = (CTempChartUI *)m_PaintManager.FindControl("chart0");
+				if (pChart0) {
+					pChart0->m_tFistDay = tFirstDay;
+					pChart0->m_sPatientName = m_tPatient.szName;
+					pChart0->m_sBedNo = m_tPatient.szBedNo;
+					pChart0->m_sInNo = m_tPatient.szInNo;
+					pChart0->m_sOffice = m_tPatient.szOffice;
+					pChart0->m_tInDate = m_tPatient.tInDate;
+					pChart0->SetTempData(m_vTempetatureData);
+				}
+
+				// 界面显示
 				if (pBlock0) {
 					pBlock0->SetVisible(true);
+
+					CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl("cmbTimeSpan");
+					if (pCombo) {
+						pCombo->SelectItem(0);
+					}
+
+					CVerticalLayoutUI * pLayoutChart = (CVerticalLayoutUI*)m_PaintManager.FindControl("layoutChart");
+					if (pLayoutChart) {
+						CScrollBarUI* pScrollBar = pLayoutChart->GetVerticalScrollBar();
+						if (pScrollBar) {
+							pScrollBar->SetScrollPos(0);
+						}
+					}
 				}
+
 				if (pBlock1) {
 					pBlock1->SetVisible(false);
 				}
 			}
 
 			ClearVector(vTags);
+		}
+		else if (name == "cmbTimeSpan") {
+			CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl(name);
+			if (0 == pCombo) {
+				return;
+			}
+
+			CControlUI * pChart0 = m_PaintManager.FindControl("chart0");
+			CControlUI * pChart1 = m_PaintManager.FindControl("chart1");
+			CControlUI * pChart2 = m_PaintManager.FindControl("chart2");
+			CControlUI * pChart3 = m_PaintManager.FindControl("chart3");
+
+			int nSel = pCombo->GetCurSel();
+			switch (nSel) {
+			case 0:
+			{
+				if (pChart0)
+					pChart0->SetVisible(true);
+				if (pChart1)
+					pChart1->SetVisible(false);
+				if (pChart2)
+					pChart2->SetVisible(false);
+				if (pChart3)
+					pChart3->SetVisible(false);
+			}
+			break;
+			case 1:
+			{
+				if (pChart0)
+					pChart0->SetVisible(true);
+				if (pChart1)
+					pChart1->SetVisible(true);
+				if (pChart2)
+					pChart2->SetVisible(false);
+				if (pChart3)
+					pChart3->SetVisible(false);
+			}
+			break;
+			case 2:
+			{
+				if (pChart0)
+					pChart0->SetVisible(true);
+				if (pChart1)
+					pChart1->SetVisible(true);
+				if (pChart2)
+					pChart2->SetVisible(true);
+				if (pChart3)
+					pChart3->SetVisible(false);
+			}
+			break;
+			case 3:
+			{
+				if (pChart0)
+					pChart0->SetVisible(true);
+				if (pChart1)
+					pChart1->SetVisible(true);
+				if (pChart2)
+					pChart2->SetVisible(true);
+				if (pChart3)
+					pChart3->SetVisible(true);
+			}
+			break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -588,6 +826,15 @@ public:
 			DeletePatient();
 			return;
 		}
+
+		//if (msg.sType == "textchanged") {
+		//	int a = 100;
+		//}
+
+		//if (msg.pSender->GetName() == "DateTime1") {
+		//	g_log->Output(ILog::LOG_SEVERITY_ERROR, "%s\n", (const char *)msg.sType);
+		//}
+
 		//TRACE("msgtype = %s\n", (const char *)msg.sType);
 		WindowImplBase::Notify(msg);
 	}
@@ -683,6 +930,27 @@ public:
 		}
 
 		ClearVector(v);
+
+		CTempChartUI * pChart = (CTempChartUI *)m_PaintManager.FindControl("chart0");
+		if (pChart) {
+			pChart->m_nWeekIndex = 0;
+		}
+
+		pChart = (CTempChartUI *)m_PaintManager.FindControl("chart1");
+		if (pChart) {
+			pChart->m_nWeekIndex = 1;
+		}
+
+		pChart = (CTempChartUI *)m_PaintManager.FindControl("chart2");
+		if (pChart) {
+			pChart->m_nWeekIndex = 2;
+		}
+
+		pChart = (CTempChartUI *)m_PaintManager.FindControl("chart3");
+		if (pChart) {
+			pChart->m_nWeekIndex = 3;
+		}
+
 		WindowImplBase::InitWindow();
 	}
 

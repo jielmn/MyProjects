@@ -21,6 +21,10 @@ public:
 	int  DeleteTag(const TagId * pTagId);
 	int  SaveTempData(std::vector<TagData*> & v);
 
+	// 获取有数据的7天内的温度数据
+	// 温度数据按照时间排序
+	int  GetLatestTempData(const char * szPatientId, std::vector<TagData*> & vRet);
+
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;             // add or modify a patient
 	sigslot::signal1< int *>                                     sigInitDb;          // 初始化数据库（检查表是否存在）
 	sigslot::signal1< int *>                                     sigDeinitDb;        // 去初始化数据库
