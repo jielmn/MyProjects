@@ -157,6 +157,10 @@ int   CBusiness::GetLatestTempData(const char * szPatientId, std::vector<TagData
 	return CMyDatabase::GetInstance()->GetLatestTempData(szPatientId, vRet);
 }
 
+int    CBusiness::GetTempData(const char * szPatientId, time_t tStartTime, std::vector<TagData*> & vRet) {
+	return CMyDatabase::GetInstance()->GetTempData(szPatientId, tStartTime, vRet);
+}
+
 int  CBusiness::ImportExcel(const char * szFilePath) {
 	CString sDriver = GetExcelDriver();
 	if (sDriver.GetLength() == 0) {
@@ -332,6 +336,28 @@ time_t  ConvertDateTime(const char * szDatetime) {
 	tmp.tm_year -= 1900;
 	tmp.tm_mon--;
 	return mktime(&tmp);
+}
+
+time_t  ConvertDateTime(const SYSTEMTIME & t) {
+	struct tm tmp;
+	memset( &tmp, 0, sizeof(tmp) );
+
+	tmp.tm_year = t.wYear - 1900;
+	tmp.tm_mon  = t.wMonth - 1;
+	tmp.tm_mday = t.wDay;
+
+	return mktime(&tmp);
+}
+
+SYSTEMTIME  ConvertDateTime(const time_t & tTime) {
+	SYSTEMTIME s;
+	struct tm t;
+	localtime_s(&t, &tTime);
+	memset(&s, 0, sizeof(s));
+	s.wYear = t.tm_year + 1900;
+	s.wMonth = t.tm_mon + 1;
+	s.wDay = t.tm_mday;
+	return s;
 }
 
 char *  ConvertTagId(char * buf, DWORD dwBufSize, const TagId * pTagId) {	

@@ -12,6 +12,8 @@
 #define  TEMP_TABLE_NAME                  "Temperature"
 
 
+
+
 char * ConvertSqlField( char * szDest, DWORD dwDestSize, const char * filed_value ) {
 	int ret = StrReplaceAll( szDest, dwDestSize - 1, filed_value, "'", "''" );
 	if (0 == ret) {
@@ -125,6 +127,38 @@ void CMyDatabase::OnInitDb(int * ret) {
 		}
 	}
 	sqlite3_free_table(azResult);
+
+#ifdef _DEBUG
+	//std::vector<TagData*> v;
+	//char szPatientId[256];
+	//strncpy_s(szPatientId, "A101", sizeof(szPatientId));
+	//
+	//time_t tFirstDay = ConvertDateTime("2017-07-01 00:00:00");
+	//char * z = ctime(&tFirstDay);
+	//// 插入40天的温度数据
+	//for (int i = 0; i < 40; i++) {
+	//	time_t  tDay = tFirstDay + i * 3600 * 24;
+	//	for (int j = 0; j < 10; j++) {
+	//		int hour   = GetRand(0, 23);
+	//		int minute = GetRand(0, 59);
+	//		int second = GetRand(0, 59);
+	//		int nTemperature = GetRand(3650, 4050);
+
+	//		time_t tTmp = tDay + 3600 * hour + 60 * minute + second;
+	//		z = ctime(&tTmp);
+
+	//		char szTime[256];
+	//		ConvertDateTime(szTime, sizeof(szTime), &tTmp);
+
+	//		char sql[8192];
+	//		_snprintf_s(sql, sizeof(sql), "INSERT INTO %s values ('%s','%s',%d)", TEMP_TABLE_NAME, szPatientId, szTime, (int)nTemperature);
+
+	//		/* Execute SQL statement */
+	//		sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	//	}
+	//}
+#endif
+
 }
 
 void CMyDatabase::OnDeinitDb(int * ret) {
@@ -422,7 +456,7 @@ int   CMyDatabase::GetLatestTempData(const char * szPatientId, std::vector<TagDa
 	}
 
 	time_t tMaxTime = ConvertDateTime(szLatestTime);
-	time_t tMinTime = TrimDatetime (tMaxTime - 3600 * 6);
+	time_t tMinTime = TrimDatetime (tMaxTime - 3600 * 24 * (7 -1) );
 
 	char szMinTime[256];
 	ConvertDateTime(szMinTime, sizeof(szMinTime), &tMinTime);
@@ -437,6 +471,44 @@ int   CMyDatabase::GetLatestTempData(const char * szPatientId, std::vector<TagDa
 
 			pData->tTime = ConvertDateTime(azResult[(i + 1)*ncolumn + 0]);
 			sscanf_s(azResult[(i + 1)*ncolumn + 1], "%lu", &pData->dwTemperature);	
+
+			vRet.push_back(pData);
+		}
+	}
+	sqlite3_free_table(azResult);
+
+	return 0;
+}
+
+int  CMyDatabase::GetTempData(const char * szPatientId, time_t tStartTime, std::vector<TagData*> & vRet) {
+	int ret = -1;
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	char  sql[8192];
+
+	char szId[256];
+	ConvertSqlField(szId, sizeof(szId), szPatientId);
+	
+	time_t tMinTime = TrimDatetime(tStartTime);
+	time_t tMaxTime = tMinTime + 3600 * 24 * MAX_SPAN_DAYS;              
+
+	char szMinTime[256];
+	ConvertDateTime(szMinTime, sizeof(szMinTime), &tMinTime);
+
+	char szMaxTime[256];
+	ConvertDateTime(szMaxTime, sizeof(szMaxTime), &tMaxTime);
+
+	_snprintf_s(sql, sizeof(sql), "select GenTime,Data from %s where PatientID='%s' AND GenTime >= '%s' AND GenTime < '%s' ORDER BY GenTime", TEMP_TABLE_NAME, szId, szMinTime, szMaxTime);
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (nrow > 0) {
+		for (int i = 0; i < nrow; i++) {
+			TagData* pData = new TagData;
+			memset(pData, 0, sizeof(TagData));
+
+			pData->tTime = ConvertDateTime(azResult[(i + 1)*ncolumn + 0]);
+			sscanf_s(azResult[(i + 1)*ncolumn + 1], "%lu", &pData->dwTemperature);
 
 			vRet.push_back(pData);
 		}

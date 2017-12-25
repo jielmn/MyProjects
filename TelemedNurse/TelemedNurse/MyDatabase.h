@@ -24,6 +24,8 @@ public:
 	// 获取有数据的7天内的温度数据
 	// 温度数据按照时间排序
 	int  GetLatestTempData(const char * szPatientId, std::vector<TagData*> & vRet);
+	// 获取4周的温度数据
+	int  GetTempData(const char * szPatientId, time_t tStartTime, std::vector<TagData*> & vRet);
 
 	sigslot::signal3<PatientInfo *, OperationType, int *>  sigAMPatient;             // add or modify a patient
 	sigslot::signal1< int *>                                     sigInitDb;          // 初始化数据库（检查表是否存在）

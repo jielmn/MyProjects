@@ -19,6 +19,7 @@ using namespace DuiLib;
 #include "BindingReader.h"
 #include "UiMessage.h"
 #include "SerialPort.h"
+#include "LmnTemplates.h"
 
 #pragma comment(lib,"User32.lib")
 
@@ -122,12 +123,6 @@ public:
 		m_tFistDay   = 0;                            // 第一天日期
 		m_nWeekIndex = 0;                            // 第几周
 		memset(m_TempData, 0, sizeof(m_TempData));   // 温度数据
-
-		for (int i = 0; i < 7; i++) {
-			for (int j = 0; j < 6; j++) {
-				m_TempData[i][j] = GetRand( 3700, 4100);
-			}
-		}
 	}
 
 	~CTempChartUI() {
@@ -299,37 +294,41 @@ public:
 		::Polyline(hDc, points1, 2);
 	}
 
-	void SetTempData( std::vector<TagData*> & vTempData ) {
-		std::vector<TagData*>::iterator it = vTempData.begin();
+	//void SetTempData( std::vector<TagData*> & vTempData ) {
+	//	std::vector<TagData*>::iterator it = vTempData.begin();
 
-		memset(m_TempData, 0, sizeof(m_TempData));
-		for (int i = 0; i < 7; i++) {
-			time_t  t = m_tFistDay + 3600 * 24 * i;
-			for (int j = 0; j < 6; j++) {
-				BOOL bFind = FALSE;
-				for (; it != vTempData.end(); it++) {
-					TagData* pData = *it;
-					// 如果数据时间小于格子的时间
-					if ( pData->tTime < t ) {
-						continue;
-					}
-					// 时间差小于一天
-					if ( pData->tTime - t < 3600 * 24) {
-						m_TempData[i][j] = pData->dwTemperature;
-						it++;
-						bFind = TRUE;
-						break;
-					}
-					else {
-						break;
-					}
-				}
-				// 数据时间的最小的都比当前格子时间大
-				if (!bFind) {
-					break;
-				}
-			}
-		}
+	//	memset(m_TempData, 0, sizeof(m_TempData));
+	//	for (int i = 0; i < 7; i++) {
+	//		time_t  t = m_tFistDay + 3600 * 24 * i;
+	//		for (int j = 0; j < 6; j++) {
+	//			BOOL bFind = FALSE;
+	//			for (; it != vTempData.end(); it++) {
+	//				TagData* pData = *it;
+	//				// 如果数据时间小于格子的时间
+	//				if ( pData->tTime < t ) {
+	//					continue;
+	//				}
+	//				// 时间差小于一天
+	//				if ( pData->tTime - t < 3600 * 24) {
+	//					m_TempData[i][j] = pData->dwTemperature;
+	//					it++;
+	//					bFind = TRUE;
+	//					break;
+	//				}
+	//				else {
+	//					break;
+	//				}
+	//			}
+	//			// 数据时间的最小的都比当前格子时间大
+	//			if (!bFind) {
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
+
+	void SetTempData(int arrTempData[][6]) {
+		memcpy(m_TempData, arrTempData, sizeof(m_TempData));
 	}
 
 	CXml2ChartFile *  m_XmlChartFile;
@@ -411,6 +410,8 @@ protected:
 	SerialPortStatus       m_eSerialPortStatus;
 	std::vector<TagData*>  m_vTempetatureData;                   // 温度数据，用于温度曲线绘图
 	PatientInfo            m_tPatient;                           // 病人信息，用于温度曲线绘图
+	int                    m_TempData[MAX_SPAN_DAYS][6];         // 温度数据。副本，用于绘图
+	time_t                 m_tFirstTime;                         // 所有温度曲线的第一天(对应UI控件的FirstDay)
 
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
@@ -497,6 +498,76 @@ public:
 			::MessageBox(m_hWnd, GetErrDescription((GlobalErrorNo)ret), "绑定Tag", 0);
 	}
 
+	void OnTempCondChange( ) {
+		CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl("cmbTimeSpan");
+		if (0 == pCombo) {
+			return;
+		}
+
+		CTempChartUI * pChart[4] = { 0 };
+		for (int i = 0; i < 4; i++) {
+			CDuiString str;
+			str.Format("chart%d", i);
+			pChart[i] = (CTempChartUI *)m_PaintManager.FindControl(str);
+		}
+
+		int nSel = pCombo->GetCurSel();
+		int mask = (( 0xF << (nSel + 1) ) & 0xF0) >> 4;
+
+		for (int i = 0; i < 4; i++) {
+			if (0 == pChart[i]) {
+				continue;
+			}
+
+			pChart[i]->m_tFistDay = m_tFirstTime + 3600 * 24 * 7 * i;
+			pChart[i]->SetTempData(m_TempData+7*i);
+
+			if (IfHasBit(mask, i)) {
+				pChart[i]->SetVisible(true);
+			}
+			else {
+				pChart[i]->SetVisible(false);
+			}
+
+			pChart[i]->Invalidate();
+		}
+	}
+
+	// 保存温度数据副本
+	void  SaveCopyTempData() {
+		std::vector<TagData*>::iterator it = m_vTempetatureData.begin();
+		memset(m_TempData, 0, sizeof(m_TempData));
+
+		for (int i = 0; i < MAX_SPAN_DAYS; i++) {
+			time_t  t = m_tFirstTime + 3600 * 24 * i;
+
+			for (int j = 0; j < 6; j++) {
+				BOOL bFind = FALSE;
+				for (; it != m_vTempetatureData.end(); it++) {
+					TagData* pData = *it;
+					// 如果数据时间小于格子的时间
+					if (pData->tTime < t) {
+						continue;
+					}
+					// 时间差小于一天
+					if (pData->tTime - t < 3600 * 24) {
+						m_TempData[i][j] = pData->dwTemperature;
+						it++;
+						bFind = TRUE;
+						break;
+					}
+					else {
+						break;
+					}
+				}
+				// 数据时间的最小的都比当前格子时间大
+				if (!bFind) {
+					break;
+				}
+			}
+		}
+	}
+
 	void  OnItemSelected(CDuiString name) {
 		char buf[8192];
 
@@ -546,53 +617,46 @@ public:
 			}
 			// 绑定了Tag;
 			else {
+				// 清空保存的绘图用数据
 				ClearVector(m_vTempetatureData);
+				memset(m_TempData, 0, sizeof(m_TempData));
 				memset(&m_tPatient, 0, sizeof(m_tPatient));
+				m_tFirstTime = 0;
 
 				CBusiness::GetInstance()->GetLatestTempData(szId, m_vTempetatureData);
-				CBusiness::GetInstance()->GetPatient(szId, &m_tPatient);
+				CBusiness::GetInstance()->GetPatient(szId, &m_tPatient);				
 
-				time_t  tFirstDay = 0;
+				// 得到起始时间
 				if (m_vTempetatureData.size() > 0) {
-					TagData* pData = m_vTempetatureData.at( m_vTempetatureData.size() - 1 );
-					time_t  tMaxTime = TrimDatetime( pData->tTime );
-
-					pData = m_vTempetatureData.at(0);
+					TagData* pData = m_vTempetatureData.at(0);
 					time_t tMinTime = TrimDatetime( pData->tTime );
-
-					// 时间跨度小于一周
-					if (tMaxTime - tMinTime < 3600 * 24 * 6 ) {
-						tFirstDay = tMinTime;
-					}
+					m_tFirstTime = tMinTime;
 				}
 				else {
-					tFirstDay = TrimDatetime( time(0) - 3600 * 24 * 6 );
+					m_tFirstTime = TrimDatetime( time(0) - 3600 * 24 * 6 );
 				}
+				SaveCopyTempData();
 
+				// 更新起始时间UI
 				CDateTimeUI * pDateTime = (CDateTimeUI *)m_PaintManager.FindControl("DateTime1");
 				if (0 != pDateTime) {
-					SYSTEMTIME s;
-					struct tm t;
-					localtime_s(&t, &tFirstDay);
-					memset(&s, 0, sizeof(s));
-					s.wYear  = t.tm_year + 1900;
-					s.wMonth = t.tm_mon + 1;
-					s.wDay   = t.tm_mday;
-
-					pDateTime->SetText(ConvertDate(buf, sizeof(buf), &tFirstDay) );
+					SYSTEMTIME s = ConvertDateTime(m_tFirstTime);
+					pDateTime->SetText(ConvertDate(buf, sizeof(buf), &m_tFirstTime) );
 					pDateTime->SetTime(&s);
 				}
 				
-
-				CTempChartUI * pChart0 = (CTempChartUI *)m_PaintManager.FindControl("chart0");
-				if (pChart0) {
-					pChart0->m_tFistDay = tFirstDay;
-					pChart0->m_sPatientName = m_tPatient.szName;
-					pChart0->m_sBedNo = m_tPatient.szBedNo;
-					pChart0->m_sInNo = m_tPatient.szInNo;
-					pChart0->m_sOffice = m_tPatient.szOffice;
-					pChart0->m_tInDate = m_tPatient.tInDate;
-					pChart0->SetTempData(m_vTempetatureData);
+				// 设置基本信息
+				for (int i = 0; i < 4; i++) {
+					CDuiString  str;
+					str.Format("chart%d", i);
+					CTempChartUI * pChart = (CTempChartUI *)m_PaintManager.FindControl( (const char *)str );
+					if (pChart) {
+						pChart->m_sPatientName = m_tPatient.szName;
+						pChart->m_sBedNo = m_tPatient.szBedNo;
+						pChart->m_sInNo = m_tPatient.szInNo;
+						pChart->m_sOffice = m_tPatient.szOffice;
+						pChart->m_tInDate = m_tPatient.tInDate;
+					}
 				}
 
 				// 界面显示
@@ -616,74 +680,14 @@ public:
 				if (pBlock1) {
 					pBlock1->SetVisible(false);
 				}
+
+				OnTempCondChange();
 			}
 
 			ClearVector(vTags);
 		}
 		else if (name == "cmbTimeSpan") {
-			CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl(name);
-			if (0 == pCombo) {
-				return;
-			}
-
-			CControlUI * pChart0 = m_PaintManager.FindControl("chart0");
-			CControlUI * pChart1 = m_PaintManager.FindControl("chart1");
-			CControlUI * pChart2 = m_PaintManager.FindControl("chart2");
-			CControlUI * pChart3 = m_PaintManager.FindControl("chart3");
-
-			int nSel = pCombo->GetCurSel();
-			switch (nSel) {
-			case 0:
-			{
-				if (pChart0)
-					pChart0->SetVisible(true);
-				if (pChart1)
-					pChart1->SetVisible(false);
-				if (pChart2)
-					pChart2->SetVisible(false);
-				if (pChart3)
-					pChart3->SetVisible(false);
-			}
-			break;
-			case 1:
-			{
-				if (pChart0)
-					pChart0->SetVisible(true);
-				if (pChart1)
-					pChart1->SetVisible(true);
-				if (pChart2)
-					pChart2->SetVisible(false);
-				if (pChart3)
-					pChart3->SetVisible(false);
-			}
-			break;
-			case 2:
-			{
-				if (pChart0)
-					pChart0->SetVisible(true);
-				if (pChart1)
-					pChart1->SetVisible(true);
-				if (pChart2)
-					pChart2->SetVisible(true);
-				if (pChart3)
-					pChart3->SetVisible(false);
-			}
-			break;
-			case 3:
-			{
-				if (pChart0)
-					pChart0->SetVisible(true);
-				if (pChart1)
-					pChart1->SetVisible(true);
-				if (pChart2)
-					pChart2->SetVisible(true);
-				if (pChart3)
-					pChart3->SetVisible(true);
-			}
-			break;
-			default:
-				break;
-			}
+			OnTempCondChange();
 		}
 	}
 
@@ -785,6 +789,9 @@ public:
 
 				return;
 			}
+			else if (name == "btnPrint") {
+				return;
+			}
 		}
 		else if (msg.sType == "itemselect") {
 			OnItemSelected(name);
@@ -863,6 +870,10 @@ public:
 		memset(&m_tTagId, 0, sizeof(TagId));
 		m_nInventoryError = -1;
 		m_eSerialPortStatus = (SerialPortStatus)-1;
+
+		memset(&m_tPatient, 0, sizeof(m_tPatient));
+		memset(m_TempData, 0, sizeof(m_TempData));
+		m_tFirstTime = 0;		
 
 		PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
@@ -1340,6 +1351,23 @@ public:
 				delete pVRet;
 			}
 			return 0;
+		}
+		else if (WM_NOTIFY == uMsg) {
+			NMHDR* pHeader = (NMHDR*)lParam;
+			if (pHeader && pHeader->code == DTN_DATETIMECHANGE) {
+				CDateTimeUI * pTempDataStartTime = (CDateTimeUI *)m_PaintManager.FindControl("DateTime1");
+				if ( pTempDataStartTime && pTempDataStartTime->GetNativeWindow() == pHeader->hwndFrom ) {
+					LPNMDATETIMECHANGE lpChage = (LPNMDATETIMECHANGE)lParam;				
+					time_t tStartTime = ConvertDateTime(lpChage->st);
+					ClearVector(m_vTempetatureData);
+					memset(m_TempData, 0, sizeof(m_TempData));
+					m_tFirstTime = TrimDatetime( tStartTime );
+					CBusiness::GetInstance()->GetTempData( m_tPatient.szId, tStartTime, m_vTempetatureData);
+					SaveCopyTempData();
+					OnTempCondChange();
+				}				
+				return 0;
+			}
 		}
 		return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 	}
