@@ -42,6 +42,8 @@ BOOL    g_bUseUtf8 = FALSE;
 #define  SHORT_INDEX_PATIENT_NAME          1
 #define  SHORT_INDEX_PATIENT_BEDNO         2
 
+#define  CHART_UI_HEIGHT                   1000
+
 class CMyProgress : public CProgressUI
 {
 public:
@@ -136,25 +138,25 @@ public:
 		CControlUI::DoEvent(event);
 	}
 
-	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	void Print(HDC hDC, RECT & r, int nChartUIHeight) {
 		char buf[8192];
 		CDuiString tmp;
-		RECT r = this->GetPos();
+		//RECT r = this->GetPos();
 
-		if ( m_XmlChartFile->m_ChartUI ) {
-			int a = ( (r.right - r.left - 1) - 120 ) / 42;
-			int b = ((1000 - 1) - 85 - 125 - 200) / 40;
+		if (m_XmlChartFile->m_ChartUI) {
+			int a = ((r.right - r.left - 1) - 120) / 42;
+			int b = ((nChartUIHeight - 1) - 85 - 125 - 200) / 40;
 
-			int right  = a * 42 + 120 + r.left + 1;
+			int right = a * 42 + 120 + r.left + 1;
 			int h = b * 40 + 85 + 125 + 200 + 1;
 
-			m_XmlChartFile->m_ChartUI->SetRect( r.left, r.top, right, r.top + h );
+			m_XmlChartFile->m_ChartUI->SetRect(r.left, r.top, right, r.top + h);
 			m_XmlChartFile->m_ChartUI->RecacluteLayout();
 
 			char szHospitalName[256];
-			g_cfg->GetConfig( "hospital name", buf, sizeof(buf), "某某医院" );
+			g_cfg->GetConfig("hospital name", buf, sizeof(buf), "某某医院");
 			if (g_bUseUtf8) {
-				Utf8ToAnsi( szHospitalName, sizeof(szHospitalName), buf );
+				Utf8ToAnsi(szHospitalName, sizeof(szHospitalName), buf);
 			}
 			else {
 				strncpy_s(szHospitalName, buf, sizeof(szHospitalName));
@@ -202,12 +204,12 @@ public:
 
 			for (int i = 0; i < 7; i++) {
 				CDuiString name;
-				name.Format("no%d", i+1);
-				pUI = m_XmlChartFile->FindChartUIByName( (const char *)name );
+				name.Format("no%d", i + 1);
+				pUI = m_XmlChartFile->FindChartUIByName((const char *)name);
 				if (pUI) {
 					CDuiString tmpStr;
 					tmpStr.Format("%d", m_nWeekIndex * 7 + i + 1);
-					pUI->SetText( (const char *)tmpStr );
+					pUI->SetText((const char *)tmpStr);
 				}
 			}
 
@@ -221,9 +223,9 @@ public:
 					pUI->SetText(buf);
 				}
 			}
-			
 
-			DrawXml2ChartUI( hDC, m_XmlChartFile->m_ChartUI);
+
+			DrawXml2ChartUI(hDC, m_XmlChartFile->m_ChartUI);
 
 			// 画温度点 
 			CXml2ChartUI * pMainBlock = m_XmlChartFile->FindChartUIByName("MainBlock");
@@ -251,7 +253,7 @@ public:
 						int nTemp = m_TempData[i][j];
 
 						// 不在35-42度范围内
-						if ( !(nTemp >= 3400 && nTemp <= 4200) ) {
+						if (!(nTemp >= 3400 && nTemp <= 4200)) {
 							continue;
 						}
 
@@ -277,6 +279,11 @@ public:
 				}
 			}
 		}
+	}
+
+	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+		RECT r = this->GetPos();
+		Print(hDC,r, CHART_UI_HEIGHT);
 		//return CControlUI::DoPaint(hDC, rcPaint, pStopControl);
 		return true;
 	}
@@ -293,39 +300,6 @@ public:
 		POINT points1[2] = { { point.x + nTmp, point.y - nTmp },{ point.x - nTmp, point.y + nTmp } };
 		::Polyline(hDc, points1, 2);
 	}
-
-	//void SetTempData( std::vector<TagData*> & vTempData ) {
-	//	std::vector<TagData*>::iterator it = vTempData.begin();
-
-	//	memset(m_TempData, 0, sizeof(m_TempData));
-	//	for (int i = 0; i < 7; i++) {
-	//		time_t  t = m_tFistDay + 3600 * 24 * i;
-	//		for (int j = 0; j < 6; j++) {
-	//			BOOL bFind = FALSE;
-	//			for (; it != vTempData.end(); it++) {
-	//				TagData* pData = *it;
-	//				// 如果数据时间小于格子的时间
-	//				if ( pData->tTime < t ) {
-	//					continue;
-	//				}
-	//				// 时间差小于一天
-	//				if ( pData->tTime - t < 3600 * 24) {
-	//					m_TempData[i][j] = pData->dwTemperature;
-	//					it++;
-	//					bFind = TRUE;
-	//					break;
-	//				}
-	//				else {
-	//					break;
-	//				}
-	//			}
-	//			// 数据时间的最小的都比当前格子时间大
-	//			if (!bFind) {
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
 
 	void SetTempData(int arrTempData[][6]) {
 		memcpy(m_TempData, arrTempData, sizeof(m_TempData));
@@ -691,6 +665,69 @@ public:
 		}
 	}
 
+	void OnPrint() {
+		PRINTDLG printInfo;
+		ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+		printInfo.lStructSize = sizeof(printInfo);
+		printInfo.hwndOwner = 0;
+		printInfo.hDevMode = 0;
+		printInfo.hDevNames = 0;
+		//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+		//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+		//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+		printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC;
+		printInfo.nCopies = 1;
+		printInfo.nFromPage = 0xFFFF;
+		printInfo.nToPage = 0xFFFF;
+		printInfo.nMinPage = 1;
+		printInfo.nMaxPage = 0xFFFF;
+
+		//调用API拿出默认打印机     
+		//PrintDlg(&printInfo);
+		if (PrintDlg(&printInfo) == TRUE)
+		{
+			DOCINFO di;
+			ZeroMemory(&di, sizeof(DOCINFO));
+			di.cbSize = sizeof(DOCINFO);
+			di.lpszDocName = _T("MyXPS");
+
+			CDC *pDC = CDC::FromHandle(printInfo.hDC);
+			pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+			CRect rect(10, 10, 960+1+10, 930+1+10);
+			CSize size = CSize(rect.Width()+20, rect.Height()+20);
+
+			pDC->SetWindowExt(size);
+			pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+			CTempChartUI * pChart[4] = { 0 };
+			for (int i = 0; i < 4; i++) {
+				CDuiString str;
+				str.Format("chart%d", i);
+				pChart[i] = (CTempChartUI *)m_PaintManager.FindControl(str);
+			}
+
+			StartDoc(printInfo.hDC, &di);
+
+			for (int i = 0; i < 4; i++) {
+				if (pChart[i] && pChart[i]->IsVisible() ) {
+					StartPage(printInfo.hDC);
+					pChart[i]->Print(pDC->m_hDC, rect, rect.Height());
+					EndPage(printInfo.hDC);
+				}
+			}
+
+			EndDoc(printInfo.hDC);
+
+			// Delete DC when done.
+			DeleteDC(printInfo.hDC);
+
+			//OnOK();
+		}
+
+		
+	}
+
 
 	virtual void  Notify(TNotifyUI& msg) {
 		CDuiString name = msg.pSender->GetName();
@@ -789,7 +826,8 @@ public:
 
 				return;
 			}
-			else if (name == "btnPrint") {
+			else if (name == "btnPrint") {				
+				OnPrint();
 				return;
 			}
 		}
