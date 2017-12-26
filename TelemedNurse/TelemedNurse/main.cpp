@@ -20,6 +20,7 @@ using namespace DuiLib;
 #include "UiMessage.h"
 #include "SerialPort.h"
 #include "LmnTemplates.h"
+#include "ManulSelectDlg.h"
 
 #pragma comment(lib,"User32.lib")
 
@@ -250,15 +251,15 @@ public:
 				BOOL bFistPoint = TRUE;
 				for (int i = 0; i < 7; i++) {
 					for (int j = 0; j < 6; j++) {
-						int nTemp = m_TempData[i][j];
+						TagData tTemp = m_TempData[i][j];
 
 						// 不在35-42度范围内
-						if (!(nTemp >= 3400 && nTemp <= 4200)) {
+						if (!(tTemp.dwTemperature >= 3400 && tTemp.dwTemperature <= 4200)) {
 							continue;
 						}
 
 						// 高度比例
-						double h_ratio = (nTemp - 3400.0) / (4200.0 - 3400.0);
+						double h_ratio = (tTemp.dwTemperature - 3400.0) / (4200.0 - 3400.0);
 						int    nTempHeight = (int)(h_ratio * h);
 
 						CPoint pt;
@@ -301,7 +302,7 @@ public:
 		::Polyline(hDc, points1, 2);
 	}
 
-	void SetTempData(int arrTempData[][6]) {
+	void SetTempData(TagData arrTempData[][6]) {
 		memcpy(m_TempData, arrTempData, sizeof(m_TempData));
 	}
 
@@ -316,7 +317,7 @@ public:
 	time_t            m_tFistDay;                     // 第一天日期
 	int               m_nWeekIndex;                   // 第几周
 
-	int               m_TempData[7][6];               // 温度数据
+	TagData           m_TempData[7][6];               // 温度数据
 };
 
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
@@ -384,7 +385,7 @@ protected:
 	SerialPortStatus       m_eSerialPortStatus;
 	std::vector<TagData*>  m_vTempetatureData;                   // 温度数据，用于温度曲线绘图
 	PatientInfo            m_tPatient;                           // 病人信息，用于温度曲线绘图
-	int                    m_TempData[MAX_SPAN_DAYS][6];         // 温度数据。副本，用于绘图
+	TagData                m_TempData[MAX_SPAN_DAYS][6];         // 温度数据。副本，用于绘图
 	time_t                 m_tFirstTime;                         // 所有温度曲线的第一天(对应UI控件的FirstDay)
 
 public:
@@ -525,7 +526,7 @@ public:
 					}
 					// 时间差小于一天
 					if (pData->tTime - t < 3600 * 24) {
-						m_TempData[i][j] = pData->dwTemperature;
+						m_TempData[i][j] = *pData;
 						it++;
 						bFind = TRUE;
 						break;
@@ -828,6 +829,23 @@ public:
 			}
 			else if (name == "btnPrint") {				
 				OnPrint();
+				return;
+			}
+			else if (name == "manul_select") {
+				CManulSelectWnd * pManulSelectDlg = new CManulSelectWnd;
+				pManulSelectDlg->m_pvTempetatureData = &m_vTempetatureData;
+				pManulSelectDlg->m_tFirstTime = m_tFirstTime;
+				memcpy(pManulSelectDlg->m_TempData, m_TempData, sizeof(pManulSelectDlg->m_TempData));
+				CComboUI * pTimeSpan = (CComboUI *)m_PaintManager.FindControl("cmbTimeSpan");
+				if (pTimeSpan) {
+					pManulSelectDlg->m_nWeekIndex = pTimeSpan->GetCurSel();
+				}
+				pManulSelectDlg->m_sigOK.connect(this, &CDuiFrameWnd::OnManulSelectOK);
+
+				pManulSelectDlg->Create(this->m_hWnd, _T("手动选择数据"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+				pManulSelectDlg->CenterWindow();
+				pManulSelectDlg->ShowModal();
+				delete pManulSelectDlg;
 				return;
 			}
 		}
@@ -1408,6 +1426,11 @@ public:
 			}
 		}
 		return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+	}
+
+	void  OnManulSelectOK(TagData pData[MAX_SPAN_DAYS][6]) {
+		memcpy(m_TempData, pData, sizeof(m_TempData));
+		OnTempCondChange();
 	}
 
 };

@@ -164,6 +164,7 @@
     <ClCompile Include="BindingReader.cpp" />
     <ClCompile Include="Business.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ManulSelectDlg.cpp" />
     <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="PatientDlg.cpp" />
     <ClCompile Include="SerialPort.cpp" />
@@ -171,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="BindingReader.h" />
     <ClInclude Include="Business.h" />
+    <ClInclude Include="ManulSelectDlg.h" />
     <ClInclude Include="mi.h" />
     <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="PatientDlg.h" />
