@@ -479,11 +479,17 @@ public:
 			return;
 		}
 
+		CControlUI *   pControl[3] = { 0 };
 		CTempChartUI * pChart[4] = { 0 };
 		for (int i = 0; i < 4; i++) {
 			CDuiString str;
 			str.Format("chart%d", i);
 			pChart[i] = (CTempChartUI *)m_PaintManager.FindControl(str);
+
+			if (i > 0) {
+				str.Format("control_%d", i);
+				pControl[i-1] = m_PaintManager.FindControl(str);
+			}
 		}
 
 		int nSel = pCombo->GetCurSel();
@@ -499,9 +505,15 @@ public:
 
 			if (IfHasBit(mask, i)) {
 				pChart[i]->SetVisible(true);
+				if (i > 0) {
+					pControl[i - 1]->SetVisible(true);
+				}
 			}
 			else {
 				pChart[i]->SetVisible(false);
+				if (i > 0) {
+					pControl[i - 1]->SetVisible(false);
+				}
 			}
 
 			pChart[i]->Invalidate();
@@ -1309,15 +1321,15 @@ public:
 				}
 			}
 			else if (0 == nResult) {
-				if (m_nInventoryError != nResult) {
-					if (pLblOther) {
-						pLblOther->SetText("");
-					}
-
+				if (m_nInventoryError != nResult) {				
 					if (pLblBinding) {
 						pLblBinding->SetText("绑定温度贴的读卡器OK");
 						pLblBinding->SetTextColor(0xFFFFFFFF);
 					}
+				}
+
+				if (pLblOther) {
+					pLblOther->SetText("");
 				}
 
 				// 如果是病人信息管理tab页
@@ -1333,11 +1345,19 @@ public:
 						if (pBtn) {
 							pBtn->SetEnabled(false);
 						}
+						if (pLblOther) {
+							pLblOther->SetText("该温度提已经绑定，现选中该绑定的病人");
+							pLblOther->SetTextColor(0xFFCAF100);
+						}
 					}
 					else {
 						memcpy(&m_tTagId, pTagId, sizeof(TagId));
 						if (pBtn) {
 							pBtn->SetEnabled(true);
+						}
+						if (pLblOther) {
+							pLblOther->SetText("请选择病人绑定温度贴");
+							pLblOther->SetTextColor(0xFFFFFFFF);
 						}
 					}
 				}

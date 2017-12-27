@@ -36,12 +36,12 @@
 			</HorizontalLayout>
 			
 			<VerticalLayout padding="10,5,10,5" vscrollbar="true" sepheight="4" name="layoutChart" >
-				<ChartImage name="chart0" bordercolor="#FF768D9B" bordersize="1" height="1000" a="100" />
-				<Control height="100" />
+				<ChartImage name="chart0" bordercolor="#FF768D9B" bordersize="1" height="1000" />
+				<Control name="control_1" height="100" />
 				<ChartImage name="chart1"  bordercolor="#FF768D9B" bordersize="1" height="1000" visible="false" />
-				<Control height="100" />
+				<Control name="control_2" height="100" />
 				<ChartImage name="chart2"  bordercolor="#FF768D9B" bordersize="1" height="1000" visible="false" />
-				<Control height="100" />
+				<Control name="control_3" height="100" />
 				<ChartImage name="chart3"  bordercolor="#FF768D9B" bordersize="1" height="1000" visible="false" />
 			</VerticalLayout>			
 			
