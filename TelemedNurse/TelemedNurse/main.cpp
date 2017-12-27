@@ -582,82 +582,95 @@ public:
 			}
 
 			// 没有绑定tag
-			if (0 == vTags.size()) {
+			//if (0 == vTags.size()) {
+			//	if (pBlock0) {
+			//		pBlock0->SetVisible(false);
+			//	}
+			//	if (pBlock1) {
+			//		pBlock1->SetVisible(true);
+			//	}
+			//}
+			//// 绑定了Tag;
+			//else 
+			
+
+			// 清空保存的绘图用数据
+			ClearVector(m_vTempetatureData);
+			memset(m_TempData, 0, sizeof(m_TempData));
+			memset(&m_tPatient, 0, sizeof(m_tPatient));
+			m_tFirstTime = 0;
+
+			CBusiness::GetInstance()->GetLatestTempData(szId, m_vTempetatureData);
+			CBusiness::GetInstance()->GetPatient(szId, &m_tPatient);
+
+			// 数据为空，且没有绑定tag
+			if (0 == vTags.size() && 0 == m_vTempetatureData.size()) {
 				if (pBlock0) {
 					pBlock0->SetVisible(false);
 				}
 				if (pBlock1) {
 					pBlock1->SetVisible(true);
 				}
+				ClearVector(vTags);
+				return;
 			}
-			// 绑定了Tag;
+
+			// 得到起始时间
+			if (m_vTempetatureData.size() > 0) {
+				TagData* pData = m_vTempetatureData.at(0);
+				time_t tMinTime = TrimDatetime(pData->tTime);
+				m_tFirstTime = tMinTime;
+			}
 			else {
-				// 清空保存的绘图用数据
-				ClearVector(m_vTempetatureData);
-				memset(m_TempData, 0, sizeof(m_TempData));
-				memset(&m_tPatient, 0, sizeof(m_tPatient));
-				m_tFirstTime = 0;
-
-				CBusiness::GetInstance()->GetLatestTempData(szId, m_vTempetatureData);
-				CBusiness::GetInstance()->GetPatient(szId, &m_tPatient);				
-
-				// 得到起始时间
-				if (m_vTempetatureData.size() > 0) {
-					TagData* pData = m_vTempetatureData.at(0);
-					time_t tMinTime = TrimDatetime( pData->tTime );
-					m_tFirstTime = tMinTime;
-				}
-				else {
-					m_tFirstTime = TrimDatetime( time(0) - 3600 * 24 * 6 );
-				}
-				SaveCopyTempData();
-
-				// 更新起始时间UI
-				CDateTimeUI * pDateTime = (CDateTimeUI *)m_PaintManager.FindControl("DateTime1");
-				if (0 != pDateTime) {
-					SYSTEMTIME s = ConvertDateTime(m_tFirstTime);
-					pDateTime->SetText(ConvertDate(buf, sizeof(buf), &m_tFirstTime) );
-					pDateTime->SetTime(&s);
-				}
-				
-				// 设置基本信息
-				for (int i = 0; i < 4; i++) {
-					CDuiString  str;
-					str.Format("chart%d", i);
-					CTempChartUI * pChart = (CTempChartUI *)m_PaintManager.FindControl( (const char *)str );
-					if (pChart) {
-						pChart->m_sPatientName = m_tPatient.szName;
-						pChart->m_sBedNo = m_tPatient.szBedNo;
-						pChart->m_sInNo = m_tPatient.szInNo;
-						pChart->m_sOffice = m_tPatient.szOffice;
-						pChart->m_tInDate = m_tPatient.tInDate;
-					}
-				}
-
-				// 界面显示
-				if (pBlock0) {
-					pBlock0->SetVisible(true);
-
-					CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl("cmbTimeSpan");
-					if (pCombo) {
-						pCombo->SelectItem(0);
-					}
-
-					CVerticalLayoutUI * pLayoutChart = (CVerticalLayoutUI*)m_PaintManager.FindControl("layoutChart");
-					if (pLayoutChart) {
-						CScrollBarUI* pScrollBar = pLayoutChart->GetVerticalScrollBar();
-						if (pScrollBar) {
-							pScrollBar->SetScrollPos(0);
-						}
-					}
-				}
-
-				if (pBlock1) {
-					pBlock1->SetVisible(false);
-				}
-
-				OnTempCondChange();
+				m_tFirstTime = TrimDatetime(time(0) - 3600 * 24 * 6);
 			}
+			SaveCopyTempData();
+
+			// 更新起始时间UI
+			CDateTimeUI * pDateTime = (CDateTimeUI *)m_PaintManager.FindControl("DateTime1");
+			if (0 != pDateTime) {
+				SYSTEMTIME s = ConvertDateTime(m_tFirstTime);
+				pDateTime->SetText(ConvertDate(buf, sizeof(buf), &m_tFirstTime));
+				pDateTime->SetTime(&s);
+			}
+
+			// 设置基本信息
+			for (int i = 0; i < 4; i++) {
+				CDuiString  str;
+				str.Format("chart%d", i);
+				CTempChartUI * pChart = (CTempChartUI *)m_PaintManager.FindControl((const char *)str);
+				if (pChart) {
+					pChart->m_sPatientName = m_tPatient.szName;
+					pChart->m_sBedNo = m_tPatient.szBedNo;
+					pChart->m_sInNo = m_tPatient.szInNo;
+					pChart->m_sOffice = m_tPatient.szOffice;
+					pChart->m_tInDate = m_tPatient.tInDate;
+				}
+			}
+
+			// 界面显示
+			if (pBlock0) {
+				pBlock0->SetVisible(true);
+
+				CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl("cmbTimeSpan");
+				if (pCombo) {
+					pCombo->SelectItem(0);
+				}
+
+				CVerticalLayoutUI * pLayoutChart = (CVerticalLayoutUI*)m_PaintManager.FindControl("layoutChart");
+				if (pLayoutChart) {
+					CScrollBarUI* pScrollBar = pLayoutChart->GetVerticalScrollBar();
+					if (pScrollBar) {
+						pScrollBar->SetScrollPos(0);
+					}
+				}
+			}
+
+			if (pBlock1) {
+				pBlock1->SetVisible(false);
+			}
+
+			OnTempCondChange();
 
 			ClearVector(vTags);
 		}
@@ -1406,6 +1419,17 @@ public:
 				ClearVector(*pVRet);
 				delete pVRet;
 			}
+
+			if (m_tPatient.szId[0] != '\0' && m_tFirstTime != 0) {
+				ClearVector(m_vTempetatureData);
+				memset(m_TempData, 0, sizeof(m_TempData));
+
+				CBusiness::GetInstance()->GetTempData(m_tPatient.szId, m_tFirstTime, m_vTempetatureData);
+				SaveCopyTempData();
+				OnTempCondChange();
+			}
+			
+
 			return 0;
 		}
 		else if (WM_NOTIFY == uMsg) {
@@ -1418,7 +1442,7 @@ public:
 					ClearVector(m_vTempetatureData);
 					memset(m_TempData, 0, sizeof(m_TempData));
 					m_tFirstTime = TrimDatetime( tStartTime );
-					CBusiness::GetInstance()->GetTempData( m_tPatient.szId, tStartTime, m_vTempetatureData);
+					CBusiness::GetInstance()->GetTempData( m_tPatient.szId, m_tFirstTime, m_vTempetatureData);
 					SaveCopyTempData();
 					OnTempCondChange();
 				}				
