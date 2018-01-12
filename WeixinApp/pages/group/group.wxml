@@ -1,0 +1,20 @@
+<view >
+  <block wx:for="{{list}}" wx:for-item="vo" wx:key="id">
+    <scroll-view scroll-x="true" >
+      <view class="item">
+        <view class="menu rd" bindtap="del" data-id="{{vo.id}}">
+          删除
+        </view>
+        <view class="menu lb" bindtap="top" data-id="{{vo.id}}">
+          置顶
+        </view>
+        <view class="menu og {{vo.finish}}" bindtap="finish" data-id="{{vo.id}}">
+          完成
+        </view>
+        <view class="menu og" bindtap="finish" data-id="{{vo.id}}">
+          待完
+        </view>
+      </view>
+    </scroll-view>
+  </block>
+</view>

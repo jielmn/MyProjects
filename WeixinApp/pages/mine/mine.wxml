@@ -1,0 +1,29 @@
+<!--index.wxml-->
+<view class="main" catchtap="OnIgnore">
+  <view class="title" catchtap="OnIgnore">正在进行</view>
+  <view class="content" catchtap="OnIgnore">
+    <view wx:if="{{items.length>0}}" class="split" catchtap="OnIgnore" ></view>
+    <checkbox-group catchtap="OnIgnore">
+      <label wx:for="{{items}}" wx:key="id">
+        <scroll-view class="todo-item-line" scroll-x catchtap="OnIgnore">
+          <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
+            <checkbox class="todo-item todo-item-checkbox" value="{{item.id}}" checked="{{false}}" catchtap="OnIgnore"  />
+            <text class="todo-item text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnIgnore" >{{item.value}}</text>
+            <view class="todo-item menu rd" catchtap="OnDelete" >删除</view>
+          </view>
+        </scroll-view>    
+        <view class="split" catchtap="OnIgnore" ></view>
+      </label>
+    </checkbox-group>
+  </view>
+
+
+</view>
+
+<view class="bottom-view"></view>
+
+<view class="bottom">
+  <view class="add-p">
+    <view class="add" bindtap="toAddPage">+</view>
+  </view>
+</view>
