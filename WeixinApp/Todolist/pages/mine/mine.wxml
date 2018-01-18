@@ -1,0 +1,79 @@
+<!--index.wxml-->
+<view class="content-center">
+  <image src="{{personInfo.avatarUrl}}" class="person avatar"></image>
+  <view class="person">{{personInfo.nickName}}</view>
+</view>
+
+<view style="width:10px;height:10px;"></view>
+
+<view class="main" catchtap="OnIgnore">
+  <view class="title" catchtap="OnIgnore">正在进行</view>
+  <view class="content" catchtap="OnIgnore">
+    <view wx:if="{{todolist_items.length>0}}" class="split" catchtap="OnIgnore" ></view>
+    <checkbox-group catchtap="OnIgnore">
+      <label wx:for="{{todolist_items}}" wx:key="id">
+        <scroll-view class="todo-item-line" scroll-x catchtap="OnIgnore" >
+          <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
+            <view class="todo-item" style="width:10px;"></view>
+            <checkbox class="todo-item" value="{{item.id}}" checked="{{false}}" catchtap="OnIgnore" 
+            wx:if="{{self}}" />
+            <view style="display:inline-block;vertical-align:middle;">
+              <view style="display:flex;flex-direction:column;">
+                <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnIgnore" >{{item.value}}</text>
+                <view style="width:10px;height:5px;"></view>
+                <view style="display:flex;flex-direction:row;justify-content:space-between;">
+                  <view style="font-size:10px;color:#999">13小时20分前</view>
+                  <view style="font-size:10px;color:#999">石杰</view>
+                </view>                
+              </view>
+            </view>    
+                    
+            <view class="todo-item menu rd" catchtap="OnDelete" wx:if="{{self}}" >删除</view>
+          </view>
+        </scroll-view>    
+        <view class="split" catchtap="OnIgnore" ></view>
+      </label>
+    </checkbox-group>
+  </view>
+
+
+  <view style="height:20px;"></view>
+  <view class="title" catchtap="OnIgnore">已经完成</view>
+  <view class="content" catchtap="OnIgnore">
+    <view wx:if="{{history_todolist_items.length>0}}" class="split" catchtap="OnIgnore" ></view>
+    <checkbox-group catchtap="OnIgnore">
+      <label wx:for="{{history_todolist_items}}" wx:key="id">
+        <scroll-view class="todo-item-line-complete" scroll-x catchtap="OnIgnore" >
+          <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
+            <view class="todo-item" style="width:10px;"></view>
+            <checkbox class="todo-item" value="{{item.id}}" checked="{{true}}" catchtap="OnIgnore" 
+            wx:if="{{self}}" color="#ccc" />
+            <view style="display:inline-block;vertical-align:middle;">
+              <view style="display:flex;flex-direction:column;">
+                <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnIgnore" >{{item.value}}</text>
+                <view style="width:10px;height:5px;"></view>
+                <view style="display:flex;flex-direction:row;justify-content:space-between;">
+                  <view style="font-size:10px;color:#999">13小时20分前</view>
+                  <view style="font-size:10px;color:#999">石杰</view>
+                </view>                
+              </view>
+            </view>    
+                    
+            <view class="todo-item menu rd" catchtap="OnDelete" wx:if="{{self}}" >删除</view>
+          </view>
+        </scroll-view>    
+        <view class="split" catchtap="OnIgnore" ></view>
+      </label>
+    </checkbox-group>
+  </view>
+</view>
+
+<view class="content-right">
+  <view class="bottom-view">加载更多历史清单</view>
+</view>
+
+<view class="bottom">
+  <view class="add-p">
+    <view class="add" bindtap="toAddPage">+</view>
+  </view>
+</view>
