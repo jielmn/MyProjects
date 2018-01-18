@@ -6,7 +6,7 @@ Page({
   data: {
     todolist_items: [
       { id: 1, value: '很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单'},
-      { id: 2, value: '清单2'},
+      { id: 2, value: '清单222222222'},
       { id: 3, value: '清单3'},
       { id: 4, value: '清单4' },
       { id: 5, value: '清单5' },
@@ -57,11 +57,17 @@ Page({
     this.setData({ openid:   app.globalData.openid })
 
     app.userInfoReadyCallback = res => {
+      wx.hideLoading()
+
       this.setData({
         userInfo: res.userInfo
       })
-      wx.hideLoading()
+
+      // 修改personInfo      
       this.CheckPersonId();
+
+      // 注册自己
+      this.Register();
     }  
 
     app.openidReadyCallback = openid => {
@@ -70,14 +76,23 @@ Page({
       })
 
       // 检查是否自己
-      this.CheckPersonId();      
+      this.CheckPersonId();  
+
+      // 注册自己
+      this.Register();    
     }  
 
     var personid = options.personid
     this.setData({ personid: personid })
 
     // 检查是否自己
+    // 修改personInfo
     this.CheckPersonId();
+
+    // 如果有userInfo，注册用户
+    if (this.data.userInfo) {
+      this.Register();
+    }
 
     // 计算已经过去多少时间
     //this.CalculateElapsedTime(this.data.items);
@@ -112,6 +127,37 @@ Page({
 
   OnIgnore:function() {
     
+  },
+
+  // 注册当前用户
+  Register: function() {
+    var that  = this;
+
+    // 还没有拿到openid
+    if (!this.data.openid) {
+      return;
+    }
+
+    // 还没有拿到userInfo
+    if (!this.data.userInfo) {
+      return;
+    }
+
+    // 开始注册
+    wx.request({
+      url: 'http://118.25.26.186:8080/todolist/',
+      method: 'GET',
+      success: (res) => {
+        console.log("register result...")
+        console.log(res)
+        that.setData({test:res.data})
+        console.log(that.data)
+      },
+      fail() {
+        console.log("failed to register")
+      }
+    })
+
   },
 
   // 检查person id是否是当前的登录用户
