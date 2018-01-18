@@ -1,7 +1,8 @@
 {
   "pages":[
     "pages/mine/mine",
-    "pages/group/group"
+    "pages/group/group",
+    "pages/error/error"
   ],
   "window":{
     "backgroundTextStyle":"light",
@@ -12,7 +13,7 @@
   },
   "tabBar": {
     "color": "#cdcdcd",
-    "selectedColor": "#35495e",
+    "selectedColor": "#c92651",
     "borderStyle": "white",
     "list": [
       {
