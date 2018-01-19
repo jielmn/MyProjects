@@ -15,6 +15,7 @@
   <view class="title" catchtap="OnIgnore">正在进行</view>
   <view class="content" catchtap="OnIgnore">
     <view wx:if="{{todolist_items.length>0}}" class="split" catchtap="OnIgnore" ></view>
+    <view wx:else class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
     <checkbox-group catchtap="OnIgnore">
       <label wx:for="{{todolist_items}}" wx:key="id">
         <scroll-view class="todo-item-line" scroll-x catchtap="OnIgnore" >
@@ -46,6 +47,7 @@
   <view class="title" catchtap="OnIgnore">已经完成</view>
   <view class="content" catchtap="OnIgnore">
     <view wx:if="{{history_todolist_items.length>0}}" class="split" catchtap="OnIgnore" ></view>
+    <view wx:else class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
     <checkbox-group catchtap="OnIgnore">
       <label wx:for="{{history_todolist_items}}" wx:key="id">
         <scroll-view class="todo-item-line-complete" scroll-x catchtap="OnIgnore" >

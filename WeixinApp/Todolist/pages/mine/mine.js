@@ -5,7 +5,7 @@ const app = getApp()
 Page({
   data: {
     todolist_items: [
-      { id: 1, value: '很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单'},
+      /*{ id: 1, value: '很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单'},
       { id: 2, value: '清单222222222'},
       { id: 3, value: '清单3'},
       { id: 4, value: '清单4' },
@@ -15,16 +15,16 @@ Page({
       { id: 8, value: '测试清单8' },
       { id: 9, value: '测试清单9' },
       { id: 10, value: '测试清单10' },
-      { id: 11, value: '测试清单11' }
+      { id: 11, value: '测试清单11' }*/
     ],
 
     history_todolist_items: [
-      { id: 100, value: '完成的很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单' },
+      /*{ id: 100, value: '完成的很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单' },
       { id: 101, value: '完成的清单2' },
       { id: 102, value: '完成的清单3' },
       { id: 103, value: '完成的清单4' },
       { id: 104, value: '完成的清单5' },
-      { id: 105, value: '完成的清单6' },
+      { id: 105, value: '完成的清单6' },*/
     ],
 
     windowWidth:375,
@@ -33,12 +33,15 @@ Page({
     todo_item_text_width:240,
     todo_item_width:0,
 
-    self:false,
-
+    self:false,    
     personid:null,
     personInfo:null,
 
-    login:false,
+    login:false,           // 是否登录
+    open_id: null,         // 用户id
+    userInfo: null,        // 用户信息
+
+    infoFailResult:false,         // 是否已经获取过info的失败结果
   },
   
   onLoad: function (options) {
@@ -58,8 +61,9 @@ Page({
     this.setData({ userInfo: app.globalData.userInfo})
     this.setData({ openid:   app.globalData.openid })
 
+    // 设置userInfo成功的回调
     app.userInfoReadyCallback = res => {
-      wx.hideLoading()
+      console.log("callback get userInfo")
 
       this.setData({
         userInfo: res.userInfo
@@ -72,6 +76,15 @@ Page({
       this.Register();
     }  
 
+    // 获取userInfo失败的回调 
+    app.userInfoFailCallback = function() {
+      console.log("get info failed result")
+      that.data.infoFailResult = true;
+      wx.hideLoading()
+      wx.navigateTo({ url: '../error/error' })
+    }
+
+    // 获取openid成功的回调
     app.openidReadyCallback = openid => {
       this.setData({
         openid: openid
@@ -84,6 +97,12 @@ Page({
       this.Register();    
     }  
 
+    // 获取openid失败的回调
+    app.openidFailCallback = function () {
+
+    }
+
+    // 获取传递的参数personid
     var personid = options.personid
     this.setData({ personid: personid })
 
@@ -91,10 +110,8 @@ Page({
     // 修改personInfo
     this.CheckPersonId();
 
-    // 如果有userInfo，注册用户
-    if (this.data.userInfo) {
-      this.Register();
-    }
+    // 注册用户
+    this.Register();
 
     // 计算已经过去多少时间
     //this.CalculateElapsedTime(this.data.items);
@@ -104,18 +121,21 @@ Page({
   onShow:function(){
     var that = this;
     console.log("mine page onshowing......")
+
     // 如果没有获取到用户信息，开启loading条
     if (!that.data.userInfo) {      
       wx.showLoading({
-        title: '加载中',
+        title: '获取userInfo中',
       })
-      
-      setTimeout(function () {
-        wx.hideLoading()
-        if (!that.data.userInfo) {
+
+      // 如果得到获取的结果，则跳转
+      if (this.data.infoFailResult){
+        setTimeout(function () {
+          wx.hideLoading()
           wx.navigateTo({ url: '../error/error' })
-        }
-      }, 2000)
+        }, 1000)
+      }
+
     }
   },
 
@@ -145,22 +165,29 @@ Page({
       return;
     }
 
+    wx.showLoading({
+      title: '登录中',
+    })
+
     // 开始注册
     wx.request({
       url: 'http://118.25.26.186:8080/todolist/main?type=register&open_id=' + this.data.openid+'&name=' + this.data.userInfo.nickName+'&avatarUrl='+this.data.userInfo.avatarUrl + '&abc= 你好',
       method: 'GET',
       success: (res) => {
         if ( res.data.error != null && res.data.error == 0 ) {
-          that.setData({ login: true })  
-          console.log("login success!")
+          that.setData({ login: true })            
+          console.log("login success!")          
         } else {
           console.log("register result:")
-          console.log(res.data);
-        }
+          console.log(res);
+        }        
       },
       fail() {
         console.log("failed to register")
-      }
+      },
+      complete() {
+        wx.hideLoading()
+      },
     })
 
   },
@@ -185,13 +212,26 @@ Page({
       this.setData({ todo_item_text_width: this.data.windowWidth - 20 })
       this.setData({ todo_item_width: this.data.windowWidth })
     }
-
-    /*
-    this.setData({ self: false })
-    this.setData({ todo_item_text_width: this.data.windowWidth - 20 })
-    this.setData({ todo_item_width: this.data.windowWidth })
-    */
   },
+
+  toAddPage:function() {
+
+  },
+
+  canHideLoading:function() {
+    if ( !this.data.login ) {
+      return false;
+    }
+
+    if (!this.data.open_id ){
+      return false;
+    }
+
+    if ( !this.data.userInfo ) {
+      return false;
+    }
+    return true;
+  }
 
 
 

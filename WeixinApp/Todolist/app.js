@@ -1,7 +1,7 @@
 //app.js
 App({
   onLaunch: function () {
-
+    
     // 保存变量
     var app_obj = this;
 
@@ -10,7 +10,7 @@ App({
       success: function (res) {
         app_obj.globalData.windowWidth = res.windowWidth
         app_obj.globalData.windowHeight = res.windowHeight
-      }
+      },
     })
 
     // 登录
@@ -20,7 +20,7 @@ App({
         console.log("wx.login success.")
         // 登录成功后获取openid
         app_obj.getOpenid(res.code);
-      }
+      },
     })
 
     // 获取用户信息
@@ -34,31 +34,30 @@ App({
 
             // 可以将 res 发送给后台解码出 unionId
             app_obj.globalData.userInfo = res.userInfo
+
             // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
             // 所以此处加入 callback 以防止这种情况
             if (app_obj.userInfoReadyCallback) {
               app_obj.userInfoReadyCallback(res)
             }
 
-          }
-        })
+          },
 
-      }
+          // 如果失败，通知失败回调
+          fail(){
+            if (app_obj.userInfoFailCallback) {
+              app_obj.userInfoFailCallback()
+            }            
+          },
+
+        }) // end of wx.getUserInfo
+
+      }, // end of success
     })
 
+  }, // end of onLaunch
 
-    // 测试用
-    /*
-    wx.request({
-      url: 'http://118.25.26.186:8080/helloapp/login.htm',
-      method: 'GET',
-      success: (res) => {
-
-      }
-    })
-    */
-  },
-
+  // 获取open_id
   getOpenid: function (code) {
     console.log("getting openid")
     var that = this;
@@ -67,19 +66,21 @@ App({
       data: {},
       method: 'GET',
       success: function (res) {
-        var obj = {};
         console.log("ok, openid=" + res.data.openid)
-        obj.openid = res.data.openid;
-        obj.expires_in = Date.now() + res.data.expires_in;
-        obj.session_key = res.data.session_key;
         that.globalData.openid = res.data.openid;     
-
+        // openid成功的回调函数
         if (that.openidReadyCallback) {
           that.openidReadyCallback(res.data.openid)
+        }        
+      },   // success
+
+      // 获取openid失败
+      fail() {
+        if (that.openidFailCallback ) {
+          that.openidFailCallback();
         }
-        
-      }
-    });
+      },
+    }); // wx.request
   },
 
 
@@ -90,7 +91,13 @@ App({
     userInfo: null,
     openid:null,
     windowWidth:0,
-    windowHeight:0
+    windowHeight:0,
+
+    userInfoReadyCallback:null,
+    userInfoFailCallback:null,
+
+    openidReadyCallback:null,
+    openidFailCallback:null,
   }
 
 })

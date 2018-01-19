@@ -21,6 +21,11 @@
   display: block;
 }
 
+.todo-item-line-none {
+  display: block;
+  margin:10px;
+}
+
 .todo-item-line-complete {
   display:block;  
   background:#E6E6E6;
