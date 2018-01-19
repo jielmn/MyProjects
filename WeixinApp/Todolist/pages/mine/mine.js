@@ -37,6 +37,8 @@ Page({
 
     personid:null,
     personInfo:null,
+
+    login:false,
   },
   
   onLoad: function (options) {
@@ -145,13 +147,16 @@ Page({
 
     // 开始注册
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/',
+      url: 'http://118.25.26.186:8080/todolist/main?type=register&open_id=' + this.data.openid+'&name=' + this.data.userInfo.nickName+'&avatarUrl='+this.data.userInfo.avatarUrl + '&abc= 你好',
       method: 'GET',
       success: (res) => {
-        console.log("register result...")
-        console.log(res)
-        that.setData({test:res.data})
-        console.log(that.data)
+        if ( res.data.error != null && res.data.error == 0 ) {
+          that.setData({ login: true })  
+          console.log("login success!")
+        } else {
+          console.log("register result:")
+          console.log(res.data);
+        }
       },
       fail() {
         console.log("failed to register")

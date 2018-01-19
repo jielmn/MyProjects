@@ -1,4 +1,9 @@
 <!--index.wxml-->
+
+<!--控制整个页面是否显示。要求用户登录服务器-->
+<view wx:if="{{login}}">
+
+
 <view class="content-center">
   <image src="{{personInfo.avatarUrl}}" class="person avatar"></image>
   <view class="person">{{personInfo.nickName}}</view>
@@ -76,4 +81,9 @@
   <view class="add-p">
     <view class="add" bindtap="toAddPage">+</view>
   </view>
+</view>
+
+
+
+
 </view>
