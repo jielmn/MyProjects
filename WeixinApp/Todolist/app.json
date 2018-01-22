@@ -3,7 +3,8 @@
     "pages/mine/mine",
     "pages/group/group",
     "pages/error/error",
-    "pages/item/item"
+    "pages/item/item",
+    "pages/showItem/showItem"
   ],
   "window":{
     "backgroundTextStyle":"light",

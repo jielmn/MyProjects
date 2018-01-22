@@ -197,18 +197,23 @@ Page({
     })
   },
 
-  OnDetail:function() {
+  OnDetail:function(e) {
     //console.log("on detail")
 
     var that = this;
     var id = e.currentTarget.dataset.id
 
-    var item = findFromArray(that.data.todolist_items,'id',id);
+    var item = this.findFromArray(that.data.todolist_items,'id',id);
     if ( !item ) {
       return;
     }
 
-    
+    //console.log("test....")
+    //console.log(item);
+
+    wx.navigateTo({
+      url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time,
+    })
   },
 
   OnCheckbox: function () {
