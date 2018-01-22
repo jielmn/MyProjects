@@ -14,8 +14,13 @@
 <view class="main" catchtap="OnIgnore">
   <view class="title" catchtap="OnIgnore">正在进行</view>
   <view class="content" catchtap="OnIgnore">
-    <view wx:if="{{todolist_items.length>0}}" class="split" catchtap="OnIgnore" ></view>
-    <view wx:else class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
+    <view  class="split" catchtap="OnIgnore" ></view>
+
+    <view wx:if="{{todolist_items.length<=0}}">
+      <view class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
+      <view class="split" catchtap="OnIgnore" ></view>
+    </view>
+    
     <checkbox-group catchtap="OnIgnore">
       <label wx:for="{{todolist_items}}" wx:key="id">
         <scroll-view class="todo-item-line" scroll-x catchtap="OnIgnore" >
@@ -25,16 +30,16 @@
             wx:if="{{self}}" />
             <view style="display:inline-block;vertical-align:middle;">
               <view style="display:flex;flex-direction:column;">
-                <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnIgnore" >{{item.value}}</text>
+                <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnDetail" data-id="{{item.id}}" >{{item.value}}</text>
                 <view style="width:10px;height:5px;"></view>
                 <view style="display:flex;flex-direction:row;justify-content:space-between;">
-                  <view style="font-size:10px;color:#999">13小时20分前</view>
+                  <view style="font-size:10px;color:#999">{{item.start_time_txt}}前</view>
                   <view style="font-size:10px;color:#999">石杰</view>
                 </view>                
               </view>
             </view>    
                     
-            <view class="todo-item menu rd" catchtap="OnDelete" wx:if="{{self}}" >删除</view>
+            <view class="todo-item menu rd" catchtap="OnDelete" wx:if="{{self}}" data-id="{{item.id}}" >删除</view>
           </view>
         </scroll-view>    
         <view class="split" catchtap="OnIgnore" ></view>
@@ -46,8 +51,13 @@
   <view style="height:20px;"></view>
   <view class="title" catchtap="OnIgnore">已经完成</view>
   <view class="content" catchtap="OnIgnore">
-    <view wx:if="{{history_todolist_items.length>0}}" class="split" catchtap="OnIgnore" ></view>
-    <view wx:else class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
+    <view class="split" catchtap="OnIgnore" ></view>
+
+    <view wx:if="{{history_todolist_items.length<=0}}">
+      <view class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
+      <view class="split" catchtap="OnIgnore" ></view>
+    </view>
+
     <checkbox-group catchtap="OnIgnore">
       <label wx:for="{{history_todolist_items}}" wx:key="id">
         <scroll-view class="todo-item-line-complete" scroll-x catchtap="OnIgnore" >
@@ -75,13 +85,15 @@
   </view>
 </view>
 
+<view style="width:10px;height:10px;"></view>
+
 <view class="content-right">
   <view class="bottom-view">加载更多历史清单</view>
 </view>
 
 <view class="bottom">
   <view class="add-p">
-    <view class="add" bindtap="toAddPage">+</view>
+    <view class="add" bindtap="toAddItem">+</view>
   </view>
 </view>
 

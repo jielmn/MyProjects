@@ -5,17 +5,6 @@ const app = getApp()
 Page({
   data: {
     todolist_items: [
-      /*{ id: 1, value: '很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单'},
-      { id: 2, value: '清单222222222'},
-      { id: 3, value: '清单3'},
-      { id: 4, value: '清单4' },
-      { id: 5, value: '清单5' },
-      { id: 6, value: '清单6' },
-      { id: 7, value: '测试清单7' },
-      { id: 8, value: '测试清单8' },
-      { id: 9, value: '测试清单9' },
-      { id: 10, value: '测试清单10' },
-      { id: 11, value: '测试清单11' }*/
     ],
 
     history_todolist_items: [
@@ -116,9 +105,13 @@ Page({
     // 计算已经过去多少时间
     //this.CalculateElapsedTime(this.data.items);
     //this.setData({items:this.data.items})
+    //var arr = [{ id: 1, value: 'aaa' }, { id: 2, value: 'bbb' }, { id: 3, value: 'ccc' }, ]
+    //this.deleteFromArray( arr, 'id', 3 )
+    //console.log("test....")
+    //console.log(arr)
   },
 
-  onShow:function(){
+  onShow: function (){
     var that = this;
     console.log("mine page onshowing......")
 
@@ -135,12 +128,87 @@ Page({
           wx.navigateTo({ url: '../error/error' })
         }, 1000)
       }
+    }
 
+    // 如果从additem页面返回
+    if (app.globalData.additem) {
+      var item = {
+        id: app.globalData.itemid,
+        value: app.globalData.content,
+        start_time_txt:'0分',
+      };
+      
+      this.data.todolist_items.push(item)
+      this.setData({ todolist_items: this.data.todolist_items })
+      
+      app.globalData.additem = false
+      app.globalData.content=null
+      app.globalData.itemid = null
     }
   },
 
-  OnDelete: function() {
-    console.log("delete.")
+  deleteFromArray: function(arr, key,val) {  
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i][key] == val) {
+        arr.splice(i, 1);
+        break;
+      }
+    }
+  },
+
+  findFromArray: function( arr, key, val ) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i][key] == val) {
+        return arr[i]
+      }
+    }
+    return null
+  },
+
+  OnDelete: function(e) {
+    //console.log("delete....")
+    //console.log(e.currentTarget.dataset.id)
+    var that = this;
+    var id = e.currentTarget.dataset.id
+
+    wx.request({
+      url: 'http://118.25.26.186:8080/todolist/main?type=delete&id=' + id,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          console.log("delete success!")
+          wx.showToast({
+            title: '删除成功'
+          })
+          that.deleteFromArray(that.data.todolist_items, 'id', id)
+          that.setData({ todolist_items: that.data.todolist_items })        
+        } else {
+          console.log("delete result:")
+          console.log(res);
+        }
+      },
+      fail() {
+        console.log("failed to delete")
+        console.log(res);
+      },
+      complete() {
+        
+      },
+    })
+  },
+
+  OnDetail:function() {
+    //console.log("on detail")
+
+    var that = this;
+    var id = e.currentTarget.dataset.id
+
+    var item = findFromArray(that.data.todolist_items,'id',id);
+    if ( !item ) {
+      return;
+    }
+
+    
   },
 
   OnCheckbox: function () {
@@ -165,6 +233,11 @@ Page({
       return;
     }
 
+    // 如果已经注册
+    if (this.data.login){
+      return;
+    }
+
     wx.showLoading({
       title: '登录中',
     })
@@ -176,7 +249,8 @@ Page({
       success: (res) => {
         if ( res.data.error != null && res.data.error == 0 ) {
           that.setData({ login: true })            
-          console.log("login success!")          
+          console.log("login success!") 
+          that.GetTodoList();
         } else {
           console.log("register result:")
           console.log(res);
@@ -184,6 +258,11 @@ Page({
       },
       fail() {
         console.log("failed to register")
+        wx.showModal({
+          title: '登录失败',
+          content: '登录失败，请稍后再试',
+          showCancel:false,
+        })
       },
       complete() {
         wx.hideLoading()
@@ -214,8 +293,8 @@ Page({
     }
   },
 
-  toAddPage:function() {
-
+  toAddItem:function() {
+    wx.navigateTo({ url: '../item/item' })
   },
 
   canHideLoading:function() {
@@ -231,11 +310,57 @@ Page({
       return false;
     }
     return true;
-  }
+  },
+
+  GetTodoList:function() {
+    var that = this;
+
+    // 如果没有登录
+    if ( !this.data.login ) {
+      return;
+    }
+
+    // 如果没有获取到openid
+    if ( !this.data.openid ) {
+      return;
+    }
+
+    wx.showLoading({
+      title: '获取正在进行的清单',
+    })
+
+    // 开始注册
+    wx.request({
+      url: 'http://118.25.26.186:8080/todolist/main?type=todolist&open_id=' + this.data.openid,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          
+          console.log("get todolist success!")
+          //console.log(res);
+
+          var items = res.data.todolist;
+          that.CalculateElapsedTime(items);
+          //console.log(items)
+          that.setData({ todolist_items: items })
+
+        } else {
+          console.log("get todolist result:")
+          console.log(res);
+        }
+      },
+      fail() {
+        console.log("failed to get todolist")
+      },
+      complete() {
+        wx.hideLoading()
+      },
+    })
+  },
 
 
 
-  /*
+  
   CalculateElapsedTime:function( items ) {
     var now = Date.now()
     for (var i in items ) {
@@ -268,6 +393,6 @@ Page({
     var day = parseInt(elapsed / (3600 * 24))
     return day + '天'
   }
-  */
+  
 
 })

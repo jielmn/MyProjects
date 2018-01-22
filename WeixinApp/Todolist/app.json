@@ -2,7 +2,8 @@
   "pages":[
     "pages/mine/mine",
     "pages/group/group",
-    "pages/error/error"
+    "pages/error/error",
+    "pages/item/item"
   ],
   "window":{
     "backgroundTextStyle":"light",

@@ -1,0 +1,16 @@
+.main{
+  margin:0px;
+}
+
+.split{
+  height:1px;
+  background:#ccc;
+}
+
+.item{
+  margin:10px;
+}
+
+.button{
+  background:#c92651;
+}

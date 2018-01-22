@@ -98,6 +98,9 @@ App({
 
     openidReadyCallback:null,
     openidFailCallback:null,
+
+    additem:false,
+    content:null,
   }
 
 })

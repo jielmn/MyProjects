@@ -1,0 +1,7 @@
+<view class="main">
+  <form bindsubmit="formSubmit">
+    <input type="text" maxlength="64" placeholder="清单内容" class="item" name="item"></input>
+    <view class="split" catchtap="OnIgnore" ></view>
+    <button form-type="submit" class="item button">保存清单</button>
+  </form>
+</view>
