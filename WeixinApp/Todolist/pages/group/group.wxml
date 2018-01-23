@@ -1,27 +1,12 @@
 
 
 <view class="content-center">
-  <picker value="{{index}}" range="{{array}}" class="picker">当前选择：{{array[index]}}</picker>
+  <picker value="{{index}}" range="{{users}}" class="picker" range-key="nick_name" bindchange="usersChange" >当前选择：{{users[index].nick_name}}</picker>
 </view>
 
-
-
-
-
-
-
-
-
-<!--index.wxml-->
 
 <!--控制整个页面是否显示。要求用户登录服务器-->
 <view wx:if="{{login}}">
-
-
-<view class="content-center">
-  <image src="{{personInfo.avatarUrl}}" class="person avatar"></image>
-  <view class="person">{{personInfo.nickName}}</view>
-</view>
 
 <view style="width:10px;height:10px;"></view>
 
@@ -40,8 +25,7 @@
         <scroll-view class="todo-item-line" scroll-x catchtap="OnIgnore" >
           <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
             <view class="todo-item" style="width:10px;"></view>
-            <checkbox class="todo-item" value="{{item.id}}" checked="{{false}}" catchtap="OnCheckbox" data-id="{{item.id}}" 
-                      wx:if="{{self}}" />
+            <checkbox class="todo-item" value="{{item.id}}" checked="{{false}}" disabled="{{true}}" data-id="{{item.id}}"  />
             <view style="display:inline-block;vertical-align:middle;">
               <view style="display:flex;flex-direction:column;">
                 <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnDetail" 
@@ -49,7 +33,7 @@
                 <view style="width:10px;height:5px;"></view>
                 <view style="display:flex;flex-direction:row;justify-content:space-between;">
                   <view style="font-size:10px;color:#999">{{item.start_time_txt}}</view>
-                  <view style="font-size:10px;color:#999"> </view>
+                  <view style="font-size:10px;color:#999">{{item.nickname}}</view>
                 </view>                
               </view>
             </view>    

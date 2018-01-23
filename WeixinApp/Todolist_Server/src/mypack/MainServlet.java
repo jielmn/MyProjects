@@ -7,6 +7,38 @@ import java.util.*;
 import java.sql.*;
 import org.json.*;
 
+
+// http
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.HashMap; 
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
+
+
+
 // 传递的参数有：
 //     type:    操作类型
 //              egister，注册用户
@@ -16,6 +48,8 @@ public class MainServlet extends HttpServlet {
 	String dbUser="root";
 	String dbPwd="";
 	int    INCREASE_QUERY = 5;
+	String appid = "wx692cfffa15fdf5d9";
+	String secret = "3ba624f6c7add4542b0140414bea8f56";
     
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
     {       
@@ -115,6 +149,19 @@ public class MainServlet extends HttpServlet {
 				}
 				
 				getOpenId(out, code);
+			}
+			else if ( type.equals("users") ) {
+				
+				getUsers(out);
+			}
+			else if ( type.equals("any_todolist") ) {
+				String  user_id     = new String();			
+				
+				if ( null != req.getParameter("user_id") ) {
+					user_id = req.getParameter("user_id");
+				}
+				
+				getAnyTodolist(out, user_id);
 			}
 					
 		}
@@ -359,8 +406,121 @@ public class MainServlet extends HttpServlet {
 	}
 	
 	public void getOpenId(PrintWriter out, String code) {
+		// 没有填写参数
+		if ( code.length() == 0 ) {
+			setContentError(out,20);
+			return;
+		}
 		
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("appid",       appid);  
+        params.put("secret",      secret);  
+        params.put("js_code",     code);  
+		params.put("grant_type",  "authorization_code");  
+		
+		try
+		{
+			String ret = HttpHelper.sendGetByHttpUrlConnection("https://api.weixin.qq.com/sns/jscode2session", params, "utf-8");
+			out.print(ret);
+		}
+		catch(Exception ex) {
+			 out.print(ex.getMessage());
+		}
+				
 	}
+	
+	public void getUsers(PrintWriter out ) {
+						
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+						
+			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select * from users;" );
+			
+			// 获取清单
+			JSONArray item_arr = new JSONArray();
+			while ( rs.next() ) {
+				String     user_id       = rs.getString(1);
+				String     nick_name     = rs.getString(3);
+				String     avatarUrl     = rs.getString(4);
+				
+				JSONObject item_obj = new JSONObject();
+				item_obj.put("user_id",       user_id);
+				item_obj.put("nick_name",     nick_name);
+				item_obj.put("avatarUrl",     avatarUrl);
+					
+				item_arr.put(item_obj);
+			} 
+
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("users", item_arr);
+			rsp_obj.put("error", 0);
+			
+			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+				
+	}
+	
+	public void getAnyTodolist(PrintWriter out, String user_id ) {
+		
+		String user_id_sql = user_id.replace("'","''");
+						
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+						
+			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Statement stmt = con.createStatement();      
+			ResultSet rs = null;
+			
+			if ( user_id.length() == 0 ) {
+				rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0;" );
+			} else {
+				rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0 AND a.owner_id='" + user_id_sql + "';" );
+			}
+			
+			
+			// 获取清单
+			JSONArray item_arr = new JSONArray();
+			while ( rs.next() ) {
+				int        item_id     = rs.getInt(1);
+				String     content     = rs.getString(2);
+				Timestamp  start_time  = rs.getTimestamp(3);
+				String     nickname    = rs.getString(4);
+				
+				JSONObject item_obj = new JSONObject();
+				item_obj.put("id",            item_id);
+				item_obj.put("value",         content);
+				item_obj.put("start_time",    start_time.getTime());
+				item_obj.put("nickname",      nickname);
+							
+				item_arr.put(item_obj);
+			} 
+
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("todolist", item_arr);
+			rsp_obj.put("error", 0);
+			
+			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+				
+	}
+	
+	
 	
 	
 	public void test( PrintWriter out) {
@@ -387,4 +547,67 @@ public class MainServlet extends HttpServlet {
 	public void setContentError(PrintWriter out, int errCode) {
 		out.print("{\"error\":"+errCode+"}");
 	}
+}
+
+
+
+
+
+class HttpHelper {
+    
+    public static String sendGetByHttpUrlConnection(String urlStr, Map<String, Object> params, String charset) {
+        StringBuffer resultBuffer = null;
+        // 构建请求参数
+        String sbParams= JoiningTogetherParams(params);
+        HttpURLConnection con = null;
+        BufferedReader br = null;
+        try {
+            URL url = null;
+            if (sbParams != null && sbParams.length() > 0) {
+                url = new URL(urlStr + "?" + sbParams);
+            } else {
+                url = new URL(urlStr);
+            }
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            con.connect();
+            resultBuffer = new StringBuffer();
+            br = new BufferedReader(new InputStreamReader(con.getInputStream(), charset));
+            String temp;
+            while ((temp = br.readLine()) != null) {
+                resultBuffer.append(temp);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    br = null;
+                    throw new RuntimeException(e);
+                } finally {
+                    if (con != null) {
+                        con.disconnect();
+                        con = null;
+                    }
+                }
+            }
+        }
+        return resultBuffer.toString();
+    }
+
+	private static String JoiningTogetherParams(Map<String, Object> params){
+        StringBuffer sbParams = new StringBuffer();
+        if (params != null && params.size() > 0) {
+            for (Entry<String, Object> e : params.entrySet()) {
+                sbParams.append(e.getKey());
+                sbParams.append("=");
+                sbParams.append(e.getValue());
+                sbParams.append("&");
+            }
+            return sbParams.substring(0, sbParams.length() - 1);
+        }
+        return "";
+    }
 }

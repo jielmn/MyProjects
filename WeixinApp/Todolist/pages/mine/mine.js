@@ -47,6 +47,7 @@ Page({
     // 设置userInfo成功的回调
     app.userInfoReadyCallback = res => {
       console.log("callback get userInfo")
+      wx.hideLoading()
 
       this.setData({
         userInfo: res.userInfo
@@ -329,6 +330,10 @@ Page({
       success: (res) => {
         if ( res.data.error != null && res.data.error == 0 ) {
           that.setData({ login: true })            
+          app.globalData.login = true;
+          if (app.loginReadyCallback ) {
+            app.loginReadyCallback()
+          }
           console.log("login success!") 
           that.GetTodoList();
         } else {

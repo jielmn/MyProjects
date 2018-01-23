@@ -62,16 +62,24 @@ App({
     console.log("getting openid")
     var that = this;
     wx.request({
-      url: 'https://api.weixin.qq.com/sns/jscode2session?appid=' + that.globalData.appid + '&secret=' + that.globalData.secret + '&js_code=' + code + '&grant_type=authorization_code',
+      //url: 'https://api.weixin.qq.com/sns/jscode2session?appid=' + that.globalData.appid + '&secret=' + that.globalData.secret + '&js_code=' + code + '&grant_type=authorization_code',
+      url: 'https://telemed-healthcare.cn/todolist?type=get_openid&code=' + code,
       data: {},
       method: 'GET',
       success: function (res) {
-        console.log("ok, openid=" + res.data.openid)
-        that.globalData.openid = res.data.openid;     
-        // openid成功的回调函数
-        if (that.openidReadyCallback) {
-          that.openidReadyCallback(res.data.openid)
-        }        
+
+        if (res.data.openid) {
+          console.log("get openid success")
+          that.globalData.openid = res.data.openid;
+          // openid成功的回调函数
+          if (that.openidReadyCallback) {
+            that.openidReadyCallback(res.data.openid)
+          } 
+        } else {
+          console.log("get openid...")
+          console.log(res)
+        }
+               
       },   // success
 
       // 获取openid失败
@@ -80,14 +88,13 @@ App({
           that.openidFailCallback();
         }
       },
+
     }); // wx.request
   },
 
 
   globalData: {    
-    appid: "wx692cfffa15fdf5d9",
-    secret: "3ba624f6c7add4542b0140414bea8f56",
-    
+
     userInfo: null,
     openid:null,
     windowWidth:0,
@@ -101,6 +108,9 @@ App({
 
     additem:false,
     content:null,
+
+    login:false,
+    loginReadyCallback:null,
   }
 
 })
