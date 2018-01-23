@@ -13,4 +13,5 @@
 
 .button{
   background:#c92651;
+  color:white;
 }

@@ -8,12 +8,6 @@ Page({
     ],
 
     history_todolist_items: [
-      /*{ id: 100, value: '完成的很长长长长长长长长长长长长长长长长长长长长长长长长长长长长长的清单' },
-      { id: 101, value: '完成的清单2' },
-      { id: 102, value: '完成的清单3' },
-      { id: 103, value: '完成的清单4' },
-      { id: 104, value: '完成的清单5' },
-      { id: 105, value: '完成的清单6' },*/
     ],
 
     windowWidth:375,
@@ -135,6 +129,7 @@ Page({
       var item = {
         id: app.globalData.itemid,
         value: app.globalData.content,
+        start_time: Date.now(),
         start_time_txt:'0分',
       };
       
@@ -170,6 +165,7 @@ Page({
     //console.log(e.currentTarget.dataset.id)
     var that = this;
     var id = e.currentTarget.dataset.id
+    var del_type = e.currentTarget.dataset.type
 
     wx.request({
       url: 'http://118.25.26.186:8080/todolist/main?type=delete&id=' + id,
@@ -180,8 +176,14 @@ Page({
           wx.showToast({
             title: '删除成功'
           })
-          that.deleteFromArray(that.data.todolist_items, 'id', id)
-          that.setData({ todolist_items: that.data.todolist_items })        
+
+          if (del_type) {
+            that.deleteFromArray(that.data.history_todolist_items, 'id', id)
+            that.setData({ history_todolist_items: that.data.history_todolist_items })
+          } else {
+            that.deleteFromArray(that.data.todolist_items, 'id', id)
+            that.setData({ todolist_items: that.data.todolist_items })        
+          }          
         } else {
           console.log("delete result:")
           console.log(res);
@@ -202,8 +204,16 @@ Page({
 
     var that = this;
     var id = e.currentTarget.dataset.id
+    var del_type = e.currentTarget.dataset.type
 
-    var item = this.findFromArray(that.data.todolist_items,'id',id);
+    var item
+
+    if ( del_type ) {
+      item = this.findFromArray(that.data.history_todolist_items, 'id', id);
+    } else {
+      item = this.findFromArray(that.data.todolist_items, 'id', id);
+    }
+    
     if ( !item ) {
       return;
     }
@@ -211,13 +221,78 @@ Page({
     //console.log("test....")
     //console.log(item);
 
-    wx.navigateTo({
-      url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time,
-    })
+    if ( del_type ) {
+      wx.navigateTo({
+        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true',
+      })
+    } else {
+      wx.navigateTo({
+        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time,
+      })
+    }
+    
   },
 
-  OnCheckbox: function () {
-    console.log("check")
+  OnCheckbox: function (e) {
+    //console.log("check")
+    var that = this;
+    var id = e.currentTarget.dataset.id
+    var del_type = e.currentTarget.dataset.type
+
+    var item;
+
+    if ( del_type ) {
+      item = this.findFromArray(that.data.history_todolist_items, 'id', id);
+    } else {
+      item = this.findFromArray(that.data.todolist_items, 'id', id);
+    }    
+
+    if (!item) {
+      return;
+    }
+
+    wx.request({
+      url: 'http://118.25.26.186:8080/todolist/main?type=finish&id=' + id,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          console.log("finish success!")
+
+          /*wx.showToast({
+            title: '清单状态修改OK'
+          })*/
+
+          if (del_type) {
+            that.deleteFromArray(that.data.history_todolist_items, 'id', id)
+            that.setData({ history_todolist_items: that.data.history_todolist_items })
+
+            that.data.todolist_items.unshift(item)
+            that.setData({ todolist_items: that.data.todolist_items })
+
+          } else 
+          {
+            that.deleteFromArray(that.data.todolist_items, 'id', id)
+            that.setData({ todolist_items: that.data.todolist_items })
+
+            item.end_time=Date.now()
+            item.end_time_txt='0分'
+            that.data.history_todolist_items.unshift(item)
+            that.setData({ history_todolist_items: that.data.history_todolist_items })
+          }          
+        } else {
+          console.log("finish result:")
+          console.log(res);
+        }
+      },
+      fail() {
+        console.log("failed to finish")
+        console.log(res);
+      },
+      complete() {
+
+      },
+    })
+
   },
 
   OnIgnore:function() {
@@ -349,6 +424,7 @@ Page({
           //console.log(items)
           that.setData({ todolist_items: items })
 
+          that.GetHistoryTodoList();
         } else {
           console.log("get todolist result:")
           console.log(res);
@@ -358,9 +434,70 @@ Page({
         console.log("failed to get todolist")
       },
       complete() {
+        //wx.hideLoading()
+      },
+    })
+  },
+
+  GetHistoryTodoList:function(start_index) {
+    var that = this;
+
+    // 如果没有登录
+    if (!this.data.login) {
+      return;
+    }
+
+    // 如果没有获取到openid
+    if (!this.data.openid) {
+      return;
+    }
+
+    if ( !start_index ) {
+      start_index = 0
+    }
+
+    wx.showLoading({
+      title: '获取历史清单',
+    })
+
+
+    wx.request({
+      url: 'http://118.25.26.186:8080/todolist/main?type=history&open_id=' + this.data.openid + '&start_index=' + start_index,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          console.log("get history success!")
+
+          var items = res.data.todolist;
+          that.CalculateElapsedTime(items);
+
+          for (var i in items) {
+            var item      = items[i]
+            var item_find = that.findFromArray(that.data.history_todolist_items, 'id', item.id);
+            if ( !item_find ) {
+              that.data.history_todolist_items.push(item)
+            }
+          }
+
+          that.setData({ history_todolist_items: that.data.history_todolist_items })
+        } else {
+          console.log("get history result:")
+          console.log(res);
+        }
+      },
+      fail() {
+        console.log("failed to get history")
+      },
+      complete() {
         wx.hideLoading()
       },
     })
+  },
+
+  loadMoreHistory:function() {
+    console.log('load more history')
+    var start_index = this.data.history_todolist_items.length
+    this.GetHistoryTodoList(start_index);
   },
 
 
@@ -375,6 +512,14 @@ Page({
       } else {
         items[i].start_time_txt = '0分'
       }
+
+      var end_time = items[i].end_time || 0;
+      if (end_time && end_time > 0 && end_time <= now) {
+        items[i].end_time_txt = this.FormatTime(now - end_time);
+      } else {
+        items[i].end_time_txt = '0分'
+      }
+
     }
   },
 

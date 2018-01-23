@@ -1,0 +1,22 @@
+<view class="main">
+  <view class="common">内容:</view>
+  <view class="split" ></view>
+  <view class="content common">{{content}}</view>  
+
+  <view style="width:10px;height:10px;"></view>
+  <view class="common">起始时间:</view>
+  <view class="split" ></view>
+  <view class="common">{{start_time_txt}}</view>
+
+  <view wx:if="{{is_complete}}">
+    <view style="width:10px;height:10px;"></view>
+    <view class="common">结束时间:</view>
+    <view class="split" ></view>
+    <view class="common">{{start_time_txt}}</view>
+  </view>
+
+  <view style="width:10px;height:10px;"></view>
+  <form bindsubmit="formSubmit">
+    <button form-type="submit" class="common button">返回</button>
+  </form>
+</view>
