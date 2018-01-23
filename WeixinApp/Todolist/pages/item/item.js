@@ -36,7 +36,7 @@ Page({
 
     // 保存清单
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/main?type=additem&open_id=' + app.globalData.openid + '&item=' + value.item,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=additem&open_id=' + app.globalData.openid + '&item=' + value.item,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {

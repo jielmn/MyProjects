@@ -107,6 +107,15 @@ public class MainServlet extends HttpServlet {
 				
 				getHistoryTodoList(out, open_id, start_index);
 			}
+			else if ( type.equals("get_openid") ) {
+				String  code     = new String();
+				
+				if ( null != req.getParameter("code") ) {
+					code = req.getParameter("code");
+				}
+				
+				getOpenId(out, code);
+			}
 					
 		}
 		
@@ -348,6 +357,11 @@ public class MainServlet extends HttpServlet {
            out.print(ex.getMessage());
         }
 	}
+	
+	public void getOpenId(PrintWriter out, String code) {
+		
+	}
+	
 	
 	public void test( PrintWriter out) {
 		JSONObject object = new JSONObject();

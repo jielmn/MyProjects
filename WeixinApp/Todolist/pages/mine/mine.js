@@ -168,7 +168,7 @@ Page({
     var del_type = e.currentTarget.dataset.type
 
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/main?type=delete&id=' + id,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=delete&id=' + id,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
@@ -252,7 +252,7 @@ Page({
     }
 
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/main?type=finish&id=' + id,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=finish&id=' + id,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
@@ -324,7 +324,7 @@ Page({
 
     // 开始注册
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/main?type=register&open_id=' + this.data.openid+'&name=' + this.data.userInfo.nickName+'&avatarUrl='+this.data.userInfo.avatarUrl + '&abc= 你好',
+      url: 'https://telemed-healthcare.cn/todolist/main?type=register&open_id=' + this.data.openid+'&name=' + this.data.userInfo.nickName+'&avatarUrl='+this.data.userInfo.avatarUrl + '&abc= 你好',
       method: 'GET',
       success: (res) => {
         if ( res.data.error != null && res.data.error == 0 ) {
@@ -411,7 +411,7 @@ Page({
 
     // 开始注册
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/main?type=todolist&open_id=' + this.data.openid,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=todolist&open_id=' + this.data.openid,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
@@ -462,7 +462,7 @@ Page({
 
 
     wx.request({
-      url: 'http://118.25.26.186:8080/todolist/main?type=history&open_id=' + this.data.openid + '&start_index=' + start_index,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=history&open_id=' + this.data.openid + '&start_index=' + start_index,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
