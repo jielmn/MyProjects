@@ -62,15 +62,15 @@
         <scroll-view class="todo-item-line-complete" scroll-x catchtap="OnIgnore" >
           <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
             <view class="todo-item" style="width:10px;"></view>
-            <checkbox class="todo-item" value="{{item.id}}" checked="{{true}}" catchtap="OnCheckbox" 
-            wx:if="{{self}}" color="#ccc" data-id="{{item.id}}" data-type="history" />
+            <checkbox class="todo-item" value="{{item.id}}" checked="{{true}}"  
+            color="#ccc" data-id="{{item.id}}" data-type="history" disabled="{{true}}" />
             <view style="display:inline-block;vertical-align:middle;">
               <view style="display:flex;flex-direction:column;">
                 <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnDetail" data-id="{{item.id}}" data-type="history" >{{item.value}}</text>
                 <view style="width:10px;height:5px;"></view>
                 <view style="display:flex;flex-direction:row;justify-content:space-between;">
                   <view style="font-size:10px;color:#999">{{item.end_time_txt}}</view>
-                  <view style="font-size:10px;color:#999"> </view>
+                  <view style="font-size:10px;color:#999">{{item.nickname}}</view>
                 </view>                
               </view>
             </view>    

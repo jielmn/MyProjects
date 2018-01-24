@@ -156,12 +156,22 @@ public class MainServlet extends HttpServlet {
 			}
 			else if ( type.equals("any_todolist") ) {
 				String  user_id     = new String();			
+				int     is_complete = 0;
+				int     start_index = 0;
 				
 				if ( null != req.getParameter("user_id") ) {
 					user_id = req.getParameter("user_id");
 				}
 				
-				getAnyTodolist(out, user_id);
+				if ( null != req.getParameter("is_complete") ) {
+					is_complete = Integer.valueOf( req.getParameter("is_complete") );
+				}
+				
+				if ( null != req.getParameter("start_index") ) {
+					start_index = Integer.valueOf( req.getParameter("start_index") );
+				}
+				
+				getAnyTodolist(out, user_id, is_complete, start_index);
 			}
 					
 		}
@@ -469,7 +479,7 @@ public class MainServlet extends HttpServlet {
 				
 	}
 	
-	public void getAnyTodolist(PrintWriter out, String user_id ) {
+	public void getAnyTodolist(PrintWriter out, String user_id, int is_complete, int start_index ) {
 		
 		String user_id_sql = user_id.replace("'","''");
 						
@@ -482,9 +492,20 @@ public class MainServlet extends HttpServlet {
 			ResultSet rs = null;
 			
 			if ( user_id.length() == 0 ) {
-				rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0;" );
+				if ( is_complete == 0 ) {
+					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0;" );
+				} else {
+					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete = 1 order by a.end_time limit " + start_index + "," + INCREASE_QUERY + ";" );
+				}
+				
 			} else {
-				rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0 AND a.owner_id='" + user_id_sql + "';" );
+				if ( is_complete == 0 )
+				{
+					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0 AND a.owner_id='" + user_id_sql + "';" );
+				} else {
+					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =1 AND a.owner_id='" 
+					                       + user_id_sql + "' order by a.end_time limit " +  start_index + "," + INCREASE_QUERY + " ;" );
+				}				
 			}
 			
 			
@@ -494,12 +515,16 @@ public class MainServlet extends HttpServlet {
 				int        item_id     = rs.getInt(1);
 				String     content     = rs.getString(2);
 				Timestamp  start_time  = rs.getTimestamp(3);
-				String     nickname    = rs.getString(4);
+				Timestamp  end_time    = rs.getTimestamp(4);
+				String     nickname    = rs.getString(5);
 				
 				JSONObject item_obj = new JSONObject();
 				item_obj.put("id",            item_id);
 				item_obj.put("value",         content);
 				item_obj.put("start_time",    start_time.getTime());
+				if ( is_complete != 0 ) {
+					item_obj.put("end_time",      end_time.getTime());
+				}					
 				item_obj.put("nickname",      nickname);
 							
 				item_arr.put(item_obj);

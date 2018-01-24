@@ -87,7 +87,10 @@ Page({
     }
 
     // 获取传递的参数personid
-    var personid = options.personid
+    var personid = null;
+    if ( options ) {
+      personid = options.personid
+    }
     this.setData({ personid: personid })
 
     // 检查是否自己
@@ -505,7 +508,18 @@ Page({
     this.GetHistoryTodoList(start_index);
   },
 
+  onPullDownRefresh:function() {
+    this.data.todolist_items=[]
+    this.data.history_todolist_items = []
+    this.data.self = false
+    this.data.personid = null
+    this.data.personInfo = null
+    this.data.login=false
+    this.data.open_id = null
+    this.data.userInfo = null
 
+    this.onLoad()
+  },
 
   
   CalculateElapsedTime:function( items ) {
