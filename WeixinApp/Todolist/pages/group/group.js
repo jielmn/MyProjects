@@ -191,11 +191,11 @@ Page({
 
     if (del_type) {
       wx.navigateTo({
-        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true',
+        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true&username=' + item.nickname ,
       })
     } else {
       wx.navigateTo({
-        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time,
+        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&username=' + item.nickname,
       })
     }
 
@@ -255,6 +255,10 @@ Page({
 
     var day = parseInt(elapsed / (3600 * 24))
     return day + '天'
+  },
+
+  OnIgnore:function() {
+
   }
 
 })

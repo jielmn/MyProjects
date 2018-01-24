@@ -15,6 +15,13 @@
     <view class="common">{{start_time_txt}}</view>
   </view>
 
+  <view wx:if="{{username}}">
+    <view style="width:10px;height:10px;"></view>
+    <view class="common">创建者:</view>
+    <view class="split" ></view>
+    <view class="common">{{username}}</view>
+  </view>
+
   <view style="width:10px;height:10px;"></view>
   <form bindsubmit="formSubmit">
     <button form-type="submit" class="common button">返回</button>

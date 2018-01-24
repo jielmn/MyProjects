@@ -211,6 +211,23 @@ public class MainServlet extends HttpServlet {
 			} 
 			// 没有注册
 			else {
+				rs.close();
+				rs = stmt.executeQuery("select * from config;" );
+				int  register_enable = 0;
+				if ( rs.next() )
+				{
+					register_enable = rs.getInt(2);
+				}
+				
+				// 如果不允许注册
+				if ( register_enable == 0 ) {
+					setContentError(out,99);
+					
+					rs.close();
+					stmt.close();
+					con.close();
+					return;
+				}
 				stmt.executeUpdate("insert into users values('" + open_id_sql + "','" + name_sql +"','" + name_sql + "','" + avatarUrl_sql + "') ");
 			}
 			

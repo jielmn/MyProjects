@@ -9,10 +9,11 @@ Page({
     start_time:null,
     start_time_txt:null,
     is_complete:false,
+    username:null,
   },
 
   onLoad:function(e) {
-    this.setData({id:e.id,content:e.content,start_time:e.start_time})
+    this.setData({ id: e.id, content: e.content, start_time: e.start_time, username:e.username})
     var date = new Date(parseInt(e.start_time))
     this.setData({ start_time_txt: this.formatTime(date) })
     if ( e.is_complete ) {
