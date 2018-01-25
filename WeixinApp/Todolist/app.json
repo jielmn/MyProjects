@@ -9,7 +9,7 @@
   "window":{
     "backgroundTextStyle":"light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "泰利美信云清单",
+    "navigationBarTitleText": "泰利美信ToDoList",
     "navigationBarTextStyle":"black",
     "enablePullDownRefresh": false
   },
@@ -19,13 +19,13 @@
     "borderStyle": "white",
     "list": [
       {
-        "text": "我的清单",
+        "text": "我的ToDo",
         "pagePath": "pages/mine/mine",
         "iconPath": "images/mine_blur.png",
         "selectedIconPath": "images/mine.png"
       },
       {
-        "text": "大家的清单",
+        "text": "大家的ToDo",
         "pagePath": "pages/group/group",
         "iconPath": "images/group_blur.png",
         "selectedIconPath": "images/group.png"
