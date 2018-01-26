@@ -5,6 +5,8 @@ import javax.servlet.http.*;
 import java.io.*;
 import java.util.*;
 import java.sql.*;
+import javax.sql.*;
+import javax.naming.*;
 import org.json.*;
 
 
@@ -181,6 +183,14 @@ public class MainServlet extends HttpServlet {
 		out.close();
     }   
 	
+	public Connection getConnection() throws NamingException, SQLException  {
+		Context ctx = new InitialContext();
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/todolist");
+		Connection con = ds.getConnection();
+		return con;
+	}
+	
+	
 	public void register(PrintWriter out, String open_id, String name, String avatarUrl) {
 		// 没有填写open_id参数
 		if ( open_id.length() == 0 ) {
@@ -193,10 +203,23 @@ public class MainServlet extends HttpServlet {
 		String avatarUrl_sql = avatarUrl.replace("'","''");
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
-						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );						
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			
+			//Context ctx = new InitialContext();
+			//DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/todolist");
+			//Connection con = ds.getConnection();
+			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select * from users where open_id='" + open_id_sql + "';" );
 			
@@ -258,10 +281,19 @@ public class MainServlet extends HttpServlet {
 		String item_sql    = item.replace("'","''");
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 			
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate( "insert into todolist_items values( null, '" + item_sql + "', NOW(), null, 0, '" + open_id_sql + "' );" );
 			
@@ -293,10 +325,19 @@ public class MainServlet extends HttpServlet {
 		String open_id_sql = open_id.replace("'","''");
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select * from todolist_items where owner_id='" + open_id_sql + "' AND is_complete = 0 order by start_time ;" );
 			
@@ -343,10 +384,19 @@ public class MainServlet extends HttpServlet {
 		String open_id_sql = open_id.replace("'","''");
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select * from todolist_items where owner_id='" + open_id_sql + "' AND is_complete = 1 order by end_time limit " + start_index + "," + INCREASE_QUERY + " ;" );
 			
@@ -392,10 +442,19 @@ public class MainServlet extends HttpServlet {
 		}
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("delete from todolist_items where item_id = " + item_id + ";" );
 			
@@ -416,10 +475,19 @@ public class MainServlet extends HttpServlet {
 		}
 		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("UPDATE todolist_items set is_complete = not is_complete, end_time=NOW() where item_id=" + item_id );
 			
@@ -459,10 +527,19 @@ public class MainServlet extends HttpServlet {
 	public void getUsers(PrintWriter out ) {
 						
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select * from users;" );
 			
@@ -501,10 +578,19 @@ public class MainServlet extends HttpServlet {
 		String user_id_sql = user_id.replace("'","''");
 						
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
+			//Class.forName("com.mysql.jdbc.Driver");
+			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );
 						
-			Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = null;
 			
