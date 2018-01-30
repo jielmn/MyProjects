@@ -108,11 +108,11 @@ function getMyHistoryTodoList() {
 			if ( data.todolist.length == 0 ) {
 				if ( 0 == history_count ) {
 					$("#divNone1").css('display','block');
-					//$("#divNone1_split").css('display','block');
+					$("#divNone1_split").css('display','block');
 				}
 			} else {
 				$("#divNone1").css('display','none');
-				//$("#divNone1_split").css('display','none');
+				$("#divNone1_split").css('display','none');
 				
 				for (let i = 0;i < data.todolist.length;i++ ){
 									
