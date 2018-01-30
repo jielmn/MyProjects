@@ -1,0 +1,63 @@
+header {
+    background-color:#0072C6;
+    color:white;
+    text-align:center;
+	
+    padding:5px;	
+	margin:0px;
+}
+nav {
+    line-height:80px;
+    background-color:#eeeeee;
+    height:600px;
+    width:13%;
+    float:left;
+	
+    padding:0px;	      
+	margin:0px;
+}
+section {
+    width:87%;
+	height:600px;
+    float:left;
+	background-color:#00ff00;	
+	
+	padding:0px;	 
+	margin:0px;
+}
+
+.my-margin{
+	margin:10px;
+}
+
+.split-line{
+	height:1px;
+	background-color:#ccc;
+}
+
+.image-bar{
+	width:32px;
+	height:32px;
+}
+
+.my-vmiddle{
+	vertical-align: middle;
+}
+
+.my-center{
+	margin-left:45%;
+}
+
+.row{
+	align:center;
+	margin:10px;
+}
+
+.margin-none{
+	margin:0px;
+}
+
+.hand{
+	cursor:pointer;
+}
+
