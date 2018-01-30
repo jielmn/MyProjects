@@ -15,27 +15,40 @@
 
 <body class="margin-none" >
 
-  <div class="row" ><img src="" class="image-bar my-vmiddle my-center" />nickname</div>
+  <div class="row" >
+    <img id="imgAvatar" src="" class="image-bar my-vmiddle my-center" />
+	<p id="divNickname" style="display:inline;" />
+  </div>
+   
   
-  <div class="row" >正在进行</div>
-  
-  <div>
+  <div id="divTodoList" style="display:none" >
+	<div class="row" >正在进行</div>
     <div class="split-line" />
-	<div class="row" >(无)</div>
-	<div class="split-line" />
+	<div id="divNone" class="row" style="display:none" >(无)</div>
+	<div/>
   </div>
   
   <div class="row" >&nbsp;</div>
   
-  <div class="row" >已经完成</div>
-  
-  <div>
+  <div id="divTodoListHistory" style="display:none">
+	<div class="row" >已经完成</div>
     <div class="split-line" />
-	<div class="row" >(无)</div>
-	<div class="split-line" />
+	<div id="divNone1" class="row" >(无)</div>
+	
+	<div/>
   </div>
   
   <div class="row" >&nbsp;</div>
+  
+  <div align="right" class="row hand button" >
+	<div id="divMoreHistory" class="btn-more-history">加载更多历史清单</div>
+  </div>
+  
+  <div class="row" >&nbsp;</div>
+  
+  <div align="center" class="bottom" >
+    <div class="half-eclipse">+</div>
+  </div>
   
 
 </body>

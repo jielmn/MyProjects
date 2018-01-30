@@ -10,14 +10,14 @@ nav {
     line-height:80px;
     background-color:#eeeeee;
     height:600px;
-    width:13%;
+    width:15%;
     float:left;
 	
     padding:0px;	      
 	margin:0px;
 }
 section {
-    width:87%;
+    width:85%;
 	height:600px;
     float:left;
 	background-color:#00ff00;	
@@ -55,9 +55,42 @@ section {
 
 .margin-none{
 	margin:0px;
+	padding:0px;
 }
 
 .hand{
 	cursor:pointer;
 }
 
+.listitem{
+	margin:10px;
+	display:inline;
+}
+
+.bottom{
+	width:100%;position:fixed;bottom:0;
+}
+
+.half-eclipse{
+	width: 5em;
+	height: 1em;
+	padding: 0.6em 0 0.2em 0;
+	/* 水平半径 = width/2, 垂直半径 = height + padding */
+	border-radius: 2.5em 2.5em 0 0/1.8em 1.8em 0 0;
+	background-color: #c92651;
+	color: #fff;
+	text-align: center;
+	font-size: 1.2rem;
+}
+
+.button {
+	height:40px;
+	line-height:40px;
+}
+
+
+.btn-more-history{
+	background-color: #c92651;
+	width:150px;
+	text-align:center;
+}

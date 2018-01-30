@@ -175,6 +175,16 @@ public class MainServlet extends HttpServlet {
 				
 				getAnyTodolist(out, user_id, is_complete, start_index);
 			}
+			// web客户端获取用户信息
+			else if ( type.equals("userinfo") ) {				
+				String  user_id     = new String();			
+				
+				if ( null != req.getParameter("user_id") ) {
+					user_id = req.getParameter("user_id");
+				}
+				
+				getUserInfo( out, user_id );
+			}
 					
 		}
 		
@@ -638,6 +648,56 @@ public class MainServlet extends HttpServlet {
 			rsp_obj.put("error", 0);
 			
 			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+				
+	}
+	
+	public void getUserInfo(PrintWriter out, String user_id ) {
+		
+		// 没有填写参数
+		if ( user_id.length() == 0 ) {
+			setContentError(out,30);
+			return;
+		}
+		
+		String user_id_sql = user_id.replace("'","''");
+						
+		try {
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select * from users where open_id = '" + user_id_sql + "';" );
+						
+			if ( rs.next() ) {
+				JSONObject item_obj = new JSONObject();
+				
+				String     nick_name     = rs.getString(3);
+				String     avatarUrl     = rs.getString(4);
+				
+				item_obj.put("nick_name",     nick_name);
+				item_obj.put("avatarUrl",     avatarUrl);
+				
+				JSONObject rsp_obj = new JSONObject();
+				rsp_obj.put("userinfo", item_obj);
+				rsp_obj.put("error", 0);
+				
+				out.print(rsp_obj.toString());
+			} else {
+				setContentError(out,31);
+			}
 			
 			rs.close();
 			stmt.close();
