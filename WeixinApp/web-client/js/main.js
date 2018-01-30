@@ -70,7 +70,7 @@ function getMyTodoList() {
 				
 				for (let i = 0;i < data.todolist.length;i++ ){
 									
-					$("#divNone").before('<div style="display;" >');
+					$("#divNone").before('<div id="divTodoItem" value_index="' + data.todolist[i].id + '"  >');
 	
 					$("#divNone").before('<input type="checkbox" id="check_todo" style="display:inline-block;height:40px;margin:0px 0px 0px 10px;" value="' + data.todolist[i].id + '" />');
 					$("#divNone").before('<div class="listitem" style="display:inline-block;width:75%;white-space:nowrap; overflow:hidden; text-overflow:ellipsis; " >' + data.todolist[i].value  + '</div>');
@@ -92,7 +92,29 @@ function getMyTodoList() {
 }
 
 function  onTodoCheck() {
-	console.log(this.value);
+	console.log("click id=" + this.value);	
+	var id = this.value;
+	
+	//$("#divTodoList").remove();
+	
+	$("#divTodoList").find("div#divTodoItem").filter( function( index ) {
+				return $( this ).attr( "value_index" ) == id;
+			}).remove();
+	
+	/*
+	
+	$.get("https://telemed-healthcare.cn/todolist/main?type=finish&id="+id,function(data,status){
+		if ( "success" == status && 0 == data.error ) {
+			var arr = $("#divTodoList").find("div#divTodoItem").filter( function( index ) {
+				return $( this ).attr( "value_index" ) == id;
+			}).remove();		
+			
+			console.log(arr);
+		}
+	});
+	
+	*/
+	
 }
 
 
@@ -116,7 +138,7 @@ function getMyHistoryTodoList() {
 				
 				for (let i = 0;i < data.todolist.length;i++ ){
 									
-					$("#divNone1").before('<div style="display;" >');
+					$("#divNone1").before('<div>');
 	
 					$("#divNone1").before('<input type="checkbox" id="check_todo_history" checked="true" style="display:inline-block;height:40px;margin:0px 0px 0px 10px;" value="' + data.todolist[i].id + '" />');
 					$("#divNone1").before('<div class="listitem" style="display:inline-block;width:75%;white-space:nowrap; overflow:hidden; text-overflow:ellipsis; " >' + data.todolist[i].value  + '</div>');
