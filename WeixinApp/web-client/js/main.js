@@ -52,6 +52,10 @@ function onMineLoad() {
 	$("#divMoreHistory").click(function(){
 		getMyHistoryTodoList();
 	});
+	
+	$("#divAdd").click(function(){
+		window.location.href="additem.html?uid="+uid;
+	});
 }
 
 function getMyTodoList() {
@@ -109,7 +113,7 @@ function  onTodoCheck(item_type,id) {
 			if ( 0 == item_type ) {
 				$("#divNone1").css('display','none');
 				
-				item.click(function(){
+				item.find("input").click(function(){
 					onTodoCheck(1,id);
 				})
 				
@@ -121,7 +125,7 @@ function  onTodoCheck(item_type,id) {
 			} else {
 				$("#divNone").css('display','none');
 				
-				item.click(function(){
+				item.find("input").click(function(){
 					onTodoCheck(0,id);
 				})
 				
@@ -174,6 +178,13 @@ function getMyHistoryTodoList() {
 		}		
 	});
 	
+}
+
+
+
+function onAdditemLoad() {
+	uid = getUrlParam('uid');
+	console.log("additem, uid="+uid);
 }
 
 
