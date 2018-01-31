@@ -161,12 +161,25 @@ function getMyHistoryTodoList() {
 				
 				for (let i = 0;i < data.todolist.length;i++ ){
 					
-					$("#divNone1").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"  ></div>');
+					$("#divNone1").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"   ></div>');
 					
-					$("#divNone1").prev().append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" />');
-					$("#divNone1").prev().append('<div class="listitem my-content" >' + data.todolist[i].value  + '</div>');
-					$("#divNone1").prev().append('<div class="listitem my-time" >' + data.todolist[i].start_time  + '</div>');
-					$("#divNone1").prev().append('<div class="split-line" ></div>');
+					var item = $("#divNone1").prev();
+					item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" />');
+					
+					var divContent = $('<div class="listitem" style="width:90%;" ></div>');
+					divContent.append('<div  >' + data.todolist[i].value  + '</div>');
+					
+					var divContentBottom = $('<div></div>');
+					divContentBottom.append('<div class="listitem" >' + data.todolist[i].start_time  + '</div>');
+					divContentBottom.append('<div class="listitem my-right" >pop</div>');
+					
+					divContent.append(divContentBottom);
+					
+					item.append(divContent);
+					
+					item.append('<div class="listitem my-right">删除</div>')				
+					
+					item.append('<div class="split-line" ></div>');
 				}
 				
 				$("input#check_todo_history").click( function() {
