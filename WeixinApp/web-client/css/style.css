@@ -63,8 +63,8 @@ section {
 }
 
 .listitem{
-	margin:10px;
-	display:inline;
+	margin:8px;
+	display:inline-block;
 }
 
 .bottom{
@@ -93,4 +93,21 @@ section {
 	background-color: #c92651;
 	width:150px;
 	text-align:center;
+}
+
+.my-check{
+	width:20px;
+	height:20px;
+}
+
+.my-content{
+	display:inline-block;
+	width:75%;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis; 
+}
+
+.my-time{
+	float:right;
 }
