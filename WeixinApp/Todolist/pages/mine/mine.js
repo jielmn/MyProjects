@@ -83,7 +83,7 @@ Page({
 
     // 获取openid失败的回调
     app.openidFailCallback = function () {
-
+      console.log("get open_id failed!")
     }
 
     // 获取传递的参数personid
@@ -326,9 +326,11 @@ Page({
       title: '登录中',
     })
 
+    console.log("request register.......")
+
     // 开始注册
     wx.request({
-      url: 'https://telemed-healthcare.cn/todolist/main?type=register&open_id=' + this.data.openid+'&name=' + this.data.userInfo.nickName+'&avatarUrl='+this.data.userInfo.avatarUrl + '&abc= 你好',
+      url: 'https://telemed-healthcare.cn/todolist/main?type=register&open_id=' + encodeURIComponent(this.data.openid) + '&name=' + encodeURIComponent(this.data.userInfo.nickName) + '&avatarUrl=' +encodeURIComponent(this.data.userInfo.avatarUrl),
       method: 'GET',
       success: (res) => {
         if ( res.data.error != null && res.data.error == 0 ) {
@@ -345,7 +347,7 @@ Page({
         }        
       },
       fail() {
-        console.log("failed to register")
+        console.log("failed to register!!!")
         wx.showModal({
           title: '登录失败',
           content: '登录失败，请稍后再试',
@@ -419,7 +421,7 @@ Page({
 
     // 开始注册
     wx.request({
-      url: 'https://telemed-healthcare.cn/todolist/main?type=todolist&open_id=' + this.data.openid,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=todolist&open_id=' + encodeURIComponent(this.data.openid),
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
@@ -470,7 +472,7 @@ Page({
 
 
     wx.request({
-      url: 'https://telemed-healthcare.cn/todolist/main?type=history&open_id=' + this.data.openid + '&start_index=' + start_index,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=history&open_id=' + encodeURIComponent(this.data.openid) + '&start_index=' + start_index,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {

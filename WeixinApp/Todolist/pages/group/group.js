@@ -117,7 +117,7 @@ Page({
     }
 
     wx.request({
-      url: 'https://telemed-healthcare.cn/todolist/main?type=any_todolist&user_id=' + user_id + '&is_complete=' + is_complete + '&start_index='+start_index,
+      url: 'https://telemed-healthcare.cn/todolist/main?type=any_todolist&user_id=' + encodeURIComponent(user_id) + '&is_complete=' + is_complete + '&start_index='+start_index,
       method: 'GET',
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {

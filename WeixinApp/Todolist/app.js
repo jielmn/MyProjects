@@ -61,9 +61,10 @@ App({
   getOpenid: function (code) {
     console.log("getting openid")
     var that = this;
+    console.log("reqeust get openid....")
     wx.request({
       //url: 'https://api.weixin.qq.com/sns/jscode2session?appid=' + that.globalData.appid + '&secret=' + that.globalData.secret + '&js_code=' + code + '&grant_type=authorization_code',
-      url: 'https://telemed-healthcare.cn/todolist?type=get_openid&code=' + code,
+      url: 'https://telemed-healthcare.cn/todolist?type=get_openid&code=' + encodeURIComponent(code),
       data: {},
       method: 'GET',
       success: function (res) {

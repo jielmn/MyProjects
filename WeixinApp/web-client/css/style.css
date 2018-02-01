@@ -98,12 +98,11 @@ section {
 .my-check{
 	width:20px;
 	height:20px;
-	margin:0px;
+	margin:8px;
 }
 
 .my-content{
-	display:inline-block;
-	width:75%;
+	width:100%;
 	white-space:nowrap;
 	overflow:hidden;
 	text-overflow:ellipsis; 
@@ -115,4 +114,9 @@ section {
 
 .my-right{
 	float:right;
+	margin:0px 8px 0px 8px;
+}
+
+.my-del{
+	background-color: orange;
 }

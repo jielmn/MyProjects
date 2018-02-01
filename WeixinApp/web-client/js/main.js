@@ -72,11 +72,34 @@ function getMyTodoList() {
 				
 				for (let i = 0;i < data.todolist.length;i++ ){
 					
+					/*
 					$("#divNone").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"  ></div>');					
 					$("#divNone").prev().append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" />');
 					$("#divNone").prev().append('<div class="listitem my-content" >' + data.todolist[i].value  + '</div>');
 					$("#divNone").prev().append('<div class="listitem my-time" >' + data.todolist[i].start_time  + '</div>');
 					$("#divNone").prev().append('<div class="split-line" ></div>');
+					*/
+					
+					$("#divNone").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"   ></div>');
+					
+					var item = $("#divNone").prev();
+					item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" />');
+					
+					var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+					
+					var divContentBottom = $('<div></div>');
+					divContentBottom.append('<div class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time  + '</div>');
+					divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
+					
+					divContent.append(divContentBottom);
+					
+					item.append(divContent);
+					
+					item.append('<div class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')				
+					
+					item.append('<div class="split-line" ></div>');
+					
 					
 				}
 				
@@ -161,25 +184,27 @@ function getMyHistoryTodoList() {
 				
 				for (let i = 0;i < data.todolist.length;i++ ){
 					
+					
 					$("#divNone1").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"   ></div>');
 					
 					var item = $("#divNone1").prev();
 					item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" />');
 					
-					var divContent = $('<div class="listitem" style="width:90%;" ></div>');
-					divContent.append('<div  >' + data.todolist[i].value  + '</div>');
+					var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 					
 					var divContentBottom = $('<div></div>');
-					divContentBottom.append('<div class="listitem" >' + data.todolist[i].start_time  + '</div>');
-					divContentBottom.append('<div class="listitem my-right" >pop</div>');
+					divContentBottom.append('<div class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time  + '</div>');
+					divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
 					
 					divContent.append(divContentBottom);
 					
 					item.append(divContent);
 					
-					item.append('<div class="listitem my-right">删除</div>')				
+					item.append('<div class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')				
 					
 					item.append('<div class="split-line" ></div>');
+					
 				}
 				
 				$("input#check_todo_history").click( function() {
@@ -198,6 +223,33 @@ function getMyHistoryTodoList() {
 function onAdditemLoad() {
 	uid = getUrlParam('uid');
 	console.log("additem, uid="+uid);
+}
+
+function onDel( id ) {
+	//console.log(id );
+	
+	var r=confirm("确认删除该清单吗？");
+	if (r==false)
+	{
+		return;
+	}	
+	
+	$.get("https://telemed-healthcare.cn/todolist/main?type=delete&id="+id,function(data,status){
+		if ( "success" == status && 0 == data.error ) {
+			console.log("delete success!");
+			
+			var item = $("#divTodoItem"+id );
+			item.remove();
+			
+			if ( $("#divTodoListHistory").find("input").length == 0  ) {
+				$("#divNone1").css('display','block');
+			}
+			
+			if ( $("#divTodoList").find("input").length == 0  ) {
+				$("#divNone").css('display','block');
+			}
+		}
+	});
 }
 
 
