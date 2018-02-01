@@ -43,6 +43,8 @@ function onMineLoad() {
 	$.get("https://www.telemed-healthcare.cn/todolist/main?type=userinfo&user_id="+uid,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get user info success");
+			$("body").css('display','block');
+			
 			$("#imgAvatar").attr("src",data.userinfo.avatarUrl);
 			$("#divNickname").text(data.userinfo.nick_name);
 			getMyTodoList();
