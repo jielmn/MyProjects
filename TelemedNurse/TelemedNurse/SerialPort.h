@@ -74,7 +74,7 @@ public:
 extern MessageHandlerSerialPort * g_handler_serial_port;
 
 #define  MSG_RECONNECT_SERIAL_PORT      100
-#define  DELAY_RECONNECT_SERIAL_PORT    10000
+#define  DELAY_RECONNECT_SERIAL_PORT    3000
 
 #define  MSG_SERIAL_PORT_HEART_BEAT     101
 #define  DELAY_SERIAL_PORT_HEART_BEAT   10000

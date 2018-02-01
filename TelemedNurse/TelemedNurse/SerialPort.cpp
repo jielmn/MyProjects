@@ -613,6 +613,7 @@ void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::M
 					bPrepared = TRUE;
 					break;
 				}
+				CSerialPort::GetInstance()->CloseUartPort();
 			}
 		} while ( 0 );
 

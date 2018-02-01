@@ -158,8 +158,17 @@ void MessageHandlerBindingReader::OnMessage(DWORD dwMessageId, const  LmnToolkit
 		int ret = CBindingReader::GetInstance()->Inventory(&tTagId);
 		// 通知UI界面
 		CBindingReader::GetInstance()->NotifyInventory(ret, &tTagId);
+
+		// 如果是成功的盘点，则在下次盘点时留下足够长的时间
+		DWORD  dwRelayTime = DELAY_INVENTORY_TIME;
+
+		if (0 == ret) {
+			dwRelayTime = 2000;
+		}
+
 		// 再次盘点
-		g_thrd_binding_reader->PostDelayMessage(DELAY_INVENTORY_TIME, g_handler_binding_reader, MSG_INVENTORY);
+		//g_thrd_binding_reader->PostDelayMessage(DELAY_INVENTORY_TIME, g_handler_binding_reader, MSG_INVENTORY);
+		g_thrd_binding_reader->PostDelayMessage(dwRelayTime, g_handler_binding_reader, MSG_INVENTORY);
 	}
 	break;
 
