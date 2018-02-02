@@ -60,6 +60,9 @@ CSerialPort::CSerialPort() {
 
 	g_cfg->GetConfig("clear command", buf, sizeof(buf), "55 01 04 dd aa");
 	TransferReaderCmd(CLEAR_COMMAND, buf);
+
+	g_cfg->GetConfig("min temperature", m_dwMinTemp, 3500);
+	g_cfg->GetConfig("max temperature", m_dwMaxTemp, 4200);
 }
 
 CSerialPort::~CSerialPort() {
@@ -450,14 +453,17 @@ int   CSerialPort::ReadSyncRet(std::vector<TagData*> & v) {
 			}
 		}
 
-		TagData* pItem = new TagData;
-		memset(pItem, 0, sizeof(TagData));
+		// 温度在35和42度之间才被认为有效
+		if (dwTemperature > m_dwMinTemp && dwTemperature < m_dwMaxTemp) {
+			TagData* pItem = new TagData;
+			memset(pItem, 0, sizeof(TagData));
 
-		pItem->tTime = tTime;
-		pItem->dwTemperature = dwTemperature;
-		memcpy(&pItem->tTagId, &tId, sizeof(TagId));
+			pItem->tTime = tTime;
+			pItem->dwTemperature = dwTemperature;
+			memcpy(&pItem->tTagId, &tId, sizeof(TagId));
 
-		v.push_back(pItem);
+			v.push_back(pItem);
+		}		
 
 		nIndex++;
 		// 个数达到要求

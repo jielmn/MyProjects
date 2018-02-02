@@ -43,6 +43,8 @@ private:
 	static CSerialPort *  pInstance;
 	HANDLE     m_hComm;
 	CDataBuf   m_received_data;
+	DWORD      m_dwMinTemp;
+	DWORD      m_dwMaxTemp;
 
 public:
 	// ´ò¿ª´®¿Ú
