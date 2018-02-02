@@ -1,5 +1,6 @@
 var uid = null;
 var start_index = 0;
+var bEdit = true;
 
 function onTabChange(index){
 	if ( 0 == index ) {
@@ -58,6 +59,20 @@ function onMineLoad() {
 	$("#divAdd").click(function(){
 		window.location.href="additem.html?uid="+uid;
 	});
+	
+	$("#divEdit").click( function() {
+		console.log('click edit');
+		
+		if ( bEdit ) {
+			$("div#divDel").css('display','block');
+			$("#divEdit").text('完成')
+		}
+		else {
+			$("div#divDel").css('display','none');
+			$("#divEdit").text('编辑')
+		}		
+		bEdit = !bEdit;
+	})
 }
 
 function getMyTodoList() {
@@ -72,6 +87,7 @@ function getMyTodoList() {
 			} else {
 				$("#divNone").css('display','none');
 				
+				CalculateElapsedTime(data.todolist);
 				for (let i = 0;i < data.todolist.length;i++ ){
 					
 					/*
@@ -82,7 +98,7 @@ function getMyTodoList() {
 					$("#divNone").prev().append('<div class="split-line" ></div>');
 					*/
 					
-					$("#divNone").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"   ></div>');
+					$("#divNone").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '" start="' + data.todolist[i].start_time_txt + '"  ></div>');
 					
 					var item = $("#divNone").prev();
 					item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" />');
@@ -91,14 +107,14 @@ function getMyTodoList() {
 					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 					
 					var divContentBottom = $('<div></div>');
-					divContentBottom.append('<div class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time  + '</div>');
+					divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time_txt  + '</div>');
 					divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
 					
 					divContent.append(divContentBottom);
 					
 					item.append(divContent);
 					
-					item.append('<div class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')				
+					item.append('<div id="divDel" class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center;display:none" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')
 					
 					item.append('<div class="split-line" ></div>');
 					
@@ -142,6 +158,9 @@ function  onTodoCheck(item_type,id) {
 					onTodoCheck(1,id);
 				})
 				
+				item.find("#divTime").text('0分');
+				item.attr('end','0分');
+				
 				$("#divHistoryTopLine").after(item);
 				
 				if ( $("#divTodoList").find("input").length == 0  ) {
@@ -153,6 +172,8 @@ function  onTodoCheck(item_type,id) {
 				item.find("input").click(function(){
 					onTodoCheck(0,id);
 				})
+				
+				item.find("#divTime").text(item.attr('start'));
 				
 				$("#divTopLine").after(item);
 				
@@ -184,10 +205,11 @@ function getMyHistoryTodoList() {
 			} else {
 				$("#divNone1").css('display','none');
 				
+				CalculateElapsedTime(data.todolist);
 				for (let i = 0;i < data.todolist.length;i++ ){
 					
 					
-					$("#divNone1").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '"   ></div>');
+					$("#divNone1").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '" start="' + data.todolist[i].start_time_txt + '" end="' + data.todolist[i].end_time_txt + '"   ></div>');
 					
 					var item = $("#divNone1").prev();
 					item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" />');
@@ -196,14 +218,14 @@ function getMyHistoryTodoList() {
 					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 					
 					var divContentBottom = $('<div></div>');
-					divContentBottom.append('<div class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time  + '</div>');
+					divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].end_time_txt  + '</div>');
 					divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
 					
 					divContent.append(divContentBottom);
 					
 					item.append(divContent);
 					
-					item.append('<div class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')				
+					item.append('<div id="divDel" class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center;display:none" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')				
 					
 					item.append('<div class="split-line" ></div>');
 					
@@ -221,11 +243,6 @@ function getMyHistoryTodoList() {
 }
 
 
-
-function onAdditemLoad() {
-	uid = getUrlParam('uid');
-	console.log("additem, uid="+uid);
-}
 
 function onDel( id ) {
 	//console.log(id );
@@ -252,6 +269,60 @@ function onDel( id ) {
 			}
 		}
 	});
+}
+
+
+function CalculateElapsedTime( items ) {
+	var now = Date.now()
+	for (var i in items ) {
+	  var start_time = items[i].start_time || 0;
+	  if ( start_time > 0 && start_time <= now ) {
+		items[i].start_time_txt = this.FormatTime(now-start_time);
+	  } else {
+		items[i].start_time_txt = '0分'
+	  }
+
+	  var end_time = items[i].end_time || 0;
+	  if (end_time && end_time > 0 && end_time <= now) {
+		items[i].end_time_txt = this.FormatTime(now - end_time);
+	  } else {
+		items[i].end_time_txt = '0分'
+	  }
+
+	}
+}
+
+function FormatTime(elapsed) {
+	if (elapsed < 0 ) {
+	  return ''
+	}
+
+	elapsed = parseInt(elapsed / 1000);
+
+	// 小于一天
+	if ( elapsed < 3600 * 24 ) {
+	  var hour = parseInt( elapsed / 3600 );
+	  var minute = parseInt( ( elapsed % 3600 ) / 60 );
+	  if ( hour > 0 ) {
+		return hour + '小时' + minute + '分'
+	  }      
+	  return minute + '分'
+	}
+
+	var day = parseInt(elapsed / (3600 * 24))
+	return day + '天'
+}
+
+
+
+
+function onAdditemLoad() {
+	uid = getUrlParam('uid');
+	//console.log("additem, uid="+uid);
+	
+	$("#divReturn").click(function(){
+		history.back();
+	})
 }
 
 

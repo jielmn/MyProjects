@@ -20,10 +20,10 @@ section {
     width:85%;
 	height:600px;
     float:left;
-	background-color:#00ff00;	
+	background-color:#ffffff;
 	
 	padding:0px;	 
-	margin:0px;
+	margin:0px;	
 }
 
 .my-margin{
@@ -119,4 +119,36 @@ section {
 
 .my-del{
 	background-color: orange;
+}
+
+.my-edit{
+	margin:0px 10px 0px 10px;
+	background-color: #c92651;
+	width:60px;
+	height:40px;
+	text-align:center;
+	line-height:40px;
+}
+
+.my-input{
+	width:600px;
+	height:40px;
+	margin:10px;
+	font-size:15px;
+}
+
+
+.my-save{
+	background-color: #c92651;
+	height:40px;
+	width:120px;
+	text-align:center;
+	line-height:40px;
+}
+
+.my-return{
+	height:40px;
+	width:80px;
+	line-height:40px;
+	margin:10px;
 }
