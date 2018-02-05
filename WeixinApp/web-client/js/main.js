@@ -27,6 +27,7 @@ function getUrlParam(name) {
 function onMainLoad() {
 	uid = getUrlParam('uid');
 	$("#iframeMine").attr('src','mine.html?uid=' + uid); 
+	$("#iframeGroup").attr('src','group.html?uid=' + uid); 
 	
 	$("#divMine").click(function(){
 	  onTabChange(0);
@@ -39,6 +40,7 @@ function onMainLoad() {
 
 // “我的”页面加载
 function onMineLoad() {
+	console.log("mine load")
 	uid = getUrlParam('uid');
 	//alert("content:"+uid);
 	$.get("https://www.telemed-healthcare.cn/todolist/main?type=userinfo&user_id="+uid,function(data,status){
@@ -323,6 +325,152 @@ function onAdditemLoad() {
 	$("#divReturn").click(function(){
 		history.back();
 	})
+	
+	
+	$("#divSave").click(function(){
+		var items = $("#item");
+		
+		$.get("https://telemed-healthcare.cn/todolist/main?type=additem&open_id=" + encodeURIComponent(uid) + '&item=' + encodeURIComponent(items[0].value),function(data,status){
+			if ( "success" == status && 0 == data.error ) {
+				console.log("add item success!");
+				history.back();
+			}
+		});
+	})
+	
+}
+
+
+
+function onGroupLoad() {
+	uid = getUrlParam('uid');
+	//console.log("group, uid="+uid);
+	
+	$.get("https://telemed-healthcare.cn/todolist/main?type=users",function(data,status){
+		if ( "success" == status && 0 == data.error ) {
+			console.log("get group success!");
+			var users = data.users;
+			
+			for (let i = 0;i < users.length;i++ ) {
+				var option = "<option value='" + users[i].user_id + "'>" + users[i].nick_name + "</option>";
+				$("#selector").append(option)
+			}		
+			
+			getPersonTodolist(0);
+		}
+	});
+	
+	$("#selector").change(function() {
+		console.log("change");
+		
+		//$("#divTodoList").remove();
+		
+		$("#divTodoList").find("*").filter( function( index ) {
+			return $( this ).attr( "value_index" ) > 0 ;
+		}).remove();
+		
+		
+		$("#divTodoListHistory").find("*").filter(function( index ) {
+			return $( this ).attr( "value_index" ) > 0 ;
+		} ).remove();
+		
+		getPersonTodolist(0);
+	})
+	
+	$("#divMoreHistory").click(function(){
+		getPersonTodolist(1);
+	})
+}
+
+// is_complete: 0, todolist; 1, history todolist
+function  getPersonTodolist(is_complete) {
+	
+	var user_id     = $("#selector").val();
+    var start_index = 0;
+	var history_count = $("#divTodoListHistory").find("input").length;
+	if ( 0 != is_complete ) {
+		start_index = history_count;
+	}
+	
+	$.get('https://telemed-healthcare.cn/todolist/main?type=any_todolist&user_id=' + user_id + '&is_complete=' + is_complete + '&start_index='+start_index,function(data,status){
+		if ( "success" == status && 0 == data.error ) {
+			console.log("get person todolist success!");
+			CalculateElapsedTime(data.todolist);
+			//console.log(data);
+			
+			if ( 0 == is_complete ) {				
+				
+				if ( data.todolist.length == 0 ){
+					$("#divNone").css('display','block');
+				} else {
+					$("#divNone").css('display','none');
+					
+					for (let i = 0;i < data.todolist.length;i++ ){					
+					
+						$("#divNone").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '" start="' + data.todolist[i].start_time_txt + '"  ></div>');
+						
+						var item = $("#divNone").prev();
+						item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" disabled="disabled" />');
+						
+						var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+						divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+						
+						var divContentBottom = $('<div></div>');
+						divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time_txt  + '</div>');
+						divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
+						
+						divContent.append(divContentBottom);
+						
+						item.append(divContent);
+						
+						//item.append('<div id="divDel" class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center;display:none" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')
+						
+						item.append('<div class="split-line" ></div>');				
+					}	
+				}				
+			} else {
+							
+				if ( data.todolist.length == 0 ){
+					if ( 0 == history_count ) {
+						$("#divNone1").css('display','block');
+					}
+				} else {
+					$("#divNone1").css('display','none');
+					
+					for (let i = 0;i < data.todolist.length;i++ ){
+						
+						$("#divNone1").before('<div id="divTodoItem' + data.todolist[i].id + '"  value_index="' + data.todolist[i].id + '" start="' + data.todolist[i].start_time_txt + '" end="' + data.todolist[i].end_time_txt + '"   ></div>');
+						
+						var item = $("#divNone1").prev();
+						item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" disabled="disabled" />');
+						
+						var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+						divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+						
+						var divContentBottom = $('<div></div>');
+						divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].end_time_txt  + '</div>');
+						divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
+						
+						divContent.append(divContentBottom);
+						
+						item.append(divContent);
+						
+						//item.append('<div id="divDel" class="listitem my-right my-del hand" style="line-height:42px;width:60px;text-align:center;display:none" onclick="onDel(' + data.todolist[i].id + ');" >删除</div>')				
+						
+						item.append('<div class="split-line" ></div>');
+						
+					}
+				}				
+			}
+					
+			
+			if ( 0 == is_complete ) {
+				//$("#divTodoListHistory").find("div#divTodoItem").remove();
+				getPersonTodolist(1);
+			}
+			
+		}
+	});
 }
 
 
