@@ -552,6 +552,34 @@ static BOOL GetAllSerialPortName( std::vector<std::string> & vCom ) {
 	return TRUE;
 }
 
+/*
+void GetFirstTag(char * szTagId, DWORD dwTagIdLen) {
+	int ret = -1;
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	char  sql[8192];
+	static sqlite3 * m_db = 0;
+
+	if (m_db == 0) {
+		ret = sqlite3_open("telemed_nurse.db", &m_db);
+		if (ret != 0) {
+			return;
+		}
+	}
+	
+	_snprintf_s(sql, sizeof(sql), "select * from tags limit 1;");
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	if (nrow > 0) {
+		for (int i = 0; i < nrow; i++) {
+			strncpy( szTagId, azResult[(i + 1)*ncolumn + 0], dwTagIdLen );
+		}
+	}
+	sqlite3_free_table(azResult);
+}
+*/
+
 void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData) {
 	char buf[8192];
 	switch ( dwMessageId)
@@ -686,6 +714,30 @@ void MessageHandlerSerialPort::OnMessage(DWORD dwMessageId, const LmnToolkits::M
 			g_thrd_serial_port->PostDelayMessage(DELAY_RECONNECT_SERIAL_PORT, g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
 			break;
 		}
+
+		/*
+		char szTagId[256];
+		GetFirstTag(szTagId, sizeof(szTagId));
+		time_t now = time(0);
+		TagId tId;
+		ConvertTagId(&tId, szTagId);
+
+		ClearVector(*pVec);
+		for (int i = 0; i < 7; i++) {
+			time_t  t = now - 3600 * 24 * i;
+
+			for (int j = 0; j < 6; j++) {
+				TagData* pItem = new TagData;
+				memset(pItem, 0, sizeof(TagData));
+
+				pItem->tTime = t + j * 60;
+				pItem->dwTemperature = GetRand(3680, 3880);
+				memcpy(&pItem->tTagId, &tId, sizeof(TagId));
+
+				pVec->push_back(pItem);
+			}
+		}
+		*/
 
 		CSerialPort::GetInstance()->NotifySerialPortSyncRet(SERIAL_PORT_SYNC_ERROR_OK, pVec );
 	}
