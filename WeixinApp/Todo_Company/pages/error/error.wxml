@@ -1,0 +1,2 @@
+<view class="main">授权用户信息失败失败，不能使用本小程序功能。请重新授权</view>
+<button catchtap="onAuthorize">授权</button>

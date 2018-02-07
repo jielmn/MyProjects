@@ -1,0 +1,106 @@
+<!--index.wxml-->
+
+<!--控制整个页面是否显示。要求用户登录服务器-->
+<view wx:if="{{login}}">
+
+
+<view class="content-center">
+  <image src="{{personInfo.avatarUrl}}" class="person avatar"></image>
+  <view class="person">{{personInfo.nickName}}</view>
+</view>
+
+<view style="width:10px;height:10px;"></view>
+
+<view class="main" catchtap="OnIgnore">
+  <view class="title" catchtap="OnIgnore">正在进行</view>
+  <view class="content" catchtap="OnIgnore">
+    <view  class="split" catchtap="OnIgnore" ></view>
+
+    <view wx:if="{{todolist_items.length<=0}}">
+      <view class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
+      <view class="split" catchtap="OnIgnore" ></view>
+    </view>
+    
+    <checkbox-group catchtap="OnIgnore">
+      <label wx:for="{{todolist_items}}" wx:key="id">
+        <scroll-view class="todo-item-line" scroll-x catchtap="OnIgnore" >
+          <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
+            <view class="todo-item" style="width:10px;"></view>
+            <checkbox class="todo-item" value="{{item.id}}" checked="{{false}}" catchtap="OnCheckbox" data-id="{{item.id}}" 
+                      wx:if="{{self}}" />
+            <view style="display:inline-block;vertical-align:middle;">
+              <view style="display:flex;flex-direction:column;">
+                <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnDetail" 
+                      data-id="{{item.id}}" >{{item.value}}</text>
+                <view style="width:10px;height:5px;"></view>
+                <view style="display:flex;flex-direction:row;justify-content:space-between;">
+                  <view style="font-size:10px;color:#999">{{item.start_time_txt}}</view>
+                  <view style="font-size:10px;color:#999"> </view>
+                </view>                
+              </view>
+            </view>    
+                    
+            <view class="todo-item menu rd" catchtap="OnDelete" wx:if="{{self}}" data-id="{{item.id}}" >删除</view>
+          </view>
+        </scroll-view>    
+        <view class="split" catchtap="OnIgnore" ></view>
+      </label>
+    </checkbox-group>
+  </view>
+
+
+  <view style="height:20px;"></view>
+  <view class="title" catchtap="OnIgnore">已经完成</view>
+  <view class="content" catchtap="OnIgnore">
+    <view class="split" catchtap="OnIgnore" ></view>
+
+    <view wx:if="{{history_todolist_items.length<=0}}">
+      <view class="todo-item-line-none" catchtap="OnIgnore" >(空)</view>
+      <view class="split" catchtap="OnIgnore" ></view>
+    </view>
+
+    <checkbox-group catchtap="OnIgnore">
+      <label wx:for="{{history_todolist_items}}" wx:key="id">
+        <scroll-view class="todo-item-line-complete" scroll-x catchtap="OnIgnore" >
+          <view style="width:{{todo_item_width}}px" catchtap="OnIgnore">
+            <view class="todo-item" style="width:10px;"></view>
+            <checkbox class="todo-item" value="{{item.id}}" checked="{{true}}" catchtap="OnCheckbox" 
+            wx:if="{{self}}" color="#ccc" data-id="{{item.id}}" data-type="history" />
+            <view style="display:inline-block;vertical-align:middle;">
+              <view style="display:flex;flex-direction:column;">
+                <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnDetail" data-id="{{item.id}}" data-type="history" >{{item.value}}</text>
+                <view style="width:10px;height:5px;"></view>
+                <view style="display:flex;flex-direction:row;justify-content:space-between;">
+                  <view style="font-size:10px;color:#999">{{item.end_time_txt}}</view>
+                  <view style="font-size:10px;color:#999"> </view>
+                </view>                
+              </view>
+            </view>    
+                    
+            <view class="todo-item menu rd" catchtap="OnDelete" data-id="{{item.id}}" data-type="history" wx:if="{{self}}"  >删除</view>
+          </view>
+        </scroll-view>    
+        <view class="split" catchtap="OnIgnore" ></view>
+      </label>
+    </checkbox-group>
+  </view>
+</view>
+
+<view style="width:10px;height:10px;"></view>
+
+<view class="content-right">
+  <view class="bottom-view" catchtap="loadMoreHistory">加载更多历史清单</view>
+</view>
+
+<view style="width:10px;height:30px;"></view>
+
+<view class="bottom">
+  <view class="add-p">
+    <view class="add" bindtap="toAddItem">+</view>
+  </view>
+</view>
+
+
+
+
+</view>
