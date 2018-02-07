@@ -12,7 +12,7 @@
     <view style="width:10px;height:10px;"></view>
     <view class="common">结束时间:</view>
     <view class="split" ></view>
-    <view class="common">{{start_time_txt}}</view>
+    <view class="common">{{end_time_txt}}</view>
   </view>
 
   <view wx:if="{{username}}">

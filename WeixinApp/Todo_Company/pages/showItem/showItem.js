@@ -8,14 +8,20 @@ Page({
     content:null,
     start_time:null,
     start_time_txt:null,
+    end_time: null,
+    end_time_txt: null,
     is_complete:false,
     username:null,
   },
 
   onLoad:function(e) {
-    this.setData({ id: e.id, content: e.content, start_time: e.start_time, username:e.username})
+    this.setData({ id: e.id, content: e.content, start_time: e.start_time, username:e.username, end_time: e.end_time })
     var date = new Date(parseInt(e.start_time))
     this.setData({ start_time_txt: this.formatTime(date) })
+
+    var end_date = new Date(parseInt(e.end_time))
+    this.setData({ end_time_txt: this.formatTime(end_date) })
+
     if ( e.is_complete ) {
       this.setData({ is_complete: true })
     }

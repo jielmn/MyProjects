@@ -10,6 +10,9 @@ App({
       success: function (res) {
         app_obj.globalData.windowWidth = res.windowWidth
         app_obj.globalData.windowHeight = res.windowHeight
+        if (app_obj.systemInfoReady) {
+          app_obj.systemInfoReady(res)
+        }
       },
     })
 

@@ -191,7 +191,7 @@ Page({
 
     if (del_type) {
       wx.navigateTo({
-        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true&username=' + item.nickname ,
+        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true&username=' + item.nickname + '&end_time=' + item.end_time ,
       })
     } else {
       wx.navigateTo({
@@ -231,6 +231,11 @@ Page({
         items[i].end_time_txt = this.FormatTime(now - end_time);
       } else {
         items[i].end_time_txt = '0分'
+      }
+
+      if (end_time >= start_time) {
+        var duration = end_time - start_time;
+        items[i].duration = this.FormatTime(duration);
       }
 
     }

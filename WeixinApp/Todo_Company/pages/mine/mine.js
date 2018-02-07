@@ -44,6 +44,17 @@ Page({
     this.setData({ userInfo: app.globalData.userInfo})
     this.setData({ openid:   app.globalData.openid })
 
+    app.systemInfoReady = res => {
+      that.setData({ windowWidth: res.windowWidth })
+      that.setData({ windowHeight: res.windowHeight })
+
+      var todo_item_text_width = that.data.windowWidth - 5 - 50;
+      that.setData({ todo_item_text_width: todo_item_text_width })
+
+      var todo_item_width = that.data.windowWidth + 60;
+      that.setData({ todo_item_width: todo_item_width })
+    }
+
     // 设置userInfo成功的回调
     app.userInfoReadyCallback = res => {
       console.log("callback get userInfo")
@@ -227,7 +238,7 @@ Page({
 
     if ( del_type ) {
       wx.navigateTo({
-        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true',
+        url: '../showItem/showItem?id=' + id + '&content=' + item.value + '&start_time=' + item.start_time + '&is_complete=true' + '&end_time=' + item.end_time,
       })
     } else {
       wx.navigateTo({
@@ -540,6 +551,12 @@ Page({
       } else {
         items[i].end_time_txt = '0分'
       }
+
+      if (end_time >= start_time ) {
+        var duration = end_time - start_time;
+        items[i].duration = this.FormatTime(duration);
+      }
+      
 
     }
   },

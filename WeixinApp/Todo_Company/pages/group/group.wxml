@@ -69,7 +69,7 @@
                 <text class="text_item" style="width:{{ todo_item_text_width }}px;" catchtap="OnDetail" data-id="{{item.id}}" data-type="history" >{{item.value}}</text>
                 <view style="width:10px;height:5px;"></view>
                 <view style="display:flex;flex-direction:row;justify-content:space-between;">
-                  <view style="font-size:10px;color:#999">{{item.end_time_txt}}</view>
+                  <view style="font-size:10px;color:#999">用时：{{item.duration}}</view>
                   <view style="font-size:10px;color:#999">{{item.nickname}}</view>
                 </view>                
               </view>
