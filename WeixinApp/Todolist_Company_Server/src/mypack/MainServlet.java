@@ -408,7 +408,7 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			Statement stmt = con.createStatement();      
-			ResultSet rs = stmt.executeQuery("select * from todolist_items where owner_id='" + open_id_sql + "' AND is_complete = 1 order by end_time limit " + start_index + "," + INCREASE_QUERY + " ;" );
+			ResultSet rs = stmt.executeQuery("select * from todolist_items where owner_id='" + open_id_sql + "' AND is_complete = 1 order by end_time desc limit " + start_index + "," + INCREASE_QUERY + " ;" );
 			
 			// 获取清单
 			JSONArray item_arr = new JSONArray();
@@ -608,7 +608,7 @@ public class MainServlet extends HttpServlet {
 				if ( is_complete == 0 ) {
 					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0;" );
 				} else {
-					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete = 1 order by a.end_time limit " + start_index + "," + INCREASE_QUERY + ";" );
+					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete = 1 order by a.end_time desc limit " + start_index + "," + INCREASE_QUERY + ";" );
 				}
 				
 			} else {
@@ -617,7 +617,7 @@ public class MainServlet extends HttpServlet {
 					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =0 AND a.owner_id='" + user_id_sql + "';" );
 				} else {
 					rs = stmt.executeQuery("select a.item_id, a.content, a.start_time, a.end_time, b.nickname from todolist_items a inner join users b on a.owner_id = b.open_id where a.is_complete =1 AND a.owner_id='" 
-					                       + user_id_sql + "' order by a.end_time limit " +  start_index + "," + INCREASE_QUERY + " ;" );
+					                       + user_id_sql + "' order by a.end_time desc limit " +  start_index + "," + INCREASE_QUERY + " ;" );
 				}				
 			}
 			
