@@ -18,3 +18,7 @@ create table users ( open_id varchar(64) primary key not null, name varchar(32) 
 -- is_complete指示清单是否完成
 -- owner_id是用户的id
 create table todolist_items ( item_id int primary key not null auto_increment, content varchar(128) not null, start_time datetime, end_time datetime, is_complete int not null default 0, owner_id varchar(64) not null  ) DEFAULT CHARSET=utf8;
+
+
+
+create table festivals ( year int not null, month int not null, day int not null, bkimage varchar(64) not null, primary key(year, month, day)  ) DEFAULT CHARSET=utf8;

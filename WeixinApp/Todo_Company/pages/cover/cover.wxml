@@ -1,8 +1,8 @@
  <!--<view style="background:url(/images/banner2.jpg) no-repeat ;height:520px;">123</view> -->
 
 
-<view style="position:fixed;top:0;left:0;z-index:-1;">
-  <image src="https://telemed-healthcare.cn/todolist_company/images/{{bkImage}}" style="width:{{windowWidth}}px;height:{{windowHeight}}px;background:#f3f3f3;" mode="aspectFit"></image>  
+<view style="position:fixed;top:0;left:0;z-index:-1;" wx:if="{{bkImage}}" >
+  <image src="https://telemed-healthcare.cn/todolist_company/images/{{bkImage}}" style="width:{{windowWidth}}px;height:{{windowHeight}}px;background:#f3f3f3;" mode="aspectFill"></image>  
 </view>
 
 <view class="enter" catchtap='onEnter'>

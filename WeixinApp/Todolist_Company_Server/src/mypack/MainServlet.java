@@ -184,7 +184,11 @@ public class MainServlet extends HttpServlet {
 				}
 				
 				getUserInfo( out, user_id );
-			}
+			} 
+			else if ( type.equals("bk") ) {				
+				
+				getBackground( out );
+			} 
 					
 		}
 		
@@ -707,6 +711,83 @@ public class MainServlet extends HttpServlet {
         }
 				
 	}
+	
+	
+	public void getBackground(PrintWriter out ) {
+		
+		Calendar now = Calendar.getInstance();
+
+		int year  = now.get(Calendar.YEAR);
+        int month = now.get(Calendar.MONTH) + 1;
+        int day   = now.get(Calendar.DAY_OF_MONTH);
+		
+		boolean find = false;
+		String  bkImage = "common.jpg";
+		
+		// 公历节日：元旦，妇女节，愚人节，劳动节，建军节、建党节、国庆节、圣诞节
+		
+		// 元旦
+		if ( month == 1 && day == 1 ) {
+			find = true;
+		} else if ( month == 3 && 8 == day ) {
+			find = true;
+		} else if ( month == 4 && 1 == day ) {
+			find = true;
+		} else if ( month == 5 && 1 == day ) {
+			find = true;
+		} else if ( month == 7 && 1 == day ) {
+			find = true;
+		} else if ( month == 8 && 1 == day ) {
+			find = true;
+		} else if ( month == 10 && 1 == day ) {
+			find = true;
+		} else if ( month == 12 && 25 == day ) {
+			find = true;
+		}
+		
+		if ( find ) {
+			bkImage = "" + month + "_" + day + ".jpg";
+			
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("bkimage", bkImage);
+			rsp_obj.put("error", 0);
+			
+			out.print(rsp_obj.toString());
+			return;
+ 		}
+		
+		// 农历节日查表
+		try {
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select bkimage from festivals where year = " + year + " and month = " + month + " and day = " + day );
+						
+			if ( rs.next() ) {
+				bkImage = rs.getString(1);
+			}
+			
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("bkimage", bkImage);
+			rsp_obj.put("error", 0);			
+			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	
 	
 	
 	
