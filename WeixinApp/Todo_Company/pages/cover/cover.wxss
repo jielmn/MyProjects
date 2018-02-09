@@ -1,0 +1,11 @@
+.enter{
+  margin:80vh 30vw 10vh 30vw;
+  width:40vw;
+  height:8vh;
+  text-align:center;
+  background: #c92651;
+  color: white;
+  line-height: 8vh;
+  border:2px solid;
+  border-radius:25px;
+}
