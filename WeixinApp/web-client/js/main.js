@@ -1,6 +1,7 @@
 var uid = null;
 var start_index = 0;
 var bEdit = true;
+var addr = "https://www.telemed-healthcare.cn/todolist_company/";
 
 function onTabChange(index){
 	if ( 0 == index ) {
@@ -43,7 +44,7 @@ function onMineLoad() {
 	console.log("mine load")
 	uid = getUrlParam('uid');
 	//alert("content:"+uid);
-	$.get("https://www.telemed-healthcare.cn/todolist/main?type=userinfo&user_id="+uid,function(data,status){
+	$.get(addr+"main?type=userinfo&user_id="+uid,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get user info success");
 			$("body").css('display','block');
@@ -78,7 +79,7 @@ function onMineLoad() {
 }
 
 function getMyTodoList() {
-	$.get("https://telemed-healthcare.cn/todolist/main?type=todolist&open_id="+uid,function(data,status){
+	$.get(addr+"main?type=todolist&open_id="+uid,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get todolist success");
 			//console.log(data);
@@ -140,7 +141,7 @@ function  onTodoCheck(item_type,id) {
 	
 	console.log("click id=" + id);	
 	
-	$.get("https://telemed-healthcare.cn/todolist/main?type=finish&id="+id,function(data,status){
+	$.get(addr+"main?type=finish&id="+id,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("finish todo item ok");
 			
@@ -194,7 +195,7 @@ function  onTodoCheck(item_type,id) {
 function getMyHistoryTodoList() {
 	var history_count = $("#divTodoListHistory").find("input").length;
 		
-	$.get("https://telemed-healthcare.cn/todolist/main?type=history&open_id="+uid+"&start_index="+history_count,function(data,status){
+	$.get(addr+"main?type=history&open_id="+uid+"&start_index="+history_count,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get history todolist success");
 			//console.log(data);
@@ -255,7 +256,7 @@ function onDel( id ) {
 		return;
 	}	
 	
-	$.get("https://telemed-healthcare.cn/todolist/main?type=delete&id="+id,function(data,status){
+	$.get(addr+"main?type=delete&id="+id,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("delete success!");
 			
@@ -330,7 +331,7 @@ function onAdditemLoad() {
 	$("#divSave").click(function(){
 		var items = $("#item");
 		
-		$.get("https://telemed-healthcare.cn/todolist/main?type=additem&open_id=" + encodeURIComponent(uid) + '&item=' + encodeURIComponent(items[0].value),function(data,status){
+		$.get(addr+"main?type=additem&open_id=" + encodeURIComponent(uid) + '&item=' + encodeURIComponent(items[0].value),function(data,status){
 			if ( "success" == status && 0 == data.error ) {
 				console.log("add item success!");
 				history.back();
@@ -346,7 +347,7 @@ function onGroupLoad() {
 	uid = getUrlParam('uid');
 	//console.log("group, uid="+uid);
 	
-	$.get("https://telemed-healthcare.cn/todolist/main?type=users",function(data,status){
+	$.get(addr+"main?type=users",function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get group success!");
 			var users = data.users;
@@ -392,7 +393,7 @@ function  getPersonTodolist(is_complete) {
 		start_index = history_count;
 	}
 	
-	$.get('https://telemed-healthcare.cn/todolist/main?type=any_todolist&user_id=' + user_id + '&is_complete=' + is_complete + '&start_index='+start_index,function(data,status){
+	$.get(addr+'main?type=any_todolist&user_id=' + user_id + '&is_complete=' + is_complete + '&start_index='+start_index,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get person todolist success!");
 			CalculateElapsedTime(data.todolist);
