@@ -20,6 +20,8 @@ Page({
     todo_item_width: 0,
 
     login:false,
+
+    no_more_history: false,
   } ,
 
   onLoad: function (options) {
@@ -95,6 +97,12 @@ Page({
       return
     }
 
+    if ( is_complete != 0 ) {
+      if (this.data.no_more_history == true ) {
+        return;
+      }
+    }
+
     if ( is_complete == 0 ) {
       wx.showLoading({
         title: '获取未完成清单',
@@ -130,6 +138,10 @@ Page({
             that.getTodolist(1)
           } else {
             that.setData({ history_todolist_items: that.data.history_todolist_items.concat(res.data.todolist) })
+
+            if (res.data.todolist.length == 0  ) {
+              that.setData({ no_more_history: true })
+            }
           }          
         } else {
           console.log("get any todolist result123:")
@@ -151,6 +163,8 @@ Page({
 
     if (e.detail.value != this.data.index){
       this.setData({ index: e.detail.value})
+
+      this.setData({ no_more_history: false })
     }
 
     this.data.todolist_items = []
@@ -214,6 +228,12 @@ Page({
     this.data.login = false
 
     this.onLoad()
+  },
+
+  onReachBottom() {
+    console.log('==group.onReachBottom==')
+    //wx.showNavigationBarLoading() //在标题栏中显示加载
+    this.loadMoreHistory();
   },
 
   CalculateElapsedTime: function (items) {

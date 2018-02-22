@@ -88,9 +88,11 @@
 
 <view style="width:10px;height:10px;"></view>
 
+<!--
 <view class="content-right">
   <view class="bottom-view" catchtap="loadMoreHistory">加载更多历史清单</view>
 </view>
+-->
 
 <view style="width:10px;height:30px;"></view>
 

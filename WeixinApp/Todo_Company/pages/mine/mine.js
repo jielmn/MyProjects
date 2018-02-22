@@ -25,6 +25,8 @@ Page({
     userInfo: null,        // 用户信息
 
     infoFailResult:false,         // 是否已经获取过info的失败结果
+
+    no_more_history:false,
   },
   
   onLoad: function (options) {
@@ -473,6 +475,10 @@ Page({
       return;
     }
 
+    if ( this.data.no_more_history == true ) {
+      return;
+    }
+
     if ( !start_index ) {
       start_index = 0
     }
@@ -501,6 +507,10 @@ Page({
           }
 
           that.setData({ history_todolist_items: that.data.history_todolist_items })
+
+          if ( items.length == 0 ) {
+            that.setData({ no_more_history: true })
+          }
         } else {
           console.log("get history result:")
           console.log(res);
@@ -532,6 +542,12 @@ Page({
     this.data.userInfo = null
 
     this.onLoad()
+  },
+
+  onReachBottom() {
+    console.log('--mine.onReachBottom')
+    // wx.showNavigationBarLoading() //在标题栏中显示加载
+    this.loadMoreHistory();
   },
 
   
