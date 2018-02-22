@@ -2,7 +2,8 @@ var uid = null;
 var start_index = 0;
 var bEdit = true;
 var addr = "https://www.telemed-healthcare.cn/todolist_company/";
-var content_len = "70%";
+var content_len  = "70%";
+var content_len1 = "90%";
 
 function onTabChange(index){
 	if ( 0 == index ) {
@@ -109,7 +110,11 @@ function getMyTodoList() {
 					item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" />');
 					
 					var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
-					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+					//divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+					var divChild=$("<div></div>").text(data.todolist[i].value);
+					divChild.attr('title',"内      容: " + data.todolist[i].value + "\n开始时间: " + FormatDate( new Date(data.todolist[i].start_time))  );
+					divChild.attr('class',"my-content");
+					divContent.append(divChild);
 					
 					var divContentBottom = $('<div></div>');
 					divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time_txt  + '</div>');
@@ -220,7 +225,11 @@ function getMyHistoryTodoList() {
 					item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" />');
 					
 					var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
-					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+					//divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+					var divChild=$("<div></div>").text(data.todolist[i].value);
+					divChild.attr('title',"内      容: " + data.todolist[i].value + "\n开始时间: " + FormatDate( new Date(data.todolist[i].start_time))  + "\n结束时间: " + FormatDate( new Date(data.todolist[i].end_time)) );
+					divChild.attr('class',"my-content");
+					divContent.append(divChild);
 					
 					var divContentBottom = $('<div></div>');
 					divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].end_time_txt  + '</div>');
@@ -293,6 +302,11 @@ function CalculateElapsedTime( items ) {
 	  } else {
 		items[i].end_time_txt = '0分'
 	  }
+	  
+	  if (end_time >= start_time ) {
+        var duration = end_time - start_time;
+        items[i].duration = this.FormatTime(duration);
+      }
 
 	}
 }
@@ -318,7 +332,21 @@ function FormatTime(elapsed) {
 	return day + '天'
 }
 
+function FormatDate (date) {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const second = date.getSeconds()
 
+    return [year, month, day].map( formatNumber).join('/') + ' ' + [hour, minute, second].map( formatNumber).join(':')
+  }
+
+function formatNumber ( n ) {
+    n = n.toString()
+    return n[1] ? n : '0' + n
+  }
 
 
 function onAdditemLoad() {
@@ -399,7 +427,7 @@ function  getPersonTodolist(is_complete) {
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get person todolist success!");
 			CalculateElapsedTime(data.todolist);
-			//console.log(data);
+			console.log(data);
 			
 			if ( 0 == is_complete ) {				
 				
@@ -415,12 +443,16 @@ function  getPersonTodolist(is_complete) {
 						var item = $("#divNone").prev();
 						item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" disabled="disabled" />');
 						
-						var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
-						divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+						var divContent = $('<div class="listitem" style="width:' + content_len1 + ';line-height:21px;" ></div>');
+						//divContent.append('<div class="my-content" title=' + data.todolist[i].value + ' >' + data.todolist[i].value  + '</div>');
+						var divChild=$("<div></div>").text(data.todolist[i].value);
+						divChild.attr('title',"内      容: " + data.todolist[i].value + "\n开始时间: " + FormatDate( new Date(data.todolist[i].start_time))   );
+						divChild.attr('class',"my-content");
+						divContent.append(divChild); 
 						
 						var divContentBottom = $('<div></div>');
 						divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].start_time_txt  + '</div>');
-						divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
+						divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >' + data.todolist[i].nickname + '</div>');
 						
 						divContent.append(divContentBottom);
 						
@@ -447,12 +479,19 @@ function  getPersonTodolist(is_complete) {
 						var item = $("#divNone1").prev();
 						item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" disabled="disabled" />');
 						
-						var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
-						divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
+						var divContent = $('<div class="listitem" style="width:' + content_len1 + ';line-height:21px;" ></div>');
+						//divContent.append('<div class="my-content" title="' + data.todolist[i].value + '" >' + data.todolist[i].value  + '</div>');						
+						
+						var divChild=$("<div></div>").text(data.todolist[i].value);
+						divChild.attr('title',"内      容: " + data.todolist[i].value + "\n开始时间: " + FormatDate( new Date(data.todolist[i].start_time))  + "\n结束时间: " + FormatDate( new Date(data.todolist[i].end_time)) );
+						divChild.attr('class',"my-content");
+						divContent.append(divChild);
+						
+						
 						
 						var divContentBottom = $('<div></div>');
-						divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].end_time_txt  + '</div>');
-						divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
+						divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >用时:' + data.todolist[i].duration  + '</div>');
+						divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >' + data.todolist[i].nickname + '</div>');
 						
 						divContent.append(divContentBottom);
 						
