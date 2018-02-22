@@ -2,6 +2,7 @@ var uid = null;
 var start_index = 0;
 var bEdit = true;
 var addr = "https://www.telemed-healthcare.cn/todolist_company/";
+var content_len = "70%";
 
 function onTabChange(index){
 	if ( 0 == index ) {
@@ -107,7 +108,7 @@ function getMyTodoList() {
 					var item = $("#divNone").prev();
 					item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" />');
 					
-					var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+					var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
 					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 					
 					var divContentBottom = $('<div></div>');
@@ -218,7 +219,7 @@ function getMyHistoryTodoList() {
 					var item = $("#divNone1").prev();
 					item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" />');
 					
-					var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+					var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
 					divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 					
 					var divContentBottom = $('<div></div>');
@@ -414,7 +415,7 @@ function  getPersonTodolist(is_complete) {
 						var item = $("#divNone").prev();
 						item.append('<input type="checkbox" id="check_todo" class="listitem my-check" value="' + data.todolist[i].id + '" disabled="disabled" />');
 						
-						var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+						var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
 						divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 						
 						var divContentBottom = $('<div></div>');
@@ -446,7 +447,7 @@ function  getPersonTodolist(is_complete) {
 						var item = $("#divNone1").prev();
 						item.append('<input type="checkbox" id="check_todo_history" checked="true" class="listitem my-check" value="' + data.todolist[i].id + '" disabled="disabled" />');
 						
-						var divContent = $('<div class="listitem" style="width:90%;style="line-height:21px;" ></div>');
+						var divContent = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" ></div>');
 						divContent.append('<div class="my-content" >' + data.todolist[i].value  + '</div>');
 						
 						var divContentBottom = $('<div></div>');
