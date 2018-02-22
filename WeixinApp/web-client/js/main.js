@@ -89,8 +89,9 @@ function getMyTodoList() {
 				$("#divNone").css('display','block');
 			} else {
 				$("#divNone").css('display','none');
-				
+								
 				CalculateElapsedTime(data.todolist);
+				
 				for (let i = 0;i < data.todolist.length;i++ ){
 					
 					/*
