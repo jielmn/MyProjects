@@ -99,6 +99,7 @@ Page({
 
     if ( is_complete != 0 ) {
       if (this.data.no_more_history == true ) {
+        console.log('no more history!')
         return;
       }
     }
@@ -216,7 +217,7 @@ Page({
   },
 
   loadMoreHistory: function () {
-    console.log('load more history')
+    //console.log('load more history')
     this.getTodolist(1);
   },
 
@@ -226,6 +227,7 @@ Page({
     this.data.users = [{ nick_name: '全部', user_id: null, avatarUrl: null }]
     this.data.index = 0
     this.data.login = false
+    this.data.no_more_history = false
 
     this.onLoad()
   },

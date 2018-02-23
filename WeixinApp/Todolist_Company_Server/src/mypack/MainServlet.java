@@ -49,7 +49,7 @@ public class MainServlet extends HttpServlet {
 	//String dbUrl = "jdbc:mysql://localhost:3306/todo_list?useUnicode=true&characterEncoding=UTF-8";
 	//String dbUser="root";
 	//String dbPwd="";
-	int    INCREASE_QUERY = 5;
+	int    INCREASE_QUERY = 10;
 	String appid = "wx7a3e83a343c2347e";
 	String secret = "384078a850d0bd5bdc842e89be5c88d8";
     

@@ -540,6 +540,7 @@ Page({
     this.data.login=false
     this.data.open_id = null
     this.data.userInfo = null
+    this.data.no_more_history = false
 
     this.onLoad()
   },

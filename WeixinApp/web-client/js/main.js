@@ -4,6 +4,7 @@ var bEdit = true;
 var addr = "https://www.telemed-healthcare.cn/todolist_company/";
 var content_len  = "70%";
 var content_len1 = "90%";
+var no_more_history = false;
 
 function onTabChange(index){
 	if ( 0 == index ) {
@@ -78,6 +79,14 @@ function onMineLoad() {
 		}		
 		bEdit = !bEdit;
 	})
+	
+	var iframe = $("body").parent().parent();
+	//console.log(iframe);
+	iframe.scroll(function() {	  
+	  if(getScrollHeight() == getWindowHeight() + getDocumentTop()){
+		getMyHistoryTodoList();
+	  }
+	});
 }
 
 function getMyTodoList() {
@@ -200,6 +209,11 @@ function  onTodoCheck(item_type,id) {
 
 
 function getMyHistoryTodoList() {
+	if ( no_more_history ) {
+		console.log("no more history!");
+		return;
+	}
+	
 	var history_count = $("#divTodoListHistory").find("input").length;
 		
 	$.get(addr+"main?type=history&open_id="+uid+"&start_index="+history_count,function(data,status){
@@ -212,6 +226,7 @@ function getMyHistoryTodoList() {
 				if ( 0 == history_count ) {
 					$("#divNone1").css('display','block');
 				}
+				no_more_history = true;
 			} else {
 				$("#divNone1").css('display','none');
 				
@@ -394,6 +409,7 @@ function onGroupLoad() {
 	$("#selector").change(function() {
 		console.log("change");
 		
+		no_more_history = false;
 		//$("#divTodoList").remove();
 		
 		$("#divTodoList").find("*").filter( function( index ) {
@@ -411,6 +427,13 @@ function onGroupLoad() {
 	$("#divMoreHistory").click(function(){
 		getPersonTodolist(1);
 	})
+	
+	var iframe = $("body").parent().parent();
+	iframe.scroll(function() {	  
+	  if(getScrollHeight() == getWindowHeight() + getDocumentTop()){
+		getPersonTodolist(1);
+	  }
+	});
 }
 
 // is_complete: 0, todolist; 1, history todolist
@@ -420,14 +443,18 @@ function  getPersonTodolist(is_complete) {
     var start_index = 0;
 	var history_count = $("#divTodoListHistory").find("input").length;
 	if ( 0 != is_complete ) {
-		start_index = history_count;
+		if ( no_more_history ) {
+			console.log("no more history!");
+			return;
+		}
+		start_index = history_count;		
 	}
 	
 	$.get(addr+'main?type=any_todolist&user_id=' + user_id + '&is_complete=' + is_complete + '&start_index='+start_index,function(data,status){
 		if ( "success" == status && 0 == data.error ) {
 			console.log("get person todolist success!");
 			CalculateElapsedTime(data.todolist);
-			console.log(data);
+			//console.log(data);
 			
 			if ( 0 == is_complete ) {				
 				
@@ -469,6 +496,7 @@ function  getPersonTodolist(is_complete) {
 					if ( 0 == history_count ) {
 						$("#divNone1").css('display','block');
 					}
+					no_more_history = true;
 				} else {
 					$("#divNone1").css('display','none');
 					
@@ -516,3 +544,42 @@ function  getPersonTodolist(is_complete) {
 }
 
 
+
+//文档高度
+function getDocumentTop() {
+	var scrollTop = 0, bodyScrollTop = 0, documentScrollTop = 0;
+	if (document.body) {
+	  bodyScrollTop = document.body.scrollTop;
+	}
+
+	if (document.documentElement) {
+	  documentScrollTop = document.documentElement.scrollTop;
+	}
+	scrollTop = (bodyScrollTop - documentScrollTop > 0) ? bodyScrollTop : documentScrollTop;    return scrollTop;
+}
+
+
+//可视窗口高度
+function getWindowHeight() {
+	var windowHeight = 0;    if (document.compatMode == "CSS1Compat") {
+		windowHeight = document.documentElement.clientHeight;
+	} else {
+	  windowHeight = document.body.clientHeight;
+	}
+	return windowHeight;
+}
+
+
+//滚动条滚动高度
+function getScrollHeight() {
+	var scrollHeight = 0, bodyScrollHeight = 0, documentScrollHeight = 0;
+	if (document.body) {
+	  bodyScrollHeight = document.body.scrollHeight;
+	}
+	
+	if (document.documentElement) {
+	  documentScrollHeight = document.documentElement.scrollHeight;
+	}
+	
+	scrollHeight = (bodyScrollHeight - documentScrollHeight > 0) ? bodyScrollHeight : documentScrollHeight;    return scrollHeight;
+}
