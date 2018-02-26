@@ -247,7 +247,7 @@ function getMyHistoryTodoList() {
 					divContent.append(divChild);
 					
 					var divContentBottom = $('<div></div>');
-					divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >' + data.todolist[i].end_time_txt  + '</div>');
+					divContentBottom.append('<div id="divTime" class="listitem" style="font-size:10px;" >用时:' + data.todolist[i].duration  + '</div>');
 					divContentBottom.append('<div class="listitem my-right " style="font-size:10px;" >&nbsp;</div>');
 					
 					divContent.append(divContentBottom);
