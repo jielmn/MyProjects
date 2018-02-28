@@ -39,6 +39,7 @@ public:
 
 	virtual void  Notify(TNotifyUI& msg) {
 		if (msg.sType == "itemclick") {
+			CDuiString name = msg.pSender->GetName();
 			int a = 100;
 		}
 		WindowImplBase::Notify(msg);
@@ -70,6 +71,12 @@ public:
 				pMenu->ShowWindow(TRUE);
 				return;
 			}
+			else {
+				CDuiString name = msg.pSender->GetName();
+				int a = 100;
+				//::MessageBox(0, "click open", "", 0);
+			}
+
 		}
 
 		WindowImplBase::Notify(msg);
