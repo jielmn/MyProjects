@@ -7,6 +7,12 @@
 #include "PrintBarcodeDlg.h"
 #include "afxdialogex.h"
 
+#if BAR_CODE
+#include "39BarCode.h"
+#endif
+
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -147,7 +153,14 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 				pDC->SetWindowExt(size);
 				pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
 
+
+#if BAR_CODE
+				DrawBarcode(pDC->m_hDC, 0, 0, nWidth, nHeight, (const char *)strString);
+#else
 				DrawQrImg(pDC, nWidth, nHeight, nBold);
+#endif
+				
+				
 
 				EndPage(printInfo.hDC);
 				EndDoc(printInfo.hDC);

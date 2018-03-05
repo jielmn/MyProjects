@@ -52,4 +52,3 @@
 #endif
 
 
-#define  BAR_CODE    0
