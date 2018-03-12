@@ -11,6 +11,7 @@ class CTestDlg : public CDialogEx
 // 构造
 public:
 	CTestDlg(CWnd* pParent = NULL);	// 标准构造函数
+	~CTestDlg();
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -24,6 +25,7 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
+	HFONT m_font;
 
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();

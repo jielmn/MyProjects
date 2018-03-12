@@ -22,6 +22,27 @@ CTestDlg::CTestDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_TEST_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_font = CreateFont(
+		33,                            // nHeight
+		0,                            // nWidth
+		0,                            // nEscapement
+		0,                            // nOrientation
+		FW_NORMAL,                        // nWeight
+		FALSE,                        // bItalic
+		FALSE,                        // bUnderline
+		0,                            // cStrikeOut
+		ANSI_CHARSET,                    // nCharSet
+		OUT_DEFAULT_PRECIS,            // nOutPrecision
+		CLIP_DEFAULT_PRECIS,            // nClipPrecision
+		DEFAULT_QUALITY,                // nQuality
+		DEFAULT_PITCH | FF_SWISS,        // nPitchAndFamily
+		_T("宋体")
+	);
+}
+
+CTestDlg::~CTestDlg() {
+	DeleteObject(m_font);
 }
 
 void CTestDlg::DoDataExchange(CDataExchange* pDX)
@@ -82,7 +103,7 @@ void CTestDlg::OnPaint()
 		GetClientRect(rect);
 
 		::Rectangle(dc.m_hDC, 0, 0, rect.Width(), rect.Height());
-		DrawBarcode(dc.m_hDC, 100, 100, 250, 100, "whet201801001001");
+		DrawBarcode(dc.m_hDC, 100, 100, 600, 100, "whet201801001001", m_font);
 		//CDialogEx::OnPaint();
 	}
 }
@@ -99,5 +120,11 @@ HCURSOR CTestDlg::OnQueryDragIcon()
 void CTestDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	CString strText;
+	GetDlgItemText(IDC_EDIT1, strText);
+	if (strText.GetLength() > 0) {
+		MessageBox(strText);
+	}
+
 	CDialogEx::OnOK();
 }

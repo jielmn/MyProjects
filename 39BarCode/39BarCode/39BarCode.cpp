@@ -52,7 +52,7 @@ static BarCodeChar table[] = {
 	{ 37, { 4, 6, 8 } },
 };
 
-int DrawBarcode(HDC hdc, int x, int y, int w, int h, const char * szOriText) {
+int DrawBarcode(HDC hdc, int x, int y, int w, int h, const char * szOriText, HFONT hFont /* = 0 */ ) {
 	if (0 == hdc || 0 == szOriText) {
 		return 1;
 	}
@@ -199,5 +199,21 @@ int DrawBarcode(HDC hdc, int x, int y, int w, int h, const char * szOriText) {
 	left += width;
 
 	delete[] szText;
+
+	rect.left = x;
+	rect.right = x + element_width * (len + 2) * 13;
+	rect.top = y + h / 2;
+	rect.bottom = y + h;
+
+	HFONT hOld = 0;
+	if (hFont) {
+		hOld = (HFONT)::SelectObject(hdc, hFont);
+	}
+
+	::DrawText(hdc, szOriText, len, &rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+
+	if (hOld) {
+		::SelectObject(hdc, hOld);
+	}
 	return 0;
 }
