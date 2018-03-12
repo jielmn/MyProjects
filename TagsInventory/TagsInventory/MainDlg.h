@@ -56,6 +56,7 @@ public:
 protected:
 	int           m_nStatus;
 	CDuiFrameWnd1 m_duiFrame;
+	HFONT         m_font;
 
 	// 按从小到大顺序排列
 	std::vector<TagItem *>   m_tag_items;                        // 已经显示出来的tags

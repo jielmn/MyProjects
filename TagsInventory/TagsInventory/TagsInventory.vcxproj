@@ -97,11 +97,12 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>../../39BarCode/39BarCode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;qrencoded.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib_win32_debug;Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;qrencoded.lib;39BarCodeD.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib_win32_debug;Debug;../../39BarCode/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -146,6 +147,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>../../39BarCode/39BarCode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

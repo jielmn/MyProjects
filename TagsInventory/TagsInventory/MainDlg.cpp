@@ -5,6 +5,7 @@
 #include "TagsInventory.h"
 #include "MainDlg.h"
 #include "afxdialogex.h"
+#include "39BarCode.h"
 
 #define  TIMER_UPDATE_TAGS         1
 #define  INTEVAL_UPDATE_TAGS       1000
@@ -149,7 +150,11 @@ void CDuiFrameWnd1::SetStatus(int nStatus) {
 
 		pCtrl = m_PaintManager.FindControl(_T("twodimcode"));
 		if (pCtrl) {
+#if DEBUG_FLAG
+			pCtrl->SetEnabled(true);
+#else
 			pCtrl->SetEnabled(false);
+#endif
 		}
 
 		pCtrl = m_PaintManager.FindControl(_T("query"));
@@ -301,11 +306,14 @@ CMainDlg::CMainDlg(CWnd* pParent /*=NULL*/)
 {
 	m_nStatus = -1;
 	m_qrcode = 0;
-	m_query_dlg = 0;
+	m_query_dlg = 0;	
+	m_font = 0;
 }
 
 CMainDlg::~CMainDlg()
 {
+	if ( m_font )
+		DeleteObject(m_font);
 }
 
 void CMainDlg::DoDataExchange(CDataExchange* pDX)
@@ -357,6 +365,28 @@ BOOL CMainDlg::OnInitDialog()
 	m_duiFrame.SetStatus(g_myreader->GetStatus(), STATUS_TYPE_READER);
 
 	m_brush.CreateSolidBrush(RGB(0, 0, 0));
+
+
+	DWORD dwFontSize = 0;
+	g_cfg->GetConfig("font size", dwFontSize, 13);
+
+	m_font = CreateFont(
+		(int)dwFontSize,               // nHeight
+		0,                             // nWidth
+		0,                             // nEscapement
+		0,                             // nOrientation
+		FW_NORMAL,                     // nWeight
+		FALSE,                         // bItalic
+		FALSE,                         // bUnderline
+		0,                             // cStrikeOut
+		ANSI_CHARSET,                  // nCharSet
+		OUT_DEFAULT_PRECIS,            // nOutPrecision
+		CLIP_DEFAULT_PRECIS,           // nClipPrecision
+		DEFAULT_QUALITY,               // nQuality
+		DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
+		_T("宋体")
+	);
+
 	// 开始盘点
 	StartInventory();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -572,9 +602,20 @@ LRESULT CMainDlg::OnTwoDimCodeMessage(WPARAM wParam, LPARAM lParam) {
 	// TODO: 在此添加控件通知处理程序代码
 	DWORD   dwPaperWidth = 0;
 	DWORD   dwPaperLength = 0;
+	DWORD   dwDrawMode = 0;
+	DWORD   dwLeft = 0;
+	DWORD   dwTop = 0;
+	DWORD   dwRectWidth  = 0;
+	DWORD   dwRectHeight = 0;
 
 	g_cfg->GetConfig("paper width", dwPaperWidth, 500);
 	g_cfg->GetConfig("paper length", dwPaperLength, 620);
+	g_cfg->GetConfig("draw mode", dwDrawMode, 0);
+
+	g_cfg->GetConfig("paper left", dwLeft, 0);
+	g_cfg->GetConfig("paper top", dwTop, 0);
+	g_cfg->GetConfig("rect width", dwRectWidth, dwPaperWidth);
+	g_cfg->GetConfig("rect height", dwRectHeight, dwPaperLength);
 
 	PRINTDLG printInfo;
 	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
@@ -625,7 +666,19 @@ LRESULT CMainDlg::OnTwoDimCodeMessage(WPARAM wParam, LPARAM lParam) {
 		pDC->SetWindowExt(size);
 		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
 
-		DrawQrImg(pDC);
+		// 画条码
+		if (0 == dwDrawMode) {
+			CDuiString strBatchId = m_duiFrame.GetControlText("package_id");
+#if DEBUG_FLAG
+			strBatchId = "WHET20180301009";
+#endif
+			DrawBarcode(pDC->m_hDC, dwLeft, dwTop, dwRectWidth, dwRectHeight, (const char *)strBatchId, m_font );
+		}
+		// 画二维码
+		else {
+			DrawQrImg(pDC);
+		}
+		
 
 		EndPage(printInfo.hDC);
 		EndDoc(printInfo.hDC);
