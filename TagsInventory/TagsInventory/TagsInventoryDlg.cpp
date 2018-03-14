@@ -19,13 +19,6 @@ static CMainDlg  s_MainDlg;
 
 // CTagsInventoryDlg ¶Ô»°¿ò
 
-CDuiString  CDuiFrameWnd::GetSkinFile() {
-	//char buf[8192];
-	//g_cfg->GetConfig("login xml file", buf, sizeof(buf), "login.xml");
-	//return buf;
-	return "login.xml";
-}
-
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == _T("click"))
 	{

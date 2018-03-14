@@ -9,13 +9,6 @@
 #define  STATUS_IDLE      0
 #define  STATUS_BUSY      1
 
-CDuiString CDuiFrameWnd2::GetSkinFile() {
-	//char buf[8192];
-	//g_cfg->GetConfig("query xml file", buf, sizeof(buf), "query.xml");
-	//return buf;
-
-	return "query.xml";
-}
 
 void CDuiFrameWnd2::Notify(TNotifyUI& msg) {
 	if (msg.sType == _T("click"))

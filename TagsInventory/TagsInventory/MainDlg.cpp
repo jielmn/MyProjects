@@ -218,15 +218,6 @@ void CDuiFrameWnd1::SetControlText(const char * szControlName, CDuiString strTex
 	pCtrl->SetText(strText);
 }
 
-// CMainDlg ¶Ô»°¿ò
-CDuiString  CDuiFrameWnd1::GetSkinFile() {
-	//char buf[8192];
-	//g_cfg->GetConfig("main xml file", buf, sizeof(buf), "main.xml");
-	//return buf;
-
-	return "main.xml";
-}
-
 void CDuiFrameWnd1::SetStatus(int nStatus, int nType) {
 	CLabelUI * pStatus = 0;
 	const char * szType = 0;

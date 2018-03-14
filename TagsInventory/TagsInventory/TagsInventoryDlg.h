@@ -11,9 +11,16 @@ class CDuiFrameWnd : public WindowImplBase
 {
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
-	virtual CDuiString GetSkinFile();
-	virtual CDuiString GetSkinFolder() { return _T(""); }
 
+	virtual CDuiString GetSkinFile() {
+		return "login.xml";
+	}
+
+	virtual CDuiString GetSkinFolder() {
+		return _T("");
+	}
+
+#ifndef _DEBUG
 	virtual UILIB_RESOURCETYPE GetResourceType() const {
 		return UILIB_ZIPRESOURCE;
 	}
@@ -21,6 +28,7 @@ public:
 	virtual LPCTSTR GetResourceID() const {
 		return MAKEINTRESOURCE(IDR_ZIPRES1);
 	}
+#endif
 
 	//CButtonUI* m_btnClose;
 

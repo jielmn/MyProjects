@@ -114,6 +114,9 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>xcopy res\res  Debug\  /dseiy</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -153,8 +156,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;qrencode.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib_win32_debug;Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;qrencode.lib;39BarCode.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib_win32_debug;Release;../../39BarCode/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
