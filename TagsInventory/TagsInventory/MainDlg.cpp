@@ -368,14 +368,14 @@ BOOL CMainDlg::OnInitDialog()
 
 
 	DWORD dwFontSize = 0;
-	g_cfg->GetConfig("font size", dwFontSize, 13);
+	g_cfg->GetConfig("font size", dwFontSize, 28);
 
 	m_font = CreateFont(
 		(int)dwFontSize,               // nHeight
 		0,                             // nWidth
 		0,                             // nEscapement
 		0,                             // nOrientation
-		FW_NORMAL,                     // nWeight
+		FW_BOLD,                       // nWeight
 		FALSE,                         // bItalic
 		FALSE,                         // bUnderline
 		0,                             // cStrikeOut
@@ -384,7 +384,7 @@ BOOL CMainDlg::OnInitDialog()
 		CLIP_DEFAULT_PRECIS,           // nClipPrecision
 		DEFAULT_QUALITY,               // nQuality
 		DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
-		_T("宋体")
+		_T("黑体")
 	);
 
 	// 开始盘点
@@ -607,7 +607,9 @@ LRESULT CMainDlg::OnTwoDimCodeMessage(WPARAM wParam, LPARAM lParam) {
 	DWORD   dwTop = 0;
 	DWORD   dwRectWidth  = 0;
 	DWORD   dwRectHeight = 0;
+	DWORD   dwTextHeight = 0;
 
+	g_cfg->Reload();
 	g_cfg->GetConfig("paper width", dwPaperWidth, 500);
 	g_cfg->GetConfig("paper length", dwPaperLength, 620);
 	g_cfg->GetConfig("draw mode", dwDrawMode, 0);
@@ -616,6 +618,8 @@ LRESULT CMainDlg::OnTwoDimCodeMessage(WPARAM wParam, LPARAM lParam) {
 	g_cfg->GetConfig("paper top", dwTop, 0);
 	g_cfg->GetConfig("rect width", dwRectWidth, dwPaperWidth);
 	g_cfg->GetConfig("rect height", dwRectHeight, dwPaperLength);
+
+	g_cfg->GetConfig("text height", dwTextHeight, 50);
 
 	PRINTDLG printInfo;
 	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
@@ -672,7 +676,8 @@ LRESULT CMainDlg::OnTwoDimCodeMessage(WPARAM wParam, LPARAM lParam) {
 #if DEBUG_FLAG
 			strBatchId = "WHET20180301009";
 #endif
-			DrawBarcode(pDC->m_hDC, dwLeft, dwTop, dwRectWidth, dwRectHeight, (const char *)strBatchId, m_font );
+			//DrawBarcode(pDC->m_hDC,  dwLeft, dwTop, dwRectWidth, dwRectHeight, (const char *)strBatchId, m_font );
+			DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwRectWidth, dwRectHeight, (const char *)strBatchId, m_font, dwTextHeight, "ID:");
 		}
 		// 画二维码
 		else {

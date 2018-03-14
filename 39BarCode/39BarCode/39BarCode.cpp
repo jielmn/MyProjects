@@ -228,7 +228,7 @@ int DrawBarcode(HDC hdc, int x, int y, int w, int h, const char * szOriText, HFO
 			str = szTextPrefix;
 		}
 		str += szOriText;
-		::DrawText(hdc, str, str.GetLength() , &rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+		::DrawText(hdc, str, str.GetLength() , &rect, DT_LEFT | DT_TOP | DT_SINGLELINE);
 	}
 	
 
@@ -681,7 +681,7 @@ int DrawBarcode128(HDC hdc, int x, int y, int w, int h, const char * szOriText, 
 			str = szTextPrefix;
 		}
 		str += szOriText;
-		::DrawText(hdc, str, str.GetLength(), &rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+		::DrawText(hdc, str, str.GetLength(), &rect, DT_LEFT | DT_TOP | DT_SINGLELINE);
 	}
 
 
