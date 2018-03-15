@@ -8,14 +8,16 @@
 #include "afxdialogex.h"
 #include "MainDlg.h"
 #include "MyEncrypt.h"
+#include "Main1Dlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-static HWND      s_hLogin = 0;
-static CMainDlg  s_MainDlg;
+static HWND       s_hLogin = 0;
+static CMainDlg   s_MainDlg;
+static CMain1Dlg  s_Main1Dlg;
 
 // CTagsInventoryDlg ¶Ô»°¿ò
 
@@ -26,6 +28,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		AfxGetApp()->m_pMainWnd = &s_MainDlg;
 		::PostMessage(s_hLogin, WM_CLOSE, 0, 0);
 		s_MainDlg.DoModal();
+
+		//AfxGetApp()->m_pMainWnd = &s_Main1Dlg;
+		//::PostMessage(s_hLogin, WM_CLOSE, 0, 0);
+		//s_Main1Dlg.DoModal();
 #endif
 	}
 }

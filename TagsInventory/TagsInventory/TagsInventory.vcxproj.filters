@@ -48,6 +48,9 @@
     <ClInclude Include="QueryDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Main1Dlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TagsInventory.cpp">
@@ -72,6 +75,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="QueryDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Main1Dlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
