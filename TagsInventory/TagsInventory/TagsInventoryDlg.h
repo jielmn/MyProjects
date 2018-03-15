@@ -41,6 +41,8 @@ public:
 	void SetStatus(int nStatus, int nType);
 
 	virtual void    Notify(TNotifyUI& msg);
+
+	int  GetType();
 };
 
 // CTagsInventoryDlg ¶Ô»°¿ò

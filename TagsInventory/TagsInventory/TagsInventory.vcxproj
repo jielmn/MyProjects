@@ -200,7 +200,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Main1Dlg.h" />
     <ClInclude Include="MainDlg.h" />
     <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="MyEncrypt.h" />
@@ -213,7 +212,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main1Dlg.cpp" />
     <ClCompile Include="MainDlg.cpp" />
     <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="MyEncrypt.cpp" />

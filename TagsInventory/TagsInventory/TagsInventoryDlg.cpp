@@ -17,7 +17,7 @@
 
 static HWND       s_hLogin = 0;
 static CMainDlg   s_MainDlg;
-static CMain1Dlg  s_Main1Dlg;
+//static CMain1Dlg  s_Main1Dlg;
 
 // CTagsInventoryDlg ¶Ô»°¿ò
 
@@ -65,6 +65,15 @@ void CDuiFrameWnd::SetStatus( int nStatus, int nType ) {
 	pStatus->SetText(strText);
 }
 
+
+int  CDuiFrameWnd::GetType() {
+	CComboUI * pCombo = (CComboUI *)m_PaintManager.FindControl("cmbType");
+	if ( 0 == pCombo) {
+		return -1;
+	}
+
+	return pCombo->GetCurSel();
+}
 
 
 
@@ -199,6 +208,7 @@ LRESULT CTagsInventoryDlg::OnVerifyResultMessage(WPARAM wParam, LPARAM lParam) {
 	AfxGetApp()->m_pMainWnd = &s_MainDlg;
 	::PostMessage(s_hLogin, WM_CLOSE, 0, 0);
 	s_MainDlg.DoModal();
+	
 	return 0;
 }
 
