@@ -13,7 +13,7 @@
 	<VerticalLayout>
 		<VerticalLayout bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" borderround="5,5" inset="10,0,10,0" > <!-- 整个窗口的背景色 -->
 			<!-- 标题栏区 -->
-			<HorizontalLayout height="32" bkcolor="#00000000" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
+			<HorizontalLayout height="32" bkcolor="#FFCCE3F0" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
 				<HorizontalLayout inset="10,1,10,1" >
 					<Container width="61" height="27" bkimage="file='logo.png'" />
 					<Text text="泰利美信-盘点" pos="75, 8, 400, 24" float="true" textcolor="#FF447AA1" font="0" />

@@ -1,3 +1,4 @@
+#include <afx.h>
 #include "login.h"
 
 void CLoginWnd::Notify(TNotifyUI& msg) {

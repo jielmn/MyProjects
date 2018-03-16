@@ -21,6 +21,15 @@
     <ClCompile Include="login.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Business.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="InvDatabase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -30,6 +39,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Business.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="InvDatabase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="InvCommon.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
