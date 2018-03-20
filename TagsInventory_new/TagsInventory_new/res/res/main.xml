@@ -2,7 +2,7 @@
 <Window size="1024,768" mininfo="800,600" caption="0,0,0,32" sizebox="4,4,4,4" roundcorner="5,5"> <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
 	<Font id="0" name="宋体" size="12" bold="true" />
 	<Font id="1" name="宋体" size="15" bold="true" />
-	<Font id="2" name="宋体" size="15" />
+	<Font id="2" name="宋体" size="29" bold="true" />
 	<Font id="3" name="宋体" size="17" bold="true" />
 	<Font id="4" name="宋体" size="22" bold="true" italic="true"/>
 	<Font id="5" name="宋体" size="12" bold="true" />
@@ -29,19 +29,26 @@
 			
 			<!-- 客户区 -->
 			<HorizontalLayout height="85" inset="8,5,0,0">
-				<Option  pos="10,  0, 110, 80"  float="true" name="temperature" text="小包装盘点" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='package0.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
-				<Option  pos="110, 0, 210, 80"  float="true" name="patients_info" text="大包装盘点" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='package1.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
-				<!--<Button  pos="230, 0, 330, 80"  float="true" name="btnSync" text="查询" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='query.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" />-->
-				<Option  pos="210, 0, 310, 80"  float="true" name="btnSync" text="查询" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='query.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Option width="100" height="80" name="Inventory_small" text="小包装盘点" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='package0.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
+				<Option width="100" height="80" name="Inventory_big"   text="大包装盘点" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='package1.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Option width="100" height="80" name="Query"           text="查询" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='query.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Control />
+				<Label  width="200" height="80" name="lblUser" text="欢迎您" textcolor="#FF386382" font="2" />
 			</HorizontalLayout>
 			
+			<HorizontalLayout height="5" />
+			
+			<!--Tab区-->
 			<HorizontalLayout bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1">
 				<TabLayout name="switch">
 					<HorizontalLayout>
-						<Temperature_data />
+						<Inventory_small />
 					</HorizontalLayout>
 					<HorizontalLayout>
-						<Patients />
+						<Inventory_big />
+					</HorizontalLayout>
+					<HorizontalLayout>
+						<Query />
 					</HorizontalLayout>
 				</TabLayout>				
 			</HorizontalLayout>			

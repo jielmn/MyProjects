@@ -37,6 +37,7 @@ public:
 
 	// 是否登录成功
 	BOOL  IfLogined () const;
+	const char * GetUserName();
 
 	// 用盘点的Tag ID信息登录
 	int   LoginUserAsyn(const TagItem * pItem);

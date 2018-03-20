@@ -247,3 +247,12 @@ CInvDatabase::DATABASE_STATUS  CBusiness::GetDbStatus() {
 CInvReader::READER_STATUS    CBusiness::GetReaderStatus() {
 	return  m_InvReader.GetStatus();
 }
+
+const char * CBusiness::GetUserName() {
+	if (m_bLogin) {
+		return m_user.szUserName;
+	}
+	else {
+		return "";
+	}
+}

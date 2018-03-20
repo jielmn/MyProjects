@@ -12,6 +12,9 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_lblDbStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblDatabaseStatus");
 	m_lblReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblReaderStatus");
+	m_lblUser = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblUser");
+	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(_T("switch")));
+	
 
 	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
 	CInvReader::READER_STATUS     eReaderStatus = CBusiness::GetInstance()->GetReaderStatus();
@@ -30,10 +33,48 @@ void  CDuiFrameWnd::InitWindow() {
 		SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_CLOSE_TEXT);
 	}
 
+	CString strText;
+	strText = "»¶Ó­Äú£¬";
+	SET_CONTROL_TEXT(m_lblUser, strText + CBusiness::GetInstance()->GetUserName() );
+
 	WindowImplBase::InitWindow();
 }
 
+DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp("Inventory_small", pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T("Inventory_small.xml"), (UINT)0, 0, &m_PaintManager);
+		return pUI;
+	}
+	else if (0 == strcmp("Inventory_big", pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T("Inventory_big.xml"), (UINT)0, 0, &m_PaintManager);
+		return pUI;
+	} else if (0 == strcmp("Query", pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T("Query.xml"), (UINT)0, 0, &m_PaintManager);
+		return pUI;
+	}
+	return 0;
+}
+
 void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
+	DuiLib::CDuiString name = msg.pSender->GetName();
+
+	if (msg.sType == _T("selectchanged"))
+	{
+		if (0 == m_tabs) {
+			return;
+		}
+
+		if (name == _T("Inventory_small")) {
+			m_tabs->SelectItem(0);
+		} else if (name == _T("Inventory_big")) {
+			m_tabs->SelectItem(1);			
+		} else if (name == _T("Query")) {
+			m_tabs->SelectItem(2);
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 

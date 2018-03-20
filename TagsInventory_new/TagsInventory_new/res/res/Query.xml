@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1"   >		
+		<Label text="查询" />
+		
+		
+	</VerticalLayout>
+</Window>
