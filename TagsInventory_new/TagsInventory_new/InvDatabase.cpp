@@ -1,11 +1,12 @@
 #include <afx.h>
 #include "InvDatabase.h"
+#include "Business.h"
 
-
-CInvDatabase::CInvDatabase(/*CBusiness * pBusiness*/) {
+CInvDatabase::CInvDatabase( CBusiness * pBusiness ) {
 	m_eDbStatus = STATUS_CLOSE;
 	m_eDbType   = TYPE_ORACLE;
 	m_bUtf8     = FALSE;
+	m_pBusiness = pBusiness;
 
 	m_recordset.m_pDatabase = &m_database;
 }
@@ -43,10 +44,10 @@ int CInvDatabase::ReconnectDb() {
 		}
 
 		if (m_eDbType == TYPE_ORACLE) {
-			g_cfg->GetConfig( ODBC_STRING_ORACLE, buf, sizeof(buf) );
+			g_cfg->GetConfig( ODBC_STRING_ORACLE, buf, sizeof(buf),"" );
 		}
 		else {
-			g_cfg->GetConfig(ODBC_STRING_MYSQL, buf, sizeof(buf));
+			g_cfg->GetConfig(ODBC_STRING_MYSQL, buf, sizeof(buf),"");
 		}
 
 		char  szOdbcStr[8192] = {0};
@@ -86,8 +87,68 @@ int CInvDatabase::ReconnectDb() {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
 		m_eDbStatus = STATUS_CLOSE;
 
-		//g_thrd_db->PostDelayMessage(RECONNECT_DB_TIME, g_handler_db, MSG_RECONNECT_DB);
+		// 重连数据库
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
 	}
 
-	//::PostMessage(g_hDlg, UM_SHOW_STATUS, STATUS_TYPE_DATABASE, m_nStatus);
+	m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+	return 0;
+}
+
+
+
+// 用户登录
+int CInvDatabase::LoginUser( const CTagItemParam * pItem, User * pUser) {
+	CString strSql;
+	char buf[8192];
+
+	if ( m_eDbStatus == STATUS_CLOSE ) {
+		return -1;
+	}
+
+	int ret = 0;
+	try
+	{
+		GetUid( buf, sizeof(buf), pItem->m_item.abyUid, pItem->m_item.dwUidLen );
+		g_log->Output(ILog::LOG_SEVERITY_INFO, "try to login id is %s\n", buf);
+
+		strSql.Format("select * from staff where ext1='%s'", buf);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		// 存在记录，验证OK
+		// 获取用户信息
+		if (!m_recordset.IsEOF())
+		{
+			CString   v;
+			m_recordset.GetFieldValue((short)1, v);
+			strncpy(pUser->szUserId, v, sizeof(pUser->szUserId) - 1);
+
+			m_recordset.GetFieldValue((short)2, v);
+			if (m_bUtf8) {
+				Utf8ToAnsi(pUser->szUserName, sizeof(pUser->szUserName), v);
+			}
+			else {
+				strncpy(pUser->szUserName, v, sizeof(pUser->szUserName) - 1);
+			}
+
+			memcpy(&pUser->tTagId, &pItem->m_item, sizeof(TagItem));
+		}
+		//验证失败
+		else {
+			ret = 1;
+		}
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = -2;
+		e->GetErrorMessage(buf, sizeof(buf));
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+	}
+
+	return ret;
+}
+
+CInvDatabase::DATABASE_STATUS CInvDatabase::GetStatus() {
+	return m_eDbStatus;
 }

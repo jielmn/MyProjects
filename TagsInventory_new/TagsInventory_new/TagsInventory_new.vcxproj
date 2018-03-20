@@ -89,16 +89,19 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0502;_RICHEDIT_VER=0x0210;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0502;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib</AdditionalDependencies>
+      <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib_reader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\res ..\Debug\res /dseiy</Command>
+      <Command>xcopy res\res ..\Debug\res /dseiy
+xcopy Drivers ..\Debug\Drivers  /dseiy
+xcopy dll_reader ..\Debug  /dseiy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,7 +126,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x0502;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -131,7 +134,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>User32.lib;duilib.lib;LmnCommonX.lib</AdditionalDependencies>
+      <AdditionalDependencies>User32.lib;duilib.lib;LmnCommonX.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib_reader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Release\res /dseiy</Command>
@@ -159,13 +163,51 @@
     <ClCompile Include="Business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="InvDatabase.cpp" />
+    <ClCompile Include="InvReader.cpp" />
     <ClCompile Include="login.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Business.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANM103R.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANM200.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANM201.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANMF102U.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_anmf103R.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANMR113R.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD100.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD120M.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD122.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD131.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD201.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD242.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD501.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD503.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD5112.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD543.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANSSR100.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_ANWE818.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_drv_M60.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_drv_RD5100.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_drv_RL8000.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_drv_rpan.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_G101.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_G302.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_LSG405.h" />
+    <ClInclude Include="inc\device_driver\rfidlib_LSG606.h" />
+    <ClInclude Include="inc\rfidlib.h" />
+    <ClInclude Include="inc\rfidlib_aip_iso14443A.h" />
+    <ClInclude Include="inc\rfidlib_aip_iso14443b.h" />
+    <ClInclude Include="inc\rfidlib_AIP_ISO15693.h" />
+    <ClInclude Include="inc\rfidlib_aip_iso18000p3m3.h" />
+    <ClInclude Include="inc\rfidlib_aip_iso18000p6c.h" />
+    <ClInclude Include="inc\rfidlib_Gxxx.h" />
+    <ClInclude Include="inc\rfidlib_LSGate.h" />
+    <ClInclude Include="inc\rfidlib_nfc.h" />
+    <ClInclude Include="inc\rfidlib_reader.h" />
     <ClInclude Include="InvCommon.h" />
     <ClInclude Include="InvDatabase.h" />
+    <ClInclude Include="InvReader.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />

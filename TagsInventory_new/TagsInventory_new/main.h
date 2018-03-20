@@ -1,14 +1,20 @@
 #pragma once
 
 #include "UIlib.h"
-using namespace DuiLib;
+//using namespace DuiLib;
 
-class CDuiFrameWnd : public WindowImplBase
+class CDuiFrameWnd : public DuiLib::WindowImplBase
 {
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
-	virtual CDuiString GetSkinFile()              { return _T("main.xml"); }
-	virtual CDuiString GetSkinFolder()            { return _T("res"); }
+	virtual DuiLib::CDuiString GetSkinFile()              { return _T("main.xml"); }
+	virtual DuiLib::CDuiString GetSkinFolder()            { return _T("res"); }
 
-	virtual void    Notify(TNotifyUI& msg);
+	virtual void    InitWindow();
+	virtual void    Notify(DuiLib::TNotifyUI& msg);
+
+private:
+
+	DuiLib::CLabelUI *     m_lblDbStatus;
+	DuiLib::CLabelUI *     m_lblReaderStatus;
 };

@@ -7,7 +7,33 @@
 #include "Business.h"
 
 
-void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+void  CDuiFrameWnd::InitWindow() {
+	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+
+	m_lblDbStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblDatabaseStatus");
+	m_lblReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblReaderStatus");
+
+	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
+	CInvReader::READER_STATUS     eReaderStatus = CBusiness::GetInstance()->GetReaderStatus();
+
+	if (eDbStatus == CInvDatabase::STATUS_OPEN) {
+		SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_OK_TEXT);
+	}
+	else {
+		SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_CLOSE_TEXT);
+	}
+
+	if (eReaderStatus == CInvReader::STATUS_OPEN) {
+		SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT);
+	}
+	else {
+		SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_CLOSE_TEXT);
+	}
+
+	WindowImplBase::InitWindow();
+}
+
+void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 	WindowImplBase::Notify(msg);
 }
 
@@ -21,7 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->sigInit.emit(&ret);
 
-	CPaintManagerUI::SetInstance(hInstance);	
+	DuiLib::CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	
 	CLoginWnd loginFrame;

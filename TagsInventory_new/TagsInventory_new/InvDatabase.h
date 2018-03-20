@@ -6,11 +6,13 @@ class CBusiness;
 
 class  CInvDatabase {
 public:
-	CInvDatabase(/*CBusiness * pBusiness*/);
+	CInvDatabase( CBusiness * pBusiness );
 	~CInvDatabase();
 
 	// 重连数据库
 	int ReconnectDb();
+	// 用户登录
+	int LoginUser( const CTagItemParam * pItem, User * pUser);
 
 	enum DATABASE_STATUS {
 		STATUS_CLOSE = 0,
@@ -22,6 +24,8 @@ public:
 		TYPE_ORACLE = 0,
 		TYPE_MYSQL,
 	};
+
+	DATABASE_STATUS GetStatus();
 
 private:
 	void Clear();

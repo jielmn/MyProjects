@@ -48,9 +48,9 @@
 		</VerticalLayout>
 		
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
-			<Label name="lblBindingReader" text="数据库连接失败"     width="250" font="5" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />
-			<Label name="lblSyncReader"    text="读卡器连接失败"     width="250" font="5" textcolor="#FFCAF100" /><Control width="1" bkimage="sep.png" /><Control width="10" />
-			<Label name="lblOther"         text="" font="5" textcolor="#FFFFFFFF" /><Control width="1" bkimage="sep.png" />
+			<Label name="lblDatabaseStatus"  text="数据库连接失败"     width="250" font="5" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />
+			<Label name="lblReaderStatus"    text="读卡器连接失败"     width="250" font="5" textcolor="#FFCAF100" /><Control width="1" bkimage="sep.png" /><Control width="10" />
+			<Label name="lblOther"           text="" font="5" textcolor="#FFFFFFFF" /><Control width="1" bkimage="sep.png" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

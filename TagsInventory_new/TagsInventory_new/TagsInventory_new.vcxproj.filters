@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\inc">
+      <UniqueIdentifier>{3f839f1b-2a54-46b7-951d-49b15df9d8cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\inc\device_driver">
+      <UniqueIdentifier>{1502e716-4d54-4b83-b681-73c8400673fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -28,6 +34,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="common.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="InvReader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,6 +57,117 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="InvCommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_aip_iso14443A.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_aip_iso14443b.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_AIP_ISO15693.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_aip_iso18000p3m3.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_aip_iso18000p6c.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_Gxxx.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_LSGate.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_nfc.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rfidlib_reader.h">
+      <Filter>头文件\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANM103R.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANM200.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANM201.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANMF102U.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_anmf103R.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANMR113R.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD100.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD120M.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD122.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD131.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD201.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD242.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD501.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD503.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD543.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANRD5112.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANSSR100.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_ANWE818.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_drv_M60.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_drv_RD5100.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_drv_RL8000.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_drv_rpan.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_G101.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_G302.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_LSG405.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\device_driver\rfidlib_LSG606.h">
+      <Filter>头文件\inc\device_driver</Filter>
+    </ClInclude>
+    <ClInclude Include="InvReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
