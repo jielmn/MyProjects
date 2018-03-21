@@ -11,7 +11,7 @@ public:
 
 	virtual void    Notify(DuiLib::TNotifyUI& msg);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual void   InitWindow();
+	virtual void   InitWindow();	
 
 private:
 	DuiLib::CLabelUI *     m_lblDbStatus;

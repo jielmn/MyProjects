@@ -6,8 +6,8 @@
 #include "Business.h"
 
 void  CLoginWnd::InitWindow() {
-	m_lblDbStatus     = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblDatabaseStatus");
-	m_lblReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblReaderStatus");
+	m_lblDbStatus     = (DuiLib::CLabelUI *)m_PaintManager.FindControl(DATABASE_STATUS_LABEL_ID);
+	m_lblReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl(READER_STATUS_LABEL_ID);
 
 	SET_CONTROL_TEXT(m_lblDbStatus,     DB_STATUS_CLOSE_TEXT);
 	SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_CLOSE_TEXT);

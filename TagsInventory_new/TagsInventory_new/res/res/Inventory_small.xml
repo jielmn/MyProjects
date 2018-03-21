@@ -2,10 +2,10 @@
 <Window>	
 	<VerticalLayout inset="1,1,1,1"   >		
 		<HorizontalLayout height="130" bkcolor="#FFD1E8F5" >
-			<Button name="btnStart" text="开始盘点" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='start.png' dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled1.png" enabled="true" />
-			<Button name="btnStop"  text="停止盘点" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='stop.png'  dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled1.png" enabled="true" />
-			<Button name="btnSave"  text="保存盘点" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='save.png'  dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled1.png" enabled="true" />
-			<Button name="btnBarcode"  text="打印条码" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='barcode.png'  dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled1.png" enabled="true" />
+			<Button name="btnStartSmall"    text="开始盘点" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='start.png' dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled.png" enabled="true" />
+			<Button name="btnStopSmall"     text="停止盘点" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='stop.png'  dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled.png" enabled="true" />
+			<Button name="btnSaveSmall"     text="保存盘点" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='save.png'  dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled.png" enabled="true" />
+			<Button name="btnBarcodeSmall"  text="打印条码" textcolor="#FF386382" font="1" width="120" textpadding="0,110,0,2" foreimage="file='barcode.png'  dest='10,10,110,110'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" disabledimage="toolbar_disabled.png" enabled="true" />
 		</HorizontalLayout>
 		
 		<VerticalLayout bkcolor="#FFD1E8F5" height="50">
@@ -13,16 +13,24 @@
 		
 		<VerticalLayout bkcolor="#FFD1E8F5" inset="10,1,10,1" >
 			<HorizontalLayout height="40">
-				<Label text="当月批次：" width="120" height="40" font="1" textcolor="#FF386382" /><Edit name="batch_id" text="批次" height="40" width="300" font="0" textcolor="#FF386382" />
+				<Label text="当月批次：" width="120" height="40" font="1" textcolor="#FF386382" /><Edit name="batch_id" text="批次" height="40" width="300" font="3" textcolor="#FF386382" />
 			</HorizontalLayout>			
+			
 			<HorizontalLayout height="10" />
 			<HorizontalLayout height="40">
-				<Label text="盘点总数：" width="120" height="40" font="1" textcolor="#FF386382" />
+				<Label text="盘点总数：" width="120" height="40" font="1" textcolor="#FF386382" /><Label name="lblCountSmall" text="0" width="300" height="40" font="3" textcolor="#FF386382" />
 			</HorizontalLayout>
+			
 			<HorizontalLayout height="10" />
 			<HorizontalLayout height="40">
-				<Label text="生成包装号：" width="120" height="40" font="1" textcolor="#FF386382" /><Edit name="package_id" text="包装号" height="40" width="300" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" font="0" textcolor="#FF386382" />
+				<Label text="生成包装号：" width="120" height="40" font="1" textcolor="#FF386382" /><Edit name="package_id" text="包装号" height="40" width="300" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" font="3" textcolor="#FF386382" />
 			</HorizontalLayout>
+			
+			<HorizontalLayout height="60" />
+			<HorizontalLayout height="40">
+				<Label text="保存结果" width="520" height="40" font="4" textcolor="#FF386382" name="lblInvSmallSaveRet" />
+			</HorizontalLayout>
+			
 		</VerticalLayout>
 		
 		<VerticalLayout bkcolor="#FFD1E8F5">

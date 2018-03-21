@@ -38,10 +38,16 @@ public:
 	// 是否登录成功
 	BOOL  IfLogined () const;
 	const char * GetUserName();
+	BOOL  IfUserId( const TagItem * pItem ) const;
 
 	// 用盘点的Tag ID信息登录
 	int   LoginUserAsyn(const TagItem * pItem);
 	int   LoginUser(const CTagItemParam * pItem);
+
+	// 保存小盘点
+	int   InvSmallSaveAsyn( const CString & strBatchId,  const std::vector<TagItem *> & v );
+	int   InvSmallSave( const CInvSmallSaveParam * pParam);
+	int   NotifyUiInvSmallSaveRet( int nError, const CString & strBatchId );
 
 	sigslot::signal1< int *>                               sigInit;                
 	sigslot::signal1< int *>                               sigDeinit;              

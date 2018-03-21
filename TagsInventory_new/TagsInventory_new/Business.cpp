@@ -135,6 +135,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_INV_SMALL_SAVE:
+	{
+		CInvSmallSaveParam * pParam = (CInvSmallSaveParam *)pMessageData;
+		InvSmallSave(pParam);
+	}
+	break;
+
 	default:
 		break;
 	}
@@ -255,4 +262,59 @@ const char * CBusiness::GetUserName() {
 	else {
 		return "";
 	}
+}
+
+// 判断盘点的id是否是用户登录的id
+BOOL  CBusiness::IfUserId(const TagItem * pItem) const {
+	if ( 0 == pItem) {
+		return FALSE;
+	}
+
+	if (!m_bLogin) {
+		return FALSE;
+	}
+
+	return ( 0 == CompTag(pItem, &m_user.tTagId) );
+}
+
+
+int   CBusiness::InvSmallSaveAsyn( const CString & strBatchId, const std::vector<TagItem *> & v) {
+
+	CInvSmallSaveParam * pParam = new CInvSmallSaveParam;
+	pParam->m_strBatchId = strBatchId;
+
+	std::vector<TagItem *>::const_iterator it;
+	for ( it = v.begin(); it != v.end(); it++ ) {
+		TagItem * pItem = *it;
+		TagItem * pNewItem = new TagItem;
+		if ( 0 == pNewItem ) {
+			g_log->Output(ILog::LOG_SEVERITY_ERROR, "no memory!\n");
+			delete pParam;
+			return -1;
+		}
+
+		memcpy(pNewItem, pItem, sizeof(TagItem));
+		pParam->m_items.push_back(pNewItem);
+	}
+
+	g_thrd_db->PostMessage(this, MSG_INV_SMALL_SAVE, pParam);
+	return 0;
+}
+
+int   CBusiness::InvSmallSave(const CInvSmallSaveParam * pParam ) {
+	CString strBatchId;
+	int ret = m_InvDatabase.InvSmallSave(pParam, m_user.szUserId, strBatchId );
+	NotifyUiInvSmallSaveRet(ret, strBatchId);
+	return 0;
+}
+
+int   CBusiness::NotifyUiInvSmallSaveRet(int nError, const CString & strBatchId ) {
+	if (0 == nError) {
+		CString * pNewString = new CString(strBatchId);
+		::PostMessage(g_hWnd, UM_INV_SMALL_SAVE_RESULT, (WPARAM)nError, (LPARAM)pNewString );
+	}
+	else {
+		::PostMessage(g_hWnd, UM_INV_SMALL_SAVE_RESULT, (WPARAM)nError, 0);
+	}	
+	return 0;
 }

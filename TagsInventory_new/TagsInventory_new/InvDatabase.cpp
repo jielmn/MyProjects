@@ -2,6 +2,9 @@
 #include "InvDatabase.h"
 #include "Business.h"
 
+#define  FLOW_NUM_LEN                         3
+#define  PROCE_TYPE_INV_SMALL                 1
+
 CInvDatabase::CInvDatabase( CBusiness * pBusiness ) {
 	m_eDbStatus = STATUS_CLOSE;
 	m_eDbType   = TYPE_ORACLE;
@@ -151,4 +154,151 @@ int CInvDatabase::LoginUser( const CTagItemParam * pItem, User * pUser) {
 
 CInvDatabase::DATABASE_STATUS CInvDatabase::GetStatus() {
 	return m_eDbStatus;
+}
+
+// 保存小盘点
+int CInvDatabase::InvSmallSave( const CInvSmallSaveParam * pParam, const char * szUserId, CString & strBatchId ) {
+	int ret = 0;
+
+	if ( m_eDbStatus == STATUS_CLOSE ) {
+		return INV_ERR_DB_CLOSE;
+	}
+
+	CTime now = CTime::GetCurrentTime();
+	CString strTime = now.Format("%Y-%m-%d %H:%M:%S");
+
+	char  szFactoryId[64];
+	char  szProductId[64];
+
+	g_cfg->GetConfig( FACTORY_CODE, szFactoryId, sizeof(szFactoryId) );
+	g_cfg->GetConfig( PRODUCT_CODE, szProductId, sizeof(szProductId) );
+
+	char buf[8192];
+	std::vector<TagItem *>::const_iterator it;
+
+	CString  strSql;
+	strSql.Format("select max(id) from proceinfo;");
+	DWORD   dwProceId = 0;
+
+	try
+	{
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		if (!m_recordset.IsEOF())
+		{
+			CString   strValue;
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf(strValue, "%u", &dwProceId);
+		}
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	CString strTmp;
+	CString strTmp1;
+
+	// 如果上一步没有错误
+	if (0 == ret) {
+
+		// 开始事务
+		try
+		{
+#ifdef _DEBUG
+			if (m_database.m_bTransactionPending) {
+				m_database.Rollback();
+			}
+#else
+			m_database.Rollback();
+#endif
+			m_database.BeginTrans();
+
+			// 插入tag数据
+			for (it = pParam->m_items.begin(); it != pParam->m_items.end(); it++) {
+				TagItem * pIem = *it;
+				GetUid(buf, sizeof(buf), pIem->abyUid, pIem->dwUidLen);
+				strSql.Format("insert into tagsinfo values('%s',%u);", buf, dwProceId + 1);
+				m_database.ExecuteSQL(strSql);
+			}
+
+			CString strMaxBatchId;
+			now = CTime::GetCurrentTime();
+			strTmp.Format("%s%s%s%%", szFactoryId, szProductId, pParam->m_strBatchId);
+			strSql.Format("select proce_batch_id from proceinfo where proce_batch_id like '%s' order by proce_batch_id desc;", strTmp);
+			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+			if (!m_recordset.IsEOF())
+			{
+				m_recordset.GetFieldValue((short)0, strMaxBatchId);
+			}
+			m_recordset.Close();//关闭记录集
+
+			int nFlowId = 0;
+			if (strMaxBatchId.GetLength() > 0) {
+				DWORD dwFactoryLen = strlen(szFactoryId);
+				DWORD dwProcCodeLen = strlen(szProductId);
+				sscanf(strMaxBatchId.Mid(dwFactoryLen + dwProcCodeLen + pParam->m_strBatchId.GetLength(), FLOW_NUM_LEN), "%d", &nFlowId);
+			}
+			nFlowId++;
+
+			strTmp1.Format("%%s%%s%%s%%0%dd", FLOW_NUM_LEN);
+
+			strTmp.Format(strTmp1, szFactoryId, szProductId, pParam->m_strBatchId, nFlowId);
+			strBatchId = strTmp;
+
+			if (m_eDbType == TYPE_ORACLE) {
+				// 插入批量数据
+				strSql.Format("insert into proceinfo values ( %u, %d, '%s', to_date('%s','yyyy-mm-dd hh24:mi:ss'),'%s','%s')",
+					dwProceId + 1, PROCE_TYPE_INV_SMALL, szUserId, strTime, " ", strBatchId);
+			}
+			else {
+				// 插入批量数据
+				strSql.Format("insert into proceinfo values ( %u, %d, '%s', '%s','%s','%s')",
+					dwProceId + 1, PROCE_TYPE_INV_SMALL, szUserId, strTime, " ", strBatchId);
+			}
+
+			m_database.ExecuteSQL(strSql);
+			m_database.CommitTrans();
+		}
+		catch (CException* e)
+		{
+			ret = OnDatabaseException(e);
+			if (m_eDbType == STATUS_OPEN) {
+				m_database.Rollback();
+			}
+		}
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+	
+	return ret;
+}
+
+int  CInvDatabase::OnDatabaseException( CException* e ) {
+	char buf[8192];
+	e->GetErrorMessage(buf, sizeof(buf));
+	g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+
+	int ret = INV_ERR_DB_ERROR;
+
+	if (m_eDbType == TYPE_MYSQL) {
+		if (0 != strstr(buf, "connection") || 0 != strstr(buf, "没有连接") || 0 != strstr(buf, "gone awaw")) {
+			m_eDbStatus = STATUS_CLOSE;
+		}
+	}
+	else {
+		// 看是ORACLE否断开连接
+		if (strstr(buf, "ORA-12152") != 0) {
+			m_eDbStatus = STATUS_CLOSE;
+		}
+		else if (strstr(buf, "ORA-00001") != 0) {
+			ret = INV_ERR_DB_NOT_UNIQUE;
+		}
+	}
+
+	return ret;
 }

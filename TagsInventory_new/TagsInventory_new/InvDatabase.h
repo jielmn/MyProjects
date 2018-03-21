@@ -13,6 +13,8 @@ public:
 	int ReconnectDb();
 	// 用户登录
 	int LoginUser( const CTagItemParam * pItem, User * pUser);
+	// 保存小盘点
+	int InvSmallSave( const CInvSmallSaveParam * pParam, const char * szUserId, CString & strBatchId);
 
 	enum DATABASE_STATUS {
 		STATUS_CLOSE = 0,
@@ -29,6 +31,7 @@ public:
 
 private:
 	void Clear();
+	int  OnDatabaseException(CException* e);
 
 	DATABASE_STATUS     m_eDbStatus;
 	DATABASE_TYPE       m_eDbType;

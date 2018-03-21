@@ -2,6 +2,7 @@
 //#include "vld.h"
 //#endif
 #include <afx.h>
+#include <assert.h>
 #include "LmnString.h"
 #include "InvCommon.h"
 
@@ -28,6 +29,16 @@ CTagItemParam::CTagItemParam(const TagItem * pItem) {
 CTagItemParam::~CTagItemParam() {
 
 }
+
+// 保存小盘点的参数
+CInvSmallSaveParam::CInvSmallSaveParam() {
+
+}
+
+CInvSmallSaveParam::~CInvSmallSaveParam() {
+	ClearVector(m_items);
+}
+
 
 char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit /*= '\0'*/) {
 	if (0 == buf || 0 == dwBufLen) {
@@ -61,6 +72,41 @@ char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char c
 
 
 	return buf;
+}
+
+int CompTag(const TagItem * p1, const TagItem * p2) {
+	if ( p1 == 0 ) {
+		if (p2 == 0) {
+			return 0;
+		}
+		else {
+			return -1;
+		}
+	}
+	else if (p2 == 0) {
+		return 1;
+	}
+	else {
+		if (p1->dwUidLen == p2->dwUidLen) {
+			return memcmp(p1->abyUid, p2->abyUid, p1->dwUidLen);
+		}
+		else {
+			DWORD dwMinLen = p1->dwUidLen < p2->dwUidLen ? p1->dwUidLen : p2->dwUidLen;
+			int ret = memcmp(p1->abyUid, p2->abyUid, dwMinLen);
+
+			if ( 0 == ret ) {
+				if (p1->dwUidLen < p2->dwUidLen) {
+					return -1;
+				}
+				else {
+					return 1;
+				}
+			}
+			else {
+				return ret;
+			}
+		}
+	}
 }
 
 
