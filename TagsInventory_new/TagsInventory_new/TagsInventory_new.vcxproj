@@ -138,7 +138,9 @@ xcopy dll_reader ..\Debug  /dseiy</Command>
       <AdditionalLibraryDirectories>lib_reader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\res ..\Release\res /dseiy</Command>
+      <Command>xcopy res\res ..\Release\res /dseiy
+xcopy Drivers ..\Release\Drivers  /dseiy
+xcopy dll_reader ..\Release  /dseiy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
