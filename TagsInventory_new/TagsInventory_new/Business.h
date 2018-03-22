@@ -54,6 +54,10 @@ public:
 	int   CheckTag(const CTagItemParam * pItem );
 	int   NotifyUiCheckTagRet( int nRet, const CTagItemParam * pItem );
 
+	// …Ë÷√∂® ±∆˜
+	int   SetTimer( DWORD dwTimerId, DWORD dwDelayTime );
+	int   NotifyUiTimer(DWORD dwTimerId);
+
 	sigslot::signal1< int *>                               sigInit;                
 	sigslot::signal1< int *>                               sigDeinit;              
 	

@@ -2,7 +2,7 @@
 #include "InvDatabase.h"
 #include "Business.h"
 
-#define  FLOW_NUM_LEN                         3
+
 //#define  PROCE_TYPE_INV_SMALL                 1
 
 CInvDatabase::CInvDatabase( CBusiness * pBusiness ) {

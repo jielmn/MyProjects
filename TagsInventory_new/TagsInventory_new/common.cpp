@@ -15,6 +15,7 @@ HWND    g_hWnd = 0;
 
 LmnToolkits::Thread *  g_thrd_db = 0;                     // 数据库线程
 LmnToolkits::Thread *  g_thrd_reader = 0;                 // Reader线程
+LmnToolkits::Thread *  g_thrd_timer = 0;                  // TIMER
 
 // 用于线程的参数
 CTagItemParam::CTagItemParam(const TagItem * pItem) {

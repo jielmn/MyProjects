@@ -33,6 +33,8 @@ public:
 
 	// 大盘点收到char
 	void OnInvBigChar(char ch);
+	// 大盘点收到条码
+	void OnInvBigBarCode(const CString & strBarCode );
 
 	enum  INVENTORY_STATUS {
 		STATUS_CLOSE = 0,
@@ -78,4 +80,5 @@ private:
 
 	INVENTORY_STATUS        m_InventoryBigStatus;
 	std::vector<CString *>  m_vInventoryBig;
+	CString                 m_strInvBigBuf;                      // 大盘点的缓冲
 };

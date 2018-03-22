@@ -18,6 +18,7 @@ extern IConfig * g_cfg;
 extern HWND    g_hWnd;
 extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_reader;
+extern LmnToolkits::Thread *  g_thrd_timer;
 
 // thread message
 #define MSG_RECONNECT_DB           1
@@ -44,6 +45,7 @@ extern LmnToolkits::Thread *  g_thrd_reader;
 #define UM_LOGIN_RESULT            (WM_USER+4)
 #define UM_INV_SMALL_SAVE_RESULT   (WM_USER+5)
 #define UM_CHECK_TAG_RESULT        (WM_USER+6)
+#define UM_TIMER                   (WM_USER+7)
 
 
 // config≈‰÷√◊÷∑˚¥Æ≥£¡ø
@@ -106,6 +108,14 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  TABS_INDEX_INVENTORY_BIG      1
 #define  TABS_INDEX_INVENTORY_QUERY    2
 #define  TABS_INDEX_INVENTORY_CHECK    3
+
+#define  MIN_TIMER_ID                  10000
+#define  MAX_TIMER_ID                  19999
+
+#define  INV_BIG_CHAR_TIMER            MIN_TIMER_ID
+#define  INV_BIG_CHAR_TIMER_INTEVAL    100                          // 100∫¡√Î
+
+#define  FLOW_NUM_LEN                         3
 
 #define  NORMAL_COLOR                  0xFF386382
 #define  ERROR_COLOR                   0xFFFF0000

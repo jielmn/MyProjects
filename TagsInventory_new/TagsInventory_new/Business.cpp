@@ -77,6 +77,16 @@ void CBusiness::OnInit(int * ret) {
 	}
 	g_thrd_reader->Start();
 
+	// timer线程
+	g_thrd_timer = new LmnToolkits::Thread();
+	if (0 == g_thrd_timer) {
+		*ret = INV_ERR_NO_MEMORY;
+		return;
+	}
+	g_thrd_timer->Start();
+
+	
+
 	*ret = 0;
 }
 
@@ -95,8 +105,13 @@ void CBusiness::OnDeInit(int * ret) {
 		delete g_thrd_reader;
 		g_thrd_reader = 0;
 	}
-	
 
+	if (g_thrd_timer) {
+		g_thrd_timer->Stop();
+		delete g_thrd_timer;
+		g_thrd_timer = 0;
+	}
+	
 	Clear();
 
 	*ret = 0;
@@ -147,9 +162,17 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 		CTagItemParam * pItem = (CTagItemParam *)pMessageData;
 		CheckTag(pItem);
 	}
+	break;
 
 	default:
-		break;
+	{
+		// 定时器范围是10000~19999
+		if ( dwMessageId >= MIN_TIMER_ID && dwMessageId <= MAX_TIMER_ID ) {
+			NotifyUiTimer(dwMessageId);
+		}
+	}
+	break;
+
 	}
 }
 
@@ -341,5 +364,20 @@ int   CBusiness::NotifyUiCheckTagRet(int nRet, const CTagItemParam * pItem) {
 	TagItem * pNewItem = new TagItem;
 	memcpy(pNewItem, &pItem->m_item, sizeof(TagItem));
 	::PostMessage(g_hWnd, UM_CHECK_TAG_RESULT, (WPARAM)nRet, (LPARAM)pNewItem );
+	return 0;
+}
+
+int   CBusiness::SetTimer( DWORD dwTimerId, DWORD dwDelayTime ) {
+	// 定时器范围错误
+	if ( !(dwTimerId >= MIN_TIMER_ID && dwTimerId <= MAX_TIMER_ID) ) {
+		return -1;
+	}
+
+	g_thrd_timer->PostDelayMessage( dwDelayTime, this, dwTimerId, 0, TRUE );
+	return 0;
+}
+
+int   CBusiness::NotifyUiTimer(DWORD dwTimerId) {
+	::PostMessage(g_hWnd, UM_TIMER, (WPARAM)dwTimerId,  0);
 	return 0;
 }

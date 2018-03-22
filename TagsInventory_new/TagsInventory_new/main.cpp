@@ -723,6 +723,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 
 	}
+	else if (uMsg == UM_TIMER) {
+		DWORD dwTimerId = (DWORD)wParam;
+
+		// 如果定时器时间到
+		if (dwTimerId == INV_BIG_CHAR_TIMER) {			
+			OnInvBigBarCode(m_strInvBigBuf);
+			m_strInvBigBuf = "";
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -823,26 +832,58 @@ void  CDuiFrameWnd::OnInventoryCheckRet(const TagItem * pItem) {
 
 // 大盘点收到char
 void   CDuiFrameWnd::OnInvBigChar(char ch) {
-	static DWORD    dwLastTick = 0;
-	static CString  strBuf;
-
-	// 如果不是开始状态
-	if (m_InventoryBigStatus != STATUS_START ) {
-		return;
-	}
-	
-	DWORD dwCur = LmnGetTickCount();
-
-	// 如果buf为空
-	if ( strBuf.GetLength() == 0 ) {
-		strBuf += ch;
-		dwLastTick = dwCur;
-	}
-	else {
-
-	}
+	m_strInvBigBuf += ch;
+	CBusiness::GetInstance()->SetTimer(INV_BIG_CHAR_TIMER, INV_BIG_CHAR_TIMER_INTEVAL);
 }
 
+
+void CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode ) {
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received chars:%s\n", m_strInvBigBuf);
+
+	// 检查格式(15位)
+	// FACTORY CODE   +   PRODUCT CODE   +    批号(20180301)  + 流水号(001)
+
+	char  szFactoryId[64] = { 0 };
+	char  szProductId[64] = { 0 };
+
+	g_cfg->GetConfig(FACTORY_CODE, szFactoryId, sizeof(szFactoryId), "");
+	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId), "");
+
+	DWORD  dwFactoryLen = strlen(szFactoryId);
+	DWORD  dwProductLen = strlen(szProductId);
+
+	if (strBarCode.GetLength() != dwFactoryLen + dwProductLen + 8 + FLOW_NUM_LEN) {
+		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, length not correct!\n", strBarCode);
+		return;
+	}
+
+	CString strBatchId = strBarCode.Mid(dwFactoryLen + dwProductLen, 8);
+
+	int nBatchId = 0;
+	if (0 == sscanf(strBatchId.Mid(0, 4), "%d", &nBatchId)) {
+		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
+		return;
+	}
+
+	if (0 == sscanf(strBatchId.Mid(4, 2), "%d", &nBatchId)) {
+		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
+		return;
+	}
+
+	if (0 == sscanf(strBatchId.Mid(6), "%d", &nBatchId)) {
+		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
+		return;
+	}
+
+	CString strFlowId = strBarCode.Mid(dwFactoryLen + dwProductLen + 8);
+	int nFlowId = 0;
+	if (0 == sscanf( strFlowId, "%d", &nFlowId)) {
+		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
+		return;
+	}
+
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, OK \n", strBarCode);
+}
 
 
 
