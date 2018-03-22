@@ -52,8 +52,13 @@ LRESULT CLoginWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 		dwLastTick = dwCur;
 
-		// 用户登录
-		CBusiness::GetInstance()->LoginUserAsyn(pItem);
+		if ( CBusiness::GetInstance()->GetDbStatus() == CInvDatabase::STATUS_CLOSE ) {
+			::MessageBox(this->GetHWND(), MSG_BOX_DB_CLOSE, CAPTION_LOGIN, 0);
+		}
+		else {
+			// 用户登录
+			CBusiness::GetInstance()->LoginUserAsyn(pItem);
+		}		
 
 		if (pItem) {
 			delete pItem;

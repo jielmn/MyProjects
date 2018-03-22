@@ -70,6 +70,7 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  INV_SMALL_SAVE_RET_OK         "盘点保存成功"
 #define  INV_SMALL_SAVE_RET_ERROR      "盘点保存失败"
 #define  INV_SMALL_SAVE_RET_SAME_TAG   "盘点保存失败：数据库里已经存在相同的Tag"
+#define  CAPTION_LOGIN                 "登录"
 
 
 #define  DATABASE_STATUS_LABEL_ID      "lblDatabaseStatus"

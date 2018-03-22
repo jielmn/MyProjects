@@ -50,4 +50,6 @@ private:
 	INVENTORY_STATUS         m_InventorySmallStatus;
 	std::vector<TagItem *>   m_vInventorySmall;
 
+	HFONT                    m_font;
+
 };

@@ -91,12 +91,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0502;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../39BarCode/39BarCode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib_reader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;39BarCodeD.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib_reader;../../39BarCode/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Debug\res /dseiy
@@ -128,14 +129,15 @@ xcopy dll_reader ..\Debug  /dseiy</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x0502;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../39BarCode/39BarCode;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>User32.lib;duilib.lib;LmnCommonX.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>lib_reader;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>User32.lib;duilib.lib;LmnCommonX.lib;rfidlib_reader.lib;rfidlib_aip_iso15693.lib;rfidlib_aip_iso14443A.lib;rfidlib_aip_iso18000p3m3.lib;39BarCode.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>lib_reader;../../39BarCode/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Release\res /dseiy

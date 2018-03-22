@@ -5,7 +5,7 @@
 #include "main.h"
 #include "resource.h"
 #include "Business.h"
-
+#include "39BarCode.h"
 
 void  CDuiFrameWnd::InitWindow() {
 	char buf[8192];
@@ -59,6 +59,26 @@ void  CDuiFrameWnd::InitWindow() {
 
 	// 初始化小盘点
 	InitInventorySmall();
+
+
+	DWORD dwFontSize = 0;
+	g_cfg->GetConfig("font size", dwFontSize, 28);
+	m_font = CreateFont(
+		(int)dwFontSize,               // nHeight
+		0,                             // nWidth
+		0,                             // nEscapement
+		0,                             // nOrientation
+		FW_BOLD,                       // nWeight
+		FALSE,                         // bItalic
+		FALSE,                         // bUnderline
+		0,                             // cStrikeOut
+		ANSI_CHARSET,                  // nCharSet
+		OUT_DEFAULT_PRECIS,            // nOutPrecision
+		CLIP_DEFAULT_PRECIS,           // nClipPrecision
+		DEFAULT_QUALITY,               // nQuality
+		DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
+		_T("黑体")
+	);
 
 	WindowImplBase::InitWindow();
 }
@@ -272,7 +292,85 @@ void  CDuiFrameWnd::SaveInventorySmall() {
 
 // 打印条码
 void  CDuiFrameWnd::PrintInventorySmall() {
+	
+	DWORD   dwPaperWidth = 0;
+	DWORD   dwPaperLength = 0;
+	DWORD   dwLeft = 0;
+	DWORD   dwTop = 0;
+	DWORD   dwPrintWidth = 0;
+	DWORD   dwPrintHeight = 0;
+	DWORD   dwTextHeight = 0;
 
+	g_cfg->Reload();
+	g_cfg->GetConfig("paper width", dwPaperWidth, 600);
+	g_cfg->GetConfig("paper length", dwPaperLength, 170);
+	g_cfg->GetConfig("paper left", dwLeft, 0);
+	g_cfg->GetConfig("paper top", dwTop, 0);
+	g_cfg->GetConfig("print width", dwPrintWidth, dwPaperWidth);
+	g_cfg->GetConfig("print height", dwPrintHeight, dwPaperLength);
+	g_cfg->GetConfig("bar code text height", dwTextHeight, 50);
+
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	PrintDlg(&printInfo);
+	//if (PrintDlg(&printInfo)==TRUE) 
+	{
+		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
+
+		if (lpDevMode) {
+			lpDevMode->dmPaperSize = DMPAPER_USER;
+			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
+			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
+			lpDevMode->dmPaperLength = (short)dwPaperLength;
+			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+		}
+		GlobalUnlock(printInfo.hDevMode);
+		ResetDC(printInfo.hDC, lpDevMode);
+
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+		StartDoc(printInfo.hDC, &di);
+		StartPage(printInfo.hDC);
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		DWORD dwMultiple = 0;
+		g_cfg->GetConfig("multiple", dwMultiple);
+
+		CSize size = CSize(dwPaperWidth, dwPaperLength);
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		DuiLib::CDuiString strBatchId = GET_CONTROL_TEXT(m_edtPackageId);
+
+		// 画条码
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBatchId, m_font, dwTextHeight, "ID:");
+
+		EndPage(printInfo.hDC);
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+	}
 }
 
 // 处理自定义信息
