@@ -26,11 +26,21 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnStopSmall = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(STOP_SMALL_BUTTON_ID)));
 	m_btnSaveSmall = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(SAVE_SMALL_BUTTON_ID)));
 	m_btnPrintSmall = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(PRINT_SMALL_BUTTON_ID)));
-
 	m_lblInvSmallSaveRet = (DuiLib::CLabelUI *)m_PaintManager.FindControl(INV_SMALL_SAVE_LABEL_ID);
 
+	// check
 	m_lblCheckTagId = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_ID_LABEL_ID)));
 	m_lblCheckTagRet = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_RET_LABEL_ID)));
+
+	// 大盘点
+	m_btnStartBig = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(START_BIG_BUTTON_ID)));
+	m_btnStopBig = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(STOP_BIG_BUTTON_ID)));
+	m_btnSaveBig = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(SAVE_BIG_BUTTON_ID)));
+	m_btnPrintBig = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(PRINT_BIG_BUTTON_ID)));
+	m_edtBigBatchId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(BIG_BATCH_ID_EDIT_ID)));
+	m_edtBigPackageId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(BIG_PACKAGE_ID_EDIT_ID)));
+	m_lblInvBigSaveRet = (DuiLib::CLabelUI *)m_PaintManager.FindControl(INV_BIG_SAVE_LABEL_ID);
+	m_lblCountBig = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(COUNT_BIG_LABEL_ID)));	 
 	 
 
 	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
@@ -57,7 +67,10 @@ void  CDuiFrameWnd::InitWindow() {
 	SET_CONTROL_TEXT(m_lblInvSmallSaveRet, "");
 	SET_CONTROL_TEXT(m_lblCheckTagId, "");
 	SET_CONTROL_TEXT(m_lblCheckTagRet, "");
-	
+	SET_CONTROL_TEXT(m_edtBigBatchId, buf);
+	SET_CONTROL_TEXT(m_edtBigPackageId, "");
+	SET_CONTROL_TEXT(m_lblInvBigSaveRet, "");
+	SET_CONTROL_TEXT(m_lblCountBig, "0");
 	
 
 	CString strText;
@@ -66,6 +79,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	// 初始化小盘点
 	InitInventorySmall();
+	// 初始化大盘点
+	InitInventoryBig();
 
 
 	DWORD dwFontSize = 0;
@@ -147,6 +162,18 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == PRINT_SMALL_BUTTON_ID) {
 			PrintInventorySmall();
+		}
+		else if (name == START_BIG_BUTTON_ID) {
+			StartInventoryBig();
+		}
+		else if (name == STOP_BIG_BUTTON_ID) {
+			StopInventoryBig();
+		}
+		else if (name == SAVE_BIG_BUTTON_ID) {
+			SaveInventoryBig();
+		}
+		else if (name == PRINT_BIG_BUTTON_ID) {
+			PrintInventoryBig();
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -389,6 +416,229 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 	}
 }
 
+
+void  CDuiFrameWnd::InitInventoryBig() {
+	if (m_btnStartBig) {
+		m_btnStartBig->SetEnabled(true);
+	}
+
+	if (m_btnStopBig) {
+		m_btnStopBig->SetEnabled(false);
+	}
+
+	if (m_btnSaveBig) {
+		m_btnSaveBig->SetEnabled(false);
+	}
+
+	if (m_btnPrintBig) {
+		m_btnPrintBig->SetEnabled(false);
+	}
+
+	ClearVector(m_vInventoryBig);
+	m_InventoryBigStatus = STATUS_CLOSE;
+}
+
+void  CDuiFrameWnd::StartInventoryBig() {
+	if (m_InventoryBigStatus == STATUS_STOP) {
+		if (m_vInventoryBig.size() > 0) {
+			if (IDCANCEL == MessageBox(this->GetHWND(), MSG_BOX_NEW_INVENTORY_BIG, CAPTION_NEW_INVENTORY_BIG, MB_OKCANCEL | MB_DEFBUTTON2)) {
+				return;
+			}
+		}
+	}
+
+	if (m_btnStartBig) {
+		m_btnStartBig->SetEnabled(false);
+	}
+
+	if (m_btnStopBig) {
+		m_btnStopBig->SetEnabled(true);
+	}
+
+	if (m_btnSaveBig) {
+		m_btnSaveBig->SetEnabled(false);
+	}
+
+	if (m_btnPrintBig) {
+		m_btnPrintBig->SetEnabled(false);
+	}
+
+	ClearVector(m_vInventoryBig);
+	//SET_CONTROL_TEXT(m_lblCountSmall, "0");
+
+	SET_CONTROL_TEXT_COLOR(m_lblInvBigSaveRet, NORMAL_COLOR);
+	SET_CONTROL_TEXT(m_lblInvBigSaveRet, "");
+	SET_CONTROL_TEXT(m_edtBigPackageId, "");
+
+	m_InventoryBigStatus = STATUS_START;
+}
+
+void  CDuiFrameWnd::StopInventoryBig() {
+	if (m_btnStartBig) {
+		m_btnStartBig->SetEnabled(true);
+	}
+
+	if (m_btnStopBig) {
+		m_btnStopBig->SetEnabled(false);
+	}
+
+	if (m_btnSaveBig) {
+		if (m_vInventoryBig.size() > 0) {
+			m_btnSaveBig->SetEnabled(true);
+		}
+		else {
+			m_btnSaveBig->SetEnabled(false);
+		}
+	}
+
+	if (m_btnPrintBig) {
+		m_btnPrintBig->SetEnabled(false);
+	}
+
+	m_InventoryBigStatus = STATUS_STOP;
+}
+
+void  CDuiFrameWnd::SaveInventoryBig() {
+	if (CInvDatabase::STATUS_CLOSE == CBusiness::GetInstance()->GetDbStatus()) {
+		MessageBox(this->GetHWND(), MSG_BOX_DB_CLOSE, CAPTION_SAVE_INVENTORY_BIG, 0);
+		return;
+	}
+
+	DuiLib::CDuiString str = GET_CONTROL_TEXT(m_edtBatchId);
+	CString strBatchId = str;
+
+	if (strBatchId.GetLength() == 0) {
+		MessageBox(this->GetHWND(), MSG_BOX_BATCH_ID_EMPTY, CAPTION_SAVE_INVENTORY_BIG, 0);
+		return;
+	}
+
+	// 201709001 或者20170901
+	if (strBatchId.GetLength() != 8) {
+		MessageBox(this->GetHWND(), MSG_BOX_WRONG_BATCH_ID_FORMAT, CAPTION_SAVE_INVENTORY_BIG, 0);
+		return;
+	}
+
+	int nBatchId = 0;
+	if (0 == sscanf(strBatchId.Mid(0, 4), "%d", &nBatchId)) {
+		MessageBox(this->GetHWND(), MSG_BOX_WRONG_BATCH_ID_FORMAT, CAPTION_SAVE_INVENTORY_BIG, 0);
+		return;
+	}
+
+	if (0 == sscanf(strBatchId.Mid(4, 2), "%d", &nBatchId)) {
+		MessageBox(this->GetHWND(), MSG_BOX_WRONG_BATCH_ID_FORMAT, CAPTION_SAVE_INVENTORY_BIG, 0);
+		return;
+	}
+
+	if (0 == sscanf(strBatchId.Mid(6), "%d", &nBatchId)) {
+		MessageBox(this->GetHWND(), MSG_BOX_WRONG_BATCH_ID_FORMAT, CAPTION_SAVE_INVENTORY_BIG, 0);
+		return;
+	}
+
+	// 保存
+	//int ret = CBusiness::GetInstance()->InvSmallSaveAsyn(strBatchId, m_vInventorySmall);
+	//if (0 != ret) {
+	//	return;
+	//}
+
+	// 保存成功后的处理
+	if (m_btnStartBig) {
+		m_btnStartBig->SetEnabled(true);
+	}
+
+	if (m_btnStopBig) {
+		m_btnStopBig->SetEnabled(false);
+	}
+
+	if (m_btnSaveBig) {
+		m_btnSaveBig->SetEnabled(false);
+	}
+
+	if (m_btnPrintBig) {
+		m_btnPrintBig->SetEnabled(false);
+	}
+
+	m_InventoryBigStatus = STATUS_SAVING;
+}
+
+void  CDuiFrameWnd::PrintInventoryBig() {
+	DWORD   dwPaperWidth = 0;
+	DWORD   dwPaperLength = 0;
+	DWORD   dwLeft = 0;
+	DWORD   dwTop = 0;
+	DWORD   dwPrintWidth = 0;
+	DWORD   dwPrintHeight = 0;
+	DWORD   dwTextHeight = 0;
+
+	g_cfg->Reload();
+	g_cfg->GetConfig("paper width", dwPaperWidth, 600);
+	g_cfg->GetConfig("paper length", dwPaperLength, 170);
+	g_cfg->GetConfig("paper left", dwLeft, 0);
+	g_cfg->GetConfig("paper top", dwTop, 0);
+	g_cfg->GetConfig("print width", dwPrintWidth, dwPaperWidth);
+	g_cfg->GetConfig("print height", dwPrintHeight, dwPaperLength);
+	g_cfg->GetConfig("bar code text height", dwTextHeight, 50);
+
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	PrintDlg(&printInfo);
+	//if (PrintDlg(&printInfo)==TRUE) 
+	{
+		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
+
+		if (lpDevMode) {
+			lpDevMode->dmPaperSize = DMPAPER_USER;
+			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
+			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
+			lpDevMode->dmPaperLength = (short)dwPaperLength;
+			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+		}
+		GlobalUnlock(printInfo.hDevMode);
+		ResetDC(printInfo.hDC, lpDevMode);
+
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+		StartDoc(printInfo.hDC, &di);
+		StartPage(printInfo.hDC);
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		CSize size = CSize(dwPaperWidth, dwPaperLength);
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigPackageId);
+
+		// 画条码
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBigBatchId, m_font, dwTextHeight, "ID:");
+
+		EndPage(printInfo.hDC);
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+	}
+}
+
+
 // 处理自定义信息
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	int nError = 0;
@@ -457,6 +707,10 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (pItem) {
 			delete pItem;
 		}
+	}
+	else if ( uMsg == WM_CHAR ) {
+		char ch = (char)wParam;
+		//g_log->Output(ILog::LOG_SEVERITY_INFO, "char:%c,%d\n", ch,(int)ch);
 	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }

@@ -20,6 +20,12 @@ public:
 	void  SaveInventorySmall();
 	void  PrintInventorySmall();
 
+	void  InitInventoryBig();
+	void  StartInventoryBig();
+	void  StopInventoryBig();
+	void  SaveInventoryBig();
+	void  PrintInventoryBig();
+
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void OnInventorySmallRet( const TagItem * pItem );
@@ -53,7 +59,20 @@ private:
 
 	HFONT                    m_font;
 
+	// check
 	DuiLib::CLabelUI *       m_lblCheckTagId;
 	DuiLib::CLabelUI *       m_lblCheckTagRet;
 
+	// ´ó°ü×°
+	DuiLib::CButtonUI *      m_btnStartBig;
+	DuiLib::CButtonUI *      m_btnStopBig;
+	DuiLib::CButtonUI *      m_btnSaveBig;
+	DuiLib::CButtonUI *      m_btnPrintBig;
+	DuiLib::CEditUI *        m_edtBigBatchId;
+	DuiLib::CEditUI *        m_edtBigPackageId;
+	DuiLib::CLabelUI *       m_lblInvBigSaveRet;
+	DuiLib::CLabelUI *       m_lblCountBig;
+
+	INVENTORY_STATUS        m_InventoryBigStatus;
+	std::vector<CString *>  m_vInventoryBig;
 };

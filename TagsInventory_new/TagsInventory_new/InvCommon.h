@@ -75,7 +75,9 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  CAPTION_LOGIN                 "登录"
 #define  CHECK_TAG_RET_OK              "数据库里不存在该Tag"
 #define  CHECK_TAG_RET_ERROR           "数据库里存在该Tag"
-
+#define  MSG_BOX_NEW_INVENTORY_BIG     "盘点没有保存，要开始新的盘点吗？"
+#define  CAPTION_NEW_INVENTORY_BIG     "盘点"
+#define  CAPTION_SAVE_INVENTORY_BIG    "保存"
 
 #define  DATABASE_STATUS_LABEL_ID      "lblDatabaseStatus"
 #define  READER_STATUS_LABEL_ID        "lblReaderStatus"
@@ -91,6 +93,14 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  INV_SMALL_SAVE_LABEL_ID       "lblInvSmallSaveRet"
 #define  CHECK_TAG_ID_LABEL_ID         "lblCheckTagId"
 #define  CHECK_TAG_RET_LABEL_ID        "lblCheckTagResult"
+#define  START_BIG_BUTTON_ID           "btnStartBig"
+#define  STOP_BIG_BUTTON_ID            "btnStopBig"
+#define  SAVE_BIG_BUTTON_ID            "btnSaveBig"
+#define  PRINT_BIG_BUTTON_ID           "btnBarcodeBig"
+#define  BIG_BATCH_ID_EDIT_ID          "big_batch_id"
+#define  BIG_PACKAGE_ID_EDIT_ID        "big_package_id"
+#define  INV_BIG_SAVE_LABEL_ID         "lblInvBigSaveRet"
+#define  COUNT_BIG_LABEL_ID            "lblCountBig"
 
 #define  TABS_INDEX_INVENTORY_SMALL    0
 #define  TABS_INDEX_INVENTORY_BIG      1
