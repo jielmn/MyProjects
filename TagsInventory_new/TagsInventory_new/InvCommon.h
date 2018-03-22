@@ -25,6 +25,7 @@ extern LmnToolkits::Thread *  g_thrd_reader;
 #define MSG_READER_INVENTORY       3
 #define MSG_USER_LOGIN             4
 #define MSG_INV_SMALL_SAVE         5
+#define MSG_CHECK_TAG              6
 
 // db reconnect 时间
 #define  RECONNECT_DB_TIME         10000
@@ -42,6 +43,7 @@ extern LmnToolkits::Thread *  g_thrd_reader;
 #define UM_INVENTORY_RESULT        (WM_USER+3)
 #define UM_LOGIN_RESULT            (WM_USER+4)
 #define UM_INV_SMALL_SAVE_RESULT   (WM_USER+5)
+#define UM_CHECK_TAG_RESULT        (WM_USER+6)
 
 
 // config配置字符串常量
@@ -71,6 +73,8 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  INV_SMALL_SAVE_RET_ERROR      "盘点保存失败"
 #define  INV_SMALL_SAVE_RET_SAME_TAG   "盘点保存失败：数据库里已经存在相同的Tag"
 #define  CAPTION_LOGIN                 "登录"
+#define  CHECK_TAG_RET_OK              "数据库里不存在该Tag"
+#define  CHECK_TAG_RET_ERROR           "数据库里存在该Tag"
 
 
 #define  DATABASE_STATUS_LABEL_ID      "lblDatabaseStatus"
@@ -85,8 +89,13 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  PRINT_SMALL_BUTTON_ID         "btnBarcodeSmall"
 #define  COUNT_SMALL_LABEL_ID          "lblCountSmall"
 #define  INV_SMALL_SAVE_LABEL_ID       "lblInvSmallSaveRet"
+#define  CHECK_TAG_ID_LABEL_ID         "lblCheckTagId"
+#define  CHECK_TAG_RET_LABEL_ID        "lblCheckTagResult"
 
 #define  TABS_INDEX_INVENTORY_SMALL    0
+#define  TABS_INDEX_INVENTORY_BIG      1
+#define  TABS_INDEX_INVENTORY_QUERY    2
+#define  TABS_INDEX_INVENTORY_CHECK    3
 
 #define  NORMAL_COLOR                  0xFF386382
 #define  ERROR_COLOR                   0xFFFF0000

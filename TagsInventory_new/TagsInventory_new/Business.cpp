@@ -142,6 +142,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_CHECK_TAG:
+	{
+		CTagItemParam * pItem = (CTagItemParam *)pMessageData;
+		CheckTag(pItem);
+	}
+
 	default:
 		break;
 	}
@@ -316,5 +322,24 @@ int   CBusiness::NotifyUiInvSmallSaveRet(int nError, const CString & strBatchId 
 	else {
 		::PostMessage(g_hWnd, UM_INV_SMALL_SAVE_RESULT, (WPARAM)nError, 0);
 	}	
+	return 0;
+}
+
+
+int  CBusiness::CheckTagAsyn(const TagItem * pItem) {
+	g_thrd_db->PostMessage( this, MSG_CHECK_TAG, new CTagItemParam(pItem) );
+	return 0;
+}
+
+int   CBusiness::CheckTag(const CTagItemParam * pItem) {
+	int ret = m_InvDatabase.CheckTag(pItem);
+	NotifyUiCheckTagRet(ret, pItem);
+	return 0;
+}
+
+int   CBusiness::NotifyUiCheckTagRet(int nRet, const CTagItemParam * pItem) {
+	TagItem * pNewItem = new TagItem;
+	memcpy(pNewItem, &pItem->m_item, sizeof(TagItem));
+	::PostMessage(g_hWnd, UM_CHECK_TAG_RESULT, (WPARAM)nRet, (LPARAM)pNewItem );
 	return 0;
 }

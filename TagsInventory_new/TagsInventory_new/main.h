@@ -23,6 +23,7 @@ public:
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void OnInventorySmallRet( const TagItem * pItem );
+	void OnInventoryCheckRet(const TagItem * pItem);
 
 	enum  INVENTORY_STATUS {
 		STATUS_CLOSE = 0,
@@ -51,5 +52,8 @@ private:
 	std::vector<TagItem *>   m_vInventorySmall;
 
 	HFONT                    m_font;
+
+	DuiLib::CLabelUI *       m_lblCheckTagId;
+	DuiLib::CLabelUI *       m_lblCheckTagRet;
 
 };

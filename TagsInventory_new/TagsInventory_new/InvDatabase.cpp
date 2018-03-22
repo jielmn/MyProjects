@@ -302,3 +302,41 @@ int  CInvDatabase::OnDatabaseException( CException* e ) {
 
 	return ret;
 }
+
+
+// check
+int  CInvDatabase::CheckTag(const CTagItemParam * pItem) {
+	CString strSql;
+	char buf[8192];
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return -1;
+	}
+
+	int ret = 0;
+	try
+	{
+		GetUid(buf, sizeof(buf), pItem->m_item.abyUid, pItem->m_item.dwUidLen);
+
+		strSql.Format("select * from tagsinfo where tagid='%s'", buf);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		// 存在记录
+		if (!m_recordset.IsEOF())
+		{
+			ret = 1;
+		}
+		else {
+			ret = 0;
+		}
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = -2;
+		e->GetErrorMessage(buf, sizeof(buf));
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+	}
+
+	return ret;
+}

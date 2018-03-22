@@ -15,6 +15,8 @@ public:
 	int LoginUser( const CTagItemParam * pItem, User * pUser);
 	// ±£¥Ê–°≈Ãµ„
 	int InvSmallSave( const CInvSmallSaveParam * pParam, const char * szUserId, CString & strBatchId);
+	// check
+	int CheckTag(const CTagItemParam * pItem);
 
 	enum DATABASE_STATUS {
 		STATUS_CLOSE = 0,

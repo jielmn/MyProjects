@@ -49,6 +49,11 @@ public:
 	int   InvSmallSave( const CInvSmallSaveParam * pParam);
 	int   NotifyUiInvSmallSaveRet( int nError, const CString & strBatchId );
 
+	// check
+	int   CheckTagAsyn(const TagItem * pItem);
+	int   CheckTag(const CTagItemParam * pItem );
+	int   NotifyUiCheckTagRet( int nRet, const CTagItemParam * pItem );
+
 	sigslot::signal1< int *>                               sigInit;                
 	sigslot::signal1< int *>                               sigDeinit;              
 	

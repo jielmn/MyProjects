@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1"   >		
+	
+		<HorizontalLayout height="20" bkcolor="#FFD1E8F5" />
+		
+		<HorizontalLayout bkcolor="#FFD1E8F5" height="40" inset="10,0,10,0" >
+			<Label text="Tag ID：" width="80" height="40" font="1" textcolor="#FF386382" /><Label name="lblCheckTagId" text="" height="40" width="300" font="3" textcolor="#FF386382" />
+		</HorizontalLayout>		
+		
+		<HorizontalLayout height="20" bkcolor="#FFD1E8F5" />
+		
+		<HorizontalLayout height="40" bkcolor="#FFD1E8F5" inset="10,0,10,0">
+			<Label text="数据库检查结果" width="520" height="40" font="4" textcolor="#FF386382" name="lblCheckTagResult" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout bkcolor="#FFD1E8F5" />
+		
+	</VerticalLayout>
+</Window>

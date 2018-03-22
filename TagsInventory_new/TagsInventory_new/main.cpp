@@ -29,7 +29,10 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_lblInvSmallSaveRet = (DuiLib::CLabelUI *)m_PaintManager.FindControl(INV_SMALL_SAVE_LABEL_ID);
 
-		
+	m_lblCheckTagId = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_ID_LABEL_ID)));
+	m_lblCheckTagRet = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_RET_LABEL_ID)));
+	 
+
 	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
 	CInvReader::READER_STATUS     eReaderStatus = CBusiness::GetInstance()->GetReaderStatus();
 
@@ -52,6 +55,10 @@ void  CDuiFrameWnd::InitWindow() {
 	SET_CONTROL_TEXT(m_edtPackageId, "");
 	SET_CONTROL_TEXT(m_lblCountSmall, "0");
 	SET_CONTROL_TEXT(m_lblInvSmallSaveRet, "");
+	SET_CONTROL_TEXT(m_lblCheckTagId, "");
+	SET_CONTROL_TEXT(m_lblCheckTagRet, "");
+	
+	
 
 	CString strText;
 	strText = "欢迎您，";
@@ -98,6 +105,11 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 		DuiLib::CControlUI * pUI = builder.Create(_T("Query.xml"), (UINT)0, 0, &m_PaintManager);
 		return pUI;
 	}
+	else if (0 == strcmp("Check", pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T("Check.xml"), (UINT)0, 0, &m_PaintManager);
+		return pUI;
+	}
 	return 0;
 }
 
@@ -112,11 +124,15 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 
 		if (name == _T("Inventory_small")) {
-			m_tabs->SelectItem(0);
+			m_tabs->SelectItem(TABS_INDEX_INVENTORY_SMALL);
 		} else if (name == _T("Inventory_big")) {
-			m_tabs->SelectItem(1);			
+			m_tabs->SelectItem(TABS_INDEX_INVENTORY_BIG);
 		} else if (name == _T("Query")) {
-			m_tabs->SelectItem(2);
+			m_tabs->SelectItem(TABS_INDEX_INVENTORY_QUERY);
+		} else if (name = "Check") {			
+			m_tabs->SelectItem(TABS_INDEX_INVENTORY_CHECK);
+			SET_CONTROL_TEXT(m_lblCheckTagId, "");
+			SET_CONTROL_TEXT(m_lblCheckTagRet, "");
 		}
 	}
 	else if (msg.sType == "click") {
@@ -375,18 +391,28 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 
 // 处理自定义信息
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	int nError = 0;
+	char buf[8192];
+
 	if ( uMsg == UM_INVENTORY_RESULT ) {
 		TagItem * pItem = (TagItem *)wParam;
 
-		OnInventorySmallRet(pItem);
-
+		if (m_tabs) {
+			if (TABS_INDEX_INVENTORY_SMALL == m_tabs->GetCurSel()) {
+				OnInventorySmallRet(pItem);
+			}
+			else if (TABS_INDEX_INVENTORY_CHECK == m_tabs->GetCurSel()) {
+				OnInventoryCheckRet(pItem);
+			}
+		}		
+			
 		if (pItem) {
 			delete pItem;
 		}
 		return 0;
 	}
 	else if (uMsg == UM_INV_SMALL_SAVE_RESULT) {
-		int nError = (int)wParam;
+		nError = (int)wParam;
 		CString * pPackageId = (CString *)lParam;
 
 		if (0 == nError) {
@@ -412,13 +438,30 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			delete pPackageId;
 		}
 	}
+	else if (uMsg == UM_CHECK_TAG_RESULT) {
+		nError = (int)wParam;
+		TagItem * pItem = (TagItem *)lParam;
+
+		GetUid(buf, sizeof(buf), pItem->abyUid, pItem->dwUidLen, '-');
+		SET_CONTROL_TEXT(m_lblCheckTagId, buf);
+
+		if (0 == nError) {
+			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
+			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_OK);
+		}
+		else {
+			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, ERROR_COLOR);
+			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_ERROR);
+		}
+
+		if (pItem) {
+			delete pItem;
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
 void CDuiFrameWnd::OnInventorySmallRet( const TagItem * pItem ) {
-	if ( 0 == m_tabs || TABS_INDEX_INVENTORY_SMALL != m_tabs->GetCurSel() ) {
-		return;
-	}
 
 	// 如果不是开始状态
 	if (m_InventorySmallStatus != STATUS_START) {
@@ -500,7 +543,18 @@ void CDuiFrameWnd::OnInventorySmallRet( const TagItem * pItem ) {
 }
 
 
+void CDuiFrameWnd::OnInventoryCheckRet(const TagItem * pItem) {
+	static DWORD  dwLastTick = 0;
 
+	DWORD dwCur = LmnGetTickCount();
+	// 不要发送太频繁
+	if (dwCur - dwLastTick < 1000) {
+		return;
+	}
+	dwLastTick = dwCur;
+
+	CBusiness::GetInstance()->CheckTagAsyn(pItem);
+}
 
 
 
