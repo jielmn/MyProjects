@@ -31,6 +31,9 @@ public:
 	void OnInventorySmallRet( const TagItem * pItem );
 	void OnInventoryCheckRet(const TagItem * pItem);
 
+	// 大盘点收到char
+	void OnInvBigChar(char ch);
+
 	enum  INVENTORY_STATUS {
 		STATUS_CLOSE = 0,
 		STATUS_START,

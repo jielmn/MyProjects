@@ -181,6 +181,10 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			strText = GET_CONTROL_TEXT(m_edtBatchId);
 			g_cfg->SetConfig(LAST_BATCH_ID, (const char *)strText);
 		}
+		else if (name == BIG_BATCH_ID_EDIT_ID) {
+			strText = GET_CONTROL_TEXT(m_edtBigBatchId);
+			g_cfg->SetConfig(LAST_BATCH_ID, (const char *)strText);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -711,6 +715,13 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if ( uMsg == WM_CHAR ) {
 		char ch = (char)wParam;
 		//g_log->Output(ILog::LOG_SEVERITY_INFO, "char:%c,%d\n", ch,(int)ch);
+
+		if (m_tabs) {
+			if (TABS_INDEX_INVENTORY_BIG == m_tabs->GetCurSel() ) {
+				OnInvBigChar( ch );
+			}
+		}
+
 	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -797,7 +808,7 @@ void CDuiFrameWnd::OnInventorySmallRet( const TagItem * pItem ) {
 }
 
 
-void CDuiFrameWnd::OnInventoryCheckRet(const TagItem * pItem) {
+void  CDuiFrameWnd::OnInventoryCheckRet(const TagItem * pItem) {
 	static DWORD  dwLastTick = 0;
 
 	DWORD dwCur = LmnGetTickCount();
@@ -808,6 +819,28 @@ void CDuiFrameWnd::OnInventoryCheckRet(const TagItem * pItem) {
 	dwLastTick = dwCur;
 
 	CBusiness::GetInstance()->CheckTagAsyn(pItem);
+}
+
+// 大盘点收到char
+void   CDuiFrameWnd::OnInvBigChar(char ch) {
+	static DWORD    dwLastTick = 0;
+	static CString  strBuf;
+
+	// 如果不是开始状态
+	if (m_InventoryBigStatus != STATUS_START ) {
+		return;
+	}
+	
+	DWORD dwCur = LmnGetTickCount();
+
+	// 如果buf为空
+	if ( strBuf.GetLength() == 0 ) {
+		strBuf += ch;
+		dwLastTick = dwCur;
+	}
+	else {
+
+	}
 }
 
 

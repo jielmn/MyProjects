@@ -3,7 +3,7 @@
 #include "Business.h"
 
 #define  FLOW_NUM_LEN                         3
-#define  PROCE_TYPE_INV_SMALL                 1
+//#define  PROCE_TYPE_INV_SMALL                 1
 
 CInvDatabase::CInvDatabase( CBusiness * pBusiness ) {
 	m_eDbStatus = STATUS_CLOSE;
@@ -177,7 +177,7 @@ int CInvDatabase::InvSmallSave( const CInvSmallSaveParam * pParam, const char * 
 	std::vector<TagItem *>::const_iterator it;
 
 	CString  strSql;
-	strSql.Format("select max(id) from proceinfo;");
+	strSql.Format("select max(id) from small_pkg;");
 	DWORD   dwProceId = 0;
 
 	try
@@ -218,14 +218,14 @@ int CInvDatabase::InvSmallSave( const CInvSmallSaveParam * pParam, const char * 
 			for (it = pParam->m_items.begin(); it != pParam->m_items.end(); it++) {
 				TagItem * pIem = *it;
 				GetUid(buf, sizeof(buf), pIem->abyUid, pIem->dwUidLen);
-				strSql.Format("insert into tagsinfo values('%s',%u);", buf, dwProceId + 1);
+				strSql.Format("insert into tags values('%s',%u);", buf, dwProceId + 1);
 				m_database.ExecuteSQL(strSql);
 			}
 
 			CString strMaxBatchId;
 			now = CTime::GetCurrentTime();
 			strTmp.Format("%s%s%s%%", szFactoryId, szProductId, pParam->m_strBatchId);
-			strSql.Format("select proce_batch_id from proceinfo where proce_batch_id like '%s' order by proce_batch_id desc;", strTmp);
+			strSql.Format("select package_id from small_pkg where package_id like '%s' order by package_id desc;", strTmp);
 			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
 			if (!m_recordset.IsEOF())
 			{
@@ -248,13 +248,13 @@ int CInvDatabase::InvSmallSave( const CInvSmallSaveParam * pParam, const char * 
 
 			if (m_eDbType == TYPE_ORACLE) {
 				// 插入批量数据
-				strSql.Format("insert into proceinfo values ( %u, %d, '%s', to_date('%s','yyyy-mm-dd hh24:mi:ss'),'%s','%s')",
-					dwProceId + 1, PROCE_TYPE_INV_SMALL, szUserId, strTime, " ", strBatchId);
+				strSql.Format("insert into small_pkg values ( %u, '%s', to_date('%s','yyyy-mm-dd hh24:mi:ss'),'%s', 0)",
+					dwProceId + 1, szUserId, strTime, strBatchId);
 			}
 			else {
 				// 插入批量数据
-				strSql.Format("insert into proceinfo values ( %u, %d, '%s', '%s','%s','%s')",
-					dwProceId + 1, PROCE_TYPE_INV_SMALL, szUserId, strTime, " ", strBatchId);
+				strSql.Format("insert into small_pkg values ( %u, '%s', '%s','%s',0)",
+					dwProceId + 1, szUserId, strTime, strBatchId);
 			}
 
 			m_database.ExecuteSQL(strSql);
@@ -318,7 +318,7 @@ int  CInvDatabase::CheckTag(const CTagItemParam * pItem) {
 	{
 		GetUid(buf, sizeof(buf), pItem->m_item.abyUid, pItem->m_item.dwUidLen);
 
-		strSql.Format("select * from tagsinfo where tagid='%s'", buf);
+		strSql.Format("select * from tags where id='%s'", buf);
 		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
 
 		// 存在记录
