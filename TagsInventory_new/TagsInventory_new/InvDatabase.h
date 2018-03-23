@@ -17,6 +17,8 @@ public:
 	int InvSmallSave( const CInvSmallSaveParam * pParam, const char * szUserId, CString & strBatchId);
 	// check
 	int CheckTag(const CTagItemParam * pItem);
+	// ±£¥Ê¥Û≈Ãµ„
+	int InvBigSave(const CInvBigSaveParam * pParam, const char * szUserId, CString & strBatchId, CString & strWrongSmallPkgId );
 
 	enum DATABASE_STATUS {
 		STATUS_CLOSE = 0,

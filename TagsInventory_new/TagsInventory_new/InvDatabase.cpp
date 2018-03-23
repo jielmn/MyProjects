@@ -1,6 +1,8 @@
 #include <afx.h>
+#include <assert.h>
 #include "InvDatabase.h"
 #include "Business.h"
+#include "LmnString.h"
 
 
 //#define  PROCE_TYPE_INV_SMALL                 1
@@ -240,6 +242,12 @@ int CInvDatabase::InvSmallSave( const CInvSmallSaveParam * pParam, const char * 
 				sscanf(strMaxBatchId.Mid(dwFactoryLen + dwProcCodeLen + pParam->m_strBatchId.GetLength(), FLOW_NUM_LEN), "%d", &nFlowId);
 			}
 			nFlowId++;
+			// 流水号太大
+			if ( nFlowId >= MAX_FLOW_NUMBER ) {
+				m_database.Rollback();
+				ret = INV_ERR_DB_TOO_LARGE_FLOW_NUM;
+				return ret;
+			}
 
 			strTmp1.Format("%%s%%s%%s%%0%dd", FLOW_NUM_LEN);
 
@@ -336,6 +344,188 @@ int  CInvDatabase::CheckTag(const CTagItemParam * pItem) {
 		ret = -2;
 		e->GetErrorMessage(buf, sizeof(buf));
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+	}
+
+	return ret;
+}
+
+
+int CInvDatabase::InvBigSave(const CInvBigSaveParam * pParam, const char * szUserId, CString & strBatchId, CString & strWrongSmallPkgId ) {
+	int ret = 0;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return INV_ERR_DB_CLOSE;
+	}
+
+	CTime now = CTime::GetCurrentTime();
+	CString strTime = now.Format("%Y-%m-%d %H:%M:%S");
+
+	char  szFactoryId[64];
+	char  szProductId[64];
+
+	g_cfg->GetConfig(FACTORY_CODE, szFactoryId, sizeof(szFactoryId));
+	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId));
+
+	//char buf[8192];
+	std::vector<CString *>::const_iterator it;
+
+	CString  strSql;
+	strSql.Format("select max(id) from big_pkg;");
+	DWORD   dwProceId = 0;
+
+	try
+	{
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		if (!m_recordset.IsEOF())
+		{
+			CString   strValue;
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf(strValue, "%u", &dwProceId);
+		}
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	CString strTmp;
+	CString strTmp1;
+	int nTemp = 0;
+
+	// 如果上一步没有错误
+	if (0 == ret) {
+
+		// 开始事务
+		try
+		{
+#ifdef _DEBUG
+			if (m_database.m_bTransactionPending) {
+				m_database.Rollback();
+			}
+#else
+			m_database.Rollback();
+#endif
+			m_database.BeginTrans();
+
+			// 检查条码是否正确
+			for (it = pParam->m_items.begin(); it != pParam->m_items.end(); it++) {
+				CString * pIem = *it;
+				BOOL  bCheckOk = FALSE;
+				strSql.Format("select id, package_id, big_pkg_id from small_pkg where package_id='%s';", *pIem );
+
+				m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+				if (!m_recordset.IsEOF())
+				{
+					CString   strValue;
+					DWORD     dwBigPkgId = 0;
+					m_recordset.GetFieldValue((short)2, strValue);
+					sscanf(strValue, "%u", &dwBigPkgId);
+					// 大包装不为0，说明已经装入大包装, ERROR
+					if ( dwBigPkgId != 0 ) {
+						ret = INV_ERR_DB_SMALL_PKG_IN_USE;
+					}
+				}
+				else {
+					ret = INV_ERR_DB_SMALL_PKG_NOT_FOUND;
+				}
+				m_recordset.Close();//关闭记录集
+
+				if ( ret != 0 ) {
+					strWrongSmallPkgId = *pIem;
+					m_database.Rollback();
+					return ret;
+				}
+			}
+
+			CString strMaxBatchId;
+			now = CTime::GetCurrentTime();
+			strTmp.Format("%s%s%s%%", szFactoryId, szProductId, pParam->m_strBatchId);
+			strSql.Format("select package_id from big_pkg where package_id like '%s' order by package_id desc;", strTmp);
+			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+			if (!m_recordset.IsEOF())
+			{
+				m_recordset.GetFieldValue((short)0, strMaxBatchId);
+			}
+			m_recordset.Close();//关闭记录集
+
+			assert( FLOW_NUM_LEN > 1);
+			int  nFlowId = 0;
+			char ch = 0;
+			if (strMaxBatchId.GetLength() > 0) {
+				DWORD dwFactoryLen = strlen(szFactoryId);
+				DWORD dwProcCodeLen = strlen(szProductId);
+				nTemp = sscanf( strMaxBatchId.Mid( dwFactoryLen + dwProcCodeLen + pParam->m_strBatchId.GetLength() ), "%c%d", &ch, &nFlowId);
+				if (2 != nTemp) {
+					ch = 'A';
+					nFlowId = 0;
+				}
+				else {
+					ch = Char2Upper(ch);
+					// 如果字符不是 a ~ z
+					if ( !(ch >= 'A' && ch <= 'Z') ) {
+						ch = 'A';
+						nFlowId = 0;
+					}
+				}
+			}
+			else {
+				ch = 'A';
+				nFlowId = 0;
+			}
+
+			nFlowId++;
+			if ( nFlowId >= MAX_FLOW_NUMBER_BIG ) {
+				ch++;
+				nFlowId = 1;
+				// 超出范围
+				if ( ch > 'Z' ) {
+					m_database.Rollback();
+					ret = INV_ERR_DB_TOO_LARGE_FLOW_NUM;
+					return ret;
+				}				
+			}
+
+			strTmp1.Format("%%s%%s%%s%%c%%0%dd", FLOW_NUM_LEN - 1 );
+
+			strTmp.Format(strTmp1, szFactoryId, szProductId, pParam->m_strBatchId, ch, nFlowId );
+			strBatchId = strTmp;
+
+			if (m_eDbType == TYPE_ORACLE) {
+				// 插入批量数据
+				strSql.Format("insert into big_pkg values ( %u, '%s', to_date('%s','yyyy-mm-dd hh24:mi:ss'), '%s' )",
+					dwProceId + 1, szUserId, strTime, strBatchId);
+			}
+			else {
+				// 插入批量数据
+				strSql.Format("insert into big_pkg values ( %u, '%s', '%s','%s' )",
+					dwProceId + 1, szUserId, strTime, strBatchId);
+			}
+
+			m_database.ExecuteSQL(strSql);
+
+
+			// 修改小包装的大包装号
+			for (it = pParam->m_items.begin(); it != pParam->m_items.end(); it++) {
+				CString * pIem = *it;
+				strSql.Format("update small_pkg set big_pkg_id = %d where package_id='%s';", dwProceId + 1, *pIem );
+				m_database.ExecuteSQL(strSql);				
+			}
+			m_database.CommitTrans();
+		}
+		catch (CException* e)
+		{
+			ret = OnDatabaseException(e);
+			if (m_eDbType == STATUS_OPEN) {
+				m_database.Rollback();
+			}
+		}
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
 	}
 
 	return ret;

@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "Business.h"
 #include "39BarCode.h"
+#include "LmnString.h"
 
 void  CDuiFrameWnd::InitWindow() {
 	char buf[8192];
@@ -41,6 +42,11 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edtBigPackageId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(BIG_PACKAGE_ID_EDIT_ID)));
 	m_lblInvBigSaveRet = (DuiLib::CLabelUI *)m_PaintManager.FindControl(INV_BIG_SAVE_LABEL_ID);
 	m_lblCountBig = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(COUNT_BIG_LABEL_ID)));	 
+	m_lstInvBig = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(INV_BIG_LIST_ID)));	 
+	m_edtManualSmallPkgId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(MANUAL_SMALL_PKG_ID_EDIT_ID)));
+	m_btnManualSmallPkg = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(MANUAL_SMALL_PKG_ID_BUTTON_ID)));
+	
+	 
 	 
 
 	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
@@ -71,6 +77,7 @@ void  CDuiFrameWnd::InitWindow() {
 	SET_CONTROL_TEXT(m_edtBigPackageId, "");
 	SET_CONTROL_TEXT(m_lblInvBigSaveRet, "");
 	SET_CONTROL_TEXT(m_lblCountBig, "0");
+	SET_CONTROL_TEXT(m_edtManualSmallPkgId, "");
 	
 
 	CString strText;
@@ -174,6 +181,9 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == PRINT_BIG_BUTTON_ID) {
 			PrintInventoryBig();
+		}
+		else if ( name == MANUAL_SMALL_PKG_ID_BUTTON_ID ) {
+			OnManualAddBarcode();
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -410,7 +420,7 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 		DuiLib::CDuiString strBatchId = GET_CONTROL_TEXT(m_edtPackageId);
 
 		// 画条码
-		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBatchId, m_font, dwTextHeight, "ID:");
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBatchId, m_font, dwTextHeight, "S/N:");
 
 		EndPage(printInfo.hDC);
 		EndDoc(printInfo.hDC);
@@ -422,21 +432,13 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 
 
 void  CDuiFrameWnd::InitInventoryBig() {
-	if (m_btnStartBig) {
-		m_btnStartBig->SetEnabled(true);
-	}
-
-	if (m_btnStopBig) {
-		m_btnStopBig->SetEnabled(false);
-	}
-
-	if (m_btnSaveBig) {
-		m_btnSaveBig->SetEnabled(false);
-	}
-
-	if (m_btnPrintBig) {
-		m_btnPrintBig->SetEnabled(false);
-	}
+	SET_CONTROL_ENABLED(m_btnStartBig, true);
+	SET_CONTROL_ENABLED(m_btnStopBig, false);
+	SET_CONTROL_ENABLED(m_btnSaveBig, false);
+	SET_CONTROL_ENABLED(m_btnPrintBig, false);
+	SET_CONTROL_ENABLED(m_lstInvBig, false);
+	SET_CONTROL_ENABLED(m_edtManualSmallPkgId, false);
+	SET_CONTROL_ENABLED(m_btnManualSmallPkg, false);
 
 	ClearVector(m_vInventoryBig);
 	m_InventoryBigStatus = STATUS_CLOSE;
@@ -451,24 +453,21 @@ void  CDuiFrameWnd::StartInventoryBig() {
 		}
 	}
 
-	if (m_btnStartBig) {
-		m_btnStartBig->SetEnabled(false);
-	}
+	SET_CONTROL_ENABLED(m_btnStartBig, false);
+	SET_CONTROL_ENABLED(m_btnStopBig, true);
+	SET_CONTROL_ENABLED(m_btnSaveBig, false);
+	SET_CONTROL_ENABLED(m_btnPrintBig, false);
 
-	if (m_btnStopBig) {
-		m_btnStopBig->SetEnabled(true);
-	}
-
-	if (m_btnSaveBig) {
-		m_btnSaveBig->SetEnabled(false);
-	}
-
-	if (m_btnPrintBig) {
-		m_btnPrintBig->SetEnabled(false);
-	}
+	SET_CONTROL_ENABLED(m_lstInvBig, true);
+	SET_CONTROL_ENABLED(m_edtManualSmallPkgId, true);
+	SET_CONTROL_ENABLED(m_btnManualSmallPkg, true);
 
 	ClearVector(m_vInventoryBig);
-	//SET_CONTROL_TEXT(m_lblCountSmall, "0");
+	SET_CONTROL_TEXT(m_lblCountBig, "0");
+	if (m_lstInvBig) {
+		m_lstInvBig->RemoveAll();
+	}
+	
 
 	SET_CONTROL_TEXT_COLOR(m_lblInvBigSaveRet, NORMAL_COLOR);
 	SET_CONTROL_TEXT(m_lblInvBigSaveRet, "");
@@ -478,13 +477,8 @@ void  CDuiFrameWnd::StartInventoryBig() {
 }
 
 void  CDuiFrameWnd::StopInventoryBig() {
-	if (m_btnStartBig) {
-		m_btnStartBig->SetEnabled(true);
-	}
-
-	if (m_btnStopBig) {
-		m_btnStopBig->SetEnabled(false);
-	}
+	SET_CONTROL_ENABLED(m_btnStartBig, true);
+	SET_CONTROL_ENABLED(m_btnStopBig, false);
 
 	if (m_btnSaveBig) {
 		if (m_vInventoryBig.size() > 0) {
@@ -494,10 +488,11 @@ void  CDuiFrameWnd::StopInventoryBig() {
 			m_btnSaveBig->SetEnabled(false);
 		}
 	}
+	SET_CONTROL_ENABLED(m_btnPrintBig, false);
 
-	if (m_btnPrintBig) {
-		m_btnPrintBig->SetEnabled(false);
-	}
+	SET_CONTROL_ENABLED(m_lstInvBig, false);
+	SET_CONTROL_ENABLED(m_edtManualSmallPkgId, false);
+	SET_CONTROL_ENABLED(m_btnManualSmallPkg, false);
 
 	m_InventoryBigStatus = STATUS_STOP;
 }
@@ -538,28 +533,43 @@ void  CDuiFrameWnd::SaveInventoryBig() {
 		return;
 	}
 
+	char  szFactoryId[64];
+	char  szProductId[64];
+
+	g_cfg->GetConfig(FACTORY_CODE, szFactoryId, sizeof(szFactoryId),"");
+	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId),"");
+
+	DWORD  dwFactoryLen = strlen(szFactoryId);
+	DWORD  dwProductLen = strlen(szProductId);
+
+	std::vector<CString *>::iterator it;
+	for (it = m_vInventoryBig.begin(); it != m_vInventoryBig.end(); it++) {
+		CString * pItem = *it;
+		if ( 0 != StrICmp(pItem->Mid( dwFactoryLen + dwProductLen, 8 ), strBatchId)) {
+			MessageBox(this->GetHWND(), MSG_BOX_BATCH_NOT_MATCH, CAPTION_SAVE_INVENTORY_BIG, 0);			
+			return;
+		}
+		if ( 0 != StrICmp(pItem->Mid(0, dwFactoryLen), szFactoryId) ) {
+			MessageBox(this->GetHWND(), MSG_BOX_FACTORY_NOT_MATCH, CAPTION_SAVE_INVENTORY_BIG, 0);
+			return;			
+		}
+		if (0 != StrICmp(pItem->Mid(dwFactoryLen, dwProductLen), szProductId)) {
+			MessageBox(this->GetHWND(), MSG_BOX_PRODUCT_NOT_MATCH, CAPTION_SAVE_INVENTORY_BIG, 0);
+			return;
+		}
+	}
+
 	// 保存
-	//int ret = CBusiness::GetInstance()->InvSmallSaveAsyn(strBatchId, m_vInventorySmall);
-	//if (0 != ret) {
-	//	return;
-	//}
+	int ret = CBusiness::GetInstance()->InvBigSaveAsyn(strBatchId, m_vInventoryBig );
+	if (0 != ret) {
+		return;
+	}
 
 	// 保存成功后的处理
-	if (m_btnStartBig) {
-		m_btnStartBig->SetEnabled(true);
-	}
-
-	if (m_btnStopBig) {
-		m_btnStopBig->SetEnabled(false);
-	}
-
-	if (m_btnSaveBig) {
-		m_btnSaveBig->SetEnabled(false);
-	}
-
-	if (m_btnPrintBig) {
-		m_btnPrintBig->SetEnabled(false);
-	}
+	SET_CONTROL_ENABLED(m_btnStartBig, true);
+	SET_CONTROL_ENABLED(m_btnStopBig, false);
+	SET_CONTROL_ENABLED(m_btnSaveBig, false);
+	SET_CONTROL_ENABLED(m_btnPrintBig, false);
 
 	m_InventoryBigStatus = STATUS_SAVING;
 }
@@ -576,7 +586,7 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 	g_cfg->Reload();
 	g_cfg->GetConfig("paper width", dwPaperWidth, 600);
 	g_cfg->GetConfig("paper length", dwPaperLength, 170);
-	g_cfg->GetConfig("paper left", dwLeft, 0);
+	g_cfg->GetConfig("paper left big", dwLeft, 0);
 	g_cfg->GetConfig("paper top", dwTop, 0);
 	g_cfg->GetConfig("print width", dwPrintWidth, dwPaperWidth);
 	g_cfg->GetConfig("print height", dwPrintHeight, dwPaperLength);
@@ -632,7 +642,7 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 		DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigPackageId);
 
 		// 画条码
-		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBigBatchId, m_font, dwTextHeight, "ID:");
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBigBatchId, m_font, dwTextHeight, "S/N:");
 
 		EndPage(printInfo.hDC);
 		EndDoc(printInfo.hDC);
@@ -730,6 +740,38 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (dwTimerId == INV_BIG_CHAR_TIMER) {			
 			OnInvBigBarCode(m_strInvBigBuf);
 			m_strInvBigBuf = "";
+		}
+	}
+	else if (uMsg == UM_INV_BIG_SAVE_RESULT) {
+		nError = (int)wParam;
+		CString * pPackageId = (CString *)lParam;
+		CString  strText;
+
+		if (0 == nError) {
+			SET_CONTROL_TEXT_COLOR(m_lblInvBigSaveRet, NORMAL_COLOR);
+			SET_CONTROL_TEXT(m_lblInvBigSaveRet, INV_BIG_SAVE_RET_OK);
+			SET_CONTROL_TEXT(m_edtBigPackageId, *pPackageId);
+
+			SET_CONTROL_ENABLED(m_btnPrintBig, true);
+		} 
+		else if (INV_ERR_DB_SMALL_PKG_IN_USE == nError) {
+			SET_CONTROL_TEXT_COLOR(m_lblInvBigSaveRet, ERROR_COLOR);
+			strText.Format("小包装 %s 已经打包到大包装", *pPackageId);
+			SET_CONTROL_TEXT(m_lblInvBigSaveRet, strText);
+		}
+		else if (INV_ERR_DB_SMALL_PKG_NOT_FOUND == nError) {
+			SET_CONTROL_TEXT_COLOR(m_lblInvBigSaveRet, ERROR_COLOR);
+			strText.Format("小包装 %s 不存在", *pPackageId);
+			SET_CONTROL_TEXT(m_lblInvBigSaveRet, strText);
+		}
+		else {
+			SET_CONTROL_TEXT_COLOR(m_lblInvBigSaveRet, ERROR_COLOR);
+			SET_CONTROL_TEXT(m_lblInvBigSaveRet, INV_BIG_SAVE_RET_ERROR);
+		}
+		m_InventoryBigStatus = STATUS_SAVED;
+
+		if (pPackageId) {
+			delete pPackageId;
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
@@ -832,12 +874,14 @@ void  CDuiFrameWnd::OnInventoryCheckRet(const TagItem * pItem) {
 
 // 大盘点收到char
 void   CDuiFrameWnd::OnInvBigChar(char ch) {
-	m_strInvBigBuf += ch;
-	CBusiness::GetInstance()->SetTimer(INV_BIG_CHAR_TIMER, INV_BIG_CHAR_TIMER_INTEVAL);
+	if (m_InventoryBigStatus == STATUS_START) {
+		m_strInvBigBuf += ch;
+		CBusiness::GetInstance()->SetTimer(INV_BIG_CHAR_TIMER, INV_BIG_CHAR_TIMER_INTEVAL);
+	}
 }
 
 
-void CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode ) {
+int CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode ) {
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received chars:%s\n", m_strInvBigBuf);
 
 	// 检查格式(15位)
@@ -854,7 +898,7 @@ void CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode ) {
 
 	if (strBarCode.GetLength() != dwFactoryLen + dwProductLen + 8 + FLOW_NUM_LEN) {
 		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, length not correct!\n", strBarCode);
-		return;
+		return 1;
 	}
 
 	CString strBatchId = strBarCode.Mid(dwFactoryLen + dwProductLen, 8);
@@ -862,29 +906,67 @@ void CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode ) {
 	int nBatchId = 0;
 	if (0 == sscanf(strBatchId.Mid(0, 4), "%d", &nBatchId)) {
 		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
-		return;
+		return 2;
 	}
 
 	if (0 == sscanf(strBatchId.Mid(4, 2), "%d", &nBatchId)) {
 		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
-		return;
+		return 2;
 	}
 
 	if (0 == sscanf(strBatchId.Mid(6), "%d", &nBatchId)) {
 		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
-		return;
+		return 2;
 	}
 
 	CString strFlowId = strBarCode.Mid(dwFactoryLen + dwProductLen + 8);
 	int nFlowId = 0;
 	if (0 == sscanf( strFlowId, "%d", &nFlowId)) {
 		g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, format correct!\n", strBarCode);
-		return;
+		return 2;
 	}
 
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, OK \n", strBarCode);
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, OK \n", strBarCode);
+
+	std::vector<CString *>::iterator it;
+	for (it = m_vInventoryBig.begin(); it != m_vInventoryBig.end(); it++) {
+		CString * pItem = *it;
+		// 已经存在相同的编号
+		if ( 0 == StrICmp(*pItem, strBarCode)) {
+			return 3;
+		}
+	}
+
+	CString * pNewBarcode = new CString( strBarCode );
+	m_vInventoryBig.push_back(pNewBarcode);
+
+	// 显示
+	if (m_lstInvBig) {
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstInvBig->Add(pListElement);
+		pListElement->SetText(INDEX_INV_BIG_PACKAGE_ID, strBarCode);
+	}
+
+	DuiLib::CDuiString  strText;
+	strText.Format("%d", m_vInventoryBig.size());
+	SET_CONTROL_TEXT(m_lblCountBig, strText);
+	
+	return 0;
 }
 
+
+void CDuiFrameWnd::OnManualAddBarcode() {
+	char buf[8192];
+	if (m_InventoryBigStatus == STATUS_START) {
+		CString strPkgId = (const char *)GET_CONTROL_TEXT(m_edtManualSmallPkgId);
+		Str2Upper( strPkgId, buf, sizeof(buf) );
+		strPkgId = buf;
+		int ret = OnInvBigBarCode(strPkgId);
+		if (0 == ret) {
+			SET_CONTROL_TEXT(m_edtManualSmallPkgId, "");
+		}
+	}
+}
 
 
 

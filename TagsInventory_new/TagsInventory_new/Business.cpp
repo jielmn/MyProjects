@@ -164,6 +164,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_INV_BIG_SAVE: {
+		CInvBigSaveParam * pParam = (CInvBigSaveParam *)pMessageData;
+		InvBigSave(pParam);
+	}
+	break;
+
 	default:
 	{
 		// ¶¨Ê±Æ÷·¶Î§ÊÇ10000~19999
@@ -379,5 +385,47 @@ int   CBusiness::SetTimer( DWORD dwTimerId, DWORD dwDelayTime ) {
 
 int   CBusiness::NotifyUiTimer(DWORD dwTimerId) {
 	::PostMessage(g_hWnd, UM_TIMER, (WPARAM)dwTimerId,  0);
+	return 0;
+}
+
+
+int   CBusiness::InvBigSaveAsyn(const CString & strBatchId, const std::vector<CString *> & v) {
+	CInvBigSaveParam * pParam = new CInvBigSaveParam;
+	pParam->m_strBatchId = strBatchId;
+
+	std::vector<CString *>::const_iterator it;
+	for (it = v.begin(); it != v.end(); it++) {
+		CString * pItem = *it;
+		CString * pNewItem = new CString(*pItem);
+		if (0 == pNewItem) {
+			g_log->Output(ILog::LOG_SEVERITY_ERROR, "no memory!\n");
+			delete pParam;
+			return -1;
+		}
+
+		pParam->m_items.push_back(pNewItem);
+	}
+
+	g_thrd_db->PostMessage(this, MSG_INV_BIG_SAVE, pParam);
+	return 0;
+}
+
+int   CBusiness::InvBigSave(const CInvBigSaveParam * pParam) {
+	CString strBatchId;
+	CString strWrongSmallPkgId;
+	int ret = m_InvDatabase.InvBigSave(pParam, m_user.szUserId, strBatchId, strWrongSmallPkgId);
+	NotifyUiInvBigSaveRet(ret, strBatchId, strWrongSmallPkgId);
+	return 0;
+}
+
+int   CBusiness::NotifyUiInvBigSaveRet(int nError, const CString & strBatchId, const CString & strWrongSmallPkgId) {
+	if (0 == nError) {
+		CString * pNewString = new CString(strBatchId);
+		::PostMessage(g_hWnd, UM_INV_BIG_SAVE_RESULT, (WPARAM)nError, (LPARAM)pNewString);
+	}
+	else {
+		CString * pNewString = new CString(strWrongSmallPkgId);
+		::PostMessage(g_hWnd, UM_INV_BIG_SAVE_RESULT, (WPARAM)nError, (LPARAM)pNewString);
+	}
 	return 0;
 }

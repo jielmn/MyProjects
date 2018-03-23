@@ -34,7 +34,9 @@ public:
 	// 大盘点收到char
 	void OnInvBigChar(char ch);
 	// 大盘点收到条码
-	void OnInvBigBarCode(const CString & strBarCode );
+	int OnInvBigBarCode(const CString & strBarCode );
+	// 手动添加条码
+	void OnManualAddBarcode();
 
 	enum  INVENTORY_STATUS {
 		STATUS_CLOSE = 0,
@@ -81,4 +83,7 @@ private:
 	INVENTORY_STATUS        m_InventoryBigStatus;
 	std::vector<CString *>  m_vInventoryBig;
 	CString                 m_strInvBigBuf;                      // 大盘点的缓冲
+	DuiLib::CListUI *       m_lstInvBig;
+	DuiLib::CEditUI *       m_edtManualSmallPkgId;              // 手动添加条形码
+	DuiLib::CButtonUI *     m_btnManualSmallPkg;
 };

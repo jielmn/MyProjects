@@ -58,6 +58,11 @@ public:
 	int   SetTimer( DWORD dwTimerId, DWORD dwDelayTime );
 	int   NotifyUiTimer(DWORD dwTimerId);
 
+	// ±£¥Ê¥Û≈Ãµ„
+	int   InvBigSaveAsyn(const CString & strBatchId, const std::vector<CString *> & v);
+	int   InvBigSave(const CInvBigSaveParam * pParam);
+	int   NotifyUiInvBigSaveRet(int nError, const CString & strBatchId, const CString & strWrongSmallPkgId );
+
 	sigslot::signal1< int *>                               sigInit;                
 	sigslot::signal1< int *>                               sigDeinit;              
 	

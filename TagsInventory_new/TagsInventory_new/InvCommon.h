@@ -27,16 +27,20 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define MSG_USER_LOGIN             4
 #define MSG_INV_SMALL_SAVE         5
 #define MSG_CHECK_TAG              6
+#define MSG_INV_BIG_SAVE           7
 
 // db reconnect 时间
 #define  RECONNECT_DB_TIME         10000
 #define  RECONNECT_READER_TIME     10000
 
 // 错误码
-#define INV_ERR_NO_MEMORY          10001
-#define INV_ERR_DB_CLOSE           10002
-#define INV_ERR_DB_ERROR           10003
-#define INV_ERR_DB_NOT_UNIQUE      10004
+#define INV_ERR_NO_MEMORY               10001
+#define INV_ERR_DB_CLOSE                10002
+#define INV_ERR_DB_ERROR                10003
+#define INV_ERR_DB_NOT_UNIQUE           10004
+#define INV_ERR_DB_SMALL_PKG_IN_USE     10005
+#define INV_ERR_DB_SMALL_PKG_NOT_FOUND  10006
+#define INV_ERR_DB_TOO_LARGE_FLOW_NUM   10007
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS          (WM_USER+1)
@@ -46,6 +50,7 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define UM_INV_SMALL_SAVE_RESULT   (WM_USER+5)
 #define UM_CHECK_TAG_RESULT        (WM_USER+6)
 #define UM_TIMER                   (WM_USER+7)
+#define UM_INV_BIG_SAVE_RESULT     (WM_USER+8)
 
 
 // config配置字符串常量
@@ -80,6 +85,11 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  MSG_BOX_NEW_INVENTORY_BIG     "盘点没有保存，要开始新的盘点吗？"
 #define  CAPTION_NEW_INVENTORY_BIG     "盘点"
 #define  CAPTION_SAVE_INVENTORY_BIG    "保存"
+#define  INV_BIG_SAVE_RET_OK           "盘点保存成功"
+#define  INV_BIG_SAVE_RET_ERROR        "盘点保存失败"
+#define  MSG_BOX_BATCH_NOT_MATCH       "小包装的批号和大包装不一致"
+#define  MSG_BOX_FACTORY_NOT_MATCH     "小包装的产地编码和大包装不一致"
+#define  MSG_BOX_PRODUCT_NOT_MATCH     "小包装的产品编码和大包装不一致"
 
 #define  DATABASE_STATUS_LABEL_ID      "lblDatabaseStatus"
 #define  READER_STATUS_LABEL_ID        "lblReaderStatus"
@@ -103,11 +113,16 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  BIG_PACKAGE_ID_EDIT_ID        "big_package_id"
 #define  INV_BIG_SAVE_LABEL_ID         "lblInvBigSaveRet"
 #define  COUNT_BIG_LABEL_ID            "lblCountBig"
+#define  INV_BIG_LIST_ID               "LstInvBig"
+#define  MANUAL_SMALL_PKG_ID_EDIT_ID   "small_pkg_barcode"
+#define  MANUAL_SMALL_PKG_ID_BUTTON_ID "btnAddSmallBarcode"
 
 #define  TABS_INDEX_INVENTORY_SMALL    0
 #define  TABS_INDEX_INVENTORY_BIG      1
 #define  TABS_INDEX_INVENTORY_QUERY    2
 #define  TABS_INDEX_INVENTORY_CHECK    3
+
+#define  INDEX_INV_BIG_PACKAGE_ID      0
 
 #define  MIN_TIMER_ID                  10000
 #define  MAX_TIMER_ID                  19999
@@ -115,13 +130,16 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  INV_BIG_CHAR_TIMER            MIN_TIMER_ID
 #define  INV_BIG_CHAR_TIMER_INTEVAL    100                          // 100毫秒
 
-#define  FLOW_NUM_LEN                         3
+#define  FLOW_NUM_LEN                         4
+#define  MAX_FLOW_NUMBER                      10000
+#define  MAX_FLOW_NUMBER_BIG                  1000
 
 #define  NORMAL_COLOR                  0xFF386382
 #define  ERROR_COLOR                   0xFFFF0000
 
-#define  SET_CONTROL_TEXT(ctrl,text)    do { if ( ctrl ) { ctrl->SetText(text); } } while( 0 )
-#define  GET_CONTROL_TEXT(ctrl)         ( (ctrl == 0) ? "" : ctrl->GetText() )
+#define  SET_CONTROL_TEXT(ctrl,text)      do { if ( ctrl ) { ctrl->SetText(text); } } while( 0 )
+#define  GET_CONTROL_TEXT(ctrl)           ( (ctrl == 0) ? "" : ctrl->GetText() )
+#define  SET_CONTROL_ENABLED( ctrl, e )   do { if ( ctrl ) { ctrl->SetEnabled(e); } } while( 0 )
 
 #define  SET_CONTROL_TEXT_COLOR(ctrl, color) do { if ( ctrl ) { ctrl->SetTextColor(color); } } while( 0 )
 
@@ -158,6 +176,15 @@ public:
 
 	CString                  m_strBatchId;
 	std::vector<TagItem *>   m_items;
+};
+
+class CInvBigSaveParam : public LmnToolkits::MessageData {
+public:
+	CInvBigSaveParam();
+	~CInvBigSaveParam();
+
+	CString                  m_strBatchId;
+	std::vector<CString *>   m_items;
 };
 
 

@@ -41,6 +41,16 @@ CInvSmallSaveParam::~CInvSmallSaveParam() {
 }
 
 
+// 保存大盘点的参数
+CInvBigSaveParam::CInvBigSaveParam() {
+
+}
+
+CInvBigSaveParam::~CInvBigSaveParam() {
+	ClearVector(m_items);
+}
+
+
 char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit /*= '\0'*/) {
 	if (0 == buf || 0 == dwBufLen) {
 		return 0;
