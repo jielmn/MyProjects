@@ -46,6 +46,15 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edtManualSmallPkgId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(MANUAL_SMALL_PKG_ID_EDIT_ID)));
 	m_btnManualSmallPkg = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(MANUAL_SMALL_PKG_ID_BUTTON_ID)));
 	
+	// 查询
+	m_dtStart = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl(_T(QUERY_START_TIME_DATETIME_ID)));
+	m_dtEnd = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl(_T(QUERY_END_TIME_DATETIME_ID)));
+	m_edtQueryBatchId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(QUERY_BATCH_ID_EDIT_ID)));
+	m_edtQueryOperator = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(QUERY_OPERATOR_EDIT_ID)));
+	m_cmbQueryType = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl(_T(QUERY_TYPE_COMBO_ID)));
+	m_lstQueryBig = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(QUERY_BIG_LIST_ID)));
+	m_lstQuerySmall = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(QUERY_SMALL_LIST_ID)));
+	m_lstQueryTags = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(QUERY_TAGS_LIST_ID)));
 	 
 	 
 
@@ -78,6 +87,8 @@ void  CDuiFrameWnd::InitWindow() {
 	SET_CONTROL_TEXT(m_lblInvBigSaveRet, "");
 	SET_CONTROL_TEXT(m_lblCountBig, "0");
 	SET_CONTROL_TEXT(m_edtManualSmallPkgId, "");
+	SET_CONTROL_TEXT(m_edtQueryBatchId, "");
+	SET_CONTROL_TEXT(m_edtQueryOperator, "");
 	
 
 	CString strText;
@@ -184,6 +195,8 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if ( name == MANUAL_SMALL_PKG_ID_BUTTON_ID ) {
 			OnManualAddBarcode();
+		} else if (name == QUERY_BUTTON_ID) {
+			OnQuery();
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -713,6 +726,11 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_OK);
 		}
+		// 如果是断开连接
+		else if (INV_ERR_DB_CLOSE == nError) {
+			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
+			SET_CONTROL_TEXT(m_lblCheckTagRet, "");
+		}
 		else {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, ERROR_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_ERROR);
@@ -772,6 +790,40 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		if (pPackageId) {
 			delete pPackageId;
+		}
+	}
+	else if (uMsg == UM_SHOW_READER_STATUS) {
+		CInvReader::READER_STATUS eStatus = (CInvReader::READER_STATUS)wParam;
+		if (eStatus == CInvReader::STATUS_OPEN) {
+			SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT);
+		}
+		else {
+			SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_CLOSE_TEXT);
+		}
+		return 0;
+	}
+	else if ( uMsg == UM_SHOW_DB_STATUS) {
+		CInvDatabase::DATABASE_STATUS eStatus = (CInvDatabase::DATABASE_STATUS)wParam;
+		if (eStatus == CInvDatabase::STATUS_OPEN) {
+			SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_OK_TEXT);
+		}
+		else {
+			SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_CLOSE_TEXT);
+		}
+		return 0;
+	}
+	else if (uMsg == UM_QUERY_RESULT) {
+		nError = (int)wParam;
+		QueryResult * pRet = (QueryResult *)lParam;
+
+		OnQueryResult(pRet);
+
+		if ( pRet ) {
+			if (pRet->pvRet) {
+				ClearVector(*pRet->pvRet);
+				delete pRet->pvRet;
+			}			
+			delete pRet;
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
@@ -967,6 +1019,74 @@ void CDuiFrameWnd::OnManualAddBarcode() {
 		}
 	}
 }
+
+
+void CDuiFrameWnd::OnQuery() {
+	if (0 == m_dtStart || 0 == m_dtEnd || 0 == m_edtQueryBatchId || 0 == m_edtQueryOperator || 0 == m_cmbQueryType || m_lstQuerySmall == 0 || m_lstQueryBig == 0 || m_lstQueryTags == 0) {
+		return;
+	}
+
+	m_lstQuerySmall->RemoveAll();
+	m_lstQueryBig->RemoveAll();
+	m_lstQueryTags->RemoveAll();
+
+	SYSTEMTIME st = m_dtStart->GetTime();
+	time_t tStartTime = ConvertDateTime(st);
+
+	st = m_dtEnd->GetTime();
+	time_t tEndTime = ConvertDateTime(st);
+
+	DuiLib::CDuiString strBatchId = GET_CONTROL_TEXT(m_edtQueryBatchId);
+	DuiLib::CDuiString strOperator = GET_CONTROL_TEXT(m_edtQueryOperator);
+	int nType = m_cmbQueryType->GetCurSel();
+
+	CBusiness::GetInstance()->QueryAsyn(tStartTime, tEndTime, strBatchId, strOperator, nType);
+}
+
+// 查询结果
+void CDuiFrameWnd::OnQueryResult(const QueryResult * pRet) {
+	DuiLib::CListUI * pListUi = 0;
+
+	// 小包装
+	if ( pRet->nQueryType == 0 ) {
+		pListUi = m_lstQuerySmall;
+	}
+	// 大包装
+	else {
+		pListUi = m_lstQueryBig;
+	}
+
+	if (0 == pListUi) {
+		return;
+	}
+
+	std::vector<QueryResultItem*>::const_iterator it;
+	const std::vector<QueryResultItem*> & v = *pRet->pvRet;
+
+	int i = 0;
+	CString strText;
+	for (it = v.begin(),i=0; it != v.end(); it++,i++) {
+		QueryResultItem* pItem = *it;
+
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		pListUi->Add(pListElement);
+
+		strText.Format("%d", i + 1);
+		pListElement->SetText(0, strText);
+		pListElement->SetText(1,pItem->szBatchId );
+		pListElement->SetText(2, pItem->szOperator);
+		pListElement->SetText(3, pItem->szProcTime);
+	}
+
+	
+}
+
+
+
+
+
+
+
 
 
 

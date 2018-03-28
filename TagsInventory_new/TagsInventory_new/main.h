@@ -37,6 +37,10 @@ public:
 	int OnInvBigBarCode(const CString & strBarCode );
 	// 手动添加条码
 	void OnManualAddBarcode();
+	// 查询(大小包装)
+	void OnQuery();
+	// 查询结果
+	void OnQueryResult(const QueryResult * pRet);
 
 	enum  INVENTORY_STATUS {
 		STATUS_CLOSE = 0,
@@ -86,4 +90,14 @@ private:
 	DuiLib::CListUI *       m_lstInvBig;
 	DuiLib::CEditUI *       m_edtManualSmallPkgId;              // 手动添加条形码
 	DuiLib::CButtonUI *     m_btnManualSmallPkg;
+
+	// 查询
+	DuiLib::CDateTimeUI *   m_dtStart;
+	DuiLib::CDateTimeUI *   m_dtEnd;
+	DuiLib::CEditUI *       m_edtQueryBatchId;
+	DuiLib::CEditUI *       m_edtQueryOperator;
+	DuiLib::CComboUI *      m_cmbQueryType;
+	DuiLib::CListUI *       m_lstQueryBig;
+	DuiLib::CListUI *       m_lstQuerySmall;
+	DuiLib::CListUI *       m_lstQueryTags;
 };

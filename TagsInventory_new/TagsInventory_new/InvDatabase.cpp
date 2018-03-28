@@ -108,7 +108,7 @@ int CInvDatabase::LoginUser( const CTagItemParam * pItem, User * pUser) {
 	char buf[8192];
 
 	if ( m_eDbStatus == STATUS_CLOSE ) {
-		return -1;
+		return INV_ERR_DB_CLOSE;
 	}
 
 	int ret = 0;
@@ -145,10 +145,17 @@ int CInvDatabase::LoginUser( const CTagItemParam * pItem, User * pUser) {
 		m_recordset.Close();//关闭记录集
 	}
 	catch (CException* e)
-	{
-		ret = -2;
-		e->GetErrorMessage(buf, sizeof(buf));
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+	{		
+		//ret = -2;
+		//e->GetErrorMessage(buf, sizeof(buf));
+		//g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
 	}
 
 	return ret;
@@ -296,15 +303,20 @@ int  CInvDatabase::OnDatabaseException( CException* e ) {
 	if (m_eDbType == TYPE_MYSQL) {
 		if (0 != strstr(buf, "connection") || 0 != strstr(buf, "没有连接") || 0 != strstr(buf, "gone awaw")) {
 			m_eDbStatus = STATUS_CLOSE;
+			ret = INV_ERR_DB_CLOSE;
 		}
 	}
 	else {
 		// 看是ORACLE否断开连接
 		if (strstr(buf, "ORA-12152") != 0) {
 			m_eDbStatus = STATUS_CLOSE;
+			ret = INV_ERR_DB_CLOSE;
 		}
 		else if (strstr(buf, "ORA-00001") != 0) {
 			ret = INV_ERR_DB_NOT_UNIQUE;
+		} else if (strstr(buf, "ORA-03135") != 0) {
+			m_eDbStatus = STATUS_CLOSE;
+			ret = INV_ERR_DB_CLOSE;
 		}
 	}
 
@@ -318,7 +330,7 @@ int  CInvDatabase::CheckTag(const CTagItemParam * pItem) {
 	char buf[8192];
 
 	if (m_eDbStatus == STATUS_CLOSE) {
-		return -1;
+		return INV_ERR_DB_CLOSE;
 	}
 
 	int ret = 0;
@@ -341,9 +353,15 @@ int  CInvDatabase::CheckTag(const CTagItemParam * pItem) {
 	}
 	catch (CException* e)
 	{
-		ret = -2;
-		e->GetErrorMessage(buf, sizeof(buf));
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+		ret = OnDatabaseException(e);
+		//e->GetErrorMessage(buf, sizeof(buf));
+		//g_log->Output(ILog::LOG_SEVERITY_ERROR, buf);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
 	}
 
 	return ret;
@@ -527,6 +545,91 @@ int CInvDatabase::InvBigSave(const CInvBigSaveParam * pParam, const char * szUse
 		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
 		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
 	}
+
+	return ret;
+}
+
+
+
+int CInvDatabase::Query(const CQueryParam * pParam, std::vector<QueryResultItem *> & vRet ) {
+	assert(pParam);
+
+	int ret = 0;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return INV_ERR_DB_CLOSE;
+	}
+
+	CString  strSql;
+	CString  strWhere;
+
+	// 查询小包装
+	if (0 == pParam->m_nQueryType) {
+		strSql.Format("select a.procetime, a.package_id, b.stfname from small_pkg a inner join staff b on a.staff_id = b.stfid where ");
+	}
+	// 查大包装
+	else {
+		strSql.Format("select a.procetime, a.package_id, b.stfname from big_pkg a inner join staff b on a.staff_id = b.stfid where ");
+	}
+
+	// 起始时间子句
+	CTime  s1(pParam->m_tStart);
+	CTime  s2(pParam->m_tEnd);
+
+	CString  strStart, strEnd;
+	strStart = s1.Format("%Y-%m-%d 00:00:00");
+	strEnd = s2.Format("%Y-%m-%d 23:59:59");
+
+	strWhere += "a.procetime >= to_date('" + strStart + "', 'yyyy-mm-dd hh24:mi:ss') AND a.procetime <= to_date('" + strEnd + "', 'yyyy-mm-dd hh24:mi:ss') ";
+
+
+	if (pParam->m_strBatchId.GetLength() > 0) {
+		strWhere += "AND a.package_id like '%" + pParam->m_strBatchId + "%' ";
+	}
+
+	if (pParam->m_strOperator.GetLength() > 0) {
+		strWhere += "AND b.stfname like '%" + pParam->m_strOperator + "%' ";
+	}
+
+	strSql += strWhere;
+
+	try
+	{
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		while ( !m_recordset.IsEOF() )
+		{
+			CString  strRet;
+
+			QueryResultItem * pResult = new QueryResultItem;
+			memset(pResult, 0, sizeof(QueryResultItem));
+			
+			m_recordset.GetFieldValue((short)0, strRet);
+			strncpy(pResult->szProcTime, strRet, sizeof(pResult->szProcTime) - 1);
+
+			m_recordset.GetFieldValue((short)1, strRet);
+			strncpy(pResult->szBatchId, strRet, sizeof(pResult->szBatchId) - 1);
+
+			m_recordset.GetFieldValue((short)2, strRet);
+			strncpy(pResult->szOperator, strRet, sizeof(pResult->szOperator) - 1);
+
+			vRet.push_back(pResult);
+
+			m_recordset.MoveNext();
+		}
+		m_recordset.Close();
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+	
+
+	
 
 	return ret;
 }

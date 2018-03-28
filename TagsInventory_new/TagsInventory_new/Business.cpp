@@ -170,6 +170,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_QUERY:
+	{
+		CQueryParam * pParam = (CQueryParam *)pMessageData;
+		Query(pParam);
+	}
+	break;
+
 	default:
 	{
 		// ¶¨Ê±Æ÷·¶Î§ÊÇ10000~19999
@@ -426,6 +433,39 @@ int   CBusiness::NotifyUiInvBigSaveRet(int nError, const CString & strBatchId, c
 	else {
 		CString * pNewString = new CString(strWrongSmallPkgId);
 		::PostMessage(g_hWnd, UM_INV_BIG_SAVE_RESULT, (WPARAM)nError, (LPARAM)pNewString);
+	}
+	return 0;
+}
+
+int   CBusiness::QueryAsyn(time_t tStart, time_t tEnd, const char * szBatchId, const char * szOperator, int nQueryType) {
+	g_thrd_db->PostMessage( this, MSG_QUERY, new CQueryParam(tStart, tEnd, szBatchId, szOperator, nQueryType) );
+	return 0;
+}
+
+int   CBusiness::Query(const CQueryParam * pParam) {
+	std::vector<QueryResultItem *> * pvRet = new std::vector<QueryResultItem *>;
+	int ret = m_InvDatabase.Query(pParam, *pvRet);
+	NotifyUiQueryRet(ret, pParam->m_nQueryType, pvRet);
+	return 0;
+}
+
+int   CBusiness::NotifyUiQueryRet(int nError, int nQueryType, std::vector<QueryResultItem *> * pvRet) {
+	if (0 == nError) {
+		QueryResult * pRet = new QueryResult;
+		memset(pRet, 0, sizeof(QueryResult));
+
+		pRet->nQueryType = nQueryType;
+		pRet->pvRet = pvRet;
+
+		::PostMessage(g_hWnd, UM_QUERY_RESULT, (WPARAM)nError, (LPARAM)pRet);
+	}
+	else {
+		::PostMessage(g_hWnd, UM_QUERY_RESULT, (WPARAM)nError, (LPARAM)0);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
 	}
 	return 0;
 }

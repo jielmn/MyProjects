@@ -28,6 +28,7 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define MSG_INV_SMALL_SAVE         5
 #define MSG_CHECK_TAG              6
 #define MSG_INV_BIG_SAVE           7
+#define MSG_QUERY                  8
 
 // db reconnect 时间
 #define  RECONNECT_DB_TIME         10000
@@ -51,6 +52,7 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define UM_CHECK_TAG_RESULT        (WM_USER+6)
 #define UM_TIMER                   (WM_USER+7)
 #define UM_INV_BIG_SAVE_RESULT     (WM_USER+8)
+#define UM_QUERY_RESULT            (WM_USER+9)
 
 
 // config配置字符串常量
@@ -60,6 +62,10 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define FACTORY_CODE               "factory code"
 #define PRODUCT_CODE               "product code"
 #define LAST_BATCH_ID              "last batch id"
+
+#ifdef _DEBUG
+#define LOGIN_CARD_ID              "login card"
+#endif
 
 
 char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD dwDestSize);
@@ -116,6 +122,15 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  INV_BIG_LIST_ID               "LstInvBig"
 #define  MANUAL_SMALL_PKG_ID_EDIT_ID   "small_pkg_barcode"
 #define  MANUAL_SMALL_PKG_ID_BUTTON_ID "btnAddSmallBarcode"
+#define  QUERY_START_TIME_DATETIME_ID  "DateTimeStart"
+#define  QUERY_END_TIME_DATETIME_ID    "DateTimeEnd"
+#define  QUERY_BATCH_ID_EDIT_ID        "edtQueryBatchId"
+#define  QUERY_OPERATOR_EDIT_ID        "edtQueryOperator"
+#define  QUERY_TYPE_COMBO_ID           "cmbQueryType"
+#define  QUERY_BIG_LIST_ID             "lstQueryBig"
+#define  QUERY_SMALL_LIST_ID           "lstQuerySmall"
+#define  QUERY_TAGS_LIST_ID            "lstQueryTags"
+#define  QUERY_BUTTON_ID               "btnQuery"
 
 #define  TABS_INDEX_INVENTORY_SMALL    0
 #define  TABS_INDEX_INVENTORY_BIG      1
@@ -188,6 +203,38 @@ public:
 };
 
 
+class CQueryParam : public LmnToolkits::MessageData {
+public:
+	CQueryParam();
+	CQueryParam(time_t tStart, time_t tEnd, const char * szBatchId, const char * szOperator, int nQueryType);
+	~CQueryParam();
+
+	time_t                   m_tStart;
+	time_t                   m_tEnd;
+	CString                  m_strBatchId;
+	CString                  m_strOperator;
+	int                      m_nQueryType;
+};
+
+#define MAX_TIME_BUF_LENGTH           32
+#define MAX_BATCH_ID_LENGTH           32
+
+// 查询结果的小记录
+typedef struct tagQueryResultItem {
+	DWORD     dwId;
+	char      szOperator[MAX_USER_NAME_LENGTH];
+	char      szProcTime[MAX_TIME_BUF_LENGTH];
+	char      szBatchId[MAX_BATCH_ID_LENGTH];
+}QueryResultItem;
+
+// 查询结果
+typedef struct tagQueryResult {
+	int    nQueryType;
+	std::vector<QueryResultItem*> * pvRet;
+}QueryResult;
+
+
+
 typedef void(*CB_TAG_REPORT_HANDLE)(void *cbParam, RFID_READER_HANDLE hreader, DWORD AIPtype, DWORD TagType, DWORD AntId, BYTE uid[], WORD uidlen);
 extern err_t rfid_inventory(RFID_READER_HANDLE hreader, BOOLEAN newAI, BYTE Antennas[], BYTE AntCount,
 	BOOLEAN enISO15693, BOOLEAN enAFI, BYTE afi, BOOLEAN enISO14443A, BOOLEAN enISO18000p3m3,
@@ -195,6 +242,7 @@ extern err_t rfid_inventory(RFID_READER_HANDLE hreader, BOOLEAN newAI, BYTE Ante
 
 extern char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit = '\0');
 extern int CompTag(const TagItem * p1, const TagItem * p2);
+extern time_t  ConvertDateTime(const SYSTEMTIME & t);
 
 
 // templates

@@ -51,6 +51,30 @@ CInvBigSaveParam::~CInvBigSaveParam() {
 }
 
 
+// ²éÑ¯²ÎÊý
+CQueryParam::CQueryParam() {
+
+}
+
+CQueryParam::CQueryParam(time_t tStart, time_t tEnd, const char * szBatchId, const char * szOperator, int nQueryType) {
+	m_tStart = tStart;
+	m_tEnd = tEnd;
+
+	if (szBatchId) {
+		m_strBatchId = szBatchId;
+	}
+
+	if (szOperator) {
+		m_strOperator = szOperator;
+	}
+
+	m_nQueryType = nQueryType;
+}
+
+CQueryParam::~CQueryParam() {
+
+}
+
 char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit /*= '\0'*/) {
 	if (0 == buf || 0 == dwBufLen) {
 		return 0;
@@ -190,6 +214,18 @@ int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize) {
 
 	delete[] pTmp;
 	return 0;
+}
+
+
+time_t  ConvertDateTime(const SYSTEMTIME & t) {
+	struct tm tmp;
+	memset(&tmp, 0, sizeof(tmp));
+
+	tmp.tm_year = t.wYear - 1900;
+	tmp.tm_mon = t.wMonth - 1;
+	tmp.tm_mday = t.wDay;
+
+	return mktime(&tmp);
 }
 
 

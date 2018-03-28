@@ -19,6 +19,8 @@ public:
 	int CheckTag(const CTagItemParam * pItem);
 	// 保存大盘点
 	int InvBigSave(const CInvBigSaveParam * pParam, const char * szUserId, CString & strBatchId, CString & strWrongSmallPkgId );
+	// 查询
+	int Query(const CQueryParam * pParam, std::vector<QueryResultItem *> & vRet);
 
 	enum DATABASE_STATUS {
 		STATUS_CLOSE = 0,

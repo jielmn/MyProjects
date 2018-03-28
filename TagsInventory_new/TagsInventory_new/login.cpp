@@ -16,6 +16,33 @@ void  CLoginWnd::InitWindow() {
 }
 
 void CLoginWnd::Notify(DuiLib::TNotifyUI& msg) {
+	char buf[8192];
+
+	if ( msg.sType == "click" ) {
+		if ( msg.pSender->GetName() == "btnCenter" ) {
+#ifdef _DEBUG
+			// ÓÃ»§µÇÂ¼
+			g_cfg->GetConfig( LOGIN_CARD_ID, buf, sizeof(buf), "" );
+			DWORD  dwLen = strlen(buf);
+
+			char tmp[64] = {0};
+			BYTE uid[8192] = { 0 };
+			for (DWORD i = 0; i < dwLen / 2; i++) {
+				int n = 0;
+				memcpy( tmp, buf + 2 * i, 2 );
+				sscanf_s( tmp, "%x", &n );
+				uid[i] = n;
+			}
+
+			TagItem item;
+			//item.dwUidLen = 8;
+			//memcpy(item.abyUid, "\xe0\x04\x01\x00\xa4\x79\xf3\x90", 8 );
+			item.dwUidLen = dwLen / 2;
+			memcpy(item.abyUid, uid, item.dwUidLen);
+			CBusiness::GetInstance()->LoginUserAsyn(&item);
+#endif
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 

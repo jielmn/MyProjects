@@ -63,6 +63,11 @@ public:
 	int   InvBigSave(const CInvBigSaveParam * pParam);
 	int   NotifyUiInvBigSaveRet(int nError, const CString & strBatchId, const CString & strWrongSmallPkgId );
 
+	// ≤È—Ø
+	int   QueryAsyn(time_t tStart, time_t tEnd, const char * szBatchId, const char * szOperator, int nQueryType );
+	int   Query( const CQueryParam * pParam );
+	int   NotifyUiQueryRet(int nError,int nQueryType, std::vector<QueryResultItem *> * pvRet);
+
 	sigslot::signal1< int *>                               sigInit;                
 	sigslot::signal1< int *>                               sigDeinit;              
 	
