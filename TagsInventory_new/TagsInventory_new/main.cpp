@@ -1169,14 +1169,19 @@ void CDuiFrameWnd::OnQuerySmallResult(int nError, const std::vector<QuerySmallRe
 	char buf[8192];
 
 	std::vector<QuerySmallResultItem*>::const_iterator it;
-	for (it = pVec->begin(); it != pVec->end(); it++) {
+	int i = 0;
+	CString strText;
+	for (it = pVec->begin(),i=0; it != pVec->end(); it++,i++) {
 		QuerySmallResultItem* pItem = *it;
 
 		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
 		m_lstQueryTags->Add(pListElement);
 
+		strText.Format("%d", i + 1);
+		pListElement->SetText(0, strText);
+
 		GetUid(buf, sizeof(buf), pItem->item.abyUid, pItem->item.dwUidLen, '-');
-		pListElement->SetText(0, buf);
+		pListElement->SetText(1, buf);
 	}
 
 	if (m_lstQueryTags->GetCount() > 0) {

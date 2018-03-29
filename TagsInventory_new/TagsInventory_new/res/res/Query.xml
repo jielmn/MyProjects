@@ -80,6 +80,7 @@
 					<Label text="Tags"  height="30" font="1" textcolor="#FF386382"  align="center" />
 					<List name="lstQueryTags" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" bordercolor="#FF768D9B" bordersize="0" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
 						<ListHeader height="24" menu="true">
+							<ListHeaderItem text="序号"    font="1" width="50"   textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 							<ListHeaderItem text="Tag ID"  font="1" width="240"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 						</ListHeader>
 					</List>
