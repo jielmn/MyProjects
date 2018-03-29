@@ -29,6 +29,8 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define MSG_CHECK_TAG              6
 #define MSG_INV_BIG_SAVE           7
 #define MSG_QUERY                  8
+#define MSG_QUERY_SMALL            9
+#define MSG_QUERY_BIG              10
 
 // db reconnect 时间
 #define  RECONNECT_DB_TIME         10000
@@ -53,6 +55,8 @@ extern LmnToolkits::Thread *  g_thrd_timer;
 #define UM_TIMER                   (WM_USER+7)
 #define UM_INV_BIG_SAVE_RESULT     (WM_USER+8)
 #define UM_QUERY_RESULT            (WM_USER+9)
+#define UM_QUERY_SMALL_RESULT      (WM_USER+10)
+#define UM_QUERY_BIG_RESULT        (WM_USER+11)
 
 
 // config配置字符串常量
@@ -152,6 +156,9 @@ int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 #define  NORMAL_COLOR                  0xFF386382
 #define  ERROR_COLOR                   0xFFFF0000
 
+#define  YES_TEXT                      "是"
+#define  NO_TEXT                       "否"
+
 #define  SET_CONTROL_TEXT(ctrl,text)      do { if ( ctrl ) { ctrl->SetText(text); } } while( 0 )
 #define  GET_CONTROL_TEXT(ctrl)           ( (ctrl == 0) ? "" : ctrl->GetText() )
 #define  SET_CONTROL_ENABLED( ctrl, e )   do { if ( ctrl ) { ctrl->SetEnabled(e); } } while( 0 )
@@ -216,15 +223,35 @@ public:
 	int                      m_nQueryType;
 };
 
+class CQuerySmallParam : public LmnToolkits::MessageData {
+public:
+	CQuerySmallParam() {};
+	CQuerySmallParam(DWORD dwId) : m_dwId(dwId) {};
+	~CQuerySmallParam() {};
+
+	DWORD                   m_dwId;
+};
+
+class CQueryBigParam : public LmnToolkits::MessageData {
+public:
+	CQueryBigParam() {};
+	CQueryBigParam(DWORD dwId) : m_dwId(dwId) {};
+	~CQueryBigParam() {};
+
+	DWORD                   m_dwId;
+};
+
+
 #define MAX_TIME_BUF_LENGTH           32
 #define MAX_BATCH_ID_LENGTH           32
 
-// 查询结果的小记录
+// 查询结果的大/小记录
 typedef struct tagQueryResultItem {
 	DWORD     dwId;
 	char      szOperator[MAX_USER_NAME_LENGTH];
 	char      szProcTime[MAX_TIME_BUF_LENGTH];
 	char      szBatchId[MAX_BATCH_ID_LENGTH];
+	DWORD     dwParentId;                                // 所属大包装ID
 }QueryResultItem;
 
 // 查询结果
@@ -234,6 +261,14 @@ typedef struct tagQueryResult {
 }QueryResult;
 
 
+// 查询小包装的Tags
+typedef struct tagQuerySmallResultItem {
+	TagItem    item;
+}QuerySmallResultItem;
+
+// 查询小包装Tags的结果
+// std::vector<QuerySmallResultItem*> * pvRet;
+
 
 typedef void(*CB_TAG_REPORT_HANDLE)(void *cbParam, RFID_READER_HANDLE hreader, DWORD AIPtype, DWORD TagType, DWORD AntId, BYTE uid[], WORD uidlen);
 extern err_t rfid_inventory(RFID_READER_HANDLE hreader, BOOLEAN newAI, BYTE Antennas[], BYTE AntCount,
@@ -241,6 +276,8 @@ extern err_t rfid_inventory(RFID_READER_HANDLE hreader, BOOLEAN newAI, BYTE Ante
 	CB_TAG_REPORT_HANDLE tag_report_handler, void *cbParam, DWORD *tagCount);
 
 extern char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit = '\0');
+extern TagItem * GetUid(TagItem * pTagItem, const char * szUid, BOOL bWithSplitChar = FALSE );
+
 extern int CompTag(const TagItem * p1, const TagItem * p2);
 extern time_t  ConvertDateTime(const SYSTEMTIME & t);
 

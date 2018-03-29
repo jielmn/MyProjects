@@ -565,11 +565,11 @@ int CInvDatabase::Query(const CQueryParam * pParam, std::vector<QueryResultItem 
 
 	// 查询小包装
 	if (0 == pParam->m_nQueryType) {
-		strSql.Format("select a.procetime, a.package_id, b.stfname from small_pkg a inner join staff b on a.staff_id = b.stfid where ");
+		strSql.Format("select a.procetime, a.package_id, b.stfname, a.big_pkg_id, a.id from small_pkg a inner join staff b on a.staff_id = b.stfid where ");
 	}
 	// 查大包装
 	else {
-		strSql.Format("select a.procetime, a.package_id, b.stfname from big_pkg a inner join staff b on a.staff_id = b.stfid where ");
+		strSql.Format("select a.procetime, a.package_id, b.stfname, 0, a.id from big_pkg a inner join staff b on a.staff_id = b.stfid where ");
 	}
 
 	// 起始时间子句
@@ -591,7 +591,7 @@ int CInvDatabase::Query(const CQueryParam * pParam, std::vector<QueryResultItem 
 		strWhere += "AND b.stfname like '%" + pParam->m_strOperator + "%' ";
 	}
 
-	strSql += strWhere;
+	strSql += strWhere + "ORDER BY a.procetime asc";
 
 	try
 	{
@@ -612,6 +612,12 @@ int CInvDatabase::Query(const CQueryParam * pParam, std::vector<QueryResultItem 
 			m_recordset.GetFieldValue((short)2, strRet);
 			strncpy(pResult->szOperator, strRet, sizeof(pResult->szOperator) - 1);
 
+			m_recordset.GetFieldValue((short)3, strRet);
+			sscanf_s(strRet, "%lu", &pResult->dwParentId);
+
+			m_recordset.GetFieldValue((short)4, strRet);
+			sscanf_s(strRet, "%lu", &pResult->dwId );
+
 			vRet.push_back(pResult);
 
 			m_recordset.MoveNext();
@@ -630,6 +636,111 @@ int CInvDatabase::Query(const CQueryParam * pParam, std::vector<QueryResultItem 
 	
 
 	
+
+	return ret;
+}
+
+
+int CInvDatabase::QuerySmall(const CQuerySmallParam * pParam, std::vector<QuerySmallResultItem *> & vRet) {
+	assert(pParam);
+
+	int ret = 0;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return INV_ERR_DB_CLOSE;
+	}
+
+	CString  strSql;
+	strSql.Format("select id from tags where small_pkg_id = %lu", pParam->m_dwId);
+
+	try
+	{
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		while (!m_recordset.IsEOF())
+		{
+			CString  strRet;
+
+			QuerySmallResultItem * pResult = new QuerySmallResultItem;
+			memset(pResult, 0, sizeof(QuerySmallResultItem));
+
+			m_recordset.GetFieldValue((short)0, strRet);
+			GetUid(&pResult->item, strRet);
+
+			char buf[8192];
+			GetUid(buf, sizeof(buf), pResult->item.abyUid, pResult->item.dwUidLen, '-');
+
+			vRet.push_back(pResult);
+
+			m_recordset.MoveNext();
+		}
+		m_recordset.Close();
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+
+int CInvDatabase::QueryBig(const CQueryBigParam * pParam, std::vector<QueryResultItem *> & vRet) {
+	assert(pParam);
+
+	int ret = 0;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return INV_ERR_DB_CLOSE;
+	}
+
+	CString  strSql;
+	strSql.Format("select a.procetime, a.package_id, b.stfname, a.big_pkg_id, a.id from small_pkg a inner join staff b on a.staff_id = b.stfid where a.big_pkg_id = %lu ORDER BY a.procetime asc", pParam->m_dwId);
+
+	try
+	{
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		while (!m_recordset.IsEOF())
+		{
+			CString  strRet;
+
+			QueryResultItem * pResult = new QueryResultItem;
+			memset(pResult, 0, sizeof(QueryResultItem));
+
+			m_recordset.GetFieldValue((short)0, strRet);
+			strncpy(pResult->szProcTime, strRet, sizeof(pResult->szProcTime) - 1);
+
+			m_recordset.GetFieldValue((short)1, strRet);
+			strncpy(pResult->szBatchId, strRet, sizeof(pResult->szBatchId) - 1);
+
+			m_recordset.GetFieldValue((short)2, strRet);
+			strncpy(pResult->szOperator, strRet, sizeof(pResult->szOperator) - 1);
+
+			m_recordset.GetFieldValue((short)3, strRet);
+			sscanf_s(strRet, "%lu", &pResult->dwParentId);
+
+			m_recordset.GetFieldValue((short)4, strRet);
+			sscanf_s(strRet, "%lu", &pResult->dwId);
+
+			vRet.push_back(pResult);
+
+			m_recordset.MoveNext();
+		}
+		m_recordset.Close();
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
 
 	return ret;
 }

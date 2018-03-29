@@ -21,6 +21,10 @@ public:
 	int InvBigSave(const CInvBigSaveParam * pParam, const char * szUserId, CString & strBatchId, CString & strWrongSmallPkgId );
 	// 查询
 	int Query(const CQueryParam * pParam, std::vector<QueryResultItem *> & vRet);
+	// 查询小包装
+	int QuerySmall(const CQuerySmallParam * pParam, std::vector<QuerySmallResultItem *> & vRet);
+	// 查询大包装
+	int QueryBig(const CQueryBigParam * pParam, std::vector<QueryResultItem *> & vRet);
 
 	enum DATABASE_STATUS {
 		STATUS_CLOSE = 0,

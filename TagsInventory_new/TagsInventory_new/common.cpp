@@ -144,6 +144,96 @@ int CompTag(const TagItem * p1, const TagItem * p2) {
 	}
 }
 
+// 从十六进制数获取Byte
+static int _GetByte(char ch1, char ch2, BYTE & by) {
+	ch1 = Char2Lower(ch1);
+	if ( !((ch1 >= '0' && ch1 <= '9') || (ch1 >= 'a' && ch1 <= 'f')) ) {
+		return -1;
+	}
+
+	ch2 = Char2Lower(ch2);
+	if (!((ch2 >= '0' && ch2 <= '9') || (ch2 >= 'a' && ch2 <= 'f'))) {
+		return -1;
+	}
+
+	DWORD n1 = 0;
+	DWORD n2 = 0;
+
+	if (ch1 >= '0' && ch1 <= '9') {
+		n1 = ch1 - '0';
+	}
+	else {
+		n1 = ch1 - 'a' + 10;
+	}
+
+	if (ch2 >= '0' && ch2 <= '9') {
+		n2 = ch2 - '0';
+	}
+	else {
+		n2 = ch2 - 'a' + 10;
+	}
+
+	by = (BYTE)(n1 * 16 + n2);
+	return 0;
+}
+
+// 把 e001020304050607 转化为 BYTE格式
+// 把 e0-01-02-03-04-05-06-07 转化为 BYTE格式
+TagItem * GetUid(TagItem * pTagItem, const char * szUid, BOOL bWithSplitChar /*= FALSE*/) {
+	if ( 0 == pTagItem ) {
+		return 0;
+	}
+
+	if (0 == szUid) {
+		pTagItem->dwUidLen = 0;
+		return pTagItem;
+	}
+
+	DWORD  len = strlen(szUid);
+	if (!bWithSplitChar) {
+		// 如果非偶数，错误格式
+		if (len % 2 != 0) {
+			return 0;
+		}
+	}
+	else {
+		// 错误格式
+		if (len == 1) {
+			return 0;
+		}
+		else if (len > 2) {
+			// 错误格式
+			if ((len - 2) % 3 != 0) {
+				return 0;
+			}
+		}
+	}
+
+	int i = 0;
+	BYTE by = 0;
+	int ret = 0;
+	pTagItem->dwUidLen = 0;
+
+	while (i < (int)len) {
+		ret = _GetByte( szUid[i], szUid[i+1], by );
+		if (0 == ret) {
+			pTagItem->abyUid[pTagItem->dwUidLen] = by;
+			pTagItem->dwUidLen++;
+		}
+		else {
+			return 0;
+		}
+
+		if (bWithSplitChar) {
+			i += 3;
+		}
+		else {
+			i += 2;
+		}
+	}
+	
+	return pTagItem;
+}
 
 
 char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD dwDestSize) {

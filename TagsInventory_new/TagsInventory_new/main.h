@@ -41,6 +41,14 @@ public:
 	void OnQuery();
 	// 查询结果
 	void OnQueryResult(const QueryResult * pRet);
+	// 大查询的listitem改变
+	void OnQueryBigListChanged();
+	// 小查询的listitem改变
+	void OnQuerySmallListChanged();
+	// 查询小包装结果
+	void OnQuerySmallResult(int nError, const std::vector<QuerySmallResultItem*> * pVec);
+	// 查询大包装结果
+	void OnQueryBigResult(int nError, const std::vector<QueryResultItem*> * pVec);
 
 	enum  INVENTORY_STATUS {
 		STATUS_CLOSE = 0,

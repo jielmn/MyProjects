@@ -68,6 +68,16 @@ public:
 	int   Query( const CQueryParam * pParam );
 	int   NotifyUiQueryRet(int nError,int nQueryType, std::vector<QueryResultItem *> * pvRet);
 
+	// 查询小包装的Tags
+	int   QuerySmallAsyn(DWORD dwId);
+	int   QuerySmall(const CQuerySmallParam * pParam);
+	int   NotifyUiQuerySmallRet(int nError, std::vector<QuerySmallResultItem *> * pvRet);
+
+	// 查询大包装的Tags
+	int   QueryBigAsyn(DWORD dwId);
+	int   QueryBig(const CQueryBigParam * pParam);
+	int   NotifyUiQueryBigRet(int nError, std::vector<QueryResultItem *> * pvRet);
+
 	sigslot::signal1< int *>                               sigInit;                
 	sigslot::signal1< int *>                               sigDeinit;              
 	

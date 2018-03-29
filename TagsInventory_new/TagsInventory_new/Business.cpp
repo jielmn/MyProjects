@@ -177,6 +177,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_QUERY_SMALL:
+	{
+		CQuerySmallParam * pParam = (CQuerySmallParam *)pMessageData;
+		QuerySmall(pParam);
+	}
+	break;
+
+	case MSG_QUERY_BIG:
+	{
+		CQueryBigParam * pParam = (CQueryBigParam *)pMessageData;
+		QueryBig(pParam);
+	}
+	break;
+
 	default:
 	{
 		// ¶¨Ê±Æ÷·¶Î§ÊÇ10000~19999
@@ -461,6 +475,62 @@ int   CBusiness::NotifyUiQueryRet(int nError, int nQueryType, std::vector<QueryR
 	}
 	else {
 		::PostMessage(g_hWnd, UM_QUERY_RESULT, (WPARAM)nError, (LPARAM)0);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
+	}
+	return 0;
+}
+
+
+int  CBusiness::QuerySmallAsyn(DWORD dwId) {
+	g_thrd_db->PostMessage( this, MSG_QUERY_SMALL, new CQuerySmallParam(dwId) );
+	return 0;
+}
+
+int   CBusiness::QuerySmall(const CQuerySmallParam * pParam) {
+	std::vector<QuerySmallResultItem *> * pvRet = new std::vector<QuerySmallResultItem *>;
+	int ret = m_InvDatabase.QuerySmall(pParam, *pvRet);
+	NotifyUiQuerySmallRet(ret, pvRet);
+	return 0;
+}
+
+int   CBusiness::NotifyUiQuerySmallRet(int nError, std::vector<QuerySmallResultItem *> * pvRet) {
+	if (0 == nError) {
+		::PostMessage( g_hWnd, UM_QUERY_SMALL_RESULT, (WPARAM)nError, (LPARAM)pvRet );
+	}
+	else {
+		::PostMessage(g_hWnd, UM_QUERY_SMALL_RESULT, (WPARAM)nError, (LPARAM)0);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
+	}
+	return 0;
+}
+
+
+int  CBusiness::QueryBigAsyn(DWORD dwId) {
+	g_thrd_db->PostMessage(this, MSG_QUERY_BIG, new CQueryBigParam(dwId));
+	return 0;
+}
+
+int   CBusiness::QueryBig( const CQueryBigParam * pParam ) {
+	std::vector<QueryResultItem *> * pvRet = new std::vector<QueryResultItem *>;
+	int ret = m_InvDatabase.QueryBig(pParam, *pvRet);
+	NotifyUiQueryBigRet(ret, pvRet);
+	return 0;
+}
+
+int   CBusiness::NotifyUiQueryBigRet(int nError, std::vector<QueryResultItem *> * pvRet) {
+	if (0 == nError) {
+		::PostMessage(g_hWnd, UM_QUERY_BIG_RESULT, (WPARAM)nError, (LPARAM)pvRet);
+	}
+	else {
+		::PostMessage(g_hWnd, UM_QUERY_BIG_RESULT, (WPARAM)nError, (LPARAM)0);
 
 		if (pvRet) {
 			ClearVector(*pvRet);

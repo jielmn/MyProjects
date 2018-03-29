@@ -209,6 +209,14 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			g_cfg->SetConfig(LAST_BATCH_ID, (const char *)strText);
 		}
 	}
+	else if (msg.sType == "itemselect") {
+		if (name == QUERY_BIG_LIST_ID) {
+			OnQueryBigListChanged();
+		}
+		else if (name == QUERY_SMALL_LIST_ID) {
+			OnQuerySmallListChanged();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -826,6 +834,28 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			delete pRet;
 		}
 	}
+	else if (uMsg == UM_QUERY_SMALL_RESULT) {
+		nError = (int)wParam;
+		std::vector<QuerySmallResultItem*> * pVec = (std::vector<QuerySmallResultItem*> *)lParam;
+
+		OnQuerySmallResult(nError, pVec);
+
+		if (pVec) {
+			ClearVector(*pVec);
+			delete pVec;
+		}
+	}
+	else if (uMsg == UM_QUERY_BIG_RESULT) {
+		nError = (int)wParam;
+		std::vector<QueryResultItem*> * pVec = (std::vector<QueryResultItem*> *)lParam;
+
+		OnQueryBigResult(nError, pVec);
+
+		if (pVec) {
+			ClearVector(*pVec);
+			delete pVec;
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -1026,9 +1056,9 @@ void CDuiFrameWnd::OnQuery() {
 		return;
 	}
 
-	m_lstQuerySmall->RemoveAll();
-	m_lstQueryBig->RemoveAll();
-	m_lstQueryTags->RemoveAll();
+	//m_lstQuerySmall->RemoveAll();
+	//m_lstQueryBig->RemoveAll();
+	//m_lstQueryTags->RemoveAll();
 
 	SYSTEMTIME st = m_dtStart->GetTime();
 	time_t tStartTime = ConvertDateTime(st);
@@ -1046,6 +1076,15 @@ void CDuiFrameWnd::OnQuery() {
 // 查询结果
 void CDuiFrameWnd::OnQueryResult(const QueryResult * pRet) {
 	DuiLib::CListUI * pListUi = 0;
+
+	if (m_lstQueryBig)
+		m_lstQueryBig->RemoveAll();
+
+	if (m_lstQuerySmall)
+		m_lstQuerySmall->RemoveAll();
+
+	if (m_lstQueryTags)
+		m_lstQueryTags->RemoveAll();
 
 	// 小包装
 	if ( pRet->nQueryType == 0 ) {
@@ -1076,14 +1115,112 @@ void CDuiFrameWnd::OnQueryResult(const QueryResult * pRet) {
 		pListElement->SetText(1,pItem->szBatchId );
 		pListElement->SetText(2, pItem->szOperator);
 		pListElement->SetText(3, pItem->szProcTime);
+
+		// 小包装
+		if (pRet->nQueryType == 0) {
+			pListElement->SetText( 4, pItem->dwParentId == 0 ? NO_TEXT : YES_TEXT);
+		}
+
+		pListElement->SetTag(pItem->dwId);
 	}
 
+	if (pListUi->GetCount() > 0) {
+		pListUi->SelectItem(0, false, true);
+	}
 	
 }
 
+void  CDuiFrameWnd::OnQueryBigListChanged() {
+	if (m_lstQueryBig == 0) {
+		return;
+	}
+
+	int nIndex = m_lstQueryBig->GetCurSel();
+	DuiLib::CListTextElementUI* pItem = (DuiLib::CListTextElementUI*)m_lstQueryBig->GetItemAt(nIndex);
+	DWORD dwId = (DWORD)pItem->GetTag();
+	CBusiness::GetInstance()->QueryBigAsyn(dwId);
+}
+
+void  CDuiFrameWnd::OnQuerySmallListChanged() {
+	if (m_lstQuerySmall == 0) {
+		return;
+	}
+
+	int nIndex = m_lstQuerySmall->GetCurSel();
+	DuiLib::CListTextElementUI* pItem = (DuiLib::CListTextElementUI*)m_lstQuerySmall->GetItemAt(nIndex);
+	DWORD dwId = (DWORD)pItem->GetTag();
+	CBusiness::GetInstance()->QuerySmallAsyn(dwId);
+}
 
 
+// 查询小包装结果
+void CDuiFrameWnd::OnQuerySmallResult(int nError, const std::vector<QuerySmallResultItem*> * pVec) {
 
+	if (0 == m_lstQueryTags) {
+		return;
+	}
+
+	m_lstQueryTags->RemoveAll();
+
+	if (pVec == 0) {
+		return;
+	}
+
+	char buf[8192];
+
+	std::vector<QuerySmallResultItem*>::const_iterator it;
+	for (it = pVec->begin(); it != pVec->end(); it++) {
+		QuerySmallResultItem* pItem = *it;
+
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstQueryTags->Add(pListElement);
+
+		GetUid(buf, sizeof(buf), pItem->item.abyUid, pItem->item.dwUidLen, '-');
+		pListElement->SetText(0, buf);
+	}
+
+	if (m_lstQueryTags->GetCount() > 0) {
+		m_lstQueryTags->SelectItem(0, false, false);
+	}
+}
+
+
+void CDuiFrameWnd::OnQueryBigResult(int nError, const std::vector<QueryResultItem*> * pVec) {
+	if (0 == m_lstQuerySmall) {
+		return;
+	}
+
+	m_lstQuerySmall->RemoveAll();
+
+	if (pVec == 0) {
+		return;
+	}
+
+	std::vector<QueryResultItem*>::const_iterator it;
+	const std::vector<QueryResultItem*> & v = *pVec;
+
+	int i = 0;
+	CString strText;
+	for (it = v.begin(), i = 0; it != v.end(); it++, i++) {
+		QueryResultItem* pItem = *it;
+
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstQuerySmall->Add(pListElement);
+
+		strText.Format("%d", i + 1);
+		pListElement->SetText(0, strText);
+		pListElement->SetText(1, pItem->szBatchId);
+		pListElement->SetText(2, pItem->szOperator);
+		pListElement->SetText(3, pItem->szProcTime);
+		pListElement->SetText(4, pItem->dwParentId == 0 ? NO_TEXT : YES_TEXT);
+
+		pListElement->SetTag(pItem->dwId);
+	}
+
+	if (m_lstQuerySmall->GetCount() > 0) {
+		m_lstQuerySmall->SelectItem(0, false, true);
+	}
+}
 
 
 
