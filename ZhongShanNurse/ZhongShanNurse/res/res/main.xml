@@ -29,10 +29,10 @@
 			
 			<!-- 客户区 -->
 			<HorizontalLayout height="85" inset="8,5,0,0">
-				<Option width="100" height="80" name="TemperatureData"   text="温度数据"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='temperature_data.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
-				<Option width="100" height="80" name="Patients"          text="病人信息"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='patients.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
-				<Option width="100" height="80" name="Nurses"            text="护士信息"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='nurses.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
-				<Option width="100" height="80" name="Synchronise"       text="同步读卡器" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='synchronise.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>				
+				<Option width="100" height="80" name="optTemperatureData"   text="温度数据"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='temperature_data.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
+				<Option width="100" height="80" name="optPatients"          text="病人信息"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='patients.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Option width="100" height="80" name="optNurses"            text="护士信息"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='nurses.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Option width="100" height="80" name="optSynchronise"       text="同步读卡器" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='synchronise.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>				
 			</HorizontalLayout>
 			
 			<HorizontalLayout height="5" />
@@ -40,18 +40,23 @@
 			<!--Tab区-->
 			<HorizontalLayout bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1">
 				<TabLayout name="switch">
+				
 					<HorizontalLayout>
-						<Inventory_small />
+						<TemperatureData />
 					</HorizontalLayout>
+					
 					<HorizontalLayout>
-						<Inventory_big />
+						<Patients />
 					</HorizontalLayout>
+					
 					<HorizontalLayout>
-						<Query />
+						<Nurses />
 					</HorizontalLayout>
+					
 					<HorizontalLayout>
-						<Check />
+						<Synchronise />
 					</HorizontalLayout>
+					
 				</TabLayout>				
 			</HorizontalLayout>			
 		</VerticalLayout>

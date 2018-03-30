@@ -14,4 +14,8 @@ public:
 	virtual void      InitWindow();
 	virtual void      Notify(DuiLib::TNotifyUI& msg);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
+private:
+	DuiLib::CLabelUI *       m_lblDbStatus;
+	DuiLib::CLabelUI *       m_lblReaderStatus;
 }; 
