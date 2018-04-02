@@ -2,7 +2,7 @@
 <Window>	
 	<VerticalLayout inset="1,1,1,1"    >		
 		<VerticalLayout  bkcolor="#FFD1E8F5" >
-			<Label text="同步数据" />
+			<Label text="纯数据" />
 		</VerticalLayout>
 		
 	</VerticalLayout>

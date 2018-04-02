@@ -2,11 +2,32 @@
 #include "main.h"
 #include "resource.h"
 
+
+
+DuiLib::CControlUI* CTempDataBuilderCallback::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(PURE_DATA_CONTROL_ID, pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T(PURE_DATA_FILE), (UINT)0, 0, m_PaintManager);
+		return pUI;
+	}
+	else if (0 == strcmp(CURVE_CONTROL_ID, pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T(CURVE_FILE), (UINT)0, 0, m_PaintManager);
+		return pUI;
+	}
+	return 0;
+}
+
+
 void CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
+	m_Callback.m_PaintManager = &m_PaintManager;
+
 	m_lblDbStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl(DATABASE_STATUS_LABEL_ID);
 	m_lblReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl(READER_STATUS_LABEL_ID);
+	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(_T(TABS_ID)));
+	m_sub_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(_T(SUB_TABS_ID)));
 
 	WindowImplBase::InitWindow();
 }
@@ -14,7 +35,7 @@ void CDuiFrameWnd::InitWindow() {
 DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(TEMPERATURE_DATA_CONTROL_ID, pstrClass)) {
 		DuiLib::CDialogBuilder builder;
-		DuiLib::CControlUI * pUI = builder.Create(_T(TEMPERATURE_DATA_FILE), (UINT)0, 0, &m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T(TEMPERATURE_DATA_FILE), (UINT)0, &m_Callback, &m_PaintManager);
 		return pUI;
 	}
 	else if (0 == strcmp(PATIENTS_CONTROL_ID, pstrClass)) {
@@ -36,26 +57,35 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
+	DuiLib::CDuiString name = msg.pSender->GetName();
+	DuiLib::CDuiString strText;
+
 	if (msg.sType == _T("selectchanged"))
 	{
-		//if (0 == m_tabs) {
-		//	return;
-		//}
-
-		//if (name == _T("Inventory_small")) {
-		//	m_tabs->SelectItem(TABS_INDEX_INVENTORY_SMALL);
-		//}
-		//else if (name == _T("Inventory_big")) {
-		//	m_tabs->SelectItem(TABS_INDEX_INVENTORY_BIG);
-		//}
-		//else if (name == _T("Query")) {
-		//	m_tabs->SelectItem(TABS_INDEX_INVENTORY_QUERY);
-		//}
-		//else if (name = "Check") {
-		//	m_tabs->SelectItem(TABS_INDEX_INVENTORY_CHECK);
-		//	SET_CONTROL_TEXT(m_lblCheckTagId, "");
-		//	SET_CONTROL_TEXT(m_lblCheckTagRet, "");
-		//}
+		if (name == _T(TEMPERATURE_DATA_OPTION_ID)) {
+			if (m_tabs)
+				m_tabs->SelectItem(TEMPERATURE_DATA_INDEX);
+		}
+		else if (name == _T(PATIENTS_OPTION_ID)) {
+			if (m_tabs)
+				if (m_tabs)m_tabs->SelectItem(PATIENTS_INDEX);
+		}
+		else if (name == _T(NURSES_OPTION_ID)) {
+			if (m_tabs)
+				m_tabs->SelectItem(NURSES_INDEX);
+		}
+		else if (name == SYNCHRONIZE_OPTION_ID) {
+			if (m_tabs)
+				m_tabs->SelectItem(SYNCHRONIZE_INDEX);
+		}
+		else if (name == PURE_DATA_OPTION_ID) {
+			if (m_sub_tabs)
+				m_sub_tabs->SelectItem(PURE_DATA_INDEX);
+		}
+		else if (name == CURVE_OPTION_ID) {
+			if (m_sub_tabs)
+				m_sub_tabs->SelectItem(CURVE_INDEX);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }

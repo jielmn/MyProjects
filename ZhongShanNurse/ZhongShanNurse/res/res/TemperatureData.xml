@@ -1,9 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
 	<VerticalLayout inset="1,1,1,1"    >		
-		<VerticalLayout  bkcolor="#FFD1E8F5" >
-			<Label text="温度数据" />
-		</VerticalLayout>
-		
+		<HorizontalLayout  bkcolor="#FFD1E8F5" inset="1,0,1,0" >
+			<VerticalLayout width="350" bkcolor="#FFD1E8F5">
+				<List name="patients_list_short" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" itemfont="6" itemtextcolor="#FF386382" >
+					<ListHeader height="24" menu="false">
+						<ListHeaderItem text="编号"   font="1" width="50"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="姓名"   font="1" width="100" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="床位号" font="1" width="100" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="绑定体温贴"  font="1" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					</ListHeader>
+				</List>
+			</VerticalLayout>
+			
+			<VerticalLayout width="1" bkimage="sep1.png" />
+			
+			<VerticalLayout name="VerticalLayout_Temp" visible="true" height="1090" bkcolor="#FFD1E8F5">				
+				<HorizontalLayout height="30" padding="10,5,10,5">
+					<Label text="起始时间：" width="80" height="30" font="1" textcolor="#FF386382" />
+					<DateTime name="DateTime1" width="170" height="30" bkcolor="#FFFFFFFF" font="1" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="1" textpadding="5,0,5,0"  />
+					<Control width="50" />
+					<Label text="时间跨度：" width="80" height="30" font="1" textcolor="#FF386382" />
+					<Combo name="cmbTimeSpan" width="100" height="30" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" >
+						<ListLabelElement text="1周" selected="true" padding="5,1,5,1" />
+						<ListLabelElement text="2周" padding="5,1,5,1" />
+						<ListLabelElement text="3周" padding="5,1,5,1" />
+						<ListLabelElement text="4周" padding="5,1,5,1" />
+					</Combo>	
+					<Control width="100" />
+					<Button text="查询" font="1" textcolor="#FF386382"  width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+				</HorizontalLayout>		
+
+				<HorizontalLayout bordercolor="#FFCCCCCC" bordersize="1" padding="5,5,5,1" >
+					<TabLayout name="switch_data">
+					
+						<HorizontalLayout>
+							<PureData />
+						</HorizontalLayout>
+						
+						<HorizontalLayout>
+							<TemperatureCurve />
+						</HorizontalLayout>
+											
+					</TabLayout>				
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="85" inset="8,0,0,0">
+					<Option width="100" height="80" text="数字数据" name="optPureData"   textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='data.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
+					<Option width="100" height="80" text="温度曲线" name="optCurveData"  textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='curve.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			
+			
+		</HorizontalLayout>		
 	</VerticalLayout>
 </Window>

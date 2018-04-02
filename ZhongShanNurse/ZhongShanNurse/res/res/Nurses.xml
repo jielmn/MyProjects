@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout inset="1,1,1,1"    >		
-		<VerticalLayout  bkcolor="#FFD1E8F5" >
-			<Label text="温度数据" />
-		</VerticalLayout>
+	<VerticalLayout inset="1,1,1,1"  >
+		<HorizontalLayout  >
+			<List name="nurses_list" bkcolor="#FFD1E8F5" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="0" itemfont="1" itemtextcolor="#FF386382" >
+				<ListHeader height="24" menu="true">
+					<ListHeaderItem text="编号"       font="1" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="姓名"       font="1" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="绑定的白卡" font="1"              textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+				</ListHeader>
+			</List>
+		</HorizontalLayout>
 		
+		
+		<HorizontalLayout height="50" bkcolor="#FFD1E8F5">
+			<Button text="添加" name="btnAddNurset" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+			<Button text="修改" name="btnModifyNurse" font="1" textcolor="#FF386382"  width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+			<Button text="删除" name="btnDelNurse"    font="1" textcolor="#FF386382" width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+			<Control width="5" />
+			<Button text="从Excel导入" name="import_excel_nurse" width = "170" font="1" textcolor="#FF386382" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+			<Control width="100" />
+			<Button text="绑定白卡" name="btnBinding_nurse" font="1" textcolor="#FF386382" width = "100" normalimage="file='baidu_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='baidu_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='baidu_button_pushed.png' corner='5,5,5,5' hole='false' " disabledimage="file='baidu_button_disabled.png' corner='5,5,5,5' hole='false' " enabled="false" />
+		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

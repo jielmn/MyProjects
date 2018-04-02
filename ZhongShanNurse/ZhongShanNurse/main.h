@@ -3,6 +3,13 @@
 #include "zsCommon.h"
 #include "UIlib.h"
 
+class CTempDataBuilderCallback : public DuiLib::IDialogBuilderCallback
+{
+public:
+	virtual DuiLib::CControlUI* CreateControl(LPCTSTR pstrClass);
+
+	DuiLib::CPaintManagerUI*     m_PaintManager;
+};
 
 class CDuiFrameWnd : public DuiLib::WindowImplBase
 {
@@ -16,6 +23,15 @@ public:
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
 
 private:
-	DuiLib::CLabelUI *       m_lblDbStatus;
-	DuiLib::CLabelUI *       m_lblReaderStatus;
+	CTempDataBuilderCallback   m_Callback;
+
+	DuiLib::CLabelUI *         m_lblDbStatus;
+	DuiLib::CLabelUI *         m_lblReaderStatus;
+
+	// tabs
+	DuiLib::CTabLayoutUI *   m_tabs;
+
+	// sub tabs;
+	DuiLib::CTabLayoutUI *   m_sub_tabs;
 }; 
+
