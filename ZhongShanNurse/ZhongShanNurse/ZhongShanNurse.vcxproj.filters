@@ -24,9 +24,39 @@
     <ClInclude Include="resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Business.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zsDatabase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="zsBindingReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="mi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PatientDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Business.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zsCommon.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zsDatabase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="zsBindingReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PatientDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

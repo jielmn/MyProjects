@@ -30,6 +30,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -87,7 +88,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_RICHEDIT_VER=0x0210;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -96,7 +97,8 @@
       <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\res ..\Debug\res /dseiy</Command>
+      <Command>xcopy res\res ..\Debug\res /dseiy
+xcopy dll ..\Debug  /dseiy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -150,12 +152,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Business.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="mi.h" />
+    <ClInclude Include="PatientDlg.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="zsBindingReader.h" />
     <ClInclude Include="zsCommon.h" />
+    <ClInclude Include="zsDatabase.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Business.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PatientDlg.cpp" />
+    <ClCompile Include="zsBindingReader.cpp" />
+    <ClCompile Include="zsCommon.cpp" />
+    <ClCompile Include="zsDatabase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZhongShanNurse.rc" />
