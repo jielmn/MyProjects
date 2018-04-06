@@ -43,14 +43,106 @@ void   CDuiFrameWnd::OnFistDbConnected() {
 		return;
 	}
 
-
+	CBusiness::GetInstance()->GetAllPatientsAsyn();
 
 	m_bFisrDbConnect = FALSE;
 }
 
+void  CDuiFrameWnd::AddPatientItem2List(DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag /*= TRUE */) {
+	pListElement->SetText(PATIENTS_INFO_ID_INDEX,     pPatient->szId);
+	pListElement->SetText(PATIENTS_INFO_NAME_INDEX,   pPatient->szName);
+	pListElement->SetText(PATIENTS_INFO_GENDER_INDEX, GetGender(pPatient->bFemale));
+	pListElement->SetText(PATIENTS_INFO_BED_NO_INDEX, pPatient->szBedNo);
+	pListElement->SetText(PATIENTS_INFO_STATUS_INDEX, GetInHosStatus(pPatient->bOutHos));
+	if (bSetTag)
+		pListElement->SetTag(pPatient->dwId);
+}
+
+void   CDuiFrameWnd::OnGetAllPatientsRet( const std::vector<PatientInfo*> & vRet ) {
+	std::vector<PatientInfo*>::const_iterator it;
+	for (it = vRet.begin(); it != vRet.end(); it++) {
+		PatientInfo*  pPatient = *it;
+
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstPatients->Add(pListElement);
+
+		AddPatientItem2List(pListElement, pPatient);
+	}
+}
+
+// 删除病人ret
+void   CDuiFrameWnd::OnDeletePatientRet(int ret, DWORD dwId) {
+	if (0 == ret)
+	{
+		assert(m_lstPatients);
+		int nSelIndex = m_lstPatients->GetCurSel();
+		DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(nSelIndex);
+		assert(pListElement);
+
+		// 如果list焦点没有变化
+		if ( pListElement->GetTag() == dwId ) {
+			m_lstPatients->RemoveAt(nSelIndex);
+		}
+		// 遍历整个list
+		else {
+			int cnt = m_lstPatients->GetCount();
+			for (int i = 0; i < cnt; i++) {
+				pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(i);
+				assert(pListElement);
+				if (pListElement->GetTag() == dwId) {
+					m_lstPatients->RemoveAt(nSelIndex);
+					break;
+				}
+			}
+		}
+		
+		::MessageBox(this->GetHWND(), "删除病人成功", "删除病人", 0);
+	}
+	else {
+		::MessageBox(this->GetHWND(), GetErrDescription(ret), "删除病人", 0);
+	}
+}
+
+// 导入病人ret
+void  CDuiFrameWnd::OnImportPatientsRet(int ret, const std::vector<PatientInfo*> & vRet) {
+	if (0 == m_lstPatients) {
+		return;
+	}
+
+	std::vector<PatientInfo*>::const_iterator it;
+	for (it = vRet.begin(); it != vRet.end(); it++) {
+		PatientInfo*  pPatient = *it;
+
+		if (pPatient->bToUpdated) {
+			int nCnt = m_lstPatients->GetCount();
+			for (int i = 0; i < nCnt; i++) {
+				DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(i);
+				if (pListElement->GetTag() == pPatient->dwId) {
+					AddPatientItem2List(pListElement, pPatient, FALSE);
+				}
+			}
+		}
+		else {
+			DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+			m_lstPatients->Add(pListElement);
+
+			AddPatientItem2List(pListElement, pPatient);
+		}		
+	}
+}
+
+
+
+
+
+
 // 添加病人
 void   CDuiFrameWnd::OnAddPatient() {
 	CPatientWnd * pPatientDlg = new CPatientWnd;
+	if (0 == pPatientDlg) {
+		return;
+	}
+
 	pPatientDlg->Create(this->m_hWnd, _T("新增病人信息"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pPatientDlg->CenterWindow();
 	int ret = pPatientDlg->ShowModal();
@@ -60,13 +152,7 @@ void   CDuiFrameWnd::OnAddPatient() {
 		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
 		m_lstPatients->Add(pListElement);
 
-		pListElement->SetText(PATIENTS_INFO_ID_INDEX,     pPatientDlg->m_tPatientInfo.szId );
-		pListElement->SetText(PATIENTS_INFO_NAME_INDEX,   pPatientDlg->m_tPatientInfo.szName );
-		pListElement->SetText(PATIENTS_INFO_GENDER_INDEX, GetGender(pPatientDlg->m_tPatientInfo.bFemale) );
-		pListElement->SetText(PATIENTS_INFO_BED_NO_INDEX, pPatientDlg->m_tPatientInfo.szBedNo );
-		pListElement->SetText(PATIENTS_INFO_STATUS_INDEX, GetInHosStatus(pPatientDlg->m_tPatientInfo.bOutHos) );
-
-		pListElement->SetTag( pPatientDlg->m_tPatientInfo.dwId );
+		AddPatientItem2List(pListElement, &pPatientDlg->m_tPatientInfo);
 	}
 
 	delete pPatientDlg;
@@ -74,13 +160,80 @@ void   CDuiFrameWnd::OnAddPatient() {
 
 // 修改病人
 void   CDuiFrameWnd::OnModifyPatient() {
+	if (0 == m_lstPatients) {
+		return;
+	}
 
+	int nSelIndex = m_lstPatients->GetCurSel();
+	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(nSelIndex);
+	if (0 == pListElement) {
+		return;
+	}
+
+	CPatientWnd * pPatientDlg = new CPatientWnd(FALSE);
+	if (0 == pPatientDlg) {
+		return;
+	}
+	memset(&pPatientDlg->m_tPatientInfo, 0, sizeof(PatientInfo));
+
+	strncpy_s(pPatientDlg->m_tPatientInfo.szId,    pListElement->GetText(PATIENTS_INFO_ID_INDEX),     sizeof(pPatientDlg->m_tPatientInfo.szId));
+	strncpy_s(pPatientDlg->m_tPatientInfo.szName,  pListElement->GetText(PATIENTS_INFO_NAME_INDEX),   sizeof(pPatientDlg->m_tPatientInfo.szName));
+	strncpy_s(pPatientDlg->m_tPatientInfo.szBedNo, pListElement->GetText(PATIENTS_INFO_BED_NO_INDEX), sizeof(pPatientDlg->m_tPatientInfo.szBedNo));
+	pPatientDlg->m_tPatientInfo.bFemale = GetGender(pListElement->GetText(PATIENTS_INFO_GENDER_INDEX));
+	pPatientDlg->m_tPatientInfo.bOutHos = GetInHosStatus(pListElement->GetText(PATIENTS_INFO_STATUS_INDEX));
+	pPatientDlg->m_tPatientInfo.dwId = (DWORD)pListElement->GetTag();
+	
+	pPatientDlg->Create(this->m_hWnd, _T("新增病人信息"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pPatientDlg->CenterWindow();
+	int ret = pPatientDlg->ShowModal();
+
+	// 如果修改成功
+	if (0 == ret && m_lstPatients) {
+		AddPatientItem2List(pListElement, &pPatientDlg->m_tPatientInfo, FALSE);
+	}
+
+	delete pPatientDlg;
 }
 
 // 删除病人
 void   CDuiFrameWnd::OnDeletePatient() {
+	if (0 == m_lstPatients) {
+		return;
+	}
 
+	int nSelIndex = m_lstPatients->GetCurSel();
+	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(nSelIndex);
+	if (0 == pListElement) {
+		return;
+	}
+
+	if ( IDYES == ::MessageBox(GetHWND(), "你确定要删除该病人信息吗？", "删除病人", MB_YESNO | MB_DEFBUTTON2) ) {
+		CBusiness::GetInstance()->DeletePatientAsyn( (DWORD)pListElement->GetTag() );
+	}
 }
+
+// 导入病人
+void   CDuiFrameWnd::OnImportPatients() {
+	OPENFILENAME ofn = { 0 };
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+	ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
+	ofn.hwndOwner = NULL;//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
+	ofn.lpstrFilter = TEXT("Excel Flie(*.xls)\0*.xls\0所有文件\0*.*\0\0");//设置过滤  
+	ofn.nFilterIndex = 1;//过滤器索引  
+	ofn.lpstrFile = strFilename;//接收返回的文件名，注意第一个字符需要为NULL  
+	ofn.nMaxFile = sizeof(strFilename);//缓冲区长度  
+									   //ofn.lpstrInitialDir = NULL;//初始目录为默认  
+	ofn.lpstrInitialDir = CPaintManagerUI::GetInstancePath();
+	ofn.lpstrTitle = TEXT("请选择一个文件");//使用系统默认标题留空即可  
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;//文件、目录必须存在，隐藏只读选项  
+	if (GetOpenFileName(&ofn))
+	{
+		CBusiness::GetInstance()->ImportPatientsAsyn( strFilename );
+	}
+}
+
+
+
 
 
 void CDuiFrameWnd::InitWindow() {
@@ -186,7 +339,7 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			OnDeletePatient();
 		}
 		else if (name == IMPORT_PATIENT_BUTTON_ID) {
-
+			OnImportPatients();
 		}
 		else if (name == BINDING_PATIENT_BUTTON_ID) {
 
@@ -223,6 +376,51 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			SET_CONTROL_TEXT(m_lblBindingReaderStatus, BINDING_READER_STATUS_CLOSE_TEXT);
 		}
 		return 0;
+	}
+	else if (uMsg == UM_GET_ALL_PATIENTS_RET) {
+		nError = wParam;
+		std::vector<PatientInfo * > * pvRet = (std::vector<PatientInfo *> *)lParam;
+
+		if ( (0 == nError) && pvRet )
+			OnGetAllPatientsRet(*pvRet);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+		}
+		return 0;
+	}
+	else if (uMsg == UM_DELETE_PATIENT_RET) {
+		nError = wParam;
+		DWORD dwId = (DWORD)lParam;
+
+		OnDeletePatientRet( nError, dwId );
+		return 0;
+	}
+	else if (uMsg == UM_NOTIFY_IMPORT_PATIENTS_RET) {
+		nError = wParam;
+		std::vector<PatientInfo*> * pvRet = (std::vector<PatientInfo*> *)lParam;
+
+		if ( 0 == nError ) {
+			if (pvRet) {
+				OnImportPatientsRet(nError, *pvRet);
+			}			
+		}
+		// 部分失败
+		else if ( ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL == nError) {
+			if (pvRet) {
+				OnImportPatientsRet(nError, *pvRet);
+			}
+			::MessageBox(this->GetHWND(), GetErrDescription(nError), "导入病人信息", 0);
+		}
+		// 完全失败
+		else {
+			::MessageBox(this->GetHWND(), GetErrDescription(nError), "导入病人信息", 0);
+		}
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
 	}
 
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);

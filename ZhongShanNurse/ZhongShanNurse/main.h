@@ -43,14 +43,25 @@ private:
 	DuiLib::CListUI *           m_lstPatients;
 
 private:
+	void  AddPatientItem2List( DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag = TRUE);
+
 	// 添加病人
 	void   OnAddPatient();
 	// 修改病人
 	void   OnModifyPatient();
 	// 删除病人
 	void   OnDeletePatient();
+	// 导入病人
+	void   OnImportPatients();
 
+	// 处理UM_MESSAGE
 	// 数据库连接上
 	void   OnFistDbConnected();
+	// 所有病人ret
+	void   OnGetAllPatientsRet(const std::vector<PatientInfo*> & vRet );
+	// 删除病人ret
+	void   OnDeletePatientRet( int ret, DWORD dwId );
+	// 导入病人ret
+	void   OnImportPatientsRet(int ret, const std::vector<PatientInfo*> & vRet);
 }; 
 

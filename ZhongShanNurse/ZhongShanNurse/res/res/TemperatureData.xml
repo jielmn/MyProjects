@@ -6,9 +6,10 @@
 				<List name="patients_list_short" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" itemfont="6" itemtextcolor="#FF386382" >
 					<ListHeader height="24" menu="false">
 						<ListHeaderItem text="编号"   font="1" width="50"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
-						<ListHeaderItem text="姓名"   font="1" width="100" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="姓名"   font="1" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 						<ListHeaderItem text="床位号" font="1" width="100" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
-						<ListHeaderItem text="绑定体温贴"  font="1" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="绑定贴" font="1" width="60"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="状态 "  font="1"             textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					</ListHeader>
 				</List>
 			</VerticalLayout>

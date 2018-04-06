@@ -37,14 +37,32 @@ public:
 
 	// 添加病人
 	int   AddPatientAsyn( const PatientInfo * pPatient, HWND hWnd );
-	int   AddPatient(const CAddPatientParam * pParam);
+	int   AddPatient(const CPatientParam * pParam);
 	// 通知添加结果
 	int   NotifyUiAddPatientRet(HWND hWnd, int ret, DWORD dwId);
 
 	// 请求所有的病人信息
 	int   GetAllPatientsAsyn();
 	int   GetAllPatients();
-	int   NotifyUiGetAllPatientsRet();
+	int   NotifyUiGetAllPatientsRet(int ret, std::vector<PatientInfo * > * pvRet);
+
+	// 修改病人
+	int   ModifyPatientAsyn(const PatientInfo * pPatient, HWND hWnd);
+	int   ModifyPatient(const CPatientParam * pParam);
+	// 通知添加结果
+	int   NotifyUiModifyPatientRet(HWND hWnd, int ret);
+
+	// 删除病人
+	int   DeletePatientAsyn(DWORD dwId);
+	int   DeletePatient(const CDeletePatientParam * pParam);
+	// 通知删除结果
+	int   NotifyUiDeletePatientRet(int ret, DWORD dwId);
+
+	// 导入病人
+	int   ImportPatientsAsyn( const char * szFilePath );
+	int   ImportPatients(const CImportPatientsParam * pParam, std::vector<PatientInfo*> & vRet );
+	// 通知导入结果
+	int   NotifyUiImportPatientsRet(int ret, std::vector<PatientInfo*> * );
 
 private:
 	static CBusiness *  pInstance;

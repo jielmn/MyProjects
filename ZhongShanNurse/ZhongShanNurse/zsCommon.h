@@ -1,5 +1,9 @@
 #pragma once
 
+#include <afx.h>
+#include <vector>
+#include <algorithm>
+
 #include "LmnContainer.h"
 #include "LmnConfig.h"
 #include "LmnLog.h"
@@ -66,11 +70,19 @@
 #define MSG_RECONNECT_DB           1
 #define MSG_INVENTORY              2
 #define MSG_ADD_PATIENT            3
+#define MSG_GET_ALL_PATIENTS       4
+#define MSG_MODIFY_PATIENT         5
+#define MSG_DELETE_PATIENT         6
+#define MSG_IMPORT_PATIENTS        7
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
 #define UM_SHOW_BINDING_READER_STATUS          (WM_USER+2)
 #define UM_ADD_PATIENT_RET                     (WM_USER+3)
+#define UM_GET_ALL_PATIENTS_RET                (WM_USER+4)
+#define UM_MODIFY_PATIENT_RET                  (WM_USER+5)
+#define UM_DELETE_PATIENT_RET                  (WM_USER+6)
+#define UM_NOTIFY_IMPORT_PATIENTS_RET          (WM_USER+7)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -81,6 +93,10 @@
 #define ZS_ERR_DB_CLOSE                                 10006
 #define ZS_ERR_DB_ERROR                                 10007
 #define ZS_ERR_DB_NOT_UNIQUE                            10008
+#define ZS_ERR_PATIENT_HAS_TEMP_DATA                    10009
+#define ZS_ERR_EXCEL_DRIVER_NOT_FOUND                   10010
+#define ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL         10011
+#define ZS_ERR_FAILED_TO_EXECUTE_EXCEL                  10012
 
 #define  DB_STATUS_OK_TEXT             "数据库连接OK"
 #define  DB_STATUS_CLOSE_TEXT          "数据库连接失败"
@@ -111,12 +127,14 @@ typedef struct tagPatientInfo {
 	char     szBedNo[MAX_BED_NO_LENGTH];
 	BOOL     bFemale;
 	BOOL     bOutHos;
+
+	BOOL     bToUpdated;
 }PatientInfo;
 
 
-class CAddPatientParam : public LmnToolkits::MessageData {
+class CPatientParam : public LmnToolkits::MessageData {
 public:
-	CAddPatientParam(const PatientInfo * pPatient, HWND hWnd) {
+	CPatientParam(const PatientInfo * pPatient, HWND hWnd) {
 		if (pPatient)
 			memcpy(&m_patient, pPatient, sizeof(PatientInfo));
 		else
@@ -124,10 +142,31 @@ public:
 
 		m_hWnd = hWnd;
 	}
-	~CAddPatientParam() {}
+	~CPatientParam() {}
 
 	PatientInfo   m_patient;
 	HWND          m_hWnd;
+};
+
+
+class CDeletePatientParam : public LmnToolkits::MessageData {
+public:
+	CDeletePatientParam(DWORD dwId) {
+		m_dwId = dwId;
+	}
+	~CDeletePatientParam() {}
+
+	DWORD     m_dwId;
+};
+
+class CImportPatientsParam : public LmnToolkits::MessageData {
+public:
+	CImportPatientsParam( const char * szFilePath ) {
+		strncpy_s(m_szFilePath, szFilePath, sizeof(m_szFilePath));
+	}
+	~CImportPatientsParam() {}
+
+	char      m_szFilePath[256];
 };
 
 
@@ -142,4 +181,20 @@ extern char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD d
 extern int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 extern const char * GetErrDescription(int e);
 extern const char * GetGender(BOOL bFemale);
+extern const BOOL   GetGender(const char *);
 extern const char * GetInHosStatus(BOOL bOutHos);
+extern BOOL         GetInHosStatus(const char *);
+extern CString GetExcelDriver();
+
+
+
+// templates
+template <class T>
+void ClearVector(std::vector<T> & v) {
+	typedef std::vector<T>::iterator v_it;
+	v_it it;
+	for (it = v.begin(); it != v.end(); it++) {
+		delete *it;
+	}
+	v.clear();
+}

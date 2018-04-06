@@ -1,6 +1,7 @@
 #pragma once
 
 #include <afxdb.h>
+#include <vector>
 #include "zsCommon.h"
 
 class CBusiness;
@@ -26,7 +27,11 @@ public:
 
 	DATABASE_STATUS GetStatus();
 
-	int AddPatient(const CAddPatientParam * pParam, DWORD & dwId );
+	int AddPatient(const CPatientParam * pParam, DWORD & dwId );
+	int GetAllPatients(std::vector<PatientInfo *> & vRet);
+	int ModifyPatient(const CPatientParam * pParam);
+	int DeletePatient(const CDeletePatientParam * pParam);
+	int ImportPatient( PatientInfo * pPatient );
 
 private:
 	void Clear();

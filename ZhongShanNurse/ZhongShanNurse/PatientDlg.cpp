@@ -35,7 +35,12 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 				m_tPatientInfo.bOutHos = FALSE;
 			}
 
-			CBusiness::GetInstance()->AddPatientAsyn( &m_tPatientInfo, this->GetHWND() );
+			if ( m_bAdd ) {
+				CBusiness::GetInstance()->AddPatientAsyn(&m_tPatientInfo, this->GetHWND());
+			}				
+			else {
+				CBusiness::GetInstance()->ModifyPatientAsyn(&m_tPatientInfo, this->GetHWND());
+			}
 		}		
 	}
 	WindowImplBase::Notify(msg);
@@ -43,6 +48,8 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 
 void  CPatientWnd::InitWindow()
 {
+	DuiLib::CDuiString  strText;
+
 	m_edPatientId = (DuiLib::CEditUI *)m_PaintManager.FindControl(PATIENT_ID_EDIT_ID);
 	m_edPatientName = (DuiLib::CEditUI *)m_PaintManager.FindControl(PATIENT_NAME_EDIT_ID);
 	m_opMale = (DuiLib::COptionUI *)m_PaintManager.FindControl(MALE_OPTION_ID);
@@ -54,6 +61,22 @@ void  CPatientWnd::InitWindow()
 
 	if (m_bAdd) {		
 		SET_CONTROL_VISIBLE(m_lyTags, false);
+	}
+	else {
+		SET_CONTROL_TEXT(m_edPatientId,   m_tPatientInfo.szId);
+		SET_CONTROL_TEXT(m_edPatientName, m_tPatientInfo.szName);
+		SET_CONTROL_TEXT(m_edBedNo,       m_tPatientInfo.szBedNo);
+		if (m_tPatientInfo.bFemale) {
+			if (m_opFemale) {
+				m_opFemale->Selected(true);
+			}
+		}
+
+		if (m_tPatientInfo.bOutHos) {
+			if (m_opOutHos) {
+				m_opOutHos->Selected(true);
+			}
+		}
 	}
 
 	WindowImplBase::InitWindow();
@@ -75,5 +98,17 @@ LRESULT CPatientWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			::MessageBox( this->GetHWND(), GetErrDescription( ret ), CAPTION_PATIENT_MSG_BOX, 0 );
 		}
 	}
+	else if (uMsg == UM_MODIFY_PATIENT_RET) {
+		ret = (int)wParam;
+
+		// ³É¹¦
+		if (0 == ret) {
+			PostMessage(WM_CLOSE);
+		}
+		else {
+			::MessageBox(this->GetHWND(), GetErrDescription(ret), CAPTION_PATIENT_MSG_BOX, 0);
+		}
+	}
+
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }

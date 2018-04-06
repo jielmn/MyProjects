@@ -1,5 +1,6 @@
 
 #include "zsCommon.h"
+#include <odbcinst.h>
 #include "LmnString.h"
 
 ILog    * g_log = 0;
@@ -101,6 +102,18 @@ const char * GetErrDescription(int e) {
 	case ZS_ERR_DB_ERROR:
 		szDescription = "数据库错误";
 		break;
+	
+	case ZS_ERR_PATIENT_HAS_TEMP_DATA:
+		szDescription = "病人已经有温度数据在数据库里，不能删除";
+		break;
+
+	case ZS_ERR_EXCEL_DRIVER_NOT_FOUND:
+		szDescription = "没有找到Excel驱动";
+		break;
+
+	case ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL:
+		szDescription = "导入病人信息部分失败";
+		break;
 
 	default:
 		szDescription = "未知错误";
@@ -117,6 +130,16 @@ const char * GetGender(BOOL bFemale) {
 	}
 }
 
+// 是否女性
+const BOOL  GetGender(const char * szGender) {
+	if ( 0 == strcmp(szGender, "男") ) {
+		return FALSE;
+	}
+	else {
+		return TRUE;
+	}
+}
+
 const char * GetInHosStatus(BOOL bOutHos) {
 	if (bOutHos) {
 		return "出院";
@@ -124,4 +147,40 @@ const char * GetInHosStatus(BOOL bOutHos) {
 	else {
 		return "住院";
 	}
+}
+
+BOOL GetInHosStatus(const char * szStatus) {
+	if (0 == strcmp(szStatus, "住院")) {
+		return FALSE;
+	}
+	else {
+		return TRUE;
+	}
+}
+
+
+CString GetExcelDriver()
+{
+	char szBuf[2001];
+	WORD cbBufMax = 2000;
+	WORD cbBufOut;
+	char *pszBuf = szBuf;
+	CString sDriver;
+
+	//get driver name function(included in odbcinst.h)  
+	if (!SQLGetInstalledDrivers(szBuf, cbBufMax, &cbBufOut))
+		return "";
+	//check excel included or not  
+	do
+	{
+		if (strstr(pszBuf, "Excel") != 0)
+		{
+			//found  
+			sDriver = CString(pszBuf);
+			break;
+		}
+		pszBuf = strchr(pszBuf, '\0') + 1;
+	} while (pszBuf[1] != '\0');
+
+	return sDriver;
 }
