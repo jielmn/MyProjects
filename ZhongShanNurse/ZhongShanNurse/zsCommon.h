@@ -41,6 +41,15 @@
 #define  IN_HOS_OPTION_ID               "btnInhos"
 #define  OUT_HOS_OPTION_ID              "btnOutHos"
 #define  PATIENTS_LIST_ID               "patients_list"
+#define  ADD_NURSE_BUTTON_ID            "btnAddNurse"
+#define  MOD_NURSE_BUTTON_ID            "btnModifyNurse"
+#define  DEL_NURSE_BUTTON_ID            "btnDelNurse"
+#define  IMPORT_NURSE_BUTTON_ID         "import_excel_nurse"
+#define  BINDING_NURSE_BUTTON_ID        "btnBinding_nurse"
+#define  NURSES_LIST_ID                 "nurses_list"
+#define  NURSE_ID_EDIT_ID               "edNurseId"
+#define  NURSE_NAME_EDIT_ID             "edNurseName"
+#define  NURSE_OK_BUTTON_ID             "btnNurseOk"
 
 #define  TEMPERATURE_DATA_FILE         "TemperatureData.xml"
 #define  PATIENTS_FILE                 "Patients.xml"
@@ -74,6 +83,12 @@
 #define MSG_MODIFY_PATIENT         5
 #define MSG_DELETE_PATIENT         6
 #define MSG_IMPORT_PATIENTS        7
+#define MSG_ADD_NURSE              8
+#define MSG_GET_ALL_NURSES         9
+#define MSG_MODIFY_NURSE           10
+#define MSG_DELETE_NURSE           11
+#define MSG_IMPORT_NURSES          12
+#define MSG_CHECK_TAG_BINDING      13
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -83,6 +98,13 @@
 #define UM_MODIFY_PATIENT_RET                  (WM_USER+5)
 #define UM_DELETE_PATIENT_RET                  (WM_USER+6)
 #define UM_NOTIFY_IMPORT_PATIENTS_RET          (WM_USER+7)
+#define UM_ADD_NURSE_RET                       (WM_USER+8)
+#define UM_GET_ALL_NURSES_RET                  (WM_USER+9)
+#define UM_MODIFY_NURSE_RET                    (WM_USER+10)
+#define UM_DELETE_NURSE_RET                    (WM_USER+11)
+#define UM_NOTIFY_IMPORT_NURSES_RET            (WM_USER+12)
+#define UM_INVENTORY_RET                       (WM_USER+13)
+#define UM_CHECK_TAG_BINDING_RET               (WM_USER+14)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -97,6 +119,7 @@
 #define ZS_ERR_EXCEL_DRIVER_NOT_FOUND                   10010
 #define ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL         10011
 #define ZS_ERR_FAILED_TO_EXECUTE_EXCEL                  10012
+#define ZS_ERR_NURSE_HAS_TEMP_DATA                      10013
 
 #define  DB_STATUS_OK_TEXT             "数据库连接OK"
 #define  DB_STATUS_CLOSE_TEXT          "数据库连接失败"
@@ -107,6 +130,7 @@
 #define  COLOR_ERROR                               0xFFCAF100
 
 #define  CAPTION_PATIENT_MSG_BOX                   "添加/修改病人信息"
+#define  CAPTION_NURSE_MSG_BOX                     "添加/修改护士信息"
 
 #define  MAX_TAG_ID_LENGTH              32
 //  tag
@@ -129,7 +153,20 @@ typedef struct tagPatientInfo {
 	BOOL     bOutHos;
 
 	BOOL     bToUpdated;
+	BOOL     bStrIdChanged;
 }PatientInfo;
+
+#define  MAX_NURSE_ID_LENGTH              32
+#define  MAX_NURSE_NAME_LENGTH            32
+// 护士
+typedef struct tagNurseInfo {
+	DWORD    dwId;
+	char     szId[MAX_NURSE_ID_LENGTH];
+	char     szName[MAX_NURSE_NAME_LENGTH];
+
+	BOOL     bToUpdated;
+	BOOL     bStrIdChanged;
+}NurseInfo;
 
 
 class CPatientParam : public LmnToolkits::MessageData {
@@ -170,6 +207,52 @@ public:
 };
 
 
+class CNurseParam : public LmnToolkits::MessageData {
+public:
+	CNurseParam(const NurseInfo * p, HWND hWnd) {
+		if (p)
+			memcpy(&m_nurse, p, sizeof(NurseInfo));
+		else
+			memset(&m_nurse, 0, sizeof(NurseInfo));
+
+		m_hWnd = hWnd;
+	}
+	~CNurseParam() {}
+
+	NurseInfo     m_nurse;
+	HWND          m_hWnd;
+};
+
+class CDeleteNurseParam : public LmnToolkits::MessageData {
+public:
+	CDeleteNurseParam(DWORD dwId) {
+		m_dwId = dwId;
+	}
+	~CDeleteNurseParam() {}
+
+	DWORD     m_dwId;
+};
+
+class CImportNursesParam : public LmnToolkits::MessageData {
+public:
+	CImportNursesParam(const char * szFilePath) {
+		strncpy_s(m_szFilePath, szFilePath, sizeof(m_szFilePath));
+	}
+	~CImportNursesParam() {}
+
+	char      m_szFilePath[256];
+};
+
+class CTagItemParam : public LmnToolkits::MessageData {
+public:
+	CTagItemParam(const TagItem * pItem) {
+		memcpy(&m_tag, pItem, sizeof(TagItem));
+	}
+	~CTagItemParam() {}
+
+	TagItem    m_tag;
+};
+
 extern ILog    * g_log;
 extern IConfig * g_cfg;
 extern HWND    g_hWnd;
@@ -186,7 +269,9 @@ extern const char * GetInHosStatus(BOOL bOutHos);
 extern BOOL         GetInHosStatus(const char *);
 extern CString GetExcelDriver();
 
-
+extern BOOL  IsSameTag(const TagItem * p1, const TagItem * p2);
+extern char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit = '\0');
+extern TagItem * GetUid(TagItem * pTagItem, const char * szUid, BOOL bWithSplitChar = FALSE);
 
 // templates
 template <class T>

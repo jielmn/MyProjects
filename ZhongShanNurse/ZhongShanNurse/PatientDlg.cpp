@@ -13,6 +13,10 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == "click") {
 		if (name == PATIENT_OK_BUTTON_ID) {
 			strText = GET_CONTROL_TEXT(m_edPatientId);
+			// 如果id改变
+			if (!m_bAdd && 0 != strcmp( strText, m_tPatientInfo.szId) ) {
+				m_tPatientInfo.bStrIdChanged = TRUE;
+			}
 			strncpy_s(m_tPatientInfo.szId, strText, sizeof(m_tPatientInfo.szId));
 
 			strText = GET_CONTROL_TEXT(m_edPatientName);

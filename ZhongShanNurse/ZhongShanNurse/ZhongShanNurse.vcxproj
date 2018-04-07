@@ -88,7 +88,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_RICHEDIT_VER=0x0210;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -155,6 +155,7 @@ xcopy dll ..\Debug  /dseiy</Command>
     <ClInclude Include="Business.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="mi.h" />
+    <ClInclude Include="NurseDlg.h" />
     <ClInclude Include="PatientDlg.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="zsBindingReader.h" />
@@ -164,6 +165,7 @@ xcopy dll ..\Debug  /dseiy</Command>
   <ItemGroup>
     <ClCompile Include="Business.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NurseDlg.cpp" />
     <ClCompile Include="PatientDlg.cpp" />
     <ClCompile Include="zsBindingReader.cpp" />
     <ClCompile Include="zsCommon.cpp" />

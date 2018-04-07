@@ -5,6 +5,8 @@
 
 #define  PATIENTS_TABLE_NAME                "patients"
 #define  TEMPERATURE_TABLE_NAME             "temperature_data"
+#define  NURSES_TABLE_NAME                  "nurses"
+#define  TAGS_TABLE_NAME                    "tags"
 
 static char * ConvertSqlField(char * szDest, DWORD dwDestSize, const char * filed_value) {
 	int ret = StrReplaceAll(szDest, dwDestSize - 1, filed_value, "'", "''");
@@ -277,6 +279,14 @@ int CZsDatabase::ModifyPatient(const CPatientParam * pParam) {
 			            tPatient.szId, tPatient.szName, tPatient.szBedNo, tPatient.bFemale, tPatient.bOutHos, tPatient.dwId );
 
 		m_database.ExecuteSQL(strSql);		
+
+		if (tPatient.bStrIdChanged) {
+			strSql.Format("UPDATE %s SET patient_id='%s' where patient_id='%s' ", TEMPERATURE_TABLE_NAME,
+				tPatient.szId, tPatient.szId);
+			m_database.ExecuteSQL(strSql);
+		}
+		
+
 	}
 	catch (CException* e)
 	{
@@ -392,6 +402,304 @@ int CZsDatabase::ImportPatient( PatientInfo * pPatient) {
 		}
 		pPatient->dwId = tPatient.dwId;
 		
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+
+int CZsDatabase::AddNurse(const CNurseParam * pParam, DWORD & dwId) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	int ret = 0;
+	try
+	{
+		NurseInfo  tNurse;
+		memcpy(&tNurse, &pParam->m_nurse, sizeof(NurseInfo));
+		ConvertSqlField(tNurse.szId,   sizeof(tNurse.szId),   pParam->m_nurse.szId);
+		ConvertSqlField(tNurse.szName, sizeof(tNurse.szName), pParam->m_nurse.szName);
+
+		strSql.Format("INSERT INTO %s VALUES( null, '%s', '%s', null ) ", NURSES_TABLE_NAME, tNurse.szId, tNurse.szName );
+
+		m_database.ExecuteSQL(strSql);
+
+		strSql.Format("SELECT MAX(id) from %s ", NURSES_TABLE_NAME);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		CString   strValue;
+		m_recordset.GetFieldValue((short)0, strValue);
+		sscanf_s(strValue, "%lu", &dwId);
+
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::GetAllNurses(std::vector<NurseInfo *> & vRet) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("SELECT * FROM %s ", NURSES_TABLE_NAME);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		while (!m_recordset.IsEOF())
+		{
+			CString       strValue;
+			NurseInfo     tNurse;
+			memset(&tNurse, 0, sizeof(NurseInfo));
+
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &tNurse.dwId);
+
+			m_recordset.GetFieldValue((short)1, strValue);
+			strncpy_s(tNurse.szId, strValue, sizeof(tNurse.szId));
+
+			m_recordset.GetFieldValue((short)2, strValue);
+			strncpy_s(tNurse.szName, strValue, sizeof(tNurse.szName));
+
+			NurseInfo *  pNurse = new NurseInfo;
+			if (0 == pNurse) {
+				ClearVector(vRet);
+				ret = ZS_ERR_NO_MEMORY;
+				return ret;
+			}
+
+			memcpy(pNurse, &tNurse, sizeof(NurseInfo));
+			vRet.push_back(pNurse);
+
+			m_recordset.MoveNext();
+		}
+
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::ModifyNurse(const CNurseParam * pParam) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	int ret = 0;
+	try
+	{
+		NurseInfo  tNurse;
+		memcpy(&tNurse, &pParam->m_nurse, sizeof(NurseInfo));
+
+		ConvertSqlField(tNurse.szId, sizeof(tNurse.szId),     pParam->m_nurse.szId);
+		ConvertSqlField(tNurse.szName, sizeof(tNurse.szName), pParam->m_nurse.szName);
+
+		strSql.Format("UPDATE %s SET str_id='%s',name='%s' where id=%lu ", NURSES_TABLE_NAME,
+			tNurse.szId, tNurse.szName, tNurse.dwId);
+
+		m_database.ExecuteSQL(strSql);
+
+		if (tNurse.bStrIdChanged) {
+			strSql.Format("UPDATE %s SET nurse_id='%s' where nurse_id='%s' ", TEMPERATURE_TABLE_NAME,
+				tNurse.szId, tNurse.szId);
+			m_database.ExecuteSQL(strSql);
+		}
+
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+
+int CZsDatabase::DeleteNurse(const CDeleteNurseParam * pParam) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("SELECT count(*) from %s a inner join %s b on a.str_id = b.nurse_id WHERE a.id=%lu ", NURSES_TABLE_NAME, TEMPERATURE_TABLE_NAME, pParam->m_dwId);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		// 如果有数据
+		if (!m_recordset.IsEOF())
+		{
+			CString       strValue;
+			DWORD         dwCnt = 0;
+
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &dwCnt);
+
+			if (dwCnt > 0) {
+				ret = ZS_ERR_NURSE_HAS_TEMP_DATA;
+			}
+		}
+		m_recordset.Close();//关闭记录集
+
+		// 如果该护士没有温度数据
+		if (0 == ret) {
+			strSql.Format("DELETE FROM %s WHERE id=%lu ", NURSES_TABLE_NAME, pParam->m_dwId);
+			m_database.ExecuteSQL(strSql);
+		}
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+
+int CZsDatabase::ImportNurse(NurseInfo * pNurse) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	int ret = 0;
+	try
+	{
+		NurseInfo  tNurse;
+		memcpy(&tNurse, pNurse, sizeof(NurseInfo));
+
+		ConvertSqlField(tNurse.szId,   sizeof(tNurse.szId),   pNurse->szId);
+		ConvertSqlField(tNurse.szName, sizeof(tNurse.szName), pNurse->szName);
+
+		BOOL bFind = FALSE;
+		CString   strValue;
+		strSql.Format("SELECT id FROM %s WHERE str_id='%s' ", NURSES_TABLE_NAME, tNurse.szId);
+
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		if (!m_recordset.IsEOF())
+		{
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &tNurse.dwId);
+			bFind = TRUE;
+		}
+		m_recordset.Close();//关闭记录集
+
+							// 如果存在相同str_id的病人记录
+		if (bFind) {
+			strSql.Format("UPDATE %s SET name='%s' WHERE str_id='%s' ", NURSES_TABLE_NAME, tNurse.szName, tNurse.szId);
+			m_database.ExecuteSQL(strSql);
+			pNurse->bToUpdated = TRUE;
+		}
+		// 插入记录
+		else {
+			strSql.Format("INSERT INTO %s VALUES( null, '%s', '%s', null ) ", NURSES_TABLE_NAME, tNurse.szId, tNurse.szName );
+			m_database.ExecuteSQL(strSql);
+
+			strSql.Format("SELECT MAX(id) from %s ", NURSES_TABLE_NAME);
+			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &tNurse.dwId);
+
+			m_recordset.Close();//关闭记录集
+			pNurse->bToUpdated = FALSE;
+		}
+		pNurse->dwId = tNurse.dwId;
+
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+
+int CZsDatabase::CheckTagBinding(const CTagItemParam * pParam, DWORD & dwPatientId) {
+	CString strSql;
+	dwPatientId = 0;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	char szTagId[256] = {0};
+	GetUid(szTagId, sizeof(szTagId), pParam->m_tag.abyUid, pParam->m_tag.dwUidLen);
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("SELECT b.id FROM %s a INNER JOIN %s b on a.patient_id = b.str_id WHERE a.id='%s' ", TAGS_TABLE_NAME, PATIENTS_TABLE_NAME, szTagId );
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		if (!m_recordset.IsEOF())
+		{
+			CString       strValue;
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &dwPatientId);			
+		}
+
+		m_recordset.Close();//关闭记录集
 	}
 	catch (CException* e)
 	{

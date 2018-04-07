@@ -49,7 +49,7 @@ public:
 	// 修改病人
 	int   ModifyPatientAsyn(const PatientInfo * pPatient, HWND hWnd);
 	int   ModifyPatient(const CPatientParam * pParam);
-	// 通知添加结果
+	// 通知修改结果
 	int   NotifyUiModifyPatientRet(HWND hWnd, int ret);
 
 	// 删除病人
@@ -63,6 +63,40 @@ public:
 	int   ImportPatients(const CImportPatientsParam * pParam, std::vector<PatientInfo*> & vRet );
 	// 通知导入结果
 	int   NotifyUiImportPatientsRet(int ret, std::vector<PatientInfo*> * );
+
+	// 添加护士
+	int   AddNurseAsyn(const NurseInfo * pNurse, HWND hWnd);
+	int   AddNurse(const CNurseParam * pParam);
+	// 通知添加结果
+	int   NotifyUiAddNurseRet(HWND hWnd, int ret, DWORD dwId);
+
+	// 请求所有的护士信息
+	int   GetAllNursesAsyn();
+	int   GetAllNurses();
+	int   NotifyUiGetAllNursesRet(int ret, std::vector<NurseInfo * > * pvRet);
+
+	// 修改护士
+	int   ModifyNurseAsyn(const NurseInfo * pNurse, HWND hWnd);
+	int   ModifyNurse(const CNurseParam * pParam);
+	// 通知修改结果
+	int   NotifyUiModifyNurseRet(HWND hWnd, int ret);
+
+	// 删除护士
+	int   DeleteNurseAsyn(DWORD dwId);
+	int   DeleteNurse(const CDeleteNurseParam * pParam);
+	// 通知删除结果
+	int   NotifyUiDeleteNurseRet(int ret, DWORD dwId);
+
+	// 导入护士
+	int   ImportNursesAsyn(const char * szFilePath);
+	int   ImportNurses(const CImportNursesParam * pParam, std::vector<NurseInfo*> & vRet);
+	// 通知导入结果
+	int   NotifyUiImportNursesRet(int ret, std::vector<NurseInfo*> *);
+
+	// 检查Tag有无绑定
+	int   CheckTagBindingAsyn(const TagItem * pItem);
+	int   CheckTagBinding( const CTagItemParam * pParam );
+	int   NotifyUiCheckTagBindingRet(DWORD dwPatientId, const TagItem * pItem);
 
 private:
 	static CBusiness *  pInstance;

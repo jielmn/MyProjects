@@ -33,6 +33,14 @@ public:
 	int DeletePatient(const CDeletePatientParam * pParam);
 	int ImportPatient( PatientInfo * pPatient );
 
+	int AddNurse(const CNurseParam * pParam, DWORD & dwId);
+	int GetAllNurses(std::vector<NurseInfo *> & vRet);
+	int ModifyNurse(const CNurseParam * pParam);
+	int DeleteNurse(const CDeleteNurseParam * pParam);
+	int ImportNurse(NurseInfo * pNurse);
+
+	int CheckTagBinding(const CTagItemParam * pParam, DWORD & dwPatientId);
+
 private:
 	void Clear();
 	int  OnDatabaseException(CException* e);

@@ -161,10 +161,23 @@ int   CBusiness::Inventory() {
 	int ret =  m_BindingReader.Inventory(&item);
 	CZsBindingReader::BINDING_STATUS eNewStatus = m_BindingReader.GetStatus();
 
-	// 通知UI界面
+	// 通知UI界面状态
 	if (eOldStatus != eNewStatus) {
 		NotifyUiBindingReaderStatus(eNewStatus);
 	}
+
+	// 通知界面盘点结果
+	if (0 == ret) {
+		TagItem * pItem = new TagItem;
+		if (pItem) {
+			memcpy( pItem, &item, sizeof(TagItem) );
+			::PostMessage(g_hWnd, UM_INVENTORY_RET, ret, (LPARAM)pItem );
+		}		
+	}
+	else {
+		::PostMessage(g_hWnd, UM_INVENTORY_RET, ret, 0);
+	}
+	
 
 	// 如果是成功的盘点，则在下次盘点时留下足够长的时间
 	DWORD  dwRelayTime = 1000;
@@ -241,7 +254,7 @@ int   CBusiness::ModifyPatient(const CPatientParam * pParam) {
 	return 0;
 }
 
-// 通知添加结果
+// 通知修改结果
 int   CBusiness::NotifyUiModifyPatientRet(HWND hWnd, int ret) {
 	::PostMessage(hWnd, UM_MODIFY_PATIENT_RET, ret, 0);
 	return 0;
@@ -371,6 +384,200 @@ int   CBusiness::NotifyUiImportPatientsRet(int ret, std::vector<PatientInfo*> * 
 	return 0;
 }
 
+// 添加护士
+int   CBusiness::AddNurseAsyn(const NurseInfo * pNurse, HWND hWnd) {
+	g_thrd_db->PostMessage(this, MSG_ADD_NURSE, new CNurseParam(pNurse, hWnd));
+	return 0;
+}
+
+int   CBusiness::AddNurse(const CNurseParam * pParam) {
+	DWORD  dwId = 0;
+	int ret = m_Database.AddNurse(pParam, dwId);
+	NotifyUiAddNurseRet(pParam->m_hWnd, ret, dwId);
+	return 0;
+}
+
+// 通知添加结果
+int   CBusiness::NotifyUiAddNurseRet(HWND hWnd, int ret, DWORD dwId) {
+	::PostMessage(hWnd, UM_ADD_NURSE_RET, ret, dwId);
+	return 0;
+}
+
+// 请求所有的护士信息
+int   CBusiness::GetAllNursesAsyn() {
+	g_thrd_db->PostMessage(this, MSG_GET_ALL_NURSES);
+	return 0;
+}
+
+int   CBusiness::GetAllNurses() {
+	std::vector<NurseInfo * > * pvRet = new std::vector<NurseInfo * >;
+	int ret = 0;
+	if (0 == pvRet) {
+		ret = -1;
+	}
+	else {
+		ret = m_Database.GetAllNurses(*pvRet);
+	}
+
+	NotifyUiGetAllNursesRet(ret, pvRet);
+	return 0;
+}
+
+int   CBusiness::NotifyUiGetAllNursesRet(int ret, std::vector<NurseInfo * > * pvRet) {
+	::PostMessage(g_hWnd, UM_GET_ALL_NURSES_RET, ret, (LPARAM)pvRet);
+	return 0;
+}
+
+// 修改护士
+int   CBusiness::ModifyNurseAsyn(const NurseInfo * pNurse, HWND hWnd) {
+	g_thrd_db->PostMessage(this, MSG_MODIFY_NURSE, new CNurseParam(pNurse, hWnd));
+	return 0;
+}
+
+int   CBusiness::ModifyNurse(const CNurseParam * pParam) {
+	int ret = m_Database.ModifyNurse(pParam);
+	NotifyUiModifyNurseRet(pParam->m_hWnd, ret);
+	return 0;
+}
+
+// 通知修改结果
+int   CBusiness::NotifyUiModifyNurseRet(HWND hWnd, int ret) {
+	::PostMessage(hWnd, UM_MODIFY_NURSE_RET, ret, 0);
+	return 0;
+}
+
+// 删除护士
+int   CBusiness::DeleteNurseAsyn(DWORD dwId) {
+	g_thrd_db->PostMessage(this, MSG_DELETE_NURSE, new CDeleteNurseParam(dwId));
+	return 0;
+}
+
+int   CBusiness::DeleteNurse(const CDeleteNurseParam * pParam) {
+	int ret = m_Database.DeleteNurse(pParam);
+	NotifyUiDeleteNurseRet(ret, pParam->m_dwId);
+	return 0;
+}
+
+// 通知删除结果
+int   CBusiness::NotifyUiDeleteNurseRet(int ret, DWORD dwId) {
+	::PostMessage(g_hWnd, UM_DELETE_NURSE_RET, ret, dwId);
+	return 0;
+}
+
+// 导入护士
+int   CBusiness::ImportNursesAsyn(const char * szFilePath) {
+	g_thrd_db->PostMessage(this, MSG_IMPORT_NURSES, new CImportNursesParam(szFilePath));
+	return 0;
+}
+
+int   CBusiness::ImportNurses(const CImportNursesParam * pParam, std::vector<NurseInfo*> & vRet) {
+	CString sDriver = GetExcelDriver();
+	if (sDriver.GetLength() == 0) {
+		return ZS_ERR_EXCEL_DRIVER_NOT_FOUND;
+	}
+
+	CString sDsn;
+	CDatabase database;
+	CString sSql;
+	CString sItem;
+	int ret = 0;
+	int nTmp = 0;
+
+	const char * szFilePath = pParam->m_szFilePath;
+	sDsn.Format("ODBC;DRIVER={%s};DSN='''';DBQ=%s", sDriver, szFilePath);
+	TRY
+	{
+		//open db  
+		database.Open(NULL,false,false,sDsn);
+		CRecordset recset(&database);
+		//read sql   
+		sSql = "SELECT * from [护士信息$]";
+		recset.Open(CRecordset::forwardOnly,sSql,CRecordset::readOnly);
+
+		//int n = recset.GetODBCFieldCount();
+		//get query results  
+		//BOOL bFailed = FALSE;
+
+		while (!recset.IsEOF())
+		{
+			NurseInfo tInfo;
+			memset(&tInfo, 0, sizeof(NurseInfo));
+
+			//read inside value  
+			recset.GetFieldValue("编号",     sItem);
+			strncpy_s(tInfo.szId, sItem, sizeof(tInfo.szId));
+
+			recset.GetFieldValue("姓名",     sItem);
+			strncpy_s(tInfo.szName, sItem, sizeof(tInfo.szName));			
+
+			nTmp = m_Database.ImportNurse(&tInfo);
+			if (0 != nTmp) {
+				ret = ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL;
+			}
+			else {
+				NurseInfo * pNewInfo = new NurseInfo;
+				if (pNewInfo) {
+					memcpy(pNewInfo, &tInfo, sizeof(NurseInfo));
+					vRet.push_back(pNewInfo);
+				}
+			}
+
+			recset.MoveNext();
+		}
+
+		//close db  
+		database.Close();
+
+		return ret;
+	}
+	CATCH(CDBException, e)
+	{
+		//db exception occur  
+		database.Close();
+		return ZS_ERR_FAILED_TO_EXECUTE_EXCEL;
+	}
+	END_CATCH;
+	return 0;
+}
+
+// 通知导入结果
+int   CBusiness::NotifyUiImportNursesRet(int ret, std::vector<NurseInfo*> * pvRet) {
+	if ((0 != ret) && (ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL != ret)) {
+		ClearVector(*pvRet);
+		delete pvRet;
+		pvRet = 0;
+	}
+
+	::PostMessage(g_hWnd, UM_NOTIFY_IMPORT_NURSES_RET, ret, (LPARAM)pvRet);
+	return 0;
+}
+
+// 检查Tag有无绑定
+int   CBusiness::CheckTagBindingAsyn(const TagItem * pItem) {
+	g_thrd_db->PostMessage(this, MSG_CHECK_TAG_BINDING, new CTagItemParam(pItem) );
+	return 0;
+}
+
+int   CBusiness::CheckTagBinding(const CTagItemParam * pParam) {
+	DWORD dwPatientId = 0;
+	int ret = m_Database.CheckTagBinding(pParam, dwPatientId);
+	NotifyUiCheckTagBindingRet(dwPatientId, &pParam->m_tag);
+	return 0;
+}
+
+int   CBusiness::NotifyUiCheckTagBindingRet( DWORD dwPatientId, const TagItem * pItem ) {
+	TagItem * pNewItem = new TagItem;
+	if (0 == pNewItem) {
+		::PostMessage(g_hWnd, UM_CHECK_TAG_BINDING_RET, -1, 0 );
+	}
+	else {
+		::PostMessage(g_hWnd, UM_CHECK_TAG_BINDING_RET, dwPatientId, (LPARAM)pNewItem );
+	}
+	
+	return 0;
+}
+
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -432,6 +639,56 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 
 		NotifyUiImportPatientsRet(ret, pvRet);
 		
+	}
+	break;
+
+	case MSG_ADD_NURSE:
+	{
+		CNurseParam * pParam = (CNurseParam *)pMessageData;
+		AddNurse(pParam);
+	}
+	break;
+
+	case MSG_GET_ALL_NURSES:
+	{
+		GetAllNurses();
+	}
+	break;
+
+	case MSG_MODIFY_NURSE:
+	{
+		CNurseParam * pParam = (CNurseParam *)pMessageData;
+		ModifyNurse( pParam );
+	}
+	break;
+
+	case MSG_DELETE_NURSE:
+	{
+		CDeleteNurseParam * pParam = (CDeleteNurseParam *)pMessageData;
+		DeleteNurse(pParam);
+	}
+	break;
+
+	case MSG_IMPORT_NURSES:
+	{
+		CImportNursesParam * pParam = (CImportNursesParam *)pMessageData;
+		std::vector<NurseInfo*> * pvRet = new std::vector<NurseInfo*>;
+		int ret = 0;
+		if (pvRet) {
+			ret = ImportNurses(pParam, *pvRet);
+		}
+		else {
+			ret = -1;
+		}
+
+		NotifyUiImportNursesRet(ret, pvRet);
+	}
+	break;
+
+	case MSG_CHECK_TAG_BINDING:
+	{
+		CTagItemParam * pParam = (CTagItemParam *)pMessageData;
+		CheckTagBinding( pParam );
 	}
 	break;
 

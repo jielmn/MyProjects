@@ -114,7 +114,7 @@ int CZsBindingReader::Inventory(TagItem * pId) {
 			return ZS_ERR_BINDING_READER_FAILED_TOO_MANY_CARDS;
 		}
 
-		int nSize = sizeof(pId->abyUid);
+		int nSize = 8;
 		for (int i = 0; i < nSize; i++) {
 			pId->abyUid[i] = *(pBuffer + 2 + (nSize - 1 - i));
 		}
