@@ -46,6 +46,16 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 				CBusiness::GetInstance()->ModifyPatientAsyn(&m_tPatientInfo, this->GetHWND());
 			}
 		}		
+		else if (name == "btnDelTag") {
+			int nSelIndex = m_lstTags->GetCurSel();
+			if (nSelIndex < 0) {
+				return;
+			}
+
+			if ( IDYES == ::MessageBox(this->GetHWND(), "È·¶¨ÒªÉ¾³ýÎÂ¶ÈÌùÂð£¿", "É¾³ýÎÂ¶ÈÌù", MB_YESNO | MB_DEFBUTTON2 )) {
+
+			}
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -62,6 +72,7 @@ void  CPatientWnd::InitWindow()
 	m_opOutHos = (DuiLib::COptionUI *)m_PaintManager.FindControl(OUT_HOS_OPTION_ID);
 	m_edBedNo = (DuiLib::CEditUI *)m_PaintManager.FindControl(BED_NO_EDIT_ID);
 	m_lyTags = (DuiLib::CHorizontalLayoutUI *)m_PaintManager.FindControl(TAGS_LAYOUT_ID);
+	m_lstTags = (DuiLib::CListUI *)m_PaintManager.FindControl("patient_tags");
 
 	if (m_bAdd) {		
 		SET_CONTROL_VISIBLE(m_lyTags, false);
@@ -80,6 +91,20 @@ void  CPatientWnd::InitWindow()
 			if (m_opOutHos) {
 				m_opOutHos->Selected(true);
 			}
+		}
+
+		DWORD i;
+		for (i = 0; i < m_tPatientInfo.dwTagsCnt; i++) {
+			DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+			m_lstTags->Add(pListElement);
+
+			char szTag[256] = { 0 };
+			GetUid(szTag, sizeof(szTag), m_tPatientInfo.tags[i].abyUid, m_tPatientInfo.tags[i].dwUidLen, '-');
+			pListElement->SetText(0, szTag);
+		}
+
+		if (m_lstTags->GetCount() > 0) {
+			m_lstTags->SelectItem(0);
 		}
 	}
 

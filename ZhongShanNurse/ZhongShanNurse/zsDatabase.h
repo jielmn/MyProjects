@@ -40,6 +40,7 @@ public:
 	int ImportNurse(NurseInfo * pNurse);
 
 	int CheckTagBinding(const CTagItemParam * pParam, DWORD & dwPatientId);
+	int BindingPatient(const CBindingPatientParam * pParam);
 
 private:
 	void Clear();

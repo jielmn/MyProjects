@@ -571,9 +571,28 @@ int   CBusiness::NotifyUiCheckTagBindingRet( DWORD dwPatientId, const TagItem * 
 		::PostMessage(g_hWnd, UM_CHECK_TAG_BINDING_RET, -1, 0 );
 	}
 	else {
+		memcpy(pNewItem, pItem, sizeof(TagItem));
 		::PostMessage(g_hWnd, UM_CHECK_TAG_BINDING_RET, dwPatientId, (LPARAM)pNewItem );
 	}
 	
+	return 0;
+}
+
+// °ó¶¨
+int   CBusiness::BindingPatientAsyn(DWORD dwPatientId, const TagItem * pItem) {
+	g_thrd_db->PostMessage(this, MSG_BINDING_PATIENT, new CBindingPatientParam( dwPatientId, pItem));
+	return 0;
+}
+
+int   CBusiness::BindingPatient(const CBindingPatientParam * pParam) {
+	int ret = m_Database.BindingPatient(pParam);
+	NotifyUiBindingPatientRet(ret, pParam);
+	return 0;
+}
+
+int   CBusiness::NotifyUiBindingPatientRet(int ret, const CBindingPatientParam * pParam) {
+	CBindingPatientParam * p = new CBindingPatientParam(pParam->m_dwPatientId, &pParam->m_tag);
+	::PostMessage(g_hWnd, UM_NOTIFY_BINDING_PATIENT_RET, ret, (LPARAM)p );
 	return 0;
 }
 
@@ -689,6 +708,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CTagItemParam * pParam = (CTagItemParam *)pMessageData;
 		CheckTagBinding( pParam );
+	}
+	break;
+
+	case MSG_BINDING_PATIENT:
+	{
+		CBindingPatientParam * pParam = (CBindingPatientParam *)pMessageData;
+		BindingPatient(pParam );
 	}
 	break;
 

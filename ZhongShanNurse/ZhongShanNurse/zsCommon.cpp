@@ -116,6 +116,10 @@ const char * GetErrDescription(int e) {
 		szDescription = "导入病人信息部分失败";
 		break;
 
+	case ZS_ERR_PATIENT_HAS_TOO_MANY_TAGS:
+		szDescription = "病人已经绑定太多Tags";
+		break;
+
 	default:
 		szDescription = "未知错误";
 	}

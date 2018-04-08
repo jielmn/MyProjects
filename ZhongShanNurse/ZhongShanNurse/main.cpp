@@ -4,6 +4,7 @@
 #include "Business.h"
 #include "PatientDlg.h"
 #include "NurseDlg.h"
+#include "LmnString.h"
 
 
 #define  TEMPERATURE_DATA_INDEX        0
@@ -43,6 +44,53 @@ DuiLib::CControlUI* CTempDataBuilderCallback::CreateControl(LPCTSTR pstrClass) {
 }
 
 
+class CDuiMenu : public WindowImplBase
+{
+protected:
+	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
+	CDuiString  m_strXMLPath;
+	CControlUI * m_pOwner;
+
+public:
+	explicit CDuiMenu(LPCTSTR pszXMLPath, CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
+	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
+	virtual CDuiString GetSkinFolder() { return _T(""); }
+	virtual CDuiString GetSkinFile() { return m_strXMLPath; }
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
+
+	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		Close();
+		bHandled = FALSE;
+		return 0;
+	}
+
+	void Init(HWND hWndParent, POINT ptPos)
+	{
+		Create(hWndParent, _T("MenuWnd"), UI_WNDSTYLE_FRAME, WS_EX_WINDOWEDGE);
+		::ClientToScreen(hWndParent, &ptPos);
+		::SetWindowPos(*this, NULL, ptPos.x, ptPos.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+
+	virtual void  Notify(TNotifyUI& msg) {
+		if (msg.sType == "itemclick") {
+			if (m_pOwner) {
+				m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), 0, 0, true);
+			}
+			return;
+		}
+		WindowImplBase::Notify(msg);
+	}
+
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		return __super::HandleMessage(uMsg, wParam, lParam);
+	}
+};
+
+
+
+
 
 
 
@@ -65,6 +113,19 @@ void  CDuiFrameWnd::AddPatientItem2List(DuiLib::CListTextElementUI* pListElement
 	pListElement->SetText(PATIENTS_INFO_GENDER_INDEX, GetGender(pPatient->bFemale));
 	pListElement->SetText(PATIENTS_INFO_BED_NO_INDEX, pPatient->szBedNo);
 	pListElement->SetText(PATIENTS_INFO_STATUS_INDEX, GetInHosStatus(pPatient->bOutHos));
+
+	DuiLib::CDuiString  strText;
+	for (DWORD i = 0; i < pPatient->dwTagsCnt; i++) {
+		if (strText.GetLength() > 0) {
+			strText += ",";
+		}
+
+		char szTag[256] = {0};
+		GetUid(szTag, sizeof(szTag), pPatient->tags[i].abyUid, pPatient->tags[i].dwUidLen, '-');
+		strText += szTag;
+	}
+	pListElement->SetText(PATIENTS_INFO_TAGS_INDEX, strText);
+
 	if (bSetTag)
 		pListElement->SetTag(pPatient->dwId);
 }
@@ -79,6 +140,8 @@ void   CDuiFrameWnd::OnGetAllPatientsRet( const std::vector<PatientInfo*> & vRet
 
 		AddPatientItem2List(pListElement, pPatient);
 	}
+
+	m_bGetAllPatients = TRUE;
 }
 
 // 删除病人ret
@@ -224,6 +287,11 @@ void   CDuiFrameWnd::OnImportNursesRet(int ret, const std::vector<NurseInfo*> & 
 
 // Inventory ret
 void   CDuiFrameWnd::OnInventoryRet( const TagItem * pItem ) {
+	// 还没有获取到病人信息
+	if (!m_bGetAllPatients) {
+		return;
+	}
+
 	int nInventoryRet = RET_FAIL;              // 本次盘点结果，-1表示失败，0表示成功, 1表示进行中
 	// 本次盘点OK
 	if (pItem) {
@@ -254,9 +322,30 @@ void   CDuiFrameWnd::OnInventoryRet( const TagItem * pItem ) {
 				CBusiness::GetInstance()->CheckTagBindingAsyn(pItem);
 
 				m_btnBindingPatient->SetEnabled(false);
+				m_nLastInventoryRet_Patients = RET_PROCESSING;
+
 				// m_nLastInventoryRet_Patients = nInventoryRet;
 				// memcpy(&m_LastInventoryRet_Patients, pItem, sizeof(TagItem));
 			}			
+		}
+		// 无变化
+		else {
+			if ( 0 == pItem ) {
+				return;
+			}
+
+			// 盘点成功，定位list
+			char szTag[256] = { 0 };
+			GetUid(szTag, sizeof(szTag), pItem->abyUid, pItem->dwUidLen, '-');
+			int nCnt = m_lstPatients->GetCount();
+			for (int i = 0; i < nCnt; i++) {
+				DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(i);
+				DuiLib::CDuiString strText = pListElement->GetText(PATIENTS_INFO_TAGS_INDEX);
+				if (0 != strstr(strText, szTag)) {
+					m_lstPatients->SelectItem(i);
+					break;
+				}
+			}
 		}
 	}
 	else if (NURSES_INDEX == nSelectedTab) {
@@ -308,6 +397,49 @@ void   CDuiFrameWnd::OnCheckTagBindingRet(DWORD dwPatientId, const TagItem * pIt
 	}
 }
 
+void   CDuiFrameWnd::OnBindingPatientRet(int nError, CBindingPatientParam * pParam) {
+	m_nLastInventoryRet_Patients = RET_FAIL;
+	memset(&m_LastInventoryRet_Patients, 0, sizeof(TagItem));
+	SET_CONTROL_ENABLED(m_btnBindingPatient, false);
+
+	if (0 != nError) {
+		MessageBox(this->GetHWND(), GetErrDescription(nError), "绑定病人Tag", 0);
+		return;
+	}	
+
+	if (0 == pParam) {
+		return;
+	}
+
+	if (0 == m_lstPatients) {
+		return;
+	}
+
+	char szTag[256] = {0};
+	GetUid(szTag, sizeof(szTag), pParam->m_tag.abyUid, pParam->m_tag.dwUidLen, '-');
+
+	int nCnt = m_lstPatients->GetCount();
+	for (int i = 0; i < nCnt; i++) {
+		DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(i);
+		assert(pListElement);
+
+		// 找到该病人，并且高亮
+		if (pListElement->GetTag() == pParam->m_dwPatientId) {
+			DuiLib::CDuiString strText = pListElement->GetText(PATIENTS_INFO_TAGS_INDEX);
+			if ( strText.GetLength() == 0 ) {
+				strText = szTag;
+			}
+			else {
+				strText += ",";
+				strText += szTag;
+			}
+			pListElement->SetText(PATIENTS_INFO_TAGS_INDEX, strText);
+			break;
+		}
+	}
+
+}
+
 
 
 
@@ -356,6 +488,16 @@ void   CDuiFrameWnd::OnModifyPatient() {
 	strncpy_s(pPatientDlg->m_tPatientInfo.szBedNo, pListElement->GetText(PATIENTS_INFO_BED_NO_INDEX), sizeof(pPatientDlg->m_tPatientInfo.szBedNo));
 	pPatientDlg->m_tPatientInfo.bFemale = GetGender(pListElement->GetText(PATIENTS_INFO_GENDER_INDEX));
 	pPatientDlg->m_tPatientInfo.bOutHos = GetInHosStatus(pListElement->GetText(PATIENTS_INFO_STATUS_INDEX));
+
+	DuiLib::CDuiString  strText = pListElement->GetText(PATIENTS_INFO_TAGS_INDEX);
+	SplitString SplitObj;
+	SplitObj.Split(strText, ',');
+	DWORD i = 0;
+	for ( i = 0; i < SplitObj.Size() && i < MAX_PATIENT_TAGS; i++ ) {
+		GetUid(&pPatientDlg->m_tPatientInfo.tags[i], SplitObj[i], '-');
+	}
+	pPatientDlg->m_tPatientInfo.dwTagsCnt = i;
+
 	pPatientDlg->m_tPatientInfo.dwId = (DWORD)pListElement->GetTag();
 	
 	pPatientDlg->Create(this->m_hWnd, _T("新增病人信息"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
@@ -501,6 +643,22 @@ void  CDuiFrameWnd::OnImportNurses() {
 	}
 }
 
+void   CDuiFrameWnd::OnBindingPatient() {
+	if (m_lstPatients == 0) {
+		return;
+	}
+
+	int nSelIndex = m_lstPatients->GetCurSel();
+	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(nSelIndex);
+	if (0 == pListElement) {
+		return;
+	}
+
+	DWORD dwPatientId = pListElement->GetTag();
+
+	CBusiness::GetInstance()->BindingPatientAsyn(dwPatientId, &m_LastInventoryRet_Patients);
+}
+
 
 
 
@@ -547,6 +705,8 @@ void CDuiFrameWnd::InitWindow() {
 	memset(&m_LastInventoryRet_Patients, 0, sizeof(m_LastInventoryRet_Patients));
 	memset(&m_LastInventoryRet_Nurses, 0, sizeof(m_LastInventoryRet_Nurses));
 
+	m_bGetAllPatients = FALSE;
+
 	WindowImplBase::InitWindow();
 }
 
@@ -587,10 +747,27 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		else if (name == _T(PATIENTS_OPTION_ID)) {
 			if (m_tabs)
 				if (m_tabs)m_tabs->SelectItem(PATIENTS_INDEX);
+
+			if (m_lstPatients) {
+				if (m_lstPatients->GetCount() > 0) {
+					if (m_lstPatients->GetCurSel() < 0)
+					{
+						m_lstPatients->SelectItem(0);
+					}
+				}
+			}			
 		}
 		else if (name == _T(NURSES_OPTION_ID)) {
 			if (m_tabs)
 				m_tabs->SelectItem(NURSES_INDEX);
+			if (m_lstNurses) {
+				if (m_lstNurses->GetCount() > 0) {
+					if (m_lstNurses->GetCurSel() < 0)
+					{
+						m_lstNurses->SelectItem(0);
+					}
+				}
+			}
 		}
 		else if (name == SYNCHRONIZE_OPTION_ID) {
 			if (m_tabs)
@@ -607,10 +784,14 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 
 		int nSel = m_tabs->GetCurSel();
 		if ( nSel != PATIENTS_INDEX ) {
+			m_nLastInventoryRet_Patients = -1;
+			memset(&m_LastInventoryRet_Patients, 0, sizeof(m_LastInventoryRet_Patients));
 			SET_CONTROL_ENABLED(m_btnBindingPatient,false);
 		}
 
 		if (nSel != NURSES_INDEX) {
+			m_nLastInventoryRet_Nurses = -1;
+			memset(&m_LastInventoryRet_Nurses, 0, sizeof(m_LastInventoryRet_Nurses));
 			SET_CONTROL_ENABLED(m_btnBindingNurse, false);
 		}
 	}
@@ -628,7 +809,7 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			OnImportPatients();
 		}
 		else if (name == BINDING_PATIENT_BUTTON_ID) {
-
+			OnBindingPatient();
 		}
 		else if (name == ADD_NURSE_BUTTON_ID) {
 			OnAddNurse();
@@ -645,6 +826,38 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		else if (name == BINDING_NURSE_BUTTON_ID) {
 
 		}
+	}
+	else if (msg.sType == "itemactivate") {
+		if ( m_tabs && m_tabs->GetCurSel() == PATIENTS_INDEX) {
+			OnModifyPatient();
+		}
+	}
+	else if (msg.sType == _T("menu"))
+	{
+		POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+		CControlUI * pControl = m_PaintManager.FindControl(pt);
+		if (0 == pControl) {
+			return;
+		}
+
+		CDuiString sFindCtlClass = pControl->GetClass();
+		if (sFindCtlClass == "ListTextElement") {
+			CDuiString sListName = pControl->GetParent()->GetParent()->GetName();
+			if (sListName == "patients_list") {
+				CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+				pMenu->Init(*this, pt);
+				pMenu->ShowWindow(TRUE);
+			}
+		}
+		return;
+	}
+	else if (msg.sType == "menu_modify_patient") {
+		OnModifyPatient();
+		return;
+	}
+	else if (msg.sType == "menu_delete_patient") {
+		OnDeletePatient();
+		return;
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -790,6 +1003,17 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		if (pItem) {
 			delete pItem;
+		}
+	}
+	else if (uMsg == UM_NOTIFY_BINDING_PATIENT_RET) {
+		nError = wParam;
+		CBindingPatientParam * pParam = (CBindingPatientParam *)lParam;
+
+		OnBindingPatientRet(nError, pParam);
+		
+
+		if (pParam) {
+			delete pParam;
 		}
 	}
 

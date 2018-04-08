@@ -98,6 +98,11 @@ public:
 	int   CheckTagBinding( const CTagItemParam * pParam );
 	int   NotifyUiCheckTagBindingRet(DWORD dwPatientId, const TagItem * pItem);
 
+	// 绑定
+	int   BindingPatientAsyn(DWORD dwPatientId, const TagItem * pItem);
+	int   BindingPatient(const CBindingPatientParam * pParam);
+	int   NotifyUiBindingPatientRet(int ret, const CBindingPatientParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 
@@ -114,6 +119,7 @@ private:
 
 	CZsDatabase        m_Database;                           // 数据库
 	CZsBindingReader   m_BindingReader;                      // 绑定读卡器
+	
 };
 
 

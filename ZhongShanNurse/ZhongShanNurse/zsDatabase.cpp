@@ -244,6 +244,30 @@ int CZsDatabase::GetAllPatients( std::vector<PatientInfo *> & vRet ) {
 		}
 
 		m_recordset.Close();//关闭记录集
+
+
+		std::vector<PatientInfo *>::iterator it;
+		for (it = vRet.begin(); it != vRet.end(); it++) {
+			PatientInfo * pItem = *it;
+
+			strSql.Format("SELECT id FROM %s WHERE patient_id=%lu ", TAGS_TABLE_NAME, pItem->dwId );
+			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+			int i = 0;
+			while (!m_recordset.IsEOF()&& i < MAX_PATIENT_TAGS)
+			{
+				CString       strValue;
+
+				m_recordset.GetFieldValue((short)0, strValue);
+				GetUid(&pItem->tags[i], strValue);
+
+				m_recordset.MoveNext();
+				i++;
+			}
+			pItem->dwTagsCnt = i;
+
+			m_recordset.Close();//关闭记录集
+		}
 	}
 	catch (CException* e)
 	{
@@ -331,6 +355,9 @@ int CZsDatabase::DeletePatient(const CDeletePatientParam * pParam) {
 
 		// 如果该病人没有数据
 		if (0 == ret) {
+			strSql.Format("DELETE FROM %s WHERE patient_id=%lu ", TAGS_TABLE_NAME, pParam->m_dwId);
+			m_database.ExecuteSQL(strSql);
+
 			strSql.Format("DELETE FROM %s WHERE id=%lu ", PATIENTS_TABLE_NAME, pParam->m_dwId);
 			m_database.ExecuteSQL(strSql);
 		}
@@ -689,7 +716,7 @@ int CZsDatabase::CheckTagBinding(const CTagItemParam * pParam, DWORD & dwPatient
 	int ret = 0;
 	try
 	{
-		strSql.Format("SELECT b.id FROM %s a INNER JOIN %s b on a.patient_id = b.str_id WHERE a.id='%s' ", TAGS_TABLE_NAME, PATIENTS_TABLE_NAME, szTagId );
+		strSql.Format("SELECT b.id FROM %s a INNER JOIN %s b on a.patient_id = b.id WHERE a.id='%s' ", TAGS_TABLE_NAME, PATIENTS_TABLE_NAME, szTagId );
 		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
 
 		if (!m_recordset.IsEOF())
@@ -700,6 +727,52 @@ int CZsDatabase::CheckTagBinding(const CTagItemParam * pParam, DWORD & dwPatient
 		}
 
 		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::BindingPatient(const CBindingPatientParam * pParam) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	char szTagId[256] = { 0 };
+	GetUid(szTagId, sizeof(szTagId), pParam->m_tag.abyUid, pParam->m_tag.dwUidLen);
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("SELECT count(*) FROM %s WHERE patient_id=%lu", TAGS_TABLE_NAME, pParam->m_dwPatientId);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+		DWORD dwCnt = 0;
+		if (!m_recordset.IsEOF())
+		{
+			CString       strValue;
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &dwCnt);
+		}
+		m_recordset.Close();
+
+		// 绑定的Tag太多
+		if (dwCnt >= MAX_PATIENT_TAGS) {
+			return ZS_ERR_PATIENT_HAS_TOO_MANY_TAGS;
+		}
+
+		strSql.Format("INSERT INTO %s VALUES ('%s', %lu)", TAGS_TABLE_NAME, szTagId, pParam->m_dwPatientId);
+		m_database.ExecuteSQL(strSql);
 	}
 	catch (CException* e)
 	{

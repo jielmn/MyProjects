@@ -32,4 +32,5 @@ private:
 	DuiLib::COptionUI *            m_opOutHos;
 	DuiLib::CEditUI *              m_edBedNo;
 	DuiLib::CHorizontalLayoutUI *  m_lyTags;
+	DuiLib::CListUI *              m_lstTags;
 };

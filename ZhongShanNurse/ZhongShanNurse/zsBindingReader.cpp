@@ -115,6 +115,8 @@ int CZsBindingReader::Inventory(TagItem * pId) {
 		}
 
 		int nSize = 8;
+		pId->dwUidLen = nSize;
+
 		for (int i = 0; i < nSize; i++) {
 			pId->abyUid[i] = *(pBuffer + 2 + (nSize - 1 - i));
 		}

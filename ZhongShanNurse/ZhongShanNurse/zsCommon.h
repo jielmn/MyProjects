@@ -89,6 +89,7 @@
 #define MSG_DELETE_NURSE           11
 #define MSG_IMPORT_NURSES          12
 #define MSG_CHECK_TAG_BINDING      13
+#define MSG_BINDING_PATIENT        14
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -105,6 +106,7 @@
 #define UM_NOTIFY_IMPORT_NURSES_RET            (WM_USER+12)
 #define UM_INVENTORY_RET                       (WM_USER+13)
 #define UM_CHECK_TAG_BINDING_RET               (WM_USER+14)
+#define UM_NOTIFY_BINDING_PATIENT_RET          (WM_USER+15)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -120,6 +122,7 @@
 #define ZS_ERR_PARTIALLY_FAILED_TO_IMPORT_EXCEL         10011
 #define ZS_ERR_FAILED_TO_EXECUTE_EXCEL                  10012
 #define ZS_ERR_NURSE_HAS_TEMP_DATA                      10013
+#define ZS_ERR_PATIENT_HAS_TOO_MANY_TAGS                10014
 
 #define  DB_STATUS_OK_TEXT             "数据库连接OK"
 #define  DB_STATUS_CLOSE_TEXT          "数据库连接失败"
@@ -143,6 +146,7 @@ typedef struct tagTagItem {
 #define  MAX_PATIENT_ID_LENGTH              32
 #define  MAX_PATIENT_NAME_LENGTH            32
 #define  MAX_BED_NO_LENGTH                  32
+#define  MAX_PATIENT_TAGS                   10
 // 病人
 typedef struct tagPatientInfo {
 	DWORD    dwId;
@@ -151,6 +155,8 @@ typedef struct tagPatientInfo {
 	char     szBedNo[MAX_BED_NO_LENGTH];
 	BOOL     bFemale;
 	BOOL     bOutHos;
+	TagItem  tags[MAX_PATIENT_TAGS];
+	DWORD    dwTagsCnt;
 
 	BOOL     bToUpdated;
 	BOOL     bStrIdChanged;
@@ -251,6 +257,18 @@ public:
 	~CTagItemParam() {}
 
 	TagItem    m_tag;
+};
+
+class CBindingPatientParam : public LmnToolkits::MessageData {
+public:
+	CBindingPatientParam( DWORD dwPatientId, const TagItem * pItem) {
+		m_dwPatientId = dwPatientId;
+		memcpy(&m_tag, pItem, sizeof(TagItem));
+	}
+	~CBindingPatientParam() {}
+
+	TagItem    m_tag;
+	DWORD      m_dwPatientId;
 };
 
 extern ILog    * g_log;
