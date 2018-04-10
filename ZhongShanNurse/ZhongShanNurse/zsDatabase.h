@@ -41,6 +41,9 @@ public:
 
 	int CheckTagBinding(const CTagItemParam * pParam, DWORD & dwPatientId);
 	int BindingPatient(const CBindingPatientParam * pParam);
+	int DeleteTag(const CDeleteTagParam * pParam);
+	int CheckCardBinding(const CTagItemParam * pParam, DWORD & dwNurseId);
+	int BindingNurse(const CBindingNurseParam * pParam);
 
 private:
 	void Clear();

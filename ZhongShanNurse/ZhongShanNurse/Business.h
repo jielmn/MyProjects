@@ -103,6 +103,21 @@ public:
 	int   BindingPatient(const CBindingPatientParam * pParam);
 	int   NotifyUiBindingPatientRet(int ret, const CBindingPatientParam * pParam);
 
+	// 删除Tag
+	int   DeleteTagAsyn(const TagItem * pItem, HWND hWnd );
+	int   DeleteTag(const CDeleteTagParam * pParam);
+	int   NotifyUiDeleteTagRet(int ret, const CDeleteTagParam * pParam);
+
+	// 检查Tag有无绑定护士
+	int   CheckCardBindingAsyn(const TagItem * pItem);
+	int   CheckCardBinding(const CTagItemParam * pParam);
+	int   NotifyUiCheckCardBindingRet(DWORD dwNurseId, const TagItem * pItem);
+
+	// 绑定护士白卡
+	int   BindingNurseAsyn(DWORD dwNurseId, const TagItem * pItem);
+	int   BindingNurse(const CBindingNurseParam * pParam);
+	int   NotifyUiBindingNurseRet(int ret, const CBindingNurseParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 

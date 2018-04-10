@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
 	<VerticalLayout inset="1,1,1,1"    >		
-		<HorizontalLayout  bkcolor="#FFD1E8F5" inset="1,0,1,0" >
-			<VerticalLayout width="350" bkcolor="#FFD1E8F5">
+		<HorizontalLayout  inset="1,0,1,0" >
+			<VerticalLayout width="350" >
 				<List name="patients_list_short" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" itemfont="6" itemtextcolor="#FF386382" >
 					<ListHeader height="24" menu="false">
 						<ListHeaderItem text="编号"   font="1" width="50"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
@@ -16,7 +16,7 @@
 			
 			<VerticalLayout width="1" bkimage="sep1.png" />
 			
-			<VerticalLayout name="VerticalLayout_Temp" visible="true" height="1090" bkcolor="#FFD1E8F5">				
+			<VerticalLayout name="VerticalLayout_Temp" visible="true" height="1090" >				
 				<HorizontalLayout height="30" padding="10,5,10,5">
 					<Label text="起始时间：" width="80" height="30" font="1" textcolor="#FF386382" />
 					<DateTime name="DateTime1" width="170" height="30" bkcolor="#FFFFFFFF" font="1" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="1" textpadding="5,0,5,0"  />

@@ -596,6 +596,64 @@ int   CBusiness::NotifyUiBindingPatientRet(int ret, const CBindingPatientParam *
 	return 0;
 }
 
+int   CBusiness::DeleteTagAsyn(const TagItem * pItem, HWND hWnd) {
+	g_thrd_db->PostMessage(this, MSG_DELETE_TAG, new CDeleteTagParam(pItem, hWnd));
+	return 0;
+}
+
+int   CBusiness::DeleteTag(const CDeleteTagParam * pParam) {
+	int ret = m_Database.DeleteTag(pParam);
+	NotifyUiDeleteTagRet(ret, pParam);
+	return 0;
+}
+
+int   CBusiness::NotifyUiDeleteTagRet(int ret, const CDeleteTagParam * pParam) {
+	CDeleteTagParam * p = new CDeleteTagParam(&pParam->m_tag, pParam->m_hWnd);
+	::PostMessage(pParam->m_hWnd, UM_NOTIFY_DELETE_TAG_RET, ret, (LPARAM)p);
+	return 0;
+}
+
+int   CBusiness::CheckCardBindingAsyn(const TagItem * pItem) {
+	g_thrd_db->PostMessage(this, MSG_CHECK_CARD_BINDING, new CTagItemParam(pItem));
+	return 0;
+}
+
+int   CBusiness::CheckCardBinding(const CTagItemParam * pParam) {
+	DWORD dwNurseId = 0;
+	int ret = m_Database.CheckCardBinding(pParam, dwNurseId);
+	NotifyUiCheckCardBindingRet(dwNurseId, &pParam->m_tag);
+	return 0;
+}
+
+int   CBusiness::NotifyUiCheckCardBindingRet(DWORD dwNurseId, const TagItem * pItem) {
+	TagItem * pNewItem = new TagItem;
+	if (0 == pNewItem) {
+		::PostMessage(g_hWnd, UM_CHECK_CARD_BINDING_RET, -1, 0);
+	}
+	else {
+		memcpy(pNewItem, pItem, sizeof(TagItem));
+		::PostMessage(g_hWnd, UM_CHECK_CARD_BINDING_RET, dwNurseId, (LPARAM)pNewItem);
+	}
+	return 0;
+}
+
+
+int    CBusiness::BindingNurseAsyn(DWORD dwNurseId, const TagItem * pItem) {
+	g_thrd_db->PostMessage(this, MSG_BINDING_NURSE, new CBindingNurseParam(dwNurseId, pItem));
+	return 0;
+}
+
+int    CBusiness::BindingNurse(const CBindingNurseParam * pParam) {
+	int ret = m_Database.BindingNurse(pParam);
+	NotifyUiBindingNurseRet(ret, pParam);
+	return 0;
+}
+
+int    CBusiness::NotifyUiBindingNurseRet(int ret, const CBindingNurseParam * pParam) {
+	CBindingNurseParam * p = new CBindingNurseParam(pParam->m_dwNurseId, &pParam->m_tag);
+	::PostMessage(g_hWnd, UM_NOTIFY_BINDING_NURSE_RET, ret, (LPARAM)p);
+	return 0;
+}
 
 
 // 消息处理
@@ -715,6 +773,27 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CBindingPatientParam * pParam = (CBindingPatientParam *)pMessageData;
 		BindingPatient(pParam );
+	}
+	break;
+
+	case MSG_DELETE_TAG:
+	{
+		CDeleteTagParam * pParam = (CDeleteTagParam *)pMessageData;
+		DeleteTag(pParam);
+	}
+	break;
+
+	case MSG_CHECK_CARD_BINDING:
+	{
+		CTagItemParam * pParam = (CTagItemParam *)pMessageData;
+		CheckCardBinding(pParam);
+	}
+	break;
+
+	case MSG_BINDING_NURSE:
+	{
+		CBindingNurseParam * pParam = (CBindingNurseParam *)pMessageData;
+		BindingNurse(pParam);
 	}
 	break;
 

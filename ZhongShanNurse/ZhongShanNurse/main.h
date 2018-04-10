@@ -74,6 +74,8 @@ private:
 	void   OnImportNurses();
 	// 绑定
 	void   OnBindingPatient();
+	// 绑定护士白卡
+	void   OnBindingNurse();
 
 	// 处理UM_MESSAGE
 	// 数据库连接上
@@ -96,6 +98,10 @@ private:
 	void   OnCheckTagBindingRet(DWORD dwPatientId, const TagItem * pItem);
 	// Binding Patient ret
 	void   OnBindingPatientRet(int nError, CBindingPatientParam * pParam);
+	// Check Card binding ret
+	void   OnCheckCardBindingRet(DWORD dwNurseId, const TagItem * pItem);
+	// Binding nurse ret
+	void   OnBindingNurseRet(int nError, CBindingNurseParam * pParam);
 
 private:
 	BOOL               m_bGetAllPatients;                     // 是否获取病人

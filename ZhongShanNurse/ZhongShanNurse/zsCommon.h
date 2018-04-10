@@ -90,6 +90,9 @@
 #define MSG_IMPORT_NURSES          12
 #define MSG_CHECK_TAG_BINDING      13
 #define MSG_BINDING_PATIENT        14
+#define MSG_DELETE_TAG             15
+#define MSG_CHECK_CARD_BINDING     16
+#define MSG_BINDING_NURSE          17
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -107,6 +110,9 @@
 #define UM_INVENTORY_RET                       (WM_USER+13)
 #define UM_CHECK_TAG_BINDING_RET               (WM_USER+14)
 #define UM_NOTIFY_BINDING_PATIENT_RET          (WM_USER+15)
+#define UM_NOTIFY_DELETE_TAG_RET               (WM_USER+16)
+#define UM_CHECK_CARD_BINDING_RET              (WM_USER+17)
+#define UM_NOTIFY_BINDING_NURSE_RET            (WM_USER+18)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -169,6 +175,8 @@ typedef struct tagNurseInfo {
 	DWORD    dwId;
 	char     szId[MAX_NURSE_ID_LENGTH];
 	char     szName[MAX_NURSE_NAME_LENGTH];
+	TagItem  tag;                          //白卡
+	BOOL     bBindtingCard;                //是否绑定白卡
 
 	BOOL     bToUpdated;
 	BOOL     bStrIdChanged;
@@ -269,6 +277,30 @@ public:
 
 	TagItem    m_tag;
 	DWORD      m_dwPatientId;
+};
+
+class CDeleteTagParam : public LmnToolkits::MessageData {
+public:
+	CDeleteTagParam(const TagItem * pItem, HWND hWnd) {
+		memcpy(&m_tag, pItem, sizeof(TagItem));
+		m_hWnd = hWnd;
+	}
+	~CDeleteTagParam() {}
+
+	TagItem    m_tag;
+	HWND       m_hWnd;
+};
+
+class CBindingNurseParam : public LmnToolkits::MessageData {
+public:
+	CBindingNurseParam(DWORD dwNurseId, const TagItem * pItem) {
+		m_dwNurseId = dwNurseId;
+		memcpy(&m_tag, pItem, sizeof(TagItem));
+	}
+	~CBindingNurseParam() {}
+
+	TagItem    m_tag;
+	DWORD      m_dwNurseId;
 };
 
 extern ILog    * g_log;

@@ -515,6 +515,14 @@ int CZsDatabase::GetAllNurses(std::vector<NurseInfo *> & vRet) {
 			m_recordset.GetFieldValue((short)2, strValue);
 			strncpy_s(tNurse.szName, strValue, sizeof(tNurse.szName));
 
+			CDBVariant  objValue;
+			m_recordset.GetFieldValue((short)3, objValue);
+			if (objValue.m_dwType != 0) {
+				GetUid(&tNurse.tag, *objValue.m_pstring);
+				tNurse.bBindtingCard = TRUE;
+			}
+			
+
 			NurseInfo *  pNurse = new NurseInfo;
 			if (0 == pNurse) {
 				ClearVector(vRet);
@@ -772,6 +780,106 @@ int CZsDatabase::BindingPatient(const CBindingPatientParam * pParam) {
 		}
 
 		strSql.Format("INSERT INTO %s VALUES ('%s', %lu)", TAGS_TABLE_NAME, szTagId, pParam->m_dwPatientId);
+		m_database.ExecuteSQL(strSql);
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::DeleteTag(const CDeleteTagParam * pParam) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	char szTagId[256] = { 0 };
+	GetUid(szTagId, sizeof(szTagId), pParam->m_tag.abyUid, pParam->m_tag.dwUidLen);
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("DELETE FROM %s WHERE id='%s'", TAGS_TABLE_NAME, szTagId);
+		m_database.ExecuteSQL(strSql);
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::CheckCardBinding(const CTagItemParam * pParam, DWORD & dwNurseId) {
+	CString strSql;
+	dwNurseId = 0;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	char szTagId[256] = { 0 };
+	GetUid(szTagId, sizeof(szTagId), pParam->m_tag.abyUid, pParam->m_tag.dwUidLen);
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("SELECT id FROM %s WHERE card_no='%s' ", NURSES_TABLE_NAME, szTagId);
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		if (!m_recordset.IsEOF())
+		{
+			CString       strValue;
+			m_recordset.GetFieldValue((short)0, strValue);
+			sscanf_s(strValue, "%lu", &dwNurseId);
+		}
+
+		m_recordset.Close();//关闭记录集
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::BindingNurse(const CBindingNurseParam * pParam) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	char szTagId[256] = { 0 };
+	GetUid(szTagId, sizeof(szTagId), pParam->m_tag.abyUid, pParam->m_tag.dwUidLen);
+
+	int ret = 0;
+	try
+	{
+		strSql.Format("UPDATE %s SET card_no='%s' WHERE  id=%lu", NURSES_TABLE_NAME, szTagId, pParam->m_dwNurseId );
 		m_database.ExecuteSQL(strSql);
 	}
 	catch (CException* e)

@@ -52,8 +52,8 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 				return;
 			}
 
-			if ( IDYES == ::MessageBox(this->GetHWND(), "È·¶¨ÒªÉ¾³ýÎÂ¶ÈÌùÂð£¿", "É¾³ýÎÂ¶ÈÌù", MB_YESNO | MB_DEFBUTTON2 )) {
-
+			if ( IDYES == ::MessageBox(this->GetHWND(), "È·¶¨ÒªÉ¾³ýÎÂ¶ÈÌùÂð£¿", "É¾³ýÎÂ¶ÈÌù", MB_YESNO | MB_DEFBUTTON2 ) ) {
+				CBusiness::GetInstance()->DeleteTagAsyn( &m_tPatientInfo.tags[nSelIndex], this->GetHWND() );
 			}
 		}
 	}
@@ -136,6 +136,22 @@ LRESULT CPatientWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 		else {
 			::MessageBox(this->GetHWND(), GetErrDescription(ret), CAPTION_PATIENT_MSG_BOX, 0);
+		}
+	}
+	else if (uMsg == UM_NOTIFY_DELETE_TAG_RET) {
+		ret = (int)wParam;
+		CDeleteTagParam * pParam = (CDeleteTagParam *)lParam;
+
+		for (DWORD i = 0; i < m_tPatientInfo.dwTagsCnt; i++) {
+			if ( IsSameTag(&m_tPatientInfo.tags[i], &pParam->m_tag) ) {
+				memmove(&m_tPatientInfo.tags[i], &m_tPatientInfo.tags[i + 1], sizeof(TagItem) *  m_tPatientInfo.dwTagsCnt - 1 - i);
+				m_lstTags->RemoveAt(i);
+				break;
+			}
+		}
+
+		if (pParam) {
+			delete pParam;
 		}
 	}
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
 	<VerticalLayout inset="1,1,1,1"    >		
-		<VerticalLayout  bkcolor="#FFD1E8F5" >
+		<VerticalLayout >
 			<Label text="同步数据" />
 		</VerticalLayout>
 		
