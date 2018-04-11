@@ -6,6 +6,7 @@
 #include "zsCommon.h"
 #include "zsDatabase.h"
 #include "zsBindingReader.h"
+#include "zsSyncReader.h"
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 
@@ -118,6 +119,12 @@ public:
 	int   BindingNurse(const CBindingNurseParam * pParam);
 	int   NotifyUiBindingNurseRet(int ret, const CBindingNurseParam * pParam);
 
+	// 重连同步读卡器
+	int   ReconnectSyncReaderAsyn(DWORD dwDelayTime = 0);
+	int   ReconnectSyncReader();
+	// 通知界面连接结果
+	int   NotifyUiSyncReaderStatus(CZsSyncReader::SYNC_READER_STATUS eStatus);
+
 private:
 	static CBusiness *  pInstance;
 
@@ -134,6 +141,7 @@ private:
 
 	CZsDatabase        m_Database;                           // 数据库
 	CZsBindingReader   m_BindingReader;                      // 绑定读卡器
+	CZsSyncReader      m_SyncReader;                         // 同步读卡器
 	
 };
 

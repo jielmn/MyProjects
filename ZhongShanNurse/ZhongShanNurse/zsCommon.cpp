@@ -11,7 +11,11 @@ HWND    g_hWnd = 0;
 LmnToolkits::Thread *  g_thrd_db = 0;                     // 数据库线程
 LmnToolkits::Thread *  g_thrd_reader = 0;                 // Reader线程
 LmnToolkits::Thread *  g_thrd_timer = 0;                  // TIMER
+LmnToolkits::Thread *  g_thrd_sync_reader = 0;
 
+ReaderCmd  SYNC_COMMAND;
+ReaderCmd  PREPARE_COMMAND;
+ReaderCmd  CLEAR_COMMAND;
 
 
 char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD dwDestSize) {
@@ -324,4 +328,26 @@ TagItem * GetUid(TagItem * pTagItem, const char * szUid, BOOL bWithSplitChar /*=
 	}
 
 	return pTagItem;
+}
+
+int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd) {
+	if (0 == szCmd) {
+		return -1;
+	}
+
+	SplitString split;
+	split.SplitByBlankChars(szCmd);
+	DWORD dwSize = split.Size();
+	if (dwSize >= sizeof(cmd.abyCommand)) {
+		return -1;
+	}
+
+	for (DWORD i = 0; i < dwSize; i++) {
+		int  tmp = 0;
+		sscanf_s(split[i], "%x", &tmp);
+		cmd.abyCommand[i] = (BYTE)tmp;
+	}
+	cmd.dwCommandLength = dwSize;
+
+	return 0;
 }

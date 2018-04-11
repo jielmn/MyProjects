@@ -161,6 +161,7 @@ xcopy dll ..\Debug  /dseiy</Command>
     <ClInclude Include="zsBindingReader.h" />
     <ClInclude Include="zsCommon.h" />
     <ClInclude Include="zsDatabase.h" />
+    <ClInclude Include="zsSyncReader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Business.cpp" />
@@ -170,6 +171,7 @@ xcopy dll ..\Debug  /dseiy</Command>
     <ClCompile Include="zsBindingReader.cpp" />
     <ClCompile Include="zsCommon.cpp" />
     <ClCompile Include="zsDatabase.cpp" />
+    <ClCompile Include="zsSyncReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZhongShanNurse.rc" />

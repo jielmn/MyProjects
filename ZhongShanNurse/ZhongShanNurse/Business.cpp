@@ -11,9 +11,9 @@ CBusiness *  CBusiness::GetInstance() {
 	return pInstance;
 }
 
-CBusiness::CBusiness() : m_Database(this), m_BindingReader(this) {
+CBusiness::CBusiness() : m_Database(this), m_BindingReader(this), m_SyncReader(this) {
 	sigInit.connect(this, &CBusiness::OnInit);
-	sigDeinit.connect(this, &CBusiness::OnDeInit);
+	sigDeinit.connect(this, &CBusiness::OnDeInit);	
 }
 
 CBusiness::~CBusiness() {
@@ -73,17 +73,41 @@ void CBusiness::OnInit(int * ret) {
 	}
 	g_thrd_timer->Start();
 
+	// 同步Reader线程
+	g_thrd_sync_reader = new LmnToolkits::Thread();
+	if (0 == g_thrd_sync_reader) {
+		*ret = ZS_ERR_NO_MEMORY;
+		return;
+	}
+	g_thrd_sync_reader->Start();
+	
+
 	if (0 != m_BindingReader.Init()) {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to load binding reader DLL!\n");
 		*ret = ZS_ERR_FAILED_TO_LOAD_FUNCTION_DLL;
 		return;
 	}
 
+	char buf[8192];
+	// 获取Reader协议命令
+	g_cfg->GetConfig("sync command", buf, sizeof(buf), "55 01 03 dd aa");
+	TransferReaderCmd(SYNC_COMMAND, buf);
+
+	g_cfg->GetConfig("prepare command", buf, sizeof(buf), "55 01 01 dd aa");
+	TransferReaderCmd(PREPARE_COMMAND, buf);
+
+	g_cfg->GetConfig("clear command", buf, sizeof(buf), "55 01 04 dd aa");
+	TransferReaderCmd(CLEAR_COMMAND, buf);
+
+
 	// 连接数据库
 	ReconnectDatabaseAsyn(200);
 
 	// 盘点
 	InventoryAsyn(200);
+
+	// 同步读卡器
+	ReconnectSyncReaderAsyn(200);
 
 	*ret = 0;
 }
@@ -108,6 +132,12 @@ void CBusiness::OnDeInit(int * ret) {
 		g_thrd_timer->Stop();
 		delete g_thrd_timer;
 		g_thrd_timer = 0;
+	}
+
+	if (g_thrd_sync_reader) {
+		g_thrd_sync_reader->Stop();
+		delete g_thrd_sync_reader;
+		g_thrd_sync_reader = 0;
 	}
 
 	Clear();
@@ -655,6 +685,27 @@ int    CBusiness::NotifyUiBindingNurseRet(int ret, const CBindingNurseParam * pP
 	return 0;
 }
 
+// 重连同步读卡器
+int   CBusiness::ReconnectSyncReaderAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_sync_reader->PostMessage(this, MSG_RECONNECT_SYNC_READER);
+	}
+	else {
+		g_thrd_sync_reader->PostDelayMessage(dwDelayTime, this, MSG_RECONNECT_SYNC_READER);
+	}
+	return 0;
+}
+
+int   CBusiness::ReconnectSyncReader() {
+	int ret = m_SyncReader.Reconnect();
+	return ret;
+}
+
+// 通知界面连接结果
+int   CBusiness::NotifyUiSyncReaderStatus(CZsSyncReader::SYNC_READER_STATUS eStatus) {
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -794,6 +845,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CBindingNurseParam * pParam = (CBindingNurseParam *)pMessageData;
 		BindingNurse(pParam);
+	}
+	break;
+
+	case MSG_RECONNECT_SYNC_READER:
+	{
+		ReconnectSyncReader();
 	}
 	break;
 

@@ -93,6 +93,7 @@
 #define MSG_DELETE_TAG             15
 #define MSG_CHECK_CARD_BINDING     16
 #define MSG_BINDING_NURSE          17
+#define MSG_RECONNECT_SYNC_READER  18
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -129,6 +130,7 @@
 #define ZS_ERR_FAILED_TO_EXECUTE_EXCEL                  10012
 #define ZS_ERR_NURSE_HAS_TEMP_DATA                      10013
 #define ZS_ERR_PATIENT_HAS_TOO_MANY_TAGS                10014
+#define ZS_ERR_SYNC_READER_CLOSE                        10015
 
 #define  DB_STATUS_OK_TEXT             "数据库连接OK"
 #define  DB_STATUS_CLOSE_TEXT          "数据库连接失败"
@@ -303,12 +305,26 @@ public:
 	DWORD      m_dwNurseId;
 };
 
+#define  MAX_READER_COMMAND_LENGTH              256
+// Reader通信协议命令
+typedef struct tagReaderCmd {
+	BYTE      abyCommand[MAX_READER_COMMAND_LENGTH];
+	DWORD     dwCommandLength;
+}ReaderCmd;
+
+#define   SERIAL_PORT_SLEEP_TIME    1000
+#define   READER_TAIL               "\x0d\x0a"
+
 extern ILog    * g_log;
 extern IConfig * g_cfg;
 extern HWND    g_hWnd;
 extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_reader;
+extern LmnToolkits::Thread *  g_thrd_sync_reader;
 extern LmnToolkits::Thread *  g_thrd_timer;
+extern ReaderCmd  SYNC_COMMAND;
+extern ReaderCmd  PREPARE_COMMAND;
+extern ReaderCmd  CLEAR_COMMAND;
 
 extern char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD dwDestSize);
 extern int    MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
@@ -322,6 +338,8 @@ extern CString GetExcelDriver();
 extern BOOL  IsSameTag(const TagItem * p1, const TagItem * p2);
 extern char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen, char chSplit = '\0');
 extern TagItem * GetUid(TagItem * pTagItem, const char * szUid, BOOL bWithSplitChar = FALSE);
+
+int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
 
 // templates
 template <class T>
