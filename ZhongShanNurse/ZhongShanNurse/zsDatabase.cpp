@@ -111,6 +111,7 @@ int CZsDatabase::ReconnectDb() {
 		MyDecrypt(buf, szOdbcStr, dwLen);
 
 		// 连接数据库
+		//g_log->Output(ILog::LOG_SEVERITY_INFO, "odbc string = %s\n", szOdbcStr);
 		m_database.OpenEx(szOdbcStr, CDatabase::noOdbcDialog);
 
 		// 如果是oracle数据库，防止锁住
