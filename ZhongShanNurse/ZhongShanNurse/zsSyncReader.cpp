@@ -33,6 +33,7 @@ static BOOL GetAllSerialPortName(std::vector<std::string> & vCom) {
 
 CZsSyncReader::CZsSyncReader(CBusiness * pBusiness) : m_pBusiness(pBusiness) {
 	m_eReaderStatus = STATUS_CLOSE;
+	m_hComm = 0;
 }
 
 CZsSyncReader::~CZsSyncReader() {
