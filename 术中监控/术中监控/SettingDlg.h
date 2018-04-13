@@ -19,5 +19,8 @@ public:
 	LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
-	
+	DuiLib::CEditUI *           m_edInteval;
+	DuiLib::CEditUI *           m_edLowAlarm;
+	DuiLib::CEditUI *           m_edHighAlarm;
+	DuiLib::CEditUI *           m_edAlarmPath;
 };

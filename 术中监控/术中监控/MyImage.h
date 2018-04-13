@@ -1,0 +1,40 @@
+#pragma once
+
+#include "exhCommon.h"
+#include "UIlib.h"
+
+class CMyImageUI : public DuiLib::CControlUI
+{
+public:
+	CMyImageUI(DuiLib::CPaintManagerUI *pManager);
+	~CMyImageUI();
+
+	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	virtual void DoEvent(DuiLib::TEventUI& event);
+
+	void  AddTemp(DWORD dwTemp);
+
+private:
+	vector<TempData *>   m_vTempData;
+
+	DuiLib::CPaintManagerUI *    m_pManager;
+
+	void DrawTempPoint(int x, int y, HDC hDc, int RADIUS = 6);
+
+private:
+	int                  m_nLeft;
+	int                  m_nGridSize;
+	int                  m_nTimeUnitLen;
+	int                  m_nTextOffsetX;
+	int                  m_nTextOffsetY;
+	int                  m_nTimeOffsetX;
+	int                  m_nTimeOffsetY;
+	int                  m_nMaxTimeSpan;
+
+	HPEN                 m_hPen;
+	HPEN                 m_hPen1;
+	HPEN                 m_hPen2;
+};
+
+#define  MYIMAGE_TIMER_ID             10
+

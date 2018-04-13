@@ -1,6 +1,6 @@
 #pragma once
 #include "UIlib.h"
-
+#include "MyImage.h"
 
 class CDuiFrameWnd : public DuiLib::WindowImplBase
 {
@@ -19,6 +19,8 @@ public:
 private:
 	DuiLib::CButtonUI *             m_btnMenu;
 	DuiLib::CLabelUI *              m_lblReaderStatus;
+	CMyImageUI *                    m_pImageUI;
 
+private:
 	void  OnSetting();
 };

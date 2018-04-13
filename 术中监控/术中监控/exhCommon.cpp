@@ -7,10 +7,16 @@ DWORD SERIAL_PORT_SLEEP_TIME = 500;
 
 LmnToolkits::Thread *  g_thrd_reader = 0;                 // Reader线程
 LmnToolkits::Thread *  g_thrd_timer = 0;                  // TIMER
+LmnToolkits::Thread *  g_thrd_background = 0;
 
 ReaderCmd  PREPARE_COMMAND;
 ReaderCmd  INVENTORY_COMMAND;
 ReaderCmd  READ_TAG_DATA_COMMAND;
+
+DWORD   g_dwCollectInterval = 0;
+DWORD   g_dwLowTempAlarm    = 0;
+DWORD   g_dwHighTempAlarm   = 0;
+char    g_szAlarmFilePath[MAX_ALARM_FILE_PATH];
 
 														  // 遍历系统里的所有串口
 BOOL GetAllSerialPortName(std::vector<std::string> & vCom) {

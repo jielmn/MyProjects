@@ -48,6 +48,11 @@ typedef  struct tagTagBlock {
 	BYTE     abyData[4];
 }TagBlock;
 
+typedef struct tagTempData {
+	DWORD    dwTemperature;
+	time_t   tTime;
+}TempData;
+
 #define    EXH_ERR_READER_CLOSE                          20001
 #define    EXH_ERR_READER_FAILED_TO_WRITE                20002
 #define    EXH_ERR_READER_TIMEOUT_OR_WRONG_FORMAT        20003
@@ -60,6 +65,15 @@ extern DWORD SERIAL_PORT_SLEEP_TIME;
 
 extern LmnToolkits::Thread *  g_thrd_reader;
 extern LmnToolkits::Thread *  g_thrd_timer;
+extern LmnToolkits::Thread *  g_thrd_background;
+
+extern  DWORD   g_dwCollectInterval;
+extern  DWORD   g_dwLowTempAlarm;
+extern  DWORD   g_dwHighTempAlarm;
+#define MAX_ALARM_FILE_PATH                256
+extern  char    g_szAlarmFilePath[MAX_ALARM_FILE_PATH];
+
+#define  DEFAULT_ALARM_FILE_PATH                     "\\res\\alarm.mp3"
 
 extern ReaderCmd  PREPARE_COMMAND;
 extern ReaderCmd  INVENTORY_COMMAND;

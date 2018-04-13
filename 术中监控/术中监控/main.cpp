@@ -3,6 +3,13 @@
 #include "resource.h"
 #include "Business.h"
 #include "SettingDlg.h"
+#include "MyImage.h"
+
+//#include <mmsystem.h> //导入声音头文件库   
+//#pragma comment(lib,"winmm.lib")//导入声音的链接库  
+#define MAIN_TIMER_ID                1
+#define MAIN_TIMER_INTEVAL           1000
+static DWORD   s_dwTemp = 3700;
 
 class CDuiMenu : public DuiLib::WindowImplBase
 {
@@ -83,6 +90,8 @@ void CDuiFrameWnd::InitWindow() {
 	m_btnMenu = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("menubtn"));
 	m_lblReaderStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblReaderStatus"));
 
+	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");
+	SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
 	DuiLib::WindowImplBase::InitWindow();
 }
 
@@ -113,6 +122,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 }
 
 DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp("MyImage", pstrClass)) {
+		return new CMyImageUI(&m_PaintManager);
+	}
 	return DuiLib::WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -124,6 +136,28 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else
 			m_lblReaderStatus->SetText("读卡器连接失败");
 	}
+	else if (uMsg == WM_TIMER) {
+		if (wParam == MAIN_TIMER_ID) {
+			DWORD dwTemp = GetRand(10, 40);
+			BOOL bPositive = (BOOL)GetRand(0, 1);
+			if (m_pImageUI)
+			{
+				if (bPositive) {
+					s_dwTemp += dwTemp;
+				}
+				else {
+					s_dwTemp -= dwTemp;
+				}
+				if (s_dwTemp <= 3400) {
+					s_dwTemp = 3400;
+				}
+				else if (s_dwTemp >= 4200) {
+					s_dwTemp = 4200;
+				}
+				m_pImageUI->AddTemp(s_dwTemp);
+			}
+		}
+	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam );
 }
 
@@ -134,6 +168,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	//mciSendString("open d:\\1.mp3", NULL, 0, 0);
+	//mciSendString("play d:\\1.mp3 ", NULL, 0, 0);
+	//mciSendString("close d:\\1.mp3 ", NULL, 0, 0);	
+
 	int ret = 0;
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();

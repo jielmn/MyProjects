@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "exhCommon.h"
 #include "Business.h"
 
@@ -60,6 +61,14 @@ int CBusiness::Init() {
 	}
 	g_thrd_timer->Start();
 
+	// 后台进程
+	g_thrd_background = new LmnToolkits::Thread();
+	if (0 == g_thrd_background) {
+		return -1;
+	}
+	g_thrd_background->Start();
+
+	
 	char buf[8192];
 	// 获取Reader协议命令
 	g_cfg->GetConfig("prepare command", buf, sizeof(buf), "DD 11 EF 09 00 01 00 D7 B1");
@@ -71,8 +80,19 @@ int CBusiness::Init() {
 	g_cfg->GetConfig("read tag data command", buf, sizeof(buf), " DD 11 EF 0B 00 23 00 7F 01 17 24");
 	TransferReaderCmd(READ_TAG_DATA_COMMAND, buf);
 	
-
 	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 500 );
+
+	g_dwCollectInterval = 5;                  // 间隔秒
+	g_dwLowTempAlarm    = 3500;               // 低温报警，单位1/100摄氏度
+	g_dwHighTempAlarm   = 4000;               // 高温报警，单位1/100摄氏度
+
+	GetModuleFileName(0, buf, sizeof(buf) );
+	const char * pStr = strrchr(buf, '\\');
+	assert(pStr);
+	DWORD  dwTemp = pStr - buf;
+	memcpy( g_szAlarmFilePath, buf, dwTemp );
+	memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
+	
 
 	ReconnectReaderAsyn(200);
 
@@ -91,6 +111,12 @@ int CBusiness::DeInit() {
 		g_thrd_timer->Stop();
 		delete g_thrd_timer;
 		g_thrd_timer = 0;
+	}
+
+	if (g_thrd_background) {
+		g_thrd_background->Stop();
+		delete g_thrd_background;
+		g_thrd_background = 0;
 	}
 
 	Clear();
