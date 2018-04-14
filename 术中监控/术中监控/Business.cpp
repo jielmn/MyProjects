@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "exhCommon.h"
 #include "Business.h"
-
+#include "UIlib.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -13,7 +13,7 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() : m_reader(this)  {
-	
+	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
 }
 
 CBusiness::~CBusiness() {
@@ -71,27 +71,55 @@ int CBusiness::Init() {
 	
 	char buf[8192];
 	// 获取Reader协议命令
-	g_cfg->GetConfig("prepare command", buf, sizeof(buf), "DD 11 EF 09 00 01 00 D7 B1");
+	g_cfg->GetConfig("prepare command", buf, sizeof(buf), "55 01 01 DD AA");
 	TransferReaderCmd(PREPARE_COMMAND, buf);
 
-	g_cfg->GetConfig("inventory command", buf, sizeof(buf), "DD 11 EF 09 00 01 00 D7 B1");
-	TransferReaderCmd(INVENTORY_COMMAND, buf);
-
-	g_cfg->GetConfig("read tag data command", buf, sizeof(buf), " DD 11 EF 0B 00 23 00 7F 01 17 24");
+	g_cfg->GetConfig("read tag data command", buf, sizeof(buf), "55 01 02 DD AA");
 	TransferReaderCmd(READ_TAG_DATA_COMMAND, buf);
 	
-	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 500 );
+	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 2000 );
 
-	g_dwCollectInterval = 5;                  // 间隔秒
-	g_dwLowTempAlarm    = 3500;               // 低温报警，单位1/100摄氏度
-	g_dwHighTempAlarm   = 4000;               // 高温报警，单位1/100摄氏度
+	// 采集间隔秒
+	g_cfg->GetConfig("collect interval", g_dwCollectInterval, 10);
 
-	GetModuleFileName(0, buf, sizeof(buf) );
-	const char * pStr = strrchr(buf, '\\');
-	assert(pStr);
-	DWORD  dwTemp = pStr - buf;
-	memcpy( g_szAlarmFilePath, buf, dwTemp );
-	memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
+	// 低温报警
+	g_cfg->GetConfig("low alarm", g_dwLowTempAlarm, 3500);
+	// 高温报警
+	g_cfg->GetConfig("high alarm", g_dwHighTempAlarm, 4000);
+	//g_dwLowTempAlarm    = 3500;               // 低温报警，单位1/100摄氏度
+	//g_dwHighTempAlarm   = 4000;               // 高温报警，单位1/100摄氏度
+	if (g_dwLowTempAlarm < 3500 || g_dwLowTempAlarm > 4200) {
+		g_dwLowTempAlarm = 3500;
+	}
+
+	if (g_dwHighTempAlarm < 3500 || g_dwHighTempAlarm > 4200) {
+		g_dwHighTempAlarm = 4000;
+	}
+
+	if (g_dwHighTempAlarm < g_dwLowTempAlarm) {
+		g_dwLowTempAlarm = 3500;
+		g_dwHighTempAlarm = 4000;
+	}
+
+	g_cfg->GetConfig("alarm file", buf, sizeof(buf), "");
+	if (buf[0] == '\0') {
+		GetModuleFileName(0, buf, sizeof(buf));
+		const char * pStr = strrchr(buf, '\\');
+		assert(pStr);
+		DWORD  dwTemp = pStr - buf;
+		memcpy(g_szAlarmFilePath, buf, dwTemp);
+		memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
+	}
+	else {
+		strncpy_s(g_szAlarmFilePath, buf, sizeof(g_szAlarmFilePath));
+	}
+
+	//GetModuleFileName(0, buf, sizeof(buf) );
+	//const char * pStr = strrchr(buf, '\\');
+	//assert(pStr);
+	//DWORD  dwTemp = pStr - buf;
+	//memcpy( g_szAlarmFilePath, buf, dwTemp );
+	//memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
 	
 
 	ReconnectReaderAsyn(200);
@@ -126,6 +154,8 @@ int CBusiness::DeInit() {
 
 // 重连Reader
 int   CBusiness::ReconnectReaderAsyn(DWORD dwDelayTime /*= 0*/) {
+	//g_thrd_reader->DeleteMessages();
+
 	if (0 == dwDelayTime) {
 		g_thrd_reader->PostMessage(this, MSG_RECONNECT_READER);
 	}
@@ -140,29 +170,74 @@ int   CBusiness::ReconnectReader() {
 }
 
 // 通知界面连接结果
-int   CBusiness::NotifyUiReaderStatus(CReader::READER_STATUS eStatus) {
+int   CBusiness::NotifyUiReaderStatus(CTelemedReader::READER_STATUS eStatus) {
 	::PostMessage(g_hWnd, UM_SHOW_READER_STATUS, eStatus, 0);
 	return 0;
 }
 
 // 获取状态
-CReader::READER_STATUS  CBusiness::GetReaderStatus() {
+CTelemedReader::READER_STATUS  CBusiness::GetReaderStatus() {
 	return m_reader.GetStatus();
 }
 
-int   CBusiness::GetTagTempAsyn() {
-	g_thrd_reader->PostMessage(this, MSG_GET_TAG_TEMP);
+int   CBusiness::ReadTagTempAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_reader->PostMessage(this, MSG_GET_TAG_TEMP);
+	}
+	else {
+		g_thrd_reader->PostDelayMessage( dwDelayTime, this, MSG_GET_TAG_TEMP);
+	}
+	
 	return 0;
 }
 
-int   CBusiness::GetTagTemp() {
-	int ret = m_reader.GetTagTemperatureData();
+int   CBusiness::ReadTagTemp() {
+	DWORD  dwTemp = 0;
+	int ret = m_reader.ReadTagTemp(dwTemp);
+	NotifyUiReadTagTemp(ret, dwTemp );
 	return 0;
 }
 
-int   CBusiness::NotifyUiTagTemp() {
+int   CBusiness::NotifyUiReadTagTemp( int ret, DWORD dwTemp ) {
+	::PostMessage(g_hWnd, UM_SHOW_READ_TAG_TEMP_RET, ret, dwTemp);
 	return 0;
 }
+
+int   CBusiness::AlarmAsyn(const char * szAlarmFile) {
+	g_thrd_background->PostMessage(this, MSG_ALARM, new CAlarmParam(szAlarmFile) );
+	return 0;
+}
+
+int   CBusiness::Alarm(const CAlarmParam * pParam) {
+	DuiLib::CDuiString strText;
+
+	if (m_szAlarmFile[0] == '\0') {
+		// open
+		strText.Format("open %s", pParam->m_szAlarmFile);
+		mciSendString( strText, NULL, 0, 0);
+
+		// play
+		strText.Format("play %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+	}
+	else {
+		// stop
+		strText.Format("close %s", m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+
+		// open
+		strText.Format("open %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+
+		// play
+		strText.Format("play %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+
+	}
+	strncpy_s(m_szAlarmFile, pParam->m_szAlarmFile, sizeof(m_szAlarmFile));
+	return 0;
+}
+
 
 
 
@@ -178,7 +253,14 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 
 	case MSG_GET_TAG_TEMP:
 	{
-		GetTagTemp();
+		ReadTagTemp();
+	}
+	break;
+
+	case MSG_ALARM:
+	{
+		CAlarmParam * pParam = (CAlarmParam*)pMessageData;
+		Alarm(pParam);
 	}
 	break;
 

@@ -29,7 +29,8 @@ private:
 	int                  m_nTextOffsetY;
 	int                  m_nTimeOffsetX;
 	int                  m_nTimeOffsetY;
-	int                  m_nMaxTimeSpan;
+	int                  m_nMaxPointsCnt;
+	int                  m_nRadius;
 
 	HPEN                 m_hPen;
 	HPEN                 m_hPen1;

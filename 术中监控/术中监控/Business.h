@@ -3,7 +3,7 @@
 #include "LmnCommon.h"
 #include "LmnThread.h"
 
-#include "Reader.h"
+#include "TelemedReader.h"
 
 class CBusiness : public LmnToolkits::MessageHandler {
 
@@ -20,14 +20,18 @@ public:
 	int   ReconnectReaderAsyn(DWORD dwDelayTime = 0);
 	int   ReconnectReader();
 	// 通知界面连接结果
-	int   NotifyUiReaderStatus(CReader::READER_STATUS eStatus);
+	int   NotifyUiReaderStatus(CTelemedReader::READER_STATUS eStatus);
 	// 获取状态
-	CReader::READER_STATUS  GetReaderStatus();
+	CTelemedReader::READER_STATUS  GetReaderStatus();
 
-	// 获取Tag上的温度数据
-	int   GetTagTempAsyn();
-	int   GetTagTemp();
-	int   NotifyUiTagTemp();
+	// 读取Tag温度
+	int   ReadTagTempAsyn(DWORD dwDelayTime = 0);
+	int   ReadTagTemp();
+	int   NotifyUiReadTagTemp(int ret, DWORD dwTemp );
+
+	// 报警
+	int   AlarmAsyn(const char * szAlarmFile);
+	int   Alarm(const CAlarmParam * pParam);
 
 private:
 	static CBusiness *  pInstance;
@@ -40,7 +44,9 @@ private:
 
 private:
 
-	CReader       m_reader;
+	CTelemedReader       m_reader;
+
+	char                 m_szAlarmFile[256];
 };
 
 

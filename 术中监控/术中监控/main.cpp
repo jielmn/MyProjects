@@ -4,11 +4,15 @@
 #include "Business.h"
 #include "SettingDlg.h"
 #include "MyImage.h"
+#include "AboutDlg.h"
 
 //#include <mmsystem.h> //导入声音头文件库   
 //#pragma comment(lib,"winmm.lib")//导入声音的链接库  
-#define MAIN_TIMER_ID                1
-#define MAIN_TIMER_INTEVAL           1000
+//#define MAIN_TIMER_ID                1
+//#define MAIN_TIMER_INTEVAL           5000
+
+#define COLLECT_TIMER_ID             2
+
 static DWORD   s_dwTemp = 3700;
 
 class CDuiMenu : public DuiLib::WindowImplBase
@@ -75,6 +79,20 @@ void  CDuiFrameWnd::OnSetting() {
 	delete pSettingDlg;
 }
 
+void  CDuiFrameWnd::OnAbout() {
+	CAboutDlg * pAboutDlg = new CAboutDlg;
+
+	pAboutDlg->Create(this->m_hWnd, _T("关于"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAboutDlg->CenterWindow();
+	int ret = pAboutDlg->ShowModal();
+
+	// 如果OK
+	if (0 == ret) {
+
+	}
+
+	delete pAboutDlg;
+}
 
 
 
@@ -91,7 +109,7 @@ void CDuiFrameWnd::InitWindow() {
 	m_lblReaderStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblReaderStatus"));
 
 	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");
-	SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
+	//SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
 	DuiLib::WindowImplBase::InitWindow();
 }
 
@@ -115,7 +133,7 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		return;
 	}
 	else if (msg.sType == "menu_about") {
-		CBusiness::GetInstance()->GetTagTempAsyn();
+		OnAbout();
 		return;
 	}
 	DuiLib::WindowImplBase::Notify(msg);
@@ -129,34 +147,36 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	int ret = 0;
 	if (uMsg == UM_SHOW_READER_STATUS) {
-		CReader::READER_STATUS eStatus = (CReader::READER_STATUS)wParam;
-		if ( eStatus == CReader::STATUS_OPEN)
+		CTelemedReader::READER_STATUS eStatus = (CTelemedReader::READER_STATUS)wParam;
+		if (eStatus == CTelemedReader::STATUS_OPEN)
+		{
 			m_lblReaderStatus->SetText("读卡器连接OK");
+
+			// 获取温度
+			CBusiness::GetInstance()->ReadTagTempAsyn();
+		}			
 		else
+		{
 			m_lblReaderStatus->SetText("读卡器连接失败");
+		}
 	}
 	else if (uMsg == WM_TIMER) {
-		if (wParam == MAIN_TIMER_ID) {
-			DWORD dwTemp = GetRand(10, 40);
-			BOOL bPositive = (BOOL)GetRand(0, 1);
-			if (m_pImageUI)
-			{
-				if (bPositive) {
-					s_dwTemp += dwTemp;
-				}
-				else {
-					s_dwTemp -= dwTemp;
-				}
-				if (s_dwTemp <= 3400) {
-					s_dwTemp = 3400;
-				}
-				else if (s_dwTemp >= 4200) {
-					s_dwTemp = 4200;
-				}
-				m_pImageUI->AddTemp(s_dwTemp);
-			}
+		if (wParam == COLLECT_TIMER_ID) {
+			
 		}
+	}
+	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
+		ret = wParam;
+		DWORD dwTemp = lParam;
+
+		if (0 == ret) {
+			m_pImageUI->AddTemp(dwTemp);
+
+			// 获取温度
+			CBusiness::GetInstance()->ReadTagTempAsyn(g_dwCollectInterval * 1000);
+		}		
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam );
 }

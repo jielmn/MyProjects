@@ -19,11 +19,11 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 
 			strText = m_edInteval->GetText();
 			if (1 != sscanf_s(strText, "%lu", &dwTemp)) {
-				::MessageBox(this->GetHWND(), "采集间隔请输入整数(1~60)", "设置", 0);
+				::MessageBox(this->GetHWND(), "采集间隔请输入整数(5~60)", "设置", 0);
 				return;
 			}
-			if (dwTemp > 60) {
-				::MessageBox(this->GetHWND(), "采集间隔请输入整数(1~60)", "设置", 0);
+			if ( dwTemp < 5 || dwTemp > 60) {
+				::MessageBox(this->GetHWND(), "采集间隔请输入整数(5~60)", "设置", 0);
 				return;
 			}
 			dwInterval = dwTemp;
@@ -63,6 +63,33 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 
 			PostMessage(WM_CLOSE);
 
+		}
+		else if (name == "btnBrowse") {
+			OPENFILENAME ofn;       // common dialog box structure
+			char szFile[260];       // buffer for file name
+			//HWND hwnd;              // owner window
+
+									// Initialize OPENFILENAME
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = this->GetHWND();
+			ofn.lpstrFile = szFile;
+			// Set lpstrFile[0] to '\0' so that GetOpenFileName does not 
+			// use the contents of szFile to initialize itself.
+			ofn.lpstrFile[0] = '\0';
+			ofn.nMaxFile = sizeof(szFile);
+			ofn.lpstrFilter = "mp3\0*.mp3\0wave\0*.wav\0";   //All\0*.*\0Text\0*.TXT\0
+			ofn.nFilterIndex = 1;
+			ofn.lpstrFileTitle = NULL;
+			ofn.nMaxFileTitle = 0;
+			ofn.lpstrInitialDir = NULL;
+			ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+			// Display the Open dialog box. 
+
+			if (GetOpenFileName(&ofn) == TRUE) {
+				m_edAlarmPath->SetText(ofn.lpstrFile);
+			}
 		}
 	}
 	DuiLib::WindowImplBase::Notify(msg);
