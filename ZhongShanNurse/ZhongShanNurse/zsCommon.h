@@ -50,6 +50,10 @@
 #define  NURSE_ID_EDIT_ID               "edNurseId"
 #define  NURSE_NAME_EDIT_ID             "edNurseName"
 #define  NURSE_OK_BUTTON_ID             "btnNurseOk"
+#define  SYNC_BUTTON_ID                 "btnSynchronize"
+#define  SYNC_PROGRESS_ID               "sync_progresss"
+#define  UPDATE_BUTTON_ID               "btnUpdate"
+#define  CLEAR_DATA_BUTTON_ID           "btnClearData"
 
 #define  TEMPERATURE_DATA_FILE         "TemperatureData.xml"
 #define  PATIENTS_FILE                 "Patients.xml"
@@ -72,8 +76,10 @@
 #define ODBC_STRING_MYSQL          "odbc string mysql"
 
 // db reconnect 时间
-#define  RECONNECT_DB_TIME         10000
-#define  RECONNECT_READER_TIME     10000
+#define  RECONNECT_DB_TIME           10000
+#define  RECONNECT_READER_TIME       10000
+#define  RECONNECT_SYNC_READER_TIME  10000
+#define  SYNC_READER_HEART_BEAT_TIME 60000
 
 // thread message
 #define MSG_RECONNECT_DB           1
@@ -94,6 +100,9 @@
 #define MSG_CHECK_CARD_BINDING     16
 #define MSG_BINDING_NURSE          17
 #define MSG_RECONNECT_SYNC_READER  18
+#define MSG_SYNC_READER_HEART_BEAT 19
+#define MSG_SYNCHRONIZE            20
+#define MSG_CLEAR_READER           21
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -114,6 +123,9 @@
 #define UM_NOTIFY_DELETE_TAG_RET               (WM_USER+16)
 #define UM_CHECK_CARD_BINDING_RET              (WM_USER+17)
 #define UM_NOTIFY_BINDING_NURSE_RET            (WM_USER+18)
+#define UM_SHOW_SYNC_READER_STATUS             (WM_USER+19)
+#define UM_SYNCHRONIZE_RESULT                  (WM_USER+20)
+#define UM_CLEAR_READER_RESULT                 (WM_USER+21)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -131,11 +143,15 @@
 #define ZS_ERR_NURSE_HAS_TEMP_DATA                      10013
 #define ZS_ERR_PATIENT_HAS_TOO_MANY_TAGS                10014
 #define ZS_ERR_SYNC_READER_CLOSE                        10015
+#define ZS_ERR_SYNC_READER_FAILED_TO_WRITE              10016
+#define ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT         10017
 
 #define  DB_STATUS_OK_TEXT             "数据库连接OK"
 #define  DB_STATUS_CLOSE_TEXT          "数据库连接失败"
 #define  BINDING_READER_STATUS_OK_TEXT             "绑定读卡器连接OK"
 #define  BINDING_READER_STATUS_CLOSE_TEXT          "绑定读卡器连接失败"
+#define  SYNC_READER_STATUS_OK_TEXT             "同步读卡器连接OK"
+#define  SYNC_READER_STATUS_CLOSE_TEXT          "同步读卡器连接失败"
 
 #define  COLOR_OK                                  0xFFFFFFFF
 #define  COLOR_ERROR                               0xFFCAF100
@@ -312,8 +328,17 @@ typedef struct tagReaderCmd {
 	DWORD     dwCommandLength;
 }ReaderCmd;
 
-#define   SERIAL_PORT_SLEEP_TIME    1000
+#define   SERIAL_PORT_SLEEP_TIME    2000
 #define   READER_TAIL               "\x0d\x0a"
+
+
+typedef struct tagSyncItem {
+	time_t     tTime;
+	TagItem    tTagId;
+	DWORD      dwTemperature;
+	TagItem    tNurseId;
+	TagItem    tReaderId;
+}SyncItem;
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
@@ -340,6 +365,9 @@ extern char * GetUid(char * buf, DWORD dwBufLen, const BYTE uid[], DWORD uidlen,
 extern TagItem * GetUid(TagItem * pTagItem, const char * szUid, BOOL bWithSplitChar = FALSE);
 
 int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
+
+// Reader读取的时间数据转换
+extern time_t   GetTelemedTagDate(const BYTE * pData, DWORD dwDataLen);
 
 // templates
 template <class T>

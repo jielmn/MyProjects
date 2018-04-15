@@ -124,6 +124,18 @@ const char * GetErrDescription(int e) {
 		szDescription = "病人已经绑定太多Tags";
 		break;
 
+	case ZS_ERR_SYNC_READER_CLOSE:
+		szDescription = "同步读卡器关闭状态";
+		break;
+
+	case ZS_ERR_SYNC_READER_FAILED_TO_WRITE:
+		szDescription = "同步读卡器写数据失败";
+		break;
+
+	case ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT:
+		szDescription = "同步读卡器接收数据格式错误";
+		break;
+
 	default:
 		szDescription = "未知错误";
 	}
@@ -350,4 +362,18 @@ int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd) {
 	cmd.dwCommandLength = dwSize;
 
 	return 0;
+}
+
+time_t   GetTelemedTagDate( const BYTE * pData, DWORD dwDataLen ) {
+	assert(dwDataLen == 5);
+
+	// 时间5个字节
+	struct tm timeinfo;
+	timeinfo.tm_year = 2000 + pData[0] - 1900;
+	timeinfo.tm_mon  = pData[1] - 1;
+	timeinfo.tm_mday = pData[2];
+	timeinfo.tm_hour = pData[3];
+	timeinfo.tm_min  = pData[4];
+	timeinfo.tm_sec  = 0;
+	return mktime(&timeinfo);
 }

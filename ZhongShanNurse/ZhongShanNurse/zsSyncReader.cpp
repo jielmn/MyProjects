@@ -1,5 +1,6 @@
+#include <afx.h>
+#include "Business.h"
 #include "zsSyncReader.h"
-
 
 // 遍历系统里的所有串口
 static BOOL GetAllSerialPortName(std::vector<std::string> & vCom) {
@@ -69,9 +70,8 @@ int CZsSyncReader::Reconnect() {
 		std::vector<std::string>::iterator it;
 		for (it = vCom.begin(); it != vCom.end(); it++) {
 			std::string  sItem = *it;
-			std::string  sItemAdjust = "\\\\.\\" + sItem;
-
-			bRet = OpenUartPort( sItemAdjust.c_str() );
+	
+			bRet = OpenUartPort(sItem.c_str() );
 			if (!bRet) {
 				CloseUartPort();
 				continue;
@@ -89,16 +89,13 @@ int CZsSyncReader::Reconnect() {
 
 	if (bPrepared) {
 		m_eReaderStatus = STATUS_OPEN;
-
-		// 通知界面
-		//CSerialPort::GetInstance()->NotifySerialPortStatus(SERIAL_PORT_STATUS_OPEND);
-		// 定时检查心跳
-		// g_thrd_serial_port->PostDelayMessage(DELAY_SERIAL_PORT_HEART_BEAT, g_handler_serial_port, MSG_SERIAL_PORT_HEART_BEAT);
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		// 延时检查心跳
+		m_pBusiness->CheckSyncReaderHeartBeatAsyn(SYNC_READER_HEART_BEAT_TIME);
 	}
 	else {
 		// 连接，重新连接
-		CloseUartPort();
-		//g_thrd_serial_port->PostDelayMessage(DELAY_RECONNECT_SERIAL_PORT, g_handler_serial_port, MSG_RECONNECT_SERIAL_PORT);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
 	}
 
 	return 0;
@@ -121,8 +118,11 @@ BOOL  CZsSyncReader::OpenUartPort(const char *UartPortName) {
 		return FALSE;
 	}
 
+	char szComName[256];
+	snprintf(szComName, sizeof(szComName), "\\\\.\\%s", UartPortName);
+
 	HANDLE hComm = CreateFile(
-		UartPortName,
+		szComName,
 		GENERIC_WRITE | GENERIC_READ, //访问权限  
 		0,                            //不共享  
 		NULL,                         //返回的句柄不允许被子进程继承  
@@ -301,7 +301,7 @@ int  CZsSyncReader::Prepare() {
 	}
 	else {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to Prepare \n");
-		return -1;
+		return ZS_ERR_SYNC_READER_FAILED_TO_WRITE;
 	}
 }
 
@@ -328,7 +328,154 @@ int  CZsSyncReader::ReadPrepareRet() {
 		}
 	}
 
-	return -1;
+	return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
+}
+
+int   CZsSyncReader::SyncData() {
+	DWORD dwWrited = 0;
+	BOOL bRet = WriteUartPort(m_hComm, SYNC_COMMAND.abyCommand, SYNC_COMMAND.dwCommandLength, &dwWrited);
+
+	if (bRet) {
+		return 0;
+	}
+	else {
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to Sync command \n");
+		return ZS_ERR_SYNC_READER_FAILED_TO_WRITE;
+	}
+}
+
+int   CZsSyncReader::ReadSyncDataRet( std::vector<SyncItem*> & v ) {
+	DWORD dwReceived = 0;
+
+	do
+	{
+		Sleep(SERIAL_PORT_SLEEP_TIME);
+		Receive(dwReceived);
+		// 如果再无数据了
+		if (0 == dwReceived) {
+			break;
+		}
+	} while (TRUE);
+
+	BYTE pData[8192];
+
+	// 最少28字节：                   02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0D 0A
+	// 通常32字节(多了4字节ReaderId)：02 12 03 16 11 37 E0 02 59 CD 93 D9 3D 5E 15 21 00 01 E0 04 01 00 A4 79 F3 90 A0 00 00 01 0D 0A
+
+	if (m_received_data.GetDataLength() < 28) {
+		return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
+	}
+
+	// 读取第一个Item，里面有总数
+	m_received_data.Read(pData, 28);
+	// 如果第17和18字节是 00 00，并且最后两个字节是0D 0A，则OK
+	if ( (0 == memcmp(pData + 16, "\x00\x00", 2)) /*&& (0 == memcmp(pData + 26, READER_TAIL, 2))*/ ) {
+		return 0;
+	}
+
+	// 再读取4个字节
+	m_received_data.Read(pData+28, 4);
+	// 如果最后两个字节不是 0D 0A
+	if ( 0 != memcmp(pData + 30, READER_TAIL, 2) ) {
+		return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
+	}
+
+	DWORD   dwItemCounts = 0;
+	dwItemCounts = pData[16] * 256 + pData[17];
+
+	SyncItem * pItem = new SyncItem;
+	memset(pItem, 0, sizeof(SyncItem));
+
+	// 时间
+	pItem->tTime = GetTelemedTagDate(pData + 1, 5);
+	//  tag id
+	memcpy(pItem->tTagId.abyUid, pData + 6, 8);
+	pItem->tTagId.dwUidLen = 8;
+	// 温度
+	pItem->dwTemperature = pData[14] * 100 + pData[15];
+	// 护士id
+	memcpy(pItem->tNurseId.abyUid, pData + 18, 8);
+	pItem->tNurseId.dwUidLen = 8;
+	// reader id
+	memcpy(pItem->tReaderId.abyUid, pData + 26, 4);
+	pItem->tReaderId.dwUidLen = 4;
+
+	v.push_back(pItem);
+
+	DWORD  dwIndex = 1;
+
+	// 接着从第二个Item分析
+	while (dwIndex < dwItemCounts) {
+		if ( m_received_data.GetDataLength() < 32 ) {
+			ClearVector(v);
+			return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
+		}
+
+		m_received_data.Read(pData, 32);
+
+		pItem = new SyncItem;
+		memset(pItem, 0, sizeof(SyncItem));
+
+		// 时间
+		pItem->tTime = GetTelemedTagDate(pData + 1, 5);
+		//  tag id
+		memcpy(pItem->tTagId.abyUid, pData + 6, 8);
+		pItem->tTagId.dwUidLen = 8;
+		// 温度
+		pItem->dwTemperature = pData[14] * 100 + pData[15];
+		// 护士id
+		memcpy(pItem->tNurseId.abyUid, pData + 18, 8);
+		pItem->tNurseId.dwUidLen = 8;
+		// reader id
+		memcpy(pItem->tReaderId.abyUid, pData + 26, 4);
+		pItem->tReaderId.dwUidLen = 4;
+
+		v.push_back(pItem);
+
+		dwIndex++;
+	}
+
+	return 0;
+}
+
+int   CZsSyncReader::ClearData() {
+	DWORD dwWrited = 0;
+	BOOL bRet = WriteUartPort(m_hComm, CLEAR_COMMAND.abyCommand, CLEAR_COMMAND.dwCommandLength, &dwWrited);
+
+	if (bRet) {
+		return 0;
+	}
+	else {
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to Clear command \n");
+		return ZS_ERR_SYNC_READER_FAILED_TO_WRITE;
+	}
+	return 0;
+}
+
+int   CZsSyncReader::ReadClearDataRet() {
+	DWORD dwReceived = 0;
+
+	do
+	{
+		Sleep(SERIAL_PORT_SLEEP_TIME);
+		Receive(dwReceived);
+		// 如果再无数据了
+		if (0 == dwReceived) {
+			break;
+		}
+	} while (TRUE);
+
+	BYTE pData[8192];
+
+	if (m_received_data.GetDataLength() >= 20) {
+		m_received_data.Read(pData, 20);
+		// 如果最后两个字节是0D 0A，则OK
+		if (0 == memcmp(pData + 18, READER_TAIL, 2)) {
+			return 0;
+		}
+	}
+
+	return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
 }
 
 int   CZsSyncReader::Receive(DWORD & dwReceivedCnt) {
@@ -341,5 +488,86 @@ int   CZsSyncReader::Receive(DWORD & dwReceivedCnt) {
 			m_received_data.Append(buf, dwReceivedCnt);
 		}
 	}
+	return 0;
+}
+
+int   CZsSyncReader::CheckHeartBeat() {
+
+	// 如果已经是关闭状态
+	if (m_eReaderStatus == STATUS_CLOSE) {
+		return ZS_ERR_SYNC_READER_CLOSE;
+	}
+
+	int ret = Prepare();
+	if (0 != ret) {
+		m_eReaderStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
+		return ret;
+	}
+
+	ret = ReadPrepareRet();
+	if (0 != ret) {
+		m_eReaderStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
+		return ret;
+	}
+
+	// 延时检查心跳
+	m_pBusiness->CheckSyncReaderHeartBeatAsyn(SYNC_READER_HEART_BEAT_TIME);
+
+	return 0;
+}
+
+// 同步数据
+int   CZsSyncReader::Synchronize(std::vector<SyncItem*> & v) {
+	// 如果已经是关闭状态
+	if (m_eReaderStatus == STATUS_CLOSE) {
+		return ZS_ERR_SYNC_READER_CLOSE;
+	}
+
+	int ret = SyncData();
+	if (0 != ret) {
+		m_eReaderStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
+		return ret;
+	}
+
+	ret = ReadSyncDataRet(v);
+	if (0 != ret) {
+		m_eReaderStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
+		return ret;
+	}
+
+	return 0;
+}
+
+int CZsSyncReader::ClearReader() {
+
+	// 如果已经是关闭状态
+	if (m_eReaderStatus == STATUS_CLOSE) {
+		return ZS_ERR_SYNC_READER_CLOSE;
+	}
+
+	int ret = ClearData();
+	if (0 != ret) {
+		m_eReaderStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
+		return ret;
+	}
+
+	ret = ReadClearDataRet();
+	if (0 != ret) {
+		m_eReaderStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiSyncReaderStatus(m_eReaderStatus);
+		m_pBusiness->ReconnectSyncReaderAsyn(RECONNECT_SYNC_READER_TIME);
+		return ret;
+	}
+
 	return 0;
 }

@@ -11,6 +11,12 @@ public:
 
 	// 重连
 	int Reconnect();
+	// 检查心跳
+	int CheckHeartBeat();
+	// 同步数据
+	int Synchronize(std::vector<SyncItem*> & v);
+	// 清空数据
+	int ClearReader();
 
 	enum SYNC_READER_STATUS {
 		STATUS_CLOSE = 0,
@@ -43,6 +49,10 @@ private:
 	// Reader协议处理
 	int   Prepare();
 	int   ReadPrepareRet();
+	int   SyncData();
+	int   ReadSyncDataRet(std::vector<SyncItem*> & v);
+	int   ClearData();
+	int   ReadClearDataRet();
 
 
 	int   Receive(DWORD & dwReceivedCnt);            // 接收数据

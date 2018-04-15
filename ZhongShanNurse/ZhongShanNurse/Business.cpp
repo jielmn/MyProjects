@@ -703,6 +703,63 @@ int   CBusiness::ReconnectSyncReader() {
 
 // 通知界面连接结果
 int   CBusiness::NotifyUiSyncReaderStatus(CZsSyncReader::SYNC_READER_STATUS eStatus) {
+	::PostMessage(g_hWnd, UM_SHOW_SYNC_READER_STATUS, eStatus, 0);
+	return 0;
+}
+
+int   CBusiness::CheckSyncReaderHeartBeatAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_sync_reader->PostMessage(this, MSG_SYNC_READER_HEART_BEAT);
+	}
+	else {
+		g_thrd_sync_reader->PostDelayMessage(dwDelayTime, this, MSG_SYNC_READER_HEART_BEAT);
+	}
+	return 0;
+}
+
+int   CBusiness::CheckSyncReaderHeartBeat() {
+	m_SyncReader.CheckHeartBeat();
+	return 0;
+}
+
+// 同步温度数据
+int   CBusiness::SynchronizeAync() {
+	g_thrd_sync_reader->PostMessage(this, MSG_SYNCHRONIZE);
+	return 0;
+}
+
+int   CBusiness::Synchronize() {
+	std::vector<SyncItem*> * pVRet = new std::vector<SyncItem*>;
+	int ret = m_SyncReader.Synchronize(*pVRet);
+	NotifyUiSynchronizeRet(ret, pVRet);
+	return 0;
+}
+
+int   CBusiness::NotifyUiSynchronizeRet(int ret, std::vector<SyncItem*> * pVRet) {
+	if (0 == ret) {
+		::PostMessage(g_hWnd, UM_SYNCHRONIZE_RESULT, ret, (LPARAM)pVRet);
+	}
+	else {
+		ClearVector(*pVRet);
+		delete pVRet;
+		::PostMessage(g_hWnd, UM_SYNCHRONIZE_RESULT, ret, 0);
+	}
+	return 0;
+}
+
+int   CBusiness::ClearReaderAync() {
+	g_thrd_sync_reader->PostMessage(this, MSG_CLEAR_READER);
+	return 0;
+}
+
+int   CBusiness::ClearReader() {
+	int ret = m_SyncReader.ClearReader();
+	NotifyUiClearReaderRet(ret);
+	return 0;
+}
+
+int   CBusiness::NotifyUiClearReaderRet(int ret) {
+	::PostMessage(g_hWnd, UM_CLEAR_READER_RESULT, ret, 0);
 	return 0;
 }
 
@@ -851,6 +908,24 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_RECONNECT_SYNC_READER:
 	{
 		ReconnectSyncReader();
+	}
+	break;
+
+	case MSG_SYNC_READER_HEART_BEAT:
+	{
+		CheckSyncReaderHeartBeat();
+	}
+	break;
+
+	case MSG_SYNCHRONIZE:
+	{
+		Synchronize();
+	}
+	break;
+
+	case MSG_CLEAR_READER:
+	{
+		ClearReader();
 	}
 	break;
 

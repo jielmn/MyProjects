@@ -124,6 +124,19 @@ public:
 	int   ReconnectSyncReader();
 	// 通知界面连接结果
 	int   NotifyUiSyncReaderStatus(CZsSyncReader::SYNC_READER_STATUS eStatus);
+	// 检查心跳
+	int   CheckSyncReaderHeartBeatAsyn(DWORD dwDelayTime = 0);
+	int   CheckSyncReaderHeartBeat();
+
+	// 同步读卡器的数据
+	int   SynchronizeAync();
+	int   Synchronize();
+	int   NotifyUiSynchronizeRet(int ret, std::vector<SyncItem*> * pVRet);
+
+	// 清空同步读卡器
+	int   ClearReaderAync();
+	int   ClearReader();
+	int   NotifyUiClearReaderRet(int ret);
 
 private:
 	static CBusiness *  pInstance;

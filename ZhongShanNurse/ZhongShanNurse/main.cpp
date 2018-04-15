@@ -30,6 +30,71 @@
 #define  RET_FAIL                        -1
 #define  RET_PROCESSING                  1
 
+
+// progress UI
+CMyProgress::CMyProgress(DuiLib::CPaintManagerUI *p, DuiLib::CDuiString sForeImage) :m_pManager(p), m_nPos(0), m_sForeImage(sForeImage) {
+}
+CMyProgress::~CMyProgress() {}
+
+void CMyProgress::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_TIMER && event.wParam == 10)
+	{
+		const int MARGIN = 3;
+		const int STEP = 4;
+		CDuiString imageProp;
+		const int PROGRESS_WIDTH = 36;
+		const int PROGRESS_HEIGHT = 7;
+		const int HORIZONTAL_MARGIN = 3;
+
+		int width = this->GetWidth();
+		int height = this->GetHeight();
+
+		width -= 2 * HORIZONTAL_MARGIN;
+
+		if (m_nPos < PROGRESS_WIDTH) {
+			imageProp.Format("file='%s' source='%d,%d,%d,%d' dest='%d,%d,%d,%d'", (const char *)m_sForeImage,
+				PROGRESS_WIDTH - m_nPos, 0, PROGRESS_WIDTH, PROGRESS_HEIGHT, HORIZONTAL_MARGIN,
+				MARGIN, HORIZONTAL_MARGIN + m_nPos, height - MARGIN);
+		}
+		else if (m_nPos > width) {
+			imageProp.Format("file='%s' source='%d,%d,%d,%d' dest='%d,%d,%d,%d'", (const char *)m_sForeImage,
+				0, 0, PROGRESS_WIDTH + width - m_nPos, PROGRESS_HEIGHT,
+				m_nPos - PROGRESS_WIDTH + HORIZONTAL_MARGIN, MARGIN, width + HORIZONTAL_MARGIN, height - MARGIN);
+		}
+		else {
+			imageProp.Format("file='%s' source='%d,%d,%d,%d' dest='%d,%d,%d,%d'", (const char *)m_sForeImage, 0, 0, PROGRESS_WIDTH, PROGRESS_HEIGHT,
+				m_nPos - PROGRESS_WIDTH + HORIZONTAL_MARGIN, MARGIN, m_nPos + HORIZONTAL_MARGIN, height - MARGIN);
+		}
+
+		this->SetForeImage(imageProp);
+
+		m_nPos += STEP;
+		if (m_nPos > width + PROGRESS_WIDTH) {
+			m_nPos = 0;
+		}
+		return;
+	}
+
+	DuiLib::CProgressUI::DoEvent(event);
+}
+
+void CMyProgress::Stop() {
+	if (m_pManager) {
+		m_pManager->KillTimer(this, 10);
+	}
+}
+
+void CMyProgress::Start() {
+	if (m_pManager) {
+		m_pManager->SetTimer(this, 10, 220); 
+	}
+	m_nPos = 0;
+}
+
+
+
+
+// call back
 DuiLib::CControlUI* CTempDataBuilderCallback::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(PURE_DATA_CONTROL_ID, pstrClass)) {
 		DuiLib::CDialogBuilder builder;
@@ -41,10 +106,17 @@ DuiLib::CControlUI* CTempDataBuilderCallback::CreateControl(LPCTSTR pstrClass) {
 		DuiLib::CControlUI * pUI = builder.Create(_T(CURVE_FILE), (UINT)0, 0, m_PaintManager);
 		return pUI;
 	}
+	else if (0 == _stricmp("MyProgress", pstrClass)) {
+		return new CMyProgress( m_PaintManager, "progress_fore.png");
+	}
 	return 0;
 }
 
 
+
+
+
+// menu
 class CDuiMenu : public WindowImplBase
 {
 protected:
@@ -94,6 +166,9 @@ public:
 
 
 
+
+
+// main window
 
 // 数据库连接上
 void   CDuiFrameWnd::OnFistDbConnected() {
@@ -562,6 +637,34 @@ void   CDuiFrameWnd::OnBindingNurseRet(int nError, CBindingNurseParam * pParam) 
 	}
 }
 
+// 同步数据的结果
+void  CDuiFrameWnd::OnSynchronizeRet(int ret, const std::vector<SyncItem*> * pvRet) {
+	if (0 != ret) {
+		m_btnSync->SetEnabled(true);
+		m_pSyncProgress->Stop();
+		m_pSyncProgress->SetVisible(false);
+
+		::MessageBox( this->GetHWND(), GetErrDescription(ret), "同步数据", 0 );
+		return;
+	}
+	   
+	assert(pvRet);
+	const std::vector<SyncItem*> & vRet = *pvRet;
+
+	// 如果没有数据
+	if (vRet.size() == 0) {
+		m_btnSync->SetEnabled(true);
+		m_pSyncProgress->Stop();
+		m_pSyncProgress->SetVisible(false); 
+	}
+
+}
+
+// Clear ret
+void   CDuiFrameWnd::OnClearReaderRet(int nError) {
+
+}
+
 
 
 
@@ -803,8 +906,25 @@ void   CDuiFrameWnd::OnBindingNurse() {
 	CBusiness::GetInstance()->BindingNurseAsyn(dwNurseId, &m_LastInventoryRet_Nurses);
 }
 
+// 同步
+void   CDuiFrameWnd::OnSynchronize() {
+	m_pSyncProgress->SetVisible(true);
+	m_pSyncProgress->Start(); 
+	m_btnSync->SetEnabled(false);
+
+	CBusiness::GetInstance()->SynchronizeAync();
+}
+
+// 清空读卡器
+void   CDuiFrameWnd::OnClearReader() {
+	CBusiness::GetInstance()->ClearReaderAync();
+}
 
 
+
+CDuiFrameWnd::CDuiFrameWnd() { 
+	m_Callback.m_PaintManager = &m_PaintManager;
+}
 
 void CDuiFrameWnd::InitWindow() {
 	m_bFisrDbConnect = TRUE;
@@ -812,7 +932,7 @@ void CDuiFrameWnd::InitWindow() {
 
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
-	m_Callback.m_PaintManager = &m_PaintManager;
+	//m_Callback.m_PaintManager = &m_PaintManager;
 
 	m_lblDbStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl(DATABASE_STATUS_LABEL_ID);
 	m_lblBindingReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl(BINDING_READER_STATUS_LABEL_ID);
@@ -825,7 +945,12 @@ void CDuiFrameWnd::InitWindow() {
 	
 	m_btnBindingPatient = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(BINDING_PATIENT_BUTTON_ID)));
 	m_btnBindingNurse   = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(BINDING_NURSE_BUTTON_ID)));
+	m_pSyncProgress = static_cast<CMyProgress *>(m_PaintManager.FindControl(_T(SYNC_PROGRESS_ID)));
+	m_btnSync = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(SYNC_BUTTON_ID)));
+	m_btnUpdate = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(UPDATE_BUTTON_ID)));
+	m_btnClear = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(CLEAR_DATA_BUTTON_ID)));
 
+	m_btnUpdate->SetEnabled(false);
 
 	CZsDatabase::DATABASE_STATUS eDbStatus = CBusiness::GetInstance()->GetDbStatus();
 	if (eDbStatus == CZsDatabase::STATUS_OPEN) {
@@ -872,7 +997,7 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(SYNCHRONIZE_CONTROL_ID, pstrClass)) {
 		DuiLib::CDialogBuilder builder;
-		DuiLib::CControlUI * pUI = builder.Create(_T(SYNCHRONIZE_FILE), (UINT)0, 0, &m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T(SYNCHRONIZE_FILE), (UINT)0, &m_Callback, &m_PaintManager);
 		return pUI;
 	}
 	return 0;
@@ -969,6 +1094,15 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == BINDING_NURSE_BUTTON_ID) {
 			OnBindingNurse();
+		}
+		else if (name == SYNC_BUTTON_ID) {
+			OnSynchronize();
+		}
+		else if (name == UPDATE_BUTTON_ID) {
+
+		}
+		else if (name == CLEAR_DATA_BUTTON_ID) {
+			OnClearReader();
 		}
 	}
 	else if (msg.sType == "itemactivate") {
@@ -1105,6 +1239,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		if (pvRet) {
 			ClearVector(*pvRet);
+			delete pvRet;
 		}
 		return 0;
 	}
@@ -1194,6 +1329,35 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (pParam) {
 			delete pParam;
 		}
+	}
+	else if ( uMsg == UM_SHOW_SYNC_READER_STATUS )
+	{
+		CZsSyncReader::SYNC_READER_STATUS eStatus = (CZsSyncReader::SYNC_READER_STATUS)wParam;
+		if (eStatus == CZsSyncReader::STATUS_OPEN) {
+			SET_CONTROL_COLOR(m_lblSyncReaderStatus, COLOR_OK);
+			SET_CONTROL_TEXT(m_lblSyncReaderStatus, SYNC_READER_STATUS_OK_TEXT);
+		}
+		else {
+			SET_CONTROL_COLOR(m_lblSyncReaderStatus, COLOR_ERROR);
+			SET_CONTROL_TEXT(m_lblSyncReaderStatus, SYNC_READER_STATUS_CLOSE_TEXT);
+		}
+	}
+	else if (uMsg == UM_SYNCHRONIZE_RESULT) {
+		nError = wParam;
+		std::vector<SyncItem*> * pvRet = (std::vector<SyncItem*> *)lParam;
+
+		OnSynchronizeRet(nError, pvRet);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
+		return 0;
+	}
+	else if (uMsg == UM_CLEAR_READER_RESULT) {
+		nError = wParam;
+		OnClearReaderRet(nError);
+		return 0;
 	}
 
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
