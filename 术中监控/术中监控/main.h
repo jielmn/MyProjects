@@ -20,6 +20,7 @@ private:
 	DuiLib::CButtonUI *             m_btnMenu;
 	DuiLib::CLabelUI *              m_lblReaderStatus;
 	CMyImageUI *                    m_pImageUI;
+	DuiLib::CLabelUI *              m_lblTemperature;
 
 private:
 	void  OnSetting();

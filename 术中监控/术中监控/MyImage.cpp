@@ -113,7 +113,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 
 		int nDiff = (int)(pItem->tTime - tFistTime);
 		int nX = (int)( ( (double)nDiff / g_dwCollectInterval ) * m_nTimeUnitLen ) ;
-		int nY = (int)(( 3800 - pItem->dwTemperature) / 100.0 * m_nGridSize);
+		int nY = (int)( (3800.0 - (double)pItem->dwTemperature) / 100.0 * m_nGridSize );
 
 		DrawTempPoint(nX + m_nLeft + rect.left, nY + middle + rect.top, hDC, m_nRadius);
 

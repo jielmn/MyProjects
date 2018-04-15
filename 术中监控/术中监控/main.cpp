@@ -107,9 +107,12 @@ void CDuiFrameWnd::InitWindow() {
 
 	m_btnMenu = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("menubtn"));
 	m_lblReaderStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblReaderStatus"));
+	m_lblTemperature = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblTemperature"));
 
 	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");
 	//SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
+
+	m_lblTemperature->SetText("--");
 	DuiLib::WindowImplBase::InitWindow();
 }
 
@@ -171,12 +174,34 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		ret = wParam;
 		DWORD dwTemp = lParam;
 
+		//static int a = 0;
 		if (0 == ret) {
+			//dwTemp += a;
 			m_pImageUI->AddTemp(dwTemp);
+			//a += 100;
+
+			if ( dwTemp < g_dwLowTempAlarm ) {
+				m_lblTemperature->SetTextColor(0xFF0000FF);
+			}
+			else if (dwTemp > g_dwHighTempAlarm) {
+				m_lblTemperature->SetTextColor(0xFFFF0000);
+			}
+			else {
+				m_lblTemperature->SetTextColor(0xFF447AA1);
+			}
+
+			DuiLib::CDuiString  strTemp;
+			strTemp.Format("%.2f", (dwTemp / 100.0) );
+			m_lblTemperature->SetText(strTemp); 
 
 			// 获取温度
 			CBusiness::GetInstance()->ReadTagTempAsyn(g_dwCollectInterval * 1000);
-		}		
+		}
+		// 获取温度失败
+		else {
+			m_lblTemperature->SetTextColor(0xFF447AA1);
+			m_lblTemperature->SetText("--");
+		}
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam );
 }
