@@ -138,6 +138,18 @@ public:
 	int   ClearReader();
 	int   NotifyUiClearReaderRet(int ret);
 
+	// 补全同步数据的信息(主要是可读部分)
+	int   CompleteSyncDataAync(std::vector<SyncItem*> * pvSyncData);
+	int   CompleteSyncData( const CCompleteSyncDataParam * pParam );
+	int   NotifyUiCompleteSyncDataRet(int ret);
+
+	// 上传到数据库
+	int   UpdateAync(std::vector<SyncItem*> * pvSyncData);
+	int   Update(const CUpdateParam * pParam);
+	int   NotifyUiUpdateRet(int ret);
+	// 成功后清空Reader
+	int   ClearReaderAfterUpdate();
+
 private:
 	static CBusiness *  pInstance;
 

@@ -54,6 +54,7 @@
 #define  SYNC_PROGRESS_ID               "sync_progresss"
 #define  UPDATE_BUTTON_ID               "btnUpdate"
 #define  CLEAR_DATA_BUTTON_ID           "btnClearData"
+#define  SYNC_DATA_LIST_ID              "sync_list"
 
 #define  TEMPERATURE_DATA_FILE         "TemperatureData.xml"
 #define  PATIENTS_FILE                 "Patients.xml"
@@ -103,6 +104,9 @@
 #define MSG_SYNC_READER_HEART_BEAT 19
 #define MSG_SYNCHRONIZE            20
 #define MSG_CLEAR_READER           21
+#define MSG_COMPLETE_SYNC_DATA     22
+#define MSG_UPDATE_SYNC_DATA       23
+#define MSG_CLEAR_READER_AFTER_UPDATE       24
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -126,6 +130,8 @@
 #define UM_SHOW_SYNC_READER_STATUS             (WM_USER+19)
 #define UM_SYNCHRONIZE_RESULT                  (WM_USER+20)
 #define UM_CLEAR_READER_RESULT                 (WM_USER+21)
+#define UM_COMPLETE_SYNC_DATA_RESULT           (WM_USER+22)
+#define UM_UPDATE_SYNC_DATA_RESULT             (WM_USER+23)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -338,7 +344,41 @@ typedef struct tagSyncItem {
 	DWORD      dwTemperature;
 	TagItem    tNurseId;
 	TagItem    tReaderId;
+
+	// Info信息(用于界面显示用)
+	char     szPatientName[MAX_PATIENT_NAME_LENGTH];
+	char     szPatientBedNo[MAX_BED_NO_LENGTH];
+	char     szPatientId[MAX_PATIENT_ID_LENGTH];   //用于保存数据库 
+	char     szNurseName[MAX_NURSE_NAME_LENGTH];
+	char     szNurseId[MAX_NURSE_ID_LENGTH];       //用于保存数据库 
+	// end
+	DWORD    dwInfoBitmask;     // 第1位，patient, 第2位, nurse
+
 }SyncItem;
+
+#define   PATIENT_BITMASK_INDEX      0
+#define   NURSE_BITMASK_INDEX        1
+
+class CCompleteSyncDataParam : public LmnToolkits::MessageData {
+public:
+	CCompleteSyncDataParam(std::vector<SyncItem*> * pvSyncData) {
+		m_pvSyncData = pvSyncData;
+	}
+	~CCompleteSyncDataParam() {}
+
+	std::vector<SyncItem*> *  m_pvSyncData;
+};
+
+class CUpdateParam : public LmnToolkits::MessageData {
+public:
+	CUpdateParam(std::vector<SyncItem*> * pvSyncData) {
+		m_pvSyncData = pvSyncData;
+	}
+	~CUpdateParam() {}
+
+	std::vector<SyncItem*> *  m_pvSyncData;
+};
+
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
@@ -368,6 +408,7 @@ int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
 
 // Reader读取的时间数据转换
 extern time_t   GetTelemedTagDate(const BYTE * pData, DWORD dwDataLen);
+extern char * DateTime2Str(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>

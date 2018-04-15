@@ -45,6 +45,9 @@ public:
 	int CheckCardBinding(const CTagItemParam * pParam, DWORD & dwNurseId);
 	int BindingNurse(const CBindingNurseParam * pParam);
 
+	int CompleteSyncData(const CCompleteSyncDataParam * pParam);
+	int Update(const CUpdateParam * pParam);
+
 private:
 	void Clear();
 	int  OnDatabaseException(CException* e);

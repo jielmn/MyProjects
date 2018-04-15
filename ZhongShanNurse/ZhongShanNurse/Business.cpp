@@ -763,6 +763,48 @@ int   CBusiness::NotifyUiClearReaderRet(int ret) {
 	return 0;
 }
 
+int   CBusiness::CompleteSyncDataAync(std::vector<SyncItem*> * pvSyncData) {
+	g_thrd_db->PostMessage(this, MSG_COMPLETE_SYNC_DATA, new CCompleteSyncDataParam(pvSyncData) );
+	return 0;
+}
+
+int   CBusiness::CompleteSyncData(const CCompleteSyncDataParam * pParam) {
+	int ret = m_Database.CompleteSyncData(pParam);
+	NotifyUiCompleteSyncDataRet(ret);
+	return 0;
+}
+
+int   CBusiness::NotifyUiCompleteSyncDataRet(int ret) {
+	::PostMessage(g_hWnd, UM_COMPLETE_SYNC_DATA_RESULT, ret, 0);
+	return 0;
+}
+
+int   CBusiness::UpdateAync(std::vector<SyncItem*> * pvSyncData) {
+	g_thrd_db->PostMessage(this, MSG_UPDATE_SYNC_DATA, new CUpdateParam(pvSyncData));
+	return 0;
+}
+
+int   CBusiness::Update(const CUpdateParam * pParam) {
+	int ret = m_Database.Update(pParam);
+	NotifyUiUpdateRet(ret);
+
+	// 清空Reader
+	if (0 == ret) {
+		g_thrd_sync_reader->PostMessage(this, MSG_CLEAR_READER_AFTER_UPDATE);
+	}
+	return 0;
+}
+
+int   CBusiness::NotifyUiUpdateRet(int ret) {
+	::PostMessage(g_hWnd, UM_UPDATE_SYNC_DATA_RESULT, ret, 0);	
+	return 0;
+}
+
+int   CBusiness::ClearReaderAfterUpdate() {
+	m_SyncReader.ClearReader();
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -926,6 +968,26 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_CLEAR_READER:
 	{
 		ClearReader();
+	}
+	break;
+
+	case MSG_COMPLETE_SYNC_DATA:
+	{
+		CCompleteSyncDataParam * pParam = (CCompleteSyncDataParam *)pMessageData;
+		CompleteSyncData(pParam);
+	}
+	break;
+
+	case MSG_UPDATE_SYNC_DATA:
+	{
+		CUpdateParam * pParam = (CUpdateParam *)pMessageData;
+		Update(pParam);
+	}
+	break;
+
+	case MSG_CLEAR_READER_AFTER_UPDATE:
+	{
+		ClearReaderAfterUpdate();
 	}
 	break;
 

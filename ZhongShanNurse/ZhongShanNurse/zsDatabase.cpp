@@ -1,7 +1,8 @@
+#include <assert.h>
 #include "zsDatabase.h"
 #include "Business.h"
 #include "LmnString.h"
-
+#include "LmnTemplates.h"
 
 #define  PATIENTS_TABLE_NAME                "patients"
 #define  TEMPERATURE_TABLE_NAME             "temperature_data"
@@ -882,6 +883,181 @@ int CZsDatabase::BindingNurse(const CBindingNurseParam * pParam) {
 	{
 		strSql.Format("UPDATE %s SET card_no='%s' WHERE  id=%lu", NURSES_TABLE_NAME, szTagId, pParam->m_dwNurseId );
 		m_database.ExecuteSQL(strSql);
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::CompleteSyncData(const CCompleteSyncDataParam * pParam) {
+	CString    strSql;
+	char       buf[8192];	
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	std::vector<SyncItem*> * pvSyncData = pParam->m_pvSyncData;
+	assert(pvSyncData);
+
+	std::vector<TagItem * >  vNursesId;
+	std::vector<TagItem * >  vTagsId;
+
+	std::vector<SyncItem*>::iterator  it0;
+	std::vector<TagItem * >::iterator it1;
+	std::vector<TagItem * >::iterator it2;
+
+	// 提取出nurse id和tag id
+	for ( it0 = pvSyncData->begin(); it0 != pvSyncData->end(); it0++ ) {
+		SyncItem* pSyncItem = *it0;
+
+		for ( it1 = vNursesId.begin(); it1 != vNursesId.end(); it1++ ) {
+			TagItem * pNurseIdItem = *it1;
+
+			// 如果是相同的护士ID
+			if ( IsSameTag(pNurseIdItem, &pSyncItem->tNurseId) ) {
+				break;
+			}
+		}
+		// 如果没有找到
+		if (it1 == vNursesId.end()) {
+			vNursesId.push_back( &pSyncItem->tNurseId );
+		}
+
+		for (it2 = vTagsId.begin(); it2 != vTagsId.end(); it2++) {
+			TagItem * pTagIdItem = *it2;
+
+			// 如果是相同的TagID
+			if (IsSameTag(pTagIdItem, &pSyncItem->tTagId)) {
+				break;
+			}
+		}
+		// 如果没有找到
+		if (it2 == vTagsId.end()) {
+			vTagsId.push_back(&pSyncItem->tTagId);
+		}
+	}
+
+	// 根据nurse id和tag id查询护士和病人信息
+	int ret = 0;
+	try
+	{
+		
+		for (it1 = vNursesId.begin(); it1 != vNursesId.end(); it1++) {
+			TagItem * pNurseIdItem = *it1;		
+			GetUid(buf, sizeof(buf), pNurseIdItem->abyUid, pNurseIdItem->dwUidLen);
+
+			strSql.Format("SELECT str_id, name FROM %s WHERE  card_no='%s' ", NURSES_TABLE_NAME, buf);
+			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+			if (!m_recordset.IsEOF())
+			{
+				CString    strId;
+				CString    strName;
+
+				m_recordset.GetFieldValue((short)0, strId);
+				m_recordset.GetFieldValue((short)1, strName);
+
+				for (it0 = pvSyncData->begin(); it0 != pvSyncData->end(); it0++) {
+					SyncItem* pSyncItem = *it0;
+
+					// 填写护士信息
+					if ( IsSameTag(pNurseIdItem, &pSyncItem->tNurseId)) {
+						strncpy_s( pSyncItem->szNurseName, strName,sizeof(pSyncItem->szNurseName) );
+						strncpy_s( pSyncItem->szNurseId, strId, sizeof(pSyncItem->szNurseId) );
+						SetBit(pSyncItem->dwInfoBitmask, NURSE_BITMASK_INDEX, true);
+					}
+				}
+			}
+			m_recordset.Close();//关闭记录集
+		}
+
+
+		for (it2 = vTagsId.begin(); it2 != vTagsId.end(); it2++) {
+			TagItem * pTagIdItem = *it2;
+			GetUid(buf, sizeof(buf), pTagIdItem->abyUid, pTagIdItem->dwUidLen);
+
+			strSql.Format("SELECT a.str_id, a.name, a.bed_no FROM %s a inner join %s b on a.id = b.patient_id WHERE b.id = '%s' ", PATIENTS_TABLE_NAME, TAGS_TABLE_NAME, buf );
+			m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+			if (!m_recordset.IsEOF())
+			{
+				CString    strId;
+				CString    strName;
+				CString    strBedNo;
+
+				m_recordset.GetFieldValue((short)0, strId);
+				m_recordset.GetFieldValue((short)1, strName);
+				m_recordset.GetFieldValue((short)2, strBedNo);
+
+				for (it0 = pvSyncData->begin(); it0 != pvSyncData->end(); it0++) {
+					SyncItem* pSyncItem = *it0;
+
+					// 填写病人信息
+					if (IsSameTag(pTagIdItem, &pSyncItem->tTagId)) {
+						strncpy_s(pSyncItem->szPatientName,  strName,  sizeof(pSyncItem->szPatientName));
+						strncpy_s(pSyncItem->szPatientId,    strId,    sizeof(pSyncItem->szPatientId));
+						strncpy_s(pSyncItem->szPatientBedNo, strBedNo, sizeof(pSyncItem->szPatientBedNo));
+
+						SetBit(pSyncItem->dwInfoBitmask, PATIENT_BITMASK_INDEX, true);
+					}
+				}
+			}
+			m_recordset.Close();//关闭记录集
+		}
+
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::Update(const CUpdateParam * pParam) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	std::vector<SyncItem*> * pvSyncData = pParam->m_pvSyncData;
+	assert(pvSyncData);
+
+	int ret = 0;
+	char szPatientId[256];
+	char szNurseId[256];
+	char szReaderId[256];
+	char szDate[256];
+
+	try
+	{
+		std::vector<SyncItem*>::iterator it;
+		for (it = pvSyncData->begin(); it != pvSyncData->end(); it++) {
+			SyncItem* pItem = *it;
+
+			ConvertSqlField(szPatientId, sizeof(szPatientId), pItem->szPatientId);
+			ConvertSqlField(szNurseId,   sizeof(szNurseId),   pItem->szNurseId);
+			GetUid(szReaderId, sizeof(szReaderId), pItem->tReaderId.abyUid, pItem->tReaderId.dwUidLen );
+			DateTime2Str( szDate, sizeof(szDate), &pItem->tTime );
+
+			strSql.Format("INSERT INTO %s VALUES (NULL, '%s', '%s', '%s', '%s', %lu ) ", TEMPERATURE_TABLE_NAME, szPatientId, szNurseId, szReaderId, szDate, pItem->dwTemperature );
+			m_database.ExecuteSQL(strSql);
+		}
 	}
 	catch (CException* e)
 	{

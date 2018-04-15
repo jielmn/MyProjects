@@ -638,31 +638,100 @@ void   CDuiFrameWnd::OnBindingNurseRet(int nError, CBindingNurseParam * pParam) 
 }
 
 // 同步数据的结果
-void  CDuiFrameWnd::OnSynchronizeRet(int ret, const std::vector<SyncItem*> * pvRet) {
+void  CDuiFrameWnd::OnSynchronizeRet(int ret, std::vector<SyncItem*> * pvRet) {
 	if (0 != ret) {
-		m_btnSync->SetEnabled(true);
-		m_pSyncProgress->Stop();
-		m_pSyncProgress->SetVisible(false);
-
+		SetSyncTabStatus(TRUE);
 		::MessageBox( this->GetHWND(), GetErrDescription(ret), "同步数据", 0 );
+
+		assert(0 == pvRet);
 		return;
 	}
 	   
 	assert(pvRet);
-	const std::vector<SyncItem*> & vRet = *pvRet;
 
-	// 如果没有数据
-	if (vRet.size() == 0) {
-		m_btnSync->SetEnabled(true);
-		m_pSyncProgress->Stop();
-		m_pSyncProgress->SetVisible(false); 
+	// 如果空数据
+	if ( pvRet->size() == 0 ) {		
+		SetSyncTabStatus(TRUE);
+		::MessageBox(this->GetHWND(), "同步数据成功，数据为空", "同步数据", 0);
+
+		delete pvRet;
+		return;
 	}
 
+	// 查询病人和护士信息(name等)
+	m_pvSyncData = pvRet;
+
+	CBusiness::GetInstance()->CompleteSyncDataAync(m_pvSyncData);
 }
 
 // Clear ret
 void   CDuiFrameWnd::OnClearReaderRet(int nError) {
+	SetSyncTabStatus(TRUE);
 
+	if (0 == nError) {
+		::MessageBox(this->GetHWND(), "清除Reader数据成功", "清除Reader数据", 0);
+	}
+	else {
+		::MessageBox(this->GetHWND(), GetErrDescription(nError), "清除Reader数据", 0);
+	}
+}
+
+void   CDuiFrameWnd::OnCompleteSyncDataRet(int nError) {
+	assert(m_pvSyncData);
+
+	if (0 != nError) {
+		ClearVector(*m_pvSyncData);
+		delete m_pvSyncData;
+		m_pvSyncData = 0;
+
+		SetSyncTabStatus(TRUE);
+		::MessageBox(this->GetHWND(), GetErrDescription(nError), "同步数据", 0);
+		return;
+	}
+
+	char buf[8192];
+	DuiLib::CDuiString strText;
+
+	std::vector<SyncItem*>::iterator it;
+	for (it = m_pvSyncData->begin(); it != m_pvSyncData->end(); it++) {
+		SyncItem*  pItem = *it;
+
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstSyncData->Add(pListElement);
+
+		pListElement->SetText(0, pItem->szPatientName);
+		pListElement->SetText(1, pItem->szPatientBedNo);
+		pListElement->SetText(2, pItem->szNurseName);
+
+		GetUid(buf, sizeof(buf), pItem->tReaderId.abyUid, pItem->tReaderId.dwUidLen, '-');
+		pListElement->SetText(3, buf);
+
+		DateTime2Str(buf, sizeof(buf), &pItem->tTime);
+		pListElement->SetText(4, buf);
+
+		strText.Format("%.2f", pItem->dwTemperature / 100.0);
+		pListElement->SetText(5, strText);
+	}
+
+	SetSyncTabStatus(TRUE);
+}
+
+void   CDuiFrameWnd::OnUpdateSyncDataRet(int nError) {
+	if (0 != nError) {
+		SetSyncTabStatus(TRUE);
+		::MessageBox(this->GetHWND(), GetErrDescription(nError), "上传数据到数据库", 0);
+		return;
+	}
+
+	assert(m_pvSyncData);
+	ClearVector(*m_pvSyncData);
+	delete m_pvSyncData;
+	m_pvSyncData = 0;
+	
+	m_lstSyncData->RemoveAll();
+
+	SetSyncTabStatus(TRUE);
+	::MessageBox(this->GetHWND(), "上传数据OK", "上传数据到数据库", 0);
 }
 
 
@@ -906,24 +975,77 @@ void   CDuiFrameWnd::OnBindingNurse() {
 	CBusiness::GetInstance()->BindingNurseAsyn(dwNurseId, &m_LastInventoryRet_Nurses);
 }
 
+void  CDuiFrameWnd::SetSyncTabStatus(BOOL bEnabled /*= TRUE*/) {
+	if (bEnabled) {
+		m_btnSync->SetEnabled(true);
+		//m_btnUpdate->SetEnabled(true);
+		// 如果有待上传的数据
+		if (m_pvSyncData) {
+			m_btnUpdate->SetEnabled(true);
+		}
+		else {
+			m_btnUpdate->SetEnabled(false);
+		}
+		m_btnClear->SetEnabled(true);
+
+		m_pSyncProgress->Stop();
+		m_pSyncProgress->SetVisible(false);
+	}
+	else {
+		m_btnSync->SetEnabled(false);
+		m_btnUpdate->SetEnabled(false);
+		m_btnClear->SetEnabled(false);
+		
+		m_pSyncProgress->SetVisible(true);
+		m_pSyncProgress->Start();
+	}
+}
+
 // 同步
 void   CDuiFrameWnd::OnSynchronize() {
-	m_pSyncProgress->SetVisible(true);
-	m_pSyncProgress->Start(); 
-	m_btnSync->SetEnabled(false);
+	// 如果有可以待上传的数据
+	if (m_pvSyncData) {
+		ClearVector(*m_pvSyncData);
+		delete m_pvSyncData;
+		m_pvSyncData = 0;
+	}
 
+	m_lstSyncData->RemoveAll();
+
+	SetSyncTabStatus(FALSE);
 	CBusiness::GetInstance()->SynchronizeAync();
 }
 
 // 清空读卡器
 void   CDuiFrameWnd::OnClearReader() {
+	SetSyncTabStatus(FALSE);
 	CBusiness::GetInstance()->ClearReaderAync();
 }
 
+// 上传到数据库
+void   CDuiFrameWnd::OnUpdate() {
+	assert(m_pvSyncData);
+	if (0 == m_pvSyncData) {
+		MessageBox(this->GetHWND(), "没有待上传的数据!", "上传服务器", 0);
+		return;
+	}
+
+	SetSyncTabStatus(FALSE);
+	CBusiness::GetInstance()->UpdateAync(m_pvSyncData);
+}
 
 
 CDuiFrameWnd::CDuiFrameWnd() { 
 	m_Callback.m_PaintManager = &m_PaintManager;
+	m_pvSyncData = 0;
+}
+
+CDuiFrameWnd::~CDuiFrameWnd() {
+	if (m_pvSyncData) {
+		ClearVector(*m_pvSyncData);
+		delete m_pvSyncData;
+		m_pvSyncData = 0;
+	}
 }
 
 void CDuiFrameWnd::InitWindow() {
@@ -949,6 +1071,7 @@ void CDuiFrameWnd::InitWindow() {
 	m_btnSync = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(SYNC_BUTTON_ID)));
 	m_btnUpdate = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(UPDATE_BUTTON_ID)));
 	m_btnClear = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(CLEAR_DATA_BUTTON_ID)));
+	m_lstSyncData = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(SYNC_DATA_LIST_ID)));
 
 	m_btnUpdate->SetEnabled(false);
 
@@ -1099,7 +1222,7 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			OnSynchronize();
 		}
 		else if (name == UPDATE_BUTTON_ID) {
-
+			OnUpdate();
 		}
 		else if (name == CLEAR_DATA_BUTTON_ID) {
 			OnClearReader();
@@ -1347,16 +1470,22 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		std::vector<SyncItem*> * pvRet = (std::vector<SyncItem*> *)lParam;
 
 		OnSynchronizeRet(nError, pvRet);
-
-		if (pvRet) {
-			ClearVector(*pvRet);
-			delete pvRet;
-		}
+		
 		return 0;
 	}
 	else if (uMsg == UM_CLEAR_READER_RESULT) {
 		nError = wParam;
 		OnClearReaderRet(nError);
+		return 0;
+	}
+	else if (uMsg == UM_COMPLETE_SYNC_DATA_RESULT) {
+		nError = wParam;
+		OnCompleteSyncDataRet(nError);
+		return 0;
+	}
+	else if (uMsg == UM_UPDATE_SYNC_DATA_RESULT) {
+		nError = wParam;
+		OnUpdateSyncDataRet(nError);
 		return 0;
 	}
 

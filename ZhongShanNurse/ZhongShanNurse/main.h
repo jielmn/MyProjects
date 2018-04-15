@@ -32,6 +32,7 @@ class CDuiFrameWnd : public DuiLib::WindowImplBase
 {
 public:
 	CDuiFrameWnd();
+	~CDuiFrameWnd();
 
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
 	virtual DuiLib::CDuiString GetSkinFile() { return _T("main.xml"); }
@@ -75,10 +76,12 @@ private:
 	DuiLib::CButtonUI *        m_btnSync;
 	DuiLib::CButtonUI *        m_btnUpdate;
 	DuiLib::CButtonUI *        m_btnClear;
+	DuiLib::CListUI *          m_lstSyncData;
 
 private:
 	void  AddPatientItem2List( DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag = TRUE);
 	void  AddNurseItem2List(DuiLib::CListTextElementUI* pListElement, const NurseInfo * pNurse, BOOL bSetTag = TRUE);
+	void  SetSyncTabStatus( BOOL bEnabled = TRUE );
 
 	// 添加病人
 	void   OnAddPatient();
@@ -104,6 +107,8 @@ private:
 	void   OnSynchronize();
 	// 清空读卡器
 	void   OnClearReader();
+	// 上传到数据库
+	void   OnUpdate();
 
 	// 处理UM_MESSAGE
 	// 数据库连接上
@@ -131,11 +136,16 @@ private:
 	// Binding nurse ret
 	void   OnBindingNurseRet(int nError, CBindingNurseParam * pParam);
 	// Synchronize ret
-	void   OnSynchronizeRet( int ret, const std::vector<SyncItem*> * pvRet);
+	void   OnSynchronizeRet( int ret, std::vector<SyncItem*> * pvRet);
 	// Clear ret
 	void   OnClearReaderRet(int nError);
+	//  Complete SyncData ret
+	void   OnCompleteSyncDataRet(int nError);
+	// update ret
+	void   OnUpdateSyncDataRet(int nError);
 
 private:
-	BOOL               m_bGetAllPatients;                     // 是否获取病人
+	BOOL                       m_bGetAllPatients;                     // 是否获取病人
+	std::vector<SyncItem*> *   m_pvSyncData;                          // 一次同步的结果，用于保存到数据库
 }; 
 
