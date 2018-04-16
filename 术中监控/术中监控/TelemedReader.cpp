@@ -119,7 +119,7 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	m_pBusiness->ReconnectReaderAsyn(RECONNECT_READER_DELAY);
 
 	
-	return EXH_ERR_READER_TIMEOUT_OR_WRONG_FORMAT;
+	return EXH_ERR_READER_TIMEOUT_OR_WRONG_FORMAT; 
 }
 
 

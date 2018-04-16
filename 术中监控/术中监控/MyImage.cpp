@@ -8,8 +8,8 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	m_pManager = pManager;
 
 	m_hPen = ::CreatePen(0, 1, RGB(0, 128, 64));
-	m_hPen1 = ::CreatePen(0, 2, RGB(0, 128, 64));
-	m_hPen2 = ::CreatePen(0, 1, RGB(0, 0, 255));
+	m_hPen1 = ::CreatePen(PS_DASH, 1, RGB(0, 0, 255));
+	m_hPen2 = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
 
 
 	DWORD   dwValue;
@@ -134,6 +134,20 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 		}
 	}
 
+	// 画出报警线
+	::SelectObject(hDC, m_hPen1);
+	int nY = (int)((3800.0 - (double)g_dwLowTempAlarm) / 100.0 * m_nGridSize);
+	::MoveToEx(hDC, m_nLeft + rect.left, middle + nY + rect.top, 0);
+	::LineTo(hDC, rect.right, middle + nY + rect.top);
+	strText = "低温报警";
+	::TextOut(hDC, m_nLeft + rect.left + 5, middle + nY + rect.top + 5, strText, strText.GetLength());
+
+	::SelectObject(hDC, m_hPen2);
+	nY = (int)((3800.0 - (double)g_dwHighTempAlarm) / 100.0 * m_nGridSize);
+	::MoveToEx(hDC, m_nLeft + rect.left, middle + nY + rect.top, 0);
+	::LineTo(hDC, rect.right, middle + nY + rect.top);
+	strText = "高温报警";
+	::TextOut(hDC, m_nLeft + rect.left + 5, middle + nY + rect.top - 20, strText, strText.GetLength());
 
 	return true;
 

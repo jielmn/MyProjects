@@ -73,7 +73,12 @@ void  CDuiFrameWnd::OnSetting() {
 
 	// Èç¹ûOK
 	if (0 == ret ) {
-
+		g_cfg->SetConfig("low alarm", g_dwLowTempAlarm);
+		g_cfg->SetConfig("high alarm", g_dwHighTempAlarm);
+		g_cfg->SetConfig("collect interval", g_dwCollectInterval);
+		g_cfg->SetConfig("alarm file",g_szAlarmFilePath);
+		g_cfg->Save();
+		m_pImageUI->Invalidate();
 	}
 
 	delete pSettingDlg;

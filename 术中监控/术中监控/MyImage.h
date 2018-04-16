@@ -33,8 +33,8 @@ private:
 	int                  m_nRadius;
 
 	HPEN                 m_hPen;
-	HPEN                 m_hPen1;
-	HPEN                 m_hPen2;
+	HPEN                 m_hPen1;    // µÍÎÂÏß
+	HPEN                 m_hPen2;    // ¸ßÎÂÏß
 };
 
 #define  MYIMAGE_TIMER_ID             10
