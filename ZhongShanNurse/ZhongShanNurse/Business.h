@@ -150,6 +150,11 @@ public:
 	// 成功后清空Reader
 	int   ClearReaderAfterUpdate();
 
+	// 查询
+	int   QueryAync(DWORD dwPatientId, time_t tTime, int nTimeSpanIndex );
+	int   Query(const CQueryParam * pParam);
+	int   NotifyUiQueryRet(int ret, std::vector<QueryItem* > * pvRet);
+
 private:
 	static CBusiness *  pInstance;
 

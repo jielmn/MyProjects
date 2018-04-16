@@ -1050,6 +1050,11 @@ int CZsDatabase::Update(const CUpdateParam * pParam) {
 		for (it = pvSyncData->begin(); it != pvSyncData->end(); it++) {
 			SyncItem* pItem = *it;
 
+			// 如果id为空，则不保存
+			if (pItem->szNurseId[0] == '\0' || pItem->szPatientId[0] == '\0') {
+				continue; 
+			}
+
 			ConvertSqlField(szPatientId, sizeof(szPatientId), pItem->szPatientId);
 			ConvertSqlField(szNurseId,   sizeof(szNurseId),   pItem->szNurseId);
 			GetUid(szReaderId, sizeof(szReaderId), pItem->tReaderId.abyUid, pItem->tReaderId.dwUidLen );
@@ -1058,6 +1063,71 @@ int CZsDatabase::Update(const CUpdateParam * pParam) {
 			strSql.Format("INSERT INTO %s VALUES (NULL, '%s', '%s', '%s', '%s', %lu ) ", TEMPERATURE_TABLE_NAME, szPatientId, szNurseId, szReaderId, szDate, pItem->dwTemperature );
 			m_database.ExecuteSQL(strSql);
 		}
+	}
+	catch (CException* e)
+	{
+		ret = OnDatabaseException(e);
+	}
+
+	// 如果数据库端口，重新连接
+	if (m_eDbStatus == STATUS_CLOSE) {
+		m_pBusiness->NotifyUiDbStatus(m_eDbStatus);
+		m_pBusiness->ReconnectDatabaseAsyn(RECONNECT_DB_TIME);
+	}
+
+	return ret;
+}
+
+int CZsDatabase::Query(const CQueryParam * pParam, std::vector<QueryItem* > & vRet) {
+	CString strSql;
+
+	if (m_eDbStatus == STATUS_CLOSE) {
+		return ZS_ERR_DB_CLOSE;
+	}
+
+	int ret = 0;
+	time_t tStart = pParam->m_tTime;
+	time_t tEnd = tStart + (pParam->m_nTimeSpanIndex + 1) * 7 * 3600 * 24;
+
+	char szStart[256];
+	char szEnd[256];
+
+	DateTime2Str(szStart, sizeof(szStart), &tStart);
+	DateTime2Str(szEnd, sizeof(szEnd), &tEnd);
+
+	try
+	{
+		strSql.Format("SELECT c.name, a.reader_id, a.gen_time, a.temp_data FROM %s a inner join %s b on a.patient_id = b.str_id"
+			          " inner join %s c on a.nurse_id = c.str_id WHERE b.id = %lu AND a.gen_time >= '%s' AND a.gen_time < '%s' ", 
+			           TEMPERATURE_TABLE_NAME, PATIENTS_TABLE_NAME, NURSES_TABLE_NAME, pParam->m_dwPatientId, szStart, szEnd );
+
+		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
+
+		while (!m_recordset.IsEOF())
+		{
+			QueryItem* pItem = new QueryItem;
+			memset(pItem, 0, sizeof(QueryItem));
+
+			CString       strValue;
+
+			m_recordset.GetFieldValue((short)0, strValue);
+			strncpy_s(pItem->szNurseName, strValue, sizeof(pItem->szNurseName));
+
+			m_recordset.GetFieldValue((short)1, strValue);
+			GetUid(&pItem->tReaderId, strValue);
+			
+			m_recordset.GetFieldValue((short)2, strValue);
+			pItem->tTime = String2Time(strValue);
+
+			m_recordset.GetFieldValue((short)3, strValue);
+			sscanf_s(strValue, "%lu", &pItem->dwTemperature);
+
+			vRet.push_back(pItem);
+
+			m_recordset.MoveNext();
+		}
+
+		m_recordset.Close();//关闭记录集
 	}
 	catch (CException* e)
 	{

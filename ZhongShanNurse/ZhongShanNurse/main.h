@@ -78,8 +78,16 @@ private:
 	DuiLib::CButtonUI *        m_btnClear;
 	DuiLib::CListUI *          m_lstSyncData;
 
+	// 查询界面
+	DuiLib::CListUI *          m_lstPatients_1;
+
+	DuiLib::CListUI *          m_lstPureData;
+	DuiLib::CDateTimeUI *      m_datQueryDatetime;
+	DuiLib::CComboUI *         m_cmbTimeSpan;
+
 private:
 	void  AddPatientItem2List( DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag = TRUE);
+	void  AddPatientItem2List_1(DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag = TRUE);
 	void  AddNurseItem2List(DuiLib::CListTextElementUI* pListElement, const NurseInfo * pNurse, BOOL bSetTag = TRUE);
 	void  SetSyncTabStatus( BOOL bEnabled = TRUE );
 
@@ -109,6 +117,10 @@ private:
 	void   OnClearReader();
 	// 上传到数据库
 	void   OnUpdate();
+	// 查询界面的短PatientsList item change
+	void   OnShortPatiensListItemChange();
+	// 查询 
+	void   OnQuery();
 
 	// 处理UM_MESSAGE
 	// 数据库连接上
@@ -143,6 +155,8 @@ private:
 	void   OnCompleteSyncDataRet(int nError);
 	// update ret
 	void   OnUpdateSyncDataRet(int nError);
+	// query ret
+	void   OnQueryRet(int nError, std::vector<QueryItem* > * pvRet);
 
 private:
 	BOOL                       m_bGetAllPatients;                     // 是否获取病人

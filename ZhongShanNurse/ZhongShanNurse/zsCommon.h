@@ -55,6 +55,11 @@
 #define  UPDATE_BUTTON_ID               "btnUpdate"
 #define  CLEAR_DATA_BUTTON_ID           "btnClearData"
 #define  SYNC_DATA_LIST_ID              "sync_list"
+#define  PATIENTS_SHORT_LIST_ID         "patients_list_short"
+#define  PURE_DATA_LIST_ID              "pure_data_list"
+#define  QUERY_BUTTON_ID                "btnQuery"
+#define  QUERY_DATETIME_ID              "DateTime1"
+#define  TIME_SPAN_COMBO_ID             "cmbTimeSpan"
 
 #define  TEMPERATURE_DATA_FILE         "TemperatureData.xml"
 #define  PATIENTS_FILE                 "Patients.xml"
@@ -107,6 +112,7 @@
 #define MSG_COMPLETE_SYNC_DATA     22
 #define MSG_UPDATE_SYNC_DATA       23
 #define MSG_CLEAR_READER_AFTER_UPDATE       24
+#define MSG_QUERY                           25
 
 // windows 自定义消息
 #define UM_SHOW_DB_STATUS                      (WM_USER+1)
@@ -132,6 +138,7 @@
 #define UM_CLEAR_READER_RESULT                 (WM_USER+21)
 #define UM_COMPLETE_SYNC_DATA_RESULT           (WM_USER+22)
 #define UM_UPDATE_SYNC_DATA_RESULT             (WM_USER+23)
+#define UM_QUERY_RESULT                        (WM_USER+24)
 
 // 错误码
 #define ZS_ERR_NO_MEMORY                     10001
@@ -379,6 +386,28 @@ public:
 	std::vector<SyncItem*> *  m_pvSyncData;
 };
 
+class CQueryParam : public LmnToolkits::MessageData {
+public:
+	CQueryParam(DWORD dwPatientId, time_t tTime, int nTimeSpanIndex) {
+		m_dwPatientId = dwPatientId;
+		m_tTime = tTime;
+		m_nTimeSpanIndex = nTimeSpanIndex;
+	}
+	~CQueryParam() {}
+
+	DWORD  m_dwPatientId;
+	time_t m_tTime;
+	int    m_nTimeSpanIndex;
+};
+
+typedef struct tagQueryItem {
+	char     szNurseName[MAX_NURSE_NAME_LENGTH];
+	TagItem  tReaderId;
+	time_t   tTime;
+	DWORD    dwTemperature;
+}QueryItem;
+
+
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
@@ -408,7 +437,9 @@ int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
 
 // Reader读取的时间数据转换
 extern time_t   GetTelemedTagDate(const BYTE * pData, DWORD dwDataLen);
-extern char * DateTime2Str(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char *   DateTime2Str(char * szDest, DWORD dwDestSize, const time_t * t);
+extern time_t   SystemTime2Time(const SYSTEMTIME & t);
+extern time_t  String2Time(const char * szDatetime);
 
 // templates
 template <class T>

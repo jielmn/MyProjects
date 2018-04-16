@@ -385,3 +385,25 @@ char * DateTime2Str (char * szDest, DWORD dwDestSize, const time_t * t) {
 	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d-%02d-%02d %02d:%02d:%02d", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
 	return szDest;
 }
+
+time_t  SystemTime2Time(const SYSTEMTIME & t) {
+	struct tm tmp;
+	memset(&tmp, 0, sizeof(tmp));
+
+	tmp.tm_year = t.wYear - 1900;
+	tmp.tm_mon = t.wMonth - 1;
+	tmp.tm_mday = t.wDay;
+
+	return mktime(&tmp);
+}
+
+time_t  String2Time(const char * szDatetime) {
+	struct tm  tmp;
+	if (6 != sscanf_s(szDatetime, "%d-%d-%d %d:%d:%d", &tmp.tm_year, &tmp.tm_mon, &tmp.tm_mday, &tmp.tm_hour, &tmp.tm_min, &tmp.tm_sec)) {
+		return 0;
+	}
+
+	tmp.tm_year -= 1900;
+	tmp.tm_mon--;
+	return mktime(&tmp);
+}

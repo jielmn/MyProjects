@@ -206,6 +206,16 @@ void  CDuiFrameWnd::AddPatientItem2List(DuiLib::CListTextElementUI* pListElement
 		pListElement->SetTag(pPatient->dwId);
 }
 
+void  CDuiFrameWnd::AddPatientItem2List_1(DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag /*= TRUE */) {
+	pListElement->SetText(0, pPatient->szName);
+	pListElement->SetText(1, pPatient->szBedNo);
+	pListElement->SetText(2, pPatient->dwTagsCnt > 0 ? "是" : "否" );
+	pListElement->SetText(3, GetInHosStatus(pPatient->bOutHos));
+
+	if (bSetTag)
+		pListElement->SetTag(pPatient->dwId);
+}
+
 void   CDuiFrameWnd::OnGetAllPatientsRet( const std::vector<PatientInfo*> & vRet ) {
 	std::vector<PatientInfo*>::const_iterator it;
 	for (it = vRet.begin(); it != vRet.end(); it++) {
@@ -215,6 +225,19 @@ void   CDuiFrameWnd::OnGetAllPatientsRet( const std::vector<PatientInfo*> & vRet
 		m_lstPatients->Add(pListElement);
 
 		AddPatientItem2List(pListElement, pPatient);
+
+		// 添加到短List
+		pListElement = new DuiLib::CListTextElementUI;
+		m_lstPatients_1->Add(pListElement);
+		AddPatientItem2List_1(pListElement, pPatient); 
+	}
+
+	if (m_lstPatients_1->GetCount() > 0) {
+		m_lstPatients_1->SelectItem(0);
+	}
+
+	if (m_lstPatients->GetCount() > 0) {
+		m_lstPatients->SelectItem(0);
 	}
 
 	m_bGetAllPatients = TRUE;
@@ -734,6 +757,56 @@ void   CDuiFrameWnd::OnUpdateSyncDataRet(int nError) {
 	::MessageBox(this->GetHWND(), "上传数据OK", "上传数据到数据库", 0);
 }
 
+void   CDuiFrameWnd::OnQueryRet(int nError, std::vector<QueryItem* > * pvRet) {
+
+	if (0 != nError) {
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
+
+		MessageBox(this->GetHWND(), GetErrDescription(nError), "查询", 0);
+		return;
+	}
+
+	assert(pvRet);
+	if (pvRet->size() == 0) {
+		MessageBox(this->GetHWND(), "查询结果OK，查询结果为空", "查询", 0);
+		return;
+	}
+
+	char buf[8192];
+	DuiLib::CDuiString strText;
+
+	// 显示在列表
+	std::vector<QueryItem* >::iterator it;
+	for (it = pvRet->begin(); it != pvRet->end(); it++) {
+		QueryItem* pItem = *it;
+
+		DuiLib::CListTextElementUI * pListElement = new DuiLib::CListTextElementUI;
+		m_lstPureData->Add(pListElement);
+
+		pListElement->SetText(0, pItem->szNurseName);
+
+		GetUid(buf, sizeof(buf), pItem->tReaderId.abyUid, pItem->tReaderId.dwUidLen, '-');
+		pListElement->SetText(1, buf);
+
+		DateTime2Str( buf, sizeof(buf), &pItem->tTime);
+		pListElement->SetText(2, buf );
+
+		strText.Format("%.2f", pItem->dwTemperature / 100.0);
+		pListElement->SetText(3, strText);
+	}
+
+
+	if (pvRet) {
+		ClearVector(*pvRet);
+		delete pvRet;
+	}
+
+	MessageBox(this->GetHWND(), "查询结果OK", "查询", 0);
+}
+
 
 
 
@@ -1034,6 +1107,32 @@ void   CDuiFrameWnd::OnUpdate() {
 	CBusiness::GetInstance()->UpdateAync(m_pvSyncData);
 }
 
+// 查询界面的短PatientsList item change
+void  CDuiFrameWnd::OnShortPatiensListItemChange() {
+	m_lstPureData->RemoveAll(); 
+}
+
+void   CDuiFrameWnd::OnQuery() {
+	int nSelIndex = m_lstPatients_1->GetCurSel();
+	if (nSelIndex < 0) {
+		::MessageBox(this->GetHWND(), "没有选中病人", "查询", 0);
+		return;
+	}
+
+	m_lstPureData->RemoveAll();
+
+	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients_1->GetItemAt(nSelIndex);
+	DWORD  dwPatientId = pListElement->GetTag();
+
+	SYSTEMTIME  tSysTime = m_datQueryDatetime->GetTime();
+	time_t tTime = SystemTime2Time(tSysTime);
+
+	int nTimeSpanIndex = m_cmbTimeSpan->GetCurSel();
+	assert(nTimeSpanIndex >= 0);
+
+	CBusiness::GetInstance()->QueryAync(dwPatientId, tTime, nTimeSpanIndex);
+}
+
 
 CDuiFrameWnd::CDuiFrameWnd() { 
 	m_Callback.m_PaintManager = &m_PaintManager;
@@ -1072,6 +1171,11 @@ void CDuiFrameWnd::InitWindow() {
 	m_btnUpdate = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(UPDATE_BUTTON_ID)));
 	m_btnClear = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(CLEAR_DATA_BUTTON_ID)));
 	m_lstSyncData = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(SYNC_DATA_LIST_ID)));
+
+	m_lstPatients_1 = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(PATIENTS_SHORT_LIST_ID)));
+	m_lstPureData = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(PURE_DATA_LIST_ID)));
+	m_datQueryDatetime = static_cast<DuiLib::CDateTimeUI *>(m_PaintManager.FindControl(_T(QUERY_DATETIME_ID)));
+	m_cmbTimeSpan = static_cast<DuiLib::CComboUI *>(m_PaintManager.FindControl(_T(TIME_SPAN_COMBO_ID)));
 
 	m_btnUpdate->SetEnabled(false);
 
@@ -1135,6 +1239,10 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		if (name == _T(TEMPERATURE_DATA_OPTION_ID)) {
 			if (m_tabs)
 				m_tabs->SelectItem(TEMPERATURE_DATA_INDEX);
+
+			if ( m_lstPatients_1->GetCount() > 0 && m_lstPatients_1->GetCurSel() < 0 ) {
+				m_lstPatients_1->SelectItem(0);
+			}
 		}
 		else if (name == _T(PATIENTS_OPTION_ID)) {
 			if (m_tabs)
@@ -1227,6 +1335,9 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		else if (name == CLEAR_DATA_BUTTON_ID) {
 			OnClearReader();
 		}
+		else if (name == QUERY_BUTTON_ID) {
+			OnQuery();
+		}
 	}
 	else if (msg.sType == "itemactivate") {
 		if ( m_tabs && m_tabs->GetCurSel() == PATIENTS_INDEX) {
@@ -1273,6 +1384,12 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 	}
 	else if (msg.sType == "menu_delete_nurse") {
 		OnDeleteNurse();
+		return;
+	}
+	else if (msg.sType == "itemselect") {
+		if (name == PATIENTS_SHORT_LIST_ID) {
+			OnShortPatiensListItemChange();
+		}
 		return;
 	}
 	WindowImplBase::Notify(msg);
@@ -1486,6 +1603,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_UPDATE_SYNC_DATA_RESULT) {
 		nError = wParam;
 		OnUpdateSyncDataRet(nError);
+		return 0;
+	}
+	else if (uMsg == UM_QUERY_RESULT) {
+		nError = wParam;
+		std::vector<QueryItem* > * pvRet = (std::vector<QueryItem* > *)lParam;
+		OnQueryRet(nError, pvRet);
 		return 0;
 	}
 

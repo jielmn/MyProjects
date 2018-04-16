@@ -805,6 +805,30 @@ int   CBusiness::ClearReaderAfterUpdate() {
 	return 0;
 }
 
+// 查询
+int   CBusiness::QueryAync(DWORD dwPatientId, time_t tTime, int nTimeSpanIndex) {
+	g_thrd_db->PostMessage(this, MSG_QUERY, new CQueryParam(dwPatientId, tTime, nTimeSpanIndex));
+	return 0;
+}
+
+int   CBusiness::Query( const CQueryParam * pParam) {
+	std::vector<QueryItem* > * pvRet = new std::vector<QueryItem* >;
+	int ret = m_Database.Query(pParam, *pvRet);
+	NotifyUiQueryRet(ret, pvRet);
+	return 0;
+}
+
+int   CBusiness::NotifyUiQueryRet(int ret, std::vector<QueryItem* > * pvRet) {
+	if (0 == ret) {
+		::PostMessage(g_hWnd, UM_QUERY_RESULT, ret, (LPARAM)pvRet);
+	}
+	else {
+		ClearVector(*pvRet);
+		delete pvRet;
+		::PostMessage(g_hWnd, UM_QUERY_RESULT, ret, 0);
+	}
+	return 0;
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -988,6 +1012,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_CLEAR_READER_AFTER_UPDATE:
 	{
 		ClearReaderAfterUpdate();
+	}
+	break;
+
+	case MSG_QUERY:
+	{
+		CQueryParam * pParam = (CQueryParam *)pMessageData;
+		Query(pParam);
 	}
 	break;
 

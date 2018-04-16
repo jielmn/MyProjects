@@ -47,6 +47,7 @@ public:
 
 	int CompleteSyncData(const CCompleteSyncDataParam * pParam);
 	int Update(const CUpdateParam * pParam);
+	int Query( const CQueryParam * pParam, std::vector<QueryItem* > & vRet );
 
 private:
 	void Clear();
