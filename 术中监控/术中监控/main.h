@@ -21,6 +21,7 @@ private:
 	DuiLib::CLabelUI *              m_lblReaderStatus;
 	CMyImageUI *                    m_pImageUI;
 	DuiLib::CLabelUI *              m_lblTemperature;
+	CAlarmImageUI *                 m_pAlarmUI;
 
 private:
 	void  OnSetting();

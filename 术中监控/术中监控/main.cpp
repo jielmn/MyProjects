@@ -8,10 +8,11 @@
 
 //#include <mmsystem.h> //导入声音头文件库   
 //#pragma comment(lib,"winmm.lib")//导入声音的链接库  
-//#define MAIN_TIMER_ID                1
-//#define MAIN_TIMER_INTEVAL           5000
+#ifdef _DEBUG
+#define MAIN_TIMER_ID                1
+#define MAIN_TIMER_INTEVAL           5000
+#endif
 
-#define COLLECT_TIMER_ID             2
 
 static DWORD   s_dwTemp = 3700;
 
@@ -62,7 +63,7 @@ public:
 
 
 
-
+                  
 
 void  CDuiFrameWnd::OnSetting() {
 	CSettingDlg * pSettingDlg = new CSettingDlg;
@@ -114,10 +115,15 @@ void CDuiFrameWnd::InitWindow() {
 	m_lblReaderStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblReaderStatus"));
 	m_lblTemperature = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblTemperature"));
 
-	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");
-	//SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
+	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");	
+	m_pAlarmUI = (CAlarmImageUI *)m_PaintManager.FindControl("alarm_image");
 
 	m_lblTemperature->SetText("--");
+
+#ifdef _DEBUG
+	SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
+#endif
+	 
 	DuiLib::WindowImplBase::InitWindow();
 }
 
@@ -151,6 +157,9 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp("MyImage", pstrClass)) {
 		return new CMyImageUI(&m_PaintManager);
 	}
+	else if (0 == strcmp("AlarmImage", pstrClass)) {
+		return new CAlarmImageUI(&m_PaintManager);
+	}
 	return DuiLib::WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -171,28 +180,51 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	else if (uMsg == WM_TIMER) {
-		if (wParam == COLLECT_TIMER_ID) {
-			
+#ifdef _DEBUG
+		if (wParam == MAIN_TIMER_ID) {
+			static  DWORD  dwTemp = 3350;
+
+			m_pImageUI->AddTemp(dwTemp);
+
+			if (dwTemp < g_dwLowTempAlarm) {
+				m_lblTemperature->SetTextColor(0xFF0000FF);
+				m_pAlarmUI->LowTempAlarm();
+			}
+			else if (dwTemp > g_dwHighTempAlarm) {
+				m_lblTemperature->SetTextColor(0xFFFF0000);
+				m_pAlarmUI->HighTempAlarm();
+			}
+			else {
+				m_lblTemperature->SetTextColor(0xFF447AA1);
+				m_pAlarmUI->StopAlarm();
+			}
+
+			DuiLib::CDuiString  strTemp;
+			strTemp.Format("%.2f", (dwTemp / 100.0));
+			m_lblTemperature->SetText(strTemp);
+
+			dwTemp += 60;
 		}
+#endif
 	}
 	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
 		ret = wParam;
 		DWORD dwTemp = lParam;
 
-		//static int a = 0;
 		if (0 == ret) {
-			//dwTemp += a;
 			m_pImageUI->AddTemp(dwTemp);
-			//a += 100;
 
 			if ( dwTemp < g_dwLowTempAlarm ) {
 				m_lblTemperature->SetTextColor(0xFF0000FF);
+				m_pAlarmUI->LowTempAlarm();
 			}
 			else if (dwTemp > g_dwHighTempAlarm) {
 				m_lblTemperature->SetTextColor(0xFFFF0000);
+				m_pAlarmUI->HighTempAlarm();
 			}
 			else {
 				m_lblTemperature->SetTextColor(0xFF447AA1);
+				m_pAlarmUI->StopAlarm(); 
 			}
 
 			DuiLib::CDuiString  strTemp;
@@ -206,6 +238,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else {
 			m_lblTemperature->SetTextColor(0xFF447AA1);
 			m_lblTemperature->SetText("--");
+			m_pAlarmUI->FailureAlarm();
 		}
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam );

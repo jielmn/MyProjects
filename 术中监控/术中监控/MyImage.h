@@ -39,3 +39,24 @@ private:
 
 #define  MYIMAGE_TIMER_ID             10
 
+
+class CAlarmImageUI : public DuiLib::CControlUI
+{
+public:
+	CAlarmImageUI(DuiLib::CPaintManagerUI *pManager);
+	~CAlarmImageUI();
+
+	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	virtual void DoEvent(DuiLib::TEventUI& event);
+
+	void  HighTempAlarm();
+	void  LowTempAlarm();
+	void  FailureAlarm();
+	void  StopAlarm();
+
+private:
+	DuiLib::CPaintManagerUI *    m_pManager;
+	BOOL                         m_bSetBkImage;
+	DuiLib::CDuiString           m_strBkImage;
+};
+

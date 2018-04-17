@@ -197,3 +197,59 @@ void   CMyImageUI::DrawTempPoint(int x, int y, HDC hDc, int RADIUS /*= 6*/) {
 	POINT points1[2] = { { x + nTmp, y - nTmp },{ x - nTmp, y + nTmp } };
 	::Polyline(hDc, points1, 2);
 }
+
+
+
+
+
+
+
+CAlarmImageUI::CAlarmImageUI(DuiLib::CPaintManagerUI *pManager) {
+	m_pManager = pManager;
+	m_bSetBkImage = FALSE;
+}
+
+CAlarmImageUI::~CAlarmImageUI() {
+
+}
+
+bool CAlarmImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	return CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+}
+
+void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == DuiLib::UIEVENT_TIMER && event.wParam == MYIMAGE_TIMER_ID) {
+		if (m_bSetBkImage) {
+			this->SetBkImage(m_strBkImage);
+		}
+		else {
+			this->SetBkImage("");
+		}
+		m_bSetBkImage = !m_bSetBkImage;
+	}
+
+	CControlUI::DoEvent(event);
+}
+
+void   CAlarmImageUI::HighTempAlarm() {
+	m_strBkImage = "alarm_high_temp.png";
+	m_bSetBkImage = TRUE;
+	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+}
+
+void   CAlarmImageUI::LowTempAlarm() {
+	m_strBkImage = "alarm_low_temp.png";
+	m_bSetBkImage = TRUE;
+	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+}
+
+void  CAlarmImageUI::FailureAlarm() {
+	m_strBkImage = "alarm_fail.png";
+	m_bSetBkImage = TRUE;
+	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+}
+
+void   CAlarmImageUI::StopAlarm() {
+	this->SetBkImage("");
+	m_pManager->KillTimer(this, MYIMAGE_TIMER_ID);
+}
