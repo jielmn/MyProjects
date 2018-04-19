@@ -164,14 +164,19 @@ xcopy dll_reader ..\Release  /dseiy</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="601InvReader.cpp" />
     <ClCompile Include="Business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="InvDatabase.cpp" />
-    <ClCompile Include="InvReader.cpp" />
+    <ClCompile Include="InvReader.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="login.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="610InvReader.h" />
     <ClInclude Include="Business.h" />
     <ClInclude Include="inc\device_driver\rfidlib_ANM103R.h" />
     <ClInclude Include="inc\device_driver\rfidlib_ANM200.h" />
@@ -211,7 +216,10 @@ xcopy dll_reader ..\Release  /dseiy</Command>
     <ClInclude Include="inc\rfidlib_reader.h" />
     <ClInclude Include="InvCommon.h" />
     <ClInclude Include="InvDatabase.h" />
-    <ClInclude Include="InvReader.h" />
+    <ClInclude Include="InvReader.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />

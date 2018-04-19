@@ -2,7 +2,8 @@
 #include "InvCommon.h"
 #include "login.h"
 #include "InvDatabase.h"
-#include "InvReader.h"
+//#include "InvReader.h"
+#include "610InvReader.h"
 #include "Business.h"
 
 void  CLoginWnd::InitWindow() {
@@ -58,8 +59,8 @@ LRESULT CLoginWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 	}
 	else if (uMsg == UM_SHOW_READER_STATUS) {
-		CInvReader::READER_STATUS eStatus = (CInvReader::READER_STATUS)wParam;
-		if (eStatus == CInvReader::STATUS_OPEN) {
+		C601InvReader::READER_STATUS eStatus = (C601InvReader::READER_STATUS)wParam;
+		if (eStatus == C601InvReader::STATUS_OPEN) {
 			SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT );
 		}
 		else {

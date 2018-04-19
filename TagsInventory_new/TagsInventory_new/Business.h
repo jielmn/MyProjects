@@ -2,7 +2,8 @@
 
 #include "InvCommon.h"
 #include "InvDatabase.h"
-#include "InvReader.h"
+//#include "InvReader.h"
+#include "610InvReader.h"
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 
@@ -17,6 +18,10 @@ public:
 	// 重连Reader(异步)
 	int   ReconnectReaderAsyn(DWORD dwDelayTime = 0 );
 	int   ReconnectReader();
+	void  OnReaderStatusChange(C601InvReader::READER_STATUS);
+	void  OnReaderReconnectAsyn( DWORD dwRelayTime );
+	void  OnInvTagItem(const BYTE *, DWORD);
+	void  OnInventoryAsyn();
 
 	// 盘点
 	int   InventoryAsyn();
@@ -24,10 +29,10 @@ public:
 
 	// 通知界面DB Status
 	int   NotifyUiDbStatus(CInvDatabase::DATABASE_STATUS eStatus);
-	int   NotifyUiReaderStatus(CInvReader::READER_STATUS eStatus);
+	int   NotifyUiReaderStatus(C601InvReader::READER_STATUS eStatus);
 
 	CInvDatabase::DATABASE_STATUS  GetDbStatus();
-	CInvReader::READER_STATUS      GetReaderStatus();
+	C601InvReader::READER_STATUS      GetReaderStatus();
 
 	// 通知界面盘点的item
 	int   NotifyUiInventory(const TagItem * pItem);
@@ -100,7 +105,7 @@ private:
 	BOOL           m_bLogin;                                // 是否登录
 	User           m_user;                                  // 登录的用户
 	CInvDatabase   m_InvDatabase;                           // 数据库
-	CInvReader     m_InvReader;
+	C601InvReader    m_InvReader;
 };
 
 

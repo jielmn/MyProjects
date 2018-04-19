@@ -39,6 +39,9 @@
     <ClCompile Include="InvReader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="601InvReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -168,6 +171,9 @@
       <Filter>头文件\inc\device_driver</Filter>
     </ClInclude>
     <ClInclude Include="InvReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="610InvReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

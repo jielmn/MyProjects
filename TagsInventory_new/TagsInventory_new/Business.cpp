@@ -12,11 +12,16 @@ CBusiness *  CBusiness::GetInstance() {
 	return pInstance;
 }
 
-CBusiness::CBusiness() : m_InvDatabase(this), m_InvReader(this) {
+CBusiness::CBusiness() : m_InvDatabase(this) {
 	sigInit.connect(this, &CBusiness::OnInit);
 	sigDeinit.connect(this, &CBusiness::OnDeInit);
 	m_bLogin = FALSE;
 	memset(&m_user, 0, sizeof(m_user));
+
+	m_InvReader.m_sigStatusChange.connect(this, &CBusiness::OnReaderStatusChange);
+	m_InvReader.m_sigReconnect.connect(this, &CBusiness::OnReaderReconnectAsyn);
+	m_InvReader.m_sigInvTagIetm.connect(this, &CBusiness::OnInvTagItem);
+	m_InvReader.m_sigInventoryAsyn.connect(this, &CBusiness::OnInventoryAsyn);
 }
 
 CBusiness::~CBusiness() {
@@ -58,10 +63,10 @@ void CBusiness::OnInit(int * ret) {
 	}
 	g_cfg->Init("Inventory.cfg");
 
-	err_t iRet = RDR_LoadReaderDrivers(_T("\\Drivers"));
-	if (0 != iRet) {
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to load reader drivers!\n");
-	}
+	//err_t iRet = RDR_LoadReaderDrivers(_T("\\Drivers"));
+	//if (0 != iRet) {
+	//	g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to load reader drivers!\n");
+	//}
 
 	g_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_thrd_db) {
@@ -212,8 +217,28 @@ int   CBusiness::ReconnectDatabase() {
 
 // 重连Reader
 int   CBusiness::ReconnectReader() {
-	int ret = m_InvReader.ReconnectReader();
+	//int ret = m_InvReader.ReconnectReader();
+	int ret = m_InvReader.Reconnect();
 	return ret;
+}
+
+void  CBusiness::OnReaderStatusChange(C601InvReader::READER_STATUS eStatus ) {
+	NotifyUiReaderStatus(eStatus);
+}
+
+void  CBusiness::OnReaderReconnectAsyn(DWORD dwRelayTime) {
+	ReconnectReaderAsyn(dwRelayTime);
+}
+
+void  CBusiness::OnInvTagItem(const BYTE * abyUid, DWORD dwUidLen ) {
+	TagItem * pItem = new TagItem;
+	memcpy(pItem->abyUid, abyUid, dwUidLen);
+	pItem->dwUidLen = dwUidLen;
+	NotifyUiInventory(pItem);
+}
+
+void   CBusiness::OnInventoryAsyn() {
+	InventoryAsyn();
 }
 
 // 重连数据库(异步)
@@ -244,7 +269,7 @@ int    CBusiness::NotifyUiDbStatus(CInvDatabase::DATABASE_STATUS eStatus) {
 	return 0;
 }
 
-int   CBusiness::NotifyUiReaderStatus(CInvReader::READER_STATUS eStatus) {
+int   CBusiness::NotifyUiReaderStatus(C601InvReader::READER_STATUS eStatus) {
 	::PostMessage( g_hWnd, UM_SHOW_READER_STATUS, eStatus, 0);
 	return 0;
 }
@@ -307,7 +332,7 @@ CInvDatabase::DATABASE_STATUS  CBusiness::GetDbStatus() {
 	return  m_InvDatabase.GetStatus();
 }
 
-CInvReader::READER_STATUS    CBusiness::GetReaderStatus() {
+C601InvReader::READER_STATUS    CBusiness::GetReaderStatus() {
 	return  m_InvReader.GetStatus();
 }
 
