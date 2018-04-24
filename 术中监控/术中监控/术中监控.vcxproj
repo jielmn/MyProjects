@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqliteD.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Debug\res /dseiy</Command>
@@ -129,7 +129,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Release\res /dseiy</Command>
@@ -155,8 +155,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="AllDataImageDlg.h" />
     <ClInclude Include="Business.h" />
     <ClInclude Include="exhCommon.h" />
+    <ClInclude Include="exhDatabase.h" />
+    <ClInclude Include="ImageAll.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyImage.h" />
     <ClInclude Include="Reader.h">
@@ -169,8 +172,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="AllDataImageDlg.cpp" />
     <ClCompile Include="Business.cpp" />
     <ClCompile Include="exhCommon.cpp" />
+    <ClCompile Include="exhDatabase.cpp" />
+    <ClCompile Include="ImageAll.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyImage.cpp" />
     <ClCompile Include="Reader.cpp">

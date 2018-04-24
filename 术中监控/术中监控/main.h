@@ -26,4 +26,5 @@ private:
 private:
 	void  OnSetting();
 	void  OnAbout();
+	void  OnImageAll();
 };

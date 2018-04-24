@@ -1,7 +1,7 @@
 #include <time.h>
 #include "MyImage.h"
 #include "Business.h"
-
+#include "exhDatabase.h"
 
 
 CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
@@ -178,6 +178,7 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	pTemp->tTime = now;
 	g_log->Output(ILog::LOG_SEVERITY_INFO, "temp = %ld, time=%lu\n", dwTemp, now);
 	m_vTempData.push_back(pTemp);
+	CMyDatabase::GetInstance()->AddTemp(dwTemp, now);
 
 	Invalidate();
 

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window size="150,48">
+<Window size="150,72">
 <VerticalLayout bkimage="file='menu_bk.png' corner='30,8,8,8' mask='#FFFF0000' " hole="false" bkcolor="#FFCCCCCC">
     <List header="hidden" inset="1,1,1,1" itemhotimage="file='menu_hot_bk.png' corner='2,2,2,2'">
         <ListContainerElement name="menu_setting" height="22" inset="40,0,0,0">
             <Label text="设置" mouse="false"/>
+        </ListContainerElement>
+		<ListContainerElement name="menu_data_image" height="22" inset="40,0,0,0">
+            <Label text="温度数据全图" mouse="false"/>
         </ListContainerElement>
         <ListContainerElement name="menu_about" height="22" inset="40,0,0,0">
             <Label text="关于" mouse="false"/>

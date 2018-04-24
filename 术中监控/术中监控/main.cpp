@@ -5,6 +5,8 @@
 #include "SettingDlg.h"
 #include "MyImage.h"
 #include "AboutDlg.h"
+#include "exhDatabase.h"
+#include "AllDataImageDlg.h"
 
 //#include <mmsystem.h> //导入声音头文件库   
 //#pragma comment(lib,"winmm.lib")//导入声音的链接库  
@@ -100,6 +102,21 @@ void  CDuiFrameWnd::OnAbout() {
 	delete pAboutDlg;
 }
 
+void  CDuiFrameWnd::OnImageAll() {
+	CAllDataImageDlg * pDlg = new CAllDataImageDlg;
+
+	pDlg->Create(this->m_hWnd, _T("温度全图"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+
+	// 如果OK
+	if (0 == ret) {
+
+	}
+	   
+	delete pDlg;
+}
+
 
 
 
@@ -148,6 +165,10 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 	}
 	else if (msg.sType == "menu_about") {
 		OnAbout();
+		return;
+	}
+	else if (msg.sType == "menu_data_image") {
+		OnImageAll();
 		return;
 	}
 	DuiLib::WindowImplBase::Notify(msg);
@@ -258,6 +279,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	int ret = 0;
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
+	CMyDatabase::GetInstance()->OnInitDb();
 
 	DuiLib::CPaintManagerUI::SetInstance(hInstance);
 
@@ -275,6 +297,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// show model
 	duiFrame.ShowModal();
 
+	CMyDatabase::GetInstance()->OnDeinitDb();
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();

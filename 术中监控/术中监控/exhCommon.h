@@ -97,6 +97,9 @@ extern ReaderCmd  READ_TAG_DATA_COMMAND;
 extern BOOL GetAllSerialPortName(std::vector<std::string> & vCom);
 extern int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
 extern int AdTemperature(int AD_Value);
+extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern time_t  String2Date(const char * szDatetime);
 
 
 // templates
