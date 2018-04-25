@@ -5,7 +5,7 @@
 #include "InvReader.h"
 #include "610InvReader.h"
 
-//#define   READER_TYPE_INV
+#define   READER_TYPE_INV
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 
@@ -26,7 +26,7 @@ public:
 	void  OnInventoryAsyn();
 
 	// 盘点
-	int   InventoryAsyn();
+	int   InventoryAsyn(DWORD dwDelayTime = 0);
 	int   Inventory();
 
 	// 通知界面DB Status

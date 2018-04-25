@@ -79,7 +79,10 @@ void CBusiness::OnInit(int * ret) {
 #endif
 
 	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 2000);
-	
+
+#ifdef READER_TYPE_INV
+	g_cfg->GetConfig("reader inventory interval", m_InvReader.m_dwInventoryInterval, 1000);
+#endif
 
 	g_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_thrd_db) {
@@ -290,8 +293,13 @@ int   CBusiness::NotifyUiReaderStatus(C601InvReader::READER_STATUS eStatus) {
 	return 0;
 }
 
-int   CBusiness::InventoryAsyn() {
-	g_thrd_reader->PostMessage( this, MSG_READER_INVENTORY );
+int   CBusiness::InventoryAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_reader->PostMessage(this, MSG_READER_INVENTORY);
+	}
+	else {
+		g_thrd_reader->PostDelayMessage( dwDelayTime, this, MSG_READER_INVENTORY);
+	}	
 	return 0;
 }
 

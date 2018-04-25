@@ -40,4 +40,7 @@ private:
 	BOOL                m_enISO18000p3m3;
 
 	CBusiness  *        m_pBusiness;
+
+public:
+	DWORD               m_dwInventoryInterval;
 };

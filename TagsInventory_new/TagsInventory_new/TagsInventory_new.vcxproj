@@ -170,7 +170,7 @@ xcopy dll_reader ..\Release  /dseiy</Command>
     <ClCompile Include="InvDatabase.cpp" />
     <ClCompile Include="InvReader.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="login.cpp" />
     <ClCompile Include="main.cpp" />
@@ -218,7 +218,7 @@ xcopy dll_reader ..\Release  /dseiy</Command>
     <ClInclude Include="InvDatabase.h" />
     <ClInclude Include="InvReader.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="login.h" />
     <ClInclude Include="main.h" />

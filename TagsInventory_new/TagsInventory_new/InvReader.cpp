@@ -80,6 +80,8 @@ CInvReader::CInvReader(CBusiness * pBusiness) {
 	m_enISO18000p3m3 = FALSE;
 
 	m_afi = 0;
+
+	m_dwInventoryInterval = 0;
 }
 
 CInvReader::~CInvReader() {
@@ -139,7 +141,7 @@ void CInvReader::Inventory() {
 	// 如果OK
 	if (iret == NO_ERR) {
 		// 再来一次盘点
-		m_pBusiness->InventoryAsyn();
+		m_pBusiness->InventoryAsyn(m_dwInventoryInterval);
 	}
 	// 如果有问题
 	else {
