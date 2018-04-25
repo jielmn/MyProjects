@@ -34,6 +34,8 @@
 				<Option width="100" height="80" name="Query"           text="查询" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='query.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
 				<Option width="100" height="80" name="Check"           text="检查Tag" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='check.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
 				<Control />
+				<Button name="btnTest" width="100" text="测试" visible="false" textcolor="#FF386382" font="1" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' "  disabledimage="file='win7_button_disabled.png' corner='5,5,5,5' hole='false' " />
+				<Control width="30" />
 				<Label  width="200" height="80" name="lblUser" text="欢迎您" textcolor="#FF386382" font="2" />
 			</HorizontalLayout>
 			

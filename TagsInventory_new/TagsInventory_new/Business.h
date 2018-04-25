@@ -2,8 +2,10 @@
 
 #include "InvCommon.h"
 #include "InvDatabase.h"
-//#include "InvReader.h"
+#include "InvReader.h"
 #include "610InvReader.h"
+
+//#define   READER_TYPE_INV
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 
@@ -105,7 +107,12 @@ private:
 	BOOL           m_bLogin;                                // 是否登录
 	User           m_user;                                  // 登录的用户
 	CInvDatabase   m_InvDatabase;                           // 数据库
+#ifndef READER_TYPE_INV
 	C601InvReader    m_InvReader;
+#else
+	CInvReader         m_InvReader;
+#endif
+
 };
 
 

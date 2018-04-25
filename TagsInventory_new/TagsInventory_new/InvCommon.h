@@ -19,6 +19,7 @@ extern HWND    g_hWnd;
 extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_reader;
 extern LmnToolkits::Thread *  g_thrd_timer;
+extern DWORD SERIAL_PORT_SLEEP_TIME;
 
 // thread message
 #define MSG_RECONNECT_DB           1

@@ -56,7 +56,12 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lstQuerySmall = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(QUERY_SMALL_LIST_ID)));
 	m_lstQueryTags = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(QUERY_TAGS_LIST_ID)));
 	 
-	 
+	// ≤‚ ‘
+	m_btnTest = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnTest"));
+#ifdef _DEBUG
+	m_btnTest->SetVisible(true);  
+#endif // _DEBUG
+
 
 	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
 	C601InvReader::READER_STATUS     eReaderStatus = CBusiness::GetInstance()->GetReaderStatus();
@@ -197,6 +202,9 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			OnManualAddBarcode();
 		} else if (name == QUERY_BUTTON_ID) {
 			OnQuery();
+		}
+		else if (name == "btnTest") {
+			OnTest();
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -449,6 +457,22 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 		// Delete DC when done.
 		DeleteDC(printInfo.hDC);
 	}
+}
+
+
+void  CDuiFrameWnd::OnTest() {
+	std::vector<TagItem *>::iterator  it;
+	DuiLib::CDuiString   strText;
+	char buf[8192];
+
+	strText = "inventory result: \n";
+	for ( it = m_vInventorySmall.begin(); it != m_vInventorySmall.end(); it++ ) {
+		TagItem *  pItem = *it;
+		GetUid( buf, sizeof(buf), pItem->abyUid, pItem->dwUidLen, '-' );
+		strText += buf;
+		strText += "\n";
+	}
+	g_log->Output(ILog::LOG_SEVERITY_INFO, strText);
 }
 
 

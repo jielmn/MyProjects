@@ -2,6 +2,7 @@
 
 #include "LmnSerialPort.h"
 #include "sigslot.h"
+#include "InvCommon.h"
 
 #define  MAX_TOKEN_LENGTH              64  
 typedef struct tagToken601 {

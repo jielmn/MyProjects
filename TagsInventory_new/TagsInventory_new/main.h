@@ -25,6 +25,9 @@ public:
 	void  StopInventoryBig();
 	void  SaveInventoryBig();
 	void  PrintInventoryBig();
+	
+	// TEST
+	void  OnTest();
 
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -108,4 +111,7 @@ private:
 	DuiLib::CListUI *       m_lstQueryBig;
 	DuiLib::CListUI *       m_lstQuerySmall;
 	DuiLib::CListUI *       m_lstQueryTags;
+
+	// test
+	DuiLib::CButtonUI*      m_btnTest;
 };

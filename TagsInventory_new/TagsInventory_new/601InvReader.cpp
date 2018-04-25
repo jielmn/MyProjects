@@ -1,3 +1,4 @@
+#include <afx.h>
 #include <vector>
 #include <string>
 #include "LmnCommon.h"
@@ -13,7 +14,7 @@ typedef struct tagReaderCmd {
 	DWORD     dwCommandLength;
 }ReaderCmd;
 
-#define SERIAL_PORT_SLEEP_TIME                  2000
+
 //境噪音，读取完成，场内无标签，读取失败
 #define  STATUS_NOISE                           0x58
 #define  STATUS_COMPLETE                        0x59
@@ -278,6 +279,12 @@ int   C601InvReader::RequestInventory() {
 int   C601InvReader::ReadInventoryRet() {
 	ReceiveAsPossible(SERIAL_PORT_SLEEP_TIME, 8192);
 
+#ifdef _DEBUG
+	char buf[8192*8];
+	DebugStream(buf, sizeof(buf), m_received_data.GetData(), m_received_data.GetDataLength());
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "RECEIVED COM DATA:\n%s\n", buf);
+#endif
+
 	Token601 t;
 	int ret = ReadToken(t);
 	while (0 == ret) {
@@ -292,7 +299,10 @@ int   C601InvReader::ReadInventoryRet() {
 			}
 			//  Tag数据（每次保存最后一个）
 			else if (t.byDataLen == 11) {
-				m_sigInvTagIetm(t.abyData + 3, 8);
+				// 排除结尾为"F0"的标签
+				if ( *(t.abyData + 3 + (8 - 1)) != 0xF0 ) {
+					m_sigInvTagIetm(t.abyData + 3, 8);
+				}
 			}
 		}
 		ret = ReadToken(t);

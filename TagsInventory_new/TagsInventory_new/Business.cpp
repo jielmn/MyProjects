@@ -12,16 +12,24 @@ CBusiness *  CBusiness::GetInstance() {
 	return pInstance;
 }
 
-CBusiness::CBusiness() : m_InvDatabase(this) {
+#ifndef READER_TYPE_INV
+CBusiness::CBusiness() : m_InvDatabase(this) 
+#else
+CBusiness::CBusiness() : m_InvDatabase(this), m_InvReader(this)
+#endif
+{
 	sigInit.connect(this, &CBusiness::OnInit);
 	sigDeinit.connect(this, &CBusiness::OnDeInit);
 	m_bLogin = FALSE;
 	memset(&m_user, 0, sizeof(m_user));
 
+#ifndef READER_TYPE_INV
 	m_InvReader.m_sigStatusChange.connect(this, &CBusiness::OnReaderStatusChange);
 	m_InvReader.m_sigReconnect.connect(this, &CBusiness::OnReaderReconnectAsyn);
 	m_InvReader.m_sigInvTagIetm.connect(this, &CBusiness::OnInvTagItem);
 	m_InvReader.m_sigInventoryAsyn.connect(this, &CBusiness::OnInventoryAsyn);
+#endif
+
 }
 
 CBusiness::~CBusiness() {
@@ -63,10 +71,15 @@ void CBusiness::OnInit(int * ret) {
 	}
 	g_cfg->Init("Inventory.cfg");
 
-	//err_t iRet = RDR_LoadReaderDrivers(_T("\\Drivers"));
-	//if (0 != iRet) {
-	//	g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to load reader drivers!\n");
-	//}
+#ifdef READER_TYPE_INV
+	err_t iRet = RDR_LoadReaderDrivers(_T("\\Drivers"));
+	if (0 != iRet) {
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to load reader drivers!\n");
+	}
+#endif
+
+	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 2000);
+	
 
 	g_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_thrd_db) {
@@ -217,8 +230,11 @@ int   CBusiness::ReconnectDatabase() {
 
 // ÷ÿ¡¨Reader
 int   CBusiness::ReconnectReader() {
-	//int ret = m_InvReader.ReconnectReader();
+#ifdef READER_TYPE_INV
+	int ret = m_InvReader.ReconnectReader();
+#else
 	int ret = m_InvReader.Reconnect();
+#endif
 	return ret;
 }
 
@@ -333,7 +349,7 @@ CInvDatabase::DATABASE_STATUS  CBusiness::GetDbStatus() {
 }
 
 C601InvReader::READER_STATUS    CBusiness::GetReaderStatus() {
-	return  m_InvReader.GetStatus();
+	return  (C601InvReader::READER_STATUS)m_InvReader.GetStatus();
 }
 
 const char * CBusiness::GetUserName() {

@@ -8,6 +8,7 @@
 #include "inc/rfidlib_aip_iso14443A.h"
 #include "inc/rfidlib_aip_iso18000p3m3.h"
 
+#include "610InvReader.h"
 
 
 
@@ -118,7 +119,7 @@ int CInvReader::ReconnectReader() {
 	}
 	
 	// 通知界面
-	m_pBusiness->NotifyUiReaderStatus(m_eReaderStatus);
+	m_pBusiness->NotifyUiReaderStatus( (C601InvReader::READER_STATUS)m_eReaderStatus);
 
 	return 0;
 }
@@ -147,7 +148,7 @@ void CInvReader::Inventory() {
 
 		m_eReaderStatus = STATUS_CLOSE;
 		// 通知界面
-		m_pBusiness->NotifyUiReaderStatus(m_eReaderStatus);
+		m_pBusiness->NotifyUiReaderStatus((C601InvReader::READER_STATUS)m_eReaderStatus);
 	}
 }
 
