@@ -45,9 +45,9 @@ LRESULT CLoginWnd::MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool&
 		if (wParam == VK_RETURN) {
 			OnBtnOk();
 			bHandled = true;
-			return 0;
-		}
-	}
+			return 0; 
+		} 
+	}   
 	return DuiLib::WindowImplBase::MessageHandler(uMsg, wParam, lParam, bHandled);
 }
 

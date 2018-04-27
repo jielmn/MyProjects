@@ -11,6 +11,9 @@ public:
 	// 登录
 	int Login(const CLoginParam * pParam);
 
+	// 添加经销商
+	int AddAgency(const CAgencyParam * pParam);
+
 private:
 	
 

@@ -40,3 +40,8 @@ int CInvoutDatabase::Login(const CLoginParam * pParam) {
 	CloseRecordSet();
 	return 0;
 }
+
+// 添加经销商
+int CInvoutDatabase::AddAgency(const CAgencyParam * pParam) {
+
+}

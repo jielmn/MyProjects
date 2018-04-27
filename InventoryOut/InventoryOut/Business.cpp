@@ -118,6 +118,16 @@ int  CBusiness::Login( const CLoginParam * pParam ) {
 	return 0;
 }
 
+int  CBusiness::AddAgencyAsyn(const char * szId, const char * szName, const char * szProvinceCode) {
+	m_thrd_db.PostMessage(this, MSG_ADD_AGENCY, new CAgencyParam(szId, szName, szProvinceCode));
+	return 0;
+}
+
+int  CBusiness::AddAgency(const CAgencyParam * pParam ) {
+	return 0;
+}
+
+
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
@@ -132,6 +142,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CLoginParam * pParam = (CLoginParam *)pMessageData;
 		Login( pParam );
+	}
+	break;
+
+	case MSG_ADD_AGENCY:
+	{
+		CAgencyParam * pParam = (CAgencyParam *)pMessageData;
+		AddAgency( pParam );
 	}
 	break;
 

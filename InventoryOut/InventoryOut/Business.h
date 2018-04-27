@@ -25,6 +25,10 @@ public:
 	int  LoginAsyn(const char * szUserName, const char * szPassword);
 	int  Login( const CLoginParam * pParam );
 
+	// 添加经销商
+	int  AddAgencyAsyn( const char * szId, const char * szName, const char * szProvinceCode );
+	int  AddAgency( const CAgencyParam * pParam );
+
 public:
 	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>     m_sigStatusChange;
 	sigslot::signal1<int>                           m_sigLoginRet;
