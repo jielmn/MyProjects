@@ -10,6 +10,18 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#define  TEST_FLAG                  1
+
+#if     TEST_FLAG
+#define MAIN_TIMER_ID                1
+#define MAIN_TIMER_INTEVAL           5000
+#endif
+
+
+
+
+
+
 #define  RECONNECT_READER_DELAY          10000
 
 #define  MSG_RECONNECT_READER             1
@@ -100,6 +112,8 @@ extern int AdTemperature(int AD_Value);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern time_t  String2Date(const char * szDatetime);
+
+
 
 
 // templates

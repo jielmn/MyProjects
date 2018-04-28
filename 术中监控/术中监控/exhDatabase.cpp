@@ -76,7 +76,7 @@ int  CMyDatabase::AddTemp(DWORD dwTemp, time_t tDate) {
 }
 
 int CMyDatabase::GetAllTemp(std::vector<TempData *> & v) {
-#ifdef _DEBUG
+#if TEST_FLAG
 	InitRand( TRUE );
 
 	time_t now = time(0);

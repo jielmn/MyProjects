@@ -10,10 +10,7 @@
 
 //#include <mmsystem.h> //导入声音头文件库   
 //#pragma comment(lib,"winmm.lib")//导入声音的链接库  
-#ifdef _DEBUG
-#define MAIN_TIMER_ID                1
-#define MAIN_TIMER_INTEVAL           5000
-#endif
+
 
 
 static DWORD   s_dwTemp = 3700;
@@ -137,8 +134,9 @@ void CDuiFrameWnd::InitWindow() {
 
 	m_lblTemperature->SetText("--");
 
-#ifdef _DEBUG
+#if TEST_FLAG
 	SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
+	m_lblReaderStatus->SetText("读卡器连接OK");
 #endif
 	 
 	DuiLib::WindowImplBase::InitWindow();
@@ -201,7 +199,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	else if (uMsg == WM_TIMER) {
-#ifdef _DEBUG
+#if  TEST_FLAG
 		if (wParam == MAIN_TIMER_ID) {
 			static  DWORD  dwTemp = 3350;
 
@@ -224,7 +222,30 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			strTemp.Format("%.2f", (dwTemp / 100.0));
 			m_lblTemperature->SetText(strTemp);
 
-			dwTemp += 60;
+			if ( dwTemp < 3400 )
+				dwTemp += 80;
+			else if (dwTemp < 3450)
+				dwTemp += 60;
+			else if (dwTemp < 3500)
+				dwTemp += 50;
+			else if (dwTemp < 3550)
+				dwTemp += 40;
+			else if (dwTemp < 3580)
+				dwTemp += 30;
+			else if (dwTemp < 3620)
+				dwTemp += 20;
+			else if (dwTemp < 3640)
+				dwTemp += 10;
+			else if (dwTemp < 3650)
+				dwTemp += 5;
+			else if (dwTemp < 3655)
+				dwTemp += 3;
+			else if (dwTemp < 3658)
+				dwTemp += 2;
+			else if (dwTemp < 3663)
+				dwTemp += 1;
+			else 
+				dwTemp += 0;
 		}
 #endif
 	}
