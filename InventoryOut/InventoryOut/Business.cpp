@@ -118,15 +118,31 @@ int  CBusiness::Login( const CLoginParam * pParam ) {
 	return 0;
 }
 
-int  CBusiness::AddAgencyAsyn(const char * szId, const char * szName, const char * szProvinceCode) {
-	m_thrd_db.PostMessage(this, MSG_ADD_AGENCY, new CAgencyParam(szId, szName, szProvinceCode));
+int  CBusiness::AddAgencyAsyn(const AgencyItem * pItem) {
+	m_thrd_db.PostMessage(this, MSG_ADD_AGENCY, new CAgencyParam(pItem));
 	return 0;
 }
 
 int  CBusiness::AddAgency(const CAgencyParam * pParam ) {
+	DWORD  dwNewId = 0;
+	int ret = m_db.AddAgency(pParam, dwNewId);
+	m_sigAddAgency.emit(ret,dwNewId);
 	return 0;
 }
 
+// 获取所有经销商
+int  CBusiness::GetAllAgencyAsyn() {
+	m_thrd_db.PostMessage(this, MSG_GET_ALL_AGENCY );	
+	return 0;
+}
+
+int  CBusiness::GetAllAgency() {
+	std::vector<AgencyItem *> vRet;
+	int ret = m_db.GetAllAgency(vRet);
+	m_sigGetAllAgency.emit(ret, vRet);
+	ClearVector(vRet);
+	return 0;
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -149,6 +165,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAgencyParam * pParam = (CAgencyParam *)pMessageData;
 		AddAgency( pParam );
+	}
+	break;
+
+	case MSG_GET_ALL_AGENCY:
+	{
+		GetAllAgency();
 	}
 	break;
 

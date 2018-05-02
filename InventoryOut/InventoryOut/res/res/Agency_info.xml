@@ -26,7 +26,7 @@
         </HorizontalLayout>
         
         <!-- 客户区 -->		
-		<VerticalLayout bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10">
+		<VerticalLayout bkcolor="#FFD1E8F5" bordercolor="#FF768D9B" bordersize="1" inset="20,10,20,10">
 		
 			<HorizontalLayout height="20" />
 			

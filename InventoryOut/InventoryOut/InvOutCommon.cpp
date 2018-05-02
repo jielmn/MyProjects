@@ -1,4 +1,7 @@
+#include <assert.h>
 #include "InvOutCommon.h"
+#include "LmnOdbc.h"
+#include "InvOutDatabase.h"
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
@@ -74,8 +77,8 @@ int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize) {
 	return 0;
 }
 
-char * String2SqlString (char * szDest, DWORD dwDestSize, const char * szSrc ) {
-	int ret = StrReplaceAll(szDest, dwDestSize - 1, szSrc, "'", "''");
+char * String2SqlValue (char * szDest, DWORD dwDestSize, const char * strValue ) {
+	int ret = StrReplaceAll(szDest, dwDestSize - 1, strValue, "'", "''");
 	if (0 == ret) {
 		return szDest;
 	}
@@ -84,155 +87,52 @@ char * String2SqlString (char * szDest, DWORD dwDestSize, const char * szSrc ) {
 	}
 }
 
-const char *  GetProvinceCode(int nComboIndex) {
+const char * GetErrorDescription(int ret) {
+	const char * szRet = "";
 
-	const char * szCode = 0;
-	switch (nComboIndex)
+	assert(0 != ret);
+
+	switch (ret)
 	{
-	case 0:  //全国
-		szCode = "000";
+	case CLmnOdbc::ERROR_CONNECTION_FAILED:
+		szRet = "数据库连接失败";
 		break;
 
-	case 1: // 北京
-		szCode = "010";
+	case CLmnOdbc::ERROR_DISCONNECTED:
+		szRet = "数据库断开";
 		break;
 
-	case 2: // 上海
-		szCode = "021";
+	case CLmnOdbc::ERROR_FAILED_TO_ALLOCATE_HANDLE :
+		szRet = "数据库断开";
 		break;
 
-	case 3:  // 江苏
-		szCode = "025";
+	case CLmnOdbc::ERROR_FAILED_TO_EXECUTE:
+		szRet = "执行Sql失败";
 		break;
 
-	case 4:  // 浙江
-		szCode = "571";
+	case CLmnOdbc::ERROR_FAILED_TO_FETCH:
+		szRet = "MoveNext数据失败";
 		break;
 
-	case 5:  // 安徽
-		szCode = "551";
+	case CLmnOdbc::ERROR_FAILED_TO_GET_DATA:
+		szRet = "获取记录值失败";
 		break;
 
-	case 6:  // 江西
-		szCode = "791";
+	case CLmnOdbc::ERROR_RECORDSET_EOF:
+		szRet = "已经达到记录集末尾";
 		break;
 
-	case 7:  // 福建
-		szCode = "591";
+	case CInvoutDatabase::InvOutDbErr_Integrity_constraint_violation:
+		szRet = "违反唯一约束条件";
 		break;
 
-	case 8:  // 山东
-		szCode = "531";
-		break;
-
-	case 9:  // 河南
-		szCode = "371";
-		break;
-
-	case 10:  // 湖北
-		szCode = "027";
-		break;
-
-	case 11:  // 湖南
-		szCode = "731";
-		break;
-
-	case 12:   // 天津市
-		szCode = "022";
-		break;
-
-	case 13:   // 河北
-		szCode = "311";
-		break;
-
-	case 14:  // 山西
-		szCode = "351";
-		break;
-
-	case 15:  // 内蒙古自治区
-		szCode = "471";
-		break;
-
-	case 16:  // 广东
-		szCode = "020";
-		break;
-
-	case 17:  // 广西壮族自治区
-		szCode = "771";
-		break;
-
-	case 18:  // 海南
-		szCode = "898";
-		break;
-
-	case 19:  // 香港
-		szCode = "HK";
-		break;
-
-	case 20:  // 澳门
-		szCode = "MA";
-		break;
-
-	case 21:  // 陕西
-		szCode = "029";
-		break;
-
-	case 22:  // 甘肃
-		szCode = "931";
-		break;
-
-	case 23: // 青海
-		szCode = "971";
-		break;
-
-	case 24: // 宁夏回族
-		szCode = "951";
-		break;
-
-	case 25:  // 新疆
-		szCode = "991";
-		break;
-
-	case 26:  // 辽宁
-		szCode = "024";
-		break;
-
-	case 27:  // 内蒙古
-		szCode = "471";
-		break;
-
-	case 28:  // 吉林
-		szCode = "431";
-		break;
-
-	case 29:  // 黑龙江
-		szCode = "451";
-		break;
-
-	case 30:   // 四川
-		szCode = "028";
-		break;
-
-	case 31:  // 贵州
-		szCode = "851";
-		break;
-
-	case 32:  // 云南
-		szCode = "871";
-		break;
-
-	case 33:  // 西藏
-		szCode = "891";
-		break;
-
-	case 34:  // 重庆
-		szCode = "023";
+	case -1:
+		szRet = "未知错误";
 		break;
 
 	default:
-		szCode = "";
 		break;
 	}
 
-	return szCode;
+	return szRet;
 }

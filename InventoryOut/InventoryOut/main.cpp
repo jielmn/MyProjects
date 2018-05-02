@@ -11,12 +11,14 @@
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigStatusChange.connect(this, &CDuiFrameWnd::OnDbStatusChange);
+	CBusiness::GetInstance()->m_sigGetAllAgency.connect(this, &CDuiFrameWnd::OnGetAllAgency);
 }
 
 void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
 	m_lblDbStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblDbStatus"));
+	m_lstAgencies = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("agency_list"));
 
 	CInvoutDatabase::DATABASE_STATUS eStatus = CBusiness::GetInstance()->GetDbStatus();
 	if (eStatus == CLmnOdbc::STATUS_OPEN) {
@@ -25,6 +27,8 @@ void  CDuiFrameWnd::InitWindow() {
 	else {
 		m_lblDbStatus->SetText("数据库连接失败");     
 	}
+
+	CBusiness::GetInstance()->GetAllAgency();
 
 	DuiLib::WindowImplBase::InitWindow();
 }
@@ -49,6 +53,12 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		if (name == "btnAddAgency") {
 			OnAddAgency();
 		}
+		else if (name == "btnModifyAgency") {
+			OnModifyAgency();
+		}
+		else if (name == "btnDelAgency") {
+			OnDeleteAgency();
+		}
 	}
 
 	DuiLib::WindowImplBase::Notify(msg);
@@ -65,9 +75,22 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 
 	//return DuiLib::WindowImplBase::CreateControl( pstrClass );
 }
-
+      
 // 处理自定义信息
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	int ret = 0;
+	if ( UM_GET_ALL_AGENCY_RET == uMsg ) {
+		ret = wParam;
+		std::vector<AgencyItem *> * pvRet = (std::vector<AgencyItem *> *)lParam;
+		assert(pvRet);
+
+		OnGetAllAgencyMsg(ret, *pvRet);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
+	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -84,6 +107,48 @@ void   CDuiFrameWnd::OnDbStatusChangeMsg(CLmnOdbc::DATABASE_STATUS eNewStatus) {
 	}
 }
 
+void  CDuiFrameWnd::OnGetAllAgency(int ret, const std::vector<AgencyItem *> & vRet ) {
+	std::vector<AgencyItem *> * pvRet = new std::vector<AgencyItem *>;
+	std::vector<AgencyItem *>::const_iterator it;
+	for (it = vRet.begin(); it != vRet.end(); it++) {
+		AgencyItem * pItem = *it;
+		AgencyItem * pNewItem = new AgencyItem;
+		memcpy(pNewItem, pItem, sizeof(AgencyItem));
+		pvRet->push_back(pNewItem);
+	}
+
+	::PostMessage( GetHWND(), UM_GET_ALL_AGENCY_RET, ret, (LPARAM)pvRet);
+}
+
+void  CDuiFrameWnd::OnGetAllAgencyMsg(int ret, const std::vector<AgencyItem *> & vRet) {
+	if (0 != ret) {
+		return;
+	}
+
+	std::vector<AgencyItem *>::const_iterator it;
+	for ( it = vRet.begin(); it != vRet.end(); it++) {
+		AgencyItem * pItem = *it;
+
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstAgencies->Add(pListElement);
+
+		AddAgencyItem2List(pListElement, pItem);
+	}
+}
+
+
+
+
+
+void  CDuiFrameWnd::AddAgencyItem2List(DuiLib::CListTextElementUI* pListElement, AgencyItem * pItem, BOOL bSetTag /*= TRUE*/) {
+	pListElement->SetText(0, pItem->szId);
+	pListElement->SetText(1, pItem->szName);
+	pListElement->SetText(2, pItem->szProvince);    
+	if (bSetTag) {
+		pListElement->SetTag(pItem->dwId);
+	}
+}
+
 void  CDuiFrameWnd::OnAddAgency() {
 	CAgencyWnd * pDlg = new CAgencyWnd;
 
@@ -93,13 +158,45 @@ void  CDuiFrameWnd::OnAddAgency() {
 
 	// 如果添加成功
 	if (0 == ret) {
-		//DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
-		//m_lstPatients->Add(pListElement);
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstAgencies->Add(pListElement);
 
-		//AddPatientItem2List(pListElement, &pPatientDlg->m_tPatientInfo);
+		AddAgencyItem2List(pListElement, &pDlg->m_tAgency);
 	}
 
 	delete pDlg; 
+}
+
+void  CDuiFrameWnd::OnModifyAgency() {
+	int nSelIndex = m_lstAgencies->GetCurSel();
+	if (nSelIndex < 0) {
+		return;
+	}
+
+	//CAgencyWnd * pDlg = new CAgencyWnd;
+
+	//DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstAgencies->GetItemAt(nSelIndex);
+	//STRNCPY(pDlg->m_tAgency.szId,   pListElement->GetText(0), sizeof(pDlg->m_tAgency.szId));
+	//STRNCPY(pDlg->m_tAgency.szName, pListElement->GetText(0), sizeof(pDlg->m_tAgency.szName));
+	//STRNCPY(pDlg->m_tAgency.szId,   pListElement->GetText(0), sizeof(pDlg->m_tAgency.szId));
+
+	//pDlg->Create(this->m_hWnd, _T("新增经销商信息"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	//pDlg->CenterWindow();
+	//int ret = pDlg->ShowModal();
+
+	//// 如果添加成功
+	//if (0 == ret) {
+	//	DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+	//	m_lstAgencies->Add(pListElement);
+
+	//	AddAgencyItem2List(pListElement, &pDlg->m_tAgency);
+	//}
+
+	//delete pDlg;
+}
+
+void  CDuiFrameWnd::OnDeleteAgency() {
+
 }
 
 

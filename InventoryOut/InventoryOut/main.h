@@ -2,6 +2,7 @@
 #include "UIlib.h"
 #include "sigslot.h"
 #include "LmnOdbc.h"
+#include "InvOutCommon.h"
 
 class CDuiFrameWnd : public DuiLib::WindowImplBase, public sigslot::has_slots<>
 {
@@ -23,11 +24,18 @@ private:
 	
 	DuiLib::CTabLayoutUI *        m_tabs;
 	DuiLib::CLabelUI *            m_lblDbStatus;
+	DuiLib::CListUI *             m_lstAgencies;
 
 private:
 	void  OnDbStatusChange(CLmnOdbc::DATABASE_STATUS eNewStatus);
 	void  OnDbStatusChangeMsg(CLmnOdbc::DATABASE_STATUS eNewStatus);
 
+	void  OnGetAllAgency(int, const std::vector<AgencyItem *> &);
+	void  OnGetAllAgencyMsg(int, const std::vector<AgencyItem *> &);
+
 private:
+	void  AddAgencyItem2List(DuiLib::CListTextElementUI* pListElement, AgencyItem * pItem, BOOL bSetTag = TRUE);
 	void  OnAddAgency();
+	void  OnModifyAgency();
+	void  OnDeleteAgency();
 };

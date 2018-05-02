@@ -26,12 +26,18 @@ public:
 	int  Login( const CLoginParam * pParam );
 
 	// 添加经销商
-	int  AddAgencyAsyn( const char * szId, const char * szName, const char * szProvinceCode );
+	int  AddAgencyAsyn( const AgencyItem * pItem );
 	int  AddAgency( const CAgencyParam * pParam );
 
+	// 获取所有经销商
+	int  GetAllAgencyAsyn();
+	int  GetAllAgency();
+
 public:
-	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>     m_sigStatusChange;
-	sigslot::signal1<int>                           m_sigLoginRet;
+	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>                     m_sigStatusChange;
+	sigslot::signal1<int>                                           m_sigLoginRet;
+	sigslot::signal2<int, DWORD>                                    m_sigAddAgency;
+	sigslot::signal2<int, const std::vector<AgencyItem *> & >       m_sigGetAllAgency;
 
 private:
 	static CBusiness *  pInstance;

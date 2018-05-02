@@ -68,6 +68,10 @@ void  CLoginWnd::InitWindow() {
 	g_cfg->GetConfig("last login name", buf, sizeof(buf), "");
 	m_edUserName->SetText(buf);
 
+#ifdef _DEBUG
+	m_edUserPassword->SetText("shijie");
+#endif
+
 	DuiLib::WindowImplBase::InitWindow();
 }
 
