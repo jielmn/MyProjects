@@ -80,6 +80,7 @@ private:
 	std::vector<TagItem *>   m_vInventorySmall;
 
 	HFONT                    m_font;
+	HFONT                    m_font1;
 
 	// check
 	DuiLib::CLabelUI *       m_lblCheckTagId;
@@ -102,6 +103,9 @@ private:
 	DuiLib::CEditUI *       m_edtManualSmallPkgId;              // 手动添加条形码
 	DuiLib::CButtonUI *     m_btnManualSmallPkg;
 
+	DuiLib::CDateTimeUI *   m_dateProc;    // 生产日期
+	DuiLib::CDateTimeUI *   m_dateValid;   // 有效期
+
 	// 查询
 	DuiLib::CDateTimeUI *   m_dtStart;
 	DuiLib::CDateTimeUI *   m_dtEnd;
@@ -113,5 +117,5 @@ private:
 	DuiLib::CListUI *       m_lstQueryTags;
 
 	// test
-	DuiLib::CButtonUI*      m_btnTest;
+	DuiLib::CButtonUI*      m_btnTest;	
 };

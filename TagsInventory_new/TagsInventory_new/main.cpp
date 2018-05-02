@@ -45,6 +45,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lstInvBig = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(INV_BIG_LIST_ID)));	 
 	m_edtManualSmallPkgId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(MANUAL_SMALL_PKG_ID_EDIT_ID)));
 	m_btnManualSmallPkg = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(MANUAL_SMALL_PKG_ID_BUTTON_ID)));
+
+	m_dateProc = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl("DateTimeProc"));
+	m_dateValid = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl("DateTimeValid"));
 	
 	// 查询
 	m_dtStart = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl(_T(QUERY_START_TIME_DATETIME_ID)));
@@ -124,6 +127,30 @@ void  CDuiFrameWnd::InitWindow() {
 		DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
 		_T("黑体")
 	);
+
+	g_cfg->GetConfig("big inv font size", dwFontSize, 80);
+	m_font1 = CreateFont(
+		(int)dwFontSize,               // nHeight
+		0,                             // nWidth
+		0,                             // nEscapement
+		0,                             // nOrientation
+		FW_NORMAL,                       // nWeight
+		FALSE,                         // bItalic
+		FALSE,                         // bUnderline
+		0,                             // cStrikeOut
+		ANSI_CHARSET,                  // nCharSet
+		OUT_DEFAULT_PRECIS,            // nOutPrecision
+		CLIP_DEFAULT_PRECIS,           // nClipPrecision
+		DEFAULT_QUALITY,               // nQuality
+		DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
+		_T("宋体")
+	);
+
+	SYSTEMTIME t = m_dateValid->GetTime();
+	t.wYear += 3;
+	m_dateValid->SetTime(&t);
+	SNPRINTF( buf, sizeof(buf), "%04d-%02d-%02d", t.wYear, t.wMonth, t.wDay);
+	m_dateValid->SetText( buf );
 
 	WindowImplBase::InitWindow();
 }
@@ -461,6 +488,7 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 
 
 void  CDuiFrameWnd::OnTest() {
+#if 0
 	std::vector<TagItem *>::iterator  it;
 	DuiLib::CDuiString   strText;
 	char buf[8192];
@@ -473,6 +501,91 @@ void  CDuiFrameWnd::OnTest() {
 		strText += "\n";
 	}
 	g_log->Output(ILog::LOG_SEVERITY_INFO, strText);
+#endif
+
+	DWORD   dwPaperWidth = 0;
+	DWORD   dwPaperLength = 0;
+	DWORD   dwLeft = 0;
+	DWORD   dwTop = 0;
+	DWORD   dwPrintWidth = 0;
+	DWORD   dwPrintHeight = 0;
+	DWORD   dwTextHeight = 0;
+	DWORD   dwInterval = 0;
+
+	g_cfg->Reload();
+	g_cfg->GetConfig("big inv paper width", dwPaperWidth, 750);
+	g_cfg->GetConfig("big inv paper height", dwPaperLength, 520);
+	g_cfg->GetConfig("big inv print left", dwLeft, 50);
+	g_cfg->GetConfig("big inv print top", dwTop, 30);
+	g_cfg->GetConfig("big inv print barcode width", dwPrintWidth, dwPaperWidth);
+	g_cfg->GetConfig("big inv print barcode height", dwPrintHeight, dwPaperLength);
+	g_cfg->GetConfig("big inv bar code text height", dwTextHeight, 50);
+	g_cfg->GetConfig("big inv print vertical interval", dwInterval, 130);
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	PrintDlg(&printInfo);
+	//if (PrintDlg(&printInfo)==TRUE) 
+	{
+		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
+
+		if (lpDevMode) {
+			lpDevMode->dmPaperSize = DMPAPER_USER;
+			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
+			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
+			lpDevMode->dmPaperLength = (short)dwPaperLength;
+			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+		}
+		GlobalUnlock(printInfo.hDevMode);
+		ResetDC(printInfo.hDC, lpDevMode);
+
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+		StartDoc(printInfo.hDC, &di);
+		StartPage(printInfo.hDC);
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		CSize size = CSize(dwPaperWidth, dwPaperLength);
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigPackageId);
+
+		// 画条码
+		//DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBigBatchId, m_font, dwTextHeight, "S/N:");
+		::SelectObject(pDC->m_hDC, m_font1);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop,                "ET20180301", 12);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop+ dwInterval,    "2018年03月01日", 12);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval*2, "2021年03月01日", 12);
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwInterval * 3, dwPrintWidth, dwPrintHeight, (const char *)"WHET20180301A001", m_font, dwTextHeight, "S/N:");
+
+
+		EndPage(printInfo.hDC);
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+	}
+
 }
 
 
@@ -548,7 +661,7 @@ void  CDuiFrameWnd::SaveInventoryBig() {
 		return;
 	}
 
-	DuiLib::CDuiString str = GET_CONTROL_TEXT(m_edtBatchId);
+	DuiLib::CDuiString str = GET_CONTROL_TEXT(m_edtBigBatchId);
 	CString strBatchId = str;
 
 	if (strBatchId.GetLength() == 0) {
@@ -618,8 +731,9 @@ void  CDuiFrameWnd::SaveInventoryBig() {
 
 	m_InventoryBigStatus = STATUS_SAVING;
 }
-
+           
 void  CDuiFrameWnd::PrintInventoryBig() {
+#if 0
 	DWORD   dwPaperWidth = 0;
 	DWORD   dwPaperLength = 0;
 	DWORD   dwLeft = 0;
@@ -695,6 +809,102 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 		// Delete DC when done.
 		DeleteDC(printInfo.hDC);
 	}
+#endif
+
+
+	DWORD   dwPaperWidth = 0;
+	DWORD   dwPaperLength = 0;
+	DWORD   dwLeft = 0;
+	DWORD   dwTop = 0;
+	DWORD   dwPrintWidth = 0;
+	DWORD   dwPrintHeight = 0;
+	DWORD   dwTextHeight = 0;
+	DWORD   dwInterval = 0;
+	char buf[8192];
+	char  szProductId[64] = { 0 };
+	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId), "");
+
+	g_cfg->Reload();
+	g_cfg->GetConfig("big inv paper width", dwPaperWidth, 750);
+	g_cfg->GetConfig("big inv paper height", dwPaperLength, 520);
+	g_cfg->GetConfig("big inv print left", dwLeft, 50);
+	g_cfg->GetConfig("big inv print top", dwTop, 30);
+	g_cfg->GetConfig("big inv print barcode width", dwPrintWidth, dwPaperWidth);
+	g_cfg->GetConfig("big inv print barcode height", dwPrintHeight, dwPaperLength);
+	g_cfg->GetConfig("big inv bar code text height", dwTextHeight, 50);
+	g_cfg->GetConfig("big inv print vertical interval", dwInterval, 130);
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	PrintDlg(&printInfo);
+	//if (PrintDlg(&printInfo)==TRUE) 
+	{
+		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
+
+		if (lpDevMode) {
+			lpDevMode->dmPaperSize = DMPAPER_USER;
+			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
+			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
+			lpDevMode->dmPaperLength = (short)dwPaperLength;
+			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+		}
+		GlobalUnlock(printInfo.hDevMode);
+		ResetDC(printInfo.hDC, lpDevMode);
+
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+		StartDoc(printInfo.hDC, &di);
+		StartPage(printInfo.hDC);
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		CSize size = CSize(dwPaperWidth, dwPaperLength);
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		DuiLib::CDuiString strBigPackageId = GET_CONTROL_TEXT(m_edtBigPackageId);
+		DuiLib::CDuiString strBigBatchId   = GET_CONTROL_TEXT(m_edtBigBatchId);
+
+		SYSTEMTIME t1 = m_dateProc->GetTime();
+		SYSTEMTIME t2 = m_dateValid->GetTime();
+
+		DuiLib::CDuiString  strText = szProductId;
+		strText += strBigBatchId;
+
+		::SelectObject(pDC->m_hDC, m_font1);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop, (const char *)strText, strText.GetLength() );
+		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t1.wYear, (DWORD)t1.wMonth, (DWORD)t1.wDay);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval, buf, strlen(buf) );
+		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t2.wYear, (DWORD)t2.wMonth, (DWORD)t2.wDay);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval * 2, buf, strlen(buf));
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwInterval * 3, dwPrintWidth, dwPrintHeight, (const char *)strBigPackageId, m_font, dwTextHeight, "S/N:");
+
+
+		EndPage(printInfo.hDC);
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+	}
+
 }
 
 
