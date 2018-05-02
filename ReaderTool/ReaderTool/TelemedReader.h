@@ -6,7 +6,7 @@
 #include "sigslot.h"
 #include "ReaderToolCommon.h"
 
-class CTelemedReader : public CSerialPort {
+class CTelemedReader : public CLmnSerialPort {
 public:
 	enum  ReaderError {
 		ERROR_OK = 0,

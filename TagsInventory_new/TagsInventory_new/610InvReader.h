@@ -14,7 +14,7 @@ typedef struct tagToken601 {
 }Token601;
 
 
-class  C601InvReader : public CSerialPort {
+class  C601InvReader : public CLmnSerialPort {
 public:
 	C601InvReader();
 	~C601InvReader();
