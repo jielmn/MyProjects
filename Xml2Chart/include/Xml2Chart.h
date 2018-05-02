@@ -9,6 +9,10 @@
 
 #include "tinyxml.h"  
 
+#ifdef GetNextSibling
+#undef GetNextSibling
+#endif
+
 /*
 某某医院
 体温单
