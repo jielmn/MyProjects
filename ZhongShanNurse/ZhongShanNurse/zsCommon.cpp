@@ -386,6 +386,14 @@ char * DateTime2Str (char * szDest, DWORD dwDestSize, const time_t * t) {
 	return szDest;
 }
 
+char * Date2Str(char * szDest, DWORD dwDestSize, time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d-%02d-%02d", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday);
+	return szDest;
+}
+
 time_t  SystemTime2Time(const SYSTEMTIME & t) {
 	struct tm tmp;
 	memset(&tmp, 0, sizeof(tmp));

@@ -16,6 +16,7 @@ void  CPatientWnd::Notify(TNotifyUI& msg) {
 			// 如果id改变
 			if (!m_bAdd && 0 != strcmp( strText, m_tPatientInfo.szId) ) {
 				m_tPatientInfo.bStrIdChanged = TRUE;
+				STRNCPY(m_tPatientInfo.szOldId, m_tPatientInfo.szId, sizeof(m_tPatientInfo.szOldId));
 			}
 			strncpy_s(m_tPatientInfo.szId, strText, sizeof(m_tPatientInfo.szId));
 

@@ -307,8 +307,9 @@ int CZsDatabase::ModifyPatient(const CPatientParam * pParam) {
 		m_database.ExecuteSQL(strSql);		
 
 		if (tPatient.bStrIdChanged) {
+			ConvertSqlField(tPatient.szOldId, sizeof(tPatient.szOldId), pParam->m_patient.szOldId);
 			strSql.Format("UPDATE %s SET patient_id='%s' where patient_id='%s' ", TEMPERATURE_TABLE_NAME,
-				tPatient.szId, tPatient.szId);
+				tPatient.szId, tPatient.szOldId );
 			m_database.ExecuteSQL(strSql);
 		}
 		
@@ -576,8 +577,9 @@ int CZsDatabase::ModifyNurse(const CNurseParam * pParam) {
 		m_database.ExecuteSQL(strSql);
 
 		if (tNurse.bStrIdChanged) {
+			ConvertSqlField(tNurse.szOldId, sizeof(tNurse.szOldId), pParam->m_nurse.szOldId);
 			strSql.Format("UPDATE %s SET nurse_id='%s' where nurse_id='%s' ", TEMPERATURE_TABLE_NAME,
-				tNurse.szId, tNurse.szId);
+				tNurse.szId, tNurse.szOldId);
 			m_database.ExecuteSQL(strSql);
 		}
 

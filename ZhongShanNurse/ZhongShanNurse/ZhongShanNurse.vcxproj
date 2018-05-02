@@ -91,11 +91,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../Xml2Chart/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib;legacy_stdio_definitions.lib</AdditionalDependencies>
+      <AdditionalDependencies>User32.lib;duilibd.lib;LmnCommonXD.lib;legacy_stdio_definitions.lib;Xml2ChartD.lib;tinyxml.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Debug\res /dseiy
@@ -126,6 +128,7 @@ xcopy dll ..\Debug  /dseiy</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_RICHEDIT_VER=0x0210;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>../../Xml2Chart/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -164,6 +167,7 @@ xcopy dll ..\Release  /dseiy</Command>
     <ClInclude Include="NurseDlg.h" />
     <ClInclude Include="PatientDlg.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TempChartUI.h" />
     <ClInclude Include="zsBindingReader.h" />
     <ClInclude Include="zsCommon.h" />
     <ClInclude Include="zsDatabase.h" />
@@ -174,6 +178,7 @@ xcopy dll ..\Release  /dseiy</Command>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NurseDlg.cpp" />
     <ClCompile Include="PatientDlg.cpp" />
+    <ClCompile Include="TempChartUI.cpp" />
     <ClCompile Include="zsBindingReader.cpp" />
     <ClCompile Include="zsCommon.cpp" />
     <ClCompile Include="zsDatabase.cpp" />

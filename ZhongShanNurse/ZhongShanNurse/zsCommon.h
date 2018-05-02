@@ -194,6 +194,7 @@ typedef struct tagPatientInfo {
 	BOOL     bOutHos;
 	TagItem  tags[MAX_PATIENT_TAGS];
 	DWORD    dwTagsCnt;
+	char     szOldId[MAX_PATIENT_ID_LENGTH];
 
 	BOOL     bToUpdated;
 	BOOL     bStrIdChanged;
@@ -208,6 +209,7 @@ typedef struct tagNurseInfo {
 	char     szName[MAX_NURSE_NAME_LENGTH];
 	TagItem  tag;                          //白卡
 	BOOL     bBindtingCard;                //是否绑定白卡
+	char     szOldId[MAX_NURSE_ID_LENGTH];
 
 	BOOL     bToUpdated;
 	BOOL     bStrIdChanged;
@@ -408,6 +410,13 @@ typedef struct tagQueryItem {
 }QueryItem;
 
 
+// 温度贴数据
+typedef struct tagTagData {
+	time_t     tTime;                  // 时间
+	TagItem    tTagId;                 // id
+	DWORD      dwTemperature;          // 温度数据，如3500表示35.00
+}TagData;
+
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
@@ -438,6 +447,7 @@ int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
 // Reader读取的时间数据转换
 extern time_t   GetTelemedTagDate(const BYTE * pData, DWORD dwDataLen);
 extern char *   DateTime2Str(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Date2Str(char * szDest, DWORD dwDestSize, time_t * t);
 extern time_t   SystemTime2Time(const SYSTEMTIME & t);
 extern time_t  String2Time(const char * szDatetime);
 

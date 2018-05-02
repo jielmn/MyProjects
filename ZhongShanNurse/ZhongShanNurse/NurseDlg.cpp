@@ -16,6 +16,7 @@ void  CNurseWnd::Notify(TNotifyUI& msg) {
 			// 如果id改变
 			if (!m_bAdd && 0 != strcmp(strText, m_tNurseInfo.szId)) {
 				m_tNurseInfo.bStrIdChanged = TRUE;
+				STRNCPY(m_tNurseInfo.szOldId, m_tNurseInfo.szId, sizeof(m_tNurseInfo.szOldId));
 			}
 			strncpy_s(m_tNurseInfo.szId, strText, sizeof(m_tNurseInfo.szId));
 
