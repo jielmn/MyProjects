@@ -2,6 +2,8 @@
 #include "Business.h"
 #include "zsSyncReader.h"
 
+#define   READER_VERSION          1
+
 // 遍历系统里的所有串口
 static BOOL GetAllSerialPortName(std::vector<std::string> & vCom) {
 
@@ -368,17 +370,30 @@ int   CZsSyncReader::ReadSyncDataRet( std::vector<SyncItem*> & v ) {
 
 	// 读取第一个Item，里面有总数
 	m_received_data.Read(pData, 28);
+
+#if READER_VERSION == 0
 	// 如果第17和18字节是 00 00，并且最后两个字节是0D 0A，则OK
 	if ( (0 == memcmp(pData + 16, "\x00\x00", 2)) /*&& (0 == memcmp(pData + 26, READER_TAIL, 2))*/ ) {
 		return 0;
 	}
+#else
+	if ( 0 == memcmp(pData + 16, "\x00\x00", 2) ) {
+		return 0;
+	}
+#endif
 
+#if READER_VERSION == 0
 	// 再读取4个字节
 	m_received_data.Read(pData+28, 4);
 	// 如果最后两个字节不是 0D 0A
 	if ( 0 != memcmp(pData + 30, READER_TAIL, 2) ) {
 		return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
 	}
+#else
+	if (0 != memcmp(pData + 26, READER_TAIL, 2)) {
+		return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
+	}
+#endif
 
 	DWORD   dwItemCounts = 0;
 	dwItemCounts = pData[16] * 256 + pData[17];
@@ -396,9 +411,15 @@ int   CZsSyncReader::ReadSyncDataRet( std::vector<SyncItem*> & v ) {
 	// 护士id
 	memcpy(pItem->tNurseId.abyUid, pData + 18, 8);
 	pItem->tNurseId.dwUidLen = 8;
+
+#if READER_VERSION == 0
 	// reader id
 	memcpy(pItem->tReaderId.abyUid, pData + 26, 4);
 	pItem->tReaderId.dwUidLen = 4;
+#else
+	memcpy(pItem->tReaderId.abyUid, "\x00\x00\x00\x00", 4);
+	pItem->tReaderId.dwUidLen = 4;
+#endif
 
 	v.push_back(pItem);
 
@@ -406,12 +427,23 @@ int   CZsSyncReader::ReadSyncDataRet( std::vector<SyncItem*> & v ) {
 
 	// 接着从第二个Item分析
 	while (dwIndex < dwItemCounts) {
+#if READER_VERSION == 0
 		if ( m_received_data.GetDataLength() < 32 ) {
 			ClearVector(v);
 			return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
 		}
+#else
+		if (m_received_data.GetDataLength() < 28) {
+			ClearVector(v);
+			return ZS_ERR_SYNC_READER_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
+		}
+#endif
 
+#if READER_VERSION == 0
 		m_received_data.Read(pData, 32);
+#else
+		m_received_data.Read(pData, 28);
+#endif
 
 		pItem = new SyncItem;
 		memset(pItem, 0, sizeof(SyncItem));
@@ -426,10 +458,15 @@ int   CZsSyncReader::ReadSyncDataRet( std::vector<SyncItem*> & v ) {
 		// 护士id
 		memcpy(pItem->tNurseId.abyUid, pData + 18, 8);
 		pItem->tNurseId.dwUidLen = 8;
+
+#if READER_VERSION == 0
 		// reader id
 		memcpy(pItem->tReaderId.abyUid, pData + 26, 4);
 		pItem->tReaderId.dwUidLen = 4;
-
+#else
+		memcpy(pItem->tReaderId.abyUid, "\x00\x00\x00\x00", 4);
+		pItem->tReaderId.dwUidLen = 4;
+#endif
 		v.push_back(pItem);
 
 		dwIndex++;

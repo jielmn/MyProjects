@@ -145,6 +145,7 @@ LRESULT CPatientWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		for (DWORD i = 0; i < m_tPatientInfo.dwTagsCnt; i++) {
 			if ( IsSameTag(&m_tPatientInfo.tags[i], &pParam->m_tag) ) {
 				memmove(&m_tPatientInfo.tags[i], &m_tPatientInfo.tags[i + 1], sizeof(TagItem) *  m_tPatientInfo.dwTagsCnt - 1 - i);
+				m_tPatientInfo.dwTagsCnt--;
 				m_lstTags->RemoveAt(i);
 				break;
 			}

@@ -263,7 +263,7 @@ void   CDuiFrameWnd::OnDeletePatientRet(int ret, DWORD dwId) {
 				pListElement = (DuiLib::CListTextElementUI*)m_lstPatients->GetItemAt(i);
 				assert(pListElement);
 				if (pListElement->GetTag() == dwId) {
-					m_lstPatients->RemoveAt(nSelIndex);
+					m_lstPatients->RemoveAt(i);
 					break;
 				}
 			}
@@ -271,6 +271,23 @@ void   CDuiFrameWnd::OnDeletePatientRet(int ret, DWORD dwId) {
 		
 		m_nLastInventoryRet_Patients = RET_FAIL;
 		memset(&m_LastInventoryRet_Patients, 0, sizeof(TagItem));
+
+		// 同步到查询面板
+		nSelIndex = m_lstPatients_1->GetCurSel();
+		int cnt = m_lstPatients_1->GetCount();
+		for (int i = 0; i < cnt; i++) {
+			pListElement = (DuiLib::CListTextElementUI*)m_lstPatients_1->GetItemAt(i);
+			assert(pListElement);
+			if (pListElement->GetTag() == dwId) {
+				m_lstPatients_1->RemoveAt(i);
+				// 需要更新查询界面
+				if (nSelIndex == i) {
+					m_lstPureData->RemoveAll();
+				}
+				break;
+			}
+		}
+		
 
 		::MessageBox(this->GetHWND(), "删除病人成功", "删除病人", 0);
 	}
@@ -825,8 +842,12 @@ void   CDuiFrameWnd::OnAddPatient() {
 	if (0 == ret && m_lstPatients) {
 		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
 		m_lstPatients->Add(pListElement);
-
 		AddPatientItem2List(pListElement, &pPatientDlg->m_tPatientInfo);
+
+		// 同步到查询面板
+		pListElement = new DuiLib::CListTextElementUI;
+		m_lstPatients_1->Add(pListElement);
+		AddPatientItem2List_1(pListElement, &pPatientDlg->m_tPatientInfo);
 	}
 
 	delete pPatientDlg;
@@ -877,6 +898,22 @@ void   CDuiFrameWnd::OnModifyPatient() {
 
 		m_nLastInventoryRet_Patients = RET_FAIL;
 		memset(&m_LastInventoryRet_Patients, 0, sizeof(TagItem));
+
+		// 同步到查询面板
+		int cnt = m_lstPatients_1->GetCount();
+		for (int i = 0; i < cnt; i++) {
+			pListElement = (DuiLib::CListTextElementUI*)m_lstPatients_1->GetItemAt(i);
+			assert(pListElement);
+			if (pListElement->GetTag() == pPatientDlg->m_tPatientInfo.dwId) {
+
+				pListElement->SetText(0, pPatientDlg->m_tPatientInfo.szName);
+				pListElement->SetText(1, pPatientDlg->m_tPatientInfo.szBedNo);
+				pListElement->SetText(2, pPatientDlg->m_tPatientInfo.dwTagsCnt > 0 ? "是" : "否");
+				pListElement->SetText(3, GetInHosStatus(pPatientDlg->m_tPatientInfo.bOutHos));
+
+				break;
+			}
+		}
 	}
 
 	delete pPatientDlg;
