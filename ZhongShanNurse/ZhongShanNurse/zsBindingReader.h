@@ -2,10 +2,11 @@
 
 #include <afxdb.h>
 #include "zsCommon.h"
+#include "LmnSerialPort.h"
 
 class CBusiness;
 
-class  CZsBindingReader {
+class  CZsBindingReader : public CLmnSerialPort {
 public:
 	CZsBindingReader(CBusiness * pBusiness);
 	~CZsBindingReader();
@@ -24,6 +25,20 @@ public:
 
 private:
 	void Clear();
+
+	// 协议部分
+	int   RequestPrepare();
+	int   ReadPrepareRet();
+
+	int   RequestBeep();
+	int   ReadBeepRet();
+
+	int   RequestInv();
+	int   ReadInvRet(TagItem * pId);
+
+	void  ReceiveAsPossible(DWORD  dwWaitTime, DWORD dwMaxDataLength = 0);
+
+	CDataBuf                  m_received_data;                // 从串口接收数据的缓冲区	
 
 	BINDING_STATUS      m_eStatus;
 
