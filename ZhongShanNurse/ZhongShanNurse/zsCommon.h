@@ -413,7 +413,7 @@ typedef struct tagQueryItem {
 // 温度贴数据
 typedef struct tagTagData {
 	time_t     tTime;                  // 时间
-	TagItem    tTagId;                 // id
+	//TagItem    tTagId;                 // id
 	DWORD      dwTemperature;          // 温度数据，如3500表示35.00
 }TagData;
 

@@ -5,6 +5,7 @@
 #include "PatientDlg.h"
 #include "NurseDlg.h"
 #include "LmnString.h"
+#include "TempChartUI.h"
 
 
 #define  TEMPERATURE_DATA_INDEX        0
@@ -94,6 +95,16 @@ void CMyProgress::Start() {
 
 
 
+
+
+
+DuiLib::CControlUI* CTempDataBuilderCallback0::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp("ChartImage", pstrClass)) {
+		return new CTempChartUI(); 
+	}
+	return 0;
+}
+
 // call back
 DuiLib::CControlUI* CTempDataBuilderCallback::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(PURE_DATA_CONTROL_ID, pstrClass)) {
@@ -103,12 +114,12 @@ DuiLib::CControlUI* CTempDataBuilderCallback::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(CURVE_CONTROL_ID, pstrClass)) {
 		DuiLib::CDialogBuilder builder;
-		DuiLib::CControlUI * pUI = builder.Create(_T(CURVE_FILE), (UINT)0, 0, m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T(CURVE_FILE), (UINT)0, &m_callback, m_PaintManager);
 		return pUI;
 	}
 	else if (0 == _stricmp("MyProgress", pstrClass)) {
 		return new CMyProgress( m_PaintManager, "progress_fore.png");
-	}
+	}	
 	return 0;
 }
 
@@ -788,6 +799,9 @@ void   CDuiFrameWnd::OnQueryRet(int nError, std::vector<QueryItem* > * pvRet) {
 
 	assert(pvRet);
 	if (pvRet->size() == 0) {
+		ClearVector(*pvRet);
+		delete pvRet;
+
 		MessageBox(this->GetHWND(), "查询结果OK，查询结果为空", "查询", 0);
 		return;
 	}
@@ -815,6 +829,73 @@ void   CDuiFrameWnd::OnQueryRet(int nError, std::vector<QueryItem* > * pvRet) {
 		pListElement->SetText(3, strText);
 	}
 
+	// 显示温度曲线
+	int nSelIndex = m_cmbTimeSpan->GetCurSel();
+	assert(nSelIndex >= 0 && nSelIndex < 4);
+
+	time_t tStartTime = SystemTime2Time( m_datQueryDatetime->GetTime() ); 
+
+	for ( int i = 0; i <= nSelIndex; i++ ) {
+		m_Chart[i]->SetVisible(true);
+		if (i > 0) {
+			m_ChartInterval[i]->SetVisible(true);
+		}
+		
+		time_t t1 = tStartTime + 3600 * 24 * 7 * i;		
+		m_Chart[i]->m_tFistDay = t1;
+
+		TagData arrTempData[7][6];
+		memset(arrTempData, 0, sizeof(arrTempData));
+		int nDayIndex = -1;
+		int nPointIndex = -1;
+		time_t tLastTime = 0;
+
+		for (it = pvRet->begin(); it != pvRet->end(); it++) {
+			QueryItem* pItem = *it;
+
+			if ( pItem->tTime < t1 ) {
+				continue;
+			}
+
+			int nCurDayIndex = int( (pItem->tTime - t1) / (3600 * 24) );
+			if (nCurDayIndex > 6) {
+				break;
+			}
+
+			assert(nCurDayIndex >= nDayIndex);
+			if (nCurDayIndex > nDayIndex) {
+				nDayIndex = nCurDayIndex;
+				nPointIndex = 0;
+				tLastTime = 0;
+			}
+
+			// 如果时间间隔大于5分钟
+			if ( tLastTime > 0 && pItem->tTime - tLastTime > 5 * 60 ) {
+				nPointIndex++;
+			}
+
+			if (nPointIndex > 5) {
+				continue;
+			}
+
+			arrTempData[nDayIndex][nPointIndex].dwTemperature = pItem->dwTemperature;
+			arrTempData[nDayIndex][nPointIndex].tTime = pItem->tTime;
+			tLastTime = pItem->tTime;
+			
+		}
+
+
+		m_Chart[i]->SetTempData(arrTempData);
+
+		m_Chart[i]->Invalidate();
+	}
+
+	for (int i = nSelIndex+1; i < 4; i++) {
+		m_Chart[i]->SetVisible(false);
+		m_ChartInterval[i]->SetVisible(false);
+	}
+
+	m_btnPrint->SetVisible(true);
 
 	if (pvRet) {
 		ClearVector(*pvRet);
@@ -1158,6 +1239,13 @@ void   CDuiFrameWnd::OnQuery() {
 
 	m_lstPureData->RemoveAll();
 
+	for (int i = 0; i < 4; i++) {
+		m_Chart[i]->SetVisible(false);
+		if ( i > 0 )
+			m_ChartInterval[i]->SetVisible(false);
+	}
+	m_btnPrint->SetVisible(false);
+
 	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstPatients_1->GetItemAt(nSelIndex);
 	DWORD  dwPatientId = pListElement->GetTag();
 
@@ -1168,6 +1256,62 @@ void   CDuiFrameWnd::OnQuery() {
 	assert(nTimeSpanIndex >= 0);
 
 	CBusiness::GetInstance()->QueryAync(dwPatientId, tTime, nTimeSpanIndex);
+}
+
+void CDuiFrameWnd::OnPrint() {
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	//PrintDlg(&printInfo);
+	if (PrintDlg(&printInfo) == TRUE)
+	{
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		CRect rect(10, 10, 960 + 1 + 10, 930 + 1 + 10);
+		CSize size = CSize(rect.Width() + 20, rect.Height() + 20);
+
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		StartDoc(printInfo.hDC, &di);     
+
+		for (int i = 0; i < 4; i++) {
+			if ( m_Chart[i]->IsVisible()) {
+				StartPage(printInfo.hDC);
+				m_Chart[i]->Print(pDC->m_hDC, rect, rect.Height());
+				EndPage(printInfo.hDC);
+			}
+		}
+
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+
+		//OnOK();
+	}
+
+
 }
 
 
@@ -1213,6 +1357,18 @@ void CDuiFrameWnd::InitWindow() {
 	m_lstPureData = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl(_T(PURE_DATA_LIST_ID)));
 	m_datQueryDatetime = static_cast<DuiLib::CDateTimeUI *>(m_PaintManager.FindControl(_T(QUERY_DATETIME_ID)));
 	m_cmbTimeSpan = static_cast<DuiLib::CComboUI *>(m_PaintManager.FindControl(_T(TIME_SPAN_COMBO_ID)));
+
+	m_Chart[0] = static_cast<CTempChartUI *>(m_PaintManager.FindControl("chart0"));
+	m_Chart[1] = static_cast<CTempChartUI *>(m_PaintManager.FindControl("chart1"));
+	m_Chart[2] = static_cast<CTempChartUI *>(m_PaintManager.FindControl("chart2"));
+	m_Chart[3] = static_cast<CTempChartUI *>(m_PaintManager.FindControl("chart3"));
+
+	m_ChartInterval[0] = 0;
+	m_ChartInterval[1] = m_PaintManager.FindControl("control_1");
+	m_ChartInterval[2] = m_PaintManager.FindControl("control_2");
+	m_ChartInterval[3] = m_PaintManager.FindControl("control_3");
+
+	m_btnPrint = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPrint"));
 
 	m_btnUpdate->SetEnabled(false);
 
@@ -1263,7 +1419,7 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 		DuiLib::CDialogBuilder builder;
 		DuiLib::CControlUI * pUI = builder.Create(_T(SYNCHRONIZE_FILE), (UINT)0, &m_Callback, &m_PaintManager);
 		return pUI;
-	}
+	}	
 	return 0;
 }
 
@@ -1374,6 +1530,9 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == QUERY_BUTTON_ID) {
 			OnQuery();
+		}
+		else if (name == "btnPrint") {
+			OnPrint();
 		}
 	}
 	else if (msg.sType == "itemactivate") {

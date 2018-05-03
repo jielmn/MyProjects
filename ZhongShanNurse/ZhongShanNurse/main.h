@@ -2,6 +2,7 @@
 
 #include "zsCommon.h"
 #include "UIlib.h"
+#include "TempChartUI.h"
 
 class CMyProgress : public DuiLib::CProgressUI
 {
@@ -19,6 +20,13 @@ private:
 	DuiLib::CDuiString        m_sForeImage;
 };
 
+class CTempDataBuilderCallback0 : public DuiLib::IDialogBuilderCallback
+{
+public:
+	virtual DuiLib::CControlUI* CreateControl(LPCTSTR pstrClass);
+
+	DuiLib::CPaintManagerUI*     m_PaintManager;
+};
 
 class CTempDataBuilderCallback : public DuiLib::IDialogBuilderCallback
 {
@@ -26,6 +34,8 @@ public:
 	virtual DuiLib::CControlUI* CreateControl(LPCTSTR pstrClass);
 
 	DuiLib::CPaintManagerUI*     m_PaintManager;
+private:
+	CTempDataBuilderCallback0    m_callback;
 };
 
 class CDuiFrameWnd : public DuiLib::WindowImplBase
@@ -85,6 +95,10 @@ private:
 	DuiLib::CDateTimeUI *      m_datQueryDatetime;
 	DuiLib::CComboUI *         m_cmbTimeSpan;
 
+	CTempChartUI*              m_Chart[4];
+	DuiLib::CControlUI *       m_ChartInterval[4];
+	DuiLib::CButtonUI *        m_btnPrint;
+
 private:
 	void  AddPatientItem2List( DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag = TRUE);
 	void  AddPatientItem2List_1(DuiLib::CListTextElementUI* pListElement, const PatientInfo * pPatient, BOOL bSetTag = TRUE);
@@ -121,6 +135,8 @@ private:
 	void   OnShortPatiensListItemChange();
 	// 查询 
 	void   OnQuery();
+	// print
+	void   OnPrint();
 
 	// 处理UM_MESSAGE
 	// 数据库连接上

@@ -1100,7 +1100,7 @@ int CZsDatabase::Query(const CQueryParam * pParam, std::vector<QueryItem* > & vR
 	try
 	{
 		strSql.Format("SELECT c.name, a.reader_id, a.gen_time, a.temp_data FROM %s a inner join %s b on a.patient_id = b.str_id"
-			          " inner join %s c on a.nurse_id = c.str_id WHERE b.id = %lu AND a.gen_time >= '%s' AND a.gen_time < '%s' ", 
+			          " inner join %s c on a.nurse_id = c.str_id WHERE b.id = %lu AND a.gen_time >= '%s' AND a.gen_time < '%s' ORDER BY a.gen_time  ", 
 			           TEMPERATURE_TABLE_NAME, PATIENTS_TABLE_NAME, NURSES_TABLE_NAME, pParam->m_dwPatientId, szStart, szEnd );
 
 		m_recordset.Open(CRecordset::forwardOnly, strSql, CRecordset::readOnly);
