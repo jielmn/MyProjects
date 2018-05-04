@@ -1,0 +1,1 @@
+create table agencies ( id int not null primary key, str_id varchar(32) not null unique, name varchar(64) not null, province varchar(32) not null );

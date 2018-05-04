@@ -2,7 +2,7 @@
 <Window>	
 	<VerticalLayout inset="1,1,1,1"   >		
 		<HorizontalLayout  >
-			<List name="agency_list" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="0" itemfont="3" itemtextcolor="#FF386382" >
+			<List name="agency_list" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="0" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
 				<ListHeader height="24" menu="true">
 					<ListHeaderItem text="编号"      font="3" width="200"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					<ListHeaderItem text="名称"      font="3" width="400"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>

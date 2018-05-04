@@ -144,6 +144,33 @@ int  CBusiness::GetAllAgency() {
 	return 0;
 }
 
+// 修改经销商
+int  CBusiness::ModifyAgencyAsyn(const AgencyItem * pItem) {
+	m_thrd_db.PostMessage(this, MSG_MODIFY_AGENCY, new CAgencyParam(pItem));
+	return 0;
+}
+
+int  CBusiness::ModifyAgency(const CAgencyParam * pParam) {
+	int ret = m_db.ModifyAgency(pParam);
+	m_sigModifyAgency.emit(ret);
+	return 0;
+}
+
+// 删除经销商
+int  CBusiness::DeleteAgencyAsyn(DWORD  dwAgentId) {
+	m_thrd_db.PostMessage(this, MSG_DELETE_AGENCY, new CAgencyParam(dwAgentId));
+	return 0;
+}
+
+int  CBusiness::DeleteAgency(const CAgencyParam * pParam ) {
+	int ret = m_db.DeleteAgency(pParam);
+	m_sigDeleteAgency.emit(ret, pParam->m_tAgency.dwId);
+	return 0;
+}
+
+
+
+
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
@@ -171,6 +198,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_GET_ALL_AGENCY:
 	{
 		GetAllAgency();
+	}
+	break;
+
+	case MSG_MODIFY_AGENCY:
+	{
+		CAgencyParam * pParam = (CAgencyParam *)pMessageData;
+		ModifyAgency(pParam);
+	}
+	break;
+
+	case MSG_DELETE_AGENCY:
+	{
+		CAgencyParam * pParam = (CAgencyParam *)pMessageData;
+		DeleteAgency(pParam);
 	}
 	break;
 

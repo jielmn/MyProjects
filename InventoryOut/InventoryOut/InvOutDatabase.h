@@ -23,6 +23,12 @@ public:
 	// 获取所有的经销商
 	int  GetAllAgency( std::vector<AgencyItem *> & vRet );
 
+	// 修改经销商
+	int  ModifyAgency(const CAgencyParam * pParam);
+
+	// 删除经销商
+	int  DeleteAgency(const CAgencyParam * pParam);
+
 private:
 	
 

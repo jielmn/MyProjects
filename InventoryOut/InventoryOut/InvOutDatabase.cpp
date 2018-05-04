@@ -147,6 +147,73 @@ int  CInvoutDatabase::GetAllAgency(std::vector<AgencyItem *> & vRet) {
 	}
 	catch (CLmnOdbcException e)
 	{
+		const char * pStatus = GetSysStatus(); 
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	return ret;
+}
+
+// 修改经销商
+int  CInvoutDatabase::ModifyAgency(const CAgencyParam * pParam) {
+	if (GetStatus() == STATUS_CLOSE) {
+		return CLmnOdbc::ERROR_DISCONNECTED;
+	}
+
+	char sql[8192];
+
+	AgencyItem   tAgency;
+	String2SqlValue(tAgency.szName, sizeof(tAgency.szName), pParam->m_tAgency.szName);
+	String2SqlValue(tAgency.szProvince, sizeof(tAgency.szProvince), pParam->m_tAgency.szProvince);
+	tAgency.dwId = pParam->m_tAgency.dwId;
+
+	SNPRINTF(sql, sizeof(sql), "UPDATE  %s set name='%s', province='%s' WHERE id = %lu ", AGENCY_TABLE_NAME, tAgency.szName, tAgency.szProvince, tAgency.dwId );
+
+	int ret = -1;
+	try
+	{
+		Execute(sql);
+		ret = 0;
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	return ret;
+}
+
+// 删除经销商
+int  CInvoutDatabase::DeleteAgency(const CAgencyParam * pParam) {
+	if (GetStatus() == STATUS_CLOSE) {
+		return CLmnOdbc::ERROR_DISCONNECTED;
+	}
+
+	char sql[8192];
+
+	SNPRINTF(sql, sizeof(sql), "DELETE FROM  %s WHERE id = %lu ", AGENCY_TABLE_NAME, pParam->m_tAgency.dwId );
+
+	int ret = -1;
+	try
+	{
+		Execute(sql);
+		ret = 0;
+	}
+	catch (CLmnOdbcException e)
+	{
 		const char * pStatus = GetSysStatus();
 		if (0 == strcmp(pStatus, "23000")) {
 			ret = InvOutDbErr_Integrity_constraint_violation;

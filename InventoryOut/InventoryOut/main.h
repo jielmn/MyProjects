@@ -33,6 +33,9 @@ private:
 	void  OnGetAllAgency(int, const std::vector<AgencyItem *> &);
 	void  OnGetAllAgencyMsg(int, const std::vector<AgencyItem *> &);
 
+	void  OnDeleteAgencyRet(int, DWORD);
+	void  OnDeleteAgencyMsg(int, DWORD);
+
 private:
 	void  AddAgencyItem2List(DuiLib::CListTextElementUI* pListElement, AgencyItem * pItem, BOOL bSetTag = TRUE);
 	void  OnAddAgency();

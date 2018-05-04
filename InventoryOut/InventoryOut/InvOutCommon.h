@@ -13,6 +13,8 @@
 #define  MSG_LOGIN                      2
 #define  MSG_ADD_AGENCY                 3
 #define  MSG_GET_ALL_AGENCY             4
+#define  MSG_MODIFY_AGENCY              5
+#define  MSG_DELETE_AGENCY              6
 
 #define  RECONNECT_DB_TIME              10000
 
@@ -20,6 +22,8 @@
 #define  UM_LOGIN_RET                   (WM_USER+2)
 #define  UM_ADD_AGENCY_RET              (WM_USER+3)
 #define  UM_GET_ALL_AGENCY_RET          (WM_USER+4)
+#define  UM_MODIFY_AGENCY_RET           (WM_USER+5)
+#define  UM_DELETE_AGENCY_RET           (WM_USER+6)
 
 
 class CLoginParam : public LmnToolkits::MessageData {
@@ -45,6 +49,11 @@ class CAgencyParam : public LmnToolkits::MessageData {
 public:
 	CAgencyParam(const AgencyItem * pItem) {
 		memcpy(&m_tAgency, pItem, sizeof(AgencyItem));
+	}
+
+	CAgencyParam(DWORD dwId) {
+		memset(&m_tAgency, 0, sizeof(AgencyItem));
+		m_tAgency.dwId = dwId;
 	}
 
 	AgencyItem   m_tAgency;

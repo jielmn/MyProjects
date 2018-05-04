@@ -9,9 +9,66 @@
 #include "LoginDlg.h"
 #include "AgencyDlg.h"
 
+
+
+// menu
+class CDuiMenu : public DuiLib::WindowImplBase
+{
+protected:
+	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
+	DuiLib::CDuiString  m_strXMLPath;
+	DuiLib::CControlUI * m_pOwner;
+
+public:
+	explicit CDuiMenu(LPCTSTR pszXMLPath, DuiLib::CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
+	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
+	virtual DuiLib::CDuiString GetSkinFolder() { return _T(""); }
+	virtual DuiLib::CDuiString GetSkinFile() { return m_strXMLPath; }
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
+
+	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		Close();
+		bHandled = FALSE;
+		return 0;
+	}
+
+	void Init(HWND hWndParent, POINT ptPos)
+	{
+		Create(hWndParent, _T("MenuWnd"), UI_WNDSTYLE_FRAME, WS_EX_WINDOWEDGE);
+		::ClientToScreen(hWndParent, &ptPos);
+		::SetWindowPos(*this, NULL, ptPos.x, ptPos.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+
+	virtual void  Notify(DuiLib::TNotifyUI& msg) {
+		if (msg.sType == "itemclick") {
+			if (m_pOwner) {
+				m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), 0, 0, true);
+			}
+			return;
+		}
+		WindowImplBase::Notify(msg);
+	}
+
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		return __super::HandleMessage(uMsg, wParam, lParam);
+	}
+};
+
+
+
+
+
+
+
+
+
+
 CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigStatusChange.connect(this, &CDuiFrameWnd::OnDbStatusChange);
 	CBusiness::GetInstance()->m_sigGetAllAgency.connect(this, &CDuiFrameWnd::OnGetAllAgency);
+	CBusiness::GetInstance()->m_sigDeleteAgency.connect(this, &CDuiFrameWnd::OnDeleteAgencyRet);
 }
 
 void  CDuiFrameWnd::InitWindow() {
@@ -60,6 +117,42 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			OnDeleteAgency();
 		}
 	}
+	else if (msg.sType == "itemactivate") {
+		DuiLib::CControlUI * pParent = msg.pSender->GetParent();
+		if ( pParent ) {
+			pParent = pParent->GetParent();
+			if (pParent) {
+				if (pParent->GetName() == "agency_list") {
+					OnModifyAgency();
+				}
+			}
+		}
+
+	} 
+	else if (msg.sType == _T("menu"))
+	{
+		POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+		DuiLib::CControlUI * pControl = m_PaintManager.FindControl(pt);
+		if (0 == pControl) {
+			return;
+		}
+
+		DuiLib::CDuiString sFindCtlClass = pControl->GetClass();
+		if (sFindCtlClass == "ListTextElement") {
+			DuiLib::CDuiString sListName = pControl->GetParent()->GetParent()->GetName();
+			if (sListName == "agency_list") {
+				CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+				pMenu->Init(*this, pt);
+				pMenu->ShowWindow(TRUE);
+			}
+		}
+	}
+	else if (msg.sType == "menu_modify_agent") {
+		OnModifyAgency();
+	}
+	else if (msg.sType == "menu_delete_agent") {
+		OnDeleteAgency();
+	}
 
 	DuiLib::WindowImplBase::Notify(msg);
 }
@@ -90,6 +183,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			ClearVector(*pvRet);
 			delete pvRet;
 		}
+	}
+	else if (UM_DB_STATUS == uMsg) {
+		OnDbStatusChangeMsg( (CLmnOdbc::DATABASE_STATUS)wParam );
+	}
+	else if (UM_DELETE_AGENCY_RET == uMsg) {
+		OnDeleteAgencyMsg(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -136,6 +235,26 @@ void  CDuiFrameWnd::OnGetAllAgencyMsg(int ret, const std::vector<AgencyItem *> &
 	}
 }
 
+void  CDuiFrameWnd::OnDeleteAgencyRet(int ret, DWORD dwId) {
+	::PostMessage(GetHWND(), UM_DELETE_AGENCY_RET, ret, dwId);
+}
+
+void  CDuiFrameWnd::OnDeleteAgencyMsg(int  ret, DWORD dwId) {
+	if (0 == ret) {
+		int nCnt = m_lstAgencies->GetCount();
+		for (int i = 0; i < nCnt; i++) {
+			DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI* )m_lstAgencies->GetItemAt(i);
+			if (pListElement->GetTag() == dwId) {
+				m_lstAgencies->Remove(pListElement);
+				break;
+			}
+		}
+	}
+	else {
+		::MessageBox(GetHWND(), GetErrorDescription(ret), "删除经销商", 0);
+	}
+}
+
 
 
 
@@ -173,30 +292,39 @@ void  CDuiFrameWnd::OnModifyAgency() {
 		return;
 	}
 
-	//CAgencyWnd * pDlg = new CAgencyWnd;
+	CAgencyWnd * pDlg = new CAgencyWnd(FALSE);
 
-	//DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstAgencies->GetItemAt(nSelIndex);
-	//STRNCPY(pDlg->m_tAgency.szId,   pListElement->GetText(0), sizeof(pDlg->m_tAgency.szId));
-	//STRNCPY(pDlg->m_tAgency.szName, pListElement->GetText(0), sizeof(pDlg->m_tAgency.szName));
-	//STRNCPY(pDlg->m_tAgency.szId,   pListElement->GetText(0), sizeof(pDlg->m_tAgency.szId));
+	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstAgencies->GetItemAt(nSelIndex);
+	STRNCPY(pDlg->m_tAgency.szId,         pListElement->GetText(0), sizeof(pDlg->m_tAgency.szId));
+	STRNCPY(pDlg->m_tAgency.szName,       pListElement->GetText(1), sizeof(pDlg->m_tAgency.szName));
+	STRNCPY(pDlg->m_tAgency.szProvince,   pListElement->GetText(2), sizeof(pDlg->m_tAgency.szProvince));
+	pDlg->m_tAgency.dwId = pListElement->GetTag();
 
-	//pDlg->Create(this->m_hWnd, _T("新增经销商信息"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
-	//pDlg->CenterWindow();
-	//int ret = pDlg->ShowModal();
+	pDlg->Create(this->m_hWnd, _T("修改经销商信息"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
 
-	//// 如果添加成功
-	//if (0 == ret) {
-	//	DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
-	//	m_lstAgencies->Add(pListElement);
+	// 如果修改成功
+	if (0 == ret) {
+		pListElement->SetText(1, pDlg->m_tAgency.szName);
+		pListElement->SetText(2, pDlg->m_tAgency.szProvince);
+	}
 
-	//	AddAgencyItem2List(pListElement, &pDlg->m_tAgency);
-	//}
-
-	//delete pDlg;
+	delete pDlg;
 }
 
 void  CDuiFrameWnd::OnDeleteAgency() {
+	int nSelIndex = m_lstAgencies->GetCurSel();
+	if (nSelIndex < 0) {
+		return;
+	}
 
+	DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstAgencies->GetItemAt(nSelIndex);
+	assert(pListElement);
+
+	if ( ::MessageBox(GetHWND(), "确定要删除吗？", "删除经销商", MB_YESNO | MB_DEFBUTTON2) == IDYES ) {
+		CBusiness::GetInstance()->DeleteAgencyAsyn(pListElement->GetTag());
+	}
 }
 
 
