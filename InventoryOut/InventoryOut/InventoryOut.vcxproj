@@ -165,6 +165,7 @@
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="TargetDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AgencyDlg.cpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="InvOutDatabase.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TargetDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="InventoryOut.rc" />

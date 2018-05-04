@@ -15,6 +15,8 @@
 #define  MSG_GET_ALL_AGENCY             4
 #define  MSG_MODIFY_AGENCY              5
 #define  MSG_DELETE_AGENCY              6
+#define  MSG_GET_ALL_SALES              7
+#define  MSG_GET_ALL_AGENCY_FOR_TARGET  8
 
 #define  RECONNECT_DB_TIME              10000
 
@@ -24,7 +26,12 @@
 #define  UM_GET_ALL_AGENCY_RET          (WM_USER+4)
 #define  UM_MODIFY_AGENCY_RET           (WM_USER+5)
 #define  UM_DELETE_AGENCY_RET           (WM_USER+6)
+#define  UM_GET_ALL_SALES               (WM_USER+7)
 
+
+
+#define TARGET_TYPE_SALES              0
+#define TARGET_TYPE_AGENCIES           1
 
 class CLoginParam : public LmnToolkits::MessageData {
 public:
@@ -58,6 +65,11 @@ public:
 
 	AgencyItem   m_tAgency;
 };
+
+typedef struct tagSaleStaff {
+	char    szId[128];
+	char    szName[128];	
+}SaleStaff;
 
 
 

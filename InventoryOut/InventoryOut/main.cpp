@@ -8,7 +8,7 @@
 #include "resource.h"
 #include "LoginDlg.h"
 #include "AgencyDlg.h"
-
+#include "TargetDlg.h"
 
 
 // menu
@@ -77,6 +77,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblDbStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblDbStatus"));
 	m_lstAgencies = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("agency_list"));
 
+	m_optSales = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl("optSales"));
+	m_edTarget = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtInvTarget"));
+
 	CInvoutDatabase::DATABASE_STATUS eStatus = CBusiness::GetInstance()->GetDbStatus();
 	if (eStatus == CLmnOdbc::STATUS_OPEN) {
 		m_lblDbStatus->SetText("数据库连接OK");
@@ -105,6 +108,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		else if (name == _T("Query")) { 
 			m_tabs->SelectItem(2);
 		}
+		else if (name == "optSales" || name == "optAgent" ) {
+			m_edTarget->SetText("");
+		}
 	}
 	else if (msg.sType == "click") {
 		if (name == "btnAddAgency") {
@@ -115,6 +121,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnDelAgency") {
 			OnDeleteAgency();
+		}
+		else if (name == "btnTarget") {
+			OnSelectTarget();
 		}
 	}
 	else if (msg.sType == "itemactivate") {
@@ -135,7 +144,7 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		DuiLib::CControlUI * pControl = m_PaintManager.FindControl(pt);
 		if (0 == pControl) {
 			return;
-		}
+		}                                                 
 
 		DuiLib::CDuiString sFindCtlClass = pControl->GetClass();
 		if (sFindCtlClass == "ListTextElement") {
@@ -327,6 +336,32 @@ void  CDuiFrameWnd::OnDeleteAgency() {
 	}
 }
 
+void  CDuiFrameWnd::OnSelectTarget() {
+	int nTargetType = 0;
+	if ( m_optSales->IsSelected() ) {
+		nTargetType = TARGET_TYPE_SALES;
+	}
+	else {
+		nTargetType = TARGET_TYPE_AGENCIES;
+	}
+
+	CTargetDlg * pDlg = new CTargetDlg(nTargetType);
+
+	pDlg->Create(this->m_hWnd, _T("目标"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+
+	DuiLib::CDuiString  strText;
+	if (0 == ret) {
+		strText = pDlg->m_strId;
+		strText += ",";
+		strText += pDlg->m_strName;
+
+		m_edTarget->SetText(strText);
+	}
+
+	delete pDlg;                
+}
 
 
 

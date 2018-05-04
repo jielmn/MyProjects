@@ -41,13 +41,24 @@ public:
 	int  DeleteAgencyAsyn(DWORD  dwAgentId);
 	int  DeleteAgency(const CAgencyParam * pParam);
 
+	// 获取所有的销售
+	int  GetAllSalesAsyn();
+	int  GetAllSales();
+
+	// 获取所有经销商
+	int  GetAllAgencyForTargetAsyn();
+	int  GetAllAgencyForTarget();
+
 public:
 	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>                     m_sigStatusChange;
 	sigslot::signal1<int>                                           m_sigLoginRet;
 	sigslot::signal2<int, DWORD>                                    m_sigAddAgency;
 	sigslot::signal2<int, const std::vector<AgencyItem *> & >       m_sigGetAllAgency;
+	sigslot::signal2<int, const std::vector<AgencyItem *> & >       m_sigGetAllAgencyForTarget;
 	sigslot::signal1<int>                                           m_sigModifyAgency;
 	sigslot::signal2<int, DWORD>                                    m_sigDeleteAgency;
+
+	sigslot::signal2<int, const std::vector<SaleStaff *> & >        m_sigGetAllSaleStaff;
 
 private:
 	static CBusiness *  pInstance;

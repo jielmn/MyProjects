@@ -85,6 +85,11 @@ void  CAgencyWnd::OnAgencyOk() {
 		return;
 	}
 
+	if ( strId.Find(',') >= 0 ) {
+		::MessageBox(GetHWND(), "±àºÅ²»ÄÜº¬ÓÐ','", strTitle, 0);
+		return;
+	}
+
 	strProvince = m_cmbProvince->GetText();
 
 	STRNCPY(m_tAgency.szId,           strId,          sizeof(m_tAgency.szId));

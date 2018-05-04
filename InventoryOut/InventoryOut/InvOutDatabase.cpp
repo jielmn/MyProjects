@@ -5,6 +5,7 @@
 #pragma comment(lib, "crypt32.lib")
 
 #define  AGENCY_TABLE_NAME          "agencies"
+#define  STAFF_TABLE_NAME           "staff"
 
 CInvoutDatabase::CInvoutDatabase() {
 	
@@ -210,6 +211,53 @@ int  CInvoutDatabase::DeleteAgency(const CAgencyParam * pParam) {
 	try
 	{
 		Execute(sql);
+		ret = 0;
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	return ret;
+}
+
+
+// 获取所有的销售
+int  CInvoutDatabase::GetAllSales(std::vector<SaleStaff *> & vRet) {
+	if (GetStatus() == STATUS_CLOSE) {
+		return CLmnOdbc::ERROR_DISCONNECTED;
+	}
+
+	char sql[8192];
+	BOOL  bNull = FALSE;
+
+	int ret = -1;
+	SNPRINTF(sql, sizeof(sql), "SELECT stfid, stfname FROM %s ", STAFF_TABLE_NAME);
+
+	try
+	{
+		OpenRecordSet(sql);
+
+		while (MoveNext()) {
+
+			SaleStaff * pItem = new SaleStaff;
+			memset(pItem, 0, sizeof(SaleStaff));
+
+			GetFieldValue(1, pItem->szId,   sizeof(pItem->szId),   &bNull);
+			GetFieldValue(2, pItem->szName, sizeof(pItem->szName), &bNull);
+
+			vRet.push_back(pItem);
+		}
+
+		CloseRecordSet();
+
 		ret = 0;
 	}
 	catch (CLmnOdbcException e)

@@ -1,7 +1,7 @@
 #pragma once
 #include "UIlib.h"
 #include "sigslot.h"
-#include "InvOutDatabase.h"
+#include "InvOutCommon.h"
 
 class CAgencyWnd : public DuiLib::WindowImplBase, public sigslot::has_slots<>
 {

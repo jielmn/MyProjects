@@ -144,6 +144,19 @@ int  CBusiness::GetAllAgency() {
 	return 0;
 }
 
+int  CBusiness::GetAllAgencyForTargetAsyn() {
+	m_thrd_db.PostMessage(this, MSG_GET_ALL_AGENCY_FOR_TARGET);
+	return 0;
+}
+
+int  CBusiness::GetAllAgencyForTarget() {
+	std::vector<AgencyItem *> vRet;
+	int ret = m_db.GetAllAgency(vRet);
+	m_sigGetAllAgencyForTarget.emit(ret, vRet);
+	ClearVector(vRet);
+	return 0;
+}
+
 // 修改经销商
 int  CBusiness::ModifyAgencyAsyn(const AgencyItem * pItem) {
 	m_thrd_db.PostMessage(this, MSG_MODIFY_AGENCY, new CAgencyParam(pItem));
@@ -165,6 +178,22 @@ int  CBusiness::DeleteAgencyAsyn(DWORD  dwAgentId) {
 int  CBusiness::DeleteAgency(const CAgencyParam * pParam ) {
 	int ret = m_db.DeleteAgency(pParam);
 	m_sigDeleteAgency.emit(ret, pParam->m_tAgency.dwId);
+	return 0;
+}
+
+// 获取所有的销售
+int  CBusiness::GetAllSalesAsyn() {
+	m_thrd_db.PostMessage(this, MSG_GET_ALL_SALES);
+	return 0;
+}
+
+int  CBusiness::GetAllSales() {
+	std::vector<SaleStaff *> vRet;
+	int ret = m_db.GetAllSales(vRet );
+
+	m_sigGetAllSaleStaff.emit(ret, vRet);
+
+	ClearVector(vRet);
 	return 0;
 }
 
@@ -212,6 +241,18 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAgencyParam * pParam = (CAgencyParam *)pMessageData;
 		DeleteAgency(pParam);
+	}
+	break;
+
+	case MSG_GET_ALL_SALES:
+	{
+		GetAllSales();
+	}
+	break;
+
+	case MSG_GET_ALL_AGENCY_FOR_TARGET:
+	{
+		GetAllAgencyForTarget();
 	}
 	break;
 

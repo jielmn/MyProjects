@@ -29,6 +29,9 @@ public:
 	// 删除经销商
 	int  DeleteAgency(const CAgencyParam * pParam);
 
+	// 获取所有的销售
+	int  GetAllSales( std::vector<SaleStaff *> & vRet );
+
 private:
 	
 

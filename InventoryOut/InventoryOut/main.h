@@ -26,6 +26,10 @@ private:
 	DuiLib::CLabelUI *            m_lblDbStatus;
 	DuiLib::CListUI *             m_lstAgencies;
 
+	// ел╣Ц
+	DuiLib::COptionUI *           m_optSales;
+	DuiLib::CEditUI *             m_edTarget;
+
 private:
 	void  OnDbStatusChange(CLmnOdbc::DATABASE_STATUS eNewStatus);
 	void  OnDbStatusChangeMsg(CLmnOdbc::DATABASE_STATUS eNewStatus);
@@ -41,4 +45,5 @@ private:
 	void  OnAddAgency();
 	void  OnModifyAgency();
 	void  OnDeleteAgency();
+	void  OnSelectTarget();
 };

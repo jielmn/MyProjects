@@ -1,7 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
 	<VerticalLayout inset="1,1,1,1"   >		
-		<Label text="出库" />
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout inset="10,5,10,5" height="40" >
+			<Label text="出库目标：" width="100" font="3" textcolor="#FF386382"  />
+			<Option text="销售" width="60" name="optSales" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="target" selected="true" />
+			<Control width="10" />
+			<Option text="经销商" width="80" name="optAgent" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="target" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout inset="10,5,10,5" height="40" >
+			<Label text="" width="100" font="3" textcolor="#FF386382"  />
+			<Edit name="edtInvTarget" font="3" textcolor="#FF386382" width="240" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
+			<Control width="10" />
+			<Button name="btnTarget" text="选择" font="3" textcolor="#FF386382" width = "60" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout inset="10,5,10,5"  >
+			<VerticalLayout height="30" width="100" >
+				<Label text="出库列表" font="3" textcolor="#FF386382"  />
+			</VerticalLayout>			
+			
+			<VerticalLayout width="341" >
+				<List name="inv_list" bkcolor="#FFCCCCCC" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="0" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
+					<ListHeader height="24" menu="true">
+						<ListHeaderItem text="类型"      font="3" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="编号"      font="3" width="240"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					</ListHeader>
+				</List>				
+				<Control height="10" />
+				<HorizontalLayout height="30" >
+					<Edit name="edtPackageId" font="3" textcolor="#FF386382" width="260" bordercolor="#FF768D9B" bordersize="1" />
+					<Control width="10" />
+					<Button name="btnAddList" text="添加" font="3" textcolor="#FF386382" width = "60" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+				</HorizontalLayout>
+				
+				<Control height="10" />
+				
+				<HorizontalLayout height="30" >
+					<Label text="大包装个数：" font="3" textcolor="#FF386382" width="150" />
+					<Label text="0" font="3" textcolor="#FF386382" />
+				</HorizontalLayout>
+				<HorizontalLayout height="30" >
+					<Label text="小包装个数：" font="3" textcolor="#FF386382" width="150" />
+					<Label text="0" font="3" textcolor="#FF386382" />
+				</HorizontalLayout>
+			</VerticalLayout>
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout inset="10,5,10,5" height="60" width="440" >
+			<Control />
+			<Button name="btnInvOk" text="确定出库" font="3" textcolor="#FF386382" width = "100" normalimage="file='baidu_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='baidu_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='baidu_button_pushed.png' corner='5,5,5,5' hole='false' " disabledimage="file='baidu_button_disabled.png' corner='5,5,5,5' hole='false' " />
+			<Control />
+		</HorizontalLayout>
 		
 		
 	</VerticalLayout>
