@@ -36,7 +36,8 @@
 				<Option width="100" height="80" name="Agency"          text="经销商" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='agency.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
 				<Option width="100" height="80" name="Query"           text="查询" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='query.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
 				<Control />
-				<Label  width="280" height="80" name="lblUser" text="欢迎您" textcolor="#FF386382" font="2" />
+				<Label  width="100" height="80" text="欢迎您，" textcolor="#FF386382" font="2" />
+				<Label  width="100" height="80" name="lblUser" text="" textcolor="#FF386382" font="2" />
 			</HorizontalLayout>
 			
 			<HorizontalLayout height="5" />

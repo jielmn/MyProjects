@@ -3,6 +3,7 @@
 #include "LmnThread.h"
 #include "InvOutCommon.h"
 #include "InvOutDatabase.h"
+#include "UIlib.h"
 
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
@@ -38,7 +39,7 @@ public:
 	int  ModifyAgency(const CAgencyParam * pParam);
 
 	// 删除经销商
-	int  DeleteAgencyAsyn(DWORD  dwAgentId);
+	int  DeleteAgencyAsyn(DWORD  dwAgentId, const char * szAgentId);
 	int  DeleteAgency(const CAgencyParam * pParam);
 
 	// 获取所有的销售
@@ -48,6 +49,13 @@ public:
 	// 获取所有经销商
 	int  GetAllAgencyForTargetAsyn();
 	int  GetAllAgencyForTarget();
+
+	// 设置定时器
+	int   SetTimerAsyn(DWORD dwTimerId, DWORD dwDelayTime);
+	int   NotifyUiTimer(DWORD dwTimerId);
+
+	int   SaveInvOutAsyn(int nTargetType, const DuiLib::CDuiString & strTargetId, const std::vector<DuiLib::CDuiString *> & vBig, const std::vector<DuiLib::CDuiString *> & vSmall);
+	int   SaveInvOut( const CSaveInvOutParam * pParam );
 
 public:
 	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>                     m_sigStatusChange;
@@ -60,6 +68,9 @@ public:
 
 	sigslot::signal2<int, const std::vector<SaleStaff *> & >        m_sigGetAllSaleStaff;
 
+	sigslot::signal1<DWORD>                                         m_sigTimer;
+	sigslot::signal1<int>                                           m_sigSaveInvOutRet;
+
 private:
 	static CBusiness *  pInstance;
 
@@ -71,10 +82,15 @@ private:
 
 private:
 	LmnToolkits::Thread   m_thrd_db;
+	LmnToolkits::Thread   m_thrd_timer;
 
 private:
 	CInvoutDatabase       m_db;
 	char                  m_szOdbcString[256];
+	DuiLib::CDuiString    m_strLoginId;
+
+public:
+	DuiLib::CDuiString    m_strLoginName;
 };
 
 

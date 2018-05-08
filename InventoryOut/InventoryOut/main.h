@@ -22,6 +22,8 @@ public:
 
 private:
 	
+	DuiLib::CLabelUI *           m_lblLoginUser;
+
 	DuiLib::CTabLayoutUI *        m_tabs;
 	DuiLib::CLabelUI *            m_lblDbStatus;
 	DuiLib::CListUI *             m_lstAgencies;
@@ -29,6 +31,10 @@ private:
 	// 盘点
 	DuiLib::COptionUI *           m_optSales;
 	DuiLib::CEditUI *             m_edTarget;
+	DuiLib::CListUI *             m_lstPackages;
+	DuiLib::CLabelUI *            m_lblSmallCnt;
+	DuiLib::CLabelUI *            m_lblBigCnt;
+	DuiLib::CEditUI *             m_edPackageId;
 
 private:
 	void  OnDbStatusChange(CLmnOdbc::DATABASE_STATUS eNewStatus);
@@ -40,10 +46,34 @@ private:
 	void  OnDeleteAgencyRet(int, DWORD);
 	void  OnDeleteAgencyMsg(int, DWORD);
 
+	void  OnTimerRet(DWORD);
+	void  OnTimerMsg(DWORD);
+
+	void  OnSaveInvOutRet(int);
+	void  OnSaveInvOutMsg(int);
+
 private:
 	void  AddAgencyItem2List(DuiLib::CListTextElementUI* pListElement, AgencyItem * pItem, BOOL bSetTag = TRUE);
 	void  OnAddAgency();
 	void  OnModifyAgency();
 	void  OnDeleteAgency();
 	void  OnSelectTarget();
+
+	// 盘点收到char
+	void OnInvOutChar(char ch);
+	int  OnInvOutBarCode(const DuiLib::CDuiString & strBarCode);
+	
+	// 清空盘点列表
+	void OnClearInvList();
+	// 添加条码
+	void OnAddPackage();
+	// 
+	void OnInvOk();
+
+private:
+	DuiLib::CDuiString                 m_strInvOutBuf;                      // 盘点字符的缓冲
+	int                                m_nSmallCount;
+	int                                m_nBigCount;
+
+	void  ClearInvOut();
 };

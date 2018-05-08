@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <time.h>
 #include "InvOutCommon.h"
 #include "LmnOdbc.h"
 #include "InvOutDatabase.h"
@@ -126,6 +127,14 @@ const char * GetErrorDescription(int ret) {
 		szRet = "违反唯一约束条件";
 		break;
 
+	case CInvoutDatabase::InvOutDbErr_Not_found:
+		szRet = "记录不存在数据库";
+		break;
+
+	case CInvoutDatabase::InvOutDbErr_Cannt_delete_foreign_key:
+		szRet = "由于外键约束，删除失败";
+		break;
+
 	case -1:
 		szRet = "未知错误";
 		break;
@@ -135,4 +144,39 @@ const char * GetErrorDescription(int ret) {
 	}
 
 	return szRet;
+}
+
+
+
+CSaveInvOutParam::CSaveInvOutParam( int nTargetType, const DuiLib::CDuiString & strTargetId, const DuiLib::CDuiString & strOperatorId, 
+	                                const std::vector<DuiLib::CDuiString *> & vBig, const std::vector<DuiLib::CDuiString *> & vSmall ) {
+	m_nTargetType = nTargetType;
+	m_strTargetId = strTargetId;
+	m_strOperatorId = strOperatorId;
+
+	std::vector<DuiLib::CDuiString *>::const_iterator it;
+	for (it = vBig.begin(); it != vBig.end(); it++) {
+		DuiLib::CDuiString * pStr = *it;
+		DuiLib::CDuiString * pNewStr = new DuiLib::CDuiString(*pStr);
+		m_vBig.push_back(pNewStr);
+	}
+
+	for (it = vSmall.begin(); it != vSmall.end(); it++) {
+		DuiLib::CDuiString * pStr = *it;
+		DuiLib::CDuiString * pNewStr = new DuiLib::CDuiString(*pStr);
+		m_vSmall.push_back(pNewStr);
+	}
+}
+
+CSaveInvOutParam::~CSaveInvOutParam() {
+	ClearVector(m_vBig);
+	ClearVector(m_vSmall);
+}
+
+char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d-%02d-%02d %02d:%02d:%02d", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
+	return szDest;
 }

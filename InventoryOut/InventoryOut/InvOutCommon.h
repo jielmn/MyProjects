@@ -6,7 +6,7 @@
 #include "LmnLog.h"
 #include "LmnThread.h"
 #include "LmnString.h"
-
+#include "UIlib.h"
 
 
 #define  MSG_RECONNECT_DB               1
@@ -17,6 +17,7 @@
 #define  MSG_DELETE_AGENCY              6
 #define  MSG_GET_ALL_SALES              7
 #define  MSG_GET_ALL_AGENCY_FOR_TARGET  8
+#define  MSG_SAVE_INV_OUT               9
 
 #define  RECONNECT_DB_TIME              10000
 
@@ -27,11 +28,23 @@
 #define  UM_MODIFY_AGENCY_RET           (WM_USER+5)
 #define  UM_DELETE_AGENCY_RET           (WM_USER+6)
 #define  UM_GET_ALL_SALES               (WM_USER+7)
+#define  UM_GET_ALL_AGENCY_FOR_TARGET_RET  (WM_USER+8)
+#define  UM_TIMER_RET                      (WM_USER+9)
+#define  UM_SAVE_INV_OUT_RET               (WM_USER+10)
 
 
 
 #define TARGET_TYPE_SALES              0
 #define TARGET_TYPE_AGENCIES           1
+
+
+#define  MIN_TIMER_ID                  10000
+#define  MAX_TIMER_ID                  19999
+
+#define  INV_OUT_CHAR_TIMER            MIN_TIMER_ID
+#define  INV_OUT_CHAR_TIMER_INTEVAL    100                          // 100毫秒
+
+#define  FLOW_NUM_LEN                         4
 
 class CLoginParam : public LmnToolkits::MessageData {
 public:
@@ -58,9 +71,10 @@ public:
 		memcpy(&m_tAgency, pItem, sizeof(AgencyItem));
 	}
 
-	CAgencyParam(DWORD dwId) {
+	CAgencyParam(DWORD dwId, const char * szId) {
 		memset(&m_tAgency, 0, sizeof(AgencyItem));
 		m_tAgency.dwId = dwId;
+		STRNCPY(m_tAgency.szId, szId, sizeof(m_tAgency.szId));
 	}
 
 	AgencyItem   m_tAgency;
@@ -72,6 +86,27 @@ typedef struct tagSaleStaff {
 }SaleStaff;
 
 
+class CSaveInvOutParam : public LmnToolkits::MessageData {
+public:
+	CSaveInvOutParam( int nTargetType, const DuiLib::CDuiString & strTargetId, const DuiLib::CDuiString & strOperatorId, 
+		             const std::vector<DuiLib::CDuiString *> & vBig, const std::vector<DuiLib::CDuiString *> & vSmall);
+	~CSaveInvOutParam();
+
+	int                   m_nTargetType;
+	DuiLib::CDuiString    m_strTargetId;
+	DuiLib::CDuiString    m_strOperatorId;
+
+	std::vector<DuiLib::CDuiString *> m_vBig;
+	std::vector<DuiLib::CDuiString *> m_vSmall;
+};
+
+// 大、小包装数据库结构
+typedef struct tagPackage {
+	DWORD     dwId;
+	char      szId[32];
+	DWORD     dwParentId;
+}Package;
+
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
@@ -81,7 +116,7 @@ extern int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 char * String2SqlValue(char * szDest, DWORD dwDestSize, const char * strValue);
 
 const char * GetErrorDescription(int ret);
-
+extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>

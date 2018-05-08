@@ -34,7 +34,7 @@ int CBusiness::Init() {
 	g_cfg->Init("InvOut.cfg");
 
 	m_thrd_db.Start();
-
+	m_thrd_timer.Start();
 
 
 	char  buf[8192];
@@ -50,8 +50,9 @@ int CBusiness::Init() {
 	return 0;
 }
 
-int CBusiness::DeInit() {
+int CBusiness::DeInit() {	
 	m_thrd_db.Stop();
+	m_thrd_timer.Stop();
 
 	Clear();
 	return 0;
@@ -113,8 +114,8 @@ int  CBusiness::LoginAsyn(const char * szUserName, const char * szPassword) {
 }
 
 int  CBusiness::Login( const CLoginParam * pParam ) {
-	int ret = m_db.Login(pParam);
-	m_sigLoginRet.emit(ret);
+	int ret = m_db.Login(pParam, m_strLoginId, m_strLoginName);
+	m_sigLoginRet.emit(ret);  
 	return 0;
 }
 
@@ -170,8 +171,8 @@ int  CBusiness::ModifyAgency(const CAgencyParam * pParam) {
 }
 
 // 删除经销商
-int  CBusiness::DeleteAgencyAsyn(DWORD  dwAgentId) {
-	m_thrd_db.PostMessage(this, MSG_DELETE_AGENCY, new CAgencyParam(dwAgentId));
+int  CBusiness::DeleteAgencyAsyn(DWORD  dwAgentId,const char * szAgentId) {
+	m_thrd_db.PostMessage(this, MSG_DELETE_AGENCY, new CAgencyParam(dwAgentId, szAgentId));
 	return 0;
 }
 
@@ -197,7 +198,34 @@ int  CBusiness::GetAllSales() {
 	return 0;
 }
 
+// 设置定时器
+int   CBusiness::SetTimerAsyn(DWORD dwTimerId, DWORD dwDelayTime) {
+	// 定时器范围错误
+	if (!(dwTimerId >= MIN_TIMER_ID && dwTimerId <= MAX_TIMER_ID)) {
+		return -1;
+	}
 
+	m_thrd_timer.PostDelayMessage(dwDelayTime, this, dwTimerId, 0, TRUE);
+	return 0;
+}
+
+int   CBusiness::NotifyUiTimer(DWORD dwTimerId) {
+	m_sigTimer.emit(dwTimerId);
+	return 0;
+}
+
+int   CBusiness::SaveInvOutAsyn( int nTargetType, const DuiLib::CDuiString & strTargetId, 
+	                             const std::vector<DuiLib::CDuiString *> & vBig, 
+	                             const std::vector<DuiLib::CDuiString *> & vSmall) {
+	m_thrd_db.PostMessage(this, MSG_SAVE_INV_OUT, new CSaveInvOutParam( nTargetType, strTargetId, m_strLoginId, vBig, vSmall));
+	return 0;
+}
+
+int   CBusiness::SaveInvOut( const CSaveInvOutParam * pParam ) {
+	int ret = m_db.SaveInvOut(pParam);
+	m_sigSaveInvOutRet.emit(ret);
+	return 0;
+}
 
 
 // 消息处理
@@ -256,7 +284,21 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_SAVE_INV_OUT:
+	{
+		CSaveInvOutParam * pParam = (CSaveInvOutParam *)pMessageData;
+		SaveInvOut(pParam);
+	}
+	break;
+
 	default:
-		break;
+	{
+		// 定时器范围是10000~19999
+		if (dwMessageId >= MIN_TIMER_ID && dwMessageId <= MAX_TIMER_ID) {
+			NotifyUiTimer(dwMessageId);
+		}
+	}
+	break;
+
 	}
 }
