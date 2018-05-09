@@ -86,7 +86,7 @@ int  CBusiness::ReconnectDbAsyn( DWORD dwDelayTime /*= 0*/ ) {
 }
 
 int  CBusiness::ReconnectDb() {
-	int ret = m_db.ConnectDb(m_szOdbcString);
+	int ret = m_db.ConnectDb(m_szOdbcString, FALSE);
 	// 如果连接失败
 	if (0 != ret) {
 		ReconnectDbAsyn(RECONNECT_DB_TIME);

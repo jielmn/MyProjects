@@ -9,6 +9,7 @@
 #include "LoginDlg.h"
 #include "AgencyDlg.h"
 #include "TargetDlg.h"
+#include "MyProgress.h"
 
 
 // menu
@@ -58,8 +59,18 @@ public:
 
 
 
+ 
 
 
+DuiLib::CControlUI* CDuiFrameWndBuildCallback::CreateControl(LPCTSTR pstrClass) {
+	DuiLib::CDuiString  strText;
+	strText = pstrClass;
+	strText += ".xml";
+
+	DuiLib::CDialogBuilder builder;
+	DuiLib::CControlUI * pUI = builder.Create((const char *)strText, (UINT)0, 0, m_PaintManager);
+	return pUI;
+}
 
 
 
@@ -68,12 +79,15 @@ public:
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_nSmallCount = 0;
 	m_nBigCount   = 0;
+	m_bBusy = FALSE;
 
 	CBusiness::GetInstance()->m_sigStatusChange.connect(this, &CDuiFrameWnd::OnDbStatusChange);
 	CBusiness::GetInstance()->m_sigGetAllAgency.connect(this, &CDuiFrameWnd::OnGetAllAgency);
 	CBusiness::GetInstance()->m_sigDeleteAgency.connect(this, &CDuiFrameWnd::OnDeleteAgencyRet);
 	CBusiness::GetInstance()->m_sigTimer.connect(this, &CDuiFrameWnd::OnTimerRet);
 	CBusiness::GetInstance()->m_sigSaveInvOutRet.connect(this, &CDuiFrameWnd::OnSaveInvOutRet);
+
+	m_Callback.m_PaintManager = &m_PaintManager;
 }
 
 void  CDuiFrameWnd::InitWindow() {
@@ -91,6 +105,11 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblSmallCnt = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblSmallCount"));
 	m_lblBigCnt = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblBigCount"));
 	m_edPackageId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtPackageId"));
+	m_btnInvOk = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnInvOk"));
+
+	m_tabs_query = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("query_switch"));
+
+	m_progress = static_cast<CMyProgress *>(m_PaintManager.FindControl("progress"));
 
 	CInvoutDatabase::DATABASE_STATUS eStatus = CBusiness::GetInstance()->GetDbStatus();
 	if (eStatus == CLmnOdbc::STATUS_OPEN) {
@@ -124,6 +143,18 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "optSales" || name == "optAgent" ) {
 			m_edTarget->SetText("");
+		}
+		else if (name == "optByTime") { 
+			m_tabs_query->SelectItem(0);
+		}
+		else if (name == "optByBigPkg") {
+			m_tabs_query->SelectItem(1);
+		}
+		else if (name == "optBySmallPkg") {
+			m_tabs_query->SelectItem(2);
+		}
+		else if (name == "optByTag") {
+			m_tabs_query->SelectItem(3);
 		}
 	}
 	else if (msg.sType == "click") {
@@ -193,12 +224,16 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 }
 
 DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, "MyProgress")) {
+		return new CMyProgress(&m_PaintManager, "progress_fore.png");  
+	}
+
 	DuiLib::CDuiString  strText;
 	strText = pstrClass;
 	strText += ".xml";
 
 	DuiLib::CDialogBuilder builder;
-	DuiLib::CControlUI * pUI = builder.Create((const char *)strText, (UINT)0, 0, &m_PaintManager);
+	DuiLib::CControlUI * pUI = builder.Create((const char *)strText, (UINT)0, &m_Callback, &m_PaintManager);
 	return pUI;
 
 	//return DuiLib::WindowImplBase::CreateControl( pstrClass );
@@ -320,6 +355,7 @@ int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
 	// 检查格式(15位)
 	// FACTORY CODE (2)  +   PRODUCT CODE (2)   +    批号(8, 例如20180301)  + 流水号(4, 例如0001, A001)
 
+	char buf[8192];
 	char  szProductId[64] = { 'E', 'T' };
 
 	DWORD  dwFactoryLen = 2;
@@ -368,7 +404,7 @@ int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
 		return 3;
 	}
 
-	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, OK \n", strBarCode);
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received barcode:%s, OK \n", strBarCode);      
 
 	DuiLib::CDuiString  strText;
 	int nCount = m_lstPackages->GetCount();
@@ -377,7 +413,7 @@ int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
 		strText = pListElement->GetText(1);
 
 		// 已经存在相同的编号
-		if (strText == strBarCode) {
+		if ( StrICmp( strText, strBarCode ) == 0 ) {
 			return 4;
 		}
 	}
@@ -385,8 +421,9 @@ int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
 	// 显示
 	DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
 	m_lstPackages->Add(pListElement);
-	pListElement->SetText(0, (0 == nType ? "小包装" : "大包装") );
-	pListElement->SetText(1, strBarCode);    
+	pListElement->SetText(0, (0 == nType ? "小包装" : "大包装") );	
+	Str2Upper(strBarCode, buf, sizeof(buf));
+	pListElement->SetText(1, buf);
 
 	if (0 == nType) {
 		m_nSmallCount++;
@@ -399,7 +436,7 @@ int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
 		m_lblBigCnt->SetText(strText);
 	}
 	return 0;
-}
+}	
 
 
 void  CDuiFrameWnd::OnSaveInvOutRet(int ret) {
@@ -407,13 +444,15 @@ void  CDuiFrameWnd::OnSaveInvOutRet(int ret) {
 }
 
 void  CDuiFrameWnd::OnSaveInvOutMsg(int ret) {
+	SetBusy(FALSE);
+
 	if (0 == ret) {
 		::MessageBox(GetHWND(), "出库记录保存成功", "出库记录保存", 0);
 		ClearInvOut();
 	}
 	else {
 		::MessageBox(GetHWND(), GetErrorDescription(ret), "出库记录保存", 0);
-	}
+	}	
 }
 
 
@@ -489,12 +528,28 @@ void CDuiFrameWnd::OnInvOk() {
 
 	ClearVector(vBig);
 	ClearVector(vSmall);
+
+	SetBusy();
 }
 
 void  CDuiFrameWnd::ClearInvOut() {
 	m_edTarget->SetText("");
 	m_edPackageId->SetText("");
 	OnClearInvList();
+}
+
+void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
+	if (bBusy) {
+		m_btnInvOk->SetEnabled(false);
+		m_progress->SetVisible(true);
+		m_progress->Start();
+	}
+	else {
+		m_btnInvOk->SetEnabled(true);
+		m_progress->Stop();
+		m_progress->SetVisible(false);
+	}
+	m_bBusy = bBusy;
 }
 
 
@@ -612,7 +667,7 @@ void CDuiFrameWnd::OnInvOutChar(char ch) {
 
 
 
-
+                   
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,

@@ -14,6 +14,7 @@ public:
 		InvOutDbErr_Integrity_constraint_violation = 100,
 		InvOutDbErr_Not_found,
 		InvOutDbErr_Cannt_delete_foreign_key,
+		InvOutDbErr_Small_pkg_Parent_pkg_Already_out,
 	};
 
 	// µÇÂ¼

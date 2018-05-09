@@ -164,6 +164,7 @@
     <ClInclude Include="InvOutDatabase.h" />
     <ClInclude Include="LoginDlg.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MyProgress.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="TargetDlg.h" />
   </ItemGroup>
@@ -174,6 +175,7 @@
     <ClCompile Include="InvOutDatabase.cpp" />
     <ClCompile Include="LoginDlg.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyProgress.cpp" />
     <ClCompile Include="TargetDlg.cpp" />
   </ItemGroup>
   <ItemGroup>

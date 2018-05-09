@@ -135,6 +135,10 @@ const char * GetErrorDescription(int ret) {
 		szRet = "由于外键约束，删除失败";
 		break;
 
+	case CInvoutDatabase::InvOutDbErr_Small_pkg_Parent_pkg_Already_out:
+		szRet = "小包装的所在大包装已经出库";
+		break;
+
 	case -1:
 		szRet = "未知错误";
 		break;

@@ -63,6 +63,9 @@
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
 			<Label name="lblDbStatus"    text="数据库连接失败"  width="250" font="4" textcolor="#FFCAF100" />
 			<Control width="1" bkimage="sep.png" />
+			<Control width="10" />
+			<MyProgress name="progress" height="30"  visible="false" />
+			<Control width="10" />
 		</HorizontalLayout>
 	
 	</VerticalLayout>

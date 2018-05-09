@@ -3,6 +3,15 @@
 #include "sigslot.h"
 #include "LmnOdbc.h"
 #include "InvOutCommon.h"
+#include "MyProgress.h"
+
+class CDuiFrameWndBuildCallback : public DuiLib::IDialogBuilderCallback
+{
+public:
+	virtual DuiLib::CControlUI* CreateControl(LPCTSTR pstrClass);
+
+	DuiLib::CPaintManagerUI*     m_PaintManager;
+};
 
 class CDuiFrameWnd : public DuiLib::WindowImplBase, public sigslot::has_slots<>
 {
@@ -35,6 +44,13 @@ private:
 	DuiLib::CLabelUI *            m_lblSmallCnt;
 	DuiLib::CLabelUI *            m_lblBigCnt;
 	DuiLib::CEditUI *             m_edPackageId;
+	DuiLib::CButtonUI *           m_btnInvOk;
+
+	// ²éÑ¯
+	DuiLib::CTabLayoutUI *        m_tabs_query;
+
+	// ×´Ì¬À¸
+	CMyProgress *                 m_progress;
 
 private:
 	void  OnDbStatusChange(CLmnOdbc::DATABASE_STATUS eNewStatus);
@@ -75,5 +91,9 @@ private:
 	int                                m_nSmallCount;
 	int                                m_nBigCount;
 
+	CDuiFrameWndBuildCallback          m_Callback;
+	BOOL                               m_bBusy;
+
 	void  ClearInvOut();
+	void  SetBusy( BOOL bBusy = TRUE );
 };

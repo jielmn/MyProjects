@@ -97,6 +97,7 @@ int CInvoutDatabase::AddAgency(const CAgencyParam * pParam, DWORD & dwNewId) {
 
 		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES (%lu, '%s', '%s', '%s') ", AGENCY_TABLE_NAME, (dwMaxId + 1), tAgency.szId, tAgency.szName, tAgency.szProvince);
 		Execute(sql);
+		EndTran();
 
 		dwNewId = dwMaxId + 1;
 		ret = 0;
@@ -111,6 +112,7 @@ int CInvoutDatabase::AddAgency(const CAgencyParam * pParam, DWORD & dwNewId) {
 			ret = e.GetError();
 		}
 		CloseRecordSet();
+		EndTran(FALSE);
 	}
 
 	return ret;   
@@ -191,6 +193,7 @@ int  CInvoutDatabase::ModifyAgency(const CAgencyParam * pParam) {
 	try
 	{
 		Execute(sql);
+		EndTran();
 		ret = 0;
 	}
 	catch (CLmnOdbcException e)
@@ -203,6 +206,7 @@ int  CInvoutDatabase::ModifyAgency(const CAgencyParam * pParam) {
 			ret = e.GetError();
 		}
 		CloseRecordSet();
+		EndTran(FALSE);
 	}
 
 	return ret;
@@ -283,6 +287,7 @@ int  CInvoutDatabase::DeleteAgency(const CAgencyParam * pParam) {
 	try
 	{
 		Execute(sql);
+		EndTran();
 	}
 	catch (CLmnOdbcException e)
 	{
@@ -294,6 +299,7 @@ int  CInvoutDatabase::DeleteAgency(const CAgencyParam * pParam) {
 			ret = e.GetError();
 		}
 		CloseRecordSet();
+		EndTran(FALSE);
 	}
 
 	return ret;
@@ -472,6 +478,49 @@ int   CInvoutDatabase::SaveInvOut(const CSaveInvOutParam * pParam) {
 		}
 	}
 
+	// 查看小包装的父包装是否出库
+	for (it_x = vSmall.begin(); it_x != vSmall.end(); it_x++) {
+		Package * pPackage = *it_x;
+
+		BOOL bFound = FALSE;
+		if (pPackage->dwParentId > 0) {
+			SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE package_id=%lu ", BIG_OUT_TABLE_NAME, pPackage->dwParentId);
+			try
+			{
+				OpenRecordSet(sql);
+				if ( MoveNext() ) {
+					bFound = TRUE;
+				}
+				CloseRecordSet();
+			}
+			catch (CLmnOdbcException e)
+			{
+				const char * pStatus = GetSysStatus();
+				if (0 == strcmp(pStatus, "23000")) {
+					ret = InvOutDbErr_Integrity_constraint_violation;
+				}
+				else {
+					ret = e.GetError();
+				}
+				CloseRecordSet();
+			}
+		}
+
+		if (0 != ret) {
+			ClearVector(vBig);
+			ClearVector(vSmall);
+			return ret;
+		}
+
+		// 如果找到父包装已经入库
+		if ( bFound ) {
+			ret = InvOutDbErr_Small_pkg_Parent_pkg_Already_out;
+			ClearVector(vBig);
+			ClearVector(vSmall);
+			return ret;
+		}		
+	}
+
 	char  szTargetId[32];
 	char  szOperatorId[32];
 
@@ -538,6 +587,23 @@ int   CInvoutDatabase::SaveInvOut(const CSaveInvOutParam * pParam) {
 			ClearVector(vSmall);
 			return ret;
 		}
+	}
+
+	try
+	{
+		EndTran();
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+		EndTran(FALSE);
 	}
 
 	return 0;

@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout inset="1,1,1,1"   >		
-		<Label text="查询" />
+	<HorizontalLayout inset="1,1,1,1"   >		
+		<VerticalLayout width="120" inset="10,10,10,10" bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" >
+			<Option text="按时间查"     width="100" height="80" name="optByTime"     font="3" align="center" textcolor="#FF386382"  textpadding="0,60,0,2" foreimage="file='time.png' dest='23,5,78,60' "     normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="query_group" selected="true" />
+			<Option text="按大包装查"   width="100" height="80" name="optByBigPkg"   font="3" align="center" textcolor="#FF386382"  textpadding="0,60,0,2" foreimage="file='package1.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="query_group" />
+			<Option text="按小包装查"   width="100" height="80" name="optBySmallPkg" font="3" align="center" textcolor="#FF386382"  textpadding="0,60,0,2" foreimage="file='package0.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="query_group" />
+			<Option text="按Tag查"      width="100" height="80" name="optByTag"      font="3" align="center" textcolor="#FF386382"  textpadding="0,60,0,2" foreimage="file='tag.png' dest='23,5,78,60' "      normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="query_group" />
+		</VerticalLayout>
 		
-		
-	</VerticalLayout>
+		<VerticalLayout>
+			<TabLayout name="query_switch">
+			
+				<HorizontalLayout>
+					<query_by_time />
+				</HorizontalLayout>
+				
+				<HorizontalLayout>
+					<query_by_big_pkg />
+				</HorizontalLayout>
+				
+				<HorizontalLayout>
+					<query_by_small_pkg />
+				</HorizontalLayout>
+				
+				<HorizontalLayout>
+					<query_by_tag />
+				</HorizontalLayout>
+				
+			</TabLayout>
+		</VerticalLayout>		
+	</HorizontalLayout>
 </Window>
