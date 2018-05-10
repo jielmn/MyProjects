@@ -78,7 +78,7 @@ void CBusiness::OnInit(int * ret) {
 	}
 #endif
 
-	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 2000);
+	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 6000);
 
 #ifdef READER_TYPE_INV
 	g_cfg->GetConfig("reader inventory interval", m_InvReader.m_dwInventoryInterval, 1000);
@@ -241,7 +241,7 @@ int   CBusiness::ReconnectReader() {
 	return ret;
 }
 
-void  CBusiness::OnReaderStatusChange(C601InvReader::READER_STATUS eStatus ) {
+void  CBusiness::OnReaderStatusChange(int eStatus ) {
 	NotifyUiReaderStatus(eStatus);
 }
 
@@ -288,7 +288,7 @@ int    CBusiness::NotifyUiDbStatus(CInvDatabase::DATABASE_STATUS eStatus) {
 	return 0;
 }
 
-int   CBusiness::NotifyUiReaderStatus(C601InvReader::READER_STATUS eStatus) {
+int   CBusiness::NotifyUiReaderStatus(int eStatus) {
 	::PostMessage( g_hWnd, UM_SHOW_READER_STATUS, eStatus, 0);
 	return 0;
 }
@@ -356,8 +356,8 @@ CInvDatabase::DATABASE_STATUS  CBusiness::GetDbStatus() {
 	return  m_InvDatabase.GetStatus();
 }
 
-C601InvReader::READER_STATUS    CBusiness::GetReaderStatus() {
-	return  (C601InvReader::READER_STATUS)m_InvReader.GetStatus();
+int    CBusiness::GetReaderStatus() {
+	return  m_InvReader.GetStatus();
 }
 
 const char * CBusiness::GetUserName() {

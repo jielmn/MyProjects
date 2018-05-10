@@ -3,9 +3,10 @@
 #include "InvCommon.h"
 #include "InvDatabase.h"
 #include "InvReader.h"
-#include "610InvReader.h"
+//#include "610InvReader.h"
+#include "TelemedInvReader.h"
 
-#define   READER_TYPE_INV
+//#define   READER_TYPE_INV
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 
@@ -20,7 +21,7 @@ public:
 	// 重连Reader(异步)
 	int   ReconnectReaderAsyn(DWORD dwDelayTime = 0 );
 	int   ReconnectReader();
-	void  OnReaderStatusChange(C601InvReader::READER_STATUS);
+	void  OnReaderStatusChange(int);
 	void  OnReaderReconnectAsyn( DWORD dwRelayTime );
 	void  OnInvTagItem(const BYTE *, DWORD);
 	void  OnInventoryAsyn();
@@ -31,10 +32,10 @@ public:
 
 	// 通知界面DB Status
 	int   NotifyUiDbStatus(CInvDatabase::DATABASE_STATUS eStatus);
-	int   NotifyUiReaderStatus(C601InvReader::READER_STATUS eStatus);
+	int   NotifyUiReaderStatus(int eStatus);
 
 	CInvDatabase::DATABASE_STATUS  GetDbStatus();
-	C601InvReader::READER_STATUS      GetReaderStatus();
+	int      GetReaderStatus();
 
 	// 通知界面盘点的item
 	int   NotifyUiInventory(const TagItem * pItem);
@@ -108,9 +109,9 @@ private:
 	User           m_user;                                  // 登录的用户
 	CInvDatabase   m_InvDatabase;                           // 数据库
 #ifndef READER_TYPE_INV
-	C601InvReader    m_InvReader;
+	CTelemedInvReader    m_InvReader;
 #else
-	CInvReader         m_InvReader;
+	CInvReader           m_InvReader;
 #endif
 
 };

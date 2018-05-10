@@ -67,7 +67,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 
 	CInvDatabase::DATABASE_STATUS eDbStatus     = CBusiness::GetInstance()->GetDbStatus();
-	C601InvReader::READER_STATUS     eReaderStatus = CBusiness::GetInstance()->GetReaderStatus();
+	int     eReaderStatus                       = CBusiness::GetInstance()->GetReaderStatus();
 
 	if (eDbStatus == CInvDatabase::STATUS_OPEN) {
 		SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_OK_TEXT);
@@ -76,7 +76,7 @@ void  CDuiFrameWnd::InitWindow() {
 		SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_CLOSE_TEXT);
 	}
 
-	if (eReaderStatus == C601InvReader::STATUS_OPEN) {
+	if (eReaderStatus == CTelemedInvReader::STATUS_OPEN) {
 		SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT);
 	}
 	else {
@@ -1035,8 +1035,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	else if (uMsg == UM_SHOW_READER_STATUS) {
-		C601InvReader::READER_STATUS eStatus = (C601InvReader::READER_STATUS)wParam;
-		if (eStatus == C601InvReader::STATUS_OPEN) {
+		int eStatus = wParam;
+		if (eStatus == CTelemedInvReader::STATUS_OPEN) {
 			SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT);
 		}
 		else {

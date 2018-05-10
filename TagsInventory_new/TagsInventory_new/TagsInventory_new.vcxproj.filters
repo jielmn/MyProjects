@@ -42,6 +42,9 @@
     <ClCompile Include="601InvReader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TelemedInvReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -174,6 +177,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="610InvReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TelemedInvReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
