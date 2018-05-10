@@ -105,6 +105,8 @@ void  CLoginWnd::OnLoginRet(int ret) {
 void  CLoginWnd::OnLoginRetMsg(int ret) {
 	// µÇÂ¼³É¹¦
 	if (0 == ret) {
+		DuiLib::CDuiString strName = m_edUserName->GetText();
+		g_cfg->SetConfig("last login name", (const char *)strName);
 		PostMessage(WM_CLOSE);
 	}
 	else {
