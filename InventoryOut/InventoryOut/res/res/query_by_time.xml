@@ -13,9 +13,9 @@
 		
 		<HorizontalLayout inset="10,5,10,5" height="40" >
 			<Label text="出库目标：" width="100" font="3" textcolor="#FF386382"  />
-			<Option text="销售" width="60" name="optSales_1" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="target" selected="true" />
+			<Option text="销售" width="60" name="optSales_1" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="target_1" selected="true" />
 			<Control width="10" />
-			<Option text="经销商" width="80" name="optAgent_1" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="target" />
+			<Option text="经销商" width="80" name="optAgent_1" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="target_1" />
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="10,5,10,5" height="40" >
