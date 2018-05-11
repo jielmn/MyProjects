@@ -48,6 +48,14 @@ private:
 
 	// ²éÑ¯
 	DuiLib::CTabLayoutUI *        m_tabs_query;
+	DuiLib::COptionUI *           m_optSales_1;
+	DuiLib::CEditUI *             m_edTarget_1;
+	DuiLib::CButtonUI *           m_btnQuery_1;
+	DuiLib::CDateTimeUI *         m_dateTimeStart;
+	DuiLib::CDateTimeUI *         m_dateTimeEnd;
+	DuiLib::CListUI *             m_lstQueryByTime;
+	DuiLib::CLabelUI *            m_lblSmallCnt_1;
+	DuiLib::CLabelUI *            m_lblBigCnt_1;
 
 	// ×´Ì¬À¸
 	CMyProgress *                 m_progress;
@@ -67,6 +75,9 @@ private:
 
 	void  OnSaveInvOutRet(int);
 	void  OnSaveInvOutMsg(int);
+
+	void  OnQueryByTimeRet(int, const std::vector<QueryByTimeItem*> &);
+	void  OnQueryByTimeMsg(int, const std::vector<QueryByTimeItem*> &);
 
 private:
 	void  AddAgencyItem2List(DuiLib::CListTextElementUI* pListElement, AgencyItem * pItem, BOOL bSetTag = TRUE);
@@ -88,6 +99,7 @@ private:
 
 	/*²éÑ¯*/
 	void OnQueryByTime();
+	void OnSelectTarget_1();
 
 private:
 	DuiLib::CDuiString                 m_strInvOutBuf;                      // ÅÌµã×Ö·ûµÄ»º³å

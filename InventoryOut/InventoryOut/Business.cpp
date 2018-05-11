@@ -227,6 +227,19 @@ int   CBusiness::SaveInvOut( const CSaveInvOutParam * pParam ) {
 	return 0;
 }
 
+// 根据时间查询结果
+int   CBusiness::QueryByTimeAsyn(time_t tStart, time_t tEnd, int nTargetType, const char * szTargetId) {
+	m_thrd_db.PostMessage(this, MSG_QUERY_BY_TIME, new CQueryByTimeParam(tStart, tEnd, nTargetType, szTargetId ));
+	return 0;
+}
+
+int   CBusiness::QueryByTime(const CQueryByTimeParam * pParam) {
+	std::vector<QueryByTimeItem*> vRet;
+	int ret = m_db.QueryByTime(pParam, vRet);
+	m_sigQueryByTime.emit(ret, vRet);
+	ClearVector(vRet);
+	return 0;
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -288,6 +301,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveInvOutParam * pParam = (CSaveInvOutParam *)pMessageData;
 		SaveInvOut(pParam);
+	}
+	break;
+
+	case MSG_QUERY_BY_TIME:
+	{
+		CQueryByTimeParam * pParam = (CQueryByTimeParam *)pMessageData;
+		QueryByTime(pParam);
 	}
 	break;
 

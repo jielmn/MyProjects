@@ -54,8 +54,13 @@ public:
 	int   SetTimerAsyn(DWORD dwTimerId, DWORD dwDelayTime);
 	int   NotifyUiTimer(DWORD dwTimerId);
 
+	// 保存出库
 	int   SaveInvOutAsyn(int nTargetType, const DuiLib::CDuiString & strTargetId, const std::vector<DuiLib::CDuiString *> & vBig, const std::vector<DuiLib::CDuiString *> & vSmall);
 	int   SaveInvOut( const CSaveInvOutParam * pParam );
+
+	// 根据时间查询结果
+	int   QueryByTimeAsyn(time_t tStart, time_t tEnd, int nTargetType, const char * szTargetId);
+	int   QueryByTime( const CQueryByTimeParam * pParam );
 
 public:
 	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>                     m_sigStatusChange;
@@ -70,6 +75,9 @@ public:
 
 	sigslot::signal1<DWORD>                                         m_sigTimer;
 	sigslot::signal1<int>                                           m_sigSaveInvOutRet;
+
+	// 查询
+	sigslot::signal2<int, const std::vector<QueryByTimeItem*> & >   m_sigQueryByTime;
 
 private:
 	static CBusiness *  pInstance;

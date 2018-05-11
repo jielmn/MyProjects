@@ -608,3 +608,477 @@ int   CInvoutDatabase::SaveInvOut(const CSaveInvOutParam * pParam) {
 
 	return 0;
 }
+
+
+// 根据时间查询
+int   CInvoutDatabase::QueryByTime(const CQueryByTimeParam * pParam, std::vector<QueryByTimeItem*> & vRet ) {
+	if (GetStatus() == STATUS_CLOSE) {
+		return CLmnOdbc::ERROR_DISCONNECTED;
+	}
+
+	char sql[8192];
+	char buf[8192];
+	char szWhere[8192];
+	BOOL  bNull = FALSE;
+	char szStartTime[256];
+	char szEndTime[256];
+	time_t tEnd = pParam->m_tEnd + 3600 * 24;
+	char szTargetId[256];
+
+	int ret = 0;
+
+	DateTime2String( szStartTime, sizeof(szStartTime), &pParam->m_tStart );
+	DateTime2String( szEndTime,   sizeof(szEndTime),   &tEnd );
+	String2SqlValue( szTargetId, sizeof(szTargetId), pParam->m_szTargetId );
+
+	if (pParam->m_nTargetType == -1) {
+		SNPRINTF(szWhere, sizeof(szWhere), "b.operate_time >= to_date( '%s', 'yyyy-mm-dd hh24:mi:ss' ) AND b.operate_time < to_date( '%s', 'yyyy-mm-dd hh24:mi:ss' ) ", szStartTime, szEndTime);
+
+		// 大包装开始
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.name, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.str_id"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 1 AND %s; ", BIG_PKG_TABLE_NAME, BIG_OUT_TABLE_NAME, AGENCY_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_BIG;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.stfname, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.stfid"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 0 AND %s; ", BIG_PKG_TABLE_NAME, BIG_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_BIG;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+
+
+		// 小包装开始
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.name, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.str_id"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 1 AND %s; ", SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, AGENCY_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_SMALL;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+
+
+
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.stfname, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.stfid"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 0 AND %s; ", SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_SMALL;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+	} 
+	// 根据out target查询
+	else if (pParam->m_nTargetType == TARGET_TYPE_SALES) {
+		SNPRINTF(szWhere, sizeof(szWhere), " b.operate_time >= to_date( '%s', 'yyyy-mm-dd hh24:mi:ss' )"
+			                               " AND b.operate_time < to_date( '%s', 'yyyy-mm-dd hh24:mi:ss' ) "
+			                               " AND b.out_target_id = '%s' ", szStartTime, szEndTime, szTargetId );
+
+		// 大包装开始
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.stfname, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.stfid"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 0 AND %s; ", BIG_PKG_TABLE_NAME, BIG_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_BIG;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+
+
+		// 小包装开始
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.stfname, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.stfid"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 0 AND %s; ", SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_SMALL;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+	}
+	else if (pParam->m_nTargetType == TARGET_TYPE_AGENCIES) {
+		SNPRINTF(szWhere, sizeof(szWhere), " b.operate_time >= to_date( '%s', 'yyyy-mm-dd hh24:mi:ss' )"
+			                               " AND b.operate_time < to_date( '%s', 'yyyy-mm-dd hh24:mi:ss' ) "
+			                               " AND b.out_target_id = '%s' ", szStartTime, szEndTime, szTargetId );
+
+		// 大包装开始
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.name, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.str_id"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 1 AND %s; ", BIG_PKG_TABLE_NAME, BIG_OUT_TABLE_NAME, AGENCY_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_BIG;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+
+		SNPRINTF(sql, sizeof(sql), " select a.package_id, b.out_target_type, c.name, d.stfname, b.operate_time from %s a "
+			" inner join %s b on a.id = b.package_id"
+			" inner join %s c on b.out_target_id = c.str_id"
+			" inner join %s d on b.operator = d.stfid"
+			" where b.out_target_type = 1 AND %s; ", SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, AGENCY_TABLE_NAME, STAFF_TABLE_NAME, szWhere);
+
+		try
+		{
+			OpenRecordSet(sql);
+
+			while (MoveNext()) {
+
+				QueryByTimeItem * pItem = new QueryByTimeItem;
+				memset(pItem, 0, sizeof(QueryByTimeItem));
+
+				pItem->m_nPackageType = PACKAGE_TYPE_SMALL;
+
+				GetFieldValue(1, pItem->m_szPackageId, sizeof(pItem->m_szPackageId), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(2, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%d", &pItem->m_nTargetType);
+
+				GetFieldValue(3, pItem->m_szTargetName, sizeof(pItem->m_szTargetName), &bNull);
+
+				GetFieldValue(4, pItem->m_szOperatorName, sizeof(pItem->m_szOperatorName), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(5, buf, sizeof(buf), &bNull);
+				pItem->m_tOperatorTime = String2DateTime(buf);
+
+				vRet.push_back(pItem);
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			const char * pStatus = GetSysStatus();
+			if (0 == strcmp(pStatus, "23000")) {
+				ret = InvOutDbErr_Integrity_constraint_violation;
+			}
+			else {
+				ret = e.GetError();
+			}
+			CloseRecordSet();
+		}
+
+		if (0 != ret) {
+			ClearVector(vRet);
+			return ret;
+		}
+
+	}
+	else {
+		assert(0);
+	}
+	
+
+
+
+	return ret;
+}

@@ -184,3 +184,47 @@ char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d-%02d-%02d %02d:%02d:%02d", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
 	return szDest;
 }
+
+time_t  String2DateTime(const char * szDatetime) {
+	struct tm  tmp;
+	if (6 != sscanf_s(szDatetime, "%d-%d-%d %d:%d:%d", &tmp.tm_year, &tmp.tm_mon, &tmp.tm_mday, &tmp.tm_hour, &tmp.tm_min, &tmp.tm_sec)) {
+		return 0;
+	}
+
+	tmp.tm_year -= 1900;
+	tmp.tm_mon--;
+	return mktime(&tmp);
+}
+
+time_t SystemTime2Time(const SYSTEMTIME & t) {
+	struct tm tmTime;
+	memset(&tmTime, 0, sizeof(tmTime));
+
+	tmTime.tm_year = t.wYear - 1900;
+	tmTime.tm_mon = t.wMonth - 1;
+	tmTime.tm_mday = t.wDay;
+
+	tmTime.tm_hour = t.wHour;
+	tmTime.tm_min = t.wMinute;
+	tmTime.tm_sec = t.wSecond;
+
+	return mktime(&tmTime);
+}
+
+SYSTEMTIME Time2SystemTime(time_t  t) {
+	SYSTEMTIME tSystemTime;
+	memset(&tSystemTime, 0, sizeof(tSystemTime));
+
+	struct tm * pTime = localtime(&t);
+	if (pTime) {
+		tSystemTime.wYear = pTime->tm_year + 1900;
+		tSystemTime.wMonth = pTime->tm_mon + 1;
+		tSystemTime.wDay = pTime->tm_mday;
+
+		tSystemTime.wHour = pTime->tm_hour;
+		tSystemTime.wMinute = pTime->tm_min;
+		tSystemTime.wSecond = pTime->tm_sec;
+	}
+
+	return tSystemTime;
+}

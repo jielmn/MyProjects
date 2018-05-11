@@ -18,6 +18,7 @@
 #define  MSG_GET_ALL_SALES              7
 #define  MSG_GET_ALL_AGENCY_FOR_TARGET  8
 #define  MSG_SAVE_INV_OUT               9
+#define  MSG_QUERY_BY_TIME              10
 
 #define  RECONNECT_DB_TIME              10000
 
@@ -31,6 +32,7 @@
 #define  UM_GET_ALL_AGENCY_FOR_TARGET_RET  (WM_USER+8)
 #define  UM_TIMER_RET                      (WM_USER+9)
 #define  UM_SAVE_INV_OUT_RET               (WM_USER+10)
+#define  UM_QUERY_BY_TIM_RET               (WM_USER+11)
 
 
 
@@ -108,6 +110,40 @@ typedef struct tagPackage {
 }Package;
 
 
+class CQueryByTimeParam : public LmnToolkits::MessageData {
+public:
+	CQueryByTimeParam(time_t tStart, time_t tEnd, int nTargetType, const char * szTargetId) {
+		m_tStart = tStart;
+		m_tEnd = tEnd;
+		m_nTargetType = nTargetType;
+
+		if (szTargetId) {
+			STRNCPY(m_szTargetId, szTargetId, sizeof(m_szTargetId));
+		}
+		else {
+			memset(m_szTargetId, 0, sizeof(m_szTargetId));
+		}
+	}
+
+	time_t  m_tStart;
+	time_t  m_tEnd;
+	int     m_nTargetType;
+	char    m_szTargetId[128];
+};
+
+typedef struct tagQueryByTimeItem {
+	int     m_nPackageType;
+	char    m_szPackageId[32];
+	int     m_nTargetType;
+	char    m_szTargetName[64];
+	char    m_szOperatorName[32];
+	time_t  m_tOperatorTime;
+}QueryByTimeItem;
+
+#define  PACKAGE_TYPE_BIG         0
+#define  PACKAGE_TYPE_SMALL       1
+
+
 extern ILog    * g_log;
 extern IConfig * g_cfg;
 
@@ -117,6 +153,10 @@ char * String2SqlValue(char * szDest, DWORD dwDestSize, const char * strValue);
 
 const char * GetErrorDescription(int ret);
 extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern time_t  String2DateTime(const char * szDatetime);
+
+time_t SystemTime2Time(const SYSTEMTIME & t);
+SYSTEMTIME Time2SystemTime(time_t  t);
 
 // templates
 template <class T>

@@ -38,6 +38,9 @@ public:
 	// 保存Inv
 	int   SaveInvOut(const CSaveInvOutParam * pParam);
 
+	// 根据时间查询
+	int   QueryByTime(const CQueryByTimeParam * pParam, std::vector<QueryByTimeItem*> & vRet);
+
 private:
 	
 

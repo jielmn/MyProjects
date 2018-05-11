@@ -86,6 +86,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigDeleteAgency.connect(this, &CDuiFrameWnd::OnDeleteAgencyRet);
 	CBusiness::GetInstance()->m_sigTimer.connect(this, &CDuiFrameWnd::OnTimerRet);
 	CBusiness::GetInstance()->m_sigSaveInvOutRet.connect(this, &CDuiFrameWnd::OnSaveInvOutRet);
+	CBusiness::GetInstance()->m_sigQueryByTime.connect(this, &CDuiFrameWnd::OnQueryByTimeRet);
 
 	m_Callback.m_PaintManager = &m_PaintManager;
 }
@@ -108,6 +109,14 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnInvOk = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnInvOk"));
 
 	m_tabs_query = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("query_switch"));
+	m_optSales_1 = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl("optSales_1"));
+	m_edTarget_1 = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtInvTarget_1"));
+	m_btnQuery_1 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnQuery_1"));
+	m_dateTimeStart = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl("DateTime1"));
+	m_dateTimeEnd = static_cast<DuiLib::CDateTimeUI*>(m_PaintManager.FindControl("DateTime2"));
+	m_lstQueryByTime = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("query_list_1"));
+	m_lblSmallCnt_1 = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblSmallCount_1"));
+	m_lblBigCnt_1 = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblBigCount_1"));
 
 	m_progress = static_cast<CMyProgress *>(m_PaintManager.FindControl("progress"));
 
@@ -156,6 +165,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		else if (name == "optByTag") {
 			m_tabs_query->SelectItem(3);
 		}
+		else if (name == "optSales_1" || name == "optAgent_1") {
+			m_edTarget_1->SetText("");
+		}
 	}
 	else if (msg.sType == "click") {
 		if (name == "btnAddAgency") {
@@ -181,6 +193,12 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnInvOk") {
 			OnInvOk();
+		}
+		else if (name == "btnQuery_1") {
+			OnQueryByTime();
+		}
+		else if (name == "btnTarget_1") {
+			OnSelectTarget_1();
 		}
 	}
 	else if (msg.sType == "itemactivate") {
@@ -271,6 +289,18 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_SAVE_INV_OUT_RET) {
 		OnSaveInvOutMsg(wParam);
+	}
+	else if (uMsg == UM_QUERY_BY_TIM_RET) {
+		ret = wParam;
+		std::vector<QueryByTimeItem*> * pvRet = (std::vector<QueryByTimeItem*> *)lParam;
+		assert(pvRet);
+
+		OnQueryByTimeMsg(ret, *pvRet);
+
+		if (pvRet) {
+			ClearVector(*pvRet);
+			delete pvRet;
+		}
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -455,6 +485,67 @@ void  CDuiFrameWnd::OnSaveInvOutMsg(int ret) {
 	}	
 }
 
+void  CDuiFrameWnd::OnQueryByTimeRet(int ret, const std::vector<QueryByTimeItem*> & vRet) {
+	std::vector<QueryByTimeItem*> * pvRet = new std::vector<QueryByTimeItem*>;
+	if ( ret == 0 ) {
+		std::vector<QueryByTimeItem*>::const_iterator it;
+		for (it = vRet.begin(); it != vRet.end(); it++) {
+			QueryByTimeItem* pItem = *it;
+			QueryByTimeItem* pNewItem = new QueryByTimeItem;
+			memcpy(pNewItem, pItem, sizeof(QueryByTimeItem));
+			pvRet->push_back(pNewItem);
+		}
+	}
+	::PostMessage(GetHWND(), UM_QUERY_BY_TIM_RET, ret, (LPARAM)pvRet);
+}
+
+void  CDuiFrameWnd::OnQueryByTimeMsg(int ret, const std::vector<QueryByTimeItem*> & vRet) {
+	SetBusy(FALSE);
+
+	if (0 != ret) {
+		::MessageBox(GetHWND(), GetErrorDescription(ret), "查询", 0);
+		return;
+	}
+	
+	char buf[8192];
+	DuiLib::CDuiString strText;
+	std::vector<QueryByTimeItem*>::const_iterator it;
+	int nBigCnt = 0;
+	int nSmallCnt = 0;
+
+	for ( it = vRet.begin(); it != vRet.end(); ++it ) {
+		QueryByTimeItem* pItem = *it;
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstQueryByTime->Add(pListElement);
+
+		pListElement->SetText(0, PACKAGE_TYPE_BIG == pItem->m_nPackageType ? "大包装" : "小包装" );
+
+		if (pItem->m_nPackageType == PACKAGE_TYPE_BIG) {
+			nBigCnt++;
+		} if (pItem->m_nPackageType == PACKAGE_TYPE_SMALL) {
+			nSmallCnt++;
+		}
+
+		pListElement->SetText(1, pItem->m_szPackageId);
+
+		pListElement->SetText(2, TARGET_TYPE_SALES == pItem->m_nTargetType ? "销售" : "经销商" );
+
+		pListElement->SetText(3, pItem->m_szTargetName);
+
+		pListElement->SetText(4, pItem->m_szOperatorName);
+
+		DateTime2String(buf, sizeof(buf), &pItem->m_tOperatorTime);
+		pListElement->SetText(5, buf);
+	}
+
+	strText.Format("%d", nSmallCnt);
+	m_lblSmallCnt_1->SetText(strText);
+
+	strText.Format("%d", nBigCnt);
+	m_lblBigCnt_1->SetText(strText); 
+
+}
+
 
 
 
@@ -553,9 +644,72 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 }
 
 void  CDuiFrameWnd::OnQueryByTime() {
+	SYSTEMTIME t1 = m_dateTimeStart->GetTime();
+	SYSTEMTIME t2 = m_dateTimeEnd->GetTime();
 
+	t1.wHour = 0;
+	t1.wMinute = 0;
+	t1.wSecond = 0;
+
+	t2.wHour = 0;
+	t2.wMinute = 0;
+	t2.wSecond = 0;
+
+	time_t tStartTime = SystemTime2Time(t1);
+	time_t tEndTime = SystemTime2Time(t2);
+
+	DuiLib::CDuiString  strText;
+	DuiLib::CDuiString  strTargetId;
+	int nTargetType = -1;
+
+	strText = m_edTarget_1->GetText();
+	if (strText.GetLength() > 0) {
+		int nPos = strText.Find(',');
+		assert(nPos >= 0);
+		strTargetId = strText.Mid(0, nPos);
+
+		if ( m_optSales_1->IsSelected() ) {
+			nTargetType = 0;
+		}
+		else {
+			nTargetType = 1;
+		}
+	}
+
+	m_lstQueryByTime->RemoveAll();
+	m_lblSmallCnt_1->SetText("0");
+	m_lblBigCnt_1->SetText("0");
+	SetBusy();
+	CBusiness::GetInstance()->QueryByTimeAsyn(tStartTime, tEndTime, nTargetType, strTargetId); 
+	
 }
 
+void  CDuiFrameWnd::OnSelectTarget_1() {
+	int nTargetType = 0;
+	if (m_optSales_1->IsSelected()) {
+		nTargetType = TARGET_TYPE_SALES;
+	}
+	else {
+		nTargetType = TARGET_TYPE_AGENCIES;
+	}
+
+	CTargetDlg * pDlg = new CTargetDlg(nTargetType);
+
+	pDlg->Create(this->m_hWnd, _T("目标"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+
+	DuiLib::CDuiString  strText;
+	if (0 == ret) {
+		strText = pDlg->m_strId;
+		strText += ",";
+		strText += pDlg->m_strName;
+
+		m_edTarget_1->SetText(strText);
+	}
+
+	delete pDlg;
+}
 
 
 
