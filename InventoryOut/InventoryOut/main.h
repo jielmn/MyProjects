@@ -86,6 +86,9 @@ private:
 	// 
 	void OnInvOk();
 
+	/*²éÑ¯*/
+	void OnQueryByTime();
+
 private:
 	DuiLib::CDuiString                 m_strInvOutBuf;                      // ÅÌµã×Ö·ûµÄ»º³å
 	int                                m_nSmallCount;

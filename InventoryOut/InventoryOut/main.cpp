@@ -552,6 +552,10 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 	m_bBusy = bBusy;
 }
 
+void  CDuiFrameWnd::OnQueryByTime() {
+
+}
+
 
 
 
@@ -712,4 +716,4 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LmnToolkits::ThreadManager::ReleaseInstance();
 
 	return 0;
-}
+}   

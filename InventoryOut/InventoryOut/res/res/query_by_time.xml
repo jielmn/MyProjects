@@ -45,5 +45,14 @@
 			</List>
 		</HorizontalLayout>
 		
+		<HorizontalLayout inset="10,5,10,5" height="40" >
+			<Label text="大包装个数：" font="3" textcolor="#FF386382" width="120" />
+			<Label name="lblBigCount_1" text="0" font="3" textcolor="#FF386382" width="120" />
+			<Label text="小包装个数：" font="3" textcolor="#FF386382" width="120" />
+			<Label name="lblSmallCount_1" text="0" font="3" textcolor="#FF386382" width="120" />
+		</HorizontalLayout>
+		
+		
+		
 	</VerticalLayout>
 </Window>
