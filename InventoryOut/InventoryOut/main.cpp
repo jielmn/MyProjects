@@ -512,13 +512,17 @@ void  CDuiFrameWnd::OnQueryByTimeMsg(int ret, const std::vector<QueryByTimeItem*
 	std::vector<QueryByTimeItem*>::const_iterator it;
 	int nBigCnt = 0;
 	int nSmallCnt = 0;
+	int i = 0;
 
-	for ( it = vRet.begin(); it != vRet.end(); ++it ) {
+	for ( it = vRet.begin(), i = 0; it != vRet.end(); ++it, ++i ) {
 		QueryByTimeItem* pItem = *it;
 		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
 		m_lstQueryByTime->Add(pListElement);
 
-		pListElement->SetText(0, PACKAGE_TYPE_BIG == pItem->m_nPackageType ? "大包装" : "小包装" );
+		strText.Format("%d", i + 1);
+		pListElement->SetText(0, strText);
+
+		pListElement->SetText(1, PACKAGE_TYPE_BIG == pItem->m_nPackageType ? "大包装" : "小包装" );
 
 		if (pItem->m_nPackageType == PACKAGE_TYPE_BIG) {
 			nBigCnt++;
@@ -526,18 +530,18 @@ void  CDuiFrameWnd::OnQueryByTimeMsg(int ret, const std::vector<QueryByTimeItem*
 			nSmallCnt++;
 		}
 
-		pListElement->SetText(1, pItem->m_szPackageId);
+		pListElement->SetText(2, pItem->m_szPackageId);
 
-		pListElement->SetText(2, TARGET_TYPE_SALES == pItem->m_nTargetType ? "销售" : "经销商" );
+		pListElement->SetText(3, TARGET_TYPE_SALES == pItem->m_nTargetType ? "销售" : "经销商" );
 
-		pListElement->SetText(3, pItem->m_szTargetName);
+		pListElement->SetText(4, pItem->m_szTargetName);
 
-		pListElement->SetText(4, pItem->m_szOperatorName);
+		pListElement->SetText(5, pItem->m_szOperatorName);
 
 		DateTime2String(buf, sizeof(buf), &pItem->m_tOperatorTime);
-		pListElement->SetText(5, buf);
+		pListElement->SetText(6, buf);
 	}
-
+	   
 	strText.Format("%d", nSmallCnt);
 	m_lblSmallCnt_1->SetText(strText);
 
@@ -632,11 +636,13 @@ void  CDuiFrameWnd::ClearInvOut() {
 void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 	if (bBusy) {
 		m_btnInvOk->SetEnabled(false);
+		m_btnQuery_1->SetEnabled(false);
 		m_progress->SetVisible(true);
 		m_progress->Start();
 	}
 	else {
 		m_btnInvOk->SetEnabled(true);
+		m_btnQuery_1->SetEnabled(true); 
 		m_progress->Stop();
 		m_progress->SetVisible(false);
 	}
