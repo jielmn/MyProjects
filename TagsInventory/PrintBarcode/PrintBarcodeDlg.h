@@ -10,6 +10,11 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "LmnCommon.h"
+#include "LmnConfig.h"
+
+extern IConfig * g_cfg;
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -48,15 +53,39 @@ public:
 		if (pCtrl) {
 			pCtrl->SetText("10");
 		}
+
+		DWORD dwFontSize = 0;
+		g_cfg->GetConfig("font size", dwFontSize, 28);
+
+		m_font = CreateFont(
+			(int)dwFontSize,               // nHeight
+			0,                             // nWidth
+			0,                             // nEscapement
+			0,                             // nOrientation
+			FW_BOLD,                       // nWeight
+			FALSE,                         // bItalic
+			FALSE,                         // bUnderline
+			0,                             // cStrikeOut
+			ANSI_CHARSET,                  // nCharSet
+			OUT_DEFAULT_PRECIS,            // nOutPrecision
+			CLIP_DEFAULT_PRECIS,           // nClipPrecision
+			DEFAULT_QUALITY,               // nQuality
+			DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
+			_T("黑体")
+		);
 	}
 
 	virtual void    Notify(TNotifyUI& msg);
 
 	void DrawQrImg(CDC * pDc, int nWidth, int nHeight, int nBold);
+	void PrintInventorySmall();
+	void Print2DCode();
 
 protected:
 	QRcode * m_qrcode;                                           // 二维码
 	CBrush   m_brush;
+
+	HFONT                    m_font;
 };
 
 
@@ -79,7 +108,7 @@ public:
 // 实现
 protected:
 	HICON m_hIcon;
-	void DrawQrImg(CDC * pDc, int nWidth, int nHeight, int nBold);
+	void DrawQrImg(CDC * pDc, int nWidth, int nHeight, int nBold);	
 
 	CDuiFrameWnd  m_duiFrame;
 	//QRcode * m_qrcode;                                           // 二维码

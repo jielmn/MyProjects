@@ -6,6 +6,8 @@
 #include "PrintBarcode.h"
 #include "PrintBarcodeDlg.h"
 #include "afxdialogex.h"
+#include "39BarCode.h"
+#include "LmnString.h"
 
 #if BAR_CODE
 #include "39BarCode.h"
@@ -16,6 +18,8 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+
 
 void CDuiFrameWnd::DrawQrImg(CDC * pDc, int nWidth, int nHeight, int nBold) {
 
@@ -57,119 +61,213 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		// 打印按钮
 		if (sendName == _T("btnPrint"))
 		{
-			CDuiString  strText;
-			CDuiString  strString;
-
-			CControlUI * pCtrl = 0;
-			pCtrl = m_PaintManager.FindControl(_T("edString"));
-			if (pCtrl) {
-				strString = pCtrl->GetText();
-			}
-
-			if (strString.GetLength() == 0) {
-				::MessageBox(m_hWnd, "请输入要编入的字符串！", "错误", 0);
-				return;
-			}
-
-			int nWidth = 0;
-			int nHeight = 0;
-			int nBold = 0;
-
-			// width
-			pCtrl = m_PaintManager.FindControl(_T("edWidth"));
-			if (pCtrl) {
-				strText = pCtrl->GetText();
-			}
-			sscanf_s((const char *)strText, " %d", &nWidth);
-
-			// height
-			pCtrl = m_PaintManager.FindControl(_T("edHeight"));
-			if (pCtrl) {
-				strText = pCtrl->GetText();
-			}
-			sscanf_s((const char *)strText, " %d", &nHeight);
-
-			// bold
-			pCtrl = m_PaintManager.FindControl(_T("edBold"));
-			if (pCtrl) {
-				strText = pCtrl->GetText();
-			}
-			sscanf_s((const char *)strText, " %d", &nBold);
-
-			if (nWidth <= 0 || nHeight <= 0 || nBold <= 0) {
-				::MessageBox(m_hWnd, "参数有误！", "错误", 0);
-				return;
-			}
-
-			if (m_qrcode) {
-				QRcode_free(m_qrcode);
-				m_qrcode = 0;
-			}
-			m_qrcode = QRcode_encodeString((const char *)strString, 2, QR_ECLEVEL_L, QR_MODE_8, 0);
-
-			PRINTDLG printInfo;
-			ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
-			printInfo.lStructSize = sizeof(printInfo);
-			printInfo.hwndOwner = 0;
-			printInfo.hDevMode = 0;
-			printInfo.hDevNames = 0;
-			//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
-			//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
-			//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
-			printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
-			printInfo.nCopies = 1;
-			printInfo.nFromPage = 0xFFFF;
-			printInfo.nToPage = 0xFFFF;
-			printInfo.nMinPage = 1;
-			printInfo.nMaxPage = 0xFFFF;
-
-			//调用API拿出默认打印机     
-			PrintDlg(&printInfo);
-			//if (PrintDlg(&printInfo)==TRUE) 
-			{
-				LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
-
-				if (lpDevMode) {
-					lpDevMode->dmPaperSize = DMPAPER_USER;
-					lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
-					lpDevMode->dmPaperWidth = (short)nWidth;
-					lpDevMode->dmPaperLength = (short)nHeight;
-					lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
-				}
-				GlobalUnlock(printInfo.hDevMode);
-				ResetDC(printInfo.hDC, lpDevMode);
-
-				DOCINFO di;
-				ZeroMemory(&di, sizeof(DOCINFO));
-				di.cbSize = sizeof(DOCINFO);
-				di.lpszDocName = _T("MyXPS");
-				StartDoc(printInfo.hDC, &di);
-				StartPage(printInfo.hDC);
-
-				CDC *pDC = CDC::FromHandle(printInfo.hDC);
-				pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
-
-				CSize size = CSize(nWidth, nHeight);
-				pDC->SetWindowExt(size);
-				pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
-
-
 #if BAR_CODE
-				DrawBarcode(pDC->m_hDC, 0, 0, nWidth, nHeight, (const char *)strString);
+			PrintInventorySmall();
 #else
-				DrawQrImg(pDC, nWidth, nHeight, nBold);
+			Print2DCode();
 #endif
-				
-				
-
-				EndPage(printInfo.hDC);
-				EndDoc(printInfo.hDC);
-
-				// Delete DC when done.
-				DeleteDC(printInfo.hDC);
-
-			}
 		}
+	}
+}
+
+
+
+// 打印条码
+void  CDuiFrameWnd::PrintInventorySmall() {
+
+	DWORD   dwPaperWidth = 0;
+	DWORD   dwPaperLength = 0;
+	DWORD   dwLeft = 0;
+	DWORD   dwTop = 0;
+	DWORD   dwPrintWidth = 0;
+	DWORD   dwPrintHeight = 0;
+	DWORD   dwTextHeight = 0;
+
+	g_cfg->Reload();
+	g_cfg->GetConfig("paper width", dwPaperWidth, 600);
+	g_cfg->GetConfig("paper length", dwPaperLength, 170);
+	g_cfg->GetConfig("paper left", dwLeft, 0);
+	g_cfg->GetConfig("paper top", dwTop, 0);
+	g_cfg->GetConfig("print width", dwPrintWidth, dwPaperWidth);
+	g_cfg->GetConfig("print height", dwPrintHeight, dwPaperLength);
+	g_cfg->GetConfig("bar code text height", dwTextHeight, 50);
+
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	PrintDlg(&printInfo);
+	//if (PrintDlg(&printInfo)==TRUE) 
+	{
+		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
+
+		if (lpDevMode) {
+			lpDevMode->dmPaperSize = DMPAPER_USER;
+			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
+			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
+			lpDevMode->dmPaperLength = (short)dwPaperLength;
+			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+		}
+		GlobalUnlock(printInfo.hDevMode);
+		ResetDC(printInfo.hDC, lpDevMode);
+
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+		StartDoc(printInfo.hDC, &di);
+		StartPage(printInfo.hDC);
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		DWORD dwMultiple = 0;
+		g_cfg->GetConfig("multiple", dwMultiple);
+
+		CSize size = CSize(dwPaperWidth, dwPaperLength);
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		CDuiString  strBatchId;
+		CControlUI * pCtrl = 0;
+		pCtrl = m_PaintManager.FindControl(_T("edString"));
+		if (pCtrl) {
+			strBatchId = pCtrl->GetText();
+		}
+
+		char buf[8192];
+		Str2Upper((const char*)strBatchId, buf, sizeof(buf));
+
+		// 画条码
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, buf, m_font, dwTextHeight, "S/N:");
+
+		EndPage(printInfo.hDC);
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+	}
+}
+
+void CDuiFrameWnd::Print2DCode() {
+	CDuiString  strText;
+	CDuiString  strString;
+
+	CControlUI * pCtrl = 0;
+	pCtrl = m_PaintManager.FindControl(_T("edString"));
+	if (pCtrl) {
+		strString = pCtrl->GetText();
+	}
+
+	if (strString.GetLength() == 0) {
+		::MessageBox(m_hWnd, "请输入要编入的字符串！", "错误", 0);
+		return;
+	}
+
+	int nWidth = 0;
+	int nHeight = 0;
+	int nBold = 0;
+
+	// width
+	pCtrl = m_PaintManager.FindControl(_T("edWidth"));
+	if (pCtrl) {
+		strText = pCtrl->GetText();
+	}
+	sscanf_s((const char *)strText, " %d", &nWidth);
+
+	// height
+	pCtrl = m_PaintManager.FindControl(_T("edHeight"));
+	if (pCtrl) {
+		strText = pCtrl->GetText();
+	}
+	sscanf_s((const char *)strText, " %d", &nHeight);
+
+	// bold
+	pCtrl = m_PaintManager.FindControl(_T("edBold"));
+	if (pCtrl) {
+		strText = pCtrl->GetText();
+	}
+	sscanf_s((const char *)strText, " %d", &nBold);
+
+	if (nWidth <= 0 || nHeight <= 0 || nBold <= 0) {
+		::MessageBox(m_hWnd, "参数有误！", "错误", 0);
+		return;
+	}
+
+	if (m_qrcode) {
+		QRcode_free(m_qrcode);
+		m_qrcode = 0;
+	}
+	m_qrcode = QRcode_encodeString((const char *)strString, 2, QR_ECLEVEL_L, QR_MODE_8, 0);
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	PrintDlg(&printInfo);
+	//if (PrintDlg(&printInfo)==TRUE) 
+	{
+		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
+
+		if (lpDevMode) {
+			lpDevMode->dmPaperSize = DMPAPER_USER;
+			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
+			lpDevMode->dmPaperWidth = (short)nWidth;
+			lpDevMode->dmPaperLength = (short)nHeight;
+			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+		}
+		GlobalUnlock(printInfo.hDevMode);
+		ResetDC(printInfo.hDC, lpDevMode);
+
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+		StartDoc(printInfo.hDC, &di);
+		StartPage(printInfo.hDC);
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		CSize size = CSize(nWidth, nHeight);
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		DrawQrImg(pDC, nWidth, nHeight, nBold);
+
+		EndPage(printInfo.hDC);
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+
 	}
 }
 

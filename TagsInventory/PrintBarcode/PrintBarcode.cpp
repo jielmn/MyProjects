@@ -5,11 +5,14 @@
 #include "stdafx.h"
 #include "PrintBarcode.h"
 #include "PrintBarcodeDlg.h"
+#include "LmnCommon.h"
+#include "LmnConfig.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
+IConfig * g_cfg = 0;
 
 // CPrintBarcodeApp
 
@@ -73,6 +76,9 @@ BOOL CPrintBarcodeApp::InitInstance()
 	CPaintManagerUI::SetInstance(AfxGetInstanceHandle());                    // 指定duilib的实例
 	CPaintManagerUI::SetResourcePath(CPaintManagerUI::GetInstancePath());    // 指定duilib资源的路径，这里指定为和exe同目录
 	::CoInitialize(NULL);
+
+	g_cfg = new FileConfigEx();
+	g_cfg->Init("Inventory.cfg");
 
 	CPrintBarcodeDlg dlg;
 	m_pMainWnd = &dlg;

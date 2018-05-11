@@ -52,4 +52,4 @@
 #endif
 
 
-#define  BAR_CODE    0
+#define  BAR_CODE    1
