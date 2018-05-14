@@ -87,6 +87,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigTimer.connect(this, &CDuiFrameWnd::OnTimerRet);
 	CBusiness::GetInstance()->m_sigSaveInvOutRet.connect(this, &CDuiFrameWnd::OnSaveInvOutRet);
 	CBusiness::GetInstance()->m_sigQueryByTime.connect(this, &CDuiFrameWnd::OnQueryByTimeRet);
+	CBusiness::GetInstance()->m_sigQueryByBigPkg.connect(this, &CDuiFrameWnd::OnQueryByBigPkgRet);
 
 	m_Callback.m_PaintManager = &m_PaintManager;
 }
@@ -118,6 +119,11 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblSmallCnt_1 = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblSmallCount_1"));
 	m_lblBigCnt_1 = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblBigCount_1"));
 
+	m_lstQueryByBigPkg = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("query_list_2"));
+	m_lstQueryByBigPkg_1 = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("query_list_2_1"));
+	m_btnQuery_2 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnQuery_2"));
+	m_edBigPackageId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtBigPackageId"));
+
 	m_progress = static_cast<CMyProgress *>(m_PaintManager.FindControl("progress"));
 
 	CInvoutDatabase::DATABASE_STATUS eStatus = CBusiness::GetInstance()->GetDbStatus();
@@ -129,6 +135,8 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 	m_lblLoginUser->SetText(CBusiness::GetInstance()->m_strLoginName);
+
+	m_lstQueryByBigPkg_1->SetVisible(false);
 
 	CBusiness::GetInstance()->GetAllAgency();
 
@@ -199,6 +207,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnTarget_1") {
 			OnSelectTarget_1();
+		}
+		else if ( name == "btnQuery_2" ) {
+			OnQueryByBigPkg();
 		}
 	}
 	else if (msg.sType == "itemactivate") {
@@ -300,6 +311,25 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (pvRet) {
 			ClearVector(*pvRet);
 			delete pvRet;
+		}
+	}
+	else if (uMsg == UM_QUERY_BY_BIG_PKG_RET) {
+		ret = wParam;
+		void ** pParam = (void **)lParam;
+		std::vector<PkgItem*> * pvBig = (std::vector<PkgItem*> *)pParam[0];
+		std::vector<PkgItem*> * pvSmall = (std::vector<PkgItem*> *)pParam[1];
+		assert(pvBig && pvSmall);
+
+		OnQueryByBigPkgMsg(ret, *pvBig, *pvSmall);
+
+		if (pvBig) {
+			ClearVector(*pvBig);
+			delete pvBig;
+		}
+
+		if (pvSmall) {
+			ClearVector(*pvSmall);
+			delete pvSmall;
 		}
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
@@ -550,6 +580,125 @@ void  CDuiFrameWnd::OnQueryByTimeMsg(int ret, const std::vector<QueryByTimeItem*
 
 }
 
+void  CDuiFrameWnd::OnQueryByBigPkgRet(int ret, const std::vector<PkgItem*> & vBig, const std::vector<PkgItem*> & vSmall) {
+	void ** pParam = new void *[2];
+	std::vector<PkgItem*> * pvBig   = new std::vector<PkgItem*>;
+	std::vector<PkgItem*> * pvSmall = new std::vector<PkgItem*>;
+	pParam[0] = pvBig;
+	pParam[1] = pvSmall;
+
+	std::vector<PkgItem*>::const_iterator it;
+	for ( it = vBig.begin(); it != vBig.end(); it++ ) {
+		PkgItem* pPkgItem = *it;
+		PkgItem* pNewPkgItem = new PkgItem;
+		memcpy(pNewPkgItem, pPkgItem, sizeof(PkgItem));
+		pvBig->push_back(pNewPkgItem);
+	}
+
+	for (it = vSmall.begin(); it != vSmall.end(); it++) {
+		PkgItem* pPkgItem = *it;
+		PkgItem* pNewPkgItem = new PkgItem;
+		memcpy(pNewPkgItem, pPkgItem, sizeof(PkgItem));
+		pvSmall->push_back(pNewPkgItem);
+	}
+
+	::PostMessage( GetHWND(), UM_QUERY_BY_BIG_PKG_RET, ret, (LPARAM)pParam );
+}
+
+void  CDuiFrameWnd::OnQueryByBigPkgMsg(int ret, const std::vector<PkgItem*> & vBig, const std::vector<PkgItem*> & vSmall) {
+	SetBusy(FALSE);
+
+	if (0 != ret) {
+		::MessageBox(GetHWND(), GetErrorDescription(ret), "查询", 0);
+		return;
+	}
+
+	DuiLib::CDuiString  strText;
+	char buf[8192];
+	std::vector<PkgItem*>::const_iterator it;
+	int i;
+
+	for (it = vBig.begin(), i = 0; it != vBig.end(); it++, i++) {
+		PkgItem* pItem = *it;
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstQueryByBigPkg->Add(pListElement);
+
+		strText.Format( "%d", i + 1 );
+		pListElement->SetText(0, strText);
+
+		pListElement->SetText(1, pItem->szId);
+		if (pItem->dwStatus == PKG_STATUS_OUT) {
+			pListElement->SetText(2, "已出库");
+		}
+		else if (pItem->dwStatus == PKG_STATUS_HALF_OUT) {
+			pListElement->SetText(2, "半出库");
+		}
+		else {
+			pListElement->SetText(2, "在库");
+		}
+
+		pListElement->SetText(3, pItem->szInOperator);
+
+		DateTime2String( buf, sizeof(buf), &pItem->tInTime );
+		pListElement->SetText( 4, buf );
+
+		if (pItem->nOutTargetType != -1) {
+			pListElement->SetText(5, TARGET_TYPE_SALES == pItem->nOutTargetType ? "销售" : "经销商");
+		}
+		
+		pListElement->SetText(6, pItem->szOutTargetName );
+
+		pListElement->SetText(7, pItem->szOutOperator);
+
+		if (pItem->nOutTargetType != -1) {
+			DateTime2String(buf, sizeof(buf), &pItem->tOutTime);
+			pListElement->SetText(8, buf);
+		}		
+	}
+
+	for (it = vSmall.begin(), i = 0; it != vSmall.end(); it++, i++) {
+		PkgItem* pItem = *it;
+		DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+		m_lstQueryByBigPkg_1->Add(pListElement);
+
+		strText.Format("%d", i + 1);
+		pListElement->SetText(0, strText);
+
+		pListElement->SetText(1, pItem->szId);
+		if (pItem->dwStatus == PKG_STATUS_OUT) {
+			pListElement->SetText(2, "已出库");
+		}
+		else if (pItem->dwStatus == PKG_STATUS_HALF_OUT) {
+			pListElement->SetText(2, "半出库");
+		}
+		else {
+			pListElement->SetText(2, "在库");
+		}
+
+		pListElement->SetText(3, pItem->szInOperator);
+
+		DateTime2String(buf, sizeof(buf), &pItem->tInTime);
+		pListElement->SetText(4, buf);
+
+		if (pItem->nOutTargetType != -1) {
+			pListElement->SetText(5, TARGET_TYPE_SALES == pItem->nOutTargetType ? "销售" : "经销商");
+		}
+
+		pListElement->SetText(6, pItem->szOutTargetName);
+
+		pListElement->SetText(7, pItem->szOutOperator);
+
+		if (pItem->nOutTargetType != -1) {
+			DateTime2String(buf, sizeof(buf), &pItem->tOutTime);
+			pListElement->SetText(8, buf);
+		}
+	}
+
+	if (vSmall.size() > 0) {
+		m_lstQueryByBigPkg_1->SetVisible(true);
+	}
+}
+
 
 
 
@@ -637,12 +786,14 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 	if (bBusy) {
 		m_btnInvOk->SetEnabled(false);
 		m_btnQuery_1->SetEnabled(false);
+		m_btnQuery_2->SetEnabled(false);
 		m_progress->SetVisible(true);
 		m_progress->Start();
 	}
 	else {
 		m_btnInvOk->SetEnabled(true);
 		m_btnQuery_1->SetEnabled(true); 
+		m_btnQuery_2->SetEnabled(true);
 		m_progress->Stop();
 		m_progress->SetVisible(false);
 	}
@@ -716,6 +867,24 @@ void  CDuiFrameWnd::OnSelectTarget_1() {
 
 	delete pDlg;
 }
+
+void CDuiFrameWnd::OnQueryByBigPkg() {
+	DuiLib::CDuiString  strText;
+
+	strText = m_edBigPackageId->GetText();
+
+	m_lstQueryByBigPkg->RemoveAll();
+	m_lstQueryByBigPkg_1->RemoveAll();
+	m_lstQueryByBigPkg_1->SetVisible(false);
+
+	char buf[256];
+	Str2Upper( strText, buf, sizeof(buf) );
+
+	SetBusy();
+	CBusiness::GetInstance()->QueryByBigPkgAsyn(buf);
+}
+
+
 
 
 

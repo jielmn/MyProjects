@@ -1077,8 +1077,370 @@ int   CInvoutDatabase::QueryByTime(const CQueryByTimeParam * pParam, std::vector
 		assert(0);
 	}
 	
-
-
-
 	return ret;
+}
+   
+
+// 根据大包装查询
+int   CInvoutDatabase::QueryByBigPkg( const CQueryByBigPkgParam * pParam , std::vector<PkgItem*> & vBig, std::vector<PkgItem*> & vSmall) {
+
+	if ( GetStatus() == STATUS_CLOSE ) {
+		return CLmnOdbc::ERROR_DISCONNECTED;
+	}
+
+	char sql[8192];
+	char buf[8192];
+	char szBigPkgId[256];
+	int ret = 0;
+	BOOL bNull = FALSE;
+
+	String2SqlValue(szBigPkgId, sizeof(szBigPkgId), pParam->m_szBigPkgId);
+
+	SNPRINTF(sql, sizeof(sql), " select a.id, a.PACKAGE_ID, c.stfname, a.procetime, b.OUT_TARGET_TYPE, e.stfname, d.stfname,  b.OPERATE_TIME from %s a"
+		                       " left join %s b on a.id = b.package_id"
+		                       " left join %s c on a.staff_id = c.STFID"
+		                       " left join %s d on b.operator = d.STFID"
+		                       " left join %s e on b.OUT_TARGET_ID = e.STFID"
+	                           " where (b.OUT_TARGET_TYPE is null OR b.OUT_TARGET_TYPE = 0) AND a.package_id like '%%%s%%'; ", 
+		                       BIG_PKG_TABLE_NAME, BIG_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, szBigPkgId );
+	try
+	{
+		OpenRecordSet(sql);
+
+		while (MoveNext()) {
+
+			PkgItem * pItem = new PkgItem;
+			memset(pItem, 0, sizeof(PkgItem));
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue( 1, buf, sizeof(buf), &bNull );
+			sscanf( buf, "%lu", &pItem->dwPkgId );
+
+			GetFieldValue(2, pItem->szId, sizeof(pItem->szId), &bNull);
+
+			GetFieldValue(3, pItem->szInOperator, sizeof(pItem->szInOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(4, buf, sizeof(buf), &bNull);
+			pItem->tInTime = String2DateTime(buf);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(5, buf, sizeof(buf), &bNull);
+			if (bNull) {
+				pItem->nOutTargetType = -1;
+			}
+			else {
+				sscanf(buf, "%d", &pItem->nOutTargetType);
+			}
+			
+			GetFieldValue(6, pItem->szOutTargetName, sizeof(pItem->szOutTargetName), &bNull);
+
+			GetFieldValue(7, pItem->szOutOperator, sizeof(pItem->szOutOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(8, buf, sizeof(buf), &bNull);
+			pItem->tOutTime = String2DateTime(buf);
+
+			vBig.push_back(pItem);
+		}
+
+		CloseRecordSet();
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	if (0 != ret) {
+		ClearVector(vBig);
+		return ret;
+	}
+
+
+	SNPRINTF(sql, sizeof(sql), " select a.id, a.PACKAGE_ID, c.stfname, a.procetime, b.OUT_TARGET_TYPE, e.name, d.stfname,  b.OPERATE_TIME from %s a"
+		                       " inner join %s b on a.id = b.package_id"
+		                       " inner join %s c on a.staff_id = c.STFID"
+		                       " inner join %s d on b.operator = d.STFID"
+		                       " inner join %s e on b.OUT_TARGET_ID = e.str_id"
+	                           " where b.OUT_TARGET_TYPE = 1 AND a.package_id like '%%%s%%'; ",
+		                       BIG_PKG_TABLE_NAME, BIG_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, AGENCY_TABLE_NAME, szBigPkgId);
+	try
+	{
+		OpenRecordSet(sql);
+
+		while (MoveNext()) {
+
+			PkgItem * pItem = new PkgItem;
+			memset(pItem, 0, sizeof(PkgItem));
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(1, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%lu", &pItem->dwPkgId);
+
+			GetFieldValue(2, pItem->szId, sizeof(pItem->szId), &bNull);
+
+			GetFieldValue(3, pItem->szInOperator, sizeof(pItem->szInOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(4, buf, sizeof(buf), &bNull);
+			pItem->tInTime = String2DateTime(buf);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(5, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%d", &pItem->nOutTargetType);
+
+			GetFieldValue(6, pItem->szOutTargetName, sizeof(pItem->szOutTargetName), &bNull);
+
+			GetFieldValue(7, pItem->szOutOperator, sizeof(pItem->szOutOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(8, buf, sizeof(buf), &bNull);
+			pItem->tOutTime = String2DateTime(buf);
+
+			vBig.push_back(pItem);
+		}
+
+		CloseRecordSet();
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	if (0 != ret) {
+		ClearVector(vBig);
+		return ret;
+	}
+
+	// 如果查询的大包装记录个数为0
+	if ( 0 == vBig.size() ) {
+		return ret;
+	}
+
+	// 如果大包装个数大于1个
+	if ( vBig.size() > 1 ) {
+
+		std::vector<PkgItem*>::iterator it;
+		for (it = vBig.begin(); it != vBig.end(); ++it) {
+			PkgItem* pItem = *it;
+			// 已经出库
+			if (pItem->nOutTargetType != -1) {
+				pItem->dwStatus = PKG_STATUS_OUT;
+				continue;
+			}
+
+			// 遍历每个大包装的子包装，看其有无出库
+			SNPRINTF(sql, sizeof(sql), " select count(*) from %s a inner join %s b on a.id = b.package_id where a.BIG_PKG_ID = %lu;  ",
+				SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, pItem->dwPkgId );
+			try
+			{
+				OpenRecordSet(sql);
+
+				if (MoveNext()) {
+
+					DWORD  dwCount = 0;
+					memset(buf, 0, sizeof(buf));
+					GetFieldValue(1, buf, sizeof(buf), &bNull);
+					sscanf(buf, "%lu", &dwCount);
+
+					if (0 == dwCount) {
+						pItem->dwStatus = PKG_STATUS_NOT_OUT;
+					}
+					else {
+						pItem->dwStatus = PKG_STATUS_HALF_OUT;
+					}
+				}
+
+				CloseRecordSet();
+			}
+			catch (CLmnOdbcException e)
+			{
+				const char * pStatus = GetSysStatus();
+				if (0 == strcmp(pStatus, "23000")) {
+					ret = InvOutDbErr_Integrity_constraint_violation;
+				}
+				else {
+					ret = e.GetError();
+				}
+				CloseRecordSet();
+			}
+
+			if (0 != ret) {
+				ClearVector(vBig);
+				return ret;
+			}			
+		}		
+		return ret;
+	}
+
+	// 只有一个结果的情况下，查询其小包装
+	PkgItem* pBigPkg = vBig.at(0);
+	// 如果大包装没有出库，查询其子包装有无出库记录
+	// 如果已经出库，则查询结束
+	if ( pBigPkg->nOutTargetType != -1 ) {
+		pBigPkg->dwStatus = PKG_STATUS_OUT;
+		return ret;
+	}
+
+	BOOL  bFindChildrenOut = FALSE;
+
+	SNPRINTF(sql, sizeof(sql), " select a.id, a.PACKAGE_ID, c.stfname, a.procetime, b.OUT_TARGET_TYPE, e.stfname, d.stfname,  b.OPERATE_TIME from %s a"
+		                       " left join %s b on a.id = b.package_id"
+		                       " left join %s c on a.staff_id = c.STFID"
+		                       " left join %s d on b.operator = d.STFID"
+		                       " left join %s e on b.OUT_TARGET_ID = e.STFID"
+	                           " where (b.OUT_TARGET_TYPE is null OR b.OUT_TARGET_TYPE = 0) AND a.big_pkg_id = %lu;  ",
+		                       SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, pBigPkg->dwPkgId );
+	try
+	{
+		OpenRecordSet(sql);
+
+		while (MoveNext()) {
+
+			PkgItem * pItem = new PkgItem;
+			memset(pItem, 0, sizeof(PkgItem));
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(1, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%lu", &pItem->dwPkgId);
+
+			GetFieldValue(2, pItem->szId, sizeof(pItem->szId), &bNull);
+
+			GetFieldValue(3, pItem->szInOperator, sizeof(pItem->szInOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(4, buf, sizeof(buf), &bNull);
+			pItem->tInTime = String2DateTime(buf);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(5, buf, sizeof(buf), &bNull);
+			if (bNull) {
+				pItem->nOutTargetType = -1;
+				pItem->dwStatus = PKG_STATUS_NOT_OUT;
+			}
+			else {
+				sscanf(buf, "%d", &pItem->nOutTargetType);
+				pItem->dwStatus = PKG_STATUS_OUT;
+				bFindChildrenOut = TRUE;
+			}
+
+			GetFieldValue(6, pItem->szOutTargetName, sizeof(pItem->szOutTargetName), &bNull);
+
+			GetFieldValue(7, pItem->szOutOperator, sizeof(pItem->szOutOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(8, buf, sizeof(buf), &bNull);
+			pItem->tOutTime = String2DateTime(buf);
+
+			vSmall.push_back(pItem);
+		}
+
+		CloseRecordSet();
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	if (0 != ret) {
+		ClearVector(vBig);
+		ClearVector(vSmall);
+		return ret;
+	}
+
+
+	SNPRINTF(sql, sizeof(sql), " select a.id, a.PACKAGE_ID, c.stfname, a.procetime, b.OUT_TARGET_TYPE, e.name, d.stfname,  b.OPERATE_TIME from %s a"
+		                       " inner join %s b on a.id = b.package_id"
+		                       " inner join %s c on a.staff_id = c.STFID"
+		                       " inner join %s d on b.operator = d.STFID"
+		                       " inner join %s e on b.OUT_TARGET_ID = e.str_id"
+	                           " where b.OUT_TARGET_TYPE = 1 AND a.big_pkg_id = %lu; ",
+		                       SMALL_PKG_TABLE_NAME, SMALL_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, AGENCY_TABLE_NAME, pBigPkg->dwPkgId);
+	try
+	{
+		OpenRecordSet(sql);
+
+		while (MoveNext()) {
+
+			PkgItem * pItem = new PkgItem;
+			memset(pItem, 0, sizeof(PkgItem));
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(1, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%lu", &pItem->dwPkgId);
+
+			GetFieldValue(2, pItem->szId, sizeof(pItem->szId), &bNull);
+
+			GetFieldValue(3, pItem->szInOperator, sizeof(pItem->szInOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(4, buf, sizeof(buf), &bNull);
+			pItem->tInTime = String2DateTime(buf);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(5, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%d", &pItem->nOutTargetType);
+			pItem->dwStatus = PKG_STATUS_OUT;
+			bFindChildrenOut = TRUE;
+
+			GetFieldValue(6, pItem->szOutTargetName, sizeof(pItem->szOutTargetName), &bNull);
+
+			GetFieldValue(7, pItem->szOutOperator, sizeof(pItem->szOutOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(8, buf, sizeof(buf), &bNull);
+			pItem->tOutTime = String2DateTime(buf);
+
+			vSmall.push_back(pItem);
+		}
+
+		CloseRecordSet();
+	}
+	catch (CLmnOdbcException e)
+	{
+		const char * pStatus = GetSysStatus();
+		if (0 == strcmp(pStatus, "23000")) {
+			ret = InvOutDbErr_Integrity_constraint_violation;
+		}
+		else {
+			ret = e.GetError();
+		}
+		CloseRecordSet();
+	}
+
+	if (0 != ret) {
+		ClearVector(vBig);
+		ClearVector(vSmall);
+		return ret;
+	}
+
+	if (bFindChildrenOut) {
+		pBigPkg->dwStatus = PKG_STATUS_HALF_OUT;
+	}
+	else {
+		pBigPkg->dwStatus = PKG_STATUS_NOT_OUT;
+	}
+
+	return 0;
 }

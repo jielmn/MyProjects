@@ -62,6 +62,10 @@ public:
 	int   QueryByTimeAsyn(time_t tStart, time_t tEnd, int nTargetType, const char * szTargetId);
 	int   QueryByTime( const CQueryByTimeParam * pParam );
 
+	// 根据大包装查询
+	int   QueryByBigPkgAsyn(const char * szBigPkgId);
+	int   QueryByBigPkg(const CQueryByBigPkgParam * pParam);
+
 public:
 	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>                     m_sigStatusChange;
 	sigslot::signal1<int>                                           m_sigLoginRet;
@@ -78,6 +82,7 @@ public:
 
 	// 查询
 	sigslot::signal2<int, const std::vector<QueryByTimeItem*> & >   m_sigQueryByTime;
+	sigslot::signal3<int, const std::vector<PkgItem*> &, const std::vector<PkgItem*> & >   m_sigQueryByBigPkg;
 
 private:
 	static CBusiness *  pInstance;

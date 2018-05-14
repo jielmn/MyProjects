@@ -41,6 +41,9 @@ public:
 	// 根据时间查询
 	int   QueryByTime(const CQueryByTimeParam * pParam, std::vector<QueryByTimeItem*> & vRet);
 
+	// 根据大包装查询
+	int   QueryByBigPkg(const CQueryByBigPkgParam * pParam, std::vector<PkgItem*> & vBig, std::vector<PkgItem*> & vSmall );
+
 private:
 	
 

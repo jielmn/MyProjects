@@ -19,6 +19,7 @@
 #define  MSG_GET_ALL_AGENCY_FOR_TARGET  8
 #define  MSG_SAVE_INV_OUT               9
 #define  MSG_QUERY_BY_TIME              10
+#define  MSG_QUERY_BY_BIG_PKG           11
 
 #define  RECONNECT_DB_TIME              10000
 
@@ -33,6 +34,7 @@
 #define  UM_TIMER_RET                      (WM_USER+9)
 #define  UM_SAVE_INV_OUT_RET               (WM_USER+10)
 #define  UM_QUERY_BY_TIM_RET               (WM_USER+11)
+#define  UM_QUERY_BY_BIG_PKG_RET           (WM_USER+12)
 
 
 
@@ -139,6 +141,35 @@ typedef struct tagQueryByTimeItem {
 	char    m_szOperatorName[32];
 	time_t  m_tOperatorTime;
 }QueryByTimeItem;
+
+
+class CQueryByBigPkgParam : public LmnToolkits::MessageData {
+public:
+	CQueryByBigPkgParam(const char * szBigPkgId) {
+		STRNCPY(m_szBigPkgId, szBigPkgId, sizeof(m_szBigPkgId));
+	}
+
+	char    m_szBigPkgId[32];
+};
+
+#define  PKG_STATUS_OUT                0                  // 已出库
+#define  PKG_STATUS_HALF_OUT           1                  // 半出库
+#define  PKG_STATUS_NOT_OUT            2                  // 没有出库
+
+typedef struct tagPkgItem {
+	DWORD    dwPkgId;
+	DWORD    dwStatus;
+	char     szId[32];
+
+	char     szInOperator[16];
+	time_t   tInTime;
+
+	int      nOutTargetType;
+	char     szOutTargetName[64];
+	char     szOutOperator[16];
+	time_t   tOutTime;
+}PkgItem;
+
 
 #define  PACKAGE_TYPE_BIG         0
 #define  PACKAGE_TYPE_SMALL       1

@@ -12,7 +12,7 @@
 		
 		<HorizontalLayout height="20" />
 		
-		<HorizontalLayout  inset="10,5,10,5" >
+		<VerticalLayout  inset="10,5,10,5" >
 			<List name="query_list_2" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
 				<ListHeader height="24" menu="true">
 					<ListHeaderItem text="序号"             font="3" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
@@ -26,7 +26,25 @@
 					<ListHeaderItem text="出库时间"        font="3" width="200"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>					
 				</ListHeader>
 			</List>
-		</HorizontalLayout>
+			
+			<Control height="20" />
+			
+			<List name="query_list_2_1" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
+				<ListHeader height="24" menu="true">
+					<ListHeaderItem text="序号"             font="3" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="小包装ID"         font="3" width="200"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="状态"             font="3" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="入库操作人员"    font="3" width="120"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="入库时间"        font="3" width="200"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="出库目标类型"    font="3" width="120"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="出库目标名称"    font="3" width="200"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>					
+					<ListHeaderItem text="出库操作人员"    font="3" width="120"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>					
+					<ListHeaderItem text="出库时间"        font="3" width="200"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>					
+				</ListHeader>
+			</List>
+			
+		</VerticalLayout>
+		
 		
 	</VerticalLayout>
 </Window>

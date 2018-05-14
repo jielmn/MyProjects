@@ -241,6 +241,27 @@ int   CBusiness::QueryByTime(const CQueryByTimeParam * pParam) {
 	return 0;
 }
 
+// 根据大包装查询
+int   CBusiness::QueryByBigPkgAsyn( const char * szBigPkgId ) {
+	m_thrd_db.PostMessage(this, MSG_QUERY_BY_BIG_PKG, new CQueryByBigPkgParam(szBigPkgId));
+	return 0;
+}
+
+int   CBusiness::QueryByBigPkg( const CQueryByBigPkgParam * pParam ) {
+	std::vector<PkgItem*> vBig;
+	std::vector<PkgItem*> vSmall;
+	int ret = m_db.QueryByBigPkg(pParam, vBig, vSmall );
+	m_sigQueryByBigPkg.emit(ret, vBig, vSmall);
+
+	ClearVector(vBig);
+	ClearVector(vSmall);
+	return 0;
+}
+
+
+
+
+
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
@@ -308,6 +329,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryByTimeParam * pParam = (CQueryByTimeParam *)pMessageData;
 		QueryByTime(pParam);
+	}
+	break;
+
+	case MSG_QUERY_BY_BIG_PKG:
+	{
+		CQueryByBigPkgParam * pParam = (CQueryByBigPkgParam *)pMessageData;
+		QueryByBigPkg(pParam);
 	}
 	break;
 
