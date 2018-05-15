@@ -20,6 +20,7 @@
 #define  MSG_SAVE_INV_OUT               9
 #define  MSG_QUERY_BY_TIME              10
 #define  MSG_QUERY_BY_BIG_PKG           11
+#define  MSG_QUERY_BY_SMALL_PKG         12
 
 #define  RECONNECT_DB_TIME              10000
 
@@ -35,6 +36,7 @@
 #define  UM_SAVE_INV_OUT_RET               (WM_USER+10)
 #define  UM_QUERY_BY_TIM_RET               (WM_USER+11)
 #define  UM_QUERY_BY_BIG_PKG_RET           (WM_USER+12)
+#define  UM_QUERY_BY_SMALL_PKG_RET         (WM_USER+13)
 
 
 
@@ -152,14 +154,25 @@ public:
 	char    m_szBigPkgId[32];
 };
 
-#define  PKG_STATUS_OUT                0                  // 已出库
-#define  PKG_STATUS_HALF_OUT           1                  // 半出库
-#define  PKG_STATUS_NOT_OUT            2                  // 没有出库
+class CQueryBySmallPkgParam : public LmnToolkits::MessageData {
+public:
+	CQueryBySmallPkgParam(const char * szSmallPkgId) {
+		STRNCPY(m_szSmallPkgId, szSmallPkgId, sizeof(m_szSmallPkgId));
+	}
+
+	char    m_szSmallPkgId[32];
+};
+
+#define  PKG_STATUS_OUT                1                  // 已出库
+#define  PKG_STATUS_HALF_OUT           2                  // 半出库
+#define  PKG_STATUS_NOT_OUT            0                  // 没有出库
 
 typedef struct tagPkgItem {
-	DWORD    dwPkgId;
+	DWORD    dwPkgId;	
 	DWORD    dwStatus;
 	char     szId[32];
+	DWORD    dwParentPkgId;
+	char     szParentPkgId[32];
 
 	char     szInOperator[16];
 	time_t   tInTime;

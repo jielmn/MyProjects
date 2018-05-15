@@ -63,6 +63,11 @@ private:
 	DuiLib::CButtonUI *           m_btnQuery_2;
 	DuiLib::CEditUI *             m_edBigPackageId;
 
+	// 根据小包装查询
+	DuiLib::CListUI *             m_lstQueryBySmallPkg;
+	DuiLib::CButtonUI *           m_btnQuery_3;
+	DuiLib::CEditUI *             m_edSmallPackageId;
+
 	// 状态栏
 	CMyProgress *                 m_progress;
 
@@ -88,6 +93,9 @@ private:
 	void  OnQueryByBigPkgRet(int, const std::vector<PkgItem*> &, const std::vector<PkgItem*> &);
 	void  OnQueryByBigPkgMsg(int, const std::vector<PkgItem*> &, const std::vector<PkgItem*> &);
 
+	void  OnQueryBySmallPkgRet(int, const std::vector<PkgItem*> &);
+	void  OnQueryBySmallPkgMsg(int, const std::vector<PkgItem*> &);
+
 private:
 	void  AddAgencyItem2List(DuiLib::CListTextElementUI* pListElement, AgencyItem * pItem, BOOL bSetTag = TRUE);
 	void  OnAddAgency();
@@ -112,6 +120,9 @@ private:
 
 	// 根据大包装查询
 	void OnQueryByBigPkg();
+
+	// 根据小包装查询
+	void OnQueryBySmallPkg();
 
 private:
 	DuiLib::CDuiString                 m_strInvOutBuf;                      // 盘点字符的缓冲

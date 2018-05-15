@@ -44,6 +44,9 @@ public:
 	// 根据大包装查询
 	int   QueryByBigPkg(const CQueryByBigPkgParam * pParam, std::vector<PkgItem*> & vBig, std::vector<PkgItem*> & vSmall );
 
+	// 根据小包装查询
+	int   QueryBySmallPkg(const CQueryBySmallPkgParam * pParam, std::vector<PkgItem*> & vSmall);
+
 private:
 	
 
