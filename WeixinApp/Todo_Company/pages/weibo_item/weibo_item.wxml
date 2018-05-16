@@ -1,0 +1,8 @@
+<view class="main">
+  <form bindsubmit="formSubmit">
+    <textarea maxlength="128" placeholder="分享你的内容" class="item" name="item"></textarea>
+    <!--<view class="split"></view>-->
+    <view class="image-add">+</view>
+    <button form-type="submit" class="item button">保存清单</button>
+  </form>
+</view>

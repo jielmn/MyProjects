@@ -1,0 +1,36 @@
+<!--<view >
+  <image src="{{personInfo.avatarUrl}}" class="person avatar"></image>
+  <view class="person">姓名</view>
+</view>
+
+<text class="note_item">111111111111222222222222222222223333333333333333333333344444444444444411111111111122222222222222222222333333333333333333333334444444444444441111111111112222222222222222222233333333333333333333333444444444444444</text>
+-->
+
+
+<view wx:for="{{weibo_items}}" wx:key="id" class="weibo">
+  <view>
+    <image src="{{item.avatarUrl}}" class="person avatar"></image>
+    <view class="person">{{item.name}}</view>
+  </view>
+  
+  <text class="weibo_item">{{item.content}}</text>
+  
+  <image wx:if="{{item.src0}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src1}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src2}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src3}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src4}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src5}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src6}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src7}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <image wx:if="{{item.src8}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+
+  <text class="weibo_reader">a,b,c已读</text>
+
+</view>
+
+<view class="bottom">
+  <view class="add-p">
+    <view class="add" bindtap="toAddWeibo">+</view>
+  </view>
+</view>
