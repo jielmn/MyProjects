@@ -47,9 +47,12 @@ public:
 	// 根据小包装查询
 	int   QueryBySmallPkg(const CQueryBySmallPkgParam * pParam, std::vector<PkgItem*> & vSmall);
 
+	// 根据Tag查询
+	int   QueryByTag(const CQueryByTagParam * pParam, TagItem & tTag );
+
 private:
 	
-
+	void OnException(int & ret, CLmnOdbcException * e);
 private:
 
 };

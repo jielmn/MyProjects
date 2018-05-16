@@ -11,6 +11,7 @@
 #define  SMALL_PKG_TABLE_NAME       "small_pkg"
 #define  BIG_OUT_TABLE_NAME         "big_out"
 #define  SMALL_OUT_TABLE_NAME       "small_out"
+#define  TAGS_TABLE_NAME            "tags"
 
 CInvoutDatabase::CInvoutDatabase() {
 	
@@ -1666,4 +1667,183 @@ int   CInvoutDatabase::QueryBySmallPkg(const CQueryBySmallPkgParam * pParam, std
 	}
 
 	return 0;
+}
+
+
+// 根据Tag查询
+int   CInvoutDatabase::QueryByTag(const CQueryByTagParam * pParam, TagItem & tTag ) {
+	if (GetStatus() == STATUS_CLOSE) {
+		return CLmnOdbc::ERROR_DISCONNECTED;
+	}
+
+	memset(&tTag, 0, sizeof(TagItem));
+	tTag.nOutTargetType = -1;
+
+	char sql[8192];
+	char buf[8192];
+	int ret = 0;
+	BOOL bNull = FALSE;
+	BOOL bFind = FALSE;
+
+	SNPRINTF(sql, sizeof(sql), " select a.id, a.small_pkg_id, b.package_id, b.big_pkg_id, c.package_id, d.stfname, b.procetime"
+		                       " from %s a inner join %s b on a.small_pkg_id = b.id"
+		                       " left join %s c on b.big_pkg_id = c.id"
+		                       " left join %s d on b.staff_id = d.stfid"
+		                       " where a.id = '%s';  ",
+		                       TAGS_TABLE_NAME, SMALL_PKG_TABLE_NAME, BIG_PKG_TABLE_NAME, STAFF_TABLE_NAME, pParam->m_szTagId );
+	try
+	{
+		OpenRecordSet(sql);
+
+		if (MoveNext()) {
+			bFind = TRUE;
+
+			GetFieldValue(1, tTag.szTagId, sizeof(tTag.szTagId), &bNull);
+			
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(2, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%lu", &tTag.dwSmallPkgId);
+
+			GetFieldValue(3, tTag.szSmallPkgId, sizeof(tTag.szSmallPkgId), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(4, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%lu", &tTag.dwBigPkgId);
+
+			GetFieldValue(5, tTag.szBigPkgId, sizeof(tTag.szBigPkgId), &bNull);			
+
+			GetFieldValue(6, tTag.szInOperator, sizeof(tTag.szInOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(7, buf, sizeof(buf), &bNull);
+			tTag.tInTime = String2DateTime(buf);
+		}
+
+		CloseRecordSet();
+	}
+	catch (CLmnOdbcException e)
+	{
+		OnException(ret, &e);
+	}
+
+	if (0 != ret) {
+		return ret;
+	}
+
+	// 如果没有该Tag
+	if ( !bFind ) {
+		return 0;
+	}
+
+	
+	// 查询大包装有无出库
+	if (tTag.dwBigPkgId > 0) {
+		SNPRINTF(sql, sizeof(sql), " select a.out_target_type, b.stfname, c.stfname, a.operate_time"
+			                       " from %s a inner join %s b on a.out_target_id = b.stfid"
+			                       " inner join %s c on a.operator = c.stfid"
+			                       " where a.out_target_type = 0 and a.package_id = %lu"
+			                       " union"
+			                       " select a.out_target_type, b.name, c.stfname, a.operate_time"
+			                       " from %s a inner join %s b on a.out_target_id = b.str_id"
+			                       " inner join %s c on a.operator = c.stfid"
+			                       " where a.out_target_type = 1 and a.package_id = %lu;  ",
+			                       BIG_OUT_TABLE_NAME, STAFF_TABLE_NAME, STAFF_TABLE_NAME, tTag.dwBigPkgId,
+			                       BIG_OUT_TABLE_NAME, AGENCY_TABLE_NAME, STAFF_TABLE_NAME, tTag.dwBigPkgId);
+		try
+		{
+			OpenRecordSet(sql);
+
+			if (MoveNext()) {
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(1, buf, sizeof(buf), &bNull);
+				sscanf(buf, "%lu", &tTag.nOutTargetType);
+
+				GetFieldValue(2, tTag.szOutTargetName, sizeof(tTag.szOutTargetName), &bNull);
+
+				GetFieldValue(3, tTag.szOutOperator, sizeof(tTag.szOutOperator), &bNull);
+
+				memset(buf, 0, sizeof(buf));
+				GetFieldValue(4, buf, sizeof(buf), &bNull);
+				tTag.tOutTime = String2DateTime(buf);
+
+				tTag.dwStatus = PKG_STATUS_OUT;
+			}
+
+			CloseRecordSet();
+		}
+		catch (CLmnOdbcException e)
+		{
+			OnException(ret, &e);
+		}
+
+		if (0 != ret) {
+			return ret;
+		}
+	}
+
+	if ( tTag.nOutTargetType != -1 ) {
+		return 0;
+	}
+
+	// 查询小包装有无出库
+	SNPRINTF(sql, sizeof(sql),	" select a.out_target_type, b.stfname, c.stfname, a.OPERATE_TIME "
+								" from %s a inner join %s b on a.out_target_id = b.stfid"
+								" inner join %s c on a.operator = c.stfid"
+								" where a.OUT_TARGET_TYPE = 0 and a.package_id = %lu"
+								" union"
+								" select a.out_target_type, b.name, c.stfname, a.OPERATE_TIME"
+								" from %s a inner join %s b on a.out_target_id = b.str_id"
+								" inner join %s c on a.operator = c.stfid"
+								" where a.OUT_TARGET_TYPE = 1 and a.package_id = %lu;  ",
+								SMALL_OUT_TABLE_NAME, STAFF_TABLE_NAME,  STAFF_TABLE_NAME, tTag.dwSmallPkgId,
+								SMALL_OUT_TABLE_NAME, AGENCY_TABLE_NAME, STAFF_TABLE_NAME, tTag.dwSmallPkgId );
+	try
+	{
+		OpenRecordSet(sql);
+
+		if (MoveNext()) {
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(1, buf, sizeof(buf), &bNull);
+			sscanf(buf, "%lu", &tTag.nOutTargetType);
+
+			GetFieldValue(2, tTag.szOutTargetName, sizeof(tTag.szOutTargetName), &bNull);
+
+			GetFieldValue(3, tTag.szOutOperator, sizeof(tTag.szOutOperator), &bNull);
+
+			memset(buf, 0, sizeof(buf));
+			GetFieldValue(4, buf, sizeof(buf), &bNull);
+			tTag.tOutTime = String2DateTime(buf);
+
+			tTag.dwStatus = PKG_STATUS_OUT;
+		}
+
+		CloseRecordSet();
+	}
+	catch (CLmnOdbcException e)
+	{
+		OnException(ret, &e);
+	}
+
+	if (0 != ret) {
+		return ret;
+	}
+
+	return 0;
+}
+
+
+
+
+
+void CInvoutDatabase::OnException(int & ret, CLmnOdbcException * e) {
+	const char * pStatus = GetSysStatus();
+	if (0 == strcmp(pStatus, "23000")) {
+		ret = InvOutDbErr_Integrity_constraint_violation;
+	}
+	else {
+		ret = e->GetError();
+	}
+	CloseRecordSet();
 }

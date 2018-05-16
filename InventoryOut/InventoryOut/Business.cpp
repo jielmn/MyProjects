@@ -272,6 +272,19 @@ int   CBusiness::QueryBySmallPkg(const CQueryBySmallPkgParam * pParam) {
 	return 0;
 }
 
+// ¸ù¾ÝTag²éÑ¯
+int   CBusiness::QueryByTagAsyn(const char * szTagId) {
+	m_thrd_db.PostMessage(this, MSG_QUERY_BY_TAG, new CQueryByTagParam(szTagId));
+	return 0;
+}
+
+int   CBusiness::QueryByTag(const CQueryByTagParam * pParam) {
+	TagItem tTag;
+	int ret = m_db.QueryByTag(pParam, tTag);
+	m_sigQueryByTag.emit(ret, tTag);
+	return 0;
+}
+
 
 
 
@@ -356,6 +369,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryBySmallPkgParam * pParam = (CQueryBySmallPkgParam *)pMessageData;
 		QueryBySmallPkg(pParam);
+	}
+	break;
+
+	case MSG_QUERY_BY_TAG:
+	{
+		CQueryByTagParam * pParam = (CQueryByTagParam*)pMessageData;
+		QueryByTag(pParam);
 	}
 	break;
 

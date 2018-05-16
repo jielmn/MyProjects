@@ -70,6 +70,10 @@ public:
 	int   QueryBySmallPkgAsyn(const char * szSmallPkgId);
 	int   QueryBySmallPkg(const CQueryBySmallPkgParam * pParam);
 
+	// ¸ù¾ÝTag²éÑ¯
+	int   QueryByTagAsyn(const char * szTagId);
+	int   QueryByTag(const CQueryByTagParam * pParam);
+
 public:
 	sigslot::signal1<CLmnOdbc::DATABASE_STATUS>                     m_sigStatusChange;
 	sigslot::signal1<int>                                           m_sigLoginRet;
@@ -88,6 +92,7 @@ public:
 	sigslot::signal2<int, const std::vector<QueryByTimeItem*> & >   m_sigQueryByTime;
 	sigslot::signal3<int, const std::vector<PkgItem*> &, const std::vector<PkgItem*> & >   m_sigQueryByBigPkg;
 	sigslot::signal2<int, const std::vector<PkgItem*> &>                                   m_sigQueryBySmallPkg;
+	sigslot::signal2<int, const TagItem &>                                                 m_sigQueryByTag;
 
 private:
 	static CBusiness *  pInstance;

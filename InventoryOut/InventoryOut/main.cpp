@@ -89,6 +89,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigQueryByTime.connect(this, &CDuiFrameWnd::OnQueryByTimeRet);
 	CBusiness::GetInstance()->m_sigQueryByBigPkg.connect(this, &CDuiFrameWnd::OnQueryByBigPkgRet);
 	CBusiness::GetInstance()->m_sigQueryBySmallPkg.connect(this, &CDuiFrameWnd::OnQueryBySmallPkgRet);
+	CBusiness::GetInstance()->m_sigQueryByTag.connect(this, &CDuiFrameWnd::OnQueryByTagRet);
 
 	m_Callback.m_PaintManager = &m_PaintManager;
 }
@@ -128,6 +129,10 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lstQueryBySmallPkg = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("query_list_3"));
 	m_btnQuery_3 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnQuery_3"));
 	m_edSmallPackageId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtSmallPackageId"));
+
+	m_lstQueryByTag = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("query_list_4"));
+	m_btnQuery_4 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnQuery_4"));
+	m_edTagId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtTagId"));
 
 	m_progress = static_cast<CMyProgress *>(m_PaintManager.FindControl("progress"));
 
@@ -218,6 +223,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnQuery_3") {
 			OnQueryBySmallPkg();
+		}
+		else if (name == "btnQuery_4") {
+			OnQueryByTag();
 		}
 	}
 	else if (msg.sType == "itemactivate") {
@@ -350,6 +358,17 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (pvSmall) {
 			ClearVector(*pvSmall);
 			delete pvSmall;
+		}
+	}
+	else if (uMsg == UM_QUERY_BY_TAG_RET) {
+		ret = wParam;
+		TagItem * pTag = (TagItem *)lParam;
+		assert(pTag);
+
+		OnQueryByTagMsg(ret, *pTag);
+
+		if (pTag) {
+			delete pTag;
 		}
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
@@ -784,6 +803,59 @@ void  CDuiFrameWnd::OnQueryBySmallPkgMsg(int ret, const std::vector<PkgItem*> & 
 	}
 }
 
+void  CDuiFrameWnd::OnQueryByTagRet(int ret, const TagItem & tTag) {
+	TagItem * pTag = new TagItem;
+	memcpy( pTag, &tTag, sizeof(TagItem) );
+	::PostMessage( GetHWND(), UM_QUERY_BY_TAG_RET, ret, (LPARAM)pTag);
+}
+
+void  CDuiFrameWnd::OnQueryByTagMsg(int ret, const TagItem & tTag) {
+	SetBusy(FALSE);
+
+	if (0 != ret) {
+		::MessageBox(GetHWND(), GetErrorDescription(ret), "查询", 0);
+		return;
+	}
+
+	// 如果没有该Tag
+	if ( '\0' == tTag.szTagId[0] ) {
+		return;
+	}
+
+	char buf[8192];
+
+	DuiLib::CListTextElementUI* pListElement = new DuiLib::CListTextElementUI;
+	m_lstQueryByTag->Add(pListElement);
+	
+	pListElement->SetText(0, tTag.szBigPkgId);
+	pListElement->SetText(1, tTag.szSmallPkgId);
+	pListElement->SetText(2, tTag.szTagId);
+
+	if (tTag.dwStatus == PKG_STATUS_OUT) {
+		pListElement->SetText(3, "已出库");
+	}
+	else {
+		pListElement->SetText(3, "在库");
+	}
+
+	pListElement->SetText(4, tTag.szInOperator);
+
+	DateTime2String(buf, sizeof(buf), &tTag.tInTime);
+	pListElement->SetText(5, buf);
+
+	if (tTag.nOutTargetType != -1) {
+		pListElement->SetText(6, TARGET_TYPE_SALES == tTag.nOutTargetType ? "销售" : "经销商");
+	}
+
+	pListElement->SetText(7, tTag.szOutTargetName);
+
+	pListElement->SetText(8, tTag.szOutOperator);
+
+	if (tTag.nOutTargetType != -1) {
+		DateTime2String(buf, sizeof(buf), &tTag.tOutTime);
+		pListElement->SetText(9, buf);
+	}
+}
 
 
 
@@ -873,6 +945,7 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnQuery_1->SetEnabled(false);
 		m_btnQuery_2->SetEnabled(false);
 		m_btnQuery_3->SetEnabled(false);
+		m_btnQuery_4->SetEnabled(false);
 		m_progress->SetVisible(true);
 		m_progress->Start();
 	}
@@ -881,6 +954,7 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnQuery_1->SetEnabled(true); 
 		m_btnQuery_2->SetEnabled(true);
 		m_btnQuery_3->SetEnabled(true);
+		m_btnQuery_4->SetEnabled(true);
 		m_progress->Stop();
 		m_progress->SetVisible(false);
 	}
@@ -984,6 +1058,97 @@ void CDuiFrameWnd::OnQueryBySmallPkg() {
 
 	SetBusy();
 	CBusiness::GetInstance()->QueryBySmallPkgAsyn(buf);
+}
+
+// 根据Tag查询
+void CDuiFrameWnd::OnQueryByTag() {
+
+	DuiLib::CDuiString  strText;
+
+	strText = m_edTagId->GetText();	
+
+	char buf[256];
+	Str2Lower(strText, buf, sizeof(buf));
+	StrTrim(buf);
+
+	DWORD  dwLen = strlen(buf);
+	if (dwLen == 0) {
+		::MessageBox(GetHWND(), "请输入完整的Tag ID", "查询Tag", 0);
+		return;
+	}
+
+	if ( dwLen < 16 ) {
+		::MessageBox(GetHWND(), "Tag格式不对", "查询Tag", 0);
+		return;
+	}
+
+	char szTagId[20] = {0};
+	int nStatus = 0;  // 0, 第一个字符，1, 第二个字符，2，间隔符号
+	int nIndex = 0;
+
+	for ( DWORD i = 0; i < dwLen; i++ ) {
+		if ( 0 == nStatus || 1 == nStatus ) {
+			if ( (buf[i] >= '0' && buf[i] <= '9') || (buf[i] >= 'a' && buf[i] <= 'f') ) {
+
+				// 如果id过长
+				if (nIndex >= 16) {
+					::MessageBox(GetHWND(), "Tag格式不对", "查询Tag", 0);
+					return;
+				}
+
+				szTagId[nIndex] = buf[i];
+				nIndex++;
+				nStatus++;
+			}
+			// 如果是空格，忽略
+			else if ( buf[i] == ' ' ) {
+
+			}
+			else {
+				::MessageBox(GetHWND(), "Tag格式不对", "查询Tag", 0);
+				return;
+			}
+		}
+		else {
+			assert(nStatus == 2);
+			// 如果没有间隔
+			if ( (buf[i] >= '0' && buf[i] <= '9') || (buf[i] >= 'a' && buf[i] <= 'f') ) {
+
+				// 如果id过长
+				if (nIndex >= 16) {
+					::MessageBox(GetHWND(), "Tag格式不对", "查询Tag", 0);
+					return;
+				}
+
+				szTagId[nIndex] = buf[i];
+				nIndex++;
+				nStatus = 1;
+			}
+			// 如果是空格，忽略
+			else if (buf[i] == ' ') {
+
+			}
+			// 如果是间隔符号
+			else if (buf[i] == '-' || buf[i] == ':') {
+				nStatus = 0;
+			}
+			else {
+				::MessageBox(GetHWND(), "Tag格式不对", "查询Tag", 0);
+				return;
+			}
+		}
+	}
+
+	if ( nIndex != 16 ) {
+		::MessageBox(GetHWND(), "Tag格式不对", "查询Tag", 0);
+		return;
+	}
+
+	m_lstQueryByTag->RemoveAll();
+
+	SetBusy();
+	CBusiness::GetInstance()->QueryByTagAsyn(szTagId);
+
 }
 
 
