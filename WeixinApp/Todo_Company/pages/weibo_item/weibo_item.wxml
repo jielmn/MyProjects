@@ -1,8 +1,24 @@
 <view class="main">
-  <form bindsubmit="formSubmit">
-    <textarea maxlength="128" placeholder="分享你的内容" class="item" name="item"></textarea>
+  <form bindsubmit="formSubmit"> 
+    <textarea maxlength="220" placeholder="前线热点内容" class="item" name="item"></textarea>
     <!--<view class="split"></view>-->
-    <view class="image-add">+</view>
-    <button form-type="submit" class="item button">保存清单</button>
+ 
+    <view class="weibo_form">
+      <label wx:for="{{images}}" wx:key="">
+        <view class="weibo_item" wx:if="{{images[index]}}" >
+          <image src="{{images[index]}}" mode="aspectFit" class="weibo_image" catchtap="OnPreviewImg" data-index="{{index}}" ></image>
+          <view class="del_button" catchtap="OnDelImg" data-index="{{index}}" >删除</view>
+        </view>      
+      </label>
+      <view class="weibo_item">
+        <view class="image-add" catchtap="OnAddImg" >+</view>
+      </view>
+    </view>
+
+    
+
+    
+    
+    <button form-type="submit" class="button">保存前线热点</button>
   </form>
 </view>

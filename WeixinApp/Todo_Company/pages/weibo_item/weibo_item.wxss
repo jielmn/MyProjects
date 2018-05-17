@@ -8,7 +8,9 @@
 }
 
 .item{
-  margin:10px;
+  margin:10rpx;
+  width:740rpx;
+  height:320rpx;
 }
 
 .button{
@@ -17,7 +19,45 @@
 }
 
 .image-add {
-  border:1rpx dashed red;
-  width:200rpx;
-  height:200rpx;
+  border:1rpx dashed #ccc;
+  width:230rpx;
+  height:230rpx;
+  font-size:100rpx;
+  line-height:230rpx;
+  vertical-align:middle;  
+  text-align: center;
+  display: inline-block;
+}
+
+.weibo_image{
+  width:230rpx;
+  height:230rpx;
+  font-size:100rpx;
+  line-height:230rpx;
+  vertical-align:middle;  
+  text-align: center;
+  display: inline-block;
+  margin-left:10rpx;
+  margin-right:10rpx;
+}
+
+.weibo_item{
+  display:flex;
+  flex-direction:column;
+  width:246rpx;
+  height:280rpx;
+}
+
+.weibo_form{
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+}
+
+.del_button{
+  text-align:center;
+  background:orange;
+  color:white;
+  margin-left:10rpx;
+  margin-right:10rpx;
 }

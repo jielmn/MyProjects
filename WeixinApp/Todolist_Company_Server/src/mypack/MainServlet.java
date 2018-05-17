@@ -38,7 +38,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 
 // 传递的参数有：
@@ -788,6 +794,88 @@ public class MainServlet extends HttpServlet {
 	}
 	
 	
+	/*
+	public void doPost(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException {
+		
+	}
+	*/
+	
+	
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		
+		response.setContentType("application/json;charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+		
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		
+		PrintWriter out = response.getWriter();		
+		JSONArray item_arr = new JSONArray();		
+		int nError = 0;
+		
+		try {
+			List items = upload.parseRequest(request);
+			Iterator itr = items.iterator();
+			while (itr.hasNext()) {				
+				FileItem item = (FileItem) itr.next();
+				if (item.isFormField()) {
+					//out.print("<p>from param name:" + item.getFieldName() + "，value:" + item.getString("UTF-8") + "</p>");
+				} else {
+					if (item.getName() != null && !item.getName().equals("")) {
+						//out.print("<p>file size:" + item.getSize() + "</p>");
+						//out.print("<p>file type:" + item.getContentType() + "</p>");
+						// item.getName()返回上传文件在客户端的完整路径名称
+						//out.print("<p>file name:" + item.getName() +"</p>");
+						
+						int pos = item.getName().lastIndexOf(".");  
+						String post_fix = new String();
+						if ( pos > -1 ) {
+							post_fix = item.getName().substring( pos );
+						}
+						
+						Date d = new Date();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");						
+						String newRelativeName = "tmp/" + sdf.format(d) + post_fix;
+						String newFileName = this.getServletContext().getRealPath("/") + newRelativeName;
+						
+						//out.print("<p>new file:" + newFileName + "</p>" );										
+						File file = new File(newFileName);
+						item.write(file);
+						//out.print("<p>upload success!</p>");
+						
+						JSONObject item_obj = new JSONObject();
+						item_obj.put("filename",  newRelativeName);
+						item_arr.put(item_obj);
+						
+					} else {
+						//out.print("<p>no file!</p>");
+					}
+				}
+			}
+		} catch (FileUploadException e) {
+			e.printStackTrace();
+			nError = -1;
+		} catch (Exception e) {
+			e.printStackTrace();
+			//out.print("<p>failed to upload file!</p>");
+			nError = -1;
+		}
+		
+		if ( nError == 0 ) {			
+			//JSONObject rsp_obj = new JSONObject();
+			//rsp_obj.put("upload_files", item_arr);
+			//rsp_obj.put("error", 0);
+			//out.print(rsp_obj.toString());
+			setContentError(out,0);
+		} else {
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("error", -1);
+			out.print(rsp_obj.toString());
+		}
+		
+		out.close();
+	}
 	
 	
 	
