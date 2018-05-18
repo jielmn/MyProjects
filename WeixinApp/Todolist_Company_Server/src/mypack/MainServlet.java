@@ -195,6 +195,41 @@ public class MainServlet extends HttpServlet {
 				
 				getBackground( out );
 			} 
+			else if ( type.equals("addhotpoint") ) {
+				String  open_id   = new String();
+				String  item      = new String();
+				
+				if ( null != req.getParameter("open_id") ) {
+					open_id = req.getParameter("open_id");
+				}
+				
+				if ( null != req.getParameter("item") ) {
+					item = req.getParameter("item");
+				}
+				
+				String[] image_urls = new String[9];
+				int i;
+				for ( i = 0; i <  9; i++ ) {
+					String img_url_name = "img" + i;
+					if ( null != req.getParameter( img_url_name ) ) {
+						image_urls[i] = req.getParameter(img_url_name);
+					} else {
+						break;
+					}
+				}
+				
+				addhotpoint( out, open_id, item, image_urls );
+			}
+			else if ( type.equals("weibo") ) {
+				
+				int  start_index = 0;
+				
+				if ( null != req.getParameter("start_index") ) {
+					start_index = Integer.valueOf(req.getParameter("start_index"));
+				}
+				
+				getHotPoint(out, start_index);
+			}
 					
 		}
 		
@@ -863,11 +898,11 @@ public class MainServlet extends HttpServlet {
 		}
 		
 		if ( nError == 0 ) {			
-			//JSONObject rsp_obj = new JSONObject();
-			//rsp_obj.put("upload_files", item_arr);
-			//rsp_obj.put("error", 0);
-			//out.print(rsp_obj.toString());
-			setContentError(out,0);
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("upload_files", item_arr);
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());
+			//setContentError(out,0);
 		} else {
 			JSONObject rsp_obj = new JSONObject();
 			rsp_obj.put("error", -1);
@@ -875,6 +910,132 @@ public class MainServlet extends HttpServlet {
 		}
 		
 		out.close();
+	}
+	
+	public void addhotpoint( PrintWriter out, String open_id, String item, String[] img_urls ) {
+		// 没有填写open_id参数
+		if ( open_id.length() == 0 ) {
+			setContentError(out,2);
+			return;
+		}
+		
+		// 没有填写item参数
+		if ( item.length() == 0 ) {
+			setContentError(out,3);
+			return;
+		}
+		
+		String open_id_sql = open_id.replace("'","''");
+		String item_sql    = item.replace("'","''");
+		
+		for ( int i = 0; i <  img_urls.length; i++ ) {
+			if ( img_urls[i] == null ) {
+				img_urls[i] = "null";
+			} else {
+				img_urls[i] = "'" + img_urls[i] + "'";
+			}			
+		}
+		
+		try {
+			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate( "insert into weibo_items values( null, '" + open_id_sql + "', NOW(), '" + item_sql + "'," + img_urls[0] + "," + img_urls[1] + "," 
+			     + img_urls[2] +"," + img_urls[3] + "," + img_urls[4] + "," + img_urls[5] + "," + img_urls[6] + "," + img_urls[7] + "," + img_urls[8] + ");"  );
+						
+			// 获取插入值id			
+			ResultSet rs = stmt.executeQuery("select max(weibo_id) from weibo_items where user_id='" + open_id_sql + "'" );			
+			int id = 0;
+			if ( rs.next() ) {
+				id = rs.getInt(1);
+			}						
+			rs.close();
+			
+			stmt.executeUpdate( "insert into weibo_reader values( " + id + ", '" + open_id_sql + "' );" );
+						
+			JSONObject rsp_obj = new JSONObject();			
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());
+			
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void getHotPoint(PrintWriter out, int start_index) {
+		
+		try {
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select a.weibo_id,b.nickname,b.avatar_url,a.pub_time,a.content,a.img0,a.img1,a.img2,a.img3," 
+			    + "a.img4,a.img5,a.img6,a.img7,a.img8 from weibo_items a inner join users b on a.user_id = b.open_id order by a.pub_time desc limit " + start_index + "," + INCREASE_QUERY + " ;" );
+			
+			// 获取清单
+			JSONArray item_arr = new JSONArray();
+			while ( rs.next() ) {
+				int        item_id     = rs.getInt(1);
+				String     nickname    = rs.getString(2);
+				String     avatar_url  = rs.getString(3);
+				Timestamp  pub_time    = rs.getTimestamp(4);
+				String     content     = rs.getString(5);
+				
+				String[] imgs = new String[9];
+				for ( int i = 0; i < 9; i++ ) {
+					imgs[i] = rs.getString(6+i);
+				}
+								
+				
+				JSONObject item_obj = new JSONObject();
+				item_obj.put("id",            item_id);
+				item_obj.put("name",          nickname);
+				item_obj.put("avatarUrl",     avatar_url);
+				item_obj.put("content",       content);
+				item_obj.put("pubtime",       pub_time.getTime());
+				
+				JSONArray img_arr = new JSONArray();
+				for ( int i = 0; i < 9; i++ ) {
+					if ( imgs[i] != null ) {
+						//JSONObject img_obj = new JSONObject();
+						//img_obj.put("src", imgs[i]);
+						//img_arr.put( img_obj );
+						img_arr.put( imgs[i] );
+					}					
+				}
+				item_obj.put("images", img_arr);
+					
+				item_arr.put(item_obj);
+			} 
+
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("weibo_items", item_arr);
+			rsp_obj.put("error", 0);
+			
+			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
 	}
 	
 	

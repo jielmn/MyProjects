@@ -1,12 +1,3 @@
-<!--<view >
-  <image src="{{personInfo.avatarUrl}}" class="person avatar"></image>
-  <view class="person">姓名</view>
-</view>
-
-<text class="note_item">111111111111222222222222222222223333333333333333333333344444444444444411111111111122222222222222222222333333333333333333333334444444444444441111111111112222222222222222222233333333333333333333333444444444444444</text>
--->
-
-
 <view wx:for="{{weibo_items}}" wx:key="id" class="weibo">
   <view>
     <image src="{{item.avatarUrl}}" class="person avatar"></image>
@@ -15,15 +6,9 @@
   
   <text class="weibo_item">{{item.content}}</text>
   
-  <image wx:if="{{item.src0}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src1}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src2}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src3}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src4}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src5}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src6}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src7}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
-  <image wx:if="{{item.src8}}" src="{{item.src0}}" data-id="{{item.id}}" class="font_image" />
+  <label wx:for="{{item.images}}" wx:key="id" wx:for-item="subitem" wx:for-index="subindex" >
+    <image wx:if="{{subitem}}" src="https://telemed-healthcare.cn/todolist_company/{{subitem}}" class="font_image" mode="aspectFit" catchtap="OnPreviewImg" data-index="{{index}}" data-subindex="{{subindex}}" />  
+  </label>
 
   <text class="weibo_reader">a,b,c已读</text>
 

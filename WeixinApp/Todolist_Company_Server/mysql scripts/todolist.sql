@@ -25,6 +25,6 @@ create table festivals ( year int not null, month int not null, day int not null
 
 
 
-create table weibo_items ( weibo_id int primary key not null auto_increment, user_id varchar(64) not null, content varchar(240) not null, img0 varchar(32) null, img1 varchar(32) null, img2 varchar(32) null, img3 varchar(32) null, img4 varchar(32) null, img5 varchar(32) null, img6 varchar(32) null, img7 varchar(32) null, img8 varchar(32) null );
+create table weibo_items ( weibo_id int primary key not null auto_increment, user_id varchar(64) not null, pub_time datetime not null, content varchar(240) not null, img0 varchar(32) null, img1 varchar(32) null, img2 varchar(32) null, img3 varchar(32) null, img4 varchar(32) null, img5 varchar(32) null, img6 varchar(32) null, img7 varchar(32) null, img8 varchar(32) null );
 						   
 create table weibo_reader ( weibo_id int not null, user_id varchar(64) not null, primary key(weibo_id, user_id) );						   

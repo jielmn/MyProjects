@@ -5,6 +5,8 @@ const app = getApp()
 Page({
   data: {
     images: [],
+    upload_files_url:[],
+    content: null,
   },
 
   onLoad:function() {
@@ -53,6 +55,56 @@ Page({
     this.data.images.splice(e.target.dataset.index, 1) 
     this.setData({ images: this.data.images })
   },
+
+  OnUploadImageRet : function ( ret )  {
+    wx.hideToast();
+
+     // 上传失败
+     if ( 0 != ret ) {       
+       wx.showModal({
+         title: '错误提示',
+         content: '上传图片失败',
+         showCancel: false,
+       })
+       return;
+     }
+
+     // 上传成功
+     this.saveHotPoint();
+  },
+
+  // 上传图片
+  uploadImage: function (index) {
+    var that = this;
+
+    // 没有要上传的下一张图片
+    if ( this.data.images.length == index ) {
+      that.OnUploadImageRet(0);
+      return;
+    }
+
+    wx.uploadFile({
+      url: app.globalData.serverAddr,
+      filePath: this.data.images[index],
+      name: 'upload_image',
+      header: {
+        "Content-Type": "multipart/form-data"
+      },
+      success: function (res) {
+        var result = JSON.parse(res.data);
+        // 成功
+        if ( result.error == 0 ) {        
+          that.data.upload_files_url.push(result.upload_files[0]);
+          that.uploadImage( index + 1 );
+        } else {
+          that.OnUploadImageRet(-1);
+        }
+      },
+      fail: function (res) {
+        that.OnUploadImageRet(-1);
+      }
+    });// end of wx.upload
+  }, // end of uploadImage funcion
   
   //添加Banner  
   formSubmit: function (e) {
@@ -67,52 +119,68 @@ Page({
       return; 
     }
 
-    if ( that.data.images.length > 0 ) {
+    this.data.content = value.item;
+    this.data.upload_files_url = [];
+
+    // 如果有图片要上传
+    if ( this.data.images.length > 0 ) {
+
       wx.showToast({
-        title: '正在上传...',
+        title: '正在上传图片...',
         icon: 'loading',
         mask: true,
-        duration: 10000
       });  
-    }
 
-    var upload_ret = 0;
-    for (var i = 0; i < that.data.images.length && upload_ret == 0; i++) {
-      wx.uploadFile({
-        url: app.globalData.serverAddr,
-        filePath: that.data.images[i],
-        name: 'uploadfile_ant',
-        formData: {
-          'imgIndex': i
-        },
-        header: {
-          "Content-Type": "multipart/form-data"
-        },
-        success: function (res) {
-          var result = JSON.parse(res.data);
-          // 成功
-          if ( result.error != 0 ) {
-            upload_ret = -1;
-          }
-        },
-        fail: function (res) {
-          upload_ret = -1;          
-        }
+      // 开始上传第一张图片
+      this.uploadImage(0);
 
-      });// end of wx.upload
-
-    }// end of for
-
-    wx.hideToast();
-    if ( upload_ret != 0 ) {
-      wx.showModal({
-        title: '错误提示',
-        content: '上传图片失败',
-        showCancel: false,
-      })
+    // 保存热点内容  
+    } else {
+      this.saveHotPoint();
     }
     
-  }  
+  },
+
+  // 保存热点
+  saveHotPoint : function () {
+    var imageUrlParam = '';
+    for ( var i = 0; i < this.data.upload_files_url.length; i++ ) {
+      imageUrlParam += '&img' + i + '=' + encodeURIComponent(this.data.upload_files_url[i].filename);
+    }
+    
+    wx.request({
+      url: app.globalData.serverAddr + '?type=addhotpoint&open_id=' + encodeURIComponent(app.globalData.openid) + '&item=' + encodeURIComponent(this.data.content) + imageUrlParam,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          console.log("addhotpoint success")
+
+          wx.showToast({
+            title: '保存成功'
+          })
+
+          // 返回
+          setTimeout(function () {
+            app.globalData.addweibo = true;
+
+            wx.navigateBack();
+          }, 800);
+
+        } else {
+          console.log("addhotpoint:")
+          console.log(res);
+        }
+      },
+      fail() {
+        console.log("failed to addhotpoint")
+      },
+      complete() {
+
+      },
+    })
+
+  },
+
 
   
 

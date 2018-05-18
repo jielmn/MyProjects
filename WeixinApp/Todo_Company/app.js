@@ -120,6 +120,8 @@ App({
     serverAddr: "https://telemed-healthcare.cn/todolist_company/main",
 
     timer_bk:null,
+
+    addweibo:false,
   }
 
 })
