@@ -56,6 +56,7 @@ public class MainServlet extends HttpServlet {
 	//String dbUser="root";
 	//String dbPwd="";
 	int    INCREASE_QUERY = 10;
+	int    INCREASE_QUERY_WEIBO = 6;
 	String appid = "wx7a3e83a343c2347e";
 	String secret = "384078a850d0bd5bdc842e89be5c88d8";
     
@@ -223,12 +224,17 @@ public class MainServlet extends HttpServlet {
 			else if ( type.equals("weibo") ) {
 				
 				int  start_index = 0;
+				String  open_id   = new String();
 				
 				if ( null != req.getParameter("start_index") ) {
 					start_index = Integer.valueOf(req.getParameter("start_index"));
 				}
 				
-				getHotPoint(out, start_index);
+				if ( null != req.getParameter("open_id") ) {
+					open_id = req.getParameter("open_id");
+				}
+				
+				getHotPoint(out, start_index, open_id);
 			}
 					
 		}
@@ -972,7 +978,14 @@ public class MainServlet extends HttpServlet {
         }
 	}
 	
-	public void getHotPoint(PrintWriter out, int start_index) {
+	public void getHotPoint(PrintWriter out, int start_index, String  open_id) {
+		// 没有填写open_id参数
+		if ( open_id.length() == 0 ) {
+			setContentError(out,2);
+			return;
+		}
+		
+		String open_id_sql = open_id.replace("'","''");
 		
 		try {
 			Connection con = null;
@@ -986,8 +999,9 @@ public class MainServlet extends HttpServlet {
 			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select a.weibo_id,b.nickname,b.avatar_url,a.pub_time,a.content,a.img0,a.img1,a.img2,a.img3," 
-			    + "a.img4,a.img5,a.img6,a.img7,a.img8 from weibo_items a inner join users b on a.user_id = b.open_id order by a.pub_time desc limit " + start_index + "," + INCREASE_QUERY + " ;" );
+			    + "a.img4,a.img5,a.img6,a.img7,a.img8 from weibo_items a inner join users b on a.user_id = b.open_id order by a.pub_time desc limit " + start_index + "," + INCREASE_QUERY_WEIBO + " ;" );
 			
+			Statement sub_stmt = con.createStatement();
 			// 获取清单
 			JSONArray item_arr = new JSONArray();
 			while ( rs.next() ) {
@@ -1020,9 +1034,25 @@ public class MainServlet extends HttpServlet {
 					}					
 				}
 				item_obj.put("images", img_arr);
+				
+				JSONArray reader_arr = new JSONArray();
+				ResultSet sub_rs = sub_stmt.executeQuery( "select b.nickname from weibo_reader a inner join users b on a.user_id = b.open_id and a.weibo_id = " + item_id );
+				while ( sub_rs.next() ) {
+					String reader = sub_rs.getString(1);
+					reader_arr.put( reader );
+				}
+				item_obj.put("readers", reader_arr);
+				sub_rs.close();		
+				try{
+					sub_stmt.executeUpdate("insert into weibo_reader values ( " + item_id + ", '" + open_id_sql + "' );");
+				}
+				catch(Exception ex){
+					
+				}
 					
 				item_arr.put(item_obj);
-			} 
+			}
+			sub_stmt.close();			
 
 			JSONObject rsp_obj = new JSONObject();
 			rsp_obj.put("weibo_items", item_arr);

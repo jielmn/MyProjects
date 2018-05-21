@@ -113,7 +113,7 @@ Page({
     if (value.item == '' || value.item == null) {
       wx.showModal({
         title: '提示',
-        content: '前线热点内容不能为空',
+        content: '前线新闻内容不能为空',
         showCancel: false,
       })
       return; 

@@ -1,6 +1,6 @@
 <view class="main">
   <form bindsubmit="formSubmit"> 
-    <textarea maxlength="220" placeholder="前线热点内容" class="item" name="item"></textarea>
+    <textarea maxlength="220" placeholder="前线新闻内容" class="item" name="item"></textarea>
     <!--<view class="split"></view>-->
  
     <view class="weibo_form">
@@ -19,6 +19,6 @@
 
     
     
-    <button form-type="submit" class="button">保存前线热点</button>
+    <button form-type="submit" class="button">保存前线新闻</button>
   </form>
 </view>

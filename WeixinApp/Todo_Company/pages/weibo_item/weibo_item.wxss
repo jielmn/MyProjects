@@ -16,6 +16,7 @@
 .button{
   background:#c92651;
   color:white;
+  margin-top:60rpx;
 }
 
 .image-add {

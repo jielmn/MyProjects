@@ -1,4 +1,6 @@
 <view wx:for="{{weibo_items}}" wx:key="id" class="weibo">
+  <view class="split" catchtap="OnIgnore" ></view>
+  
   <view>
     <image src="{{item.avatarUrl}}" class="person avatar"></image>
     <view class="person">{{item.name}}</view>
@@ -10,9 +12,9 @@
     <image wx:if="{{subitem}}" src="https://telemed-healthcare.cn/todolist_company/{{subitem}}" class="font_image" mode="aspectFit" catchtap="OnPreviewImg" data-index="{{index}}" data-subindex="{{subindex}}" />  
   </label>
 
-  <text class="weibo_reader">a,b,c已读</text>
-
+  <text class="weibo_reader">{{item.readers_text}}已读</text>  
 </view>
+
 
 <view class="bottom">
   <view class="add-p">

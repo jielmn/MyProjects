@@ -60,7 +60,7 @@ Page({
     start_index = this.data.weibo_items.length;
 
     wx.request({
-      url: app.globalData.serverAddr + '?type=weibo&start_index=' + start_index,
+      url: app.globalData.serverAddr + '?type=weibo&start_index=' + start_index + '&open_id=' + encodeURIComponent(app.globalData.openid),
       method: 'GET',
       success: (res) => {
 
@@ -68,7 +68,11 @@ Page({
         //console.log(res);
         if (res.data.error != null && res.data.error == 0) {
           console.log("get weibo success!");
-          that.setData({ weibo_items: that.data.weibo_items.concat(res.data.weibo_items) });
+          var weibo_items = that.data.weibo_items.concat(res.data.weibo_items);
+          for (var i in weibo_items) {
+            weibo_items[i].readers_text = weibo_items[i].readers.join('，');
+          }
+          that.setData({ weibo_items: weibo_items });
         } else {
           console.log("get weibo result:")
           console.log(res);

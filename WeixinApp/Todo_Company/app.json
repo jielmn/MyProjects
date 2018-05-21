@@ -34,7 +34,7 @@
         "selectedIconPath": "images/group.png"
       },
       {
-        "text": "前线热点",
+        "text": "前线专栏",
         "pagePath": "pages/front/front",
         "iconPath": "images/sales_blur.png",
         "selectedIconPath": "images/sales.png"
