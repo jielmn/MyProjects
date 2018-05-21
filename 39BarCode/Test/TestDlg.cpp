@@ -104,8 +104,10 @@ void CTestDlg::OnPaint()
 
 		::Rectangle(dc.m_hDC, 0, 0, rect.Width(), rect.Height());
 
-		DrawBarcode(dc.m_hDC, 100, 100, 500, 100, "whet201801001001", m_font, 50, "–Ú¡–∫≈£∫");
-		int ret = DrawBarcode128(dc.m_hDC, 100, 250, 500, 100, "whet201801001001", m_font, 50, "–Ú¡–∫≈£∫");
+		//DrawBarcode(dc.m_hDC, 100, 100, 600, 100, "WHET201805020045", m_font, 50, "–Ú¡–∫≈£∫");
+		int ret  = DrawBarcode128(dc.m_hDC, 100,  50, 600, 100, "WHET201805020044", m_font, 50, "–Ú¡–∫≈£∫");
+		int ret1 = DrawBarcode128(dc.m_hDC, 100, 200, 600, 100, "WHET201805020045", m_font, 50, "–Ú¡–∫≈£∫");
+		int ret2 = DrawBarcode128(dc.m_hDC, 100, 350, 600, 100, "WHET201805020046", m_font, 50, "–Ú¡–∫≈£∫");
 		int a = 100;
 	}
 }

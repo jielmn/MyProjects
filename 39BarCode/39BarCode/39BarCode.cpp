@@ -372,6 +372,10 @@ static BarCode128 table_128[] = {
 	{ (char)203, { '9','8' }, { 4, 1, 1, 3, 1, 1 } },
 	{ (char)204, { '9','9' }, { 1, 1, 3, 1, 4, 1 } },
 
+	{ (char)205,{ 'a','0' },{ 1, 1, 4, 1, 3, 1 } },
+	{ (char)206,{ 'a','1' },{ 3, 1, 1, 1, 4, 1 } },
+	{ (char)207,{ 'a','2' },{ 4, 1, 1, 1, 3, 1 } },
+
 };
 
 #define CODE128_B   0
@@ -406,7 +410,7 @@ void FillCode128(HDC hdc, RECT & rect, const int barcode[], int length, int elem
 }
 
 int FindInCode128(char ch) {
-	int n = sizeof(table_128) / sizeof(BarCode128);
+	int n = sizeof(table_128) / sizeof(BarCode128) - 8;
 	for (int i = 0; i < n; i++) {
 		if (table_128[i].ch == ch) {
 			return i;
