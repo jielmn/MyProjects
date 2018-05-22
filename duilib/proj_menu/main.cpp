@@ -8,20 +8,20 @@ using namespace DuiLib;
 #pragma comment(lib,"User32.lib")
 
 
+// menu
 class CDuiMenu : public WindowImplBase
 {
 protected:
 	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
 	CDuiString  m_strXMLPath;
+	CControlUI * m_pOwner;
 
 public:
-	explicit CDuiMenu(LPCTSTR pszXMLPath) : m_strXMLPath(pszXMLPath) {}
+	explicit CDuiMenu(LPCTSTR pszXMLPath, CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
 	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
 	virtual CDuiString GetSkinFolder() { return _T(""); }
 	virtual CDuiString GetSkinFile() { return m_strXMLPath; }
-	virtual void       OnFinalMessage(HWND hWnd) { 
-		delete this; 
-	}
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
 
 	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 	{
@@ -39,8 +39,11 @@ public:
 
 	virtual void  Notify(TNotifyUI& msg) {
 		if (msg.sType == "itemclick") {
-			CDuiString name = msg.pSender->GetName();
-			int a = 100;
+			if (m_pOwner) {
+				m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), 0, 0, true);
+				this->PostMessage(WM_CLOSE);
+			}
+			return;
 		}
 		WindowImplBase::Notify(msg);
 	}
@@ -57,7 +60,7 @@ class CDuiFrameWnd : public WindowImplBase
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
 	virtual CDuiString GetSkinFile() { return _T("mainframe_menu.xml"); }
-	virtual CDuiString GetSkinFolder() { return _T(""); }
+	virtual CDuiString GetSkinFolder() { return _T("res"); }
 
 	virtual void    Notify(TNotifyUI& msg) {
 		if (msg.sType == _T("click"))
@@ -65,7 +68,7 @@ public:
 			if (msg.pSender->GetName() == _T("btnHello"))
 			{
 				POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
-				CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"));
+				CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
 
 				pMenu->Init(*this, pt);
 				pMenu->ShowWindow(TRUE);
@@ -77,6 +80,15 @@ public:
 				//::MessageBox(0, "click open", "", 0);
 			}
 
+		}
+		else if (msg.sType == "menu_Open") {
+			::MessageBox( GetHWND(), "click open", "", 0);
+		}
+		else if (msg.sType == "menu_Mark") {
+			::MessageBox(GetHWND(), "click MARK", "", 0);
+		}
+		else if (msg.sType == "menu_Delete") {
+			::MessageBox(GetHWND(), "click DELETE", "", 0);
 		}
 
 		WindowImplBase::Notify(msg);
