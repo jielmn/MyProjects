@@ -199,6 +199,13 @@ void   CMyImageUI::DrawTempPoint(int x, int y, HDC hDc, int RADIUS /*= 6*/) {
 	::Polyline(hDc, points1, 2);
 }
 
+void  CMyImageUI::SetWndRect(int x, int y) {
+	int h = y - 340;
+	if (h > 0) {
+		m_nGridSize = h / 8;
+		Invalidate();
+	}
+}
 
 
 

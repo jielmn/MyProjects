@@ -118,7 +118,15 @@ void  CDuiFrameWnd::OnImageAll() {
 
 
 
-
+CDuiFrameWnd::CDuiFrameWnd() {
+	m_btnMenu = 0;
+	m_lblReaderStatus = 0;
+	m_pImageUI = 0;
+	m_lblTemperature = 0;
+	m_pAlarmUI = 0;
+	m_nWidth = 0;
+	m_nHeight = 0;
+}
 
 void CDuiFrameWnd::InitWindow() {
 	g_hWnd = GetHWND();
@@ -282,6 +290,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_lblTemperature->SetText("--");
 			m_pAlarmUI->FailureAlarm();
 		}
+	}
+	else if (uMsg == WM_SIZE) {
+		m_nWidth  = LOWORD(lParam);
+		m_nHeight = HIWORD(lParam);
+
+		if (0 != m_pImageUI) {
+			m_pImageUI->SetWndRect(m_nWidth, m_nHeight);
+		}
+
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam );
 }

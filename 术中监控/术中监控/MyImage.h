@@ -14,6 +14,8 @@ public:
 
 	void  AddTemp(DWORD dwTemp);
 
+	void  SetWndRect(int x, int y);
+
 private:
 	vector<TempData *>   m_vTempData;
 

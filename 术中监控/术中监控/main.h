@@ -5,6 +5,7 @@
 class CDuiFrameWnd : public DuiLib::WindowImplBase
 {
 public:
+	CDuiFrameWnd();
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
 	virtual DuiLib::CDuiString GetSkinFile() { return _T("main.xml"); }
 	virtual DuiLib::CDuiString GetSkinFolder() { return _T("res"); }
@@ -22,6 +23,9 @@ private:
 	CMyImageUI *                    m_pImageUI;
 	DuiLib::CLabelUI *              m_lblTemperature;
 	CAlarmImageUI *                 m_pAlarmUI;
+
+	int                             m_nWidth;
+	int                             m_nHeight;
 
 private:
 	void  OnSetting();

@@ -10,7 +10,7 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
-#define  TEST_FLAG                  1
+#define  TEST_FLAG                  0
 
 #if     TEST_FLAG
 #define MAIN_TIMER_ID                1
