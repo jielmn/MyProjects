@@ -82,13 +82,13 @@ public:
 
 		}
 		else if (msg.sType == "menu_Open") {
-			::MessageBox( GetHWND(), "click open", "", 0);
+			::MessageBox( 0, "click open", "", 0);
 		}
 		else if (msg.sType == "menu_Mark") {
-			::MessageBox(GetHWND(), "click MARK", "", 0);
+			::MessageBox(0, "click MARK", "", 0);
 		}
 		else if (msg.sType == "menu_Delete") {
-			::MessageBox(GetHWND(), "click DELETE", "", 0);
+			::MessageBox(0, "click DELETE", "", 0);
 		}
 
 		WindowImplBase::Notify(msg);

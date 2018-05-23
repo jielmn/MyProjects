@@ -22,7 +22,7 @@
 
 
 
-#define  RECONNECT_READER_DELAY          10000
+#define  RECONNECT_READER_DELAY          5000
 
 #define  MSG_RECONNECT_READER             1
 #define  MSG_GET_TAG_TEMP                 2

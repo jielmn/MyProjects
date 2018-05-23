@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window size="800,600" mininfo="600,400" caption="0,0,0,32" sizebox="4,4,4,4"> <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
+	<Font id="0" name="宋体" size="12" bold="true" />
+    <VerticalLayout bkcolor="#FFF0F0F0" bkcolor2="#FFAAAAA0"> <!-- 整个窗口的背景色 -->
+        <!-- 标题栏区 -->
+        <HorizontalLayout height="32" bkcolor="#FFE6E6DC" bkcolor2="#FFAAAAA0"> <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->
+			<Control width="10" />
+			<Label text="菜单" font="0"  />
+            <VerticalLayout /> <!-- 占空位，占据左边所有的空位-->
+            <VerticalLayout width="100"> <!-- 右边三个控件所占的宽度-->
+                <Button name="minbtn"                     tooltip="最小化" float="true" pos="0,5,26,23"  width="26" normalimage=" file='frame_btn_min.bmp' source='0,0,26,18' mask='#FFFF00FF' " hotimage=" file='frame_btn_min.bmp' source='26,0,52,18' mask='#FFFF00FF' " pushedimage=" file='frame_btn_min.bmp' source='52,0,78,18' mask='#FFFF00FF' "/>
+                <Button name="maxbtn"                     tooltip="最大化" float="true" pos="26,5,52,23" width="26" normalimage=" file='frame_btn_max.bmp' source='0,0,26,18'"                   hotimage=" file='frame_btn_max.bmp' source='26,0,52,18'"                   pushedimage=" file='frame_btn_max.bmp' source='52,0,78,18' " />
+                <Button name="restorebtn" visible="false" tooltip="还原"   float="true" pos="26,5,52,23" width="26" normalimage=" file='frame_btn_max.bmp' source='104,0,130,18'"                hotimage=" file='frame_btn_max.bmp' source='130,0,156,18'"                 pushedimage=" file='frame_btn_max.bmp' source='156,0,182,18' " />
+                <Button name="closebtn"                   tooltip="关闭"   float="true" pos="52,5,78,23" width="42" normalimage=" file='frame_btn_close_normal.bmp' mask='#FFFF00FF'" hotimage=" file='frame_btn_close_hot.bmp' mask='#FFFF00FF'" pushedimage=" file='frame_btn_close_down.bmp' mask='#FFFF00FF'"/>
+            </VerticalLayout>      
+        </HorizontalLayout>
+        
+        <!-- 客户区 -->
+    <HorizontalLayout>
+        <Button text="文件" name="btnFile" />
+    </HorizontalLayout>
+    </VerticalLayout>
+</Window>

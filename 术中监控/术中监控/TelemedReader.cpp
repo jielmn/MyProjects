@@ -61,7 +61,7 @@ int  CTelemedReader::Reconnect() {
 		m_pBusiness->NotifyUiReaderStatus(m_eStatus);
 	}
 	else {
-		m_pBusiness->ReconnectReaderAsyn(10000);
+		m_pBusiness->ReconnectReaderAsyn(RECONNECT_READER_DELAY);
 	}
 
 	return 0;
@@ -105,6 +105,7 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 		// 如果最后两个字节是0D 0A，则OK
 		if (0 == memcmp(pData + 17, READER_TAIL, 2)) {
 			dwTemp = pData[14] * 100 + pData[15];
+			//m_received_data.Reform();
 			return 0;
 		}
 
@@ -118,7 +119,7 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	m_pBusiness->NotifyUiReaderStatus(m_eStatus);
 	m_pBusiness->ReconnectReaderAsyn(RECONNECT_READER_DELAY);
 
-	
+	//m_received_data.Reform();
 	return EXH_ERR_READER_TIMEOUT_OR_WRONG_FORMAT; 
 }
 
