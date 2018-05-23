@@ -148,7 +148,7 @@ m_pLayout(),
 m_xml(_T("")),
 m_pNotifyTarget(pNotifyTarget)
 {
-	OutputDebugString("menu wnd!\n");
+	//OutputDebugString("menu wnd!\n");
 }
 
 BOOL CMenuWnd::Receive(ContextMenuParam param)
