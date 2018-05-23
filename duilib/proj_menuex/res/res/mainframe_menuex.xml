@@ -17,7 +17,8 @@
         
         <!-- 客户区 -->
     <HorizontalLayout>
-        <Button text="文件" name="btnFile" />
+        <Button text="文件" name="btnFile" width="80" height="30" bordercolor="#FF768D9B" bordersize="0" hotimage="toolbar_hover.png" />
+		<Button text="编辑" name="btnEdit" width="80" height="30" bordercolor="#FF768D9B" bordersize="0" hotimage="toolbar_hover.png" />
     </HorizontalLayout>
     </VerticalLayout>
 </Window>

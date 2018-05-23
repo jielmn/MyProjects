@@ -155,16 +155,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="UICrack.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="UIMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
     <ClInclude Include="observer_impl_base.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="UICrack.h" />
     <ClInclude Include="UIMenu.h" />
   </ItemGroup>
   <ItemGroup>

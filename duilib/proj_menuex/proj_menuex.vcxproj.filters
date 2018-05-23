@@ -21,9 +21,6 @@
     <ClCompile Include="UIMenu.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UICrack.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -33,9 +30,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="observer_impl_base.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UICrack.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

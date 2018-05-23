@@ -1,5 +1,4 @@
 #include "main.h"
-#include "UICrack.h"
 #include "UIMenu.h"
 #include "resource.h"
 
@@ -7,15 +6,17 @@
 
 void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
-	if ( strcmp(msg.sType, kClick) == 0 ) {
-		DuiLib::CDuiString name = msg.pSender->GetName();
-		if ( strcmp(msg.pSender->GetName(), _T("btnFile")) == 0 )
+	if ( strcmp(msg.sType, "click") == 0 ) {
+		if ( strcmp(msg.pSender->GetName(), _T("btnFile")) == 0 || strcmp(msg.pSender->GetName(), _T("btnEdit")) == 0)
 		{
+			RECT r = m_PaintManager.FindControl(msg.pSender->GetName())->GetPos();
+			POINT point = { r.left, r.bottom };
+
 			CMenuWnd* pMenu = new CMenuWnd(m_hWnd, msg.pSender);
-			CDuiPoint point = msg.ptMouse;
+			// CDuiPoint point = msg.ptMouse;
 			ClientToScreen(m_hWnd, &point);
 			STRINGorID xml(IDR_XML1);
-			pMenu->Init(NULL, xml, "xml", point);                      
+			pMenu->Init(NULL, xml, "xml", point);      
 		}
 	}
 	else if (0 == strcmp(msg.sType, "munu_test_3")) {
@@ -24,7 +25,28 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (0 == strcmp(msg.sType, "munu_test_4")) {
 		::MessageBox(0, "click menu test 4", "²Ëµ¥²âÊÔ", 0);  
 	}
-	WindowImplBase::Notify(msg); 
+	else if (0 == strcmp(msg.sType, "munu_test_e")) {
+		::MessageBox(0, "click menu test e", "²Ëµ¥²âÊÔ", 0);
+	}
+	else if (0 == strcmp(msg.sType, "munu_test_f")) {
+		::MessageBox(0, "click menu test f", "²Ëµ¥²âÊÔ", 0);
+	}
+	else if (0 == strcmp(msg.sType, "munu_hello")) {
+		::MessageBox(0, "click menu hello", "²Ëµ¥²âÊÔ", 0);
+	}
+	else if (0 == strcmp(msg.sType, "munu_world")) {
+		::MessageBox(0, "click menu world", "²Ëµ¥²âÊÔ", 0);
+	}
+	else if (0 == strcmp(msg.sType, "munu_test_5")) {
+		::MessageBox(0, "click menu 5", "²Ëµ¥²âÊÔ", 0);
+	}
+	else if (0 == strcmp(msg.sType, "munu_test_c")) {
+		::MessageBox(0, "click menu c", "²Ëµ¥²âÊÔ", 0);
+	}
+	else if (0 == strcmp(msg.sType, "munu_test_d")) {
+		::MessageBox(0, "click menu d", "²Ëµ¥²âÊÔ", 0);
+	}
+	WindowImplBase::Notify(msg);         
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {

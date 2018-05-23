@@ -1,5 +1,4 @@
 #include "StdAfx.h"
-#include "UICrack.h"
 #include "UIMenu.h"
 
 namespace DuiLib {
@@ -148,7 +147,9 @@ m_pOwner(NULL),
 m_pLayout(),
 m_xml(_T("")),
 m_pNotifyTarget(pNotifyTarget)
-{}
+{
+	OutputDebugString("menu wnd!\n");
+}
 
 BOOL CMenuWnd::Receive(ContextMenuParam param)
 {
