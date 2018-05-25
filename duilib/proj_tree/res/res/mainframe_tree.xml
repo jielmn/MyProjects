@@ -19,12 +19,12 @@
     <HorizontalLayout inset="0,0,0,0">
 		<!-- 左边的树 -->
         <VerticalLayout bordercolor="#FF000000" bordersize="0" width="300" bkcolor="#FFCCCCCC">
-			<MyTree name="tree1" header="hidden" />
+			<MyTree name="tree1" header="hidden" menu="true" />
 		</VerticalLayout>
 		
 		<!-- 右边的视图 -->
-		<VerticalLayout  bkcolor="#FFD1E8F5"  >
-			<Button text="视图" />
+		<VerticalLayout  bkcolor="#FFD1E8F5" inset="10,10,10,10" >
+			<Label text="视图" name="lblView" />
 		</VerticalLayout>
 		
     </HorizontalLayout>

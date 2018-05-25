@@ -6,10 +6,6 @@ void CMyTreeUI::Node::set_parent(CMyTreeUI::Node* parent) {
 		
 CMyTreeUI::Node::Node() : _parent(NULL) {  }
 
-CMyTreeUI::Node::Node(NodeData t) : _data(t), _parent(NULL) {  }
-
-CMyTreeUI::Node::Node(NodeData t, Node* parent) : _data(t), _parent(parent) {  }
-
 CMyTreeUI::Node::~Node()
 {
 	for (int i = 0; i < num_children(); i++)
@@ -43,6 +39,10 @@ void CMyTreeUI::Node::remove_child(CMyTreeUI::Node* child)
 			return;
 		}
 	}
+}
+
+void CMyTreeUI::Node::remove_all_child() {
+	_children.clear();
 }
 
 CMyTreeUI::Node* CMyTreeUI::Node::get_last_child()
@@ -83,6 +83,7 @@ CMyTreeUI::CMyTreeUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwD
 	_root->data()._level = -1;
 	_root->data()._expand = true;
 	_root->data()._pListElement = NULL;
+	_root->data()._pUserData = 0;
 }
 
 CMyTreeUI::~CMyTreeUI() { if (_root) delete _root; }
@@ -156,7 +157,7 @@ void CMyTreeUI::DoEvent(TEventUI& event)
 
 CMyTreeUI::Node* CMyTreeUI::GetRoot() { return _root; }
 
-CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/)
+CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/, void * pUserData /*= 0*/)
 {
 	if (!parent) parent = _root;
 
@@ -167,6 +168,7 @@ CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/)
 	else node->data()._expand = false;
 	node->data()._text = text;
 	node->data()._pListElement = pListElement;
+	node->data()._pUserData = pUserData;
 
 	if (parent != _root) {
 		if (!(parent->data()._expand && parent->data()._pListElement->IsVisible()))
@@ -222,12 +224,24 @@ CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/)
 bool CMyTreeUI::RemoveNode(CMyTreeUI::Node* node)
 {
 	if (!node || node == _root) return false;
-	for (int i = 0; i < node->num_children(); ++i) {
-		Node* child = node->child(i);
+	while (node->num_children()>0) {
+		Node* child = node->child(0);
 		RemoveNode(child);
 	}
 	CListUI::Remove(node->data()._pListElement);
 	node->parent()->remove_child(node);
+
+	if (!node->parent()->has_children()) {
+		if (node->parent()->data()._pListElement) {
+			CDuiString strText = node->parent()->data()._pListElement->GetText();
+			int pos = strText.Find("<v center>");
+			if (pos >= 0) {
+				CDuiString strNewText = strText.Mid(0, pos) + strText.Mid(pos + 44);
+				node->parent()->data()._pListElement->SetText(strNewText);
+			}
+		}		
+	}
+	
 	delete node;
 	return true;
 }

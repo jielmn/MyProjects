@@ -20,4 +20,5 @@ public:
 
 private:
 	CMyTreeUI  *      m_tree;
+	CLabelUI*         m_view;
 };

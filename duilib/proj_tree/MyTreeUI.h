@@ -15,6 +15,7 @@ public:
 		bool _expand;
 		CDuiString _text;
 		CListLabelElementUI* _pListElement;
+		void * _pUserData;
 	};
 
 	class Node
@@ -29,8 +30,6 @@ public:
 
 	public:
 		Node();
-		explicit Node(NodeData t);
-		Node(NodeData t, Node* parent);
 		~Node();
 
 		NodeData& data();
@@ -40,6 +39,7 @@ public:
 		bool has_children() const;
 		void add_child(Node* child);
 		void remove_child(Node* child);
+		void remove_all_child();
 		Node* get_last_child();
 	};
 
@@ -64,7 +64,7 @@ public:
 
 	Node* GetRoot();
 
-	Node* AddNode(LPCTSTR text, Node* parent = NULL);
+	Node* AddNode(LPCTSTR text, Node* parent = NULL, void * pUserData = 0);
 
 	bool RemoveNode(Node* node);
 
