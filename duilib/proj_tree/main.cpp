@@ -114,7 +114,7 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if ( name == "tree1" )
 		{
 			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
-			CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+			CDuiMenu *pMenu = new CDuiMenu(_T("menu_tree.xml"), msg.pSender);
 			pMenu->Init(*this, pt);
 			pMenu->ShowWindow(TRUE);
 		}

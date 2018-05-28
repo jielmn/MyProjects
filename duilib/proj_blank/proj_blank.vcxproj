@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{237C46C0-39B7-4CE3-81B0-A9C9C9D18554}</ProjectGuid>
+    <ProjectGuid>{34863D4A-1616-4977-A516-13505774E072}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>proj_menuex</RootNamespace>
+    <RootNamespace>proj_blank</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -95,12 +95,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>duilibd.lib</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy res\res  ..\Debug\res /dseiy</Command>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>del /Q ..\Debug\res\*.*</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy res\res  ..\Debug\res /dseiy</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -134,12 +134,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>duilib.lib</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>xcopy res\res  ..\Release\res /dseiy</Command>
-    </PostBuildEvent>
     <PreBuildEvent>
       <Command>del /Q ..\Release\res\*.*</Command>
     </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy res\res  ..\Release\res /dseiy</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -161,24 +161,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="UIMenu.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="main.h" />
-    <ClInclude Include="observer_impl_base.hpp" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="UIMenu.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="proj_menuex.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\button.png" />
-    <Image Include="res\menu_bk.png" />
-    <Image Include="res\tree_expand.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="res\menutest.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
