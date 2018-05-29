@@ -23,6 +23,7 @@ private:
 	CMyImageUI *                    m_pImageUI;
 	DuiLib::CLabelUI *              m_lblTemperature;
 	CAlarmImageUI *                 m_pAlarmUI;
+	DuiLib::CTextUI *               m_txtTitle;
 
 	int                             m_nWidth;
 	int                             m_nHeight;

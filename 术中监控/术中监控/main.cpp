@@ -142,11 +142,18 @@ void CDuiFrameWnd::InitWindow() {
 
 	m_lblTemperature->SetText("--");
 
+	m_txtTitle = static_cast<DuiLib::CTextUI*>(m_PaintManager.FindControl("txtTitle"));
+
 #if TEST_FLAG
 	SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
 	m_lblReaderStatus->SetText("读卡器连接OK");
 #endif
 	 
+#ifdef TELEMED_READER_TYPE_1
+	m_txtTitle->SetText("术中监控 1.1");
+#else
+	m_txtTitle->SetText("术中监控");
+#endif
 	DuiLib::WindowImplBase::InitWindow();
 }
 

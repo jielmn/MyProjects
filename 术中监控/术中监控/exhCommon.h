@@ -17,7 +17,8 @@
 #define MAIN_TIMER_INTEVAL           5000
 #endif
 
-
+// 张维国的新的读卡器
+#define TELEMED_READER_TYPE_1         
 
 
 

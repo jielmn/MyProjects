@@ -99,6 +99,20 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	} while (TRUE);
 
 	BYTE pData[8192];
+
+#ifdef TELEMED_READER_TYPE_1
+	if (m_received_data.GetDataLength() >= 14) {
+		m_received_data.Read(pData, 14);
+		if (pData[0] == 0xFF && pData[13] == 0xFF) {
+			dwTemp = pData[1] * 1000 + pData[2] * 100  + pData[3] * 10 + pData[4];
+			return 0;
+		}
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, wrong format! \n");
+	}
+	else {
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, received data length =%lu \n", m_received_data.GetDataLength());
+	}
+#else
 	// 02 12 04 0E 10 02 E0 02 59 CD 93 D9 3D 5E 21 5E 01 0D 0A 
 	if (m_received_data.GetDataLength() >= 19) {
 		m_received_data.Read(pData, 19);
@@ -114,6 +128,7 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	else {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, received data length =%lu \n", m_received_data.GetDataLength() );
 	}
+#endif
 
 	m_eStatus = STATUS_CLOSE;
 	m_pBusiness->NotifyUiReaderStatus(m_eStatus);
@@ -361,6 +376,14 @@ int  CTelemedReader::ReadPrepareRet() {
 	} while (TRUE);
 
 	BYTE pData[8192];
+#ifdef TELEMED_READER_TYPE_1
+	if (m_received_data.GetDataLength() >= 4) {
+		m_received_data.Read(pData, 4);
+		if (0 == memcmp(pData, "\xFF\x55\x55\xFF", 4)) {
+			return 0;
+		}
+	}
+#else
 	if (m_received_data.GetDataLength() >= 20) {
 		m_received_data.Read(pData, 20);
 		// 如果最后两个字节是0D 0A，则OK
@@ -368,6 +391,7 @@ int  CTelemedReader::ReadPrepareRet() {
 			return 0;
 		}
 	}
+#endif
 
 	return -1;
 }
