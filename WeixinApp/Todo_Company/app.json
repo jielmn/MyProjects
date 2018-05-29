@@ -7,7 +7,8 @@
     "pages/item/item",
     "pages/showItem/showItem",
     "pages/front/front",
-    "pages/weibo_item/weibo_item"
+    "pages/weibo_item/weibo_item",
+    "pages/chart/chart"
   ],
   "window":{
     "backgroundTextStyle":"light",
@@ -38,6 +39,12 @@
         "pagePath": "pages/front/front",
         "iconPath": "images/sales_blur.png",
         "selectedIconPath": "images/sales.png"
+      },
+      {
+        "text": "业务数据",
+        "pagePath": "pages/chart/chart",
+        "iconPath": "images/data_blur.png",
+        "selectedIconPath": "images/data.png"
       }
     ]
   }

@@ -1,0 +1,22 @@
+.table {
+  border:1rpx solid #dadada;
+  border-right: 0;
+  border-bottom: 0;
+  width: 100%;
+}
+.tr {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.th,.td {
+  padding: 10rpx;
+  border-bottom: 1rpx solid #dadada;
+  border-right: 1rpx solid #dadada;
+  text-align: center;
+  width:100%
+}
+.th {
+  font-weight: 400;
+  background-color: #dadada
+}
