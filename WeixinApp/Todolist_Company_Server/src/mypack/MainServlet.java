@@ -236,6 +236,16 @@ public class MainServlet extends HttpServlet {
 				
 				getHotPoint(out, start_index, open_id);
 			}
+			else if ( type.equals("delete_weibo") ) {
+				
+				int  id = 0;
+				
+				if ( null != req.getParameter("id") ) {
+					id = Integer.valueOf(req.getParameter("id"));
+				}
+				
+				delhotpoint(out, id);
+			}
 					
 		}
 		
@@ -999,7 +1009,7 @@ public class MainServlet extends HttpServlet {
 			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select a.weibo_id,b.nickname,b.avatar_url,a.pub_time,a.content,a.img0,a.img1,a.img2,a.img3," 
-			    + "a.img4,a.img5,a.img6,a.img7,a.img8 from weibo_items a inner join users b on a.user_id = b.open_id order by a.pub_time desc limit " + start_index + "," + INCREASE_QUERY_WEIBO + " ;" );
+			    + "a.img4,a.img5,a.img6,a.img7,a.img8,b.open_id from weibo_items a inner join users b on a.user_id = b.open_id order by a.pub_time desc limit " + start_index + "," + INCREASE_QUERY_WEIBO + " ;" );
 			
 			Statement sub_stmt = con.createStatement();
 			// 获取清单
@@ -1015,6 +1025,8 @@ public class MainServlet extends HttpServlet {
 				for ( int i = 0; i < 9; i++ ) {
 					imgs[i] = rs.getString(6+i);
 				}
+				
+				String    user_id = rs.getString(15);
 								
 				
 				JSONObject item_obj = new JSONObject();
@@ -1034,6 +1046,7 @@ public class MainServlet extends HttpServlet {
 					}					
 				}
 				item_obj.put("images", img_arr);
+				item_obj.put("self",   user_id.equals(open_id) );
 				
 				JSONArray reader_arr = new JSONArray();
 				ResultSet sub_rs = sub_stmt.executeQuery( "select b.nickname from weibo_reader a inner join users b on a.user_id = b.open_id and a.weibo_id = " + item_id );
@@ -1061,6 +1074,34 @@ public class MainServlet extends HttpServlet {
 			out.print(rsp_obj.toString());
 			
 			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void delhotpoint( PrintWriter out, int id ) {
+		
+		try {
+			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate( "DELETE FROM weibo_items WHERE weibo_id = " + id + ";"  );
+			stmt.executeUpdate( "DELETE FROM weibo_reader WHERE weibo_id = " + id + ";"  );
+						
+			JSONObject rsp_obj = new JSONObject();			
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());
+			
 			stmt.close();
 			con.close();
         } catch (Exception ex ) {

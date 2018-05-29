@@ -1,10 +1,17 @@
 <view wx:for="{{weibo_items}}" wx:key="id" class="weibo">
   <view class="split" catchtap="OnIgnore" ></view>
   
-  <view>
-    <image src="{{item.avatarUrl}}" class="person avatar"></image>
-    <view class="person">{{item.name}}</view>
-  </view>
+  <scroll-view  scroll-x  catchtap="OnIgnore">
+    <view wx:if="{{item.self}}" style="width:1000rpx;">
+      <image src="{{item.avatarUrl}}" class="person avatar" catchtap="OnIgnore"></image>
+      <view class="person" catchtap="OnIgnore">{{item.name}}</view>     
+      <view class="todo-item menu rd" catchtap="OnDelete" data-id="{{item.id}}" >删除</view>      
+    </view>
+    <view wx:else>
+      <image src="{{item.avatarUrl}}" class="person avatar" catchtap="OnIgnore"></image>
+      <view class="person" catchtap="OnIgnore">{{item.name}}</view>
+    </view>    
+  </scroll-view> 
   
   <text class="weibo_item">{{item.content}}</text>
   

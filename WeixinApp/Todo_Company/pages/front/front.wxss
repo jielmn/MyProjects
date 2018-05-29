@@ -33,7 +33,7 @@
 
 
 .todo-item {
-  display:inline-block; 
+  float: right;
   vertical-align:middle;  
   line-height:50px;
 }

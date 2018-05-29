@@ -119,4 +119,50 @@ Page({
     }
   },
 
+  OnIgnore: function () {
+
+  },
+
+  OnDelete:function(e) {
+    //console.log("delete weibo....")
+    //console.log(e.currentTarget.dataset.id)
+    var that = this;
+    var id = e.currentTarget.dataset.id
+    
+    wx.request({
+      url: app.globalData.serverAddr + '?type=delete_weibo&id=' + id,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          console.log("delete success!")
+          wx.showToast({
+            title: '删除成功'
+          })
+
+          that.deleteFromArray(that.data.weibo_items, 'id', id)
+          that.setData({ weibo_items: that.data.weibo_items })
+        } else {
+          console.log("delete result:")
+          console.log(res);
+        }
+      },
+      fail() {
+        console.log("failed to delete")
+        console.log(res);
+      },
+      complete() {
+
+      },
+    })
+  },
+
+  deleteFromArray: function (arr, key, val) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i][key] == val) {
+        arr.splice(i, 1);
+        break;
+      }
+    }
+  },
+
 }) //  END OF PAGE
