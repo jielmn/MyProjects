@@ -6,8 +6,8 @@ Page({
 
   data: {
     login: false,
-    navbar: ['半月维保', '季度维保', '半年维保', "年度维保"],
-    currentTab: 4,
+    navbar: ['温度贴', '读卡器'],
+    currentTab: 0,
   },
 
   

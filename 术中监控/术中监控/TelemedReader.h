@@ -41,6 +41,8 @@ private:
 	// 协议部分
 	int   Prepare();
 	int   ReadPrepareRet();
+
+	void  ReceiveAsPossible(DWORD dwMaxTime, DWORD dwMaxDataLength);
 private:
 	READER_STATUS      m_eStatus;
 	HANDLE             m_hComm;                           // 串口句柄

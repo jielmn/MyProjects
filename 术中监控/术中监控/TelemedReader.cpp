@@ -87,6 +87,9 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 		return EXH_ERR_READER_FAILED_TO_WRITE;
 	}
 
+#ifdef TELEMED_READER_TYPE_1
+	ReceiveAsPossible(SERIAL_PORT_SLEEP_TIME, 14);
+#else
 	DWORD dwReceived = 0;
 	do
 	{
@@ -97,9 +100,9 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 			break;
 		}
 	} while (TRUE);
+#endif
 
 	BYTE pData[8192];
-
 #ifdef TELEMED_READER_TYPE_1
 	if (m_received_data.GetDataLength() >= 14) {
 		m_received_data.Read(pData, 14);
@@ -365,6 +368,9 @@ int  CTelemedReader::Prepare() {
 int  CTelemedReader::ReadPrepareRet() {
 	DWORD dwReceived = 0;
 
+#ifdef TELEMED_READER_TYPE_1
+	ReceiveAsPossible(SERIAL_PORT_SLEEP_TIME, 4);
+#else
 	do
 	{
 		Sleep(SERIAL_PORT_SLEEP_TIME);
@@ -374,6 +380,7 @@ int  CTelemedReader::ReadPrepareRet() {
 			break;
 		}
 	} while (TRUE);
+#endif
 
 	BYTE pData[8192];
 #ifdef TELEMED_READER_TYPE_1
@@ -396,3 +403,34 @@ int  CTelemedReader::ReadPrepareRet() {
 	return -1;
 }
 
+
+
+void  CTelemedReader::ReceiveAsPossible( DWORD dwMaxTime, DWORD dwMaxDataLength ) {
+	const DWORD  dwIntervalTime = 200;
+	DWORD  dwLeftTime = dwMaxTime;
+
+	DWORD  dwReceived = 0;
+	DWORD  dwReceivedCnt = m_received_data.GetDataLength();
+
+	do
+	{
+		// 如果达到数据长度要求
+		if (dwReceivedCnt >= dwMaxDataLength) {
+			break;
+		}
+
+		Sleep(dwIntervalTime);
+		Receive(dwReceived);
+
+		dwReceivedCnt += dwReceived;
+		
+		if ( dwLeftTime > dwIntervalTime ) {
+			dwLeftTime -= dwIntervalTime;
+		}
+		// 时间已经用完
+		else {
+			break;
+		}
+
+	} while (TRUE);
+}

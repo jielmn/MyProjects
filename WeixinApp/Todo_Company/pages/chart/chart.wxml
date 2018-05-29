@@ -1,5 +1,5 @@
 <!--导航菜单-->
-<view class="navbar" style=" z-index:50">
+<view class="navbar" >
   <!--循环-->
   <view wx:for="{{navbar}}" data-idx="{{index}}" wx:key="unique" class="item {{currentTab==index ? 'active' : ''}}" bindtap="navbarTap">
     {{item}}
@@ -22,7 +22,7 @@
   444444
 </view>
 
-<!--
+
 <view >
     <view class="table">
         <view class="tr">
@@ -33,18 +33,18 @@
             <view class="th">标题5</view>
         </view>
         <view class="tr" >
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
+            <view class="td">内容1</view>
+            <view class="td">内容2</view>
+            <view class="td">内容3</view>
+            <view class="td">内容4</view>
+            <view class="td">内容5</view>
         </view>
         <view class="tr" >
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
+            <view class="td">内容a</view>
+            <view class="td">内容b</view>
+            <view class="td">内容c</view>
+            <view class="td">内容d</view>
+            <view class="td">内容e</view>
         </view>
         <view class="tr" >
             <view class="td">内容</view>
@@ -55,4 +55,3 @@
         </view>
     </view>
 </view>
--->
