@@ -1,3 +1,28 @@
+<!--导航菜单-->
+<view class="navbar" style=" z-index:50">
+  <!--循环-->
+  <view wx:for="{{navbar}}" data-idx="{{index}}" wx:key="unique" class="item {{currentTab==index ? 'active' : ''}}" bindtap="navbarTap">
+    {{item}}
+  </view>
+</view>
+
+<view wx:if="{{currentTab==1}}">
+  1111111
+</view>
+
+<view wx:elif="{{currentTab==2}}">
+  222222
+</view>
+
+<view wx:elif="{{currentTab==3}}">
+  333333
+</view>
+
+<view wx:else>
+  444444
+</view>
+
+<!--
 <view >
     <view class="table">
         <view class="tr">
@@ -30,3 +55,4 @@
         </view>
     </view>
 </view>
+-->
