@@ -3,25 +3,57 @@
   border-right: 0;
   border-bottom: 0;
   width: 100%;
+  font-size: 30rpx;
 }
 .tr {
   width: 100%;
   display: flex;
   justify-content: space-between;
 }
+.head{
+  font-size: 35rpx;
+  height:80rpx;
+  line-height: 80rpx;
+  font-weight: bold;
+}
 .th,.td {
-  padding: 10rpx;
+  padding: 0rpx;
   border-bottom: 1rpx solid #dadada;
   border-right: 1rpx solid #dadada;
-  text-align: center;
+  text-align:center;
   width:100%
 }
 .th {
-  font-weight: 400;
+  font-weight:normal;
   background-color: #dadada
 }
-
-
+.tdd {
+  padding: 0rpx;
+  border-bottom: 1rpx solid #dadada;
+  text-align:center;
+  width:100%;
+  height:80rpx;
+  line-height: 80rpx;
+}
+.tdb {
+  padding: 0rpx;
+  text-align:center;
+  width:100%;
+  height:80rpx;
+  line-height: 80rpx;
+}
+.column_1{
+  width:500rpx;
+}
+.qu{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.input_1{
+  height:80rpx;
+}
 
 
 

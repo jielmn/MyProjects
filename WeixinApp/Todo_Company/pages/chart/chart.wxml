@@ -23,35 +23,63 @@
 </view>
 
 
+<form bindsubmit="formSubmit">
+
 <view >
     <view class="table">
-        <view class="tr">
-            <view class="th"></view>
-            <view class="th">标题2</view>
-            <view class="th">标题3</view>
-            <view class="th">标题4</view>
-            <view class="th">标题5</view>
+
+        <view class="tr head">
+            <view class="th column_1">区</view>
+            <view class="th">省</view>
+            <view class="th">计划</view>
+            <view class="th">预定</view>
+            <view class="th">实际</view>
+            <view class="th">比率</view>
         </view>
+
         <view class="tr" >
-            <view class="td">内容1</view>
-            <view class="td">内容2</view>
-            <view class="td">内容3</view>
-            <view class="td">内容4</view>
-            <view class="td">内容5</view>
-        </view>
-        <view class="tr" >
-            <view class="td">内容a</view>
-            <view class="td">内容b</view>
-            <view class="td">内容c</view>
-            <view class="td">内容d</view>
-            <view class="td">内容e</view>
-        </view>
-        <view class="tr" >
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
-            <view class="td">内容</view>
+            <view class="td column_1 qu">
+              华北
+            </view>
+            <view class="td">
+              <view class="tdd" >北京</view>
+              <view class="tdd" >天津</view>
+              <view class="tdd" >河北</view>
+              <view class="tdd" >山西</view>
+              <view class="tdb" >内蒙古</view>
+            </view>
+            <view class="td">
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="plan_1_1" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="plan_1_2" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="plan_1_3" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="plan_1_4" /></view>
+              <view class="tdb"><input type="digit" maxlength="10" class="input_1" name="plan_1_5" /></view>
+            </view>
+            <view class="td">
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="book_1_1" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="book_1_2" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="book_1_3" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="book_1_4" /></view>
+              <view class="tdb"><input type="digit" maxlength="10" class="input_1" name="book_1_5" /></view>
+            </view>
+            <view class="td">
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="target_1_1" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="target_1_2" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="target_1_3" /></view>
+              <view class="tdd"><input type="digit" maxlength="10" class="input_1" name="target_1_4" /></view>
+              <view class="tdb"><input type="digit" maxlength="10" class="input_1" name="target_1_5" /></view>
+            </view>
+
+            <view class="td">
+              <view class="tdd"></view>
+              <view class="tdd"></view>
+              <view class="tdd"></view>
+              <view class="tdd"></view>
+              <view class="tdb"></view>
+            </view>
+
         </view>
     </view>
 </view>
+
+</form>
