@@ -57,7 +57,11 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::Node::get_last_child()
 }
 	
 
-
+CMyTreeCfgUI::ConfigValue::ConfigValue() {
+	m_nComboSel = -1;
+	m_bCheckbox = FALSE;
+	m_eConfigType = ConfigType_NONE;
+}
 
 
 
@@ -86,9 +90,16 @@ CMyTreeCfgUI::CMyTreeCfgUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0),
 	_root->data()._expand = true;
 	_root->data()._pListElement = NULL;
 	_root->data()._pUserData = 0;
+
+	m_dwFixedLeft = 170;
+
+	m_hPen = CreatePen(PS_DOT, 1, RGB(0x99, 0x99, 0x99));
 }
 
-CMyTreeCfgUI::~CMyTreeCfgUI() { if (_root) delete _root; }
+CMyTreeCfgUI::~CMyTreeCfgUI() { 
+	if (_root) delete _root; 
+	DeleteObject(m_hPen);
+}
 
 bool CMyTreeCfgUI::Add(CControlUI* pControl)
 {
@@ -192,11 +203,14 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	node->data()._pUserData = pUserData;	
 	node->data()._expand = true;
 
-	int nPlaceHolderWidth = 10;
+	int nPlaceHolderWidth = 2;
 	for (int i = 0; i < node->data()._level; ++i) {
 		nPlaceHolderWidth += 24;
 	}
 	place_holder->SetFixedWidth(nPlaceHolderWidth);
+	if ( m_dwFixedLeft > (DWORD)nPlaceHolderWidth ) {
+		pTitle->SetFixedWidth(m_dwFixedLeft - nPlaceHolderWidth);
+	}
 
 	if (!parent->has_children()) {
 		CListContainerElementUI * parent_element = parent->data()._pListElement;
@@ -206,7 +220,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			btn_expand->SetFixedWidth(15);
 			btn_expand->SetFixedHeight(15);
 			btn_expand->SetBkImage("expand.png");
-			btn_expand->SetAttribute("padding", "5,5,5,5");
+			btn_expand->SetAttribute("padding", "0,5,4,5");
 			layout_parent->AddAt(btn_expand, 1);
 		}
 	}
@@ -327,11 +341,69 @@ int CMyTreeCfgUI::GetItemIndex(CControlUI* pControl) const {
 
 bool CMyTreeCfgUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CListUI::DoPaint(hDC, rcPaint, pStopControl);
+
+	HPEN hOldPen = (HPEN)::SelectObject(hDC, m_hPen);
+
 	RECT r = this->GetPos();
-	::MoveToEx(hDC, r.left, r.top, 0);
-	::LineTo(hDC, r.right-1, r.top);
-	::LineTo(hDC, r.right-1, r.bottom-1);
-	::LineTo(hDC, r.left, r.bottom-1);
-	::LineTo(hDC, r.left, r.top);
+	//::MoveToEx(hDC, r.left, r.top, 0);
+	//::LineTo(hDC, r.right-1, r.top);
+	//::LineTo(hDC, r.right-1, r.bottom-1);
+	//::LineTo(hDC, r.left, r.bottom-1);
+	//::LineTo(hDC, r.left, r.top);
+
+	int nCount = this->GetCount();
+	int h = r.top;
+	for (int i = 0; i < nCount; i++) {
+		if (0 == i) {
+			::MoveToEx(hDC, r.left, h, 0);
+			::LineTo(hDC, r.right - 1, h);
+		}
+		int nHeight = this->GetItemAt(i)->GetHeight();
+		h += nHeight;
+		::MoveToEx(hDC, r.left, h, 0);
+		::LineTo(hDC, r.right - 1, h);
+	}
+
+	::MoveToEx(hDC, r.left + m_dwFixedLeft, r.top, 0);
+	::LineTo(hDC, r.left + m_dwFixedLeft, h);
+
+	::SelectObject(hDC, hOldPen);
+	return true;
+}
+
+bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
+	if (nIndex < 0) {
+		return false;
+	}
+
+	int nCount = this->GetCount();
+	if (nIndex >= nCount) {
+		return false;
+	}
+
+	CListContainerElementUI * pContainer =  (CListContainerElementUI *)this->GetItemAt(nIndex);
+	CHorizontalLayoutUI * pLayout = (CHorizontalLayoutUI *)pContainer->GetItemAt(0);
+
+	if ( pLayout->GetCount() < 3 ) {
+		return false;
+	}
+
+	CControlUI * pCtl = pLayout->GetItemAt(2);
+	if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_EDIT) ) {
+		cfgValue.m_eConfigType = ConfigType_EDIT;
+		cfgValue.m_strEdit = pCtl->GetText();
+	}
+	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_COMBO ) ) {
+		cfgValue.m_eConfigType = ConfigType_COMBO;
+		cfgValue.m_nComboSel = ((CComboUI*)pCtl)->GetCurSel();
+	}
+	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_CHECKBOX) ) {
+		cfgValue.m_eConfigType = ConfigType_CHECKBOX;
+		cfgValue.m_bCheckbox = ((CCheckBoxUI*)pCtl)->IsSelected();
+	}
+	else {
+		return false;
+	}
+
 	return true;
 }

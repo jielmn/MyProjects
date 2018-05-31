@@ -80,7 +80,13 @@ void CDuiFrameWnd::InitWindow() {
 		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i + 1));
 
 		for (int j = 0; j < 3; j++) {
-			strText.Format("SUB配置选项 %d-%d", i+1, j + 1);
+			if (j == 0) {
+				strText.Format("SUB配置选项 %d-%d", i + 1, j + 1);
+			}
+			else {
+				strText.Format("%d-%d", i + 1, j + 1);
+			}
+			
 
 			if (j == 0) {
 				CEditUI * pEdit = new CEditUI;
@@ -127,8 +133,45 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			}
 		}
 	}
-	else if (msg.sType == "itemclick") {
-		int a = 100;
+	else if (msg.sType == "itemselect") {
+		int nIndex = m_tree->GetCurSel();
+		if (nIndex >= 0) {
+			CControlUI * pControl = m_tree->GetItemAt(nIndex);
+			CListContainerElementUI * pElement = (CListContainerElementUI *)pControl;
+			CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)pElement->GetTag();
+			CHorizontalLayoutUI * pLayout = (CHorizontalLayoutUI *)pElement->GetItemAt(0);
+			if ( pLayout->GetCount() == 3 ) {
+				CDuiString a = pLayout->GetItemAt(2)->GetClass();
+				CDuiString b = pLayout->GetItemAt(2)->GetText();
+			}
+
+			CMyTreeCfgUI::ConfigValue  cfgValue;
+			bool bGetCfg = m_tree->GetConfigValue(nIndex, cfgValue);
+
+			CDuiString strText;
+			if ( bGetCfg) {
+				if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_EDIT) {
+					strText.Format("UserData:%d,edit:%s", (int)node->data()._pUserData, cfgValue.m_strEdit);
+				}
+				else if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_COMBO) {
+					strText.Format("UserData:%d,combo:%d", (int)node->data()._pUserData, cfgValue.m_nComboSel);
+				} 
+				else if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_CHECKBOX) {
+					strText.Format("UserData:%d,checkbox:%s", (int)node->data()._pUserData, cfgValue.m_bCheckbox?"checked":"unchecked" );
+				}
+				else {
+					assert(FALSE);
+				}
+			}
+			else {
+				strText.Format("UserData:%d", (int)node->data()._pUserData);
+			}
+			
+			m_view->SetText(strText);
+		}
+		else {
+			m_view->SetText("");
+		}
 	}
 
 	WindowImplBase::Notify(msg);

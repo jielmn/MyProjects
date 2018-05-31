@@ -42,6 +42,23 @@ public:
 		Node* get_last_child();
 	};
 
+	enum ConfigType{
+		ConfigType_NONE = 0,
+		ConfigType_EDIT,
+		ConfigType_COMBO,
+		ConfigType_CHECKBOX
+	};
+
+	class ConfigValue {
+	public:
+		ConfigValue();
+
+		CDuiString  m_strEdit;
+		int         m_nComboSel;
+		BOOL        m_bCheckbox;
+		ConfigType  m_eConfigType;
+	};
+
 	CMyTreeCfgUI();
 
 	~CMyTreeCfgUI();
@@ -75,10 +92,15 @@ public:
 
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
+	bool GetConfigValue(int nIndex, ConfigValue & cfgValue);
+
 private:
 	Node* _root;
 
 	LONG m_dwDelayDeltaY;
 	DWORD m_dwDelayNum;
 	DWORD m_dwDelayLeft;
+
+	DWORD  m_dwFixedLeft;
+	HPEN   m_hPen;
 };

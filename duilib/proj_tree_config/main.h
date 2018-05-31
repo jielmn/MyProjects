@@ -20,6 +20,6 @@ public:
 
 private:
 	CMyTreeCfgUI  *      m_tree;
-	CLabelUI*         m_view;
+	CLabelUI*            m_view;
 };
 

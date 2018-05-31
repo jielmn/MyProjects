@@ -18,12 +18,12 @@
         <!-- 客户区 -->
     <HorizontalLayout inset="0,0,0,0">
 		<!-- 左边的树 -->
-        <VerticalLayout bordercolor="#FF000000" bordersize="0" width="300" bkcolor="#FFCCCCCC">
+        <VerticalLayout bordercolor="#FFAAAAA0" bordersize="1" inset="1,1,1,1" width="300" bkcolor="#FFFFFFFF">
 			<MyTree name="tree1" header="hidden" menu="true" />
 		</VerticalLayout>
 		
 		<!-- 右边的视图 -->
-		<VerticalLayout  bkcolor="#FFD1E8F5" inset="10,10,10,10" width="200" >
+		<VerticalLayout  bkcolor="#FFD1E8F5" inset="10,10,10,10"  >
 			<Label text="视图" name="lblView" />
 		</VerticalLayout>
 		
