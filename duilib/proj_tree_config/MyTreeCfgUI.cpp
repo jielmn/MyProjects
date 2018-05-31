@@ -91,7 +91,7 @@ CMyTreeCfgUI::CMyTreeCfgUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0),
 	_root->data()._pListElement = NULL;
 	_root->data()._pUserData = 0;
 
-	m_dwFixedLeft = 170;
+	m_dwFixedLeft = 160;
 
 	m_hPen = CreatePen(PS_DOT, 1, RGB(0x99, 0x99, 0x99));
 }
@@ -189,7 +189,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	pTitle->SetText(text);
 
 	if (pConfig) {
-		pConfig->SetAttribute("padding", "3,3,3,3");
+		pConfig->SetAttribute("padding", "10,3,10,3");
 		pLayout->Add(pConfig);
 	}
 	
@@ -205,7 +205,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 
 	int nPlaceHolderWidth = 2;
 	for (int i = 0; i < node->data()._level; ++i) {
-		nPlaceHolderWidth += 24;
+		nPlaceHolderWidth += 12;
 	}
 	place_holder->SetFixedWidth(nPlaceHolderWidth);
 	if ( m_dwFixedLeft > (DWORD)nPlaceHolderWidth ) {
