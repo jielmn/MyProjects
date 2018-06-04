@@ -13,8 +13,18 @@
     <url-pattern>/main</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+  <servlet-name>addr</servlet-name>
+  <servlet-class>mypack.GetAddrServlet</servlet-class>
+ </servlet>
+
+  <servlet-mapping>
+    <servlet-name>addr</servlet-name>
+    <url-pattern>/addr</url-pattern>
+  </servlet-mapping>
+
   <welcome-file-list>
-    <welcome-file>main</welcome-file>
+    <welcome-file>addr</welcome-file>
   </welcome-file-list>
 
   <resource-ref>
