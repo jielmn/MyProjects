@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1"  >
+		<Label text="修正曲线" />
+	</VerticalLayout>
+</Window>

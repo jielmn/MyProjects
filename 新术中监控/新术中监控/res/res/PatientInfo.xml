@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="10,10,10,10" bordercolor="#FF000000" bordersize="1"  >
+	
+		<HorizontalLayout />
+	
+		<HorizontalLayout height="360">
+			<VerticalLayout />
+			
+			<VerticalLayout width="280" height="360">
+				<HorizontalLayout inset="0,5,0,5" height="40">
+					<Control />
+					<Label text="1.病人信息" width="140" font="2" textcolor="#FF386382"  />
+					<Control />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="30" />
+				
+				<HorizontalLayout inset="0,5,0,5" height="40">
+					<Label text="姓名：" width="80" font="3" textcolor="#FF386382"  /><Edit text="" name="edPatientName" bordercolor="#FF768D9B" bordersize="1" font="3" textcolor="#FF386382" width="200" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="10" />
+				
+				<HorizontalLayout inset="0,5,0,5" height="40">
+					<Label text="性别：" width="80" font="3" textcolor="#FF386382" />
+					<Option text="男" width="50" name="btnMale" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="sex" selected="true" />
+					<Control width="10" />
+					<Option text="女" width="50" name="btnFemale" font="3" textcolor="#FF386382"  textpadding="15,0,0,0" normalimage="file='RadioBtnNon.png' dest='0,9,13,22'" selectedimage="file='RadioBtnSel.png' dest='0,9,13,22'" group="sex" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="20" />
+				
+				<HorizontalLayout inset="0,5,0,5" height="40">
+					<Label text="年龄：" width="80" font="3" textcolor="#FF386382"  /><Edit text="" name="edPatientAge" bordercolor="#FF768D9B" bordersize="1" font="3" textcolor="#FF386382" width="200"  />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="20" />
+				
+				<HorizontalLayout inset="0,5,0,5" height="40">
+					<Label text="住院号：" width="80" font="3" textcolor="#FF386382"  /><Edit text="" name="edAD" bordercolor="#FF768D9B" bordersize="1" font="3" textcolor="#FF386382" width="200"  />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="20" />
+				
+				<HorizontalLayout inset="0,5,0,5" height="40">
+					<Label text="床号：" width="80" font="3" textcolor="#FF386382"  /><Edit text="" name="edBedno" bordercolor="#FF768D9B" bordersize="1" font="3" textcolor="#FF386382" width="200"  />
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			<VerticalLayout />
+		</HorizontalLayout>		
+	
+		<HorizontalLayout />
+			
+	</VerticalLayout>
+</Window>
