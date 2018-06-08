@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlited.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Debug\res /dseiy</Command>
@@ -129,7 +129,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilib.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\res ..\Release\res /dseiy</Command>
@@ -154,11 +154,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="business.cpp" />
+    <ClCompile Include="ImageAll.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Common.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="business.h" />
+    <ClInclude Include="ImageAll.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Common.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="新术中监控.rc" />
