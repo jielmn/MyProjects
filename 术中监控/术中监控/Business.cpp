@@ -77,9 +77,9 @@ int CBusiness::Init() {
 	g_cfg->GetConfig("read tag data command", buf, sizeof(buf), "55 01 02 DD AA");
 	TransferReaderCmd(READ_TAG_DATA_COMMAND, buf);
 	
-	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 5000 );
-	if ( SERIAL_PORT_SLEEP_TIME < 3500 ) {
-		 SERIAL_PORT_SLEEP_TIME = 3500;
+	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 30000 );
+	if ( SERIAL_PORT_SLEEP_TIME < 30000 ) {
+		 SERIAL_PORT_SLEEP_TIME = 30000;
 	}
 
 	// ²É¼¯¼ä¸ôÃë

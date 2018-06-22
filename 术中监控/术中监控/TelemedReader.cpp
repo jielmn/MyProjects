@@ -25,9 +25,19 @@ int  CTelemedReader::Reconnect() {
 		return 0;
 	}
 
+	char szPort[256];
+	g_cfg->GetConfig("com port", szPort, sizeof(szPort), "");
+
 	std::vector<std::string>  vCom;
-	// 获取所有的串口信息
-	GetAllSerialPortName(vCom);
+	if (szPort[0] != '\0') {
+		vCom.push_back(szPort);
+	}
+	else {
+		// 获取所有的串口信息
+		GetAllSerialPortName(vCom);
+	}
+
+	
 
 	// 先关闭之前可能打开的串口
 	CloseUartPort();
@@ -75,6 +85,8 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 		return EXH_ERR_READER_CLOSE;
 	}
 
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "send get temperature command \n");
+
 	DWORD dwWrited = 0;
 	BOOL bRet = WriteUartPort(m_hComm, READ_TAG_DATA_COMMAND.abyCommand, READ_TAG_DATA_COMMAND.dwCommandLength, &dwWrited);
 
@@ -101,6 +113,8 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 		}
 	} while (TRUE);
 #endif
+
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "RESPONSE OR TIMEOUT \n");
 
 	BYTE pData[8192];
 #ifdef TELEMED_READER_TYPE_1
@@ -369,7 +383,8 @@ int  CTelemedReader::ReadPrepareRet() {
 	DWORD dwReceived = 0;
 
 #ifdef TELEMED_READER_TYPE_1
-	ReceiveAsPossible(SERIAL_PORT_SLEEP_TIME, 4);
+	//ReceiveAsPossible(SERIAL_PORT_SLEEP_TIME, 4);
+	ReceiveAsPossible(5000, 4);
 #else
 	do
 	{
