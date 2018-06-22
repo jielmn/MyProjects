@@ -2,11 +2,11 @@
 
 #include "InvCommon.h"
 #include "InvDatabase.h"
-#include "InvReader.h"
+//#include "InvReader.h"
 //#include "610InvReader.h"
-//#include "TelemedInvReader.h"
+#include "TelemedInvReader.h"
 
-#define   READER_TYPE_INV
+//#define   READER_TYPE_INV
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 

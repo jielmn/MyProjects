@@ -76,7 +76,7 @@ void  CDuiFrameWnd::InitWindow() {
 		SET_CONTROL_TEXT(m_lblDbStatus, DB_STATUS_CLOSE_TEXT);
 	}
 
-	if (eReaderStatus == CInvReader::STATUS_OPEN) {
+	if (eReaderStatus == CTelemedInvReader::STATUS_OPEN) {
 		SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT);
 	}
 	else {
@@ -1036,7 +1036,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_SHOW_READER_STATUS) {
 		int eStatus = wParam;
-		if (eStatus == CInvReader::STATUS_OPEN) {
+		if (eStatus == CTelemedInvReader::STATUS_OPEN) {
 			SET_CONTROL_TEXT(m_lblReaderStatus, READER_STATUS_OK_TEXT);
 		}
 		else {
