@@ -7,12 +7,18 @@
 CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	m_pManager = pManager;
 
-	m_hPen = ::CreatePen(0, 1, RGB(0, 128, 64));
+	char buf[8192];
+	DWORD   dwValue;
+
+	g_cfg->GetConfig( "COLOR 1", buf, sizeof(buf), MY_COLOR_1);
+	sscanf(buf, "0x%x", &dwValue);
+	m_hPen = ::CreatePen(0, 1, dwValue); 
 	m_hPen1 = ::CreatePen(PS_DASH, 1, RGB(0, 0, 255));
 	m_hPen2 = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
 
+	m_hPen3 = ::CreatePen(PS_SOLID, 4, RGB(2, 165, 241));
 
-	DWORD   dwValue;
+	
 
 	g_cfg->GetConfig("LEFT", dwValue, 50);
 	m_nLeft = (int)dwValue;
@@ -41,9 +47,9 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	}
 	m_nMaxPointsCnt = dwValue;
 
-	g_cfg->GetConfig("RADIUS", dwValue, 6);
+	g_cfg->GetConfig("RADIUS", dwValue, 6);  
 	m_nRadius = dwValue;
-	if ( m_nRadius < 4 || m_nRadius > 6 ) {
+	if ( m_nRadius < 2 || m_nRadius > 6 ) {
 		m_nRadius = 6;
 	}
 
@@ -113,6 +119,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 		tFistTime = pFist->tTime;
 		nLastTimeTextLeft = 0;
 	}
+
+
+	::SelectObject(hDC, m_hPen3);
 
 	assert(g_dwCollectInterval > 0);
 	int nMiddleTemp = (42 + nMinTemp) / 2;

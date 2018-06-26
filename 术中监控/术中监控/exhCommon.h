@@ -11,7 +11,7 @@
 #include "LmnString.h"
 
 #ifdef _DEBUG
-#define  TEST_FLAG                  0
+#define  TEST_FLAG                  1
 #endif
 
 #if     TEST_FLAG
@@ -22,7 +22,7 @@
 // 张维国的新的读卡器
 #define TELEMED_READER_TYPE_1         
 
-
+#define  MY_COLOR_1                 "0xFFFFFF"
 
 
 #define  RECONNECT_READER_DELAY          5000

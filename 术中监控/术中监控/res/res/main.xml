@@ -31,7 +31,7 @@
 		</HorizontalLayout>
 		
 		<!-- 客户区 -->
-		<VerticalLayout bkcolor="#FFFFFFFF" inset="10,0,10,10" >
+		<VerticalLayout bkcolor="#FF192431" inset="10,0,10,10" >
 		
 			<HorizontalLayout height="40" >
 				<Label text="病人基本信息"   textcolor="#FF447AA1" width="150" font="1" />
@@ -78,7 +78,7 @@
 			</HorizontalLayout>
 		
 			<VerticalLayout inset="20,0,20,0">
-				<MyImage name="image0" bordercolor="#FF008040" bordersize="1" bkcolor="#FFFFFFFF" />
+				<MyImage name="image0" bordercolor="#FFFFFFFF" bordersize="1" bkcolor="#FF192431" />
 			</VerticalLayout>
 						
 		</VerticalLayout>		

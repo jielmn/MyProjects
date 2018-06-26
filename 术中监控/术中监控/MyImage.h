@@ -40,6 +40,8 @@ private:
 	HPEN                 m_hPen;
 	HPEN                 m_hPen1;    // 低温线
 	HPEN                 m_hPen2;    // 高温线
+
+	HPEN                 m_hPen3;     // 数据线
 };
 
 #define  MYIMAGE_TIMER_ID             10
