@@ -77,7 +77,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 
 	int RIGHT = width - m_nLeft;
 
-	// 38度位置
+	// 中间温度的位置
 	int middle = height / 2;
 
 	::SelectObject(hDC, m_hPen);
@@ -88,11 +88,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 	::LineTo(hDC, m_nLeft + rect.left, rect.bottom);
 
 	// 42度线的top位置
-	int nFirstTop = middle - m_nGridSize * 4;
+	int nFirstTop = middle - m_nGridSize * ( m_nGridCount / 2 );
 	int nFistTemperature = 42;
 	DuiLib::CDuiString strText;
 
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < m_nGridCount+1; i++) {
 		int  nTop = nFirstTop + i * m_nGridSize;
 		int  nTemperature = nFistTemperature - i;
 
@@ -115,13 +115,14 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 
 		// 第一个点的时间
 		strText.Format("%02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
-		::TextOut(hDC, m_nLeft + rect.left + m_nTimeOffsetX, middle + 4 * m_nGridSize + rect.top + m_nTimeOffsetY, strText, strText.GetLength());
+		::TextOut(hDC, m_nLeft + rect.left + m_nTimeOffsetX, middle + (m_nGridCount / 2) * m_nGridSize + rect.top + m_nTimeOffsetY, strText, strText.GetLength());
 
 		tFistTime = pFist->tTime;
 		nLastTimeTextLeft = 0;
 	}
 
 	assert(g_dwCollectInterval > 0);
+	int nMiddleTemp = (42 + m_nMinTemp) / 2;
 
 	vector<TempData *>::iterator it;
 	for (it = m_vTempData.begin(); it != m_vTempData.end(); it++) {
@@ -129,7 +130,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 
 		int nDiff = (int)(pItem->tTime - tFistTime);
 		int nX = (int)( ( (double)nDiff / g_dwCollectInterval ) * m_nTimeUnitLen ) ;
-		int nY = (int)( (3800.0 - (double)pItem->dwTemperature) / 100.0 * m_nGridSize );
+		int nY = (int)( (nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * m_nGridSize );
 
 		DrawTempPoint(nX + m_nLeft + rect.left, nY + middle + rect.top, hDC, m_nRadius);
 
@@ -138,7 +139,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 			struct tm tTmTime;
 			localtime_s(&tTmTime, &pItem->tTime);
 			strText.Format("%02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
-			::TextOut(hDC, m_nLeft + rect.left + nX - 30, middle + 4 * m_nGridSize + rect.top + m_nTimeOffsetY, strText, strText.GetLength());
+			::TextOut(hDC, m_nLeft + rect.left + nX - 30, middle + (m_nGridCount / 2) * m_nGridSize + rect.top + m_nTimeOffsetY, strText, strText.GetLength());
 			nLastTimeTextLeft = nX;
 		}
 
@@ -152,14 +153,14 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 
 	// 画出报警线
 	::SelectObject(hDC, m_hPen1);
-	int nY = (int)((3800.0 - (double)g_dwLowTempAlarm) / 100.0 * m_nGridSize);
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_dwLowTempAlarm) / 100.0 * m_nGridSize);
 	::MoveToEx(hDC, m_nLeft + rect.left, middle + nY + rect.top, 0);
 	::LineTo(hDC, rect.right, middle + nY + rect.top);
 	strText = "低温报警";
 	::TextOut(hDC, m_nLeft + rect.left + 5, middle + nY + rect.top + 5, strText, strText.GetLength());
 
 	::SelectObject(hDC, m_hPen2);
-	nY = (int)((3800.0 - (double)g_dwHighTempAlarm) / 100.0 * m_nGridSize);
+	nY = (int)((nMiddleTemp * 100.0 - (double)g_dwHighTempAlarm) / 100.0 * m_nGridSize);
 	::MoveToEx(hDC, m_nLeft + rect.left, middle + nY + rect.top, 0);
 	::LineTo(hDC, rect.right, middle + nY + rect.top);
 	strText = "高温报警";
@@ -218,7 +219,7 @@ void   CMyImageUI::DrawTempPoint(int x, int y, HDC hDc, int RADIUS /*= 6*/) {
 void  CMyImageUI::SetWndRect(int x, int y) {
 	int h = y - 340;
 	if (h > 0) {
-		m_nGridSize = h / 8;
+		m_nGridSize = h / m_nGridCount;
 		Invalidate();
 	}
 }
