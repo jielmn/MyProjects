@@ -124,7 +124,7 @@ int CBusiness::Init() {
 		g_dwMinTemp--;
 	}
 
-	g_cfg->GetConfig("alarm file", buf, sizeof(buf), "");
+	g_cfg->GetConfig("alarm file", buf, sizeof(buf), "");	
 	if (buf[0] == '\0') {
 		GetModuleFileName(0, buf, sizeof(buf));
 		const char * pStr = strrchr(buf, '\\');
@@ -134,16 +134,19 @@ int CBusiness::Init() {
 		memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
 	}
 	else {
-		strncpy_s(g_szAlarmFilePath, buf, sizeof(g_szAlarmFilePath));
+		if ( -1 != GetFileAttributes(buf) )    
+		{
+			strncpy_s(g_szAlarmFilePath, buf, sizeof(g_szAlarmFilePath));
+		}
+		else {
+			GetModuleFileName(0, buf, sizeof(buf));
+			const char * pStr = strrchr(buf, '\\');
+			assert(pStr);
+			DWORD  dwTemp = pStr - buf;
+			memcpy(g_szAlarmFilePath, buf, dwTemp);
+			memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
+		}
 	}
-
-	//GetModuleFileName(0, buf, sizeof(buf) );
-	//const char * pStr = strrchr(buf, '\\');
-	//assert(pStr);
-	//DWORD  dwTemp = pStr - buf;
-	//memcpy( g_szAlarmFilePath, buf, dwTemp );
-	//memcpy(g_szAlarmFilePath + dwTemp, DEFAULT_ALARM_FILE_PATH, strlen(DEFAULT_ALARM_FILE_PATH));
-	
 
 	ReconnectReaderAsyn(200);
 
