@@ -73,6 +73,12 @@ void CDuiFrameWnd::InitWindow() {
 	CMyTreeCfgUI::Node* pRoomNode1 = NULL;
 
 	CDuiString  strText;
+	m_tree->AddNode(_T("参数设置123"));
+
+	CEditUI * pEdit = new CEditUI;
+	pEdit->SetText("请输入123");
+	m_tree->AddNode("100", 0, (void *)(100), pEdit);
+
 	pCategoryNode = m_tree->AddNode(_T("参数设置"));
 	for (int i = 0; i < 3; ++i)
 	{
