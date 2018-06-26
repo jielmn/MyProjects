@@ -34,6 +34,9 @@ private:
 	int                  m_nMaxPointsCnt;
 	int                  m_nRadius;
 
+	int                  m_nMinTemp;
+	int                  m_nGridCount;
+
 	HPEN                 m_hPen;
 	HPEN                 m_hPen1;    // µÍÎÂÏß
 	HPEN                 m_hPen2;    // ¸ßÎÂÏß

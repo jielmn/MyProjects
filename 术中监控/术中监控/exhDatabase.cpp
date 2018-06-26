@@ -93,11 +93,17 @@ int CMyDatabase::GetAllTemp(std::vector<TempData *> & v) {
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
 	char *zErrMsg = 0;            // 错误描述
-	const char * sql = 0;
+	char sql[8192];
 
 	char buf[8192];
 
-	sql = "select * from " TABLE_NAME " order by GenDate;";
+	time_t now = time(0);
+	now -= 24 * 3600;
+
+	char szNow[256];
+	Time2String(szNow, sizeof(szNow), &now);
+
+	SNPRINTF(sql, sizeof(sql), "select * from " TABLE_NAME " order by GenDate where GenDate >= '%s';", szNow );
 	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
 	for (int i = 0; i < nrow; i++) {
 		TempData * pItem = new TempData;

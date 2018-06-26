@@ -46,6 +46,22 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	if ( m_nRadius < 4 || m_nRadius > 6 ) {
 		m_nRadius = 6;
 	}
+
+	g_cfg->GetConfig("min temperature degree", dwValue, 34);
+	m_nMinTemp = dwValue;
+
+	if (m_nMinTemp < 20 ) {
+		m_nMinTemp = 20;
+	}
+	else if (m_nMinTemp > 34) {
+		m_nMinTemp = 34;
+	}
+	
+	if ( (m_nMinTemp % 2) != 0 ) {
+		m_nMinTemp--;
+	}
+
+	m_nGridCount = 42 - m_nMinTemp;
 }
 
 CMyImageUI::~CMyImageUI() {

@@ -150,7 +150,7 @@ void CDuiFrameWnd::InitWindow() {
 #endif
 	 
 #ifdef TELEMED_READER_TYPE_1
-	m_txtTitle->SetText("术中监控 1.1");
+	m_txtTitle->SetText("术中监控");
 #else
 	m_txtTitle->SetText("术中监控");
 #endif

@@ -47,7 +47,7 @@
 							<Label text="住院号：" textcolor="#FF447AA1" width="50" font="2" /><Label text="XXXXXXXXXXXXX" textcolor="#FF447AA1" font="2" />
 						</HorizontalLayout>
 						<HorizontalLayout height="20" >
-							<Label text="性别："   textcolor="#FF447AA1" width="50" font="2" /><Label text="男" textcolor="#FF447AA1" font="2" />
+							<Label text="性别："   textcolor="#FF447AA1" width="50" font="2" /><Label text="X" textcolor="#FF447AA1" font="2" />
 						</HorizontalLayout>
 						<HorizontalLayout height="20" >
 							<Label text="年龄："   textcolor="#FF447AA1" width="50" font="2" /><Label text="XX" textcolor="#FF447AA1" font="2" />
