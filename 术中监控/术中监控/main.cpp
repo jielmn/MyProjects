@@ -237,31 +237,32 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			DuiLib::CDuiString  strTemp;
 			strTemp.Format("%.2f", (dwTemp / 100.0));
 			m_lblTemperature->SetText(strTemp);
+			dwTemp += 100;
 
-			if ( dwTemp < 3400 )
-				dwTemp += 80;
-			else if (dwTemp < 3450)
-				dwTemp += 60;
-			else if (dwTemp < 3500)
-				dwTemp += 50;
-			else if (dwTemp < 3550)
-				dwTemp += 40;
-			else if (dwTemp < 3580)
-				dwTemp += 30;
-			else if (dwTemp < 3620)
-				dwTemp += 20;
-			else if (dwTemp < 3640)
-				dwTemp += 10;
-			else if (dwTemp < 3650)
-				dwTemp += 5;
-			else if (dwTemp < 3655)
-				dwTemp += 3;
-			else if (dwTemp < 3658)
-				dwTemp += 2;
-			else if (dwTemp < 3663)
-				dwTemp += 1;
-			else 
-				dwTemp += 0;
+			//if ( dwTemp < 3400 )
+			//	dwTemp += 80;
+			//else if (dwTemp < 3450)
+			//	dwTemp += 60;
+			//else if (dwTemp < 3500)
+			//	dwTemp += 50;
+			//else if (dwTemp < 3550)
+			//	dwTemp += 40;
+			//else if (dwTemp < 3580)
+			//	dwTemp += 30;
+			//else if (dwTemp < 3620)
+			//	dwTemp += 20;
+			//else if (dwTemp < 3640)
+			//	dwTemp += 10;
+			//else if (dwTemp < 3650)
+			//	dwTemp += 5;
+			//else if (dwTemp < 3655)
+			//	dwTemp += 3;
+			//else if (dwTemp < 3658)
+			//	dwTemp += 2;
+			//else if (dwTemp < 3663)
+			//	dwTemp += 1;
+			//else 
+			//	dwTemp += 0;
 		}
 #endif
 	}

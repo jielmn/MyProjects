@@ -64,7 +64,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 
 	int nMinTemp = g_dwMinTemp;
 	int m_nGridCount = 42 - nMinTemp;
-	m_nGridSize = (height - 40) / m_nGridCount;       
+
+	m_nGridSize   = height / m_nGridCount;
+	int nReminder = height % m_nGridCount;
+	int nMulti    = (40 - nReminder - 1) / m_nGridCount + 1;
+	m_nGridSize  -= nMulti;
 
 	// 中间温度的位置
 	int middle = height / 2;
@@ -252,7 +256,7 @@ void   CAlarmImageUI::HighTempAlarm() {
 }
 
 void   CAlarmImageUI::LowTempAlarm() {
-	m_strBkImage = "alarm_low_temp.png";
+	m_strBkImage = "alarm_low_temp.png"; 
 	m_bSetBkImage = TRUE;
 	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
 }
