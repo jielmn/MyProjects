@@ -3,6 +3,7 @@
 #include "exhCommon.h"
 #include "Business.h"
 #include "UIlib.h"
+#include "MyTreeCfgUI.h"
 
 class CSettingDlg : public DuiLib::WindowImplBase
 {
@@ -18,9 +19,13 @@ public:
 
 	LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
 private:
 	DuiLib::CEditUI *           m_edInteval;
 	DuiLib::CEditUI *           m_edLowAlarm;
 	DuiLib::CEditUI *           m_edHighAlarm;
 	DuiLib::CEditUI *           m_edAlarmPath;
+
+	CMyTreeCfgUI  *             m_tree;
 };

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window size="800,600" mininfo="800,600" caption="0,0,0,32" sizebox="0,0,0,0" roundcorner="5,5"> <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
+<Window size="800,600" mininfo="800,600" caption="0,0,0,32" sizebox="4,4,4,4" roundcorner="5,5"> <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
 	<Font id="0" name="宋体" size="12" bold="true" />
 	<Font id="1" name="宋体" size="15" bold="true" />
 	<Font id="2" name="宋体" size="12" />
-	<Font id="3" name="宋体" size="25" bold="true"  />
+	<Font id="3" name="宋体" size="35" bold="true"  />
 	<Font id="4" name="宋体" size="15" bold="true" />
 	<Font id="5" name="宋体" size="12" bold="true" />
 	<Font id="6" name="宋体" size="15" bold="false" />
@@ -37,7 +37,7 @@
 				<Label text="病人基本信息"   textcolor="#FF447AA1" width="150" font="1" />
 			</HorizontalLayout>
 			
-			<HorizontalLayout height="140">
+			<HorizontalLayout height="150">
 				<VerticalLayout width="300">
 					<VerticalLayout height="80" inset="20,0,20,0">
 						<HorizontalLayout height="20" >
@@ -58,14 +58,14 @@
 						<Label text="病人体温(℃)"   textcolor="#FF447AA1" width="150" font="1" />
 					</HorizontalLayout>
 					
-					<VerticalLayout height="20" inset="20,0,20,0">
-						<HorizontalLayout height="20" >
+					<VerticalLayout height="30" inset="20,0,20,0">
+						<HorizontalLayout height="30" >
 							<Label name="lblTemperature" text="36.4"   textcolor="#FF447AA1" width="200" font="3" />
 						</HorizontalLayout>
 					</VerticalLayout>
 				</VerticalLayout>
 				
-				<AlarmImage name="alarm_image" width="140" height="140" />
+				<AlarmImage name="alarm_image" width="150" height="150" />
 			</HorizontalLayout>
 			
 			

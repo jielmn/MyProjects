@@ -8,7 +8,7 @@ CSettingDlg::CSettingDlg() {
 void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
 	DuiLib::CDuiString strText;
-	DWORD   dwTemp;
+	//DWORD   dwTemp;
 	double  dbTemp;
 
 	if (msg.sType == "click") {
@@ -16,36 +16,73 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 			DWORD   dwInterval = 0;
 			DWORD   dwLowAlarm = 0;
 			DWORD   dwHighAlarm = 0;
+			DWORD   dwMinTemp = 0;
 
-			strText = m_edInteval->GetText();
-			if (1 != sscanf_s(strText, "%lu", &dwTemp)) {
-				::MessageBox(this->GetHWND(), "采集间隔请输入整数(5~60)", "设置", 0);
-				return;
-			}
-			if ( dwTemp < 5 || dwTemp > 60) {
-				::MessageBox(this->GetHWND(), "采集间隔请输入整数(5~60)", "设置", 0);
-				return;
-			}
-			dwInterval = dwTemp;
+			//strText = m_edInteval->GetText();
+			//if (1 != sscanf_s(strText, "%lu", &dwTemp)) {
+			//	::MessageBox(this->GetHWND(), "采集间隔请输入整数(5~60)", "设置", 0);
+			//	return;
+			//}
+			//if ( dwTemp < 5 || dwTemp > 60) {
+			//	::MessageBox(this->GetHWND(), "采集间隔请输入整数(5~60)", "设置", 0);
+			//	return;
+			//}
+			//dwInterval = dwTemp;
 
-			strText = m_edLowAlarm->GetText();
+			CMyTreeCfgUI::ConfigValue  cfgValue;
+			bool bGetCfg = m_tree->GetConfigValue(0, cfgValue);
+			if (0 == cfgValue.m_nComboSel) {
+				dwInterval = 5;
+			}
+			else if (1 == cfgValue.m_nComboSel) {
+				dwInterval = 10;
+			}
+			else if (2 == cfgValue.m_nComboSel) {
+				dwInterval = 20;
+			}
+			else if (3 == cfgValue.m_nComboSel) {
+				dwInterval = 30;
+			}
+			else {
+				dwInterval = 60;
+			}
+
+			bGetCfg = m_tree->GetConfigValue(1, cfgValue);
+			if (0 == cfgValue.m_nComboSel) {
+				dwMinTemp = 20;
+			}
+			else if (1 == cfgValue.m_nComboSel) {
+				dwMinTemp = 24;
+			}
+			else if (2 == cfgValue.m_nComboSel) {
+				dwMinTemp = 28;
+			}
+			else {
+				dwMinTemp = 32;
+			}
+
+			bGetCfg = m_tree->GetConfigValue(2, cfgValue);
+			//strText = m_edLowAlarm->GetText();
+			strText = cfgValue.m_strEdit;
 			if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 				::MessageBox(this->GetHWND(), "低温报警请输入数字", "设置", 0);
 				return;
 			}
-			if ( dbTemp > 42 || dbTemp < 35 ) {
-				::MessageBox(this->GetHWND(), "低温报警请输入范围(35~42)", "设置", 0);
+			if ( dbTemp > 42 || dbTemp < 20 ) {
+				::MessageBox(this->GetHWND(), "低温报警请输入范围(20~42)", "设置", 0);
 				return;
 			}
 			dwLowAlarm = (DWORD)(dbTemp * 100);
 
-			strText = m_edHighAlarm->GetText();
+			bGetCfg = m_tree->GetConfigValue(3, cfgValue);
+			//strText = m_edHighAlarm->GetText();
+			strText = cfgValue.m_strEdit;
 			if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 				::MessageBox(this->GetHWND(), "高温报警请输入数字", "设置", 0);
 				return;
 			}
-			if (dbTemp > 42 || dbTemp < 35) {
-				::MessageBox(this->GetHWND(), "高温报警请输入范围(35~42)", "设置", 0);
+			if (dbTemp > 42 || dbTemp < 20) {
+				::MessageBox(this->GetHWND(), "高温报警请输入范围(20~42)", "设置", 0);
 				return;
 			}
 			if (dbTemp < dwLowAlarm / 100.0) {
@@ -57,9 +94,10 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 			g_dwCollectInterval = dwInterval;
 			g_dwLowTempAlarm = dwLowAlarm;
 			g_dwHighTempAlarm = dwHighAlarm;
+			g_dwMinTemp = dwMinTemp;
 
-			strText = m_edAlarmPath->GetText();
-			strncpy_s(g_szAlarmFilePath, strText, sizeof(g_szAlarmFilePath));
+			//strText = m_edAlarmPath->GetText();
+			//strncpy_s(g_szAlarmFilePath, strText, sizeof(g_szAlarmFilePath));
 
 			PostMessage(WM_CLOSE);
 
@@ -96,26 +134,139 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 }
 
 void   CSettingDlg::InitWindow() {
-	m_edInteval   = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edInteval"));
-	m_edLowAlarm  = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edLowTempAlarm"));
-	m_edHighAlarm = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edHiTempAlarm"));
-	m_edAlarmPath = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edAlarm"));
+	//m_edInteval   = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edInteval"));
+	//m_edLowAlarm  = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edLowTempAlarm"));
+	//m_edHighAlarm = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edHiTempAlarm"));
+	//m_edAlarmPath = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edAlarm"));
 
 	DuiLib::CDuiString  strText;
-	strText.Format( "%lu", g_dwCollectInterval );
-	m_edInteval->SetText( strText );
+	//strText.Format( "%lu", g_dwCollectInterval );
+	//m_edInteval->SetText( strText );
 
-	strText.Format("%.2f", g_dwLowTempAlarm / 100.0 );
-	m_edLowAlarm->SetText(strText);
+	//strText.Format("%.2f", g_dwLowTempAlarm / 100.0 );
+	//m_edLowAlarm->SetText(strText);
 
-	strText.Format("%.2f", g_dwHighTempAlarm / 100.0 );
-	m_edHighAlarm->SetText(strText);
+	//strText.Format("%.2f", g_dwHighTempAlarm / 100.0 );
+	//m_edHighAlarm->SetText(strText);
 
-	m_edAlarmPath->SetText(g_szAlarmFilePath);
+	//m_edAlarmPath->SetText(g_szAlarmFilePath);
+
+	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl("tree1"); 
+
+	CComboUI * pCombo = new CComboUI;
+
+	CListLabelElementUI * pElement = new CListLabelElementUI;
+	pElement->SetText("5秒");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("10秒");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("20秒");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("30秒");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("60秒");
+	pCombo->Add(pElement);
+
+	if (5 == g_dwCollectInterval) {
+		pCombo->SelectItem(0);
+	}
+	else if (10 == g_dwCollectInterval) {
+		pCombo->SelectItem(1);
+	}
+	else if (20 == g_dwCollectInterval) {
+		pCombo->SelectItem(2);
+	}
+	else if (30 == g_dwCollectInterval) {
+		pCombo->SelectItem(3);
+	}
+	else {
+		pCombo->SelectItem(4);
+	}
+	
+	pCombo->SetItemTextColor(0xFF386382);
+	pCombo->SetHotItemTextColor(0xFF386382);
+	pCombo->SetSelectedItemTextColor(0xFF386382);
+	pCombo->SetItemFont(2);
+
+	pCombo->SetAttributeList("normalimage=\"file = 'Combo_nor.bmp' corner = '2,2,24,2'\" hotimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" pushedimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" textpadding=\"5, 1, 5, 1\" ");
+
+	m_tree->AddNode("采样间隔", 0, (void *)(1), pCombo);
+
+
+
+	pCombo = new CComboUI;
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("20℃");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("24℃");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("28℃");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("32℃");
+	pCombo->Add(pElement);
+
+	if (g_dwMinTemp < 24) {
+		pCombo->SelectItem(0);
+	}
+	else if (g_dwMinTemp < 28) {
+		pCombo->SelectItem(1);
+	}
+	else if (g_dwMinTemp < 32) {
+		pCombo->SelectItem(2);
+	}
+	else {
+		pCombo->SelectItem(3);
+	}
+
+	pCombo->SetItemTextColor(0xFF386382);
+	pCombo->SetHotItemTextColor(0xFF386382);
+	pCombo->SetSelectedItemTextColor(0xFF386382);
+	pCombo->SetItemFont(2);
+
+	pCombo->SetAttributeList("normalimage=\"file = 'Combo_nor.bmp' corner = '2,2,24,2'\" hotimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" pushedimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" textpadding=\"5, 1, 5, 1\" ");
+
+	m_tree->AddNode("显示的最低温度", 0, (void *)(2), pCombo);
+
+	CEditUI * pEdit = new CEditUI;
+	pEdit->SetTextColor(0xFF386382);
+	pEdit->SetFont(2);
+	strText.Format("%.2f", g_dwLowTempAlarm / 100.0);
+	pEdit->SetText(strText);
+	m_tree->AddNode("低温报警", 0, (void *)(3), pEdit);
+
+	pEdit = new CEditUI;
+	pEdit->SetTextColor(0xFF386382);
+	pEdit->SetFont(2); 
+	strText.Format("%.2f", g_dwHighTempAlarm / 100.0);
+	pEdit->SetText(strText);
+	m_tree->AddNode("高温报警", 0, (void *)(4), pEdit);   
+
 
 	DuiLib::WindowImplBase::InitWindow();
 }
 
 LRESULT  CSettingDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+}
+
+DuiLib::CControlUI * CSettingDlg::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, "MyTree")) {
+		return new CMyTreeCfgUI();
+	}
+	return WindowImplBase::CreateControl(pstrClass);
 }

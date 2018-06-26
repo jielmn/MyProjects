@@ -47,21 +47,6 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 		m_nRadius = 6;
 	}
 
-	g_cfg->GetConfig("min temperature degree", dwValue, 34);
-	m_nMinTemp = dwValue;
-
-	if (m_nMinTemp < 20 ) {
-		m_nMinTemp = 20;
-	}
-	else if (m_nMinTemp > 34) {
-		m_nMinTemp = 34;
-	}
-	
-	if ( (m_nMinTemp % 2) != 0 ) {
-		m_nMinTemp--;
-	}
-
-	m_nGridCount = 42 - m_nMinTemp;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -76,6 +61,10 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 	int  height = rect.bottom - rect.top;
 
 	int RIGHT = width - m_nLeft;
+
+	int nMinTemp = g_dwMinTemp;
+	int m_nGridCount = 42 - nMinTemp;
+	m_nGridSize = (height - 30) / m_nGridCount;       
 
 	// 中间温度的位置
 	int middle = height / 2;
@@ -122,7 +111,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 	}
 
 	assert(g_dwCollectInterval > 0);
-	int nMiddleTemp = (42 + m_nMinTemp) / 2;
+	int nMiddleTemp = (42 + nMinTemp) / 2;
 
 	vector<TempData *>::iterator it;
 	for (it = m_vTempData.begin(); it != m_vTempData.end(); it++) {
@@ -217,11 +206,11 @@ void   CMyImageUI::DrawTempPoint(int x, int y, HDC hDc, int RADIUS /*= 6*/) {
 }
 
 void  CMyImageUI::SetWndRect(int x, int y) {
-	int h = y - 340;
-	if (h > 0) {
-		m_nGridSize = h / m_nGridCount;
-		Invalidate();
-	}
+	//int h = y - 340;
+	//if (h > 0) {
+	//	m_nGridSize = h / (42 - g_dwMinTemp);
+	//	Invalidate();
+	//}
 }
 
 

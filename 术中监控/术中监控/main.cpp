@@ -77,6 +77,7 @@ void  CDuiFrameWnd::OnSetting() {
 		g_cfg->SetConfig("high alarm", g_dwHighTempAlarm);
 		g_cfg->SetConfig("collect interval", g_dwCollectInterval);
 		g_cfg->SetConfig("alarm file",g_szAlarmFilePath);
+		g_cfg->SetConfig("min temperature degree", g_dwMinTemp);
 		g_cfg->Save();
 		m_pImageUI->Invalidate();
 	}
@@ -196,7 +197,7 @@ DuiLib::CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	}
 	return DuiLib::WindowImplBase::CreateControl(pstrClass);
 }
-
+  
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	int ret = 0;
 	if (uMsg == UM_SHOW_READER_STATUS) {

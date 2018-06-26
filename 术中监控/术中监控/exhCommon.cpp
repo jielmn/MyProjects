@@ -17,6 +17,7 @@ ReaderCmd  READ_TAG_DATA_COMMAND;
 DWORD   g_dwCollectInterval = 0;
 DWORD   g_dwLowTempAlarm    = 0;
 DWORD   g_dwHighTempAlarm   = 0;
+DWORD   g_dwMinTemp = 0;
 char    g_szAlarmFilePath[MAX_ALARM_FILE_PATH];
 
 														  // 遍历系统里的所有串口

@@ -162,6 +162,7 @@
     <ClInclude Include="ImageAll.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyImage.h" />
+    <ClInclude Include="MyTreeCfgUI.h" />
     <ClInclude Include="Reader.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -179,6 +180,7 @@
     <ClCompile Include="ImageAll.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyImage.cpp" />
+    <ClCompile Include="MyTreeCfgUI.cpp" />
     <ClCompile Include="Reader.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

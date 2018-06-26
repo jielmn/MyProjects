@@ -89,6 +89,9 @@ int CBusiness::Init() {
 	g_cfg->GetConfig("low alarm", g_dwLowTempAlarm, 3500);
 	// 高温报警
 	g_cfg->GetConfig("high alarm", g_dwHighTempAlarm, 4000);
+
+	g_cfg->GetConfig("min temperature degree", g_dwMinTemp, 32);
+
 	//g_dwLowTempAlarm    = 3500;               // 低温报警，单位1/100摄氏度
 	//g_dwHighTempAlarm   = 4000;               // 高温报警，单位1/100摄氏度
 	if (g_dwLowTempAlarm < 3500 || g_dwLowTempAlarm > 4200) {
@@ -102,6 +105,23 @@ int CBusiness::Init() {
 	if (g_dwHighTempAlarm < g_dwLowTempAlarm) {
 		g_dwLowTempAlarm = 3500;
 		g_dwHighTempAlarm = 4000;
+	}
+
+	if (g_dwMinTemp < 24) {
+		g_dwMinTemp = 20;
+	}
+	else if (g_dwMinTemp < 28) {
+		g_dwMinTemp = 24;
+	}
+	else if (g_dwMinTemp < 32) {
+		g_dwMinTemp = 28;
+	}
+	else {
+		g_dwMinTemp = 32;
+	}
+
+	if ((g_dwMinTemp % 2) != 0) {
+		g_dwMinTemp--;
 	}
 
 	g_cfg->GetConfig("alarm file", buf, sizeof(buf), "");
