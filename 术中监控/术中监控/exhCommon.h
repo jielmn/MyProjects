@@ -11,7 +11,7 @@
 #include "LmnString.h"
 
 #ifdef _DEBUG
-#define  TEST_FLAG                  1
+#define  TEST_FLAG                  0
 #endif
 
 #if     TEST_FLAG
@@ -19,11 +19,21 @@
 #define MAIN_TIMER_INTEVAL           5000
 #endif
 
+#define TIME_LEFT_TIMER_ID           2
+#define TIME_LEFT_TIMER_INTEVAL      1000
+
 // 张维国的新的读卡器
 #define TELEMED_READER_TYPE_1         
 
-#define  MY_COLOR_1                 "0xFFFFFF"
+#define  COLOR_THREAD_1                 "0x666666"
+#define  COLOR_THREAD_2                 "0x9EF8D1"
+#define  COLOR_TEXT_1                   "0xFFFFFF"
 
+#define  COLOR_LOW_TEMPERATURE          "0x02A5F1"
+#define  COLOR_NORMAL_TEMPERATURE       "0xFFFFFF"
+#define  COLOR_HIGH_TEMPERATURE         "0xFC235C"
+
+#define  RGB_REVERSE(a)                 ( ( (a & 0xFF) << 16 ) | ( a & 0xFF00 ) | ( (a & 0xFF0000) >> 16  ) )
 
 #define  RECONNECT_READER_DELAY          5000
 

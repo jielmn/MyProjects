@@ -42,6 +42,8 @@ private:
 	HPEN                 m_hPen2;    // 高温线
 
 	HPEN                 m_hPen3;     // 数据线
+
+	DWORD                m_dwTextColor;
 };
 
 #define  MYIMAGE_TIMER_ID             10

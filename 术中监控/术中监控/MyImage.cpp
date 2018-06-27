@@ -10,13 +10,29 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	char buf[8192];
 	DWORD   dwValue;
 
-	g_cfg->GetConfig( "COLOR 1", buf, sizeof(buf), MY_COLOR_1);
+	g_cfg->GetConfig( "color thread 1", buf, sizeof(buf), COLOR_THREAD_1);
 	sscanf(buf, "0x%x", &dwValue);
-	m_hPen = ::CreatePen(0, 1, dwValue); 
-	m_hPen1 = ::CreatePen(PS_DASH, 1, RGB(0, 0, 255));
-	m_hPen2 = ::CreatePen(PS_DASH, 1, RGB(255, 0, 0));
+	dwValue = RGB_REVERSE(dwValue);
+	m_hPen  = ::CreatePen(0, 1, dwValue); 
 
-	m_hPen3 = ::CreatePen(PS_SOLID, 4, RGB(2, 165, 241));
+	g_cfg->GetConfig("low temperature color", buf, sizeof(buf), COLOR_LOW_TEMPERATURE);
+	sscanf(buf, "0x%x", &dwValue);	
+	dwValue = RGB_REVERSE(dwValue);
+	m_hPen1 = ::CreatePen(PS_DASH, 1, dwValue);
+
+	g_cfg->GetConfig("high temperature color", buf, sizeof(buf), COLOR_HIGH_TEMPERATURE);
+	sscanf(buf, "0x%x", &dwValue);
+	dwValue = RGB_REVERSE(dwValue);
+	m_hPen2 = ::CreatePen(PS_DASH, 1, dwValue);
+
+	g_cfg->GetConfig("color thread 2", buf, sizeof(buf), COLOR_THREAD_2);
+	sscanf(buf, "0x%x", &dwValue);
+	dwValue = RGB_REVERSE(dwValue);
+	m_hPen3 = ::CreatePen( PS_SOLID, 2, dwValue );
+
+	g_cfg->GetConfig("text color 1", buf, sizeof(buf), COLOR_TEXT_1);
+	sscanf(buf, "0x%x", &dwValue);
+	m_dwTextColor = RGB_REVERSE(dwValue);
 
 	
 
@@ -26,7 +42,7 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	g_cfg->GetConfig("GRID SIZE", dwValue, 50);
 	m_nGridSize = dwValue;
 
-	g_cfg->GetConfig("text offset x", dwValue, -25);
+	g_cfg->GetConfig("text offset x", dwValue, -30); 
 	m_nTextOffsetX = dwValue;
 
 	g_cfg->GetConfig("text offset y", dwValue, -8);
@@ -47,10 +63,10 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	}
 	m_nMaxPointsCnt = dwValue;
 
-	g_cfg->GetConfig("RADIUS", dwValue, 6);  
+	g_cfg->GetConfig("RADIUS", dwValue, 4);  
 	m_nRadius = dwValue;
 	if ( m_nRadius < 2 || m_nRadius > 6 ) {
-		m_nRadius = 6;
+		m_nRadius = 4;
 	}
 
 }
@@ -80,7 +96,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 	int middle = height / 2;
 
 	::SelectObject(hDC, m_hPen);
-	::SetTextColor(hDC, RGB(68, 122, 161));
+	::SetTextColor(hDC, m_dwTextColor);
 
 	// »­ÊúÏß
 	::MoveToEx(hDC, m_nLeft + rect.left, rect.top, 0);
@@ -100,7 +116,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 		::LineTo(hDC, rect.right, nTop + rect.top);
 
 		// »­¿Ì¶ÈÖµ
-		strText.Format("%d", nTemperature);
+		strText.Format("%d¡æ", nTemperature);
 		::TextOut(hDC, m_nLeft + rect.left + m_nTextOffsetX, nTop + rect.top + m_nTextOffsetY, strText, strText.GetLength());
 	}
 
@@ -265,7 +281,7 @@ void   CAlarmImageUI::HighTempAlarm() {
 }
 
 void   CAlarmImageUI::LowTempAlarm() {
-	m_strBkImage = "alarm_low_temp.png"; 
+	m_strBkImage = "alarm_low_temp_1.png";   
 	m_bSetBkImage = TRUE;
 	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
 }

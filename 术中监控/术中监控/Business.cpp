@@ -94,17 +94,16 @@ int CBusiness::Init() {
 
 	//g_dwLowTempAlarm    = 3500;               // 低温报警，单位1/100摄氏度
 	//g_dwHighTempAlarm   = 4000;               // 高温报警，单位1/100摄氏度
-	if (g_dwLowTempAlarm < 3500 || g_dwLowTempAlarm > 4200) {
-		g_dwLowTempAlarm = 3500;
+	if (g_dwLowTempAlarm < 2000 || g_dwLowTempAlarm > 4200) {
+		g_dwLowTempAlarm = 3000;
 	}
 
-	if (g_dwHighTempAlarm < 3500 || g_dwHighTempAlarm > 4200) {
+	if (g_dwHighTempAlarm < 2000 || g_dwHighTempAlarm > 4200) {
 		g_dwHighTempAlarm = 4000;
 	}
 
 	if (g_dwHighTempAlarm < g_dwLowTempAlarm) {
-		g_dwLowTempAlarm = 3500;
-		g_dwHighTempAlarm = 4000;
+		g_dwHighTempAlarm = g_dwLowTempAlarm;
 	}
 
 	if (g_dwMinTemp < 24) {

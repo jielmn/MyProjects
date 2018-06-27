@@ -115,6 +115,60 @@ void  CDuiFrameWnd::OnImageAll() {
 	delete pDlg;
 }
 
+void  CDuiFrameWnd::OnTemperatureResult(int nRet, DWORD dwTemp /*= 0*/) {
+	if (0 != nRet) {
+		m_lblTemperature->SetTextColor(0xFF447AA1);
+		m_lblTemperature->SetText("--");
+		m_pAlarmUI->FailureAlarm();
+		return;
+	}
+
+	m_pImageUI->AddTemp(dwTemp);
+
+	if (dwTemp < g_dwLowTempAlarm) {
+		m_lblTemperature->SetTextColor(m_dwLowTempColor);
+		m_pAlarmUI->LowTempAlarm();
+	}
+	else if (dwTemp > g_dwHighTempAlarm) {
+		m_lblTemperature->SetTextColor(m_dwHighTempColor);
+		m_pAlarmUI->HighTempAlarm();
+	}
+	else {
+		m_lblTemperature->SetTextColor(m_dwNormalColor);
+		m_pAlarmUI->StopAlarm();
+	}
+
+	DuiLib::CDuiString  strTemp;
+	strTemp.Format("%.2f", (dwTemp / 100.0));
+	m_lblTemperature->SetText(strTemp);
+
+	if ( (int)dwTemp > m_nHighestTemp ) {
+		m_nHighestTemp = dwTemp;
+
+		strTemp.Format("%.2f", (dwTemp / 100.0));
+		m_lblHighTemperature->SetText(strTemp);
+	}
+
+	if ((int)dwTemp < m_nLowestTemp ) {
+		m_nLowestTemp = dwTemp;
+
+		strTemp.Format("%.2f", (dwTemp / 100.0));
+		m_lblLowTemperature->SetText(strTemp);    
+	}
+}
+
+void  CDuiFrameWnd::ShowTimeLeft() {
+	CDuiString  strTimeLeft;
+	strTimeLeft.Format("%ld", m_nTimeLeft);
+	m_lblTimeLeft->SetText(strTimeLeft);
+}
+
+void  CDuiFrameWnd::ShowTimeLeftError() { 
+	m_lblTimeLeft->SetText("--");
+}
+
+
+
 
 
 
@@ -127,6 +181,20 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_pAlarmUI = 0;
 	m_nWidth = 0;
 	m_nHeight = 0;
+
+	char buf[8192];
+	g_cfg->GetConfig("low temperature color", buf, sizeof(buf), COLOR_LOW_TEMPERATURE);
+	sscanf( buf, "0x%x", &m_dwLowTempColor);
+
+	g_cfg->GetConfig("normal temperature color", buf, sizeof(buf), COLOR_NORMAL_TEMPERATURE);
+	sscanf(buf, "0x%x", &m_dwNormalColor);	
+
+	g_cfg->GetConfig("high temperature color", buf, sizeof(buf), COLOR_HIGH_TEMPERATURE);
+	sscanf(buf, "0x%x", &m_dwHighTempColor);
+
+	m_nLowestTemp  = 10000;
+	m_nHighestTemp = 0;
+	m_nTimeLeft = 0;
 }
 
 void CDuiFrameWnd::InitWindow() {
@@ -138,12 +206,19 @@ void CDuiFrameWnd::InitWindow() {
 	m_lblReaderStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblReaderStatus"));
 	m_lblTemperature = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblTemperature"));
 
+	m_lblLowTemperature = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblLowestTemperature"));
+	m_lblHighTemperature = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblHighestTemperature"));
+	m_lblTimeLeft = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblTileLeft"));
+
 	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");	
 	m_pAlarmUI = (CAlarmImageUI *)m_PaintManager.FindControl("alarm_image");
 
 	m_lblTemperature->SetText("--");
+	m_lblLowTemperature->SetText("--");
+	m_lblHighTemperature->SetText("--");
+	m_lblTimeLeft->SetText("--");
 
-	m_txtTitle = static_cast<DuiLib::CTextUI*>(m_PaintManager.FindControl("txtTitle"));
+	m_txtTitle = static_cast<DuiLib::CTextUI*>(m_PaintManager.FindControl("txtTitle")); 
 
 #if TEST_FLAG
 	SetTimer(m_hWnd, MAIN_TIMER_ID, MAIN_TIMER_INTEVAL, NULL);
@@ -214,31 +289,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_lblReaderStatus->SetText("读卡器连接失败");
 		}
 	}
-	else if (uMsg == WM_TIMER) {
+	else if (uMsg == WM_TIMER ) {
+
 #if  TEST_FLAG
 		if (wParam == MAIN_TIMER_ID) {
 			static  DWORD  dwTemp = 3350;
 
-			m_pImageUI->AddTemp(dwTemp);
-
-			if (dwTemp < g_dwLowTempAlarm) {
-				m_lblTemperature->SetTextColor(0xFF0000FF);
-				m_pAlarmUI->LowTempAlarm();
-			}
-			else if (dwTemp > g_dwHighTempAlarm) {
-				m_lblTemperature->SetTextColor(0xFFFF0000);
-				m_pAlarmUI->HighTempAlarm();
-			}
-			else {
-				m_lblTemperature->SetTextColor(0xFF447AA1);
-				m_pAlarmUI->StopAlarm();
-			}
-
-			DuiLib::CDuiString  strTemp;
-			strTemp.Format("%.2f", (dwTemp / 100.0));
-			m_lblTemperature->SetText(strTemp);
-			   
-			if (dwTemp < 3400)
+			OnTemperatureResult(0, dwTemp);
+			 
+			if (dwTemp < 3400)  
 				dwTemp += 80;
 			else if (dwTemp < 3450)
 				dwTemp += 60;
@@ -247,7 +306,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			else if (dwTemp < 3550)
 				dwTemp += 40;
 			else if (dwTemp < 3580)
-				dwTemp += 30;
+				dwTemp += 30;   
 			else if (dwTemp < 3620)
 				dwTemp += 20;
 			else if (dwTemp < 3640)
@@ -263,40 +322,40 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			else
 				dwTemp += 0;
 		}
+#else
+		if (TIME_LEFT_TIMER_ID == wParam) {
+			if ( m_nTimeLeft > 0 ) {
+				m_nTimeLeft--;
+			}			
+
+			if (m_nTimeLeft <= 0) {
+				ShowTimeLeft(); 
+				KillTimer(m_hWnd, TIME_LEFT_TIMER_ID);
+			}
+			else {
+				ShowTimeLeft();
+			}
+		}
 #endif
+
 	}
 	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
-		ret = wParam;
+		ret = wParam;   
 		DWORD dwTemp = lParam;
 
 		if (0 == ret) {
-			m_pImageUI->AddTemp(dwTemp);
-
-			if ( dwTemp < g_dwLowTempAlarm ) {
-				m_lblTemperature->SetTextColor(0xFF0000FF);
-				m_pAlarmUI->LowTempAlarm();
-			}
-			else if (dwTemp > g_dwHighTempAlarm) {
-				m_lblTemperature->SetTextColor(0xFFFF0000);
-				m_pAlarmUI->HighTempAlarm();
-			}
-			else {
-				m_lblTemperature->SetTextColor(0xFF447AA1);
-				m_pAlarmUI->StopAlarm(); 
-			}
-
-			DuiLib::CDuiString  strTemp;
-			strTemp.Format("%.2f", (dwTemp / 100.0) );
-			m_lblTemperature->SetText(strTemp); 
-
+			OnTemperatureResult( 0, dwTemp);
 			// 获取温度
 			CBusiness::GetInstance()->ReadTagTempAsyn(g_dwCollectInterval * 1000);
+			m_nTimeLeft = g_dwCollectInterval;
+			SetTimer(m_hWnd, TIME_LEFT_TIMER_ID, TIME_LEFT_TIMER_INTEVAL, 0);
+
+			ShowTimeLeft();			
 		}
 		// 获取温度失败
 		else {
-			m_lblTemperature->SetTextColor(0xFF447AA1);
-			m_lblTemperature->SetText("--");
-			m_pAlarmUI->FailureAlarm();
+			OnTemperatureResult(ret);
+			ShowTimeLeftError();
 		}
 	}
 	else if (uMsg == WM_SIZE) {

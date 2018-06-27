@@ -25,11 +25,28 @@ private:
 	CAlarmImageUI *                 m_pAlarmUI;
 	DuiLib::CTextUI *               m_txtTitle;
 
+	DuiLib::CLabelUI *              m_lblLowTemperature;
+	DuiLib::CLabelUI *              m_lblHighTemperature;
+	DuiLib::CLabelUI *              m_lblTimeLeft;
+
 	int                             m_nWidth;
 	int                             m_nHeight;
+
+	DWORD                           m_dwLowTempColor;
+	DWORD                           m_dwNormalColor;
+	DWORD                           m_dwHighTempColor;
+
+	int                             m_nLowestTemp;
+	int                             m_nHighestTemp;
+
+	int                             m_nTimeLeft;
 
 private:
 	void  OnSetting();
 	void  OnAbout();
 	void  OnImageAll();
+
+	void  OnTemperatureResult(int nRet,DWORD dwTemp = 0);
+	void  ShowTimeLeft();
+	void  ShowTimeLeftError();
 };
