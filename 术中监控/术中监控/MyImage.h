@@ -21,7 +21,7 @@ private:
 
 	DuiLib::CPaintManagerUI *    m_pManager;
 
-	void DrawTempPoint(int x, int y, HDC hDc, int RADIUS = 6);
+	void DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS = 6);
 
 private:
 	int                  m_nLeft;
@@ -44,6 +44,9 @@ private:
 	HPEN                 m_hPen3;     // Êý¾ÝÏß
 
 	DWORD                m_dwTextColor;
+
+	Pen                  m_pen_3;
+	SolidBrush           m_brush_3;
 };
 
 #define  MYIMAGE_TIMER_ID             10

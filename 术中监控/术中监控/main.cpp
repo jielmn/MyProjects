@@ -8,6 +8,9 @@
 #include "exhDatabase.h"
 #include "AllDataImageDlg.h"
 
+#include<gdiplus.h>//gdi+头文件
+using namespace Gdiplus;
+
 //#include <mmsystem.h> //导入声音头文件库   
 //#pragma comment(lib,"winmm.lib")//导入声音的链接库  
 
@@ -381,6 +384,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//mciSendString("play d:\\1.mp3 ", NULL, 0, 0);
 	//mciSendString("close d:\\1.mp3 ", NULL, 0, 0);	
 
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR pGdiToken;
+	GdiplusStartup(&pGdiToken, &gdiplusStartupInput, NULL);//初始化GDI+
+
 	int ret = 0;
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
@@ -406,6 +413,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();
+
+
+	//死循环，下面这句不会调用，只是想把那个意思表明
+	GdiplusShutdown(pGdiToken);//关闭GDI+
 
 	return 0;
 }

@@ -3,12 +3,15 @@
 #include "Business.h"
 #include "exhDatabase.h"
 
+#include<gdiplus.h>//gdi+头文件
+using namespace Gdiplus;
 
-CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
+CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : m_pen_3( Gdiplus::Color(0,255,0),1.0 ), m_brush_3(Gdiplus::Color(0, 255, 0) ) {
 	m_pManager = pManager;
 
 	char buf[8192];
 	DWORD   dwValue;
+	DWORD   dwValue_1;
 
 	g_cfg->GetConfig( "color thread 1", buf, sizeof(buf), COLOR_THREAD_1);
 	sscanf(buf, "0x%x", &dwValue);
@@ -27,8 +30,12 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 
 	g_cfg->GetConfig("color thread 2", buf, sizeof(buf), COLOR_THREAD_2);
 	sscanf(buf, "0x%x", &dwValue);
-	dwValue = RGB_REVERSE(dwValue);
-	m_hPen3 = ::CreatePen( PS_SOLID, 2, dwValue );
+	dwValue_1 = RGB_REVERSE(dwValue);
+	m_hPen3 = ::CreatePen( PS_SOLID, 2, dwValue_1);
+
+	m_pen_3.SetWidth( 3.0 ); 
+	m_pen_3.SetColor( Gdiplus::Color( (BYTE)((dwValue & 0xFF0000) >> 16) , (BYTE)((dwValue & 0xFF00) >> 8) , (BYTE)(dwValue & 0xFF) ) );
+	m_brush_3.SetColor(Gdiplus::Color((BYTE)((dwValue & 0xFF0000) >> 16), (BYTE)((dwValue & 0xFF00) >> 8), (BYTE)(dwValue & 0xFF)));
 
 	g_cfg->GetConfig("text color 1", buf, sizeof(buf), COLOR_TEXT_1);
 	sscanf(buf, "0x%x", &dwValue);
@@ -68,7 +75,6 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
 	if ( m_nRadius < 2 || m_nRadius > 6 ) {
 		m_nRadius = 4;
 	}
-
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -77,6 +83,9 @@ CMyImageUI::~CMyImageUI() {
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStopControl) {
 	DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);	
 
 	RECT rect   = this->GetPos();
 	int  width  = rect.right - rect.left;
@@ -150,7 +159,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 		int nX = (int)( ( (double)nDiff / g_dwCollectInterval ) * m_nTimeUnitLen ) ;
 		int nY = (int)( (nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * m_nGridSize );
 
-		DrawTempPoint(nX + m_nLeft + rect.left, nY + middle + rect.top, hDC, m_nRadius);
+		DrawTempPoint(graphics, nX + m_nLeft + rect.left, nY + middle + rect.top, hDC, m_nRadius);
 
 		// 如果间隔足够大，画出time
 		if (nX - nLastTimeTextLeft >= 120) {
@@ -165,7 +174,14 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 			::MoveToEx(hDC, nX + m_nLeft + rect.left, nY + middle + rect.top, 0);
 		}
 		else {
+#if 0
 			::LineTo(hDC, nX + m_nLeft + rect.left, nY + middle + rect.top);
+#else
+			POINT pt;
+			::GetCurrentPositionEx(hDC, &pt);
+			graphics.DrawLine( &m_pen_3, pt.x, pt.y, nX + m_nLeft + rect.left, nY + middle + rect.top );
+			::MoveToEx(hDC, nX + m_nLeft + rect.left, nY + middle + rect.top, 0);
+#endif
 		}
 	}
 
@@ -222,16 +238,18 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	}
 }
 
-void   CMyImageUI::DrawTempPoint(int x, int y, HDC hDc, int RADIUS /*= 6*/) {
-	::Ellipse(hDc, x - RADIUS, y - RADIUS, x + RADIUS, y + RADIUS);
+void   CMyImageUI::DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS /*= 6*/) {
+	// ::Ellipse(hDc, x - RADIUS, y - RADIUS, x + RADIUS, y + RADIUS);
+	//g.DrawEllipse(&m_pen_3, x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS);
+	g.FillEllipse(&m_brush_3, x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS);
 
-	int nTmp = (int)(0.707 * RADIUS);
+	//int nTmp = (int)(0.707 * RADIUS);
 
-	POINT points[2] = { { x - nTmp, y - nTmp },{ x + nTmp, y + nTmp } };
-	::Polyline(hDc, points, 2);
+	//POINT points[2] = { { x - nTmp, y - nTmp },{ x + nTmp, y + nTmp } };
+	//::Polyline(hDc, points, 2);
 
-	POINT points1[2] = { { x + nTmp, y - nTmp },{ x - nTmp, y + nTmp } };
-	::Polyline(hDc, points1, 2);
+	//POINT points1[2] = { { x + nTmp, y - nTmp },{ x - nTmp, y + nTmp } };
+	//::Polyline(hDc, points1, 2);
 }
 
 void  CMyImageUI::SetWndRect(int x, int y) {
