@@ -227,7 +227,7 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	TempData * pTemp = new TempData;
 	pTemp->dwTemperature = dwTemp;
 	pTemp->tTime = now;
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "temp = %ld, time=%lu\n", dwTemp, now);
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "temp = %ld, time=%lu\n", dwTemp, now);
 	m_vTempData.push_back(pTemp);
 	CMyDatabase::GetInstance()->AddTemp(dwTemp, now);
 

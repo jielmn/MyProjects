@@ -50,8 +50,11 @@ int  CTelemedReader::Reconnect() {
 		for (it = vCom.begin(); it != vCom.end(); it++) {
 			std::string  sItem = *it;
 
+			g_log->Output(ILog::LOG_SEVERITY_INFO, "try port %s \n", sItem.c_str());
+
 			BOOL bRet = OpenUartPort(sItem.c_str());
 			if (!bRet) {
+				g_log->Output(ILog::LOG_SEVERITY_INFO, "port %s failed \n", sItem.c_str());
 				CloseUartPort();
 				continue;
 			}
@@ -62,6 +65,8 @@ int  CTelemedReader::Reconnect() {
 				bPrepared = TRUE;
 				break;
 			}
+
+			g_log->Output(ILog::LOG_SEVERITY_INFO, "port %s failed \n", sItem.c_str());
 			CloseUartPort();
 		}
 	} while (0);
@@ -85,7 +90,7 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 		return EXH_ERR_READER_CLOSE;
 	}
 
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "send get temperature command \n");
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "send get temperature command \n");
 
 	DWORD dwWrited = 0;
 	BOOL bRet = WriteUartPort(m_hComm, READ_TAG_DATA_COMMAND.abyCommand, READ_TAG_DATA_COMMAND.dwCommandLength, &dwWrited);
@@ -114,7 +119,7 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	} while (TRUE);
 #endif
 
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "RESPONSE OR TIMEOUT \n");
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "RESPONSE OR TIMEOUT \n");
 
 	BYTE pData[8192];
 #ifdef TELEMED_READER_TYPE_1
