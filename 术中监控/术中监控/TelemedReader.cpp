@@ -301,7 +301,7 @@ BOOL   CTelemedReader::WriteUartPort(HANDLE hComm, const void * WriteBuf, DWORD 
 	BOOL bWriteStat = WriteFile(hComm, WriteBuf, ToWriteDataLen, WritedDataLen, NULL);
 	if (!bWriteStat)
 	{
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "Ð´´®¿ÚÊ§°Ü!\n");
+		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to write com port!\n");
 		return FALSE;
 	}
 
