@@ -203,6 +203,13 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 		{
 			m_hComm = hComm;
 			g_log->Output(ILog::LOG_SEVERITY_INFO, "Init Uart Port OK!!!\n");
+
+			COMMTIMEOUTS  timeout;
+			memset(&timeout, 0, sizeof(COMMTIMEOUTS));
+			GetCommTimeouts(hComm, &timeout);
+			// Ð´²Ù×÷2Ãë timeout
+			timeout.WriteTotalTimeoutConstant = 2000;
+			SetCommTimeouts(hComm, &timeout);
 		}
 		else
 		{
