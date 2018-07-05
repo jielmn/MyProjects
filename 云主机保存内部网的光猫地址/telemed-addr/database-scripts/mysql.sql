@@ -1,4 +1,4 @@
-drop database if exists global_db;
+drop database global_db if exists global_db;
 create database  global_db;
 use global_db;
 
