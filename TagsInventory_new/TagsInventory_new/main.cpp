@@ -1197,11 +1197,13 @@ void   CDuiFrameWnd::OnInvBigChar(char ch) {
 }
 
 
-int CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode ) {
+int CDuiFrameWnd::OnInvBigBarCode( const CString & strBarCode_ori ) {
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received chars:%s\n", m_strInvBigBuf);
 
 	// 检查格式(15位)
 	// FACTORY CODE   +   PRODUCT CODE   +    批号(20180301)  + 流水号(001)
+	CString strBarCode = strBarCode_ori;
+	strBarCode.Trim();
 
 	char  szFactoryId[64] = { 0 };
 	char  szProductId[64] = { 0 };
