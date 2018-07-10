@@ -33,6 +33,9 @@ public:
 	int   AlarmAsyn(const char * szAlarmFile);
 	int   Alarm(const CAlarmParam * pParam);
 
+	// 调整滑动条
+	int    UpdateScrollAsyn();
+
 private:
 	static CBusiness *  pInstance;
 

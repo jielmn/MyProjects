@@ -41,6 +41,8 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : m_pen_3( Gdiplus::Co
 	sscanf(buf, "0x%x", &dwValue);
 	m_dwTextColor = RGB_REVERSE(dwValue);
 
+	m_hBrush = ::CreateSolidBrush(RGB(0x19,0x24,0x31));
+
 	
 
 	g_cfg->GetConfig("LEFT", dwValue, 50);
@@ -75,6 +77,11 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : m_pen_3( Gdiplus::Co
 	if ( m_nRadius < 2 || m_nRadius > 6 ) {
 		m_nRadius = 4;
 	}
+
+	g_cfg->GetConfig("tail blank", dwValue, 100);
+	m_nTailBlank = dwValue;
+
+	m_bSetParentScrollPos = FALSE;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -84,14 +91,28 @@ CMyImageUI::~CMyImageUI() {
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStopControl) {
 	DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);
 
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	SIZE tParentScrollPos = pParent->GetScrollPos();
+	SIZE tParentScrollRange = pParent->GetScrollRange();   
+
+	if (tParentScrollPos.cx != tParentScrollRange.cx) {
+		if (m_bSetParentScrollPos)
+		{
+			//pParent->SetScrollPos(tParentScrollRange);
+			CBusiness::GetInstance()->UpdateScrollAsyn();
+			m_bSetParentScrollPos = FALSE;
+		}
+	}
+
+
 	Graphics graphics(hDC);
 	graphics.SetSmoothingMode(SmoothingModeHighQuality);	
 
 	RECT rect   = this->GetPos();
-	int  width  = rect.right - rect.left;
+	int  width = pParent->GetWidth(); // rect.right - rect.left;
 	int  height = rect.bottom - rect.top;
 
-	int RIGHT = width - m_nLeft;
+	//int RIGHT = width - m_nLeft;
 
 	int nMinTemp = g_dwMinTemp;
 	int m_nGridCount = 42 - nMinTemp;
@@ -104,30 +125,29 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 	// 中间温度的位置
 	int middle = height / 2;
 
-	::SelectObject(hDC, m_hPen);
 	::SetTextColor(hDC, m_dwTextColor);
-
-	// 画竖线
-	::MoveToEx(hDC, m_nLeft + rect.left, rect.top, 0);
-	::LineTo(hDC, m_nLeft + rect.left, rect.bottom);
-
-	// 42度线的top位置
-	int nFirstTop = middle - m_nGridSize * ( m_nGridCount / 2 );
-	int nFistTemperature = 42;
 	DuiLib::CDuiString strText;
 
-	for (int i = 0; i < m_nGridCount+1; i++) {
+	::SelectObject(hDC, m_hPen);
+
+	RECT rectLeft;
+	rectLeft.left   = rect.left + tParentScrollPos.cx;
+	rectLeft.top    = rect.top;
+	rectLeft.right  = rectLeft.left + m_nLeft;
+	rectLeft.bottom = rect.bottom;
+
+	int nFirstTop = middle - m_nGridSize * (m_nGridCount / 2);
+	int nFistTemperature = 42;
+
+	for (int i = 0; i < m_nGridCount + 1; i++) {
 		int  nTop = nFirstTop + i * m_nGridSize;
 		int  nTemperature = nFistTemperature - i;
 
 		// 画38~42度的横线
-		::MoveToEx(hDC, m_nLeft + rect.left, nTop + rect.top, 0);
+		::MoveToEx(hDC, rectLeft.right, nTop + rect.top, 0);
 		::LineTo(hDC, rect.right, nTop + rect.top);
-
-		// 画刻度值
-		strText.Format("%d℃", nTemperature);
-		::TextOut(hDC, m_nLeft + rect.left + m_nTextOffsetX, nTop + rect.top + m_nTextOffsetY, strText, strText.GetLength());
 	}
+
 
 	time_t  tFistTime = 0;
 	int     nLastTimeTextLeft = 0;
@@ -185,20 +205,35 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 		}
 	}
 
+	::SelectObject(hDC, m_hPen);
+	::FillRect(hDC, &rectLeft, m_hBrush );
+	::Rectangle(hDC, rectLeft.left, rectLeft.top, rectLeft.right, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left + width - 1, rectLeft.top, 0 );
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom);  
+
+	for (int i = 0; i < m_nGridCount + 1; i++) {
+		int  nTop = nFirstTop + i * m_nGridSize;
+		int  nTemperature = nFistTemperature - i;
+
+		// 画刻度值
+		strText.Format("%d℃", nTemperature);
+		::TextOut(hDC, rectLeft.right + m_nTextOffsetX, nTop + rect.top + m_nTextOffsetY, strText, strText.GetLength());
+	}
+
 	// 画出报警线
 	::SelectObject(hDC, m_hPen1);
 	int nY = (int)((nMiddleTemp * 100.0 - (double)g_dwLowTempAlarm) / 100.0 * m_nGridSize);
-	::MoveToEx(hDC, m_nLeft + rect.left, middle + nY + rect.top, 0);
-	::LineTo(hDC, rect.right, middle + nY + rect.top);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
 	strText = "低温报警";
-	::TextOut(hDC, m_nLeft + rect.left + 5, middle + nY + rect.top + 5, strText, strText.GetLength());
+	::TextOut(hDC, rectLeft.right + 5, middle + nY + rect.top + 5, strText, strText.GetLength());
 
 	::SelectObject(hDC, m_hPen2);
 	nY = (int)((nMiddleTemp * 100.0 - (double)g_dwHighTempAlarm) / 100.0 * m_nGridSize);
-	::MoveToEx(hDC, m_nLeft + rect.left, middle + nY + rect.top, 0);
-	::LineTo(hDC, rect.right, middle + nY + rect.top);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
 	strText = "高温报警";
-	::TextOut(hDC, m_nLeft + rect.left + 5, middle + nY + rect.top - 20, strText, strText.GetLength());
+	::TextOut(hDC, rectLeft.right + 5, middle + nY + rect.top - 20, strText, strText.GetLength());
 
 	return true;
 
@@ -210,9 +245,31 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 	DuiLib::CControlUI::DoEvent(event);
 }
 
+int  CMyImageUI::CalcMinWidth() {
+	DWORD dwCnt = m_vTempData.size();
+	if (dwCnt <= 1) {
+		return 0;
+	}
+
+	DWORD  dwInterval        = g_dwCollectInterval;
+	DWORD  dwUnitWidth       = m_nTimeUnitLen;
+	DWORD  dwLeftColumnWidth = m_nLeft;
+
+	int nWidth = (int)((double)(m_vTempData[dwCnt - 1]->tTime - m_vTempData[0]->tTime) / dwInterval * dwUnitWidth);
+	return nWidth + dwLeftColumnWidth + m_nTailBlank;
+}
+
+void CMyImageUI::Invalidate_0() {
+	int nMinWidth = CalcMinWidth();
+	this->SetMinWidth(nMinWidth);
+	Invalidate();
+	m_bSetParentScrollPos = TRUE; 
+}
+
 void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	time_t now = time(0);
 
+#if 0
 	RECT r = this->GetPos();
 	int nWidth = (r.right - r.left) - m_nLeft;
 
@@ -223,6 +280,7 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 			ClearVector(m_vTempData);
 		}		
 	}
+#endif
 
 	TempData * pTemp = new TempData;
 	pTemp->dwTemperature = dwTemp;
@@ -231,7 +289,7 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	m_vTempData.push_back(pTemp);
 	CMyDatabase::GetInstance()->AddTemp(dwTemp, now);
 
-	Invalidate();
+	Invalidate_0();
 
 	if (dwTemp < g_dwLowTempAlarm || dwTemp > g_dwHighTempAlarm) {
 		CBusiness::GetInstance()->AlarmAsyn(g_szAlarmFilePath);

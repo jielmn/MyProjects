@@ -15,6 +15,7 @@ public:
 	void  AddTemp(DWORD dwTemp);
 
 	void  SetWndRect(int x, int y);
+	void  Invalidate_0();
 
 private:
 	vector<TempData *>   m_vTempData;
@@ -22,6 +23,9 @@ private:
 	DuiLib::CPaintManagerUI *    m_pManager;
 
 	void DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS = 6);
+
+	int  CalcMinWidth();
+	
 
 private:
 	int                  m_nLeft;
@@ -33,6 +37,8 @@ private:
 	int                  m_nTimeOffsetY;
 	int                  m_nMaxPointsCnt;
 	int                  m_nRadius;
+
+	int                  m_nTailBlank;
 
 	//int                  m_nMinTemp;
 	//int                  m_nGridCount;
@@ -47,6 +53,10 @@ private:
 
 	Pen                  m_pen_3;
 	SolidBrush           m_brush_3;
+
+	HBRUSH               m_hBrush;
+
+	BOOL                 m_bSetParentScrollPos;
 };
 
 #define  MYIMAGE_TIMER_ID             10

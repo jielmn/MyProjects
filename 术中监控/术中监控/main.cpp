@@ -82,7 +82,7 @@ void  CDuiFrameWnd::OnSetting() {
 		g_cfg->SetConfig("alarm file",g_szAlarmFilePath);
 		g_cfg->SetConfig("min temperature degree", g_dwMinTemp);
 		g_cfg->Save();
-		m_pImageUI->Invalidate();
+		m_pImageUI->Invalidate_0();         
 	}
 
 	delete pSettingDlg;
@@ -257,7 +257,7 @@ void CDuiFrameWnd::InitWindow() {
 #endif
 	DuiLib::WindowImplBase::InitWindow();
 }
-
+ 
 void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
 	DuiLib::CDuiString strText;
@@ -433,6 +433,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_pImageUI->SetWndRect(m_nWidth, m_nHeight);
 		}
 
+	}
+	else if (uMsg == UM_UPDATE_SCROLL) {		
+		DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_pImageUI->GetParent(); 
+		SIZE tParentScrollPos = pParent->GetScrollPos();
+		SIZE tParentScrollRange = pParent->GetScrollRange();
+		pParent->SetScrollPos(tParentScrollRange);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam );
 }

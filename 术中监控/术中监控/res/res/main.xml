@@ -121,7 +121,7 @@
 						<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
 					</HorizontalLayout>
 				
-					<VerticalLayout inset="20,0,20,0">
+					<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
 						<MyImage name="image0" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
 					</VerticalLayout>
 				</VerticalLayout>

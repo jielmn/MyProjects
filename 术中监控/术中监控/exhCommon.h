@@ -49,6 +49,7 @@
 
 #define UM_SHOW_READER_STATUS            (WM_USER+1)
 #define UM_SHOW_READ_TAG_TEMP_RET        (WM_USER+2)
+#define UM_UPDATE_SCROLL                 (WM_USER+3)
 
 #define  MAX_READER_COMMAND_LENGTH              256
 // Reader通信协议命令

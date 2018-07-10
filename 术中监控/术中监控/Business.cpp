@@ -263,6 +263,12 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 	return 0;
 }
 
+// 调整滑动条
+int   CBusiness::UpdateScrollAsyn() {
+	::PostMessage(g_hWnd, UM_UPDATE_SCROLL, 0, 0);
+	return 0;
+}
+
 
 
 
