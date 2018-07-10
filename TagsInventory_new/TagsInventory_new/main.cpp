@@ -968,15 +968,16 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_OK);
 		}
-		// 如果是断开连接
-		else if (INV_ERR_DB_CLOSE == nError) {
-			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
-			SET_CONTROL_TEXT(m_lblCheckTagRet, "");
-		}
-		else {
+		else if (1 == nError) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, ERROR_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_ERROR);
 		}
+		// 如果是断开连接
+		else  {
+			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
+			SET_CONTROL_TEXT(m_lblCheckTagRet, "数据库出错");
+		}
+		
 
 		if (pItem) {
 			delete pItem;
