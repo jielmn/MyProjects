@@ -4,9 +4,14 @@
 #include "InvDatabase.h"
 //#include "InvReader.h"
 //#include "610InvReader.h"
-#include "TelemedInvReader.h"
+//#include "TelemedInvReader.h"
 
 //#define   READER_TYPE_INV
+#ifdef READER_TYPE_INV
+#include "InvReader.h"
+#else
+#include "TelemedInvReader.h"
+#endif
 
 class CBusiness : public sigslot::has_slots<>, public LmnToolkits::MessageHandler {
 
