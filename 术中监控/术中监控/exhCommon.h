@@ -11,7 +11,7 @@
 #include "LmnString.h"
 
 #ifdef _DEBUG
-#define  TEST_FLAG                  0
+#define  TEST_FLAG                  1
 #endif
 
 #if     TEST_FLAG

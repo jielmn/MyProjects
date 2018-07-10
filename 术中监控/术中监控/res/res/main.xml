@@ -31,9 +31,9 @@
 		</HorizontalLayout>
 		
 		<!-- 客户区 -->
-		<HorizontalLayout bkcolor="#FF192431" inset="10,0,10,10" >
+		<HorizontalLayout bkcolor="#FF192431" inset="0,0,0,0" >
 			
-			<VerticalLayout width="160">
+			<VerticalLayout width="180" bkcolor="#FF293441" inset="10,10,10,10" >
 				
 				<HorizontalLayout height="40">
 					<Label text="当前体温(℃)"   textcolor="#FFFFFFFF" width="150" font="1" />
@@ -93,14 +93,39 @@
 			
 			
 			
-			<VerticalLayout>
-				<HorizontalLayout height="40">
-					<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
-				</HorizontalLayout>
-			
-				<VerticalLayout inset="20,0,20,0">
-					<MyImage name="image0" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
+			<VerticalLayout inset="0,0,0,0">
+				<VerticalLayout height="80" bkcolor="#FF293441">
+					<HorizontalLayout />
+					<HorizontalLayout height="50" inset="10,0,10,0" >
+						<Label text="姓名"   textcolor="#FFFFFFFF" width="60" font="1" />
+						<Edit  name="edtName" text="--"    textcolor="#FF000000" width="150" font="3" visible="false" />
+						<Button name="btnName" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="150" font="3" />
+						<Control width="40" />
+						
+						<Label text="性别"   textcolor="#FFFFFFFF" width="60" font="1" />
+						<Edit name="edtSex" text="-"    textcolor="#FFFFFFFF" width="100" font="3" visible="false" />
+						<Button name="btnSex" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="-" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="100" font="3" />
+						<Control width="40" />
+						
+						<Label text="年龄"   textcolor="#FFFFFFFF" width="60" font="1" />
+						<Edit name="edtAge" text="--"    textcolor="#FFFFFFFF" width="100" font="3" visible="false" />
+						<Button name="btnAge" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="-" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="100" font="3" />
+						
+					</HorizontalLayout>
+					<HorizontalLayout />
 				</VerticalLayout>
+				
+				
+				<VerticalLayout inset="10,0,10,10" >
+					<HorizontalLayout height="40">
+						<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
+					</HorizontalLayout>
+				
+					<VerticalLayout inset="20,0,20,0">
+						<MyImage name="image0" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
+					</VerticalLayout>
+				</VerticalLayout>
+				
 			</VerticalLayout>
 		
 						

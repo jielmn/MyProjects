@@ -41,6 +41,14 @@ private:
 
 	int                             m_nTimeLeft;
 
+	DuiLib::CEditUI *               m_edtName;
+	DuiLib::CEditUI *               m_edtSex;
+	DuiLib::CEditUI *               m_edtAge;
+	DuiLib::CButtonUI *             m_btnName;
+	DuiLib::CButtonUI *             m_btnSex;
+	DuiLib::CButtonUI *             m_btnAge;
+
+
 private:
 	void  OnSetting();
 	void  OnAbout();

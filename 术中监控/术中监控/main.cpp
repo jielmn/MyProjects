@@ -170,7 +170,7 @@ void  CDuiFrameWnd::ShowTimeLeftError() {
 	m_lblTimeLeft->SetText("--");
 }
 
-
+              
 
 
 
@@ -201,6 +201,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 }
 
 void CDuiFrameWnd::InitWindow() {
+	char buf[8192];
+
 	g_hWnd = GetHWND();
 
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
@@ -216,10 +218,30 @@ void CDuiFrameWnd::InitWindow() {
 	m_pImageUI = (CMyImageUI *)m_PaintManager.FindControl("image0");	
 	m_pAlarmUI = (CAlarmImageUI *)m_PaintManager.FindControl("alarm_image");
 
+	m_edtName = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtName"));
+	m_edtSex  = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtSex"));
+	m_edtAge  = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtAge"));
+	m_btnName = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnName"));
+	m_btnSex  = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSex"));
+	m_btnAge  = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAge"));
+
+	m_edtName->SetVisible(false);
+	m_edtSex->SetVisible(false);
+	m_edtAge->SetVisible(false);
+
 	m_lblTemperature->SetText("--");
 	m_lblLowTemperature->SetText("--");
 	m_lblHighTemperature->SetText("--");
 	m_lblTimeLeft->SetText("--");
+
+	g_cfg->GetConfig("last name", buf, sizeof(buf), "---");
+	m_btnName->SetText(buf);
+
+	g_cfg->GetConfig("last sex", buf, sizeof(buf), "-");
+	m_btnSex->SetText(buf);
+
+	g_cfg->GetConfig("last age", buf, sizeof(buf), "--");
+	m_btnAge->SetText(buf);
 
 	m_txtTitle = static_cast<DuiLib::CTextUI*>(m_PaintManager.FindControl("txtTitle")); 
 
@@ -250,6 +272,24 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 			pMenu->Init(*this, pt);
 			pMenu->ShowWindow(TRUE);
 		}
+		else if (name == "btnName") {			
+			msg.pSender->SetVisible(false);
+			m_edtName->SetText(msg.pSender->GetText()); 
+			m_edtName->SetVisible(true);	
+			m_edtName->SetFocus();   			
+		}
+		else if (name == "btnSex") {
+			msg.pSender->SetVisible(false);			
+			m_edtSex->SetText(msg.pSender->GetText());
+			m_edtSex->SetVisible(true);
+			m_edtSex->SetFocus();
+		}
+		else if (name == "btnAge") {
+			msg.pSender->SetVisible(false);
+			m_edtAge->SetText(msg.pSender->GetText());
+			m_edtAge->SetVisible(true);
+			m_edtAge->SetFocus();
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -262,6 +302,30 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 	else if (msg.sType == "menu_data_image") {
 		OnImageAll();
 		return;
+	}
+	else if ( msg.sType == "killfocus" ) {
+		if (name == "edtName") {
+			g_cfg->SetConfig("last name", msg.pSender->GetText());
+			g_cfg->Save();
+			msg.pSender->SetVisible(false);
+			m_btnName->SetText(msg.pSender->GetText());
+			m_btnName->SetVisible(true);
+		}
+		else if (name == "edtSex") {
+			g_cfg->SetConfig("last sex", msg.pSender->GetText());
+			g_cfg->Save();
+			msg.pSender->SetVisible(false);
+			m_btnSex->SetText(msg.pSender->GetText());
+			m_btnSex->SetVisible(true);
+		}
+		else if (name == "edtAge") {
+			g_cfg->SetConfig("last age", msg.pSender->GetText());
+			g_cfg->Save();
+			msg.pSender->SetVisible(false);
+			m_btnAge->SetText(msg.pSender->GetText());
+			m_btnAge->SetVisible(true);
+		}
+
 	}
 	DuiLib::WindowImplBase::Notify(msg);
 }
@@ -419,4 +483,4 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	GdiplusShutdown(pGdiToken);//¹Ø±ÕGDI+
 
 	return 0;
-}
+}            
