@@ -113,6 +113,7 @@ extern  DWORD   g_dwCollectInterval;
 extern  DWORD   g_dwLowTempAlarm;
 extern  DWORD   g_dwHighTempAlarm;
 extern  DWORD   g_dwMinTemp;
+extern  char    g_szComPort[32];
 #define MAX_ALARM_FILE_PATH                256
 extern  char    g_szAlarmFilePath[MAX_ALARM_FILE_PATH];
 

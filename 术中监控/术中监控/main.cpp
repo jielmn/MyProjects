@@ -81,6 +81,7 @@ void  CDuiFrameWnd::OnSetting() {
 		g_cfg->SetConfig("collect interval", g_dwCollectInterval);
 		g_cfg->SetConfig("alarm file",g_szAlarmFilePath);
 		g_cfg->SetConfig("min temperature degree", g_dwMinTemp);
+		g_cfg->SetConfig("com port", g_szComPort);
 		g_cfg->Save();
 		m_pImageUI->Invalidate_0();         
 	}

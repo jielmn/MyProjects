@@ -28,4 +28,6 @@ private:
 	DuiLib::CEditUI *           m_edAlarmPath;
 
 	CMyTreeCfgUI  *             m_tree;
+
+	CComboUI *                  m_cmbComPort;
 };

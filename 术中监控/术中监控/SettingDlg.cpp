@@ -91,6 +91,16 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 			}
 			dwHighAlarm = (DWORD)(dbTemp * 100);
 
+
+			// 串口
+			bGetCfg = m_tree->GetConfigValue(4, cfgValue);
+			if (0 == cfgValue.m_nComboSel) {
+				g_szComPort[0] = '\0';
+			}
+			else {
+				STRNCPY( g_szComPort, m_cmbComPort->GetText(), sizeof(g_szComPort) );
+			}
+
 			g_dwCollectInterval = dwInterval;
 			g_dwLowTempAlarm = dwLowAlarm;
 			g_dwHighTempAlarm = dwHighAlarm;
@@ -255,6 +265,64 @@ void   CSettingDlg::InitWindow() {
 	strText.Format("%.2f", g_dwHighTempAlarm / 100.0);
 	pEdit->SetText(strText);
 	m_tree->AddNode("高温报警", 0, (void *)(4), pEdit);   
+
+
+
+	// 串口
+	char szPort[256];
+	g_cfg->GetConfig("com port", szPort, sizeof(szPort), "");
+
+	std::vector<std::string>  vCom;
+	GetAllSerialPortName(vCom);
+
+	std::vector<std::string>::iterator it;
+	if (szPort[0] != 0) {
+		for (it = vCom.begin(); it != vCom.end(); it++) {
+			std::string & s = *it;
+			if (0 == StrICmp(s.c_str(), szPort)) {
+				break;
+			}
+		}
+		if ( it == vCom.end() ) {
+			vCom.push_back(szPort);
+		}
+	}
+
+	
+	m_cmbComPort = new CComboUI;
+	pCombo = m_cmbComPort;
+	pElement = new CListLabelElementUI;
+	pElement->SetText("任意端口");
+	pCombo->Add(pElement);
+
+	for (it = vCom.begin(); it != vCom.end(); it++) {
+		std::string & s = *it;
+		pElement = new CListLabelElementUI;
+		pElement->SetText(s.c_str());
+		pCombo->Add(pElement);
+	}
+
+	if (szPort[0] == 0) {
+		pCombo->SelectItem(0);
+	}
+	else {
+		for (it = vCom.begin(); it != vCom.end(); it++) {
+			std::string & s = *it;
+			if ( 0 == StrICmp(s.c_str(), szPort) ) {
+				pCombo->SelectItem( (it - vCom.begin()) + 1 );
+			}
+		}
+	}
+	
+	pCombo->SetItemTextColor(0xFF386382);
+	pCombo->SetHotItemTextColor(0xFF386382);
+	pCombo->SetSelectedItemTextColor(0xFF386382);
+	pCombo->SetItemFont(2);
+
+	pCombo->SetAttributeList("normalimage=\"file = 'Combo_nor.bmp' corner = '2,2,24,2'\" hotimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" pushedimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" textpadding=\"5, 1, 5, 1\" ");
+
+	m_tree->AddNode("读写串口", 0, (void *)(2), pCombo);
+
 
 
 	DuiLib::WindowImplBase::InitWindow();
