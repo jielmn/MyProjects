@@ -47,6 +47,8 @@ int  CTelemedReader::Reconnect() {
 	// 尝试打开从系统获得的串口列表
 	do
 	{
+		JTelSvrPrint("\ncom ports count = %lu", vCom.size());
+
 		std::vector<std::string>::iterator it;
 		for (it = vCom.begin(); it != vCom.end(); it++) {
 			std::string  sItem = *it;
@@ -60,10 +62,17 @@ int  CTelemedReader::Reconnect() {
 				continue;
 			}
 
-			Prepare();
-			int ret = ReadPrepareRet();
+			int ret = Prepare();
+			if (0 != ret) {
+				JTelSvrPrint("port %s failed", sItem.c_str());
+				CloseUartPort();
+				continue;
+			}
+
+			ret = ReadPrepareRet();
 			if (0 == ret) {
 				bPrepared = TRUE;
+				JTelSvrPrint("port %s prepared", sItem.c_str());
 				break;
 			}
 
@@ -92,18 +101,23 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	}
 
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "send get temperature command \n");
+	JTelSvrPrint("sending get temperature command ...");
 
 	DWORD dwWrited = 0;
 	BOOL bRet = WriteUartPort(m_hComm, READ_TAG_DATA_COMMAND.abyCommand, READ_TAG_DATA_COMMAND.dwCommandLength, &dwWrited);
 
 	if (!bRet) {
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to send read tag command! \n");
+		//g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to send read tag command! \n");
+		JTelSvrPrint("failed to send read tag command");
 
+		CloseUartPort();
 		m_eStatus = STATUS_CLOSE;
 		m_pBusiness->NotifyUiReaderStatus(m_eStatus);
 		m_pBusiness->ReconnectReaderAsyn(RECONNECT_READER_DELAY);
 		return EXH_ERR_READER_FAILED_TO_WRITE;
 	}
+
+	JTelSvrPrint("sended get temperature command");
 
 #ifdef TELEMED_READER_TYPE_1
 	ReceiveAsPossible(SERIAL_PORT_SLEEP_TIME, 14);
@@ -130,10 +144,12 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 			dwTemp = pData[1] * 1000 + pData[2] * 100  + pData[3] * 10 + pData[4];
 			return 0;
 		}
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, wrong format! \n");
+		//g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, wrong format! \n");
+		JTelSvrPrint("failed to receive temp data, wrong format!");
 	}
 	else {
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, received data length =%lu \n", m_received_data.GetDataLength());
+		//g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, received data length =%lu \n", m_received_data.GetDataLength());
+		JTelSvrPrint("failed to receive temp data, received data length =%lu ", m_received_data.GetDataLength());
 	}
 #else
 	// 02 12 04 0E 10 02 E0 02 59 CD 93 D9 3D 5E 21 5E 01 0D 0A 
@@ -153,7 +169,8 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	}
 #endif
 
-	m_eStatus = STATUS_CLOSE;
+	CloseUartPort();
+	m_eStatus = STATUS_CLOSE;	
 	m_pBusiness->NotifyUiReaderStatus(m_eStatus);
 	m_pBusiness->ReconnectReaderAsyn(RECONNECT_READER_DELAY);
 
@@ -189,10 +206,11 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 		0,                            //不共享  
 		NULL,                         //返回的句柄不允许被子进程继承  
 		OPEN_EXISTING,
-		0,                            //0：同步模式，FILE_FLAG_OVERLAPPED：异步模式  
+		FILE_FLAG_OVERLAPPED,         //0：同步模式，FILE_FLAG_OVERLAPPED：异步模式  
 		0                             //不使用临时文件句柄  
 	);
-
+	
+	// DWORD t = GetLastError();
 	if (INVALID_HANDLE_VALUE == hComm)
 	{
 		JTelSvrPrint("    failed to open %s", UartPortName);
@@ -204,12 +222,15 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 		{
 			m_hComm = hComm;
 
+#if 0
 			COMMTIMEOUTS  timeout;
 			memset(&timeout, 0, sizeof(COMMTIMEOUTS));
 			GetCommTimeouts(hComm, &timeout);
 			// 写操作2秒 timeout
 			timeout.WriteTotalTimeoutConstant = 2000;
 			SetCommTimeouts(hComm, &timeout);
+#endif
+
 		}
 		else
 		{
@@ -225,6 +246,7 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 BOOL   CTelemedReader::CloseUartPort() {
 	if (0 != m_hComm) {
 		CloseHandle(m_hComm);
+		// DWORD t = GetLastError();
 		m_hComm = 0;
 	}
 	m_received_data.Clear();
@@ -305,10 +327,22 @@ BOOL   CTelemedReader::WriteUartPort(HANDLE hComm, const void * WriteBuf, DWORD 
 	}
 
 	ClearCommError(hComm, &dwError, &ComStat);//返回串口错误和报告(也可以查看缓冲区状态)
-	BOOL bWriteStat = WriteFile(hComm, WriteBuf, ToWriteDataLen, WritedDataLen, NULL);
-	if (!bWriteStat)
-	{
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to write com port!\n");
+
+	OVERLAPPED o;
+	memset(&o, 0, sizeof(OVERLAPPED));
+
+	BOOL bReadDone = WriteFile(hComm, WriteBuf, ToWriteDataLen, WritedDataLen, &o);
+	dwError = GetLastError();
+
+	if ( !bReadDone && (dwError == ERROR_IO_PENDING) ) {
+		WaitForSingleObject(hComm, 2000);    //有时此处也会发生错误。
+		// dwError = GetLastError();
+		bReadDone = TRUE;
+	}
+
+	// 传输的数据不是expected的
+	if (o.InternalHigh != ToWriteDataLen) {
+		JTelSvrPrint("    failed to write com port");
 		return FALSE;
 	}
 
@@ -362,7 +396,11 @@ BOOL   CTelemedReader::RcvDataFromUartPort(HANDLE hComm, void *RcvBuf, DWORD ToR
 int   CTelemedReader::Receive(DWORD & dwReceivedCnt) {
 	char buf[8192];
 	dwReceivedCnt = 0;
-	if (RcvDataFromUartPort(m_hComm, buf, sizeof(buf), &dwReceivedCnt, 0))
+
+	OVERLAPPED o;
+	memset(&o, 0, sizeof(OVERLAPPED));
+
+	if (RcvDataFromUartPort(m_hComm, buf, sizeof(buf), &dwReceivedCnt, &o))
 	{
 		// 保存到缓冲中
 		if (dwReceivedCnt) {
@@ -380,9 +418,11 @@ int   CTelemedReader::Receive(DWORD & dwReceivedCnt) {
 int  CTelemedReader::Prepare() {
 
 	DWORD dwWrited = 0;
-	BOOL bRet = WriteUartPort(m_hComm, PREPARE_COMMAND.abyCommand, PREPARE_COMMAND.dwCommandLength, &dwWrited);
+	JTelSvrPrint("    sending prepare command ...");
+	BOOL bRet = WriteUartPort(m_hComm, PREPARE_COMMAND.abyCommand, PREPARE_COMMAND.dwCommandLength, &dwWrited);	
 
 	if (bRet) {
+		JTelSvrPrint("    prepare command OK");
 		return 0;
 	}
 	else {
@@ -414,6 +454,7 @@ int  CTelemedReader::ReadPrepareRet() {
 	if (m_received_data.GetDataLength() >= 4) {
 		m_received_data.Read(pData, 4);
 		if (0 == memcmp(pData, "\xFF\x55\x55\xFF", 4)) {
+			JTelSvrPrint("    receive prepare response OK");
 			return 0;
 		}
 	}
