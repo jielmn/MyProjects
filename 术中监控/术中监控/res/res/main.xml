@@ -103,12 +103,12 @@
 						<Control width="40" />
 						
 						<Label text="性别"   textcolor="#FFFFFFFF" width="60" font="1" />
-						<Edit name="edtSex" text="-"    textcolor="#FFFFFFFF" width="100" font="3" visible="false" />
+						<Edit name="edtSex" text="-"    textcolor="#FF000000" width="100" font="3" visible="false" />
 						<Button name="btnSex" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="-" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="100" font="3" />
 						<Control width="40" />
 						
 						<Label text="年龄"   textcolor="#FFFFFFFF" width="60" font="1" />
-						<Edit name="edtAge" text="--"    textcolor="#FFFFFFFF" width="100" font="3" visible="false" />
+						<Edit name="edtAge" text="--"    textcolor="#FF000000" width="100" font="3" visible="false" />
 						<Button name="btnAge" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="-" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="100" font="3" />
 						
 					</HorizontalLayout>
