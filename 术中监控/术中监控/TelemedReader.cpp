@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "Business.h"
 #include "TelemedReader.h"
+#include "LmnTelSvr.h"
 
 CTelemedReader::CTelemedReader(CBusiness * pBusiness) : m_pBusiness(pBusiness) {
 	m_eStatus = STATUS_CLOSE;
@@ -50,11 +51,11 @@ int  CTelemedReader::Reconnect() {
 		for (it = vCom.begin(); it != vCom.end(); it++) {
 			std::string  sItem = *it;
 
-			g_log->Output(ILog::LOG_SEVERITY_INFO, "try port %s \n", sItem.c_str());
+			JTelSvrPrint("try port %s ", sItem.c_str());
 
 			BOOL bRet = OpenUartPort(sItem.c_str());
 			if (!bRet) {
-				g_log->Output(ILog::LOG_SEVERITY_INFO, "port %s failed \n", sItem.c_str());
+				JTelSvrPrint("port %s failed", sItem.c_str());
 				CloseUartPort();
 				continue;
 			}
@@ -66,7 +67,7 @@ int  CTelemedReader::Reconnect() {
 				break;
 			}
 
-			g_log->Output(ILog::LOG_SEVERITY_INFO, "port %s failed \n", sItem.c_str());
+			JTelSvrPrint("port %s failed", sItem.c_str());
 			CloseUartPort();
 		}
 	} while (0);
@@ -194,7 +195,7 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 
 	if (INVALID_HANDLE_VALUE == hComm)
 	{
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "Open Failed!!!\n");
+		JTelSvrPrint("    failed to open %s", UartPortName);
 		bResult = FALSE;
 	}
 	else
@@ -202,7 +203,6 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 		if (InitUartPort(hComm, 9600, 8, NOPARITY, ONESTOPBIT))
 		{
 			m_hComm = hComm;
-			g_log->Output(ILog::LOG_SEVERITY_INFO, "Init Uart Port OK!!!\n");
 
 			COMMTIMEOUTS  timeout;
 			memset(&timeout, 0, sizeof(COMMTIMEOUTS));
@@ -213,7 +213,7 @@ BOOL   CTelemedReader::OpenUartPort(const char *UartPortName) {
 		}
 		else
 		{
-			g_log->Output(ILog::LOG_SEVERITY_ERROR, "Init Uart Port Failed!!!\n");
+			JTelSvrPrint("    failed to init %s", UartPortName);
 			bResult = FALSE;
 		}
 	}
@@ -386,7 +386,7 @@ int  CTelemedReader::Prepare() {
 		return 0;
 	}
 	else {
-		g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to Prepare \n");
+		JTelSvrPrint("    failed to prepare");
 		return -1;
 	}
 }
@@ -427,6 +427,7 @@ int  CTelemedReader::ReadPrepareRet() {
 	}
 #endif
 
+	JTelSvrPrint("    failed to receive prepare response");
 	return -1;
 }
 
