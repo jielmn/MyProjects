@@ -63,7 +63,7 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : m_pen_3( Gdiplus::Co
 	g_cfg->GetConfig("time offset y", dwValue, 1);
 	m_nTimeOffsetY = dwValue;
 
-	g_cfg->GetConfig("time unit length", dwValue, 25);
+	g_cfg->GetConfig("time unit length", dwValue, 50); 
 	m_nTimeUnitLen = dwValue;
 
 	g_cfg->GetConfig("max points count", dwValue, 1500);
