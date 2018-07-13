@@ -29,7 +29,7 @@
 		<VerticalLayout  inset="10,10,10,10">
 			<Control bkimage="about.jpg" />
 			<HorizontalLayout>
-				<Control bkcolor="#FFFFFFFF"  />
+				<!--<Control bkcolor="#FFFFFFFF"  />-->
 				<Control bkimage="about1.png" width="451" />
 				<Control bkcolor="#FFFFFFFF"  />
 			</HorizontalLayout>
