@@ -219,7 +219,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			CButtonUI * btn_expand = new CButtonUI;
 			btn_expand->SetFixedWidth(15);
 			btn_expand->SetFixedHeight(15);
-			btn_expand->SetBkImage("expand.png");
+			btn_expand->SetBkImage("collapse.png");
 			btn_expand->SetAttribute("padding", "0,5,4,5");
 			layout_parent->AddAt(btn_expand, 1);
 		}
@@ -282,10 +282,10 @@ void CMyTreeCfgUI::ExpandNode(CMyTreeCfgUI::Node* node, bool expand)
 	CButtonUI * btnExpand = (CButtonUI *)pLayout->GetItemAt(1);
 
 	if (expand) {
-		btnExpand->SetBkImage("expand.png");
+		btnExpand->SetBkImage("collapse.png");
 	}
 	else {
-		btnExpand->SetBkImage("collapse.png");
+		btnExpand->SetBkImage("expand.png");
 	}
 
 	if (!node->data()._pListElement->IsVisible()) return;
