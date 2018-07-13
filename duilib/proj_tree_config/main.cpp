@@ -80,7 +80,7 @@ void CDuiFrameWnd::InitWindow() {
 	m_tree->AddNode("100", 0, (void *)(100), pEdit);
 
 	pCategoryNode = m_tree->AddNode(_T("参数设置"));
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 9; ++i)
 	{
 		strText.Format("配置选项 %d", i + 1);
 		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i + 1));
@@ -123,7 +123,8 @@ void CDuiFrameWnd::InitWindow() {
 			}
 		}
 	}
-	m_tree->SelectItem(0);
+	m_tree->SelectItem(0);	
+	m_tree->SetMinHeight(1100);
 
 	WindowImplBase::InitWindow();
 }

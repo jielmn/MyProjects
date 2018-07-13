@@ -103,4 +103,7 @@ private:
 
 	DWORD  m_dwFixedLeft;
 	HPEN   m_hPen;
+
+public:
+	// int   CalculateMinHeight();
 };

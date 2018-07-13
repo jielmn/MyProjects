@@ -242,6 +242,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	}
 
 	parent->add_child(node);
+
 	return node;
 }
 
@@ -339,6 +340,21 @@ int CMyTreeCfgUI::GetItemIndex(CControlUI* pControl) const {
 	return -1;
 }
 
+//int   CMyTreeCfgUI::CalculateMinHeight() {
+//	int nCount = this->GetCount();
+//	int sum = 0;
+//
+//	for (int i = 0; i < nCount; i++) {
+//
+//		if (this->GetItemAt(i)->IsVisible()) {
+//			int nHeight = this->GetItemAt(i)->GetHeight();
+//			sum += nHeight;
+//		}
+//	}
+//
+//	return sum + 2;
+//}
+
 bool CMyTreeCfgUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CListUI::DoPaint(hDC, rcPaint, pStopControl);
 
@@ -358,10 +374,12 @@ bool CMyTreeCfgUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopContro
 			::MoveToEx(hDC, r.left, h, 0);
 			::LineTo(hDC, r.right - 1, h);
 		}
-		int nHeight = this->GetItemAt(i)->GetHeight();
-		h += nHeight;
-		::MoveToEx(hDC, r.left, h, 0);
-		::LineTo(hDC, r.right - 1, h);
+		if (this->GetItemAt(i)->IsVisible()) {
+			int nHeight = this->GetItemAt(i)->GetHeight();
+			h += nHeight;
+			::MoveToEx(hDC, r.left, h, 0);
+			::LineTo(hDC, r.right - 1, h); 
+		}		
 	}
 
 	::MoveToEx(hDC, r.left + m_dwFixedLeft, r.top, 0);
