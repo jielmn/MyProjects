@@ -286,6 +286,12 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	pTemp->dwTemperature = dwTemp;
 	pTemp->tTime = now;
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "temp = %ld, time=%lu\n", dwTemp, now);
+	if ( m_vTempData.size() >= 1500 ) {
+		vector<TempData *>::iterator it = m_vTempData.begin();
+		TempData * pData = *it;
+		m_vTempData.erase( it );
+		delete pData;
+	}
 	m_vTempData.push_back(pTemp);
 	CMyDatabase::GetInstance()->AddTemp(dwTemp, now);
 
