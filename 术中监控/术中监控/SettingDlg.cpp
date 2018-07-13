@@ -32,19 +32,22 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 			CMyTreeCfgUI::ConfigValue  cfgValue;
 			bool bGetCfg = m_tree->GetConfigValue(0, cfgValue);
 			if (0 == cfgValue.m_nComboSel) {
-				dwInterval = 5;
-			}
-			else if (1 == cfgValue.m_nComboSel) {
 				dwInterval = 10;
 			}
+			else if (1 == cfgValue.m_nComboSel) {
+				dwInterval = 60;
+			}
 			else if (2 == cfgValue.m_nComboSel) {
-				dwInterval = 20;
+				dwInterval = 300;
 			}
 			else if (3 == cfgValue.m_nComboSel) {
-				dwInterval = 30;
+				dwInterval = 900;
+			}
+			else if (4 == cfgValue.m_nComboSel) {
+				dwInterval = 1800;
 			}
 			else {
-				dwInterval = 60;
+				dwInterval = 3600;
 			}
 
 			bGetCfg = m_tree->GetConfigValue(1, cfgValue);
@@ -166,39 +169,46 @@ void   CSettingDlg::InitWindow() {
 	CComboUI * pCombo = new CComboUI;
 
 	CListLabelElementUI * pElement = new CListLabelElementUI;
-	pElement->SetText("5秒");
-	pCombo->Add(pElement);
-
-	pElement = new CListLabelElementUI;
 	pElement->SetText("10秒");
 	pCombo->Add(pElement);
 
 	pElement = new CListLabelElementUI;
-	pElement->SetText("20秒");
+	pElement->SetText("1分钟");
 	pCombo->Add(pElement);
 
 	pElement = new CListLabelElementUI;
-	pElement->SetText("30秒");
+	pElement->SetText("5分钟");
 	pCombo->Add(pElement);
 
 	pElement = new CListLabelElementUI;
-	pElement->SetText("60秒");
+	pElement->SetText("15分钟");
 	pCombo->Add(pElement);
 
-	if (5 == g_dwCollectInterval) {
+	pElement = new CListLabelElementUI;
+	pElement->SetText("30分钟");
+	pCombo->Add(pElement);
+
+	pElement = new CListLabelElementUI;
+	pElement->SetText("1小时");
+	pCombo->Add(pElement);
+
+	if (10 >= g_dwCollectInterval) {
 		pCombo->SelectItem(0);
 	}
-	else if (10 == g_dwCollectInterval) {
+	else if (60 >= g_dwCollectInterval) {
 		pCombo->SelectItem(1);
 	}
-	else if (20 == g_dwCollectInterval) {
+	else if (300 >= g_dwCollectInterval) {
 		pCombo->SelectItem(2);
 	}
-	else if (30 == g_dwCollectInterval) {
+	else if (900 >= g_dwCollectInterval) {
 		pCombo->SelectItem(3);
 	}
-	else {
+	else if (1800 >= g_dwCollectInterval) {
 		pCombo->SelectItem(4);
+	}
+	else {
+		pCombo->SelectItem(5);
 	}
 	
 	pCombo->SetItemTextColor(0xFF386382);

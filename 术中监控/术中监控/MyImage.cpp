@@ -48,10 +48,10 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : m_pen_3( Gdiplus::Co
 	g_cfg->GetConfig("LEFT", dwValue, 50);
 	m_nLeft = (int)dwValue;
 
-	g_cfg->GetConfig("GRID SIZE", dwValue, 50);
+	g_cfg->GetConfig("GRID SIZE", dwValue, 80);
 	m_nGridSize = dwValue;
 
-	g_cfg->GetConfig("text offset x", dwValue, -30); 
+	g_cfg->GetConfig("text offset x", dwValue, -35); 
 	m_nTextOffsetX = dwValue;
 
 	g_cfg->GetConfig("text offset y", dwValue, -8);
@@ -63,12 +63,12 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : m_pen_3( Gdiplus::Co
 	g_cfg->GetConfig("time offset y", dwValue, 1);
 	m_nTimeOffsetY = dwValue;
 
-	g_cfg->GetConfig("time unit length", dwValue, 12);
+	g_cfg->GetConfig("time unit length", dwValue, 25);
 	m_nTimeUnitLen = dwValue;
 
-	g_cfg->GetConfig("max poings count", dwValue, 10);
-	if (0 == dwValue) {
-		dwValue = 10;
+	g_cfg->GetConfig("max points count", dwValue, 1500);
+	if ( dwValue < 1500 ) {
+		dwValue = 1500;
 	}
 	m_nMaxPointsCnt = dwValue;
 
@@ -286,7 +286,7 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	pTemp->dwTemperature = dwTemp;
 	pTemp->tTime = now;
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "temp = %ld, time=%lu\n", dwTemp, now);
-	if ( m_vTempData.size() >= 1500 ) {
+	if ( m_vTempData.size() >= (DWORD)m_nMaxPointsCnt ) {
 		vector<TempData *>::iterator it = m_vTempData.begin();
 		TempData * pData = *it;
 		m_vTempData.erase( it );
