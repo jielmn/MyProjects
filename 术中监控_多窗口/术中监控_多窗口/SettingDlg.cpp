@@ -123,7 +123,6 @@ BOOL  CSettingDlg::GetConfig( int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm
 	}
 	dwHighAlarm = (DWORD)(dbTemp * 100);
 
-	
 	// 串口
 	bGetCfg = m_tree->GetConfigValue(nIndex * 6 + 5, cfgValue);
 	if (0 == cfgValue.m_nComboSel) {
@@ -149,6 +148,13 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 			for (int i = 0; i < MYCHART_COUNT; i++) {
 				if ( !GetConfig(i, dwInterval, dwLowAlarm, dwHighAlarm, dwMinTemp, strComPort) ) {
 					return;
+				}
+				else {
+					g_dwLowTempAlarm[i] = dwLowAlarm;
+					g_dwHighTempAlarm[i] = dwHighAlarm;
+					g_dwCollectInterval[i] = dwInterval;
+					g_dwMinTemp[i] = dwMinTemp;
+					STRNCPY(g_szComPort[i], strComPort, 32);
 				}
 			}
 			PostMessage(WM_CLOSE);
@@ -221,46 +227,23 @@ void   CSettingDlg::InitConfig(int nIndex) {
 
 	// comob 选定index
 	int nSelIndex = 0;	
-	switch (g_dwCollectInterval[nIndex])
-	{
-	case 10:
-	{
+	if (g_dwCollectInterval[nIndex] <= 10) {
 		nSelIndex = 0;
 	}
-	break;
-
-	case 60:
-	{
+	else if (g_dwCollectInterval[nIndex] <= 60) {
 		nSelIndex = 1;
 	}
-	break;
-
-	case 300:
-	{
+	else if (g_dwCollectInterval[nIndex] <= 300) {
 		nSelIndex = 2;
 	}
-	break;
-
-	case 900:
-	{
+	else if (g_dwCollectInterval[nIndex] <= 900) {
 		nSelIndex = 3;
 	}
-	break;
-
-	case 1800:
-	{
+	else if (g_dwCollectInterval[nIndex] <= 1800) {
 		nSelIndex = 4;
 	}
-	break;
-
-	case 3600:
-	{
+	else {
 		nSelIndex = 5;
-	}
-	break;
-
-	default:
-		break;
 	}
 	pCombo->SelectItem(nSelIndex);
 
@@ -276,7 +259,20 @@ void   CSettingDlg::InitConfig(int nIndex) {
 	AddComboItem(pCombo, "32℃");
 
 	// 选定index
-	pCombo->SelectItem(0);
+	nSelIndex = 0;
+	if (g_dwMinTemp[nIndex] <= 20) {
+		nSelIndex = 0;
+	}
+	else if (g_dwMinTemp[nIndex] <= 24) {
+		nSelIndex = 1;
+	}
+	else if (g_dwMinTemp[nIndex] <= 28) {
+		nSelIndex = 2;
+	}
+	else {
+		nSelIndex = 3;
+	}
+	pCombo->SelectItem(nSelIndex);
 
 	SetComboStyle(pCombo);
 	m_tree->AddNode("显示的最低温度", pTitleNode, (void *)(2+MYCHART_COUNT*nIndex), pCombo);
@@ -284,35 +280,31 @@ void   CSettingDlg::InitConfig(int nIndex) {
 	// 低温报警
 	CEditUI * pEdit = new CEditUI;
 	SetEditStyle(pEdit);
-	strText.Format("%.2f", 35.0 / 100.0);
+	strText.Format("%.2f", g_dwLowTempAlarm[nIndex] / 100.0);
 	pEdit->SetText(strText);
 	m_tree->AddNode("低温报警", pTitleNode, (void *)(3 + MYCHART_COUNT*nIndex), pEdit);
 
 	// 高温报警
 	pEdit = new CEditUI;
 	SetEditStyle(pEdit);
-	strText.Format("%.2f", 40.0 / 100.0);
+	strText.Format("%.2f", g_dwHighTempAlarm[nIndex] / 100.0);
 	pEdit->SetText(strText);
 	m_tree->AddNode("高温报警", pTitleNode, (void *)(4 + MYCHART_COUNT*nIndex), pEdit);
 
 	// 串口
-	char szPort[256] = {0};
-	strText.Format("com port %d", nIndex + 1);
-	g_cfg->GetConfig(strText, szPort, sizeof(szPort), "");
-
 	std::vector<std::string>  vCom;
 	GetAllSerialPortName(vCom);
 
 	std::vector<std::string>::iterator it;
-	if (szPort[0] != 0) {
+	if (g_szComPort[nIndex][0] != 0) {
 		for (it = vCom.begin(); it != vCom.end(); it++) {
 			std::string & s = *it;
-			if (0 == StrICmp(s.c_str(), szPort)) {
+			if (0 == StrICmp(s.c_str(), g_szComPort[nIndex])) {
 				break;
 			}
 		}
 		if (it == vCom.end()) {
-			vCom.push_back(szPort);
+			vCom.push_back(g_szComPort[nIndex]);
 		}
 	}
 
@@ -325,13 +317,13 @@ void   CSettingDlg::InitConfig(int nIndex) {
 		AddComboItem(pCombo, s.c_str());
 	}
 
-	if (szPort[0] == 0) {
+	if (g_szComPort[nIndex][0] == 0) {
 		pCombo->SelectItem(0);
 	}
 	else {
 		for (it = vCom.begin(); it != vCom.end(); it++) {
 			std::string & s = *it;
-			if (0 == StrICmp(s.c_str(), szPort)) {
+			if (0 == StrICmp(s.c_str(), g_szComPort[nIndex])) {
 				pCombo->SelectItem((it - vCom.begin()) + 1);
 			}
 		}

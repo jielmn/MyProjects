@@ -59,6 +59,7 @@ public:
 
 
 void  CDuiFrameWnd::OnSetting() {
+	CDuiString  strText;
 	CSettingDlg * pSettingDlg = new CSettingDlg;
 
 	pSettingDlg->Create(this->m_hWnd, _T("ÉèÖÃ"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
@@ -67,13 +68,24 @@ void  CDuiFrameWnd::OnSetting() {
 
 	// Èç¹ûOK
 	if (0 == ret) {
-		//g_cfg->SetConfig("low alarm", g_dwLowTempAlarm);
-		//g_cfg->SetConfig("high alarm", g_dwHighTempAlarm);
-		//g_cfg->SetConfig("collect interval", g_dwCollectInterval);
-		//g_cfg->SetConfig("alarm file", g_szAlarmFilePath);
-		//g_cfg->SetConfig("min temperature degree", g_dwMinTemp);
-		//g_cfg->SetConfig("com port", g_szComPort);
-		//g_cfg->Save();
+		for (int i = 0; i < MYCHART_COUNT; i++) {
+			strText.Format("low alarm %d", i + 1);
+			g_cfg->SetConfig( strText, g_dwLowTempAlarm[i]);
+
+			strText.Format("high alarm %d", i + 1);
+			g_cfg->SetConfig(strText, g_dwHighTempAlarm[i]);
+
+			strText.Format("collect interval %d", i + 1);
+			g_cfg->SetConfig(strText, g_dwCollectInterval[i]);
+
+			strText.Format("min temperature degree %d", i + 1);
+			g_cfg->SetConfig(strText, g_dwMinTemp[i]);
+
+			strText.Format("com port %d", i + 1);
+			g_cfg->SetConfig(strText, g_szComPort[i]);
+		}
+		
+		g_cfg->Save();
 		//m_pImageUI->Invalidate_0();
 	}
 

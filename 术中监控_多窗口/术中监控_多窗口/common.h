@@ -9,8 +9,8 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
-#define   LOG_FILE_NAME           "blank.log"
-#define   CONFIG_FILE_NAME        "blank.cfg"
+#define   LOG_FILE_NAME           "surgery_temp.log"
+#define   CONFIG_FILE_NAME        "surgery_temp.cfg"
 
 #define   LAY_LAYER_COUNT        2
 #define   MYCHART_PER_LAYER      3

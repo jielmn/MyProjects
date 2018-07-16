@@ -1,4 +1,5 @@
 #include "business.h"
+#include "UIlib.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -49,6 +50,24 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_thrd_db->Start();
+
+	DuiLib::CDuiString  strText;
+	for (int i = 0; i < MYCHART_COUNT; i++) {
+		strText.Format("low alarm %d", i + 1);
+		g_cfg->GetConfig(strText, g_dwLowTempAlarm[i],3500);
+
+		strText.Format("high alarm %d", i + 1);
+		g_cfg->GetConfig(strText, g_dwHighTempAlarm[i], 4200);
+
+		strText.Format("collect interval %d", i + 1);
+		g_cfg->GetConfig(strText, g_dwCollectInterval[i], 10);
+
+		strText.Format("min temperature degree %d", i + 1);
+		g_cfg->GetConfig(strText, g_dwMinTemp[i], 24);
+
+		strText.Format("com port %d", i + 1);
+		g_cfg->GetConfig(strText, g_szComPort[i], 32, "");
+	}
 
 	return 0;
 }
