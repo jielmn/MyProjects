@@ -57,6 +57,7 @@ public:
 		int         m_nComboSel;
 		BOOL        m_bCheckbox;
 		ConfigType  m_eConfigType;
+		UINT_PTR    m_tag;
 	};
 
 	CMyTreeCfgUI();
