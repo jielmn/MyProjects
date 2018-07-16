@@ -35,4 +35,15 @@ private:
 	void   OnSetting();
 	void   OnAbout();
 
+
+private:
+	DuiLib::CEditUI *               m_edtBedNo[MYCHART_COUNT];
+	DuiLib::CEditUI *               m_edtName[MYCHART_COUNT];
+	DuiLib::CEditUI *               m_edtSex[MYCHART_COUNT];
+	DuiLib::CEditUI *               m_edtAge[MYCHART_COUNT];
+
+	DuiLib::CButtonUI *             m_btnBedNo[MYCHART_COUNT];
+	DuiLib::CButtonUI *             m_btnName[MYCHART_COUNT];
+	DuiLib::CButtonUI *             m_btnSex[MYCHART_COUNT];
+	DuiLib::CButtonUI *             m_btnAge[MYCHART_COUNT];
 };

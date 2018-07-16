@@ -155,6 +155,7 @@ void  CDuiFrameWnd::OnDbClick() {
 
 void  CDuiFrameWnd::InitWindow() {
 	CDuiString strText;
+	char buf[8192];
 
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
@@ -173,6 +174,77 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 	m_chart_state = CHART_STATE_NORMAL;
 
+	for (int i = 0; i < MYCHART_COUNT; i++) {
+		strText.Format("edtBed_%d", i + 1);
+		m_edtBedNo[i] = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(strText));
+
+		strText.Format("edtName_%d", i + 1);
+		m_edtName[i] = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(strText));
+
+		strText.Format("edtSex_%d", i + 1);
+		m_edtSex[i] = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(strText));
+
+		strText.Format("edtAge_%d", i + 1);
+		m_edtAge[i] = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(strText));
+
+
+		strText.Format("btnBed_%d", i + 1);
+		m_btnBedNo[i] = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(strText));
+
+		strText.Format("btnName_%d", i + 1);
+		m_btnName[i] = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(strText));
+
+		strText.Format("btnSex_%d", i + 1);
+		m_btnSex[i] = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(strText));
+
+		strText.Format("btnAge_%d", i + 1);
+		m_btnAge[i] = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(strText));
+
+
+		if ( m_edtBedNo[i] ) {
+			m_edtBedNo[i]->SetVisible(false);
+		}
+
+		if (m_edtName[i]) {
+			m_edtName[i]->SetVisible(false);
+		}
+
+		if (m_edtSex[i]) {
+			m_edtSex[i]->SetVisible(false);
+		}
+
+		if (m_edtAge[i]) {
+			m_edtAge[i]->SetVisible(false);
+		}
+
+		if (m_btnBedNo[i]) {
+			strText.Format("last bed no %d", i + 1);
+			g_cfg->GetConfig(strText, buf, sizeof(buf), "---");
+			m_btnBedNo[i]->SetText(buf);
+			m_btnBedNo[i]->SetVisible(true);
+		}
+
+		if (m_btnName[i]) {
+			strText.Format("last name %d", i + 1);
+			g_cfg->GetConfig(strText, buf, sizeof(buf), "--");
+			m_btnName[i]->SetText(buf);
+			m_btnName[i]->SetVisible(true);
+		}
+
+		if (m_btnSex[i]) {
+			strText.Format("last sex %d", i + 1);
+			g_cfg->GetConfig(strText, buf, sizeof(buf), "-");
+			m_btnSex[i]->SetText(buf);
+			m_btnSex[i]->SetVisible(true);
+		}
+
+		if (m_btnAge[i]) {
+			strText.Format("last age %d", i + 1);
+			g_cfg->GetConfig(strText, buf, sizeof(buf), "-");
+			m_btnAge[i]->SetText(buf);
+			m_btnAge[i]->SetVisible(true);
+		}
+	}
 
 	
 	WindowImplBase::InitWindow();
@@ -195,6 +267,7 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
 	DuiLib::CDuiString strText;
+	int nIndex = 0;
 
 	if (msg.sType == "click") {
 		if (name == "menubtn") {
@@ -205,12 +278,120 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			pMenu->Init(*this, pt);
 			pMenu->ShowWindow(TRUE);
 		}
+		else if (0 == strncmp(name, "btnBed_", 7)) {
+			sscanf(name.Mid(7), "%d", &nIndex);
+			nIndex--;
+			msg.pSender->SetVisible(false);
+
+			if (m_edtBedNo[nIndex]) {
+				m_edtBedNo[nIndex]->SetText(msg.pSender->GetText());
+				m_edtBedNo[nIndex]->SetVisible(true);
+				m_edtBedNo[nIndex]->SetFocus();
+			}
+		}
+		else if ( 0 == strncmp(name, "btnName_", 8) ) {
+			sscanf( name.Mid(8), "%d", &nIndex );
+			nIndex--;
+			msg.pSender->SetVisible(false);
+
+			if ( m_edtName[nIndex] ) {
+				m_edtName[nIndex]->SetText(msg.pSender->GetText());
+				m_edtName[nIndex]->SetVisible(true);
+				m_edtName[nIndex]->SetFocus();
+			}
+		}
+		else if (0 == strncmp(name, "btnSex_", 7)) {
+			sscanf(name.Mid(7), "%d", &nIndex);
+			nIndex--;
+			msg.pSender->SetVisible(false);
+
+			if (m_edtSex[nIndex]) {
+				m_edtSex[nIndex]->SetText(msg.pSender->GetText());
+				m_edtSex[nIndex]->SetVisible(true);
+				m_edtSex[nIndex]->SetFocus();
+			}
+		}
+		else if (0 == strncmp(name, "btnAge_", 7)) {
+			sscanf(name.Mid(7), "%d", &nIndex);
+			nIndex--;
+			msg.pSender->SetVisible(false);
+
+			if (m_edtAge[nIndex]) {
+				m_edtAge[nIndex]->SetText(msg.pSender->GetText());
+				m_edtAge[nIndex]->SetVisible(true);
+				m_edtAge[nIndex]->SetFocus();
+			}
+		}
 	}	
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
 	}
 	else if (msg.sType == "menu_about") {
 		OnAbout();
+	}
+	else if (msg.sType == "killfocus") {
+		if ( 0 == strncmp(name, "edtBed_", 7) ) {
+			sscanf(name.Mid(7), "%d", &nIndex);
+			nIndex--;
+
+			strText.Format("last bed no %d", nIndex + 1);
+			g_cfg->SetConfig( strText, msg.pSender->GetText());
+			g_cfg->Save();
+
+			msg.pSender->SetVisible(false);
+
+			if (m_btnBedNo[nIndex]) {
+				m_btnBedNo[nIndex]->SetText(msg.pSender->GetText());
+				m_btnBedNo[nIndex]->SetVisible(true);
+			}			
+		}
+		else if (0 == strncmp(name, "edtName_", 8)) {
+			sscanf(name.Mid(8), "%d", &nIndex);
+			nIndex--;
+
+			strText.Format("last name %d", nIndex + 1);
+			g_cfg->SetConfig(strText, msg.pSender->GetText());
+			g_cfg->Save();
+
+			msg.pSender->SetVisible(false);
+
+			if (m_btnName[nIndex]) {
+				m_btnName[nIndex]->SetText(msg.pSender->GetText());
+				m_btnName[nIndex]->SetVisible(true);
+			}
+		}
+		else if (0 == strncmp(name, "edtSex_", 7)) {
+			sscanf(name.Mid(7), "%d", &nIndex);
+			nIndex--;
+
+			strText.Format("last sex %d", nIndex + 1);
+			g_cfg->SetConfig(strText, msg.pSender->GetText());
+			g_cfg->Save();
+
+			msg.pSender->SetVisible(false);
+
+			if (m_btnSex[nIndex]) {
+				m_btnSex[nIndex]->SetText(msg.pSender->GetText());
+				m_btnSex[nIndex]->SetVisible(true);
+			}
+		}
+		else if (0 == strncmp(name, "edtAge_", 7)) {
+			sscanf(name.Mid(7), "%d", &nIndex);
+			nIndex--;
+
+			strText.Format("last age %d", nIndex + 1);
+			g_cfg->SetConfig(strText, msg.pSender->GetText());
+			g_cfg->Save();
+
+			msg.pSender->SetVisible(false);
+
+			if (m_btnAge[nIndex]) {
+				m_btnAge[nIndex]->SetText(msg.pSender->GetText());
+				m_btnAge[nIndex]->SetVisible(true);
+			}
+		}
+
+
 	}
 	WindowImplBase::Notify(msg);
 }
