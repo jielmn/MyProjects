@@ -63,7 +63,16 @@
 			<Control width="10" />
 			
 		</HorizontalLayout>
-
+		
+		<VerticalLayout inset="10,0,10,10" >
+			<HorizontalLayout height="40">
+				<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
+			</HorizontalLayout>
+		
+			<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
+				<MyImage name="image_1" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
+			</VerticalLayout>
+		</VerticalLayout>
 		
 	</VerticalLayout>
 </Window>

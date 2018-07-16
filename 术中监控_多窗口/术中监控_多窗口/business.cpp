@@ -33,6 +33,8 @@ void CBusiness::Clear() {
 }
 
 int CBusiness::Init() {
+	char buf[8192];
+
 	g_log = new FileLog();
 	if (0 == g_log) {
 		return -1;
@@ -69,6 +71,20 @@ int CBusiness::Init() {
 		g_cfg->GetConfig(strText, g_szComPort[i], 32, "");
 	}
 
+	g_cfg->GetConfig("alarm file", buf, sizeof(buf), "");
+	if (buf[0] == '\0') {
+		GetDefaultAlarmFile(g_szAlarmFilePath, sizeof(g_szAlarmFilePath));
+	}
+	else {
+		if (-1 != GetFileAttributes(buf))
+		{
+			strncpy_s(g_szAlarmFilePath, buf, sizeof(g_szAlarmFilePath));
+		}
+		else {
+			GetDefaultAlarmFile(g_szAlarmFilePath, sizeof(g_szAlarmFilePath));
+		}
+	}
+
 	return 0;
 }
 
@@ -81,6 +97,47 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+	return 0;
+}
+
+// 调整滑动条
+int   CBusiness::UpdateScrollAsyn() {
+	//::PostMessage(g_hWnd, UM_UPDATE_SCROLL, 0, 0);
+	return 0;
+}
+
+int   CBusiness::AlarmAsyn(const char * szAlarmFile) {
+	// g_thrd_background->PostMessage(this, MSG_ALARM, new CAlarmParam(szAlarmFile));
+	return 0;
+}
+
+int   CBusiness::Alarm(const CAlarmParam * pParam) {
+	DuiLib::CDuiString strText;
+
+	//if (m_szAlarmFile[0] == '\0') {
+	//	// open
+	//	strText.Format("open %s", pParam->m_szAlarmFile);
+	//	mciSendString(strText, NULL, 0, 0);
+
+	//	// play
+	//	strText.Format("play %s", pParam->m_szAlarmFile);
+	//	mciSendString(strText, NULL, 0, 0);
+	//}
+	//else {
+	//	// stop
+	//	strText.Format("close %s", m_szAlarmFile);
+	//	mciSendString(strText, NULL, 0, 0);
+
+	//	// open
+	//	strText.Format("open %s", pParam->m_szAlarmFile);
+	//	mciSendString(strText, NULL, 0, 0);
+
+	//	// play
+	//	strText.Format("play %s", pParam->m_szAlarmFile);
+	//	mciSendString(strText, NULL, 0, 0);
+
+	//}
+	//strncpy_s(m_szAlarmFile, pParam->m_szAlarmFile, sizeof(m_szAlarmFile));
 	return 0;
 }
 

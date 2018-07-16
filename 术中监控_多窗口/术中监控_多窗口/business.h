@@ -14,6 +14,14 @@ public:
 	int Init();
 	int DeInit();
 
+
+	// 调整滑动条
+	int    UpdateScrollAsyn();
+
+	// 报警
+	int   AlarmAsyn(const char * szAlarmFile);
+	int   Alarm(const CAlarmParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

@@ -11,6 +11,7 @@
 #include "resource.h"
 #include "AboutDlg.h"
 #include "SettingDlg.h"  
+#include "MyImage.h"
 
 class CDuiMenu : public DuiLib::WindowImplBase
 {
@@ -57,6 +58,15 @@ public:
 	}
 };
 
+CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp("MyImage", pstrClass)) {
+		return new CMyImageUI(m_pManager);
+	}
+
+	return NULL;
+}
+
+
 
 void  CDuiFrameWnd::OnSetting() {
 	CDuiString  strText;
@@ -86,7 +96,13 @@ void  CDuiFrameWnd::OnSetting() {
 		}
 		
 		g_cfg->Save();
-		//m_pImageUI->Invalidate_0();
+
+		for (int i = 0; i < MYCHART_COUNT; i++) {
+			if (m_ChartUi[i]) {
+				m_ChartUi[i]->Invalidate_0();
+			}
+		}
+		
 	}
 
 	delete pSettingDlg;
@@ -151,6 +167,10 @@ void  CDuiFrameWnd::OnDbClick() {
 		}
 		pFindControl = pFindControl->GetParent();
 	}
+}
+
+CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
+
 }
 
 void  CDuiFrameWnd::InitWindow() {
@@ -246,6 +266,14 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 	}
 
+	for (int i = 0; i < MYCHART_COUNT; i++) {
+		strText.Format("image_%d", i + 1);
+		m_ChartUi[i] = static_cast<CMyImageUI*>(m_PaintManager.FindControl(strText));
+		if (m_ChartUi[i]) {
+			m_ChartUi[i]->m_nChartIndex = i;
+		}		
+	}
+
 	
 	WindowImplBase::InitWindow();
 }
@@ -257,9 +285,9 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyChart_1") || 0 == strcmp(pstrClass, "MyChart_2") || 0 == strcmp(pstrClass, "MyChart_3") ||
 		0 == strcmp(pstrClass, "MyChart_4") || 0 == strcmp(pstrClass, "MyChart_5") || 0 == strcmp(pstrClass, "MyChart_6")) {
 		strText.Format("%s.xml", pstrClass);
-		CControlUI * pUI = builder.Create((const char *)strText, (UINT)0, 0, &m_PaintManager);
+		CControlUI * pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;      
-	}	 
+	}
 	
 	return WindowImplBase::CreateControl(pstrClass);                                                  
 }

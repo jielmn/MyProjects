@@ -5,10 +5,24 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "MyImage.h"
+
+
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+private:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
 
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
+	CDuiFrameWnd();
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
 	virtual CDuiString GetSkinFile() { return _T("main.xml"); }
 	virtual CDuiString GetSkinFolder() { return _T("res"); }
@@ -28,6 +42,10 @@ private:
 
 	// ²Ëµ¥°´Å¥
 	DuiLib::CButtonUI *             m_btnMenu;
+
+	CDialogBuilderCallbackEx        m_callback;
+
+	CMyImageUI *                    m_ChartUi[MYCHART_COUNT];
 
 private:
 	void   OnDbClick();

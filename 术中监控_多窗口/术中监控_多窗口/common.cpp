@@ -1,4 +1,5 @@
 #include <time.h>
+#include <assert.h>
 #include "common.h"
 
 ILog    * g_log = 0;
@@ -10,6 +11,7 @@ DWORD   g_dwLowTempAlarm[MYCHART_COUNT];
 DWORD   g_dwHighTempAlarm[MYCHART_COUNT];
 DWORD   g_dwMinTemp[MYCHART_COUNT];
 char    g_szComPort[MYCHART_COUNT][32];
+char    g_szAlarmFilePath[MAX_ALARM_FILE_PATH];
 
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
@@ -46,4 +48,17 @@ BOOL GetAllSerialPortName(std::vector<std::string> & vCom) {
 
 	RegCloseKey(hKey);
 	return TRUE;
+}
+
+char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize) {
+	char buf[8192];
+
+	GetModuleFileName(0, buf, sizeof(buf));
+	const char * pStr = strrchr(buf, '\\');
+	assert(pStr);
+	DWORD  dwTemp = pStr - buf;
+	buf[dwTemp] = '\0';
+
+	SNPRINTF(szDefaultFile, dwSize, "%s%s", buf, DEFAULT_ALARM_FILE_PATH);
+	return szDefaultFile;
 }
