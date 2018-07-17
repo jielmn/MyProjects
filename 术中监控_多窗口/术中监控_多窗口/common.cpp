@@ -4,7 +4,14 @@
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
-LmnToolkits::Thread *  g_thrd_db = 0;
+HWND    g_hWnd;
+//LmnToolkits::Thread *  g_thrd_db = 0;
+LmnToolkits::Thread *  g_thrd_reader[MYCHART_COUNT];
+LmnToolkits::Thread *  g_thrd_timer;
+LmnToolkits::Thread *  g_thrd_background;
+
+ReaderCmd  PREPARE_COMMAND;
+ReaderCmd  READ_TAG_DATA_COMMAND;
 
 DWORD   g_dwCollectInterval[MYCHART_COUNT];
 DWORD   g_dwLowTempAlarm[MYCHART_COUNT];
@@ -12,6 +19,8 @@ DWORD   g_dwHighTempAlarm[MYCHART_COUNT];
 DWORD   g_dwMinTemp[MYCHART_COUNT];
 char    g_szComPort[MYCHART_COUNT][32];
 char    g_szAlarmFilePath[MAX_ALARM_FILE_PATH];
+
+DWORD SERIAL_PORT_SLEEP_TIME;
 
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
@@ -61,4 +70,26 @@ char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize) {
 
 	SNPRINTF(szDefaultFile, dwSize, "%s%s", buf, DEFAULT_ALARM_FILE_PATH);
 	return szDefaultFile;
+}
+
+int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd) {
+	if (0 == szCmd) {
+		return -1;
+	}
+
+	SplitString split;
+	split.SplitByBlankChars(szCmd);
+	DWORD dwSize = split.Size();
+	if (dwSize >= sizeof(cmd.abyCommand)) {
+		return -1;
+	}
+
+	for (DWORD i = 0; i < dwSize; i++) {
+		int  tmp = 0;
+		sscanf_s(split[i], "%x", &tmp);
+		cmd.abyCommand[i] = (BYTE)tmp;
+	}
+	cmd.dwCommandLength = dwSize;
+
+	return 0;
 }

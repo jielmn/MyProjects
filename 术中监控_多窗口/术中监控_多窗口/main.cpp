@@ -12,6 +12,7 @@
 #include "AboutDlg.h"
 #include "SettingDlg.h"  
 #include "MyImage.h"
+#include "LmnTelSvr.h"
 
 class CDuiMenu : public DuiLib::WindowImplBase
 {
@@ -169,13 +170,115 @@ void  CDuiFrameWnd::OnDbClick() {
 	}
 }
 
-CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
+void   CDuiFrameWnd::OnReaderStatus(WPARAM wParam, LPARAM lParam) {
+	CTelemedReader::READER_STATUS eStatus = (CTelemedReader::READER_STATUS)wParam;
+	int  nIndex = (int)lParam;
+	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
 
+	if (eStatus == CTelemedReader::STATUS_OPEN)
+	{
+		m_lblReaderStatus[nIndex]->SetText("读卡器连接OK");
+		m_lblReaderComPort[nIndex]->SetText(CBusiness::GetInstance()->GetReaderComPort(nIndex));
+
+		// 获取温度
+		CBusiness::GetInstance()->ReadTagTempAsyn(nIndex);
+	}
+	else
+	{
+		m_lblReaderStatus[nIndex]->SetText("读卡器连接失败");
+		m_lblReaderComPort[nIndex]->SetText("--");
+	}
+}
+
+void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM lParam) {
+	int    ret = (int)wParam;
+	DWORD  dwTemp = lParam & 0xFFFF;
+	int    nIndex = lParam >> 16;
+	
+	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
+
+	//if (0 == ret) {
+	//	OnTemperatureResult( nIndex, 0, dwTemp);
+	//	// 获取温度
+	//	CBusiness::GetInstance()->ReadTagTempAsyn( nIndex, g_dwCollectInterval[nIndex] * 1000 );
+	//	m_nTimeLeft[nIndex] = g_dwCollectInterval[nIndex];
+	//	SetTimer(m_hWnd, TIME_LEFT_TIMER_ID, TIME_LEFT_TIMER_INTEVAL, 0);
+
+	//	ShowTimeLeft();
+	//}
+	//// 获取温度失败
+	//else {
+	//	OnTemperatureResult(nIndex, ret);
+	//	ShowTimeLeftError();
+	//}
+}
+
+void   CDuiFrameWnd::OnTemperatureResult(int nIndex, int nRet, DWORD dwTemp /*= 0*/) {
+	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
+
+	if (0 != nRet) {
+		m_lblTemperature[nIndex]->SetTextColor(0xFF447AA1);
+		m_lblTemperature[nIndex]->SetText("--");
+		return;
+	}
+
+	m_ChartUi[nIndex]->AddTemp(dwTemp);
+
+	if (dwTemp < g_dwLowTempAlarm[nIndex]) {
+		m_lblTemperature[nIndex]->SetTextColor(m_dwLowTempColor);
+	}
+	else if (dwTemp > g_dwHighTempAlarm[nIndex]) {
+		m_lblTemperature[nIndex]->SetTextColor(m_dwHighTempColor);
+	}
+	else {
+		m_lblTemperature[nIndex]->SetTextColor(m_dwNormalColor);
+	}
+
+	DuiLib::CDuiString  strTemp;
+	strTemp.Format("%.2f", (dwTemp / 100.0));
+	m_lblTemperature[nIndex]->SetText(strTemp);
+
+	if ((int)dwTemp > m_nHighestTemp[nIndex]) {
+		m_nHighestTemp[nIndex] = dwTemp;
+
+		strTemp.Format("%.2f", (dwTemp / 100.0));
+		m_lblHighTemperature[nIndex]->SetText(strTemp);
+	}
+
+	if ((int)dwTemp < m_nLowestTemp[nIndex]) {
+		m_nLowestTemp[nIndex] = dwTemp;
+
+		strTemp.Format("%.2f", (dwTemp / 100.0));
+		m_lblLowTemperature[nIndex]->SetText(strTemp);
+	}
+}
+
+
+
+
+CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
+	char buf[8192];
+	g_cfg->GetConfig("low temperature color", buf, sizeof(buf), COLOR_LOW_TEMPERATURE);
+	sscanf(buf, "0x%x", &m_dwLowTempColor);
+
+	g_cfg->GetConfig("normal temperature color", buf, sizeof(buf), COLOR_NORMAL_TEMPERATURE);
+	sscanf(buf, "0x%x", &m_dwNormalColor);
+
+	g_cfg->GetConfig("high temperature color", buf, sizeof(buf), COLOR_HIGH_TEMPERATURE);
+	sscanf(buf, "0x%x", &m_dwHighTempColor);
+
+	for (int i = 0; i < MYCHART_COUNT; i++) {
+		m_nLowestTemp[i] = 10000;
+		m_nHighestTemp[i] = 0;
+		m_nTimeLeft[i] = 0;
+	}	
 }
 
 void  CDuiFrameWnd::InitWindow() {
 	CDuiString strText;
 	char buf[8192];
+
+	g_hWnd = GetHWND();
 
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
@@ -192,7 +295,31 @@ void  CDuiFrameWnd::InitWindow() {
 		strText.Format("mychart_%d", i+1);
 		m_chart[i] = m_PaintManager.FindControl(strText);
 	}
-	m_chart_state = CHART_STATE_NORMAL;
+	m_chart_state = CHART_STATE_NORMAL; 
+
+	for (int i = 0; i < MYCHART_COUNT; i++) {
+		strText.Format("lblComStatus_%d", i + 1);
+		m_lblReaderStatus[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
+		m_lblReaderStatus[i]->SetText("读卡器连接失败");
+
+		strText.Format("lblCom_%d", i + 1);
+		m_lblReaderComPort[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
+		m_lblReaderComPort[i]->SetText("--");
+	}
+
+	for (int i = 0; i < MYCHART_COUNT; i++) {
+		strText.Format("lblCur_%d", i + 1);
+		m_lblTemperature[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
+		m_lblTemperature[i]->SetText("--");
+
+		strText.Format("lblMax_%d", i + 1);
+		m_lblHighTemperature[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
+		m_lblHighTemperature[i]->SetText("--");
+
+		strText.Format("lblMin_%d", i + 1);
+		m_lblLowTemperature[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
+		m_lblLowTemperature[i]->SetText("--");
+	}
 
 	for (int i = 0; i < MYCHART_COUNT; i++) {
 		strText.Format("edtBed_%d", i + 1);
@@ -427,6 +554,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_LBUTTONDBLCLK) {
 		OnDbClick();
+	}	
+	else if (uMsg == UM_SHOW_READER_STATUS) {
+		OnReaderStatus(wParam, lParam);		
+	}
+	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
+		OnReaderTemp(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -443,9 +576,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	HANDLE handle = ::CreateMutex(NULL, FALSE, "surgery_surveil_1");//handle为声明的HANDLE类型的全局变量 
+	if ( GetLastError() == ERROR_ALREADY_EXISTS ) {
+		HWND hWnd = ::FindWindow("DUIMainFrame_surgery", 0);
+		::ShowWindow(hWnd, SW_SHOWMAXIMIZED);
+		::InvalidateRect(hWnd, 0, TRUE);
+		return 0;
+	}
+
+	GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR pGdiToken;
+	GdiplusStartup(&pGdiToken, &gdiplusStartupInput, NULL);//初始化GDI+
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_log->Output(ILog::LOG_SEVERITY_INFO, "begin.\n");
+
+	DWORD  dwPort = 0;
+	g_cfg->GetConfig("telnet port", dwPort, 1135);
+	JTelSvrStart((unsigned short)dwPort);
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
@@ -466,6 +615,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance(); 
+
+	GdiplusShutdown(pGdiToken);//关闭GDI+
+	JTelSvrStop();
 
 	return 0;
 }

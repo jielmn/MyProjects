@@ -12,7 +12,7 @@
 	
 	<VerticalLayout>
 	
-	<VerticalLayout bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" borderround="5,5" inset="10,0,10,0" > <!-- 整个窗口的背景色 -->
+	<VerticalLayout bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" borderround="5,5" inset="10,1,10,1" > <!-- 整个窗口的背景色 -->
 	
 		<!-- 标题栏区 -->
 		<HorizontalLayout height="32" bkcolor="#00000000" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
@@ -34,15 +34,15 @@
 		<!-- 客户区 -->
 		<VerticalLayout bkcolor="#FF192431" inset="0,0,0,0" name="layMain" >
 			<HorizontalLayout name="lay_1" >
-				<MyChart_1 bordercolor="#FFFFFFFF" bordersize="1" visible="true" name="mychart_1" />				
-				<MyChart_2 bordercolor="#FFFFFFFF" bordersize="1" visible="true" name="mychart_2" />
-				<MyChart_3 bordercolor="#FFFFFFFF" bordersize="1" visible="true" name="mychart_3" />
+				<MyChart_1 bordercolor="#FFD1E8F5" bordersize="1" visible="true" name="mychart_1" />				
+				<MyChart_2 bordercolor="#FFD1E8F5" bordersize="1" visible="true" name="mychart_2" />
+				<MyChart_3 bordercolor="#FFD1E8F5" bordersize="1" visible="true" name="mychart_3" />
 			</HorizontalLayout>
 		
 			<HorizontalLayout visible="true" name="lay_2" >
-				<MyChart_4 bordercolor="#FFFFFFFF" bordersize="1" visible="true" name="mychart_4" />				
-				<MyChart_5 bordercolor="#FFFFFFFF" bordersize="1" visible="true" name="mychart_5" />
-				<MyChart_6 bordercolor="#FFFFFFFF" bordersize="1" visible="true" name="mychart_6" />
+				<MyChart_4 bordercolor="#FFD1E8F5" bordersize="1" visible="true" name="mychart_4" />				
+				<MyChart_5 bordercolor="#FFD1E8F5" bordersize="1" visible="true" name="mychart_5" />
+				<MyChart_6 bordercolor="#FFD1E8F5" bordersize="1" visible="true" name="mychart_6" />
 			</HorizontalLayout>
 		
 		</VerticalLayout>

@@ -36,6 +36,9 @@
     <ClCompile Include="MyImage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TelemedReader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MyImage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TelemedReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
