@@ -125,6 +125,14 @@ void  CDuiFrameWnd::OnAbout() {
 	delete pAboutDlg;
 }
 
+CControlUI* CALLBACK MY_FINDCONTROLPROC (CControlUI* pThis, LPVOID lpData) {
+	const char * szName = (const char *)lpData;
+	if ( 0 == strcmp(pThis->GetName(), szName) ) {
+		return pThis;
+	}
+	return 0;
+}
+
 void  CDuiFrameWnd::OnDbClick() {
 	POINT point;
 	CDuiString strName;
@@ -156,6 +164,11 @@ void  CDuiFrameWnd::OnDbClick() {
 					}
 				}       
 				m_chart_state = CHART_STATE_EXPAND;
+
+				CControlUI * pFlex = m_chart[nIndex]->FindControl( MY_FINDCONTROLPROC, "layFlex", 0);
+				if ( pFlex) {  
+					pFlex->SetAttribute("height", "150");
+				}
 			}
 			else {
 				for (int i = 0; i < LAY_LAYER_COUNT; i++) {
@@ -165,6 +178,11 @@ void  CDuiFrameWnd::OnDbClick() {
 					m_chart[i]->SetVisible(true);
 				}
 				m_chart_state = CHART_STATE_NORMAL;
+
+				CControlUI * pFlex = m_chart[nIndex]->FindControl(MY_FINDCONTROLPROC, "layFlex", 0);
+				if (pFlex) {
+					pFlex->SetAttribute("height", "72");
+				}
 			}
 		}
 		pFindControl = pFindControl->GetParent();
@@ -295,7 +313,7 @@ void   CDuiFrameWnd::OnUpdateScroll(WPARAM wParam, LPARAM lParam) {
 	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_ChartUi[nIndex]->GetParent();
 	SIZE tParentScrollPos = pParent->GetScrollPos();
 	SIZE tParentScrollRange = pParent->GetScrollRange();
-	pParent->SetScrollPos(tParentScrollRange); 
+	pParent->SetScrollPos(tParentScrollRange);    
 }
 
 
