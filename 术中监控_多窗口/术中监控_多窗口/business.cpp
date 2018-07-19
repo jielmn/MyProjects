@@ -125,8 +125,8 @@ int CBusiness::DeInit() {
 }
 
 // 调整滑动条
-int   CBusiness::UpdateScrollAsyn() {
-	//::PostMessage(g_hWnd, UM_UPDATE_SCROLL, 0, 0);
+int   CBusiness::UpdateScrollAsyn(int nIndex) {
+	::PostMessage(g_hWnd, UM_UPDATE_SCROLL, nIndex, 0);
 	return 0;
 }
 

@@ -99,7 +99,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStop
 		if (m_bSetParentScrollPos)
 		{
 			//pParent->SetScrollPos(tParentScrollRange);
-			CBusiness::GetInstance()->UpdateScrollAsyn();
+			CBusiness::GetInstance()->UpdateScrollAsyn(m_nChartIndex);
 			m_bSetParentScrollPos = FALSE;
 		}
 	}

@@ -17,7 +17,7 @@ public:
 
 
 	// 调整滑动条
-	int    UpdateScrollAsyn();
+	int    UpdateScrollAsyn(int nIndex);
 
 	// 报警
 	int   AlarmAsyn(const char * szAlarmFile);

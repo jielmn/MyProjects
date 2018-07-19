@@ -24,7 +24,13 @@ class CDuiFrameWnd : public WindowImplBase
 public:
 	CDuiFrameWnd();
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame_surgery"); }
-	virtual CDuiString GetSkinFile() { return _T("main.xml"); }
+	virtual CDuiString GetSkinFile() { 
+#if MAIN_FRAME_TYPE == 0
+		return _T("main.xml");
+#else
+		return _T("main_1.xml");
+#endif
+	}
 	virtual CDuiString GetSkinFolder() { return _T("res"); }
 
 	virtual void    Notify(TNotifyUI& msg);
@@ -57,7 +63,11 @@ private:
 	void   OnReaderTemp(WPARAM wParam, LPARAM lParam);
 	void   OnTemperatureResult(int nIndex, int nRet, DWORD dwTemp = 0);
 
+	void   ShowTimeLeft(int nIndex);
+	void   ShowTimeLeftError(int nIndex);
 
+	void   OnTimer(WPARAM wParam, LPARAM lParam);
+	void   OnUpdateScroll(WPARAM wParam, LPARAM lParam);
 private:
 	DuiLib::CEditUI *               m_edtBedNo[MYCHART_COUNT];
 	DuiLib::CEditUI *               m_edtName[MYCHART_COUNT];
@@ -79,8 +89,10 @@ private:
 
 	int                             m_nLowestTemp[MYCHART_COUNT];
 	int                             m_nHighestTemp[MYCHART_COUNT];
-	int                             m_nTimeLeft[MYCHART_COUNT];
+	int                             m_nTimeNextMesure[MYCHART_COUNT];
+	time_t                          m_tTimeNextMesure[MYCHART_COUNT];
 
 	DuiLib::CLabelUI *              m_lblLowTemperature[MYCHART_COUNT];
 	DuiLib::CLabelUI *              m_lblHighTemperature[MYCHART_COUNT];
+	DuiLib::CLabelUI *              m_lblTimeLeft[MYCHART_COUNT];
 };

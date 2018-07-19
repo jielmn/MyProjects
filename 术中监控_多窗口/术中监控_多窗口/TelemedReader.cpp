@@ -35,12 +35,31 @@ int  CTelemedReader::Reconnect() {
 	JTelSvrPrint("g_szComPort[%d] = %s", m_nIndex, g_szComPort[m_nIndex] );
 
 	std::vector<std::string>  vCom;
+	std::vector<std::string>::iterator it;
+
 	if (szPort[0] != '\0') {
 		vCom.push_back(szPort);
 	}
 	else {
 		// 获取所有的串口信息
 		GetAllSerialPortName(vCom);
+
+		// 排除掉其他指定的com口
+		for (int i = 0; i < MYCHART_COUNT; i++) {
+			if ( i != m_nIndex ) {
+				if ( g_szComPort[i][0] != '\0' ) {
+
+					for (it = vCom.begin(); it != vCom.end(); it++) {
+						const std::string & sItem = *it;
+						if (0 == StrICmp(sItem.c_str(), g_szComPort[i])) {
+							vCom.erase(it);
+							break;
+						}
+					}
+
+				}
+			}
+		}
 	}
 
 	// 先关闭之前可能打开的串口
@@ -51,10 +70,9 @@ int  CTelemedReader::Reconnect() {
 	do
 	{
 		JTelSvrPrint("\ncom ports count = %lu", vCom.size());
-
-		std::vector<std::string>::iterator it;
+		
 		for (it = vCom.begin(); it != vCom.end(); it++) {
-			std::string  sItem = *it;
+			const std::string  & sItem = *it;
 
 			JTelSvrPrint("try port %s ", sItem.c_str());
 

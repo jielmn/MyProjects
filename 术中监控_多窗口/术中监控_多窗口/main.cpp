@@ -13,6 +13,7 @@
 #include "SettingDlg.h"  
 #include "MyImage.h"
 #include "LmnTelSvr.h"
+#include <time.h>
 
 class CDuiMenu : public DuiLib::WindowImplBase
 {
@@ -197,27 +198,53 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM lParam) {
 	
 	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
 
-	//if (0 == ret) {
-	//	OnTemperatureResult( nIndex, 0, dwTemp);
-	//	// 获取温度
-	//	CBusiness::GetInstance()->ReadTagTempAsyn( nIndex, g_dwCollectInterval[nIndex] * 1000 );
-	//	m_nTimeLeft[nIndex] = g_dwCollectInterval[nIndex];
-	//	SetTimer(m_hWnd, TIME_LEFT_TIMER_ID, TIME_LEFT_TIMER_INTEVAL, 0);
+	if (0 == ret) {
+		OnTemperatureResult( nIndex, 0, dwTemp);
+		// 获取温度
+		CBusiness::GetInstance()->ReadTagTempAsyn( nIndex, g_dwCollectInterval[nIndex] * 1000 );
+		m_nTimeNextMesure[nIndex] = g_dwCollectInterval[nIndex];
+		m_tTimeNextMesure[nIndex] = time(0);
+		ShowTimeLeft(nIndex);
+	}
+	// 获取温度失败
+	else {
+		OnTemperatureResult(nIndex, ret);
+		m_nTimeNextMesure[nIndex] = -1;
+		ShowTimeLeftError(nIndex);
+	}
+}
 
-	//	ShowTimeLeft();
-	//}
-	//// 获取温度失败
-	//else {
-	//	OnTemperatureResult(nIndex, ret);
-	//	ShowTimeLeftError();
-	//}
+void   CDuiFrameWnd::ShowTimeLeft(int nIndex) {
+	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
+
+	if (m_nTimeNextMesure[nIndex] > 0) {
+		CDuiString  strTimeLeft;
+		time_t  now = time(0);
+		int nElapsed = int(now - m_tTimeNextMesure[nIndex]);
+		int nLeft = m_nTimeNextMesure[nIndex] - nElapsed;
+		if (nLeft < 0) {
+			nLeft = 0;
+		}
+
+		strTimeLeft.Format("%ld", nLeft);
+		m_lblTimeLeft[nIndex]->SetText(strTimeLeft);
+	}
+	else {
+		ShowTimeLeftError(nIndex);
+	}
+	
+}
+
+void   CDuiFrameWnd::ShowTimeLeftError(int nIndex) {
+	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
+	m_lblTimeLeft[nIndex]->SetText("--");
 }
 
 void   CDuiFrameWnd::OnTemperatureResult(int nIndex, int nRet, DWORD dwTemp /*= 0*/) {
 	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
 
 	if (0 != nRet) {
-		m_lblTemperature[nIndex]->SetTextColor(0xFF447AA1);
+		m_lblTemperature[nIndex]->SetTextColor(0xFFFFFFFF);
 		m_lblTemperature[nIndex]->SetText("--");
 		return;
 	}
@@ -253,6 +280,24 @@ void   CDuiFrameWnd::OnTemperatureResult(int nIndex, int nRet, DWORD dwTemp /*= 
 	}
 }
 
+void   CDuiFrameWnd::OnTimer(WPARAM wParam, LPARAM lParam) {
+	if (TIME_LEFT_TIMER_ID == wParam) {
+		for (int i = 0; i < MYCHART_COUNT; i++) {
+			ShowTimeLeft(i);        
+		}
+	}
+}
+
+void   CDuiFrameWnd::OnUpdateScroll(WPARAM wParam, LPARAM lParam) {
+	int nIndex = (int)wParam;
+	assert(nIndex >= 0 && nIndex < MYCHART_COUNT);
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_ChartUi[nIndex]->GetParent();
+	SIZE tParentScrollPos = pParent->GetScrollPos();
+	SIZE tParentScrollRange = pParent->GetScrollRange();
+	pParent->SetScrollPos(tParentScrollRange); 
+}
+
 
 
 
@@ -270,7 +315,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	for (int i = 0; i < MYCHART_COUNT; i++) {
 		m_nLowestTemp[i] = 10000;
 		m_nHighestTemp[i] = 0;
-		m_nTimeLeft[i] = 0;
+		m_nTimeNextMesure[i] = -1;
+		m_tTimeNextMesure[i] = 0;
 	}	
 }
 
@@ -319,6 +365,10 @@ void  CDuiFrameWnd::InitWindow() {
 		strText.Format("lblMin_%d", i + 1);
 		m_lblLowTemperature[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
 		m_lblLowTemperature[i]->SetText("--");
+
+		strText.Format("lblNextMeasure_%d", i + 1);
+		m_lblTimeLeft[i] = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(strText));
+		m_lblTimeLeft[i]->SetText("--");			
 	}
 
 	for (int i = 0; i < MYCHART_COUNT; i++) {
@@ -401,7 +451,7 @@ void  CDuiFrameWnd::InitWindow() {
 		}		
 	}
 
-	
+	SetTimer(m_hWnd, TIME_LEFT_TIMER_ID, TIME_LEFT_TIMER_INTEVAL, 0);
 	WindowImplBase::InitWindow();
 }
 
@@ -560,6 +610,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
 		OnReaderTemp(wParam, lParam);
+	}
+	else if (uMsg == WM_TIMER) {
+		OnTimer(wParam, lParam);
+	}
+	else if (uMsg == UM_UPDATE_SCROLL) {
+		OnUpdateScroll(wParam, lParam);		
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }

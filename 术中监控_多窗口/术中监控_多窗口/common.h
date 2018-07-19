@@ -12,8 +12,19 @@
 #define   LOG_FILE_NAME           "surgery_temp.log"
 #define   CONFIG_FILE_NAME        "surgery_temp.cfg"
 
+//#define  MAIN_FRAME_TYPE   0       // 3 * 2格式
+#define  MAIN_FRAME_TYPE   1       // 2 * 2格式
+
+#if MAIN_FRAME_TYPE == 0
 #define   LAY_LAYER_COUNT        2
 #define   MYCHART_PER_LAYER      3
+#else
+#define   LAY_LAYER_COUNT        2
+#define   MYCHART_PER_LAYER      2
+#endif
+
+
+
 #define   MYCHART_COUNT          (LAY_LAYER_COUNT*MYCHART_PER_LAYER)
 
 #define   CHART_STATE_NORMAL     0
@@ -52,6 +63,9 @@
 
 // 张维国的新的读卡器
 #define TELEMED_READER_TYPE_1  
+
+#define TIME_LEFT_TIMER_ID           2
+#define TIME_LEFT_TIMER_INTEVAL      1000
 
 
 #define  MAX_READER_COMMAND_LENGTH              256
