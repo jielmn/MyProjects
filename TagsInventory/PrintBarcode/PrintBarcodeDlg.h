@@ -19,7 +19,13 @@ class CDuiFrameWnd : public WindowImplBase
 {
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
-	virtual CDuiString GetSkinFile() { return _T("PrintBarcode.xml"); }
+	virtual CDuiString GetSkinFile() { 
+#if BAR_CODE == 1 || BAR_CODE == 0
+		return _T("PrintBarcode.xml");
+#else
+		return _T("PrintBarcode_1.xml");
+#endif
+	}
 	virtual CDuiString GetSkinFolder() { return _T(""); }
 
 #if 1
@@ -73,19 +79,48 @@ public:
 			DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
 			_T("ºÚÌå")
 		);
+
+		g_cfg->GetConfig("big inv font size", dwFontSize, 80);
+		m_font1 = CreateFont(
+			(int)dwFontSize,               // nHeight
+			0,                             // nWidth
+			0,                             // nEscapement
+			0,                             // nOrientation
+			FW_NORMAL,                       // nWeight
+			FALSE,                         // bItalic
+			FALSE,                         // bUnderline
+			0,                             // cStrikeOut
+			ANSI_CHARSET,                  // nCharSet
+			OUT_DEFAULT_PRECIS,            // nOutPrecision
+			CLIP_DEFAULT_PRECIS,           // nClipPrecision
+			DEFAULT_QUALITY,               // nQuality
+			DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
+			_T("ËÎÌå")
+		);
+
+		char buf[8192];
+		DuiLib::CDateTimeUI * dateValid = (DuiLib::CDateTimeUI *)m_PaintManager.FindControl(_T("date_2"));
+
+		SYSTEMTIME t = dateValid->GetTime();
+		t.wYear += 3;
+		dateValid->SetTime(&t);
+		SNPRINTF(buf, sizeof(buf), "%04d-%02d-%02d", t.wYear, t.wMonth, t.wDay);
+		dateValid->SetText(buf);
 	}
 
 	virtual void    Notify(TNotifyUI& msg);
 
 	void DrawQrImg(CDC * pDc, int nWidth, int nHeight, int nBold);
 	void PrintInventorySmall();
+	void PrintInventoryBig();
 	void Print2DCode();
 
 protected:
 	QRcode * m_qrcode;                                           // ¶þÎ¬Âë
 	CBrush   m_brush;
 
-	HFONT                    m_font;
+	HFONT                    m_font;	
+	HFONT                    m_font1;
 };
 
 

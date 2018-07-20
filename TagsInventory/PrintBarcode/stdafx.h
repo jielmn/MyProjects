@@ -51,5 +51,11 @@
 #endif
 #endif
 
+// 0 二维码
+// 1 条码 - 小包装
+// 2 条码 - 大包装
+#define  BAR_CODE    2
 
-#define  BAR_CODE    1
+#define FACTORY_CODE                "factory code"
+#define  PRODUCT_CODE               "product code"
+#define  GET_CONTROL_TEXT(ctrl)           ( (ctrl == 0) ? "" : ctrl->GetText() )
