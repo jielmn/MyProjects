@@ -22,6 +22,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	WindowImplBase::Notify(msg);
 }
 
+LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
+}
+
 
 
 
@@ -36,7 +40,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "begin.\n");
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
@@ -52,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	duiFrame->ShowModal();
 	delete duiFrame;
 
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "close.\n");
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "main close.\n");
 
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();

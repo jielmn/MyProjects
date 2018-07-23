@@ -11,13 +11,16 @@
 
 #define   LOG_FILE_NAME           "blank.log"
 #define   CONFIG_FILE_NAME        "blank.cfg"
+#define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
+#define   SKIN_FILE               "mainframe_blank.xml"
+#define   SKIN_FOLDER             "res"
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
 extern LmnToolkits::Thread *  g_thrd_db;
 
 
-extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
+//extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>
