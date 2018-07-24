@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout >
+		
+		<HorizontalLayout height="72" name="layFlex" >
+			<VerticalLayout>
+				<HorizontalLayout inset="5,2,5,2"  >
+					<Label   text="1"    textcolor="#FFFFFFFF" width="40" font="3" />
+					<Control width="60" />
+					
+					<Label   text="串口"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Label   name="lblCom_1"  text="--"    textcolor="#FFFFFFFF" font="1" visible="true" />
+					<Control width="10" />
+					
+					<Label   text="状态"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Control width="10" />
+					<Label   name="lblComStatus_1"  text="--"    textcolor="#FFFFFFFF" font="1" visible="true" />
+					
+				</HorizontalLayout>
+			
+				<HorizontalLayout inset="5,2,5,2"  >
+					<Label   text="床号"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Control width="10" />
+					<Edit    name="edtBed_1"  text="--"    textcolor="#FF000000" font="1" visible="false" />
+					<Button  name="btnBed_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" font="1" />
+					<Control width="10" />
+					
+					<Label   text="姓名"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Control width="10" />
+					<Edit    name="edtName_1" text="--"    textcolor="#FF000000" font="1" visible="false" />
+					<Button  name="btnName_1" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" font="1" />
+					<Control width="10" />
+					
+					<Label   text="性别"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Control width="10" />
+					<Edit    name="edtSex_1"  text="-"    textcolor="#FF000000"  font="1" visible="false" />
+					<Button  name="btnSex_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="-" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" font="1" />
+					<Control width="10" />
+					
+					<Label   text="年龄"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Control width="10" />
+					<Edit    name="edtAge_1"  text="--"    textcolor="#FF000000"  font="1" visible="false" />
+					<Button  name="btnAge_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'"  font="1" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,2,5,2"  >
+					<Label   text="当前温度"    textcolor="#FFFFFFFF" width="80" font="1" />
+					<Control width="10" />
+					<Label   name="lblCur_1"  text="--"    textcolor="#FFFFFFFF" font="1" visible="true" />
+					<Control width="10" />
+					
+					<Label   text="最高温度"    textcolor="#FFFFFFFF" width="80" font="1" />
+					<Control width="10" />
+					<Label   name="lblMax_1" text="--"    textcolor="#FFFFFFFF" font="1" visible="true" />
+					<Control width="10" />
+					
+					<Label   text="最低温度"    textcolor="#FFFFFFFF" width="80" font="1" />
+					<Control width="10" />
+					<Label   name="lblMin_1"  text="-"    textcolor="#FFFFFFFF"  font="1" visible="true" />
+					<Control width="10" />
+					
+					<Label   text="距离下一次测量"    textcolor="#FFFFFFFF" width="120" font="1" />
+					<Control width="10" />
+					<Label   name="lblNextMeasure_1"  text="-"    textcolor="#FFFFFFFF"  font="1" visible="true" />
+					<Control width="10" />
+					
+				</HorizontalLayout>
+			</VerticalLayout>
+		</HorizontalLayout>
+		
+		<VerticalLayout inset="10,0,10,10" >
+			<!--
+			<HorizontalLayout height="24">
+				<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
+			</HorizontalLayout>
+			-->
+		
+			<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
+				<MyImage name="image_1" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
+			</VerticalLayout>
+		</VerticalLayout>
+		
+	</VerticalLayout>
+</Window>
