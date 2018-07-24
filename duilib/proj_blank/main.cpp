@@ -10,6 +10,14 @@
 #include "business.h"
 #include "resource.h"
 
+CDuiFrameWnd::CDuiFrameWnd() {
+
+}
+
+CDuiFrameWnd::~CDuiFrameWnd() {
+
+}
+
 void  CDuiFrameWnd::InitWindow() {
 	WindowImplBase::InitWindow();
 }

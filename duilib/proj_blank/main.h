@@ -8,6 +8,9 @@ using namespace DuiLib;
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
+	CDuiFrameWnd();
+	~CDuiFrameWnd();
+
 	virtual LPCTSTR    GetWindowClassName() const { return _T(MAIN_CLASS_WINDOW_NAME); }
 	virtual CDuiString GetSkinFile() { return _T(SKIN_FILE); }
 	virtual CDuiString GetSkinFolder() { return _T(SKIN_FOLDER); }
