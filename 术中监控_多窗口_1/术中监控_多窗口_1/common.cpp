@@ -1,5 +1,6 @@
 #include <time.h>
 #include "common.h"
+#include "MyImage.h"
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
@@ -12,6 +13,8 @@ DWORD     g_dwMyImageLeftBlank = 0;
 DWORD     g_dwMyImageRightBlank = 0;
 DWORD     g_dwMyImageTimeTextOffsetX = 0;
 DWORD     g_dwMyImageTimeTextOffsetY = 0;
+DWORD     g_dwMyImageTempTextOffsetX = 0;
+DWORD     g_dwMyImageTempTextOffsetY = 0;
 DWORD     g_dwCollectInterval[MAX_GRID_COUNT];
 DWORD     g_dwMyImageMinTemp[MAX_GRID_COUNT];
 DWORD     g_dwLowTempAlarm[MAX_GRID_COUNT];
@@ -47,4 +50,42 @@ char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize) {
 
 	SNPRINTF(szDefaultFile, dwSize, "%s%s", buf, DEFAULT_ALARM_FILE_PATH);
 	return szDefaultFile;
+}
+
+LRESULT CDuiMenu::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	Close();
+	bHandled = FALSE;
+	return 0;
+}
+
+void CDuiMenu::Init(HWND hWndParent, POINT ptPos)
+{
+	Create(hWndParent, _T("MenuWnd"), UI_WNDSTYLE_FRAME, WS_EX_WINDOWEDGE);
+	::ClientToScreen(hWndParent, &ptPos);
+	::SetWindowPos(*this, NULL, ptPos.x, ptPos.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+}
+
+void  CDuiMenu::Notify(DuiLib::TNotifyUI& msg) {
+	if (msg.sType == "itemclick") {
+		if (m_pOwner) {
+			m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), 0, 0, true);
+			PostMessage(WM_CLOSE);
+		}
+		return;
+	}
+	WindowImplBase::Notify(msg);
+}
+
+LRESULT CDuiMenu::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return __super::HandleMessage(uMsg, wParam, lParam);
+}
+
+
+CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, MYIMAGE_CLASS_NAME)) {
+		return new CMyImageUI(m_pManager);
+	}
+	return NULL;
 }

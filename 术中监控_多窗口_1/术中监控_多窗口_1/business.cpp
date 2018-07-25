@@ -55,10 +55,11 @@ int CBusiness::Init() {
 	g_cfg->GetConfig(CFG_MYIMAGE_RIGHT_BLANK, g_dwMyImageRightBlank, DEFALUT_MYIMAGE_RIGHT_BLANK);
 	g_cfg->GetConfig(CFG_MYIMAGE_TIME_TEXT_OFFSET_X, g_dwMyImageTimeTextOffsetX, DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_X);
 	g_cfg->GetConfig(CFG_MYIMAGE_TIME_TEXT_OFFSET_Y, g_dwMyImageTimeTextOffsetY, DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_Y);
-
+	g_cfg->GetConfig(CFG_MYIMAGE_TEMP_TEXT_OFFSET_X, g_dwMyImageTempTextOffsetX, DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_X);
+	g_cfg->GetConfig(CFG_MYIMAGE_TEMP_TEXT_OFFSET_Y, g_dwMyImageTempTextOffsetY, DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y);
 
 	DuiLib::CDuiString  strText;
-	for (int i = 0; i < MAX_ALARM_PATH_LENGTH; i++) {
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		strText.Format(CFG_LOW_ALARM " %d", i + 1);
 		g_cfg->GetConfig(strText, g_dwLowTempAlarm[i], DEFAULT_LOW_ALARM);
 

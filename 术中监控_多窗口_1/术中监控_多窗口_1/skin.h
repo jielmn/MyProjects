@@ -9,13 +9,13 @@ public:
 	void   SetSkin(DWORD dwSkinIndex);
 	DWORD  GetSkin() const;
 	DWORD  operator [] (DWORD dwPartIndex) const;
-	HPEN   GetPen(DWORD dwPenIndex) const;
-	const Pen &  GetPenEx(DWORD dwPenIndex) const;
-	const SolidBrush &  GetBrushEx(DWORD dwBrushIndex) const;
+	HGDIOBJ  GetGdiObject(DWORD dwIndex) const;
 
 private:
 	DWORD        m_dwSkinIndex;
 	HPEN         m_hCommonThreadPen;
-	Pen          m_temperature_pen;
-	SolidBrush   m_temperature_brush;
+	HBRUSH       m_hCommonBrush;
+	HPEN         m_hBrighterThreadPen;
+	HPEN         m_hLowTempAlarmPen;
+	HPEN         m_hHighTempAlarmPen;
 };

@@ -23,6 +23,9 @@ private:
 	BOOL                         m_bSetParentScrollPos;
 	int                          m_nIndex;     // 序列号
 
+	Pen                          m_temperature_pen;
+	SolidBrush                   m_temperature_brush;
+
 private:
 	int    CalcMinWidth();   // 计算图像需要的宽度
 	void   DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);

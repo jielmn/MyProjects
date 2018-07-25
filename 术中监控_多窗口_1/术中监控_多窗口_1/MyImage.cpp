@@ -2,11 +2,17 @@
 #include "MyImage.h"
 #include "business.h"
 
-CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) {
+CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : 
+	m_temperature_pen (Gdiplus::Color(0, 255, 0), 1.0), 
+	m_temperature_brush(Gdiplus::Color(0, 255, 0)) 
+{
 	m_pManager = pManager;
-	m_nState = MYIMAGE_STATE_GRID;
+	m_nState = STATE_GRIDS;
 	m_bSetParentScrollPos = FALSE;
 	m_nIndex = -1;
+
+	m_temperature_pen.SetColor( Gdiplus::Color( g_skin[MYIMAGE_TEMP_THREAD_COLOR_INDEX] ) );
+	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -22,7 +28,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	SIZE tParentScrollRange = pParent->GetScrollRange();
 
 	// 只有最大化状态下才调整scroll
-	if ( m_nState == MYIMAGE_STATE_MAXIUM ) {
+	if ( m_nState == STATE_MAXIUM) {
 		if (tParentScrollPos.cx != tParentScrollRange.cx) {
 			if (m_bSetParentScrollPos)
 			{
@@ -39,6 +45,17 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int  width  = pParent->GetWidth();
 	int  height = pParent->GetHeight();
 	DuiLib::CDuiString strText;
+
+	int nRadius = RADIUS_SIZE_IN_MAXIUM;
+	// 如果是多格子模式，模拟父窗口的滚动条已打开
+	if ( m_nState == STATE_GRIDS) {
+		int nMinWidth = GetMinWidth();
+		if (nMinWidth > width) {
+			tParentScrollPos.cx = nMinWidth - width;
+			rect.left -= tParentScrollPos.cx;
+		}
+		nRadius = RADIUS_SIZE_IN_GRID;
+	}
 
 
 	/* 开始作图 */
@@ -57,7 +74,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int middle = height / 2;
 
 	::SetTextColor(hDC, DWORD2RGB(g_skin[COMMON_TEXT_COLOR_INDEX]));
-	::SelectObject(hDC, g_skin.GetPen(COMMON_THREAD_INDEX));
+	::SelectObject(hDC, g_skin.GetGdiObject(COMMON_PEN_INDEX));
 
 	RECT rectLeft;
 	rectLeft.left   = rect.left + tParentScrollPos.cx;
@@ -69,13 +86,22 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int nFistTemperature = MAX_TEMPERATURE;
 
 	// 画出刻度线(水平横线)
+	int nVInterval = MIN_TEMP_V_INTERVAL;
 	for (int i = 0; i < nGridCount + 1; i++) {
+		if ( nVInterval >= MIN_TEMP_V_INTERVAL ) {
+			::SelectObject(hDC, g_skin.GetGdiObject(BRIGHTER_PEN_INDEX));
+			nVInterval = nGridHeight;
+		}
+		else {
+			::SelectObject(hDC, g_skin.GetGdiObject(COMMON_PEN_INDEX));
+			nVInterval += nGridHeight;
+		}
 		int  nTop = nFirstTop + i * nGridHeight;
 		int  nTemperature = nFistTemperature - i;
 		::MoveToEx(hDC, rectLeft.right, nTop + rect.top, 0);
 		::LineTo(hDC, rect.right, nTop + rect.top);
 	}
-
+	::SelectObject(hDC, g_skin.GetGdiObject(COMMON_PEN_INDEX));
 	
 	time_t  tFistTime = 0;
 	int     nLastTimeTextLeft = 0;
@@ -103,7 +129,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		int nX    = (int)(((double)nDiff / g_dwCollectInterval[m_nIndex]) * g_dwTimeUnitWidth);
 		int nY    = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
-		DrawTempPoint(graphics, nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top, hDC );
+		DrawTempPoint(graphics, nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top, hDC, nRadius );
 
 		// 如果间隔足够大，画出time
 		if (nX - nLastTimeTextLeft >= MIN_TEXT_INTERVAL) {
@@ -122,42 +148,64 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		else {
 			POINT pt;
 			::GetCurrentPositionEx(hDC, &pt);
-			graphics.DrawLine( &g_skin.GetPenEx(TEMPERATURE_THREAD_INDEX), pt.x, pt.y, nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top);
+			graphics.DrawLine(&m_temperature_pen, pt.x, pt.y, nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top);
 			::MoveToEx(hDC, nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top, 0);
 		}
 	}
 
-	/*
-	::SelectObject(hDC, m_hPen);
-	::FillRect(hDC, &rectLeft, m_hBrush);
+	// 画边框
+	::SelectObject(hDC, g_skin.GetGdiObject(COMMON_PEN_INDEX));
+	::FillRect(hDC, &rectLeft, (HBRUSH)g_skin.GetGdiObject(COMMON_BRUSH_INDEX));
 	::Rectangle(hDC, rectLeft.left, rectLeft.top, rectLeft.right, rectLeft.bottom);
 	::MoveToEx(hDC, rectLeft.left + width - 1, rectLeft.top, 0);
 	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.top);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.bottom -1, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom -1);
 
-	for (int i = 0; i < m_nGridCount + 1; i++) {
-		int  nTop = nFirstTop + i * m_nGridSize;
-		int  nTemperature = nFistTemperature - i;
-
-		// 画刻度值
-		strText.Format("%d℃", nTemperature);
-		::TextOut(hDC, rectLeft.right + m_nTextOffsetX, nTop + rect.top + m_nTextOffsetY, strText, strText.GetLength());
+	// 画刻度值
+	nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			int  nTop = nFirstTop + i * nGridHeight;
+			int  nTemperature = nFistTemperature - i;
+			strText.Format("%d℃", nTemperature);
+			::TextOut( hDC, rectLeft.right + g_dwMyImageTempTextOffsetX,
+				       nTop + rect.top + g_dwMyImageTempTextOffsetY,
+				       strText, strText.GetLength());
+			nVInterval = nGridHeight;
+		}
+		else {
+			nVInterval += nGridHeight;
+		}
+		
 	}
 
+	
 	// 画出报警线
-	::SelectObject(hDC, m_hPen1);
-	int nY = (int)((nMiddleTemp * 100.0 - (double)g_dwLowTempAlarm[m_nChartIndex]) / 100.0 * m_nGridSize);
+	::SelectObject(hDC, g_skin.GetGdiObject(LOW_TEMP_PEN_INDEX));
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_dwLowTempAlarm[m_nIndex]) / 100.0 * nGridHeight);
 	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
 	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
-	strText = "低温报警";
-	::TextOut(hDC, rectLeft.right + 5, middle + nY + rect.top + 5, strText, strText.GetLength());
+	if (m_nState == STATE_MAXIUM) {
+		strText = LOW_TEMP_ALARM_TEXT;
+		::TextOut( hDC, rectLeft.right + LOW_TEMP_ALARM_TEXT_OFFSET_X, 
+			       middle + nY + rect.top + LOW_TEMP_ALARM_TEXT_OFFSET_Y, 
+			       strText, strText.GetLength() );
+	}
+	
 
-	::SelectObject(hDC, m_hPen2);
-	nY = (int)((nMiddleTemp * 100.0 - (double)g_dwHighTempAlarm[m_nChartIndex]) / 100.0 * m_nGridSize);
+	::SelectObject(hDC, g_skin.GetGdiObject(HIGH_TEMP_PEN_INDEX));
+	nY = (int)((nMiddleTemp * 100.0 - (double)g_dwHighTempAlarm[m_nIndex]) / 100.0 * nGridHeight);
 	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
 	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
-	strText = "高温报警";
-	::TextOut(hDC, rectLeft.right + 5, middle + nY + rect.top - 20, strText, strText.GetLength());
-	*/
+	if (m_nState == STATE_MAXIUM) {
+		strText = HIGH_TEMP_ALARM_TEXT;
+		::TextOut( hDC, rectLeft.right + HIGH_TEMP_ALARM_TEXT_OFFSET_X, 
+			       middle + nY + rect.top + HIGH_TEMP_ALARM_TEXT_OFFSET_Y,
+			       strText, strText.GetLength() );
+	}
 
 	return true;
 }
@@ -167,7 +215,7 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void   CMyImageUI::DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS /*= DEFAULT_POINT_RADIUS*/ ) {
-	g.FillEllipse( &g_skin.GetBrushEx(TEMPERATURE_BRUSH_INDEX), x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS );
+	g.FillEllipse( &m_temperature_brush, x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS );
 }
 
 // 计算图像需要的宽度

@@ -14,10 +14,14 @@ using namespace DuiLib;
 
 #include "skin.h"
 
-//#ifdef  _DEBUG
-//#define  TEST_FLAG      1
-//#define  
-//#endif
+#ifdef   _DEBUG
+#define  TEST_FLAG                1
+#endif
+
+#if TEST_FLAG
+#define  TIMER_TEST_ID            1
+#define  TIMER_TEST_INTERVAL      5000
+#endif
 
 
 /* 宏 */
@@ -46,20 +50,24 @@ using namespace DuiLib;
 #define   CFG_MYIMAGE_RIGHT_BLANK  "my image right"
 #define   CFG_MYIMAGE_TIME_TEXT_OFFSET_X   "time text offset x"
 #define   CFG_MYIMAGE_TIME_TEXT_OFFSET_Y   "time text offset y"
+#define   CFG_MYIMAGE_TEMP_TEXT_OFFSET_X   "temperature text offset x"
+#define   CFG_MYIMAGE_TEMP_TEXT_OFFSET_Y   "temperature text offset y"
 
 #define   DEFAULT_MAIN_LAYOUT_COLUMNS   4
 #define   DEFAULT_MAIN_LAYOUT_ROWS      4
 #define   DEFAULT_TIME_UNIT_WIDTH       50
 #define   DEFAULT_MAX_POINTS_COUNT      1500
-#define   DEFALUT_MYIMAGE_LEFT_BLANK    50
-#define   DEFALUT_MYIMAGE_RIGHT_BLANK   50
+#define   DEFALUT_MYIMAGE_LEFT_BLANK    40
+#define   DEFALUT_MYIMAGE_RIGHT_BLANK   40
 #define   DEFAULT_ALARM_FILE_PATH       "\\res\\1.wav"
 #define   DEFAULT_LOW_ALARM             3500
-#define   DEFAULT_HI_ALARM              4200
+#define   DEFAULT_HI_ALARM              4000
 #define   DEFAULT_COLLECT_INTERVAL      10          // 采集间隔时间，单位秒
 #define   DEFAULT_MIN_TEMP              28
 #define   DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_X   1
 #define   DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_Y   1
+#define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_X   -35
+#define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y   -8
 
 #define   LAYOUT_WINDOW_NAME       "layWindow"
 #define   LAYOUT_MAIN_NAME         "layMain"
@@ -74,6 +82,7 @@ using namespace DuiLib;
 #define   LABEL_CUR_TEMP_TITLE_SMALL_NAME    "lblCurTitle_1"
 #define   MYIMAGE_NAME                       "my_image"
 #define   MYIMAGE_CLASS_NAME                 "MyImage"
+#define   BTN_MENU_NAME                      "menubtn"
 
 #define   SKIN_BLACK                   0
 #define   SKIN_WHITE                   1
@@ -82,25 +91,43 @@ using namespace DuiLib;
 #define   LABEL_STATUS_BK_COLOR_INDEX   1
 #define   GRID_BORDER_COLOR_INDEX       2
 #define   COMMON_TEXT_COLOR_INDEX       3
+#define   MYIMAGE_BK_COLOR_INDEX        4
+#define   MYIMAGE_TEMP_THREAD_COLOR_INDEX  5
+#define   MYIMAGE_TEMP_DOT_COLOR_INDEX     6
 
-#define   COMMON_THREAD_INDEX           0
-#define   TEMPERATURE_THREAD_INDEX      1
+#define   COMMON_PEN_INDEX              0
+#define   COMMON_BRUSH_INDEX            1
+#define   BRIGHTER_PEN_INDEX            2
+#define   LOW_TEMP_PEN_INDEX            3
+#define   HIGH_TEMP_PEN_INDEX           4
 
-#define   TEMPERATURE_BRUSH_INDEX       0
-
-#define   MYIMAGE_STATE_GRID             0
-#define   MYIMAGE_STATE_MAXIUM           1
+#define   STATE_GRIDS                    0
+#define   STATE_MAXIUM                   1
 
 #define   MAX_ALARM_PATH_LENGTH          256
 #define   MAX_COM_PORT_LENGTH            8
 
 #define   MAX_TEMPERATURE                42
-#define   MIN_MYIMAGE_VMARGIN            10              // 图像的上、下至少留出的空白
+#define   MIN_MYIMAGE_VMARGIN            15              // 图像的上、下至少留出的空白
 
 #define   DWORD2RGB(a)                   ( ( ((a) & 0xFF) << 16 ) | ( (a) & 0xFF00 ) | ( ((a) & 0xFF0000) >> 16  ) )
 
 #define   MIN_TEXT_INTERVAL              120
 #define   DEFAULT_POINT_RADIUS           6
+
+#define   RADIUS_SIZE_IN_GRID            3  
+#define   RADIUS_SIZE_IN_MAXIUM          6
+
+#define   MIN_TEMP_V_INTERVAL            30
+
+#define   LOW_TEMP_ALARM_TEXT            "低温报警"
+#define   HIGH_TEMP_ALARM_TEXT           "高温报警"
+#define   LOW_TEMP_ALARM_TEXT_OFFSET_X   5
+#define   LOW_TEMP_ALARM_TEXT_OFFSET_Y   5
+#define   HIGH_TEMP_ALARM_TEXT_OFFSET_X   5
+#define   HIGH_TEMP_ALARM_TEXT_OFFSET_Y   -20
+
+#define   GRID_NAME                       "MyGrid"
 
 /* 结构体 */
 typedef struct tagTempData {
@@ -117,6 +144,37 @@ public:
 	char    m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 };
 
+class CDuiMenu : public DuiLib::WindowImplBase
+{
+protected:
+	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
+	DuiLib::CDuiString  m_strXMLPath;
+	DuiLib::CControlUI * m_pOwner;
+
+public:
+	explicit CDuiMenu(LPCTSTR pszXMLPath, DuiLib::CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
+	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
+	virtual DuiLib::CDuiString GetSkinFolder() { return _T(""); }
+	virtual DuiLib::CDuiString GetSkinFile() { return m_strXMLPath; }
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
+
+	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void Init(HWND hWndParent, POINT ptPos);
+	virtual void  Notify(DuiLib::TNotifyUI& msg);
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+};
+
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+private:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
+
 
 /* 全局变量 */
 extern ILog    * g_log;
@@ -130,6 +188,8 @@ extern DWORD     g_dwMyImageLeftBlank;
 extern DWORD     g_dwMyImageRightBlank;
 extern DWORD     g_dwMyImageTimeTextOffsetX;
 extern DWORD     g_dwMyImageTimeTextOffsetY;
+extern DWORD     g_dwMyImageTempTextOffsetX;
+extern DWORD     g_dwMyImageTempTextOffsetY;
 extern DWORD     g_dwCollectInterval[MAX_GRID_COUNT];
 extern DWORD     g_dwMyImageMinTemp[MAX_GRID_COUNT];
 extern DWORD     g_dwLowTempAlarm[MAX_GRID_COUNT];

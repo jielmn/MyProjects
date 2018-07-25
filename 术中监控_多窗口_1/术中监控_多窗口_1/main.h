@@ -3,17 +3,6 @@
 #include "common.h"
 #include "MyImage.h"
 
-class CDialogBuilderCallbackEx : public IDialogBuilderCallback
-{
-public:
-	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
-		m_pManager = pManager;
-	}
-	CControlUI* CreateControl(LPCTSTR pstrClass);
-private:
-	DuiLib::CPaintManagerUI *  m_pManager;
-};
-
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -32,6 +21,12 @@ public:
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
 	void   OnChangeSkin();
+	void   OnBtnMenu(TNotifyUI& msg);
+	void   OnSetting();
+	void   OnAbout();
+	void   OnDbClick();
+	// 重新布局
+	void   ReLayout(DWORD dwWidth, DWORD dwHeight);
 
 private:
 	CDialogBuilderCallbackEx           m_callback;
@@ -49,4 +44,8 @@ private:
 	CLabelUI *                         m_pLblNameTitle_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblCurTempTitle_small[MAX_GRID_COUNT];
 	CMyImageUI *                       m_pMyImage[MAX_GRID_COUNT];
+
+	DuiLib::CButtonUI *                m_btnMenu;    // 菜单按钮
+
+	int                                m_nState;     // 多格子状态，单格子状态
 };
