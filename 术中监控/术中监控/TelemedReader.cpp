@@ -137,11 +137,17 @@ int CTelemedReader::ReadTagTemp(DWORD & dwTemp) {
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "RESPONSE OR TIMEOUT \n");
 
 	BYTE pData[8192];
+	BYTE pId[8];
+	char szId[64];
 #ifdef TELEMED_READER_TYPE_1
 	if (m_received_data.GetDataLength() >= 14) {
 		m_received_data.Read(pData, 14);
 		if (pData[0] == 0xFF && pData[13] == 0xFF) {
 			dwTemp = pData[1] * 1000 + pData[2] * 100  + pData[3] * 10 + pData[4];
+			memcpy(pId, pData + 5, 8);
+			SNPRINTF(szId, sizeof(szId), "%02X-%02X-%02X-%02X-%02X-%02X-%02X-%02X", pId[7], pId[6], pId[5], pId[4]
+			         , pId[3], pId[2], pId[1], pId[0] );
+			JTelSvrPrint("tag id is %s", szId );
 			return 0;
 		}
 		//g_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to receive temp data, wrong format! \n");
