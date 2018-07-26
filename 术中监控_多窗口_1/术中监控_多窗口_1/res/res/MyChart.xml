@@ -36,7 +36,7 @@
 			</HorizontalLayout>
 			-->
 		
-			<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
+			<VerticalLayout inset="0,0,0,0" hscrollbar="false" vscrollbar="false" sepheight="4" >
 				<MyImage name="my_image" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
 			</VerticalLayout>
 		</VerticalLayout>

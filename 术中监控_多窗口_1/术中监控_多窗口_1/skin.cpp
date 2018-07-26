@@ -10,11 +10,7 @@ CMySkin::CMySkin() {
 	m_hLowTempAlarmPen   = 0;
 	m_hHighTempAlarmPen  = 0;
 
-#if 0
-	SetSkin(SKIN_BLACK);
-#else
-	SetSkin(SKIN_WHITE);
-#endif
+	//SetSkin(g_dwSkinIndex);
 }
 
 void CMySkin::SetSkin(DWORD dwSkinIndex) {

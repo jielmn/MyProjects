@@ -185,10 +185,17 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	pLayout->Add(place_holder);
 
 	CLabelUI * pTitle = new CLabelUI;
-	pTitle->SetFont(2);
-	pTitle->SetTextColor(0xFF386382);
+	if (pConfig) {
+		pTitle->SetFont(2);
+		pTitle->SetTextColor(0xFF386382); 
+	}
+	else {
+		pTitle->SetFont(3);
+		pTitle->SetTextColor(0xFF666666);		
+	}
 	pLayout->Add(pTitle);
 	pTitle->SetText(text);
+	
 
 	if (pConfig) {
 		pConfig->SetAttribute("padding", "10,3,10,3");

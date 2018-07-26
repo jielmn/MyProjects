@@ -23,6 +23,8 @@ BOOL      g_bAlarmOff = FALSE;   // 报警开关是否打开
 char      g_szAlarmFilePath[MAX_ALARM_PATH_LENGTH];
 char      g_szComPort[MAX_ALARM_PATH_LENGTH][MAX_COM_PORT_LENGTH];
 CMySkin   g_skin;
+BOOL      g_bAlarmVoiceOff = FALSE;
+DWORD     g_dwSkinIndex = 0;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
@@ -88,4 +90,32 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 		return new CMyImageUI(m_pManager);
 	}
 	return NULL;
+}
+
+BOOL GetAllSerialPortName(std::vector<std::string> & vCom) {
+
+	// TODO: 在此添加控件通知处理程序代码
+	HKEY hKey = NULL;
+	vCom.clear();
+
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT("HARDWARE\\DEVICEMAP\\SERIALCOMM"), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
+	{
+		return FALSE;
+	}
+
+	char valuename[200], databuffer[200];
+	DWORD valuenamebufferlength = 200, valuetype, databuddersize = 200;
+
+	int i = 0;
+	while (RegEnumValue(hKey, i++, valuename, &valuenamebufferlength, NULL, &valuetype, (BYTE*)databuffer, &databuddersize) != ERROR_NO_MORE_ITEMS)
+	{
+		std::string com_name = databuffer;
+		vCom.push_back(com_name);
+
+		databuddersize = 200;
+		valuenamebufferlength = 200;
+	}
+
+	RegCloseKey(hKey);
+	return TRUE;
 }

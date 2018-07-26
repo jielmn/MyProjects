@@ -35,6 +35,8 @@ using namespace DuiLib;
 #define   SKIN_FOLDER             "res"
 #define   MYCHART_XML_FILE        "MyChart.xml"
 #define   MAX_GRID_COUNT           50
+#define   SKIN_BLACK               0
+#define   SKIN_WHITE               1
 
 // config file configuration name
 #define   CFG_TELNET_PORT          "telnet port"
@@ -54,6 +56,8 @@ using namespace DuiLib;
 #define   CFG_MYIMAGE_TIME_TEXT_OFFSET_Y   "time text offset y"
 #define   CFG_MYIMAGE_TEMP_TEXT_OFFSET_X   "temperature text offset x"
 #define   CFG_MYIMAGE_TEMP_TEXT_OFFSET_Y   "temperature text offset y"
+#define   CFG_ALARM_VOICE_SWITCH           "alarm voice switch"
+#define   CFG_SKIN                         "skin"
 
 #define   DEFAULT_MAIN_LAYOUT_COLUMNS   4
 #define   DEFAULT_MAIN_LAYOUT_ROWS      4
@@ -70,6 +74,13 @@ using namespace DuiLib;
 #define   DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_Y   1
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_X   -35
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y   -8
+#define   DEFAULT_ALARM_VOICE_SWITCH           FALSE
+
+#if 0
+#define   DEFAULT_SKIN                         SKIN_BLACK
+#else
+#define   DEFAULT_SKIN                         SKIN_WHITE
+#endif
 
 #define   LAYOUT_WINDOW_NAME       "layWindow"
 #define   LAYOUT_MAIN_NAME         "layMain"
@@ -88,8 +99,7 @@ using namespace DuiLib;
 #define   MYTREE_CLASS_NAME                  "MyTree"
 #define   BUTTON_OK_NAME                     "btnOK"
 
-#define   SKIN_BLACK                   0
-#define   SKIN_WHITE                   1
+
 
 #define   LAYOUT_MAIN_BK_COLOR_INDEX    0
 #define   LABEL_STATUS_BK_COLOR_INDEX   1
@@ -140,6 +150,19 @@ using namespace DuiLib;
 
 #define   COMMON_SETTING_TEXT             "通用设置"
 #define   GRIDS_COLUMNS_TEXT              "窗格列数"
+#define   GRIDS_ROWS_TEXT                 "窗格行数"
+#define   ALARM_VOICE_SWITCH_TEXT         "报警声音开关"
+#define   SWITCH_ON_TEXT                  "开"
+#define   SWITCH_OFF_TEXT                 "关"
+#define   GRIDS_SETTING_TEXT              "窗格"
+#define   COLLECT_INTERVAL_TEXT           "采样间隔"
+#define   MIN_TEMPERATURE_TEXT            "显示的最低温度"
+#define   LOW_ALARM_TEXT                  "低温报警"
+#define   HIGH_ALARM_TEXT                 "高温报警"
+#define   ANY_COM_PORT_TEXT               "任意端口"
+#define   RW_COM_PORT_TEXT                "读写串口"
+#define   SKIN_BLACK_TEXT                 "黑曜石"
+#define   SKIN_WHITE_TEXT                 "白宣纸"
 
 
 /* 结构体 */
@@ -211,12 +234,15 @@ extern BOOL      g_bAlarmOff;   // 报警开关是否打开
 extern char      g_szAlarmFilePath[MAX_ALARM_PATH_LENGTH];
 extern char      g_szComPort[MAX_ALARM_PATH_LENGTH][MAX_COM_PORT_LENGTH];
 extern CMySkin   g_skin;
+extern BOOL      g_bAlarmVoiceOff;
+extern DWORD     g_dwSkinIndex;
 
 
 /* 函数 */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
+extern BOOL GetAllSerialPortName(std::vector<std::string> & vCom);
 
 // templates
 template <class T>

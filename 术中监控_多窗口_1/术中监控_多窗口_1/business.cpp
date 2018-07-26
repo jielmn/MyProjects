@@ -44,6 +44,8 @@ int CBusiness::Init() {
 	}
 	g_cfg->Init(CONFIG_FILE_NAME);
 
+	DWORD  dwCfgValue = 0;
+
 	g_cfg->GetConfig(CFG_MAIN_LAYOUT_COLUMNS, g_dwLayoutColumns,  DEFAULT_MAIN_LAYOUT_COLUMNS);
 	g_cfg->GetConfig(CFG_MAIN_LAYOUT_ROWS,    g_dwLayoutRows,     DEFAULT_MAIN_LAYOUT_ROWS);
 	g_cfg->GetConfig(CFG_TIME_UNIT_WIDTH,     g_dwTimeUnitWidth,  DEFAULT_TIME_UNIT_WIDTH);
@@ -57,6 +59,10 @@ int CBusiness::Init() {
 	g_cfg->GetConfig(CFG_MYIMAGE_TIME_TEXT_OFFSET_Y, g_dwMyImageTimeTextOffsetY, DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_Y);
 	g_cfg->GetConfig(CFG_MYIMAGE_TEMP_TEXT_OFFSET_X, g_dwMyImageTempTextOffsetX, DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_X);
 	g_cfg->GetConfig(CFG_MYIMAGE_TEMP_TEXT_OFFSET_Y, g_dwMyImageTempTextOffsetY, DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y);
+	g_cfg->GetConfig(CFG_ALARM_VOICE_SWITCH, dwCfgValue, DEFAULT_ALARM_VOICE_SWITCH);
+	g_bAlarmVoiceOff = dwCfgValue;
+	g_cfg->GetConfig(CFG_SKIN, g_dwSkinIndex, DEFAULT_SKIN);
+	g_skin.SetSkin(g_dwSkinIndex);
 
 	DuiLib::CDuiString  strText;
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {

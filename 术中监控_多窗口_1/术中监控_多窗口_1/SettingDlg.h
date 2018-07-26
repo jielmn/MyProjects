@@ -16,8 +16,7 @@ public:
 
 	virtual void   Notify(DuiLib::TNotifyUI& msg);
 	virtual void   InitWindow();
-
-	//virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
 
 private:
@@ -26,7 +25,10 @@ private:
 private:
 	void    InitCommonCfg();
 	void    SetEditStyle(CEditUI * pEdit);
+	void    AddComboItem(CComboUI * pCombo, const char * szItem);
+	void    SetComboStyle(CComboUI * pCombo);
+	void    InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex);
 	void    OnBtnOk(DuiLib::TNotifyUI& msg);
-	void    OnClick(DuiLib::TNotifyUI& msg);
+	void    OnMyClick(DuiLib::TNotifyUI& msg);
 };
 
