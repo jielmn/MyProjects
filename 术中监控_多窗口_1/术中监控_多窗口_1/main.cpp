@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include "LmnTelSvr.h"
+#include "SettingDlg.h"
 
 
 
@@ -46,7 +47,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 		m_pLblIndexes_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_INDEX_SMALL_NAME, 0));
 		if (m_pLblIndexes_small[nIndex]) {
-			strText.Format("%lu", nIndex + 1);
+			strText.Format("%lu", nIndex + 1);   
 			m_pLblIndexes_small[nIndex]->SetText(strText);
 		}
 
@@ -61,9 +62,10 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pMyImage[nIndex] = static_cast<CMyImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, MYIMAGE_NAME, 0));
 		m_pMyImage[nIndex]->SetIndex(nIndex);
 
-		if ( (DWORD)nIndex < g_dwLayoutColumns * g_dwLayoutRows ) {
-			m_layMain->Add(m_pGrids[nIndex]);
+		if ((DWORD)nIndex >= g_dwLayoutColumns * g_dwLayoutRows) {
+			m_pGrids[nIndex]->SetVisible(false);
 		}
+		m_layMain->Add(m_pGrids[nIndex]); 
 	}
 
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
@@ -119,8 +121,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 // main frame events
 void  CDuiFrameWnd::OnSize(WPARAM wParam, LPARAM lParam) {
-	DWORD dwWidth  = LOWORD(lParam) - 10 * 2;           // layWindow的左右margin
-	DWORD dwHeight = HIWORD(lParam) - 30 - 1 * 2 - 32;  // 30是底部status的大致高度, 1是layWindow的上下margin, 32是标题栏高度
+	DWORD dwWidth  = LOWORD(lParam) - LAYOUT_WINDOW_HMARGIN * 2;           // layWindow的左右margin
+	// 30是底部status的大致高度, 1是layWindow的上下margin, 32是标题栏高度
+	DWORD dwHeight = HIWORD(lParam) - STATUS_PANE_HEIGHT - LAYOUT_WINDOW_VMARGIN * 2 - WINDOW_TITLE_HEIGHT;  
 
 	ReLayout(dwWidth, dwHeight);
 }
@@ -139,7 +142,7 @@ void   CDuiFrameWnd::ReLayout(DWORD dwWidth, DWORD dwHeight) {
 		m_layMain->SetItemSize(s);
 
 		// 重新修正标题栏的高度
-		m_layStatus->SetFixedHeight(30 - (s.cy * g_dwLayoutRows - dwHeight));
+		m_layStatus->SetFixedHeight(STATUS_PANE_HEIGHT - (s.cy * g_dwLayoutRows - dwHeight));
 	}
 	else {
 		s.cx = dwWidth;
@@ -185,7 +188,25 @@ void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
 }
 
 void   CDuiFrameWnd::OnSetting() {
+	CSettingDlg * pSettingDlg = new CSettingDlg;
 
+	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pSettingDlg->CenterWindow();
+	int ret = pSettingDlg->ShowModal();
+
+	// 如果OK
+	if (0 == ret) {
+		//g_cfg->SetConfig("low alarm", g_dwLowTempAlarm);
+		//g_cfg->SetConfig("high alarm", g_dwHighTempAlarm);
+		//g_cfg->SetConfig("collect interval", g_dwCollectInterval);
+		//g_cfg->SetConfig("alarm file", g_szAlarmFilePath);
+		//g_cfg->SetConfig("min temperature degree", g_dwMinTemp);
+		//g_cfg->SetConfig("com port", g_szComPort);
+		//g_cfg->Save();
+		//m_pImageUI->Invalidate_0();
+	}
+
+	delete pSettingDlg;
 }
 
 void   CDuiFrameWnd::OnAbout() {

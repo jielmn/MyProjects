@@ -28,8 +28,10 @@ using namespace DuiLib;
 #define   LOG_FILE_NAME           "SurgerySurveil.log"
 #define   CONFIG_FILE_NAME        "SurgerySurveil.cfg"
 #define   MAIN_FRAME_NAME         "DUIMainFrame_surgery"
+#define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   GLOBAL_LOCK_NAME        "surgery_surveil"
 #define   MAIN_XML_FILE           "main.xml"
+#define   SETTING_FILE            "Setting.xml"
 #define   SKIN_FOLDER             "res"
 #define   MYCHART_XML_FILE        "MyChart.xml"
 #define   MAX_GRID_COUNT           50
@@ -72,7 +74,6 @@ using namespace DuiLib;
 #define   LAYOUT_WINDOW_NAME       "layWindow"
 #define   LAYOUT_MAIN_NAME         "layMain"
 #define   LAYOUT_STATUS_NAME       "layStatus"
-#define   LABEL_INDEX_NAME         "lblIndex"
 #define   LABEL_INDEX_SMALL_NAME   "lblIndex_1"
 #define   LABEL_BED_SMALL_NAME     "lblBed_1"
 #define   LABEL_NAME_SMALL_NAME    "lblName_1"
@@ -83,6 +84,9 @@ using namespace DuiLib;
 #define   MYIMAGE_NAME                       "my_image"
 #define   MYIMAGE_CLASS_NAME                 "MyImage"
 #define   BTN_MENU_NAME                      "menubtn"
+#define   MYTREE_CONFIG_NAME                 "CfgTree"
+#define   MYTREE_CLASS_NAME                  "MyTree"
+#define   BUTTON_OK_NAME                     "btnOK"
 
 #define   SKIN_BLACK                   0
 #define   SKIN_WHITE                   1
@@ -128,6 +132,15 @@ using namespace DuiLib;
 #define   HIGH_TEMP_ALARM_TEXT_OFFSET_Y   -20
 
 #define   GRID_NAME                       "MyGrid"
+
+#define   LAYOUT_WINDOW_HMARGIN           10
+#define   LAYOUT_WINDOW_VMARGIN           1
+#define   STATUS_PANE_HEIGHT              30
+#define   WINDOW_TITLE_HEIGHT             32
+
+#define   COMMON_SETTING_TEXT             "通用设置"
+#define   GRIDS_COLUMNS_TEXT              "窗格列数"
+
 
 /* 结构体 */
 typedef struct tagTempData {
