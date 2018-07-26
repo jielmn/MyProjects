@@ -15,6 +15,7 @@ public:
 	void  MyInvalidate();
 	void  SetState(int nNewState);
 	void  SetIndex(int nIndex);
+	void  OnChangeSkin();
 
 private:
 	DuiLib::CPaintManagerUI *    m_pManager;

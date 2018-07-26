@@ -152,29 +152,42 @@ void   CDuiFrameWnd::ReLayout(DWORD dwWidth, DWORD dwHeight) {
 		// 重新修正标题栏的高度
 		m_layStatus->SetFixedHeight(30);
 	}
-	
-	
+}
+
+// 重新布局(在设置更改之后)
+void   CDuiFrameWnd::UpdateLayout() {
+	DWORD dwInvisibleIndex = g_dwLayoutColumns * g_dwLayoutRows;
+	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
+		if (i < dwInvisibleIndex) {
+			m_pGrids[i]->SetVisible(true);
+		}
+		else {
+			m_pGrids[i]->SetVisible(false);
+		}
+	}
+
+	//m_layMain->SetFixedColumns(g_dwLayoutColumns);
+	//ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 }
 
 void   CDuiFrameWnd::OnChangeSkin() {
 	m_layMain->SetBkColor(g_skin[LAYOUT_MAIN_BK_COLOR_INDEX]);
 	m_layStatus->SetBkColor(g_skin[LABEL_STATUS_BK_COLOR_INDEX]);
 
-	for (DWORD i = 0; i < g_dwLayoutRows; i++) {
-		for (DWORD j = 0; j < g_dwLayoutColumns; j++) {
-			int nIndex = i*g_dwLayoutColumns + j;
-			m_pGrids[nIndex]->SetBorderColor(g_skin[GRID_BORDER_COLOR_INDEX]);
-			m_pLblIndexes_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		int nIndex = i;
+		m_pGrids[nIndex]->SetBorderColor(g_skin[GRID_BORDER_COLOR_INDEX]);
+		m_pLblIndexes_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 
-			m_pLblBed_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-			m_pLblName_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-			m_pLblCurTemp_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-			m_pLblBedTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-			m_pLblNameTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-			m_pLblCurTempTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblBed_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblName_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblCurTemp_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblBedTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblNameTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblCurTempTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 
-			m_pMyImage[nIndex]->SetBkColor(g_skin[MYIMAGE_BK_COLOR_INDEX]);
-		}
+		m_pMyImage[nIndex]->SetBkColor(g_skin[MYIMAGE_BK_COLOR_INDEX]);
+		m_pMyImage[nIndex]->OnChangeSkin();
 	}
 }
 
@@ -188,6 +201,8 @@ void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
 }
 
 void   CDuiFrameWnd::OnSetting() {
+	CDuiString  strText;
+	DWORD  dwValue = 0;
 	CSettingDlg * pSettingDlg = new CSettingDlg;
 
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
@@ -196,14 +211,44 @@ void   CDuiFrameWnd::OnSetting() {
 
 	// 如果OK
 	if (0 == ret) {
-		//g_cfg->SetConfig("low alarm", g_dwLowTempAlarm);
-		//g_cfg->SetConfig("high alarm", g_dwHighTempAlarm);
-		//g_cfg->SetConfig("collect interval", g_dwCollectInterval);
-		//g_cfg->SetConfig("alarm file", g_szAlarmFilePath);
-		//g_cfg->SetConfig("min temperature degree", g_dwMinTemp);
-		//g_cfg->SetConfig("com port", g_szComPort);
-		//g_cfg->Save();
-		//m_pImageUI->Invalidate_0();
+		dwValue = DEFAULT_MAIN_LAYOUT_COLUMNS;
+		g_cfg->SetConfig( CFG_MAIN_LAYOUT_COLUMNS, g_dwLayoutColumns, &dwValue );
+
+		dwValue = DEFAULT_MAIN_LAYOUT_ROWS;
+		g_cfg->SetConfig(CFG_MAIN_LAYOUT_ROWS, g_dwLayoutRows, &dwValue);
+
+		dwValue = DEFAULT_SKIN;
+		g_cfg->SetConfig(CFG_SKIN, g_dwSkinIndex, &dwValue);
+
+		dwValue = DEFAULT_ALARM_VOICE_SWITCH;
+		g_cfg->SetConfig(CFG_ALARM_VOICE_SWITCH, g_bAlarmVoiceOff, &dwValue);
+
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			strText.Format(CFG_LOW_ALARM " %d", i + 1);
+			dwValue = DEFAULT_LOW_ALARM;
+			g_cfg->SetConfig(strText, g_dwLowTempAlarm[i], &dwValue );
+
+			strText.Format(CFG_HIGH_ALARM " %d", i + 1);
+			dwValue = DEFAULT_HI_ALARM;
+			g_cfg->SetConfig(strText, g_dwHighTempAlarm[i], &dwValue);
+
+			strText.Format(CFG_COLLECT_INTERVAL " %d", i + 1);
+			dwValue = DEFAULT_COLLECT_INTERVAL;
+			g_cfg->SetConfig(strText, g_dwCollectInterval[i], &dwValue);
+
+			strText.Format(CFG_MIN_TEMP " %d", i + 1);
+			dwValue = DEFAULT_MIN_TEMP;
+			g_cfg->SetConfig(strText, g_dwMyImageMinTemp[i], &dwValue);
+
+			strText.Format(CFG_COM_PORT " %d", i + 1);
+			g_cfg->SetConfig(strText, g_szComPort[i], "");
+		}
+
+		g_cfg->Save();
+
+		g_skin.SetSkin(g_dwSkinIndex);
+		OnChangeSkin();
+		UpdateLayout();
 	}
 
 	delete pSettingDlg;
@@ -227,7 +272,7 @@ void   CDuiFrameWnd::OnDbClick() {
 			DWORD nIndex = pFindControl->GetTag();
 
 			if ( m_nState == STATE_GRIDS ) {				
-				for (DWORD i = 0; i < g_dwLayoutColumns * g_dwLayoutRows; i++) {
+				for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 					if (i != nIndex) {
 						m_layMain->Remove(m_pGrids[i], true);
 					}
@@ -237,7 +282,7 @@ void   CDuiFrameWnd::OnDbClick() {
 				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 			}
 			else {
-				for (DWORD i = 0; i < g_dwLayoutColumns * g_dwLayoutRows; i++) {
+				for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 					if (i != nIndex) {
 						m_layMain->AddAt(m_pGrids[i],i);
 					}

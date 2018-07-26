@@ -275,3 +275,8 @@ void  CMyImageUI::SetState(int nNewState) {
 void  CMyImageUI::SetIndex(int nIndex) {
 	m_nIndex = nIndex;
 }
+
+void CMyImageUI::OnChangeSkin() {
+	m_temperature_pen.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_THREAD_COLOR_INDEX]));
+	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
+}

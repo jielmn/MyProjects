@@ -254,7 +254,29 @@ void  CSettingDlg::SetComboStyle(CComboUI * pCombo) {
 }
 
 void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
+	DWORD       dwInterval = 0;
+	DWORD       dwLowAlarm = 0;
+	DWORD       dwHighAlarm = 0;
+	DWORD       dwMinTemp = 0;
+	CDuiString  strComPort;
 
+	if ( !GetCommonConfig() ) {
+		return;
+	}
+
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		if ( !GetConfig(i, dwInterval, dwLowAlarm, dwHighAlarm, dwMinTemp, strComPort) ) {
+			return;
+		}
+		else {
+			g_dwLowTempAlarm[i] = dwLowAlarm;
+			g_dwHighTempAlarm[i] = dwHighAlarm;
+			g_dwCollectInterval[i] = dwInterval;
+			g_dwMyImageMinTemp[i] = dwMinTemp;
+			STRNCPY(g_szComPort[i], strComPort, MAX_COM_PORT_LENGTH);
+		}
+	}
+	PostMessage(WM_CLOSE);
 }
 
 void  CSettingDlg::OnMyClick(DuiLib::TNotifyUI& msg) {
@@ -277,4 +299,205 @@ void  CSettingDlg::OnMyClick(DuiLib::TNotifyUI& msg) {
 		pFindControl = pFindControl->GetParent();
 		nDepth++;
 	}
+}
+
+BOOL  CSettingDlg::GetCommonConfig() {
+	CDuiString  strText;
+	CMyTreeCfgUI::ConfigValue  cfgValue;
+	bool bGetCfg = false;
+	int  nCols = 0;
+	int  nRows = 0;
+	int  nSkin = 0;
+	BOOL bAlarmVoiceOff = FALSE;
+
+	bGetCfg = m_tree->GetConfigValue( 1, cfgValue );
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%d", &nCols)) {
+		strText.Format("窗格列数请输入数字");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (nCols <= 0) {
+		strText.Format("窗格列数请输入正数");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	bGetCfg = m_tree->GetConfigValue(2, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%d", &nRows)) {
+		strText.Format("窗格行请输入数字");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (nRows <= 0) {
+		strText.Format("窗格行数请输入正数");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if ( nCols * nRows > MAX_GRID_COUNT ) {
+		strText.Format("窗口列数(%d) * 窗口行数(%d) = (%d)。请保证小于(%d)", nCols, nRows, nCols * nRows, MAX_GRID_COUNT);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	
+	bGetCfg = m_tree->GetConfigValue(3, cfgValue);
+	if ( 0 == cfgValue.m_nComboSel ) {
+		nSkin = SKIN_BLACK;
+	}
+	else if ( 1 == cfgValue.m_nComboSel ) {
+		nSkin = SKIN_WHITE;
+	}
+	else {
+		nSkin = SKIN_BLACK;
+	}
+
+	bGetCfg = m_tree->GetConfigValue(4, cfgValue);
+	if (0 == cfgValue.m_nComboSel) {
+		bAlarmVoiceOff = FALSE;
+	}
+	else  {
+		bAlarmVoiceOff = TRUE;
+	}
+
+	g_dwLayoutColumns = nCols;
+	g_dwLayoutRows = nRows;
+	g_dwSkinIndex = nSkin;
+	g_bAlarmVoiceOff = bAlarmVoiceOff;
+
+	return TRUE;
+}
+
+BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
+	DWORD & dwHighAlarm, DWORD & dwMinTemp, CDuiString & strComPort)
+{
+	CMyTreeCfgUI::ConfigValue  cfgValue;
+	CDuiString  strText;
+	double dbTemp;
+
+	dwInterval = 10;
+	bool bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 1, cfgValue);
+	switch (cfgValue.m_nComboSel)
+	{
+	case 0:
+	{
+		dwInterval = 10;
+	}
+	break;
+
+	case 1:
+	{
+		dwInterval = 60;
+	}
+	break;
+
+	case 2:
+	{
+		dwInterval = 300;
+	}
+	break;
+
+	case 3:
+	{
+		dwInterval = 900;
+	}
+	break;
+
+	case 4:
+	{
+		dwInterval = 1800;
+	}
+	break;
+
+	case 5:
+	{
+		dwInterval = 3600;
+	}
+	break;
+
+	default:
+		break;
+	}
+
+
+	dwMinTemp = 20;
+	bGetCfg = m_tree->GetConfigValue(6 + nIndex * 6 + 2, cfgValue);
+	switch (cfgValue.m_nComboSel)
+	{
+	case 0:
+	{
+		dwMinTemp = 20;
+	}
+	break;
+
+	case 1:
+	{
+		dwMinTemp = 24;
+	}
+	break;
+
+	case 2:
+	{
+		dwMinTemp = 28;
+	}
+	break;
+
+	case 3:
+	{
+		dwMinTemp = 32;
+	}
+	break;
+
+	default:
+		break;
+	}
+
+
+	bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 3, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
+		strText.Format("窗口%d配置，低温报警请输入数字", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (dbTemp > 42 || dbTemp < 20) {
+		strText.Format("窗口%d配置，低温报警请输入范围(20~42)", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	dwLowAlarm = (DWORD)(dbTemp * 100);
+
+	bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 4, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
+		strText.Format("窗口%d配置，高温报警请输入数字", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (dbTemp > 42 || dbTemp < 20) {
+		strText.Format("窗口%d配置，高温报警请输入范围(20~42)", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	if (dbTemp < dwLowAlarm / 100.0) {
+		strText.Format("窗口%d配置，高温报警请大于低温报警", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	dwHighAlarm = (DWORD)(dbTemp * 100);
+
+	// 串口
+	bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 5, cfgValue);
+	if (0 == cfgValue.m_nComboSel) {
+		strComPort = "";
+	}
+	else {
+		strComPort = cfgValue.m_strEdit;
+	}
+	return TRUE;
 }

@@ -27,6 +27,8 @@ private:
 	void   OnDbClick();
 	// 重新布局
 	void   ReLayout(DWORD dwWidth, DWORD dwHeight);
+	// 重新布局(在设置更改之后)
+	void   UpdateLayout();
 
 private:
 	CDialogBuilderCallbackEx           m_callback;

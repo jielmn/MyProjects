@@ -30,5 +30,8 @@ private:
 	void    InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex);
 	void    OnBtnOk(DuiLib::TNotifyUI& msg);
 	void    OnMyClick(DuiLib::TNotifyUI& msg);
+	BOOL    GetCommonConfig();
+	BOOL    GetConfig( int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
+		               DWORD & dwHighAlarm, DWORD & dwMinTemp, CDuiString & strComPort );
 };
 
