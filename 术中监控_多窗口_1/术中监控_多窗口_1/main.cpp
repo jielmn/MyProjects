@@ -92,7 +92,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == "click") {
 		if ( name == BTN_MENU_NAME ) {
 			OnBtnMenu(msg);			
-		} 
+		}
+		else if (name == MYIMAGE_NAME) {
+			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+			OnMyImageClick(&pt);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -342,6 +346,15 @@ void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
 	if (tParentScrollPos.cx != tParentScrollRange.cx ) {
 		pParent->SetScrollPos(tParentScrollRange);
 	}	
+}
+
+void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {
+	if ( m_nState != STATE_MAXIUM ) {
+		return;
+	}
+
+	//JTelSvrPrint("click on my image, x = %d, y = %d", pPoint->x, pPoint->y);
+	m_pMyImage[m_nMaxGridIndex]->OnMyClick( pPoint );	
 }
 
 

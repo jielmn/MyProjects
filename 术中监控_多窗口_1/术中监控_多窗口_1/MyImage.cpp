@@ -1,6 +1,7 @@
 #include <time.h>
 #include "MyImage.h"
 #include "business.h"
+#include "LmnTelSvr.h"
 
 CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : 
 	m_temperature_pen (Gdiplus::Color(0, 255, 0), 1.0), 
@@ -133,6 +134,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		int nX    = (int)(((double)nDiff / g_dwCollectInterval[m_nIndex]) * g_dwTimeUnitWidth);
 		int nY    = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
+		//if (it == m_vTempData.end() - 1) {
+		//	JTelSvrPrint("my image draw temperature point, x = %d, y = %d", nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top);
+		//}
 		DrawTempPoint(graphics, nX + g_dwMyImageLeftBlank + rect.left, nY + middle + rect.top, hDC, nRadius );
 
 		// 如果间隔足够大，画出time
@@ -233,7 +237,7 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 	DuiLib::CControlUI::DoEvent(event);
 }
 
-void   CMyImageUI::DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS /*= DEFAULT_POINT_RADIUS*/ ) {
+void   CMyImageUI::DrawTempPoint(Graphics & g, int x, int y, HDC hDc, int RADIUS /*= DEFAULT_POINT_RADIUS*/ ) {	
 	g.FillEllipse( &m_temperature_brush, x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS );
 }
 
@@ -327,4 +331,54 @@ void CMyImageUI::OnChangeSkin() {
 			pParent->SetAttribute("hscrollbarstyle", "button1normalimage=\"file='scrollbar_1.bmp' source='0,0,16,16' mask='#FFFF00FF'\" button1hotimage=\"file='scrollbar_1.bmp' source='18,0,34,16' mask='#FFFF00FF'\" button1pushedimage=\"file='scrollbar_1.bmp' source='36,0,52,16' mask='#FFFF00FF'\" button1disabledimage=\"file='scrollbar_1.bmp' source='54,0,70,16' mask='#FFFF00FF'\" button2normalimage=\"file='scrollbar_1.bmp' source='0,18,16,34' mask='#FFFF00FF'\" button2hotimage=\"file='scrollbar_1.bmp' source='18,18,34,34' mask='#FFFF00FF'\" button2pushedimage=\"file='scrollbar_1.bmp' source='36,18,52,34' mask='#FFFF00FF'\" button2disabledimage=\"file='scrollbar_1.bmp' source='54,18,70,34' mask='#FFFF00FF'\" thumbnormalimage=\"file='scrollbar_1.bmp' source='0,36,16,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbhotimage=\"file='scrollbar_1.bmp' source='18,36,34,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbpushedimage=\"file='scrollbar_1.bmp' source='36,36,52,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbdisabledimage=\"file='scrollbar_1.bmp' source='54,36,70,52' corner='2,2,2,2' mask='#FFFF00FF'\" railnormalimage=\"file='scrollbar_1.bmp' source='0,54,16,70' corner='2,2,2,2' mask='#FFFF00FF'\" railhotimage=\"file='scrollbar_1.bmp' source='18,54,34,70' corner='2,2,2,2' mask='#FFFF00FF'\" railpushedimage=\"file='scrollbar_1.bmp' source='36,54,52,70' corner='2,2,2,2' mask='#FFFF00FF'\" raildisabledimage=\"file='scrollbar_1.bmp' source='54,54,70,70' corner='2,2,2,2' mask='#FFFF00FF'\" bknormalimage=\"file='scrollbar_1.bmp' source='0,72,16,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkhotimage=\"file='scrollbar_1.bmp' source='18,72,34,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkpushedimage=\"file='scrollbar_1.bmp' source='36,72,52,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkdisabledimage=\"file='scrollbar_1.bmp' source='54,72,70,88' corner='2,2,2,2' mask='#FFFF00FF'\"");
 		}
 	}	
+}
+
+void  CMyImageUI::OnMyClick(const POINT * pPoint) {
+	if (m_nState != STATE_MAXIUM) {
+		return;
+	}
+	
+	// 找到点击了哪个点
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect   = this->GetPos();
+	int  width  = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+	int nMinTemp    = g_dwMyImageMinTemp[m_nIndex];
+	int nGridCount  = MAX_TEMPERATURE - nMinTemp;
+	int nMiddleTemp = (MAX_TEMPERATURE + nMinTemp) / 2;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder   = height % nGridCount;
+	int nVMargin    = MIN_MYIMAGE_VMARGIN;
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	time_t  tFistTime = 0;
+	if (m_vTempData.size() > 0) {
+		TempData * pFist = m_vTempData[0];
+		tFistTime = pFist->tTime;
+	}
+
+	int middle  = height / 2;
+	int nRadius = RADIUS_SIZE_IN_MAXIUM;
+	vector<TempData *>::iterator it;
+	for (it = m_vTempData.begin(); it != m_vTempData.end(); it++) {
+		TempData * pItem = *it;
+
+		int nDiff = (int)(pItem->tTime - tFistTime);
+		int nX = (int)(((double)nDiff / g_dwCollectInterval[m_nIndex]) * g_dwTimeUnitWidth);
+		int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+		int nX1 = nX + g_dwMyImageLeftBlank + rect.left;
+		int nY1 = nY + middle + rect.top;
+
+		if ( pPoint->x >= nX1 - RADIUS_SIZE_IN_MAXIUM && pPoint->x <= nX1 + RADIUS_SIZE_IN_MAXIUM
+			 && pPoint->y >= nY1 - RADIUS_SIZE_IN_MAXIUM && pPoint->y <= nY1 + RADIUS_SIZE_IN_MAXIUM ) {
+			// JTelSvrPrint("you clicked the point!");
+			break;
+		}
+	}
 }

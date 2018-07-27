@@ -31,6 +31,7 @@ private:
 	// 重新布局(在设置更改之后)
 	void   UpdateLayout();
 	void   OnUpdateGridScroll(WPARAM wParam, LPARAM lParam);
+	void   OnMyImageClick(const POINT * pPoint);
 
 private:
 	CDialogBuilderCallbackEx           m_callback;

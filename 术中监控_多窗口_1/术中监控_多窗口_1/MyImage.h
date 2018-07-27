@@ -16,6 +16,7 @@ public:
 	void  SetState(int nNewState);
 	void  SetIndex(int nIndex);
 	void  OnChangeSkin();
+	void  OnMyClick(const POINT * pPoint);
 
 private:
 	DuiLib::CPaintManagerUI *    m_pManager;
