@@ -164,6 +164,9 @@ using namespace DuiLib;
 #define   SKIN_BLACK_TEXT                 "黑曜石"
 #define   SKIN_WHITE_TEXT                 "白宣纸"
 
+#define UM_UPDATE_SCROLL                 (WM_USER+1)
+
+#define MSG_UPDATE_SCROLL                 1001
 
 /* 结构体 */
 typedef struct tagTempData {
@@ -178,6 +181,12 @@ public:
 	}
 	~CAlarmParam() {}
 	char    m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
+};
+
+class CUpdateScrollParam : public LmnToolkits::MessageData {
+public:
+	CUpdateScrollParam(int nIndex) : m_nIndex ( nIndex ) { }
+	int     m_nIndex;
 };
 
 class CDuiMenu : public DuiLib::WindowImplBase
@@ -215,7 +224,10 @@ private:
 /* 全局变量 */
 extern ILog    * g_log;
 extern IConfig * g_cfg;
+extern HWND    g_hWnd;
 //extern LmnToolkits::Thread *  g_thrd_db;
+extern LmnToolkits::Thread *  g_thrd_work;
+extern LmnToolkits::Thread *  g_thrd_reader[MAX_GRID_COUNT];
 extern DWORD     g_dwLayoutColumns;
 extern DWORD     g_dwLayoutRows;
 extern DWORD     g_dwTimeUnitWidth;

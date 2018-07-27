@@ -31,6 +31,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 void  CDuiFrameWnd::InitWindow() {
 	CDuiString strText;
 
+	g_hWnd = GetHWND();
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 	
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
@@ -116,6 +117,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_pMyImage[1]->AddTemp(GetRand(3200, 4200));
 		}
 #endif
+	}
+	else if (uMsg == UM_UPDATE_SCROLL) {
+		OnUpdateGridScroll(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -325,6 +329,21 @@ void   CDuiFrameWnd::OnDbClick() {
 		pFindControl = pFindControl->GetParent();
 	}
 }
+
+void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
+
+	if ( m_nState != STATE_MAXIUM ) {
+		return;
+	}
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_pMyImage[m_nMaxGridIndex]->GetParent();
+	SIZE tParentScrollPos   = pParent->GetScrollPos();
+	SIZE tParentScrollRange = pParent->GetScrollRange();
+	if (tParentScrollPos.cx != tParentScrollRange.cx ) {
+		pParent->SetScrollPos(tParentScrollRange);
+	}	
+}
+
 
 void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 	// 销毁没有添加进layMain的grids

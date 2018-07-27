@@ -4,7 +4,10 @@
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
+HWND    g_hWnd = 0;
 //LmnToolkits::Thread *  g_thrd_db = 0;
+LmnToolkits::Thread *  g_thrd_work = 0;
+LmnToolkits::Thread *  g_thrd_reader[MAX_GRID_COUNT];
 DWORD     g_dwLayoutColumns = 0;
 DWORD     g_dwLayoutRows = 0;
 DWORD     g_dwTimeUnitWidth = 0;

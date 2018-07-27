@@ -15,7 +15,8 @@ public:
 	int DeInit();
 
 	// 调整滑动条
-	int    UpdateScrollAsyn(int nIndex);
+	int    UpdateScrollAsyn(int nIndex,DWORD dwDelay = 0);
+	int    UpdateScroll(const CUpdateScrollParam * pParam);
 
 	// 报警
 	int   AlarmAsyn(const char * szAlarmFile);

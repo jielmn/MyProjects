@@ -93,10 +93,6 @@ int CBusiness::Init() {
 		}
 	}
 
-	
-
-
-
 	if ( g_dwLayoutRows * g_dwLayoutColumns > MAX_GRID_COUNT ) {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, "too much columns * rows(%lu * %lu) \n", g_dwLayoutColumns, g_dwLayoutRows );
 		return -1;
@@ -107,6 +103,20 @@ int CBusiness::Init() {
 	//	return -1;
 	//}
 	//g_thrd_db->Start();
+
+	g_thrd_work = new LmnToolkits::Thread();
+	if (0 == g_thrd_work) {
+		return -1;
+	}
+	g_thrd_work->Start();
+
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		g_thrd_reader[i] = new LmnToolkits::Thread();
+		if (0 == g_thrd_reader[i]) {
+			return -1;
+		}
+		g_thrd_reader[i]->Start();
+	}
 
 	return 0;
 }
@@ -119,12 +129,35 @@ int CBusiness::DeInit() {
 	//	g_thrd_db = 0;
 	//}
 
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		g_thrd_reader[i]->Stop();
+		delete g_thrd_reader[i];
+		g_thrd_reader[i] = 0;
+	}
+
+	if (g_thrd_work) {
+		g_thrd_work->Stop();
+		delete g_thrd_work;
+		g_thrd_work = 0;
+	}
+
 	Clear();
 	return 0;
 }
 
 // 调整滑动条
-int  CBusiness::UpdateScrollAsyn(int nIndex) {
+int  CBusiness::UpdateScrollAsyn(int nIndex, DWORD dwDelay /*= 0*/) {
+	if (0 == dwDelay) {
+		g_thrd_work->PostMessage( this, MSG_UPDATE_SCROLL, new CUpdateScrollParam(nIndex) );
+	}
+	else {
+		g_thrd_work->PostDelayMessage(dwDelay, this, MSG_UPDATE_SCROLL, new CUpdateScrollParam(nIndex) );
+	}
+	return 0;
+}
+
+int  CBusiness::UpdateScroll(const CUpdateScrollParam * pParam) {
+	::PostMessage(g_hWnd, UM_UPDATE_SCROLL, 0, 0);
 	return 0;
 }
 
@@ -166,5 +199,16 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_UPDATE_SCROLL:
+	{
+		CUpdateScrollParam * pParam = (CUpdateScrollParam *)pMessageData;
+		UpdateScroll(pParam);
+	}
+	break;
 
+	default:
+		break;
+	}
 }
