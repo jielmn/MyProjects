@@ -98,6 +98,7 @@ using namespace DuiLib;
 #define   MYTREE_CONFIG_NAME                 "CfgTree"
 #define   MYTREE_CLASS_NAME                  "MyTree"
 #define   BUTTON_OK_NAME                     "btnOK"
+#define   EDIT_REMARK_NAME                   "edRemark"
 
 
 
@@ -209,15 +210,18 @@ public:
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
+class CDuiFrameWnd;
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
 public:
-	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager, CDuiFrameWnd * pMainWnd) {
 		m_pManager = pManager;
+		m_pMainWnd = pMainWnd;
 	}
 	CControlUI* CreateControl(LPCTSTR pstrClass);
 private:
 	DuiLib::CPaintManagerUI *  m_pManager;
+	CDuiFrameWnd *             m_pMainWnd;
 };
 
 class CGraphicsRoundRectPath : public GraphicsPath

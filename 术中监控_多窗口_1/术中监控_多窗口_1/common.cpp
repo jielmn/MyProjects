@@ -90,7 +90,7 @@ LRESULT CDuiMenu::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, MYIMAGE_CLASS_NAME)) {
-		return new CMyImageUI(m_pManager);
+		return new CMyImageUI(m_pManager, m_pMainWnd);
 	}
 	return NULL;
 }

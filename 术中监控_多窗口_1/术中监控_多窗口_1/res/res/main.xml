@@ -12,8 +12,8 @@
 	
 	<VerticalLayout>
 	
-		<VerticalLayout bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" borderround="5,5" inset="10,1,10,1" > <!-- 整个窗口的背景色 -->
-		
+		<VerticalLayout name="layWindow" bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" borderround="5,5" inset="10,1,10,1" > <!-- 整个窗口的背景色 -->			
+			
 			<!-- 标题栏区 -->
 			<HorizontalLayout height="32" bkcolor="#00000000" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
 				<HorizontalLayout inset="10,1,10,1" >
@@ -36,7 +36,7 @@
 				
 			</TileLayout>
 			
-
+			<Edit name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" />
 		</VerticalLayout>
 	
 		<!-- 状态栏 -->

@@ -2,8 +2,9 @@
 #include "MyImage.h"
 #include "business.h"
 #include "LmnTelSvr.h"
+#include "main.h"
 
-CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) : 
+CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager, CDuiFrameWnd * pMainWnd) :
 	m_temperature_pen (Gdiplus::Color(0, 255, 0), 1.0), 
 	m_temperature_brush(Gdiplus::Color(0, 255, 0)) 
 {
@@ -14,6 +15,8 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager) :
 
 	m_temperature_pen.SetColor( Gdiplus::Color( g_skin[MYIMAGE_TEMP_THREAD_COLOR_INDEX] ) );
 	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
+
+	m_pMainWnd = pMainWnd;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -378,6 +381,12 @@ void  CMyImageUI::OnMyClick(const POINT * pPoint) {
 		if ( pPoint->x >= nX1 - RADIUS_SIZE_IN_MAXIUM && pPoint->x <= nX1 + RADIUS_SIZE_IN_MAXIUM
 			 && pPoint->y >= nY1 - RADIUS_SIZE_IN_MAXIUM && pPoint->y <= nY1 + RADIUS_SIZE_IN_MAXIUM ) {
 			// JTelSvrPrint("you clicked the point!");
+			// 如果之前在编辑状态
+			if ( m_pMainWnd->m_edRemark->IsVisible() ) {
+				m_pMainWnd->OnEdtRemarkKillFocus();
+			}
+			m_pMainWnd->m_edRemark->SetVisible(true);
+			m_pMainWnd->m_edRemark->SetFocus();
 			break;
 		}
 	}

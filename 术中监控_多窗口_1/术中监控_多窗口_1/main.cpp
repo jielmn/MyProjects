@@ -14,7 +14,7 @@
 
 
 
-CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
+CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 	memset( m_pGrids, 0, sizeof(m_pGrids) );
 	memset(m_pLblIndexes_small, 0, sizeof(m_pLblIndexes_small));
 	memset(m_pLblBed_small, 0, sizeof(m_pLblBed_small));
@@ -71,8 +71,10 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
-	
-	OnChangeSkin();
+	m_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl(EDIT_REMARK_NAME));
+	m_edRemark->SetVisible(false);
+ 
+	OnChangeSkin(); 
 
 #if TEST_FLAG
 	SetTimer(m_hWnd, TIMER_TEST_ID, TIMER_TEST_INTERVAL, NULL);
@@ -103,6 +105,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "menu_about") {
 		OnAbout();
+	}
+	else if (msg.sType == "killfocus") {
+		if (name == EDIT_REMARK_NAME ) {
+			OnEdtRemarkKillFocus();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -357,6 +364,10 @@ void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {
 	m_pMyImage[m_nMaxGridIndex]->OnMyClick( pPoint );	
 }
 
+void   CDuiFrameWnd::OnEdtRemarkKillFocus() {
+	m_edRemark->SetText("");
+	m_edRemark->SetVisible(false);
+}
 
 void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 	// 销毁没有添加进layMain的grids

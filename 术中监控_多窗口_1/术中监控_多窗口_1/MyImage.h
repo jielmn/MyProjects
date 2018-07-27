@@ -1,11 +1,12 @@
 #pragma once
 
 #include "common.h"
+class CDuiFrameWnd;
 
 class CMyImageUI : public DuiLib::CControlUI
 {
 public:
-	CMyImageUI(DuiLib::CPaintManagerUI *pManager);
+	CMyImageUI(DuiLib::CPaintManagerUI *pManager, CDuiFrameWnd * pMainWnd);
 	~CMyImageUI();
 
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -27,6 +28,8 @@ private:
 
 	Pen                          m_temperature_pen;
 	SolidBrush                   m_temperature_brush;
+
+	CDuiFrameWnd *               m_pMainWnd;
 
 private:
 	int    CalcMinWidth();   // 计算图像需要的宽度
