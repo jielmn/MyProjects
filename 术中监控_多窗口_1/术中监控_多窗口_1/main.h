@@ -50,4 +50,5 @@ private:
 	DuiLib::CButtonUI *                m_btnMenu;    // 菜单按钮
 
 	int                                m_nState;     // 多格子状态，单格子状态
+	int                                m_nMaxGridIndex; // 最大化格子的序号
 };

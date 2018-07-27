@@ -25,6 +25,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	memset(m_pLblCurTempTitle_small, 0, sizeof(m_pLblCurTempTitle_small));
 	memset(m_pMyImage, 0, sizeof(m_pMyImage));
 	m_nState = STATE_GRIDS;	
+	m_nMaxGridIndex = -1;
 }
 
 void  CDuiFrameWnd::InitWindow() {
@@ -166,8 +167,25 @@ void   CDuiFrameWnd::UpdateLayout() {
 		}
 	}
 
-	//m_layMain->SetFixedColumns(g_dwLayoutColumns);
-	//ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+	if (m_nState == STATE_GRIDS) {
+		m_layMain->SetFixedColumns(g_dwLayoutColumns);
+		ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+	}
+	else {
+		assert(m_nState == STATE_MAXIUM);
+		// 如果当前格子超出范围
+		if ( m_nMaxGridIndex >= (int)(g_dwLayoutColumns * g_dwLayoutRows) ) {
+			m_layMain->Remove(m_pGrids[m_nMaxGridIndex],true);
+			for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+				m_layMain->AddAt(m_pGrids[i], i);
+			}
+			m_layMain->SetFixedColumns(g_dwLayoutColumns);
+			m_nState = STATE_GRIDS;
+			m_nMaxGridIndex = -1;
+			ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+		}
+	}
+	
 }
 
 void   CDuiFrameWnd::OnChangeSkin() {
@@ -279,16 +297,22 @@ void   CDuiFrameWnd::OnDbClick() {
 				}
 				m_layMain->SetFixedColumns(1);
 				m_nState = STATE_MAXIUM;
+				m_nMaxGridIndex = nIndex;
 				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 			}
 			else {
+				assert(STATE_MAXIUM == m_nState);
+				assert(m_nMaxGridIndex == nIndex);
+
 				for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 					if (i != nIndex) {
 						m_layMain->AddAt(m_pGrids[i],i);
 					}
 				}
+
 				m_layMain->SetFixedColumns(g_dwLayoutColumns);
 				m_nState = STATE_GRIDS;
+				m_nMaxGridIndex = -1;
 				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 			}
 			
