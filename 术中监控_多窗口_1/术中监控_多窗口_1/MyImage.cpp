@@ -214,7 +214,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 			       strText, strText.GetLength() );
 	}
 
-	//DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+	// »­³öÀàËÆ×¢ÊÍµÄ¿ò
+	//CGraphicsRoundRectPath  RoundRectPath;
+	//RoundRectPath.AddRoundRect(rectLeft.right, rectLeft.top, 100, 100, 5, 5);
+	//graphics.DrawPath(&m_temperature_pen, &RoundRectPath);
+
 	return true;
 }
 

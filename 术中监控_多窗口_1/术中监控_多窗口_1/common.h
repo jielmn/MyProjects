@@ -220,6 +220,16 @@ private:
 	DuiLib::CPaintManagerUI *  m_pManager;
 };
 
+class CGraphicsRoundRectPath : public GraphicsPath
+{
+
+public:
+	CGraphicsRoundRectPath();
+
+public:
+	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
+};
+
 
 /* 全局变量 */
 extern ILog    * g_log;
