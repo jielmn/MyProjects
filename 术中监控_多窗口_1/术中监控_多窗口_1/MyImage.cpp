@@ -43,7 +43,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	RECT rect   = this->GetPos();
 	int  width  = pParent->GetWidth();
-	int  height = pParent->GetHeight();
+	int  height = rect.bottom - rect.top; //pParent->GetHeight();
 	DuiLib::CDuiString strText;
 
 	int nRadius = RADIUS_SIZE_IN_MAXIUM;
@@ -64,8 +64,12 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	int nGridHeight = height / nGridCount;
 	int nReminder   = height % nGridCount;
-	if ( MIN_MYIMAGE_VMARGIN * 2 > nReminder ) {
-		int nSpared = (MIN_MYIMAGE_VMARGIN * 2 - nReminder - 1) / nGridCount + 1;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+	//if ( m_nState == STATE_MAXIUM ) {
+	//	nVMargin += 20;      // scroll bar的高度
+	//}
+	if (nVMargin * 2 > nReminder ) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
 		nGridHeight -= nSpared;
 	}
 	
@@ -136,9 +140,12 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 			struct tm tTmTime;
 			localtime_s(&tTmTime, &pItem->tTime);
 			strText.Format("%02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
-			::TextOut( hDC, g_dwMyImageLeftBlank + rect.left + nX - 30, 
-				       middle + (nGridCount / 2) * nGridHeight + rect.top + g_dwMyImageTimeTextOffsetY, 
-				       strText, strText.GetLength() );
+			int nTextX = g_dwMyImageLeftBlank + rect.left + nX - 30;
+			if ( nTextX > rectLeft.left ) {
+				::TextOut(hDC, nTextX,
+					middle + (nGridCount / 2) * nGridHeight + rect.top + g_dwMyImageTimeTextOffsetY,
+					strText, strText.GetLength());
+			}			
 			nLastTimeTextLeft = nX;
 		}
 
@@ -207,10 +214,18 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 			       strText, strText.GetLength() );
 	}
 
+	//DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);
 	return true;
 }
 
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN)
+	{
+		//告诉UIManager这个消息需要处理
+		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+		return;
+	}
+
 	DuiLib::CControlUI::DoEvent(event);
 }
 
@@ -270,6 +285,25 @@ void  CMyImageUI::MyInvalidate() {
 
 void  CMyImageUI::SetState(int nNewState) {
 	m_nState = nNewState;
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();	
+
+	if (m_nState == STATE_MAXIUM) {
+		m_temperature_pen.SetWidth(3.0);
+		pParent->EnableScrollBar(false, true);	
+		if (g_dwSkinIndex == SKIN_BLACK) {
+			pParent->SetAttribute("hscrollbarstyle", "button1normalimage=\"file='scrollbar.bmp' source='0,0,16,16' mask='#FFFF00FF'\" button1hotimage=\"file='scrollbar.bmp' source='18,0,34,16' mask='#FFFF00FF'\" button1pushedimage=\"file='scrollbar.bmp' source='36,0,52,16' mask='#FFFF00FF'\" button1disabledimage=\"file='scrollbar.bmp' source='54,0,70,16' mask='#FFFF00FF'\" button2normalimage=\"file='scrollbar.bmp' source='0,18,16,34' mask='#FFFF00FF'\" button2hotimage=\"file='scrollbar.bmp' source='18,18,34,34' mask='#FFFF00FF'\" button2pushedimage=\"file='scrollbar.bmp' source='36,18,52,34' mask='#FFFF00FF'\" button2disabledimage=\"file='scrollbar.bmp' source='54,18,70,34' mask='#FFFF00FF'\" thumbnormalimage=\"file='scrollbar.bmp' source='0,36,16,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbhotimage=\"file='scrollbar.bmp' source='18,36,34,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbpushedimage=\"file='scrollbar.bmp' source='36,36,52,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbdisabledimage=\"file='scrollbar.bmp' source='54,36,70,52' corner='2,2,2,2' mask='#FFFF00FF'\" railnormalimage=\"file='scrollbar.bmp' source='0,54,16,70' corner='2,2,2,2' mask='#FFFF00FF'\" railhotimage=\"file='scrollbar.bmp' source='18,54,34,70' corner='2,2,2,2' mask='#FFFF00FF'\" railpushedimage=\"file='scrollbar.bmp' source='36,54,52,70' corner='2,2,2,2' mask='#FFFF00FF'\" raildisabledimage=\"file='scrollbar.bmp' source='54,54,70,70' corner='2,2,2,2' mask='#FFFF00FF'\" bknormalimage=\"file='scrollbar.bmp' source='0,72,16,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkhotimage=\"file='scrollbar.bmp' source='18,72,34,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkpushedimage=\"file='scrollbar.bmp' source='36,72,52,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkdisabledimage=\"file='scrollbar.bmp' source='54,72,70,88' corner='2,2,2,2' mask='#FFFF00FF'\"");
+		}
+		else {
+			pParent->SetAttribute("hscrollbarstyle", "button1normalimage=\"file='scrollbar_1.bmp' source='0,0,16,16' mask='#FFFF00FF'\" button1hotimage=\"file='scrollbar_1.bmp' source='18,0,34,16' mask='#FFFF00FF'\" button1pushedimage=\"file='scrollbar_1.bmp' source='36,0,52,16' mask='#FFFF00FF'\" button1disabledimage=\"file='scrollbar_1.bmp' source='54,0,70,16' mask='#FFFF00FF'\" button2normalimage=\"file='scrollbar_1.bmp' source='0,18,16,34' mask='#FFFF00FF'\" button2hotimage=\"file='scrollbar_1.bmp' source='18,18,34,34' mask='#FFFF00FF'\" button2pushedimage=\"file='scrollbar_1.bmp' source='36,18,52,34' mask='#FFFF00FF'\" button2disabledimage=\"file='scrollbar_1.bmp' source='54,18,70,34' mask='#FFFF00FF'\" thumbnormalimage=\"file='scrollbar_1.bmp' source='0,36,16,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbhotimage=\"file='scrollbar_1.bmp' source='18,36,34,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbpushedimage=\"file='scrollbar_1.bmp' source='36,36,52,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbdisabledimage=\"file='scrollbar_1.bmp' source='54,36,70,52' corner='2,2,2,2' mask='#FFFF00FF'\" railnormalimage=\"file='scrollbar_1.bmp' source='0,54,16,70' corner='2,2,2,2' mask='#FFFF00FF'\" railhotimage=\"file='scrollbar_1.bmp' source='18,54,34,70' corner='2,2,2,2' mask='#FFFF00FF'\" railpushedimage=\"file='scrollbar_1.bmp' source='36,54,52,70' corner='2,2,2,2' mask='#FFFF00FF'\" raildisabledimage=\"file='scrollbar_1.bmp' source='54,54,70,70' corner='2,2,2,2' mask='#FFFF00FF'\" bknormalimage=\"file='scrollbar_1.bmp' source='0,72,16,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkhotimage=\"file='scrollbar_1.bmp' source='18,72,34,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkpushedimage=\"file='scrollbar_1.bmp' source='36,72,52,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkdisabledimage=\"file='scrollbar_1.bmp' source='54,72,70,88' corner='2,2,2,2' mask='#FFFF00FF'\"");
+		}
+	}
+	else {
+		m_temperature_pen.SetWidth(1.0);
+		pParent->EnableScrollBar(false, false);
+		
+	}
+	
 }
 
 void  CMyImageUI::SetIndex(int nIndex) {
@@ -279,4 +313,14 @@ void  CMyImageUI::SetIndex(int nIndex) {
 void CMyImageUI::OnChangeSkin() {
 	m_temperature_pen.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_THREAD_COLOR_INDEX]));
 	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	if (m_nState == STATE_MAXIUM) {
+		if (g_dwSkinIndex == SKIN_BLACK) {
+			pParent->SetAttribute("hscrollbarstyle", "button1normalimage=\"file='scrollbar.bmp' source='0,0,16,16' mask='#FFFF00FF'\" button1hotimage=\"file='scrollbar.bmp' source='18,0,34,16' mask='#FFFF00FF'\" button1pushedimage=\"file='scrollbar.bmp' source='36,0,52,16' mask='#FFFF00FF'\" button1disabledimage=\"file='scrollbar.bmp' source='54,0,70,16' mask='#FFFF00FF'\" button2normalimage=\"file='scrollbar.bmp' source='0,18,16,34' mask='#FFFF00FF'\" button2hotimage=\"file='scrollbar.bmp' source='18,18,34,34' mask='#FFFF00FF'\" button2pushedimage=\"file='scrollbar.bmp' source='36,18,52,34' mask='#FFFF00FF'\" button2disabledimage=\"file='scrollbar.bmp' source='54,18,70,34' mask='#FFFF00FF'\" thumbnormalimage=\"file='scrollbar.bmp' source='0,36,16,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbhotimage=\"file='scrollbar.bmp' source='18,36,34,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbpushedimage=\"file='scrollbar.bmp' source='36,36,52,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbdisabledimage=\"file='scrollbar.bmp' source='54,36,70,52' corner='2,2,2,2' mask='#FFFF00FF'\" railnormalimage=\"file='scrollbar.bmp' source='0,54,16,70' corner='2,2,2,2' mask='#FFFF00FF'\" railhotimage=\"file='scrollbar.bmp' source='18,54,34,70' corner='2,2,2,2' mask='#FFFF00FF'\" railpushedimage=\"file='scrollbar.bmp' source='36,54,52,70' corner='2,2,2,2' mask='#FFFF00FF'\" raildisabledimage=\"file='scrollbar.bmp' source='54,54,70,70' corner='2,2,2,2' mask='#FFFF00FF'\" bknormalimage=\"file='scrollbar.bmp' source='0,72,16,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkhotimage=\"file='scrollbar.bmp' source='18,72,34,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkpushedimage=\"file='scrollbar.bmp' source='36,72,52,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkdisabledimage=\"file='scrollbar.bmp' source='54,72,70,88' corner='2,2,2,2' mask='#FFFF00FF'\"");
+		}
+		else {
+			pParent->SetAttribute("hscrollbarstyle", "button1normalimage=\"file='scrollbar_1.bmp' source='0,0,16,16' mask='#FFFF00FF'\" button1hotimage=\"file='scrollbar_1.bmp' source='18,0,34,16' mask='#FFFF00FF'\" button1pushedimage=\"file='scrollbar_1.bmp' source='36,0,52,16' mask='#FFFF00FF'\" button1disabledimage=\"file='scrollbar_1.bmp' source='54,0,70,16' mask='#FFFF00FF'\" button2normalimage=\"file='scrollbar_1.bmp' source='0,18,16,34' mask='#FFFF00FF'\" button2hotimage=\"file='scrollbar_1.bmp' source='18,18,34,34' mask='#FFFF00FF'\" button2pushedimage=\"file='scrollbar_1.bmp' source='36,18,52,34' mask='#FFFF00FF'\" button2disabledimage=\"file='scrollbar_1.bmp' source='54,18,70,34' mask='#FFFF00FF'\" thumbnormalimage=\"file='scrollbar_1.bmp' source='0,36,16,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbhotimage=\"file='scrollbar_1.bmp' source='18,36,34,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbpushedimage=\"file='scrollbar_1.bmp' source='36,36,52,52' corner='2,2,2,2' mask='#FFFF00FF'\" thumbdisabledimage=\"file='scrollbar_1.bmp' source='54,36,70,52' corner='2,2,2,2' mask='#FFFF00FF'\" railnormalimage=\"file='scrollbar_1.bmp' source='0,54,16,70' corner='2,2,2,2' mask='#FFFF00FF'\" railhotimage=\"file='scrollbar_1.bmp' source='18,54,34,70' corner='2,2,2,2' mask='#FFFF00FF'\" railpushedimage=\"file='scrollbar_1.bmp' source='36,54,52,70' corner='2,2,2,2' mask='#FFFF00FF'\" raildisabledimage=\"file='scrollbar_1.bmp' source='54,54,70,70' corner='2,2,2,2' mask='#FFFF00FF'\" bknormalimage=\"file='scrollbar_1.bmp' source='0,72,16,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkhotimage=\"file='scrollbar_1.bmp' source='18,72,34,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkpushedimage=\"file='scrollbar_1.bmp' source='36,72,52,88' corner='2,2,2,2' mask='#FFFF00FF'\" bkdisabledimage=\"file='scrollbar_1.bmp' source='54,72,70,88' corner='2,2,2,2' mask='#FFFF00FF'\"");
+		}
+	}	
 }

@@ -174,14 +174,15 @@ void   CDuiFrameWnd::UpdateLayout() {
 	else {
 		assert(m_nState == STATE_MAXIUM);
 		// 如果当前格子超出范围
-		if ( m_nMaxGridIndex >= (int)(g_dwLayoutColumns * g_dwLayoutRows) ) {
+		if ( m_nMaxGridIndex >= (int)(g_dwLayoutColumns * g_dwLayoutRows) ) {			
 			m_layMain->Remove(m_pGrids[m_nMaxGridIndex],true);
 			for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 				m_layMain->AddAt(m_pGrids[i], i);
 			}
 			m_layMain->SetFixedColumns(g_dwLayoutColumns);
 			m_nState = STATE_GRIDS;
-			m_nMaxGridIndex = -1;
+			m_pMyImage[m_nMaxGridIndex]->SetState(STATE_GRIDS);
+			m_nMaxGridIndex = -1;			
 			ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 		}
 	}
@@ -267,6 +268,7 @@ void   CDuiFrameWnd::OnSetting() {
 		g_skin.SetSkin(g_dwSkinIndex);
 		OnChangeSkin();
 		UpdateLayout();
+		//::InvalidateRect(GetHWND(), 0, TRUE);
 	}
 
 	delete pSettingDlg;
@@ -298,6 +300,7 @@ void   CDuiFrameWnd::OnDbClick() {
 				m_layMain->SetFixedColumns(1);
 				m_nState = STATE_MAXIUM;
 				m_nMaxGridIndex = nIndex;
+				m_pMyImage[nIndex]->SetState(m_nState);
 				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 			}
 			else {
@@ -313,6 +316,7 @@ void   CDuiFrameWnd::OnDbClick() {
 				m_layMain->SetFixedColumns(g_dwLayoutColumns);
 				m_nState = STATE_GRIDS;
 				m_nMaxGridIndex = -1;
+				m_pMyImage[nIndex]->SetState(m_nState);
 				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 			}
 			
@@ -321,7 +325,17 @@ void   CDuiFrameWnd::OnDbClick() {
 		pFindControl = pFindControl->GetParent();
 	}
 }
-  
+
+void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
+	// 销毁没有添加进layMain的grids
+	if ( m_nState == STATE_MAXIUM ) {
+		for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
+			if (m_nMaxGridIndex != i) {
+				m_pGrids[i]->Delete();
+			}
+		}
+	}
+}
  
 
  

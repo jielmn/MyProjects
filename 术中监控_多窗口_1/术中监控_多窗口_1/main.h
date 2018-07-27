@@ -14,6 +14,7 @@ public:
 	virtual void    Notify(TNotifyUI& msg);
 	virtual void    InitWindow();
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
+	virtual void     OnFinalMessage(HWND hWnd);
 
 	// 处理自定义信息
 	LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);

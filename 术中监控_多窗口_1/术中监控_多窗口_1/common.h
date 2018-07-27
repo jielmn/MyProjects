@@ -61,7 +61,7 @@ using namespace DuiLib;
 
 #define   DEFAULT_MAIN_LAYOUT_COLUMNS   4
 #define   DEFAULT_MAIN_LAYOUT_ROWS      4
-#define   DEFAULT_TIME_UNIT_WIDTH       50
+#define   DEFAULT_TIME_UNIT_WIDTH       80
 #define   DEFAULT_MAX_POINTS_COUNT      1500
 #define   DEFALUT_MYIMAGE_LEFT_BLANK    40
 #define   DEFALUT_MYIMAGE_RIGHT_BLANK   40
