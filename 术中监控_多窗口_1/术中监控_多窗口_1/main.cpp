@@ -72,6 +72,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
 	m_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl(EDIT_REMARK_NAME));
+	m_edRemark->SetText("");
 	m_edRemark->SetVisible(false);
  
 	OnChangeSkin(); 
@@ -365,8 +366,16 @@ void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {
 }
 
 void   CDuiFrameWnd::OnEdtRemarkKillFocus() {
+	DuiLib::CDuiString  strRemark = m_edRemark->GetText();
 	m_edRemark->SetText("");
 	m_edRemark->SetVisible(false);
+
+	assert(m_nMaxGridIndex >= 0);
+	if (m_nMaxGridIndex < 0) {
+		return;
+	}
+
+	m_pMyImage[m_nMaxGridIndex]->SetRemark(strRemark);
 }
 
 void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {

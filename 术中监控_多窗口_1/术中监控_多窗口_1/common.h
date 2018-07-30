@@ -169,10 +169,17 @@ using namespace DuiLib;
 
 #define MSG_UPDATE_SCROLL                 1001
 
+#define EDT_REMARK_WIDTH                  200
+#define EDT_REMARK_HEIGHT                 30
+#define EDT_REMARK_Y_OFFSET               -50
+#define MAX_REMARK_LENGTH                 16
+
 /* ½á¹¹Ìå */
 typedef struct tagTempData {
+	DWORD    dwIndex;
 	DWORD    dwTemperature;
 	time_t   tTime;
+	char     szRemark[MAX_REMARK_LENGTH];
 }TempData;
 
 class CAlarmParam : public LmnToolkits::MessageData {

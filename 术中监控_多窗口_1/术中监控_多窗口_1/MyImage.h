@@ -18,6 +18,7 @@ public:
 	void  SetIndex(int nIndex);
 	void  OnChangeSkin();
 	void  OnMyClick(const POINT * pPoint);
+	void  SetRemark(DuiLib::CDuiString & strRemark);
 
 private:
 	DuiLib::CPaintManagerUI *    m_pManager;
@@ -25,11 +26,11 @@ private:
 	int                          m_nState;     // 0 小格子状态，1 全屏状态
 	BOOL                         m_bSetParentScrollPos;
 	int                          m_nIndex;     // 序列号
-
 	Pen                          m_temperature_pen;
 	SolidBrush                   m_temperature_brush;
-
 	CDuiFrameWnd *               m_pMainWnd;
+	DWORD                        m_dwNextTempIndex;
+	DWORD                        m_dwCurTempIndex;
 
 private:
 	int    CalcMinWidth();   // 计算图像需要的宽度

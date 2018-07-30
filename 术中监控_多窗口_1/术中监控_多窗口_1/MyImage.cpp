@@ -17,6 +17,8 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager, CDuiFrameWnd * pMainWn
 	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
 
 	m_pMainWnd = pMainWnd;
+	m_dwNextTempIndex = 0;
+	m_dwCurTempIndex = -1;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -266,6 +268,13 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 	TempData * pTemp = new TempData;
 	pTemp->dwTemperature = dwTemp;
 	pTemp->tTime = now;
+	pTemp->dwIndex = m_dwNextTempIndex;
+	m_dwNextTempIndex++;
+	// skip -1 index
+	if (m_dwNextTempIndex == -1) {
+		m_dwNextTempIndex = 0;
+	}
+	pTemp->szRemark[0] = '\0';
 
 	if ( m_vTempData.size() >= g_dwMaxPointsCount ) {
 		vector<TempData *>::iterator it = m_vTempData.begin();
@@ -385,8 +394,33 @@ void  CMyImageUI::OnMyClick(const POINT * pPoint) {
 			if ( m_pMainWnd->m_edRemark->IsVisible() ) {
 				m_pMainWnd->OnEdtRemarkKillFocus();
 			}
+
+			m_dwCurTempIndex = pItem->dwIndex;
+			RECT rectRemark;
+			rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+			rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
+			rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+			m_pMainWnd->m_edRemark->SetPos(rectRemark);
+			m_pMainWnd->m_edRemark->SetText(pItem->szRemark);
 			m_pMainWnd->m_edRemark->SetVisible(true);
 			m_pMainWnd->m_edRemark->SetFocus();
+			break;
+		}
+	}
+}
+
+void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
+	assert(m_dwCurTempIndex != -1);
+	if (m_dwCurTempIndex == -1) {
+		return;
+	}
+
+	vector<TempData *>::iterator it;
+	for (it = m_vTempData.begin(); it != m_vTempData.end(); it++) {
+		TempData * pItem = *it;
+		if (pItem->dwIndex == m_dwCurTempIndex) {
+			STRNCPY(pItem->szRemark, strRemark, sizeof(pItem->szRemark));
 			break;
 		}
 	}
