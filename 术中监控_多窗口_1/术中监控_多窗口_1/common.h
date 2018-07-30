@@ -109,6 +109,8 @@ using namespace DuiLib;
 #define   MYIMAGE_BK_COLOR_INDEX        4
 #define   MYIMAGE_TEMP_THREAD_COLOR_INDEX  5
 #define   MYIMAGE_TEMP_DOT_COLOR_INDEX     6
+#define   MYIMAGE_REMARK_THREAD_COLOR_INDEX 7
+#define   MYIMAGE_REMARK_BRUSH_INDEX        8
 
 #define   COMMON_PEN_INDEX              0
 #define   COMMON_BRUSH_INDEX            1
@@ -172,7 +174,7 @@ using namespace DuiLib;
 #define EDT_REMARK_WIDTH                  200
 #define EDT_REMARK_HEIGHT                 30
 #define EDT_REMARK_Y_OFFSET               -50
-#define MAX_REMARK_LENGTH                 16
+#define MAX_REMARK_LENGTH                 28
 
 /* 结构体 */
 typedef struct tagTempData {
@@ -269,6 +271,7 @@ extern char      g_szComPort[MAX_ALARM_PATH_LENGTH][MAX_COM_PORT_LENGTH];
 extern CMySkin   g_skin;
 extern BOOL      g_bAlarmVoiceOff;
 extern DWORD     g_dwSkinIndex;
+extern BOOL      g_bAutoScroll;
 
 
 /* 函数 */

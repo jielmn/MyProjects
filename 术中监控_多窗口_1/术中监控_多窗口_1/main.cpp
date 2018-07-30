@@ -334,6 +334,7 @@ void   CDuiFrameWnd::OnDbClick() {
 				m_nMaxGridIndex = -1;
 				m_pMyImage[nIndex]->SetState(m_nState);
 				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+				OnEdtRemarkKillFocus();
 			}
 			
 			break;
@@ -345,6 +346,10 @@ void   CDuiFrameWnd::OnDbClick() {
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
 
 	if ( m_nState != STATE_MAXIUM ) {
+		return;
+	}
+
+	if ( !g_bAutoScroll ) {
 		return;
 	}
 
@@ -369,8 +374,9 @@ void   CDuiFrameWnd::OnEdtRemarkKillFocus() {
 	DuiLib::CDuiString  strRemark = m_edRemark->GetText();
 	m_edRemark->SetText("");
 	m_edRemark->SetVisible(false);
+	g_bAutoScroll = TRUE;
 
-	assert(m_nMaxGridIndex >= 0);
+	// assert(m_nMaxGridIndex >= 0);
 	if (m_nMaxGridIndex < 0) {
 		return;
 	}

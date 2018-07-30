@@ -6,7 +6,9 @@
 
 CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager, CDuiFrameWnd * pMainWnd) :
 	m_temperature_pen (Gdiplus::Color(0, 255, 0), 1.0), 
-	m_temperature_brush(Gdiplus::Color(0, 255, 0)) 
+	m_temperature_brush(Gdiplus::Color(0, 255, 0)) ,
+	m_remark_pen(Gdiplus::Color(0, 255, 0), 3.0),
+	m_remark_brush(Gdiplus::Color(0, 255, 0))
 {
 	m_pManager = pManager;
 	m_nState = STATE_GRIDS;
@@ -15,6 +17,8 @@ CMyImageUI::CMyImageUI(DuiLib::CPaintManagerUI *pManager, CDuiFrameWnd * pMainWn
 
 	m_temperature_pen.SetColor( Gdiplus::Color( g_skin[MYIMAGE_TEMP_THREAD_COLOR_INDEX] ) );
 	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
+	m_remark_pen.SetColor(Gdiplus::Color(g_skin[MYIMAGE_REMARK_THREAD_COLOR_INDEX]));
+	m_remark_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_REMARK_BRUSH_INDEX]));
 
 	m_pMainWnd = pMainWnd;
 	m_dwNextTempIndex = 0;
@@ -224,6 +228,36 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	}
 
 	// »­³öÀàËÆ×¢ÊÍµÄ¿ò
+	::SetBkMode(hDC, TRANSPARENT);
+	if (m_nState == STATE_MAXIUM) {
+		for (it = m_vTempData.begin(); it != m_vTempData.end(); it++) {
+			TempData * pItem = *it;
+
+			if (pItem->szRemark[0] != '\0') {
+				int nDiff = (int)(pItem->tTime - tFistTime);
+				int nX = (int)(((double)nDiff / g_dwCollectInterval[m_nIndex]) * g_dwTimeUnitWidth);
+				int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+				int nX1 = nX + g_dwMyImageLeftBlank + rect.left;
+				int nY1 = nY + middle + rect.top;
+
+				CGraphicsRoundRectPath  RoundRectPath;
+				RoundRectPath.AddRoundRect(nX1 - EDT_REMARK_WIDTH / 2, nY1 + EDT_REMARK_Y_OFFSET,
+					EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5);
+				graphics.DrawPath(&m_remark_pen, &RoundRectPath);
+				graphics.FillPath(&m_remark_brush, &RoundRectPath);
+
+				strText = pItem->szRemark;
+				RECT rectRemark;
+				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
+				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+				::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER );
+			}
+		}
+	}
+	
 	//CGraphicsRoundRectPath  RoundRectPath;
 	//RoundRectPath.AddRoundRect(rectLeft.right, rectLeft.top, 100, 100, 5, 5);
 	//graphics.DrawPath(&m_temperature_pen, &RoundRectPath);
@@ -333,6 +367,8 @@ void  CMyImageUI::SetIndex(int nIndex) {
 void CMyImageUI::OnChangeSkin() {
 	m_temperature_pen.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_THREAD_COLOR_INDEX]));
 	m_temperature_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_TEMP_DOT_COLOR_INDEX]));
+	m_remark_pen.SetColor(Gdiplus::Color(g_skin[MYIMAGE_REMARK_THREAD_COLOR_INDEX]));
+	m_remark_brush.SetColor(Gdiplus::Color(g_skin[MYIMAGE_REMARK_BRUSH_INDEX]));
 
 	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
 	if (m_nState == STATE_MAXIUM) {
@@ -397,14 +433,15 @@ void  CMyImageUI::OnMyClick(const POINT * pPoint) {
 
 			m_dwCurTempIndex = pItem->dwIndex;
 			RECT rectRemark;
-			rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
-			rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
-			rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
-			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+			rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2 + 1;
+			rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET + 3;
+			rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH - 2;
+			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT - 6;
 			m_pMainWnd->m_edRemark->SetPos(rectRemark);
 			m_pMainWnd->m_edRemark->SetText(pItem->szRemark);
 			m_pMainWnd->m_edRemark->SetVisible(true);
 			m_pMainWnd->m_edRemark->SetFocus();
+			g_bAutoScroll = FALSE;
 			break;
 		}
 	}

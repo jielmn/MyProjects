@@ -28,6 +28,7 @@ char      g_szComPort[MAX_ALARM_PATH_LENGTH][MAX_COM_PORT_LENGTH];
 CMySkin   g_skin;
 BOOL      g_bAlarmVoiceOff = FALSE;
 DWORD     g_dwSkinIndex = 0;
+BOOL      g_bAutoScroll = TRUE;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;

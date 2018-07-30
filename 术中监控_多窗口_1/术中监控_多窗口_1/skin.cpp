@@ -83,6 +83,10 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 			return 0xFF00FF00;
 		case MYIMAGE_TEMP_DOT_COLOR_INDEX:
 			return 0xFF00FF00;
+		case MYIMAGE_REMARK_THREAD_COLOR_INDEX:
+			return 0xFFFFFFFF;
+		case MYIMAGE_REMARK_BRUSH_INDEX:
+			return 0xFF014D31;
 		default:
 			break;
 		}
@@ -104,6 +108,10 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 			return 0xFFCA5100;
 		case MYIMAGE_TEMP_DOT_COLOR_INDEX:
 			return 0xFFCA5100;
+		case MYIMAGE_REMARK_THREAD_COLOR_INDEX:
+			return 0xFF333333;
+		case MYIMAGE_REMARK_BRUSH_INDEX:
+			return 0xFFCA5151;
 		default:
 			break;
 		}

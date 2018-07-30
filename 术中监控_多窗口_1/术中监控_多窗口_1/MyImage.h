@@ -31,6 +31,8 @@ private:
 	CDuiFrameWnd *               m_pMainWnd;
 	DWORD                        m_dwNextTempIndex;
 	DWORD                        m_dwCurTempIndex;
+	Pen                          m_remark_pen;
+	SolidBrush                   m_remark_brush;
 
 private:
 	int    CalcMinWidth();   // 计算图像需要的宽度
