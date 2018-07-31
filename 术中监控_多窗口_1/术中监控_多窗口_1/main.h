@@ -23,6 +23,10 @@ private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
 	void   OnChangeSkin();
 	void   OnBtnMenu(TNotifyUI& msg);
+	void   OnBtnBedName(TNotifyUI& msg);
+	void   OnEdtBedNameKillFocus(TNotifyUI& msg);
+	void   OnBtnName(TNotifyUI& msg);
+	void   OnEdtNameKillFocus(TNotifyUI& msg);
 	void   OnSetting();
 	void   OnAbout();
 	void   OnDbClick();
@@ -45,8 +49,12 @@ private:
 
 	CControlUI *                       m_pGrids[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblIndexes_small[MAX_GRID_COUNT];
-	CLabelUI *                         m_pLblBed_small[MAX_GRID_COUNT];
-	CLabelUI *                         m_pLblName_small[MAX_GRID_COUNT];
+	//CLabelUI *                         m_pLblBed_small[MAX_GRID_COUNT];
+	CButtonUI *                        m_pBtnBedName_small[MAX_GRID_COUNT];
+	CEditUI *                          m_pEdtBedName_small[MAX_GRID_COUNT];
+	//CLabelUI *                         m_pLblName_small[MAX_GRID_COUNT];
+	CButtonUI *                        m_pBtnName_small[MAX_GRID_COUNT];
+	CEditUI *                          m_pEdtName_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblCurTemp_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblBedTitle_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblNameTitle_small[MAX_GRID_COUNT];

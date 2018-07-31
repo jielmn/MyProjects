@@ -29,6 +29,10 @@ CMySkin   g_skin;
 BOOL      g_bAlarmVoiceOff = FALSE;
 DWORD     g_dwSkinIndex = 0;
 BOOL      g_bAutoScroll = TRUE;
+char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
+char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
+
+
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;

@@ -58,6 +58,8 @@ using namespace DuiLib;
 #define   CFG_MYIMAGE_TEMP_TEXT_OFFSET_Y   "temperature text offset y"
 #define   CFG_ALARM_VOICE_SWITCH           "alarm voice switch"
 #define   CFG_SKIN                         "skin"
+#define   CFG_LAST_BED_NAME                "last bed name"
+#define   CFG_LAST_PATIENT_NAME            "last patient name"
 
 #define   DEFAULT_MAIN_LAYOUT_COLUMNS   4
 #define   DEFAULT_MAIN_LAYOUT_ROWS      4
@@ -76,7 +78,7 @@ using namespace DuiLib;
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y   -8
 #define   DEFAULT_ALARM_VOICE_SWITCH           FALSE
 
-#if 0
+#if 1
 #define   DEFAULT_SKIN                         SKIN_BLACK
 #else
 #define   DEFAULT_SKIN                         SKIN_WHITE
@@ -86,8 +88,12 @@ using namespace DuiLib;
 #define   LAYOUT_MAIN_NAME         "layMain"
 #define   LAYOUT_STATUS_NAME       "layStatus"
 #define   LABEL_INDEX_SMALL_NAME   "lblIndex_1"
-#define   LABEL_BED_SMALL_NAME     "lblBed_1"
-#define   LABEL_NAME_SMALL_NAME    "lblName_1"
+//#define   LABEL_BED_SMALL_NAME     "lblBed_1"
+#define   BUTTON_BED_SMALL_NAME    "btnBed_1"
+#define   EDIT_BED_SMALL_NAME      "edtBed_1"
+//#define   LABEL_NAME_SMALL_NAME    "lblName_1"
+#define   BUTTON_PATIENT_NAME_SMALL_NAME     "btnName_1"
+#define   EDIT_PATIENT_NAME_SMALL_NAME      "edtName_1"
 #define   LABEL_CUR_TEMP_SMALL_NAME    "lblCur_1"
 #define   LABEL_BED_TITLE_SMALL_NAME     "lblBedTitle_1"
 #define   LABEL_NAME_TITLE_SMALL_NAME    "lblNameTitle_1"
@@ -111,6 +117,8 @@ using namespace DuiLib;
 #define   MYIMAGE_TEMP_DOT_COLOR_INDEX     6
 #define   MYIMAGE_REMARK_THREAD_COLOR_INDEX 7
 #define   MYIMAGE_REMARK_BRUSH_INDEX        8
+#define   EDIT_BK_COLOR_INDEX               9
+#define   EDIT_TEXT_COLOR_INDEX            10
 
 #define   COMMON_PEN_INDEX              0
 #define   COMMON_BRUSH_INDEX            1
@@ -175,6 +183,8 @@ using namespace DuiLib;
 #define EDT_REMARK_HEIGHT                 30
 #define EDT_REMARK_Y_OFFSET               -50
 #define MAX_REMARK_LENGTH                 28
+#define MAX_BED_NAME_LENGTH               16
+#define MAX_PATIENT_NAME_LENGTH           16
 
 /* 结构体 */
 typedef struct tagTempData {
@@ -272,7 +282,8 @@ extern CMySkin   g_skin;
 extern BOOL      g_bAlarmVoiceOff;
 extern DWORD     g_dwSkinIndex;
 extern BOOL      g_bAutoScroll;
-
+extern char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
+extern char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 
 /* 函数 */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);

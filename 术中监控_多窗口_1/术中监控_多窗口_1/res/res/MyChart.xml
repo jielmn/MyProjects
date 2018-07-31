@@ -10,18 +10,17 @@
 					<Control width="10" />
 					
 					<Label   name="lblBedTitle_1"  text="床号"    textcolor="#FFFFFFFF" width="40" font="1" />
-					<Control width="10" />
-					<Label   name="lblBed_1"       text="--"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Edit    name="edtBed_1"  text="--"    textcolor="#FF000000" width="60" font="1" visible="false" />
+					<Button  name="btnBed_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="60" font="1" />
 					<Control width="10" />
 					
 					<Label   name="lblNameTitle_1"  text="姓名"    textcolor="#FFFFFFFF" width="40" font="1" />
-					<Control width="10" />
-					<Label   name="lblName_1"  text="--"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Edit    name="edtName_1"  text="--"    textcolor="#FF000000" width="60" font="1" visible="false" />
+					<Button  name="btnName_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="60" font="1" />
 					<Control width="10" />
 					
 					<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" />
-					<Control width="10" />
-					<Label   name="lblCur_1"   text="--"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Label   name="lblCur_1"   text="36.50"    textcolor="#FFFFFFFF" width="50" font="1" />
 					<Control width="10" />
 					
 				</HorizontalLayout>

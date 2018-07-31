@@ -80,6 +80,12 @@ int CBusiness::Init() {
 
 		strText.Format(CFG_COM_PORT " %d", i + 1);
 		g_cfg->GetConfig(strText, g_szComPort[i], MAX_COM_PORT_LENGTH, "");
+
+		strText.Format(CFG_LAST_BED_NAME " %d", i + 1);
+		g_cfg->GetConfig(strText, g_szLastBedName[i], MAX_BED_NAME_LENGTH, "--");
+
+		strText.Format(CFG_LAST_PATIENT_NAME " %d", i + 1);
+		g_cfg->GetConfig(strText, g_szLastPatientName[i], MAX_PATIENT_NAME_LENGTH, "--");
 	}
 
 	g_cfg->GetConfig(CFG_ALARM_FILE, g_szAlarmFilePath, sizeof(g_szAlarmFilePath), "");

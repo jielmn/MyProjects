@@ -17,8 +17,10 @@
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 	memset( m_pGrids, 0, sizeof(m_pGrids) );
 	memset(m_pLblIndexes_small, 0, sizeof(m_pLblIndexes_small));
-	memset(m_pLblBed_small, 0, sizeof(m_pLblBed_small));
-	memset(m_pLblName_small, 0, sizeof(m_pLblName_small));
+	memset(m_pBtnBedName_small, 0, sizeof(m_pBtnBedName_small));
+	memset(m_pEdtBedName_small, 0, sizeof(m_pEdtBedName_small));
+	memset(m_pBtnName_small, 0, sizeof(m_pBtnName_small));
+	memset(m_pEdtName_small, 0, sizeof(m_pEdtName_small));
 	memset(m_pLblCurTemp_small, 0, sizeof(m_pLblCurTemp_small));	
 	memset(m_pLblBedTitle_small, 0, sizeof(m_pLblBedTitle_small));
 	memset(m_pLblNameTitle_small, 0, sizeof(m_pLblNameTitle_small));
@@ -53,8 +55,20 @@ void  CDuiFrameWnd::InitWindow() {
 			m_pLblIndexes_small[nIndex]->SetText(strText);
 		}
 
-		m_pLblBed_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_BED_SMALL_NAME, 0));
-		m_pLblName_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_NAME_SMALL_NAME, 0));
+		m_pBtnBedName_small[nIndex] = static_cast<CButtonUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, BUTTON_BED_SMALL_NAME, 0));
+		m_pBtnBedName_small[nIndex]->SetTag(nIndex);
+		m_pBtnBedName_small[nIndex]->SetText(g_szLastBedName[nIndex]);
+		m_pEdtBedName_small[nIndex] = static_cast<CEditUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, EDIT_BED_SMALL_NAME, 0));
+		m_pEdtBedName_small[nIndex]->SetTag(nIndex);
+		m_pEdtBedName_small[nIndex]->SetText(g_szLastBedName[nIndex]);
+
+		m_pBtnName_small[nIndex] = static_cast<CButtonUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, BUTTON_PATIENT_NAME_SMALL_NAME, 0));
+		m_pBtnName_small[nIndex]->SetTag(nIndex);
+		m_pBtnName_small[nIndex]->SetText(g_szLastPatientName[nIndex]);
+		m_pEdtName_small[nIndex] = static_cast<CEditUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, EDIT_PATIENT_NAME_SMALL_NAME, 0));
+		m_pEdtName_small[nIndex]->SetTag(nIndex);
+		m_pEdtName_small[nIndex]->SetText(g_szLastPatientName[nIndex]);
+
 		m_pLblCurTemp_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_SMALL_NAME, 0));
 
 		m_pLblBedTitle_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_BED_TITLE_SMALL_NAME, 0));
@@ -100,6 +114,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
 			OnMyImageClick(&pt);
 		}
+		else if (name == BUTTON_BED_SMALL_NAME) {
+			OnBtnBedName(msg);			
+		}
+		else if (name == BUTTON_PATIENT_NAME_SMALL_NAME) {
+			OnBtnName(msg);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -110,6 +130,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "killfocus") {
 		if (name == EDIT_REMARK_NAME ) {
 			OnEdtRemarkKillFocus();
+		}
+		else if (name == EDIT_BED_SMALL_NAME) {
+			OnEdtBedNameKillFocus(msg);
+		}
+		else if (name == EDIT_PATIENT_NAME_SMALL_NAME) {
+			OnEdtNameKillFocus(msg);
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -214,8 +240,16 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_pGrids[nIndex]->SetBorderColor(g_skin[GRID_BORDER_COLOR_INDEX]);
 		m_pLblIndexes_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 
-		m_pLblBed_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-		m_pLblName_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pBtnBedName_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pEdtBedName_small[nIndex]->SetTextColor(g_skin[EDIT_TEXT_COLOR_INDEX]);
+		m_pEdtBedName_small[nIndex]->SetBkColor(g_skin[EDIT_BK_COLOR_INDEX]);
+		m_pEdtBedName_small[nIndex]->SetNativeEditBkColor(g_skin[EDIT_BK_COLOR_INDEX]);
+
+		m_pBtnName_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pEdtName_small[nIndex]->SetTextColor(g_skin[EDIT_TEXT_COLOR_INDEX]);
+		m_pEdtName_small[nIndex]->SetBkColor(g_skin[EDIT_BK_COLOR_INDEX]);
+		m_pEdtName_small[nIndex]->SetNativeEditBkColor(g_skin[EDIT_BK_COLOR_INDEX]);
+
 		m_pLblCurTemp_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblBedTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblNameTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
@@ -233,6 +267,50 @@ void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
 
 	pMenu->Init(*this, pt);
 	pMenu->ShowWindow(TRUE);
+}
+
+void   CDuiFrameWnd::OnBtnBedName(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	msg.pSender->SetVisible(false);
+	m_pEdtBedName_small[nIndex]->SetText(msg.pSender->GetText());
+	m_pEdtBedName_small[nIndex]->SetVisible(true);
+	m_pEdtBedName_small[nIndex]->SetFocus();
+}      
+
+void   CDuiFrameWnd::OnEdtBedNameKillFocus(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	STRNCPY(g_szLastBedName[nIndex], msg.pSender->GetText(), MAX_BED_NAME_LENGTH);
+
+	CDuiString  strText;
+	strText.Format(CFG_LAST_BED_NAME " %d", nIndex+1);
+	g_cfg->SetConfig( strText, g_szLastBedName[nIndex], "" );    
+	g_cfg->Save();
+
+	msg.pSender->SetVisible(false);
+	m_pBtnBedName_small[nIndex]->SetText(msg.pSender->GetText());
+	m_pBtnBedName_small[nIndex]->SetVisible(true);
+}
+
+void   CDuiFrameWnd::OnBtnName(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	msg.pSender->SetVisible(false);
+	m_pEdtName_small[nIndex]->SetText(msg.pSender->GetText());
+	m_pEdtName_small[nIndex]->SetVisible(true);
+	m_pEdtName_small[nIndex]->SetFocus();
+}
+
+void   CDuiFrameWnd::OnEdtNameKillFocus(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	STRNCPY(g_szLastPatientName[nIndex], msg.pSender->GetText(), MAX_PATIENT_NAME_LENGTH);
+
+	CDuiString  strText;
+	strText.Format(CFG_LAST_PATIENT_NAME " %d", nIndex + 1);
+	g_cfg->SetConfig(strText, g_szLastPatientName[nIndex], "");
+	g_cfg->Save();
+
+	msg.pSender->SetVisible(false);
+	m_pBtnName_small[nIndex]->SetText(msg.pSender->GetText());
+	m_pBtnName_small[nIndex]->SetVisible(true);
 }
 
 void   CDuiFrameWnd::OnSetting() {
@@ -301,6 +379,12 @@ void   CDuiFrameWnd::OnDbClick() {
 	GetCursorPos(&point);
 	::ScreenToClient(m_hWnd, &point);
 	CControlUI * pFindControl = m_PaintManager.FindSubControlByPoint(m_layMain, point);
+	if ( pFindControl ) {
+		// 如果双击按钮，返回
+		if ( 0 == strcmp( pFindControl->GetClass(), DUI_CTR_BUTTON ) ) {
+			return;
+		}
+	}
 
 	while (pFindControl) {
 		strName = pFindControl->GetName();

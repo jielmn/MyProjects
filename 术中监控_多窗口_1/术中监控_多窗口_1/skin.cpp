@@ -87,6 +87,10 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 			return 0xFFFFFFFF;
 		case MYIMAGE_REMARK_BRUSH_INDEX:
 			return 0xFF014D31;
+		case EDIT_BK_COLOR_INDEX:
+			return 0xFFFFFFFF;
+		case EDIT_TEXT_COLOR_INDEX:
+			return 0xFF000000;
 		default:
 			break;
 		}
@@ -112,6 +116,10 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 			return 0xFF333333;
 		case MYIMAGE_REMARK_BRUSH_INDEX:
 			return 0xFFCA5151;
+		case EDIT_BK_COLOR_INDEX:
+			return 0xFFAAAAAA;
+		case EDIT_TEXT_COLOR_INDEX:
+			return 0xFFFFFFFF;  
 		default:
 			break;
 		}
