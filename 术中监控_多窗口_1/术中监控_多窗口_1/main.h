@@ -67,7 +67,8 @@ private:
 	CLabelUI *                         m_pLblNameTitle_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblCurTempTitle_small[MAX_GRID_COUNT];
 	CMyImageUI *                       m_pMyImage[MAX_GRID_COUNT];
-	DuiLib::CButtonUI *                m_btnMenu;    // 菜单按钮		
+	DuiLib::CButtonUI *                m_btnMenu;    // 菜单按钮	
+	CAlarmImageUI *                    m_pAlarmUI[MAX_GRID_COUNT];
 
 	int                                m_nState;     // 多格子状态，单格子状态
 	int                                m_nMaxGridIndex; // 最大化格子的序号

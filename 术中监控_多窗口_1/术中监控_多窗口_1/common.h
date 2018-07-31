@@ -106,7 +106,8 @@ using namespace DuiLib;
 #define   MYTREE_CLASS_NAME                  "MyTree"
 #define   BUTTON_OK_NAME                     "btnOK"
 #define   EDIT_REMARK_NAME                   "edRemark"
-
+#define   ALARM_IMAGE_CLASS_NAME             "AlarmImage"
+#define   ALARM_IMAGE_NAME                   "alarm_image"
 
 
 #define   LAYOUT_MAIN_BK_COLOR_INDEX    0
@@ -120,6 +121,8 @@ using namespace DuiLib;
 #define   MYIMAGE_REMARK_BRUSH_INDEX        8
 #define   EDIT_BK_COLOR_INDEX               9
 #define   EDIT_TEXT_COLOR_INDEX            10
+#define   HIGH_TEMP_ALARM_TEXT_COLOR_INDEX            11
+#define   LOW_TEMP_ALARM_TEXT_COLOR_INDEX             12
 
 #define   COMMON_PEN_INDEX              0
 #define   COMMON_BRUSH_INDEX            1
@@ -187,14 +190,14 @@ using namespace DuiLib;
 #define MAX_BED_NAME_LENGTH               16
 #define MAX_PATIENT_NAME_LENGTH           16
 
-#define FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM    60
+#define FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM    64
 #define INDEX_FONT_IN_STATE_MAXIUM            4
 #define TITLE_WIDTH_IN_STATE_MAXIUM           80
 #define TITLE_FONT_IN_STATE_MAXIUM            3
 #define BUTTON_WIDTH_IN_STATE_MAXIUM          160
 #define BUTTON_FONT_IN_STATE_MAXIUM           3
 
-#define FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS     30
+#define FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS     34
 #define INDEX_FONT_IN_STATE_GRIDS             3
 #define TITLE_WIDTH_IN_STATE_GRIDS            40
 #define TITLE_FONT_IN_STATE_GRIDS             1

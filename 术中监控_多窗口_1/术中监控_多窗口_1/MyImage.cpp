@@ -462,3 +462,90 @@ void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 		}
 	}
 }
+
+
+
+
+
+CAlarmImageUI::CAlarmImageUI(DuiLib::CPaintManagerUI *pManager) {
+	m_pManager = pManager;
+	m_bSetBkImage = FALSE;
+	m_nBkImageIndex = -1;
+}
+
+CAlarmImageUI::~CAlarmImageUI() {
+
+}
+
+bool CAlarmImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	return CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+}
+
+void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == DuiLib::UIEVENT_TIMER && event.wParam == MYIMAGE_TIMER_ID) {
+		if (m_bSetBkImage) {
+			if (0 == m_nBkImageIndex) {
+				if (m_nState == STATE_GRIDS) {
+					this->SetBkImage("alarm_high_temp_2.png");
+				}
+				else {
+					this->SetBkImage("alarm_high_temp_1.png"); 
+				}
+			}
+			else if (1 == m_nBkImageIndex) {
+				if (m_nState == STATE_GRIDS) {
+					this->SetBkImage("alarm_low_temp_2.png");
+				}
+				else {
+					this->SetBkImage("alarm_low_temp_1.png");
+				}
+			}
+			else if (2 == m_nBkImageIndex) {
+				if (m_nState == STATE_GRIDS) {
+					this->SetBkImage("");
+				}
+				else {
+					this->SetBkImage("");
+				}
+			}
+			else {
+				assert(0);
+				this->SetBkImage("");
+			}
+		}
+		else {
+			this->SetBkImage("");
+		}
+		m_bSetBkImage = !m_bSetBkImage;
+	}
+
+	CControlUI::DoEvent(event);
+}
+
+void   CAlarmImageUI::HighTempAlarm() {
+	m_nBkImageIndex = 0;
+	m_bSetBkImage = TRUE;
+	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+}
+
+void   CAlarmImageUI::LowTempAlarm() {
+	m_nBkImageIndex = 1;
+	m_bSetBkImage = TRUE;
+	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+}
+
+void  CAlarmImageUI::FailureAlarm() {
+	m_nBkImageIndex = 2;
+	m_bSetBkImage = TRUE;
+	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+}
+
+void   CAlarmImageUI::StopAlarm() {
+	m_nBkImageIndex = -1;
+	this->SetBkImage("");
+	m_pManager->KillTimer(this, MYIMAGE_TIMER_ID);
+}
+
+void  CAlarmImageUI::SetState(int nNewState) {
+	m_nState = nNewState;
+}

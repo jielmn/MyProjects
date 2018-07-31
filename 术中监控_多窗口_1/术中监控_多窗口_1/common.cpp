@@ -97,6 +97,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, MYIMAGE_CLASS_NAME)) {
 		return new CMyImageUI(m_pManager, m_pMainWnd);
 	}
+	else if (0 == strcmp(pstrClass, ALARM_IMAGE_CLASS_NAME)) {
+		return new CAlarmImageUI(m_pManager);
+	}
 	return NULL;
 }
 

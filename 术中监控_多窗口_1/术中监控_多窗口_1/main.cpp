@@ -27,6 +27,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 	memset(m_pLblNameTitle_small, 0, sizeof(m_pLblNameTitle_small));
 	memset(m_pLblCurTempTitle_small, 0, sizeof(m_pLblCurTempTitle_small));
 	memset(m_pMyImage, 0, sizeof(m_pMyImage));
+	memset(m_pAlarmUI, 0, sizeof(m_pAlarmUI));	
 	m_nState = STATE_GRIDS;	
 	m_nMaxGridIndex = -1;
 }
@@ -76,6 +77,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pEdtName_small[nIndex]->SetVisible(false);
 
 		m_pLblCurTemp_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_SMALL_NAME, 0));
+		m_pLblCurTemp_small[nIndex]->SetText("--");
 
 		m_pLblBedTitle_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_BED_TITLE_SMALL_NAME, 0));
 		m_pLblNameTitle_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_NAME_TITLE_SMALL_NAME, 0));
@@ -84,6 +86,9 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pMyImage[nIndex] = static_cast<CMyImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, MYIMAGE_NAME, 0));
 		m_pMyImage[nIndex]->SetIndex(nIndex);
 		m_pMyImage[nIndex]->SetTag(nIndex);
+
+		m_pAlarmUI[nIndex] = static_cast<CAlarmImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
+		m_pAlarmUI[nIndex]->SetTag(nIndex);
 
 		if ((DWORD)nIndex >= g_dwLayoutColumns * g_dwLayoutRows) {
 			m_pGrids[nIndex]->SetVisible(false);
@@ -303,6 +308,8 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 		m_pLblCurTempTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_MAXIUM);
 		m_pLblCurTemp_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
 		m_pLblCurTemp_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
+
+		m_pAlarmUI[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM - 2 * 2); 		
 	}
 	else {
 		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS);
@@ -326,8 +333,11 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 		m_pLblCurTempTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_GRIDS);
 		m_pLblCurTemp_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_GRIDS);
 		m_pLblCurTemp_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
+
+		m_pAlarmUI[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);
 	}
 	m_pMyImage[nIndex]->SetState(m_nState);
+	m_pAlarmUI[nIndex]->SetState(m_nState);
 }
 
 void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
@@ -566,6 +576,24 @@ void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 
 void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 	assert(nGridIndex >= 0 && nGridIndex < MAX_GRID_COUNT);
+
+	CDuiString  strText;
+	double dTemperature = dwTemp / 100.0;
+	strText.Format("%.2f", dTemperature );
+	m_pLblCurTemp_small[nGridIndex]->SetText( strText);
+
+	if ( dwTemp >= g_dwHighTempAlarm[nGridIndex]) {
+		m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[HIGH_TEMP_ALARM_TEXT_COLOR_INDEX]);
+		m_pAlarmUI[nGridIndex]->HighTempAlarm();
+	}
+	else if (dwTemp <= g_dwLowTempAlarm[nGridIndex]) {
+		m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[LOW_TEMP_ALARM_TEXT_COLOR_INDEX]);
+		m_pAlarmUI[nGridIndex]->LowTempAlarm();
+	}
+	else {
+		m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pAlarmUI[nGridIndex]->StopAlarm();
+	}
 
 	m_pMyImage[nGridIndex]->AddTemp(dwTemp);
 }

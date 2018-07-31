@@ -2,7 +2,7 @@
 <Window>	
 	<VerticalLayout >
 		
-		<HorizontalLayout height="30" name="layFlex" >
+		<HorizontalLayout height="34" name="layFlex" >
 			<VerticalLayout>
 			
 				<HorizontalLayout inset="5,2,5,2"  >
@@ -22,6 +22,8 @@
 					<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" />
 					<Label   name="lblCur_1"   text="36.50"    textcolor="#FFFFFFFF" width="50" font="1" />
 					<Control width="10" />
+					
+					<AlarmImage name="alarm_image" width="30" />
 					
 				</HorizontalLayout>
 				
