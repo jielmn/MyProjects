@@ -87,6 +87,7 @@ using namespace DuiLib;
 #define   LAYOUT_WINDOW_NAME       "layWindow"
 #define   LAYOUT_MAIN_NAME         "layMain"
 #define   LAYOUT_STATUS_NAME       "layStatus"
+#define   LAYOUT_FLEX_NAME         "layFlex"
 #define   LABEL_INDEX_SMALL_NAME   "lblIndex_1"
 //#define   LABEL_BED_SMALL_NAME     "lblBed_1"
 #define   BUTTON_BED_SMALL_NAME    "btnBed_1"
@@ -185,6 +186,20 @@ using namespace DuiLib;
 #define MAX_REMARK_LENGTH                 28
 #define MAX_BED_NAME_LENGTH               16
 #define MAX_PATIENT_NAME_LENGTH           16
+
+#define FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM    60
+#define INDEX_FONT_IN_STATE_MAXIUM            4
+#define TITLE_WIDTH_IN_STATE_MAXIUM           80
+#define TITLE_FONT_IN_STATE_MAXIUM            3
+#define BUTTON_WIDTH_IN_STATE_MAXIUM          160
+#define BUTTON_FONT_IN_STATE_MAXIUM           3
+
+#define FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS     30
+#define INDEX_FONT_IN_STATE_GRIDS             3
+#define TITLE_WIDTH_IN_STATE_GRIDS            40
+#define TITLE_FONT_IN_STATE_GRIDS             1
+#define BUTTON_WIDTH_IN_STATE_GRIDS           60
+#define BUTTON_FONT_IN_STATE_GRIDS            1
 
 /* ½á¹¹Ìå */
 typedef struct tagTempData {

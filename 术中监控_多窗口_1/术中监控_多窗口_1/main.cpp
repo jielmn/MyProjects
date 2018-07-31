@@ -16,6 +16,7 @@
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 	memset( m_pGrids, 0, sizeof(m_pGrids) );
+	memset(m_pLayFlex, 0, sizeof(m_pLayFlex));	
 	memset(m_pLblIndexes_small, 0, sizeof(m_pLblIndexes_small));
 	memset(m_pBtnBedName_small, 0, sizeof(m_pBtnBedName_small));
 	memset(m_pEdtBedName_small, 0, sizeof(m_pEdtBedName_small));
@@ -49,6 +50,9 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pGrids[nIndex]->SetName(GRID_NAME);
 		m_pGrids[nIndex]->SetTag(nIndex);
 
+		m_pLayFlex[nIndex] = static_cast<CHorizontalLayoutUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LAYOUT_FLEX_NAME, 0));
+		m_pLayFlex[nIndex]->SetTag(nIndex);
+
 		m_pLblIndexes_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_INDEX_SMALL_NAME, 0));
 		if (m_pLblIndexes_small[nIndex]) {
 			strText.Format("%lu", nIndex + 1);   
@@ -61,6 +65,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pEdtBedName_small[nIndex] = static_cast<CEditUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, EDIT_BED_SMALL_NAME, 0));
 		m_pEdtBedName_small[nIndex]->SetTag(nIndex);
 		m_pEdtBedName_small[nIndex]->SetText(g_szLastBedName[nIndex]);
+		m_pEdtBedName_small[nIndex]->SetVisible(false);
 
 		m_pBtnName_small[nIndex] = static_cast<CButtonUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, BUTTON_PATIENT_NAME_SMALL_NAME, 0));
 		m_pBtnName_small[nIndex]->SetTag(nIndex);
@@ -68,6 +73,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pEdtName_small[nIndex] = static_cast<CEditUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, EDIT_PATIENT_NAME_SMALL_NAME, 0));
 		m_pEdtName_small[nIndex]->SetTag(nIndex);
 		m_pEdtName_small[nIndex]->SetText(g_szLastPatientName[nIndex]);
+		m_pEdtName_small[nIndex]->SetVisible(false);
 
 		m_pLblCurTemp_small[nIndex] = static_cast<CLabelUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_SMALL_NAME, 0));
 
@@ -77,6 +83,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 		m_pMyImage[nIndex] = static_cast<CMyImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, MYIMAGE_NAME, 0));
 		m_pMyImage[nIndex]->SetIndex(nIndex);
+		m_pMyImage[nIndex]->SetTag(nIndex);
 
 		if ((DWORD)nIndex >= g_dwLayoutColumns * g_dwLayoutRows) {
 			m_pGrids[nIndex]->SetVisible(false);
@@ -127,6 +134,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_about") {
 		OnAbout();
 	}
+	else if (msg.sType == "menu_expand") {
+		OnGridExpandOrRestore(msg.pSender->GetTag());
+	}
+	else if (msg.sType == "menu_save_excel") {
+		OnGridSaveExcel(msg);
+	}
 	else if (msg.sType == "killfocus") {
 		if (name == EDIT_REMARK_NAME ) {
 			OnEdtRemarkKillFocus();
@@ -136,6 +149,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == EDIT_PATIENT_NAME_SMALL_NAME) {
 			OnEdtNameKillFocus(msg);
+		}
+	}
+	else if (msg.sType == "menu") {
+		if (name == MYIMAGE_NAME) {
+			OnGridMenu(msg);
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -151,8 +169,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == WM_TIMER) {
 #if TEST_FLAG
 		if (wParam == TIMER_TEST_ID) {
-			m_pMyImage[0]->AddTemp(GetRand(3200, 4200));
-			m_pMyImage[1]->AddTemp(GetRand(3200, 4200));
+			OnNewTempData(0, GetRand(3200, 4200));
+			OnNewTempData(1, GetRand(3200, 4200));
 		}
 #endif
 	}
@@ -260,6 +278,58 @@ void   CDuiFrameWnd::OnChangeSkin() {
 	}
 }
 
+void   CDuiFrameWnd::OnChangeState(int nIndex) {
+	assert( nIndex >= 0 && nIndex < MAX_GRID_COUNT );
+
+	if (m_nState == STATE_MAXIUM) {
+		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM);
+		m_pLblIndexes_small[nIndex]->SetFont(INDEX_FONT_IN_STATE_MAXIUM);
+
+		m_pLblBedTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_MAXIUM);
+		m_pLblBedTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_MAXIUM);
+		m_pBtnBedName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
+		m_pBtnBedName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
+		m_pEdtBedName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
+		m_pEdtBedName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
+
+		m_pLblNameTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_MAXIUM);
+		m_pLblNameTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_MAXIUM);
+		m_pBtnName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
+		m_pBtnName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
+		m_pEdtName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
+		m_pEdtName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
+
+		m_pLblCurTempTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_MAXIUM);
+		m_pLblCurTempTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_MAXIUM);
+		m_pLblCurTemp_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
+		m_pLblCurTemp_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
+	}
+	else {
+		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS);
+		m_pLblIndexes_small[nIndex]->SetFont(INDEX_FONT_IN_STATE_GRIDS);
+
+		m_pLblBedTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_GRIDS);
+		m_pLblBedTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_GRIDS);
+		m_pBtnBedName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_GRIDS);
+		m_pBtnBedName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
+		m_pEdtBedName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_GRIDS);
+		m_pEdtBedName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
+
+		m_pLblNameTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_GRIDS);
+		m_pLblNameTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_GRIDS);
+		m_pBtnName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_GRIDS);
+		m_pBtnName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
+		m_pEdtName_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_GRIDS);
+		m_pEdtName_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
+
+		m_pLblCurTempTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_GRIDS);
+		m_pLblCurTempTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_GRIDS);
+		m_pLblCurTemp_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_GRIDS);
+		m_pLblCurTemp_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
+	}
+	m_pMyImage[nIndex]->SetState(m_nState);
+}
+
 void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
 	RECT r = m_btnMenu->GetPos();
 	POINT pt = { r.left, r.bottom };
@@ -311,6 +381,15 @@ void   CDuiFrameWnd::OnEdtNameKillFocus(TNotifyUI& msg) {
 	msg.pSender->SetVisible(false);
 	m_pBtnName_small[nIndex]->SetText(msg.pSender->GetText());
 	m_pBtnName_small[nIndex]->SetVisible(true);
+}
+
+void   CDuiFrameWnd::OnGridMenu(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	
+	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+	CDuiMenu *pMenu = new CDuiMenu(_T("grid_menu.xml"), msg.pSender);
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);  
 }
 
 void   CDuiFrameWnd::OnSetting() {
@@ -390,41 +469,47 @@ void   CDuiFrameWnd::OnDbClick() {
 		strName = pFindControl->GetName();
 		if (0 == strcmp(strName, GRID_NAME)) {
 			DWORD nIndex = pFindControl->GetTag();
-
-			if ( m_nState == STATE_GRIDS ) {				
-				for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
-					if (i != nIndex) {
-						m_layMain->Remove(m_pGrids[i], true);
-					}
-				}
-				m_layMain->SetFixedColumns(1);
-				m_nState = STATE_MAXIUM;
-				m_nMaxGridIndex = nIndex;
-				m_pMyImage[nIndex]->SetState(m_nState);
-				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
-			}
-			else {
-				assert(STATE_MAXIUM == m_nState);
-				assert(m_nMaxGridIndex == nIndex);
-
-				for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
-					if (i != nIndex) {
-						m_layMain->AddAt(m_pGrids[i],i);
-					}
-				}
-
-				m_layMain->SetFixedColumns(g_dwLayoutColumns);
-				m_nState = STATE_GRIDS;
-				m_nMaxGridIndex = -1;
-				m_pMyImage[nIndex]->SetState(m_nState);
-				ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
-				OnEdtRemarkKillFocus();
-			}
-			
+			OnGridExpandOrRestore(nIndex);			
 			break;
 		}
 		pFindControl = pFindControl->GetParent();
 	}
+}
+
+void  CDuiFrameWnd::OnGridExpandOrRestore(DWORD nIndex) {
+	if (m_nState == STATE_GRIDS) {
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			if (i != nIndex) {
+				m_layMain->Remove(m_pGrids[i], true);
+			}
+		}
+		m_layMain->SetFixedColumns(1);
+		m_nState = STATE_MAXIUM;
+		m_nMaxGridIndex = nIndex;
+		OnChangeState(nIndex);
+		ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+	}
+	else {
+		assert(STATE_MAXIUM == m_nState);
+		assert(m_nMaxGridIndex == nIndex);
+
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			if (i != nIndex) {
+				m_layMain->AddAt(m_pGrids[i], i);
+			}
+		}
+
+		m_layMain->SetFixedColumns(g_dwLayoutColumns);
+		m_nState = STATE_GRIDS;
+		m_nMaxGridIndex = -1;
+		OnChangeState(nIndex);
+		ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+		OnEdtRemarkKillFocus();
+	}
+}
+
+void  CDuiFrameWnd::OnGridSaveExcel(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
 }
 
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
@@ -477,6 +562,12 @@ void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 			}
 		}
 	}
+}
+
+void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
+	assert(nGridIndex >= 0 && nGridIndex < MAX_GRID_COUNT);
+
+	m_pMyImage[nGridIndex]->AddTemp(dwTemp);
 }
  
 

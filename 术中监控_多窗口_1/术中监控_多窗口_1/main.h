@@ -22,6 +22,7 @@ public:
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
 	void   OnChangeSkin();
+	void   OnChangeState(int nGridIndex);
 	void   OnBtnMenu(TNotifyUI& msg);
 	void   OnBtnBedName(TNotifyUI& msg);
 	void   OnEdtBedNameKillFocus(TNotifyUI& msg);
@@ -30,13 +31,17 @@ private:
 	void   OnSetting();
 	void   OnAbout();
 	void   OnDbClick();
+	void   OnGridMenu(TNotifyUI& msg);
+	void   OnGridExpandOrRestore(DWORD nIndex);
+	void   OnGridSaveExcel(TNotifyUI& msg);
 	// 重新布局
 	void   ReLayout(DWORD dwWidth, DWORD dwHeight);
 	// 重新布局(在设置更改之后)
 	void   UpdateLayout();
 	void   OnUpdateGridScroll(WPARAM wParam, LPARAM lParam);
 	void   OnMyImageClick(const POINT * pPoint);
-
+	// 新温度数据达到
+	void   OnNewTempData(int nGridIndex, DWORD dwTemp);
 public:
 	void   OnEdtRemarkKillFocus();
 
@@ -48,6 +53,7 @@ private:
 	DuiLib::CHorizontalLayoutUI *      m_layStatus;
 
 	CControlUI *                       m_pGrids[MAX_GRID_COUNT];
+	CHorizontalLayoutUI *              m_pLayFlex[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblIndexes_small[MAX_GRID_COUNT];
 	//CLabelUI *                         m_pLblBed_small[MAX_GRID_COUNT];
 	CButtonUI *                        m_pBtnBedName_small[MAX_GRID_COUNT];
@@ -55,6 +61,7 @@ private:
 	//CLabelUI *                         m_pLblName_small[MAX_GRID_COUNT];
 	CButtonUI *                        m_pBtnName_small[MAX_GRID_COUNT];
 	CEditUI *                          m_pEdtName_small[MAX_GRID_COUNT];
+
 	CLabelUI *                         m_pLblCurTemp_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblBedTitle_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblNameTitle_small[MAX_GRID_COUNT];
@@ -64,7 +71,6 @@ private:
 
 	int                                m_nState;     // 多格子状态，单格子状态
 	int                                m_nMaxGridIndex; // 最大化格子的序号
-
 public:
 	DuiLib::CEditUI *                  m_edRemark;   // 编辑注释的框
 };
