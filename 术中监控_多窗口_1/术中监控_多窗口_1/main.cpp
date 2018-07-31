@@ -596,6 +596,13 @@ void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 	}
 
 	m_pMyImage[nGridIndex]->AddTemp(dwTemp);
+
+	// 如果报警开关打开
+	if (!g_bAlarmOff) {
+		if (dwTemp < g_dwLowTempAlarm[nGridIndex] || dwTemp > g_dwHighTempAlarm[nGridIndex]) {
+			CBusiness::GetInstance()->AlarmAsyn(g_szAlarmFilePath);
+		}
+	}
 }
  
 

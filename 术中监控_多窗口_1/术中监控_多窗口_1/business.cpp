@@ -10,7 +10,7 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() {
-
+	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
 }
 
 CBusiness::~CBusiness() {
@@ -168,37 +168,42 @@ int  CBusiness::UpdateScroll(const CUpdateScrollParam * pParam) {
 }
 
 int   CBusiness::AlarmAsyn(const char * szAlarmFile) {
-	// g_thrd_background->PostMessage(this, MSG_ALARM, new CAlarmParam(szAlarmFile));
+	g_thrd_work->PostMessage(this, MSG_ALARM, new CAlarmParam(szAlarmFile));
 	return 0;
 }
 
 int   CBusiness::Alarm(const CAlarmParam * pParam) {
 	DuiLib::CDuiString strText;
 
-	//if (m_szAlarmFile[0] == '\0') {
-	//	// open
-	//	strText.Format("open %s", pParam->m_szAlarmFile);
-	//	mciSendString(strText, NULL, 0, 0);
+	// 如果关闭报警开关
+	if ( g_bAlarmVoiceOff ) {
+		return 0;
+	}
 
-	//	// play
-	//	strText.Format("play %s", pParam->m_szAlarmFile);
-	//	mciSendString(strText, NULL, 0, 0);
-	//}
-	//else {
-	//	// stop
-	//	strText.Format("close %s", m_szAlarmFile);
-	//	mciSendString(strText, NULL, 0, 0);
+	if (m_szAlarmFile[0] == '\0') {
+		// open
+		strText.Format("open %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
 
-	//	// open
-	//	strText.Format("open %s", pParam->m_szAlarmFile);
-	//	mciSendString(strText, NULL, 0, 0);
+		// play
+		strText.Format("play %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+	}
+	else {
+		// stop
+		strText.Format("close %s", m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
 
-	//	// play
-	//	strText.Format("play %s", pParam->m_szAlarmFile);
-	//	mciSendString(strText, NULL, 0, 0);
+		// open
+		strText.Format("open %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
 
-	//}
-	//strncpy_s(m_szAlarmFile, pParam->m_szAlarmFile, sizeof(m_szAlarmFile));
+		// play
+		strText.Format("play %s", pParam->m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+
+	}
+	strncpy_s(m_szAlarmFile, pParam->m_szAlarmFile, sizeof(m_szAlarmFile)); 
 	return 0;
 }
 
@@ -211,6 +216,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CUpdateScrollParam * pParam = (CUpdateScrollParam *)pMessageData;
 		UpdateScroll(pParam);
+	}
+	break;
+
+	case MSG_ALARM: 
+	{
+		CAlarmParam * pParam = (CAlarmParam *)pMessageData;
+		Alarm(pParam);
 	}
 	break;
 

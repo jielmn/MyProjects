@@ -166,6 +166,7 @@ using namespace DuiLib;
 #define   COMMON_SETTING_TEXT             "通用设置"
 #define   GRIDS_COLUMNS_TEXT              "窗格列数"
 #define   GRIDS_ROWS_TEXT                 "窗格行数"
+#define   SKIN_CHOICE_TEXT                "选择皮肤"
 #define   ALARM_VOICE_SWITCH_TEXT         "报警声音开关"
 #define   SWITCH_ON_TEXT                  "开"
 #define   SWITCH_OFF_TEXT                 "关"
@@ -182,6 +183,7 @@ using namespace DuiLib;
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 
 #define MSG_UPDATE_SCROLL                 1001
+#define MSG_ALARM                         1002
 
 #define EDT_REMARK_WIDTH                  200
 #define EDT_REMARK_HEIGHT                 30

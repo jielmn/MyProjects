@@ -89,7 +89,7 @@ void  CSettingDlg::InitCommonCfg() {
 	}
 
 	SetComboStyle(pCombo);
-	m_tree->AddNode(ALARM_VOICE_SWITCH_TEXT, pTitleNode, 0, pCombo);
+	m_tree->AddNode(SKIN_CHOICE_TEXT, pTitleNode, 0, pCombo);
 
 	// ±¨¾¯ÉùÒô¿ª¹Ø
 	pCombo = new CComboUI;
@@ -366,7 +366,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 	g_dwLayoutColumns = nCols;
 	g_dwLayoutRows = nRows;
 	g_dwSkinIndex = nSkin;
-	g_bAlarmVoiceOff = bAlarmVoiceOff;
+	g_bAlarmVoiceOff = bAlarmVoiceOff; 
 
 	return TRUE;
 }

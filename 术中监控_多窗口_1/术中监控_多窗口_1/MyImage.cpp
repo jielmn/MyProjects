@@ -320,14 +320,6 @@ void  CMyImageUI::AddTemp(DWORD dwTemp) {
 
 	// 重绘
 	MyInvalidate();
-
-	assert(m_nIndex >= 0);
-	// 如果报警开关打开
-	if ( !g_bAlarmOff ) {
-		if (dwTemp < g_dwLowTempAlarm[m_nIndex] || dwTemp > g_dwHighTempAlarm[m_nIndex]) {
-			CBusiness::GetInstance()->AlarmAsyn(g_szAlarmFilePath);
-		}
-	}	
 }
 
 void  CMyImageUI::MyInvalidate() {

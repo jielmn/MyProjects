@@ -29,6 +29,9 @@ private:
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
 	BOOL CanBeFreed() { return false; }
+
+private:
+	char    m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 };
 
 
