@@ -53,6 +53,10 @@ int CBusiness::Init() {
 	if (g_dwMaxPointsCount < DEFAULT_MAX_POINTS_COUNT) {
 		g_dwMaxPointsCount = DEFAULT_MAX_POINTS_COUNT;
 	}
+	else if (g_dwMaxPointsCount > 3 * DEFAULT_MAX_POINTS_COUNT) {
+		g_dwMaxPointsCount = 3 * DEFAULT_MAX_POINTS_COUNT;
+	}
+
 	g_cfg->GetConfig(CFG_MYIMAGE_LEFT_BLANK,  g_dwMyImageLeftBlank,  DEFALUT_MYIMAGE_LEFT_BLANK);
 	g_cfg->GetConfig(CFG_MYIMAGE_RIGHT_BLANK, g_dwMyImageRightBlank, DEFALUT_MYIMAGE_RIGHT_BLANK);
 	g_cfg->GetConfig(CFG_MYIMAGE_TIME_TEXT_OFFSET_X, g_dwMyImageTimeTextOffsetX, DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_X);
