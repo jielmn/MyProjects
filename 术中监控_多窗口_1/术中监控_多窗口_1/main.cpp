@@ -11,6 +11,7 @@
 #include "resource.h"
 #include "LmnTelSvr.h"
 #include "SettingDlg.h"
+#include "AboutDlg.h"   
 
 #pragma comment(lib,"ole32.lib")
 #pragma comment(lib,"Oleaut32.lib")
@@ -459,7 +460,18 @@ void   CDuiFrameWnd::OnSetting() {
 }
 
 void   CDuiFrameWnd::OnAbout() {
-	
+	CAboutDlg * pAboutDlg = new CAboutDlg;
+
+	pAboutDlg->Create(this->m_hWnd, _T("关于"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAboutDlg->CenterWindow();
+	int ret = pAboutDlg->ShowModal();
+
+	// 如果OK
+	if (0 == ret) {
+
+	}
+
+	delete pAboutDlg;
 }
 
 void   CDuiFrameWnd::OnDbClick() {
