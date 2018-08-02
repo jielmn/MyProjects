@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout >
+		
+		<HorizontalLayout height="34" name="layFlex" >
+			<VerticalLayout>
+			
+				<HorizontalLayout inset="5,2,5,2"  >
+					<Label   name="lblIndex_1" text="1"    textcolor="#FFFFFFFF" width="40" font="3" />
+					<Control width="10" />
+					
+					<Label   name="lblBedTitle_1"  text="床号"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Edit    name="edtBed_1"  text="--"    textcolor="#FF000000" width="60" font="1" visible="true" />
+					<Button  name="btnBed_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="60" font="1" />
+					<Control width="10" />
+					
+					<Label   name="lblNameTitle_1"  text="姓名"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Edit    name="edtName_1"  text="--"    textcolor="#FF000000" width="60" font="1" visible="true" />
+					<Button  name="btnName_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="60" font="1" />
+					<Control width="10" />
+					
+					<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" />
+					<Label   name="lblCur_1"   text="36.50"    textcolor="#FFFFFFFF" width="50" font="1" />
+					<Control width="10" />
+					
+					<AlarmImage name="alarm_image" width="30" />
+					
+				</HorizontalLayout>
+				
+			</VerticalLayout>
+		</HorizontalLayout>
+		
+		<VerticalLayout inset="10,0,10,10" >
+			<!--
+			<HorizontalLayout height="24">
+				<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
+			</HorizontalLayout>
+			-->
+		
+			<VerticalLayout inset="0,0,0,0" hscrollbar="false" vscrollbar="false" sepheight="4" >
+				<MyImage name="my_image" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" menu="true" />
+			</VerticalLayout>
+		</VerticalLayout>
+		
+	</VerticalLayout>
+</Window>
