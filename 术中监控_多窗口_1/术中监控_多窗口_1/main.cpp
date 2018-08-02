@@ -12,7 +12,8 @@
 #include "LmnTelSvr.h"
 #include "SettingDlg.h"
 
-
+#pragma comment(lib,"ole32.lib")
+#pragma comment(lib,"Oleaut32.lib")
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 	memset( m_pGrids, 0, sizeof(m_pGrids) );
@@ -520,6 +521,9 @@ void  CDuiFrameWnd::OnGridExpandOrRestore(DWORD nIndex) {
 
 void  CDuiFrameWnd::OnGridSaveExcel(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	m_pMyImage[nIndex]->SaveExcel( m_pBtnBedName_small[nIndex]->GetText(), m_pBtnName_small[nIndex]->GetText() );
 }
 
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
@@ -621,6 +625,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		return 0;
 	}
 
+	CoInitialize(NULL);
+
 	int ret = 0;
 	LmnToolkits::ThreadManager::GetInstance();
 	ret = CBusiness::GetInstance()->Init();
@@ -655,6 +661,7 @@ LABEL_ERROR:
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();
 
+	CoUninitialize();
 	return 0;
 }
 

@@ -19,6 +19,7 @@ public:
 	void  OnChangeSkin();
 	void  OnMyClick(const POINT * pPoint);
 	void  SetRemark(DuiLib::CDuiString & strRemark);
+	void  SaveExcel(const char * szBed, const char * szPatientName);
 
 private:
 	DuiLib::CPaintManagerUI *    m_pManager;
