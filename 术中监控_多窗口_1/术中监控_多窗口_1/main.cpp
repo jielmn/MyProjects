@@ -91,6 +91,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 		m_pAlarmUI[nIndex] = static_cast<CAlarmImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
 		m_pAlarmUI[nIndex]->SetTag(nIndex);
+		m_pAlarmUI[nIndex]->FailureAlarm();
 
 		if ((DWORD)nIndex >= g_dwLayoutColumns * g_dwLayoutRows) {
 			m_pGrids[nIndex]->SetVisible(false);
@@ -178,11 +179,19 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (wParam == TIMER_TEST_ID) {
 			OnNewTempData(0, GetRand(3200, 4200));
 			OnNewTempData(1, GetRand(3200, 4200));
+			OnNewTempData(2, GetRand(3200, 4200));
+			OnNewTempData(3, GetRand(3200, 4200));
 		}
 #endif
 	}
 	else if (uMsg == UM_UPDATE_SCROLL) {
 		OnUpdateGridScroll(wParam, lParam);
+	}
+	else if (uMsg == UM_SHOW_READER_STATUS) {
+		OnReaderStatus(wParam, lParam);
+	}
+	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
+		OnReaderTemp(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -618,6 +627,42 @@ void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 		if (dwTemp < g_dwLowTempAlarm[nGridIndex] || dwTemp > g_dwHighTempAlarm[nGridIndex]) {
 			CBusiness::GetInstance()->AlarmAsyn(g_szAlarmFilePath);
 		}
+	}
+}
+
+void  CDuiFrameWnd::OnReaderStatus(WPARAM wParam, LPARAM lParam) {
+	CTelemedReader::READER_STATUS eStatus = (CTelemedReader::READER_STATUS)wParam;
+	int  nIndex = (int)lParam;
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	if (eStatus == CTelemedReader::STATUS_OPEN)
+	{
+		m_pAlarmUI[nIndex]->StopAlarm();
+		// 获取温度
+		CBusiness::GetInstance()->ReadTagTempAsyn(nIndex);
+	}
+	else
+	{
+		m_pAlarmUI[nIndex]->FailureAlarm();
+	}
+}
+
+// 温度数据
+void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM lParam) {
+	int    ret = (int)wParam;
+	DWORD  dwTemp = lParam & 0xFFFF;
+	int    nIndex = lParam >> 16;
+
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	if (0 == ret) {
+		OnNewTempData(nIndex, dwTemp);
+		// 获取下一次温度
+		CBusiness::GetInstance()->ReadTagTempAsyn(nIndex, g_dwCollectInterval[nIndex] * 1000);		
+	}
+	// 获取温度失败
+	else {
+		m_pLblCurTemp_small[nIndex]->SetText("--");
 	}
 }
  

@@ -11,6 +11,11 @@ CBusiness *  CBusiness::GetInstance() {
 
 CBusiness::CBusiness() {
 	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
+
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		m_reader[i].m_pBusiness = this;
+		m_reader[i].m_nIndex = i;
+	}
 }
 
 CBusiness::~CBusiness() {
@@ -32,6 +37,8 @@ void CBusiness::Clear() {
 }
 
 int CBusiness::Init() {
+	char buf[8192];
+
 	g_log = new FileLog();
 	if (0 == g_log) {
 		return -1;
@@ -108,6 +115,17 @@ int CBusiness::Init() {
 		return -1;
 	}
 
+	g_cfg->GetConfig("prepare command", buf, sizeof(buf), "55 01 01 DD AA");
+	TransferReaderCmd(PREPARE_COMMAND, buf);
+
+	g_cfg->GetConfig("read tag data command", buf, sizeof(buf), "55 01 02 DD AA");
+	TransferReaderCmd(READ_TAG_DATA_COMMAND, buf);
+
+	g_cfg->GetConfig("serial port sleep time", SERIAL_PORT_SLEEP_TIME, 30000);
+	if (SERIAL_PORT_SLEEP_TIME < 30000) {
+		SERIAL_PORT_SLEEP_TIME = 30000;
+	}
+
 	//g_thrd_db = new LmnToolkits::Thread();
 	//if (0 == g_thrd_db) {
 	//	return -1;
@@ -128,6 +146,12 @@ int CBusiness::Init() {
 		g_thrd_reader[i]->Start();
 	}
 
+	DWORD  dwRelay = 200;
+	for (DWORD i = 0; i < g_dwLayoutRows * g_dwLayoutColumns; i++) {
+		ReconnectReaderAsyn(i, dwRelay);
+		dwRelay += 200;
+	}
+
 	return 0;
 }
 
@@ -140,15 +164,19 @@ int CBusiness::DeInit() {
 	//}
 
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		g_thrd_reader[i]->Stop();
-		delete g_thrd_reader[i];
-		g_thrd_reader[i] = 0;
+		if (g_thrd_reader[i]) {
+			g_thrd_reader[i]->Stop();
+			delete g_thrd_reader[i];
+			g_thrd_reader[i] = 0;
+		}		
 	}
 
 	if (g_thrd_work) {
-		g_thrd_work->Stop();
-		delete g_thrd_work;
-		g_thrd_work = 0;
+		if (g_thrd_work) {
+			g_thrd_work->Stop();
+			delete g_thrd_work;
+			g_thrd_work = 0;
+		}
 	}
 
 	Clear();
@@ -211,6 +239,73 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 	return 0;
 }
 
+// 重连Reader
+int   CBusiness::ReconnectReaderAsyn(int nIndex, DWORD dwDelayTime /*= 0*/) {
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+	if (0 == dwDelayTime) {
+		g_thrd_reader[nIndex]->PostMessage(this, MSG_RECONNECT_READER, new CReconnectReaderParam(nIndex));
+	}
+	else {
+		g_thrd_reader[nIndex]->PostDelayMessage(dwDelayTime, this, MSG_RECONNECT_READER, new CReconnectReaderParam(nIndex));
+	}
+	return 0;
+}
+
+int   CBusiness::ReconnectReader(const CReconnectReaderParam * pParam) {
+	int nIndex = pParam->m_nIndex;
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+	return m_reader[nIndex].Reconnect();
+}
+
+// 通知界面连接结果
+int   CBusiness::NotifyUiReaderStatus(int nIndex, CTelemedReader::READER_STATUS eStatus) {
+	::PostMessage(g_hWnd, UM_SHOW_READER_STATUS, eStatus, nIndex);
+	return 0;
+}
+
+// 获取状态
+CTelemedReader::READER_STATUS  CBusiness::GetReaderStatus(int nIndex) {
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+	return m_reader[nIndex].GetStatus();
+}
+
+// 获取端口号
+const char * CBusiness::GetReaderComPort(int nIndex) {
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+	return m_reader[nIndex].m_szComPort;
+}
+
+// 读取Tag温度
+int   CBusiness::ReadTagTempAsyn(int nIndex, DWORD dwDelayTime /*= 0*/) {
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	if (0 == dwDelayTime) {
+		g_thrd_reader[nIndex]->PostMessage(this, MSG_GET_TAG_TEMP, new CReadTempParam(nIndex));
+	}
+	else {
+		g_thrd_reader[nIndex]->PostDelayMessage(dwDelayTime, this, MSG_GET_TAG_TEMP, new CReadTempParam(nIndex));
+	}
+
+	return 0;
+}
+
+int   CBusiness::ReadTagTemp(const CReadTempParam * pParam) {
+	int nIndex = pParam->m_nIndex;
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	DWORD  dwTemp = 0;
+	int ret = m_reader[nIndex].ReadTagTemp(dwTemp);
+	NotifyUiReadTagTemp(nIndex, ret, dwTemp);
+	return 0;
+}
+
+int   CBusiness::NotifyUiReadTagTemp(int nIndex, int ret, DWORD dwTemp) {
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	::PostMessage(g_hWnd, UM_SHOW_READ_TAG_TEMP_RET, ret, (nIndex << 16) | (dwTemp & 0xFFFF));
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -227,6 +322,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAlarmParam * pParam = (CAlarmParam *)pMessageData;
 		Alarm(pParam);
+	}
+	break;
+
+	case MSG_RECONNECT_READER:
+	{
+		CReconnectReaderParam * pParam = (CReconnectReaderParam *)pMessageData;
+		ReconnectReader(pParam);
+	}
+	break;
+
+	case MSG_GET_TAG_TEMP:
+	{
+		CReadTempParam * pParam = (CReadTempParam *)pMessageData;
+		ReadTagTemp(pParam);
 	}
 	break;
 

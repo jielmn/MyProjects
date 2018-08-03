@@ -570,10 +570,10 @@ void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
 			}
 			else if (2 == m_nBkImageIndex) {
 				if (m_nState == STATE_GRIDS) {
-					this->SetBkImage("");
+					this->SetBkImage("alarm_fail_2.png");
 				}
 				else {
-					this->SetBkImage("");
+					this->SetBkImage("alarm_fail_1.png");
 				}
 			}
 			else {
@@ -584,7 +584,12 @@ void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
 		else {
 			this->SetBkImage("");
 		}
-		m_bSetBkImage = !m_bSetBkImage;
+
+		// 如果不是FailureAlarm
+		if ( 2 != m_nBkImageIndex ) {
+			m_bSetBkImage = !m_bSetBkImage;
+		}
+		
 	}
 
 	CControlUI::DoEvent(event);

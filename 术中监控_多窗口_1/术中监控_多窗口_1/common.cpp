@@ -32,6 +32,10 @@ BOOL      g_bAutoScroll = TRUE;
 char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
 char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 
+ReaderCmd  PREPARE_COMMAND;
+ReaderCmd  READ_TAG_DATA_COMMAND;
+DWORD      SERIAL_PORT_SLEEP_TIME = 0;
+
 
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
@@ -172,4 +176,26 @@ void CGraphicsRoundRectPath::AddRoundRect(INT x, INT y, INT width, INT height, I
 
 	AddArc(x, y + height - elHei, elWid, elHei, 90, 90);
 	AddLine(x, y + cornerY, x, y + height - cornerY);
+}
+
+int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd) {
+	if (0 == szCmd) {
+		return -1;
+	}
+
+	SplitString split;
+	split.SplitByBlankChars(szCmd);
+	DWORD dwSize = split.Size();
+	if (dwSize >= sizeof(cmd.abyCommand)) {
+		return -1;
+	}
+
+	for (DWORD i = 0; i < dwSize; i++) {
+		int  tmp = 0;
+		sscanf_s(split[i], "%x", &tmp);
+		cmd.abyCommand[i] = (BYTE)tmp;
+	}
+	cmd.dwCommandLength = dwSize;
+
+	return 0;
 }

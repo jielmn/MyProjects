@@ -15,7 +15,7 @@ using namespace DuiLib;
 #include "skin.h"
 
 #ifdef   _DEBUG
-#define  TEST_FLAG                1
+#define  TEST_FLAG                0
 #endif
 
 #if TEST_FLAG
@@ -61,8 +61,8 @@ using namespace DuiLib;
 #define   CFG_LAST_BED_NAME                "last bed name"
 #define   CFG_LAST_PATIENT_NAME            "last patient name"
 
-#define   DEFAULT_MAIN_LAYOUT_COLUMNS   4
-#define   DEFAULT_MAIN_LAYOUT_ROWS      4
+#define   DEFAULT_MAIN_LAYOUT_COLUMNS   2
+#define   DEFAULT_MAIN_LAYOUT_ROWS      2
 #define   DEFAULT_TIME_UNIT_WIDTH       80
 #define   DEFAULT_MAX_POINTS_COUNT      1500
 #define   DEFALUT_MYIMAGE_LEFT_BLANK    40
@@ -181,9 +181,15 @@ using namespace DuiLib;
 #define   SKIN_WHITE_TEXT                 "白宣纸"
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
+#define UM_SHOW_READER_STATUS            (WM_USER+2)
+#define UM_SHOW_READ_TAG_TEMP_RET        (WM_USER+3)
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
+#define MSG_RECONNECT_READER              1003
+#define MSG_GET_TAG_TEMP                  1004
+
+#define  RECONNECT_READER_DELAY           5000
 
 #define EDT_REMARK_WIDTH                  200
 #define EDT_REMARK_HEIGHT                 30
@@ -206,6 +212,16 @@ using namespace DuiLib;
 #define BUTTON_WIDTH_IN_STATE_GRIDS           60
 #define BUTTON_FONT_IN_STATE_GRIDS            1
 
+#define    EXH_ERR_READER_CLOSE                          20001
+#define    EXH_ERR_READER_FAILED_TO_WRITE                20002
+#define    EXH_ERR_READER_TIMEOUT_OR_WRONG_FORMAT        20003
+#define    EXH_ERR_NOT_FOUND_TAG                         20004
+
+#define  MAX_READER_COMMAND_LENGTH              256
+
+// 张维国的新的读卡器
+#define TELEMED_READER_TYPE_1
+
 /* 结构体 */
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -226,6 +242,32 @@ public:
 class CUpdateScrollParam : public LmnToolkits::MessageData {
 public:
 	CUpdateScrollParam(int nIndex) : m_nIndex ( nIndex ) { }
+	int     m_nIndex;
+};
+
+class CReconnectReaderParam : public LmnToolkits::MessageData {
+public:
+	CReconnectReaderParam(int nIndex) {
+		m_nIndex = nIndex;
+	}
+	~CReconnectReaderParam() {}
+
+	int     m_nIndex;
+};
+
+// Reader通信协议命令
+typedef struct tagReaderCmd {
+	BYTE      abyCommand[MAX_READER_COMMAND_LENGTH];
+	DWORD     dwCommandLength;
+}ReaderCmd;
+
+class CReadTempParam : public LmnToolkits::MessageData {
+public:
+	CReadTempParam(int nIndex) {
+		m_nIndex = nIndex;
+	}
+	~CReadTempParam() {}
+
 	int     m_nIndex;
 };
 
@@ -305,11 +347,16 @@ extern BOOL      g_bAutoScroll;
 extern char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
 extern char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 
+extern ReaderCmd  PREPARE_COMMAND;
+extern ReaderCmd  READ_TAG_DATA_COMMAND;
+extern DWORD      SERIAL_PORT_SLEEP_TIME;
+
 /* 函数 */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern BOOL GetAllSerialPortName(std::vector<std::string> & vCom);
+extern int TransferReaderCmd(ReaderCmd & cmd, const char * szCmd);
 
 // templates
 template <class T>

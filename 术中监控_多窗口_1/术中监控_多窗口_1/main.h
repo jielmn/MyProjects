@@ -42,6 +42,11 @@ private:
 	void   OnMyImageClick(const POINT * pPoint);
 	// 新温度数据达到
 	void   OnNewTempData(int nGridIndex, DWORD dwTemp);
+
+	// 读卡器状态
+	void   OnReaderStatus(WPARAM wParam, LPARAM lParam);
+	// 温度数据
+	void   OnReaderTemp(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 
