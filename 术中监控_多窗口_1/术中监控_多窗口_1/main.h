@@ -47,6 +47,8 @@ private:
 	void   OnReaderStatus(WPARAM wParam, LPARAM lParam);
 	// 温度数据
 	void   OnReaderTemp(WPARAM wParam, LPARAM lParam);
+	// 重新分配串口给reader
+	void   ReAssignReader(DWORD dwCount, DWORD * pIntervals);
 public:
 	void   OnEdtRemarkKillFocus();
 

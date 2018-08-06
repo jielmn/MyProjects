@@ -188,6 +188,7 @@ using namespace DuiLib;
 #define MSG_ALARM                         1002
 #define MSG_RECONNECT_READER              1003
 #define MSG_GET_TAG_TEMP                  1004
+#define MSG_STOP_READER                   1005
 
 #define  RECONNECT_READER_DELAY           5000
 
@@ -267,6 +268,16 @@ public:
 		m_nIndex = nIndex;
 	}
 	~CReadTempParam() {}
+
+	int     m_nIndex;
+};
+
+class CStopReaderParam : public LmnToolkits::MessageData {
+public:
+	CStopReaderParam(int nIndex) {
+		m_nIndex = nIndex;
+	}
+	~CStopReaderParam() {}
 
 	int     m_nIndex;
 };

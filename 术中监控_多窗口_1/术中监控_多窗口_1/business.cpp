@@ -16,6 +16,8 @@ CBusiness::CBusiness() {
 		m_reader[i].m_pBusiness = this;
 		m_reader[i].m_nIndex = i;
 	}
+
+	memset(m_bReaderAvailable, 0, sizeof(m_bReaderAvailable));
 }
 
 CBusiness::~CBusiness() {
@@ -148,6 +150,7 @@ int CBusiness::Init() {
 
 	DWORD  dwRelay = 200;
 	for (DWORD i = 0; i < g_dwLayoutRows * g_dwLayoutColumns; i++) {
+		m_bReaderAvailable[i] = TRUE;
 		ReconnectReaderAsyn(i, dwRelay);
 		dwRelay += 200;
 	}
@@ -243,6 +246,14 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 // 重连Reader
 int   CBusiness::ReconnectReaderAsyn(int nIndex, DWORD dwDelayTime /*= 0*/) {
 	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+	// 如果被禁止使用
+	if (!m_bReaderAvailable[nIndex]) {
+		return 0;
+	}
+
+	m_reader[nIndex].m_bStop = TRUE;
+	g_thrd_reader[nIndex]->DeleteMessages();
+
 	if (0 == dwDelayTime) {
 		g_thrd_reader[nIndex]->PostMessage(this, MSG_RECONNECT_READER, new CReconnectReaderParam(nIndex));
 	}
@@ -307,6 +318,22 @@ int   CBusiness::NotifyUiReadTagTemp(int nIndex, int ret, DWORD dwTemp) {
 	return 0;
 }
 
+int   CBusiness::StopReaderAsyn(int nIndex) {
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+	m_bReaderAvailable[nIndex] = FALSE;
+	m_reader[nIndex].m_bStop = TRUE;
+	g_thrd_reader[nIndex]->DeleteMessages();
+	g_thrd_reader[nIndex]->PostMessage(this, MSG_STOP_READER, new CStopReaderParam(nIndex));
+	return 0;
+}
+
+int   CBusiness::StopReader(const CStopReaderParam * pParam) {
+	int nIndex = pParam->m_nIndex;
+	m_reader[nIndex].CloseUartPort();
+	NotifyUiReaderStatus(nIndex, m_reader[nIndex].GetStatus());
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -337,6 +364,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CReadTempParam * pParam = (CReadTempParam *)pMessageData;
 		ReadTagTemp(pParam);
+	}
+	break;
+
+	case MSG_STOP_READER:
+	{
+		CStopReaderParam * pParam = (CStopReaderParam *)pMessageData;
+		StopReader(pParam);
 	}
 	break;
 

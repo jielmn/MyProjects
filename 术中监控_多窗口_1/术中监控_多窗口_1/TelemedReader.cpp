@@ -27,7 +27,9 @@ CTelemedReader::READER_STATUS CTelemedReader::GetStatus() {
 int  CTelemedReader::Reconnect() {
 	// 如果已经连接上
 	if (m_eStatus == STATUS_OPEN) {
-		return 0;
+		CloseUartPort();
+		m_eStatus = STATUS_CLOSE;
+		m_pBusiness->NotifyUiReaderStatus(m_nIndex, m_eStatus);
 	}
 
 	assert( m_nIndex >= 0 && m_nIndex < MAX_GRID_COUNT );

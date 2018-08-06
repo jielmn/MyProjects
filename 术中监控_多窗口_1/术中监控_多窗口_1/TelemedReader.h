@@ -25,9 +25,12 @@ private:
 	// 串口连接，关闭处理
 	// 打开串口
 	BOOL      OpenUartPort(const char *UartPortName);
+
+public:
 	// 关闭串口
 	BOOL      CloseUartPort();
 
+private:
 	BOOL      InitUartPort(HANDLE hComm, DWORD BaudRate, BYTE ByteSize, BYTE Parity, BYTE StopBits);
 	BOOL      WriteUartPort(HANDLE hComm, const void * WriteBuf, DWORD ToWriteDataLen, DWORD *WritedDataLen);
 	BOOL      RcvDataFromUartPort(HANDLE hComm, void *RcvBuf, DWORD ToRcvDataLen, DWORD *RcvedDataLen, LPOVERLAPPED lpOverlapped);

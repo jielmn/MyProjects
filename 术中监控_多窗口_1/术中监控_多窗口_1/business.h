@@ -39,6 +39,10 @@ public:
 	int   ReadTagTemp(const CReadTempParam * pParam);
 	int   NotifyUiReadTagTemp(int nIndex, int ret, DWORD dwTemp);
 
+	// Stop Reader
+	int   StopReaderAsyn(int nIndex);
+	int   StopReader(const CStopReaderParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -50,6 +54,9 @@ private:
 private:
 	char    m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 	CTelemedReader       m_reader[MAX_GRID_COUNT];
+
+public:
+	BOOL                 m_bReaderAvailable[MAX_GRID_COUNT];
 };
 
 

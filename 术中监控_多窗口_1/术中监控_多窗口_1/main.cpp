@@ -404,6 +404,39 @@ void   CDuiFrameWnd::OnEdtNameKillFocus(TNotifyUI& msg) {
 	m_pBtnName_small[nIndex]->SetVisible(true);
 }
 
+// 重新分配串口给reader
+void   CDuiFrameWnd::ReAssignReader(DWORD dwCount, DWORD * pIntervals) {
+	DWORD dwRelay = 200;
+	for (DWORD i = 0; i < dwCount; i++) {
+		// 如果采集间隔改变，删除采集命令
+		if (     g_dwCollectInterval[i] != pIntervals[i] 
+			  && CTelemedReader::STATUS_OPEN == CBusiness::GetInstance()->GetReaderStatus(i) ) {
+			g_thrd_reader[i]->DeleteMessages();
+			CBusiness::GetInstance()->ReadTagTempAsyn(i, g_dwCollectInterval[i] * 1000);
+		}
+
+		if (g_szComPort[i][0] != '\0') {
+			for (DWORD j = i + 1; j < dwCount; j++) {
+				if (   g_szComPort[j][0] == '\0' 
+					&& 0 == strcmp(CBusiness::GetInstance()->GetReaderComPort(j), g_szComPort[i]) ) {
+					CBusiness::GetInstance()->ReconnectReaderAsyn(j, dwRelay);
+					dwRelay += 200;
+				}
+			}
+		}
+		else {
+			for (DWORD j = i + 1; j < dwCount; j++) {
+				if (g_szComPort[j][0] != '\0'
+					&& 0 == strcmp(CBusiness::GetInstance()->GetReaderComPort(i), g_szComPort[j])) {
+					CBusiness::GetInstance()->ReconnectReaderAsyn(i, dwRelay);
+					dwRelay += 200;
+					break;
+				}
+			}
+		}
+	}
+}
+
 void   CDuiFrameWnd::OnGridMenu(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	
@@ -417,6 +450,11 @@ void   CDuiFrameWnd::OnSetting() {
 	CDuiString  strText;
 	DWORD  dwValue = 0;
 	CSettingDlg * pSettingDlg = new CSettingDlg;
+
+	DWORD  dwOldRows = g_dwLayoutRows;
+	DWORD  dwOldCols = g_dwLayoutColumns;
+	DWORD  dwCollectInterval[MAX_GRID_COUNT];
+	memcpy(dwCollectInterval, g_dwCollectInterval, sizeof(dwCollectInterval));
 
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSettingDlg->CenterWindow();
@@ -463,6 +501,31 @@ void   CDuiFrameWnd::OnSetting() {
 		OnChangeSkin();
 		UpdateLayout();
 		//::InvalidateRect(GetHWND(), 0, TRUE);
+
+		// 窗格不变
+		DWORD dwOldCount = dwOldCols * dwOldRows;
+		DWORD dwNewCount = g_dwLayoutColumns * g_dwLayoutRows;
+		if ( dwOldCount == dwNewCount) {			
+			ReAssignReader(dwOldCount, dwCollectInterval);
+		}
+		// 扩大
+		else if ( dwOldCount < dwNewCount ) {
+			DWORD dwDelay = 200;
+			for (DWORD i = 0; i < dwNewCount - dwOldCount; i++) {
+				CBusiness::GetInstance()->m_bReaderAvailable[dwOldCount + i] = TRUE;
+				CBusiness::GetInstance()->ReconnectReaderAsyn(dwOldCount + i, dwDelay);
+				dwDelay += 200;
+			}
+			ReAssignReader(dwNewCount, dwCollectInterval);			
+		}
+		// 缩小
+		else {
+			ReAssignReader(dwNewCount, dwCollectInterval);
+
+			for (DWORD i = 0; i < dwOldCount - dwNewCount; i++) {
+				CBusiness::GetInstance()->StopReaderAsyn(dwOldCount - i - 1);
+			}
+		}
 	}
 
 	delete pSettingDlg;
