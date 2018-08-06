@@ -8,6 +8,7 @@ CTelemedReader::CTelemedReader(CBusiness * pBusiness) : m_pBusiness(pBusiness) {
 	m_hComm = 0;
 	m_nIndex = 0;
 	memset(m_szComPort, 0, sizeof(m_szComPort));
+	m_bStop = TRUE;
 }
 
 CTelemedReader::~CTelemedReader() {
@@ -16,6 +17,7 @@ CTelemedReader::~CTelemedReader() {
 
 void CTelemedReader::Clear() {
 	m_received_data.Clear();
+	m_bStop = TRUE;
 }
 
 CTelemedReader::READER_STATUS CTelemedReader::GetStatus() {
@@ -64,6 +66,7 @@ int  CTelemedReader::Reconnect() {
 	// 先关闭之前可能打开的串口
 	CloseUartPort();
 
+	m_bStop = FALSE;
 	BOOL  bPrepared = FALSE;
 	// 尝试打开从系统获得的串口列表
 	do
@@ -105,9 +108,11 @@ int  CTelemedReader::Reconnect() {
 	if (bPrepared) {		
 		m_eStatus = STATUS_OPEN;
 		m_pBusiness->NotifyUiReaderStatus(m_nIndex,m_eStatus);
+		m_bStop = FALSE;
 	}
 	else {
 		m_pBusiness->ReconnectReaderAsyn(m_nIndex,RECONNECT_READER_DELAY);
+		m_bStop = TRUE;
 	}
 
 	return 0;
@@ -523,5 +528,5 @@ void  CTelemedReader::ReceiveAsPossible( DWORD dwMaxTime, DWORD dwMaxDataLength 
 			break;
 		}
 
-	} while (TRUE);
+	} while (!m_bStop);
 }

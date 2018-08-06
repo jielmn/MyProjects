@@ -165,6 +165,7 @@ int CBusiness::DeInit() {
 
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		if (g_thrd_reader[i]) {
+			m_reader[i].m_bStop = TRUE;
 			g_thrd_reader[i]->Stop();
 			delete g_thrd_reader[i];
 			g_thrd_reader[i] = 0;

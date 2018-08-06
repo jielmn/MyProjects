@@ -47,6 +47,8 @@ private:
 	READER_STATUS      m_eStatus;
 	HANDLE             m_hComm;                           // 串口句柄
 	CDataBuf           m_received_data;                   // 从串口接收数据的缓冲区
+public:
+	BOOL               m_bStop;
 
 public:
 	CBusiness  *       m_pBusiness;
