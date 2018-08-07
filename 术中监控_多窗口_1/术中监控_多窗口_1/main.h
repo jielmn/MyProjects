@@ -49,6 +49,8 @@ private:
 	void   OnReaderTemp(WPARAM wParam, LPARAM lParam);
 	// 重新分配串口给reader
 	void   ReAssignReader(DWORD dwCount, DWORD * pIntervals);
+	// 鼠轮
+	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 

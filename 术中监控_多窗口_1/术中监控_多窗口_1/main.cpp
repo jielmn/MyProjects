@@ -193,6 +193,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_SHOW_READ_TAG_TEMP_RET) {
 		OnReaderTemp(wParam, lParam);
 	}
+	else if (uMsg == WM_MOUSEWHEEL) {
+		OnMyMouseWheel(wParam, lParam);
+	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -726,6 +729,32 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM lParam) {
 	// »ñÈ¡ÎÂ¶ÈÊ§°Ü
 	else {
 		m_pLblCurTemp_small[nIndex]->SetText("--");
+	}
+}
+
+// ÊóÂÖ
+void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
+	int nDirectory = (int)wParam;
+	BOOL bChanged = FALSE;
+	if (nDirectory > 0)
+	{
+		if ( g_dwTimeUnitWidth >= 20 ) {
+			g_dwTimeUnitWidth -= 5;
+			bChanged = TRUE;
+		}		
+	}		
+	else
+	{
+		if ( g_dwTimeUnitWidth < 100 ) {
+			g_dwTimeUnitWidth += 5;
+			bChanged = TRUE;
+		}		
+	}
+		
+	if ( bChanged ) {
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pMyImage[i]->MyInvalidate();
+		}
 	}
 }
  
