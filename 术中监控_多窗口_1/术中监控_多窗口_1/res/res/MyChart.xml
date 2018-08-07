@@ -6,7 +6,7 @@
 			<VerticalLayout>
 			
 				<HorizontalLayout inset="5,2,5,2"  >
-					<Label   name="lblIndex_1" text="1"    textcolor="#FFFFFFFF" width="40" font="3" />
+					<Label   name="lblIndex_1" text="1"    textcolor="#FFFFFFFF" width="60" font="3" />
 					<Control width="10" />
 					
 					<Label   name="lblBedTitle_1"  text="床号"    textcolor="#FFFFFFFF" width="40" font="1" />
