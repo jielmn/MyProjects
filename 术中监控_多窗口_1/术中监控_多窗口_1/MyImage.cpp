@@ -466,6 +466,12 @@ void  CMyImageUI::SaveExcel(const char * szBed, const char * szPatientName) {
 
 	OPENFILENAME ofn = { 0 };
 	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+
+	char szTime[256];
+	time_t now = time(0);
+	Date2String_1(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s_%s", szPatientName, szTime);
+
 	ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
 	ofn.hwndOwner = m_pMainWnd->GetHWND();//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
 	ofn.lpstrFilter = TEXT("Excel Flie(*.xls)\0*.xls\0Excel Flie(*.xlsx)\0*.xlsx\0\0");//设置过滤  

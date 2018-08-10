@@ -771,6 +771,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		HWND hWnd = ::FindWindow(MAIN_FRAME_NAME, 0);
 		::ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 		::InvalidateRect(hWnd, 0, TRUE);
+		::MessageBox(0,"程序已经打开或没有关闭完全，请先关闭或等待完全关闭!", "错误", 0);
 		return 0;
 	}
 
