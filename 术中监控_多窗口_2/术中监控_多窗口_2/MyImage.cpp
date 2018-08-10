@@ -458,6 +458,12 @@ void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 
 void  CMyImageUI::SaveExcel(const char * szBed, const char * szPatientName) {
 	CDuiString strText;
+
+	if ( !CExcel::IfExcelInstalled() ) {
+		::MessageBox(m_pMainWnd->GetHWND(), "没有检测到系统安装了excel", "保存excel", 0);
+		return;
+	}
+
 	if ( m_vTempData.size() == 0 ) {
 		strText.Format("第%d个窗格没有温度数据，放弃保存excel", m_nIndex + 1);
 		::MessageBox( m_pMainWnd->GetHWND(), strText, "保存excel", 0 );
@@ -466,6 +472,12 @@ void  CMyImageUI::SaveExcel(const char * szBed, const char * szPatientName) {
 
 	OPENFILENAME ofn = { 0 };
 	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+
+	char szTime[256];
+	time_t now = time(0);
+	Date2String_1(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s_%s", szPatientName, szTime);
+
 	ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
 	ofn.hwndOwner = m_pMainWnd->GetHWND();//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
 	ofn.lpstrFilter = TEXT("Excel Flie(*.xls)\0*.xls\0Excel Flie(*.xlsx)\0*.xlsx\0\0");//设置过滤  
@@ -570,10 +582,10 @@ void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
 			}
 			else if (2 == m_nBkImageIndex) {
 				if (m_nState == STATE_GRIDS) {
-					this->SetBkImage("");
+					this->SetBkImage("alarm_fail_2.png");
 				}
 				else {
-					this->SetBkImage("");
+					this->SetBkImage("alarm_fail_1.png");
 				}
 			}
 			else {
@@ -584,7 +596,12 @@ void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
 		else {
 			this->SetBkImage("");
 		}
-		m_bSetBkImage = !m_bSetBkImage;
+
+		// 如果不是FailureAlarm
+		if ( 2 != m_nBkImageIndex ) {
+			m_bSetBkImage = !m_bSetBkImage;
+		}
+		
 	}
 
 	CControlUI::DoEvent(event);

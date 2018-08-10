@@ -458,6 +458,12 @@ void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 
 void  CMyImageUI::SaveExcel(const char * szBed, const char * szPatientName) {
 	CDuiString strText;
+
+	if (!CExcel::IfExcelInstalled()) {
+		::MessageBox(m_pMainWnd->GetHWND(), "没有检测到系统安装了excel", "保存excel", 0);
+		return;
+	}
+
 	if ( m_vTempData.size() == 0 ) {
 		strText.Format("第%d个窗格没有温度数据，放弃保存excel", m_nIndex + 1);
 		::MessageBox( m_pMainWnd->GetHWND(), strText, "保存excel", 0 );

@@ -42,6 +42,8 @@ private:
 	void   OnMyImageClick(const POINT * pPoint);
 	// 新温度数据达到
 	void   OnNewTempData(int nGridIndex, DWORD dwTemp);
+	// 鼠轮
+	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 

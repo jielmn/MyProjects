@@ -91,6 +91,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 		m_pAlarmUI[nIndex] = static_cast<CAlarmImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
 		m_pAlarmUI[nIndex]->SetTag(nIndex);
+		m_pAlarmUI[nIndex]->FailureAlarm();
 
 		if ((DWORD)nIndex >= g_dwLayoutColumns * g_dwLayoutRows) {
 			m_pGrids[nIndex]->SetVisible(false);
@@ -183,6 +184,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_UPDATE_SCROLL) {
 		OnUpdateGridScroll(wParam, lParam);
+	}
+	else if (uMsg == WM_MOUSEWHEEL) {
+		OnMyMouseWheel(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -620,6 +624,32 @@ void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 		}
 	}
 }
+
+// 鼠轮
+void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
+	int nDirectory = (int)wParam;
+	BOOL bChanged = FALSE;
+	if (nDirectory > 0)
+	{
+		if (g_dwTimeUnitWidth >= 20) {
+			g_dwTimeUnitWidth -= 5;
+			bChanged = TRUE;
+		}
+	}
+	else
+	{
+		if (g_dwTimeUnitWidth < 100) {
+			g_dwTimeUnitWidth += 5;
+			bChanged = TRUE;
+		}
+	}
+
+	if (bChanged) {
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pMyImage[i]->MyInvalidate();
+		}
+	}
+}
  
 
  
@@ -634,6 +664,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		HWND hWnd = ::FindWindow(MAIN_FRAME_NAME, 0);
 		::ShowWindow(hWnd, SW_SHOWMAXIMIZED);
 		::InvalidateRect(hWnd, 0, TRUE);
+		::MessageBox(0,"程序已经打开或没有关闭完全，请先关闭或等待完全关闭!", "错误", 0);
 		return 0;
 	}
 
