@@ -9,8 +9,10 @@
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
+IConfig * g_cfg_area = 0;
 LmnToolkits::Thread *  g_thrd_worker = 0;
 HWND    g_hWnd = 0;
+std::vector<TArea *>  g_vArea;
 
 //char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 //	struct tm  tmp;
@@ -149,4 +151,22 @@ BOOL EnumPortsWdm(std::vector<std::string> & v)
 	}
 
 	return TRUE;
+}
+
+void  SaveAreas() {
+	g_cfg_area->ClearConfig();
+
+	std::vector<TArea *>::iterator it;
+	int i = 0;
+	DuiLib::CDuiString strText;
+
+	for (it = g_vArea.begin(); it != g_vArea.end(); it++, i++) {
+		TArea * pArea = *it;
+		strText.Format("area no %d", i + 1);
+		g_cfg_area->SetConfig(strText, pArea->dwAreaNo);
+		strText.Format("area name %d", i + 1);
+		g_cfg_area->SetConfig(strText, pArea->szAreaName);
+	}
+
+	g_cfg_area->Save();
 }

@@ -28,6 +28,9 @@ private:
 	void  OnSettingGw();
 	void  SetBusy(BOOL bBusy);
 	void  OnQueryGw();
+	void  OnAddArea();
+
+	void  OnAreaListMenu(TNotifyUI& msg);
 
 	void  OnSettingReaderRet(WPARAM wParm, LPARAM  lParam);
 	void  OnDeviceChanged(WPARAM wParm, LPARAM  lParam);
@@ -46,6 +49,7 @@ private:
 	DuiLib::CButtonUI *                 m_btnSetting2;
 	DuiLib::CButtonUI *                 m_btnQuery2;
 	DuiLib::CEditUI *                   m_edtQuery2Ret;
+	DuiLib::CListUI *                   m_lstArea;
 
 	BOOL                                m_bBusy;
 

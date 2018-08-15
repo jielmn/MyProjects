@@ -10,6 +10,53 @@
 #include "business.h"
 #include "resource.h"
 #include <locale.h>
+#include "AreaDlg.h"
+
+class CDuiMenu : public WindowImplBase
+{
+protected:
+	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
+	CDuiString  m_strXMLPath;
+	CControlUI * m_pOwner;
+
+public:
+	explicit CDuiMenu(LPCTSTR pszXMLPath, CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
+	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
+	virtual CDuiString GetSkinFolder() { return _T(""); }
+	virtual CDuiString GetSkinFile() { return m_strXMLPath; }
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
+
+	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+	{
+		Close();
+		bHandled = FALSE;
+		return 0;
+	}
+
+	void Init(HWND hWndParent, POINT ptPos)
+	{
+		Create(hWndParent, _T("MenuWnd"), UI_WNDSTYLE_FRAME, WS_EX_WINDOWEDGE);
+		::ClientToScreen(hWndParent, &ptPos);
+		::SetWindowPos(*this, NULL, ptPos.x, ptPos.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+	}
+
+	virtual void  Notify(TNotifyUI& msg) {
+		if (msg.sType == "itemclick") {
+			if (m_pOwner) {
+				m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), 0, 0, true);
+			}
+			return;
+		}
+		WindowImplBase::Notify(msg);
+	}
+
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		return __super::HandleMessage(uMsg, wParam, lParam);
+	}
+};
+
+
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_bBusy = FALSE;
@@ -37,13 +84,28 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnQuery2 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnQuery2"));
 
 	m_edtQuery2Ret = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtAreaNo_Ret2"));
+	m_lstArea = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstArea"));
 
 	OnFreshComPort_Reader();
-	OnFreshComPort_Gw();
+	OnFreshComPort_Gw();    
+
+	DuiLib::CDuiString  strText;
+	std::vector<TArea *>::iterator it;
+	for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+		TArea * pArea = *it;
+
+		CListTextElementUI* pItem = new CListTextElementUI;
+		m_lstArea->Add(pItem);
+
+		strText.Format("%lu", pArea->dwAreaNo);
+		pItem->SetText(0, strText);
+		pItem->SetText(1, pArea->szAreaName);
+	}
+	
 
 	WindowImplBase::InitWindow();
 } 
-   
+         
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp("reader_setting", pstrClass)) {
 		DuiLib::CDialogBuilder builder;
@@ -53,6 +115,11 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp("gw_setting", pstrClass)) {
 		DuiLib::CDialogBuilder builder;
 		DuiLib::CControlUI * pUI = builder.Create(_T("gw_setting.xml"), (UINT)0, 0, &m_PaintManager);
+		return pUI;
+	}
+	else if (0 == strcmp("area_setting", pstrClass)) {
+		DuiLib::CDialogBuilder builder;
+		DuiLib::CControlUI * pUI = builder.Create(_T("area_setting.xml"), (UINT)0, 0, &m_PaintManager);
 		return pUI;
 	}
 	else if (0 == strcmp(pstrClass, "MyProgress")) {
@@ -77,6 +144,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == _T("opn_gw_setting")) {
 			m_tabs->SelectItem(1);
 		}
+		else if (name == _T("opn_area_setting")) {
+			m_tabs->SelectItem(2);
+		}
 	}
 	else if ( msg.sType == "click" ) {
 		if (name == "btnFresh1") {
@@ -94,6 +164,15 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnQuery2") {
 			OnQueryGw();
 		}
+	}
+	else if ( msg.sType == "menu" )
+	{ 
+		if (name == "lstArea" ) {
+			OnAreaListMenu(msg);
+		} 
+	}
+	else if (msg.sType == "menu_add_area") {
+		OnAddArea();		
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -336,6 +415,25 @@ void  CDuiFrameWnd::OnQueryGw() {
 	SetBusy(TRUE);
 }
 
+void  CDuiFrameWnd::OnAddArea() {
+	CAreaWnd * pAreaDlg = new CAreaWnd();
+	pAreaDlg->Create(this->m_hWnd, _T("添加区域"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAreaDlg->CenterWindow();
+
+	// 如果是确定按钮后关闭
+	if ( 0 == pAreaDlg->ShowModal() ) {
+		DuiLib::CDuiString  strText;
+		CListTextElementUI* pItem = new CListTextElementUI;
+		m_lstArea->Add(pItem);
+
+		strText.Format("%lu", pAreaDlg->m_tArea.dwAreaNo);
+		pItem->SetText(0, strText);
+		pItem->SetText(1, pAreaDlg->m_tArea.szAreaName);
+	}
+
+	delete pAreaDlg;
+}
+
 void  CDuiFrameWnd::OnSettingReaderRet(WPARAM wParm, LPARAM  lParam) {
 	int ret = (int)wParm;
 	SetBusy(FALSE);
@@ -385,6 +483,13 @@ void  CDuiFrameWnd::OnDeviceChanged(WPARAM wParm, LPARAM  lParam) {
 
 	OnFreshComPort_Reader();
 	OnFreshComPort_Gw();
+}
+
+void  CDuiFrameWnd::OnAreaListMenu(TNotifyUI& msg) {
+	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
 }
 
                          

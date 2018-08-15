@@ -9,6 +9,9 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#include "UIlib.h"
+using namespace DuiLib;
+
 #define   LOG_FILE_NAME           "surgery_setting.log"
 #define   CONFIG_FILE_NAME        "surgery_setting.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
@@ -22,6 +25,8 @@
 #define   UM_SETTTING_READER_RET   (WM_USER + 1)
 #define   UM_SETTTING_GW_RET       (WM_USER + 2)
 #define   UM_QUERY_GW_RET          (WM_USER + 3)
+
+#define   MAX_AREA_COUNT            20
 
 class CSettingReaderParam : public LmnToolkits::MessageData {
 public:
@@ -56,14 +61,22 @@ public:
 	int   m_nComPort;
 };
 
+typedef struct tagArea {
+	char   szAreaName[64];
+	DWORD  dwAreaNo;
+}TArea;
+
 extern ILog    * g_log;
 extern IConfig * g_cfg;
+extern IConfig * g_cfg_area;
 extern LmnToolkits::Thread *  g_thrd_worker;
 extern HWND    g_hWnd;
+extern std::vector<TArea *>  g_vArea;
 
 
 //extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
+extern void  SaveAreas();
 
 // templates
 template <class T>
