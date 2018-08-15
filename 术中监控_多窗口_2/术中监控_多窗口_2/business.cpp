@@ -82,8 +82,11 @@ int CBusiness::Init() {
 		strText.Format(CFG_MIN_TEMP " %d", i + 1);
 		g_cfg->GetConfig(strText, g_dwMyImageMinTemp[i], DEFAULT_MIN_TEMP);
 
-		strText.Format(CFG_COM_PORT " %d", i + 1);
-		g_cfg->GetConfig(strText, g_szComPort[i], MAX_COM_PORT_LENGTH, "");
+		//strText.Format(CFG_COM_PORT " %d", i + 1);
+		//g_cfg->GetConfig(strText, g_szComPort[i], MAX_COM_PORT_LENGTH, "");
+
+		strText.Format(CFG_BED_NO " %d", i + 1);
+		g_cfg->GetConfig(strText, g_dwBedNo[i], 0);
 
 		strText.Format(CFG_LAST_BED_NAME " %d", i + 1);
 		g_cfg->GetConfig(strText, g_szLastBedName[i], MAX_BED_NAME_LENGTH, "--");

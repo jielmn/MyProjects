@@ -50,6 +50,7 @@ using namespace DuiLib;
 #define   CFG_COLLECT_INTERVAL     "collect interval"
 #define   CFG_MIN_TEMP             "min temperature degree"
 #define   CFG_COM_PORT             "com port"
+#define   CFG_BED_NO               "bed no"
 #define   CFG_MYIMAGE_LEFT_BLANK   "my image left"
 #define   CFG_MYIMAGE_RIGHT_BLANK  "my image right"
 #define   CFG_MYIMAGE_TIME_TEXT_OFFSET_X   "time text offset x"
@@ -164,6 +165,8 @@ using namespace DuiLib;
 #define   WINDOW_TITLE_HEIGHT             32
 
 #define   COMMON_SETTING_TEXT             "通用设置"
+#define   AREA_NO_TEXT                    "区域号"
+#define   READER_ID_TEXT                  "Reader相关床号"
 #define   GRIDS_COLUMNS_TEXT              "窗格列数"
 #define   GRIDS_ROWS_TEXT                 "窗格行数"
 #define   SKIN_CHOICE_TEXT                "选择皮肤"
@@ -281,6 +284,7 @@ extern HWND    g_hWnd;
 //extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_work;
 extern LmnToolkits::Thread *  g_thrd_reader[MAX_GRID_COUNT];
+extern DWORD     g_dwAreaNo;
 extern DWORD     g_dwLayoutColumns;
 extern DWORD     g_dwLayoutRows;
 extern DWORD     g_dwTimeUnitWidth;
@@ -297,7 +301,8 @@ extern DWORD     g_dwLowTempAlarm[MAX_GRID_COUNT];
 extern DWORD     g_dwHighTempAlarm[MAX_GRID_COUNT];
 extern BOOL      g_bAlarmOff;   // 报警开关是否打开
 extern char      g_szAlarmFilePath[MAX_ALARM_PATH_LENGTH];
-extern char      g_szComPort[MAX_ALARM_PATH_LENGTH][MAX_COM_PORT_LENGTH];
+//extern char      g_szComPort[MAX_GRID_COUNT][MAX_COM_PORT_LENGTH];
+extern DWORD     g_dwBedNo[MAX_GRID_COUNT];
 extern CMySkin   g_skin;
 extern BOOL      g_bAlarmVoiceOff;
 extern DWORD     g_dwSkinIndex;

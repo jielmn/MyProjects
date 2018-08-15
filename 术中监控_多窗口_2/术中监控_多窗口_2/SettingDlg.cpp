@@ -61,6 +61,12 @@ void  CSettingDlg::InitCommonCfg() {
 
 	CEditUI * pEdit = new CEditUI;
 	SetEditStyle(pEdit);
+	strText.Format("%lu", g_dwAreaNo);
+	pEdit->SetText(strText);
+	m_tree->AddNode(AREA_NO_TEXT, pTitleNode, 0, pEdit);
+
+	pEdit = new CEditUI;
+	SetEditStyle(pEdit);
 	strText.Format("%lu", g_dwLayoutColumns);
 	pEdit->SetText(strText);
 	m_tree->AddNode(GRIDS_COLUMNS_TEXT, pTitleNode, 0, pEdit);
@@ -193,44 +199,51 @@ void   CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	m_tree->AddNode(HIGH_ALARM_TEXT, pSubTitleNode, 0, pEdit);
 
 	// 串口
-	std::vector<std::string>  vCom;
-	GetAllSerialPortName(vCom);
+	//std::vector<std::string>  vCom;
+	//GetAllSerialPortName(vCom);
 
-	std::vector<std::string>::iterator it;
-	if (g_szComPort[dwIndex][0] != 0) {
-		for (it = vCom.begin(); it != vCom.end(); it++) {
-			std::string & s = *it;
-			if (0 == StrICmp(s.c_str(), g_szComPort[dwIndex])) {
-				break;
-			}
-		}
-		if (it == vCom.end()) {
-			vCom.push_back(g_szComPort[dwIndex]);
-		}
-	}
+	//std::vector<std::string>::iterator it;
+	//if (g_szComPort[dwIndex][0] != 0) {
+	//	for (it = vCom.begin(); it != vCom.end(); it++) {
+	//		std::string & s = *it;
+	//		if (0 == StrICmp(s.c_str(), g_szComPort[dwIndex])) {
+	//			break;
+	//		}
+	//	}
+	//	if (it == vCom.end()) {
+	//		vCom.push_back(g_szComPort[dwIndex]);
+	//	}
+	//}
 
-	pCombo = new CComboUI;
-	AddComboItem( pCombo, ANY_COM_PORT_TEXT);
+	//pCombo = new CComboUI;
+	//AddComboItem( pCombo, ANY_COM_PORT_TEXT);
 
-	for (it = vCom.begin(); it != vCom.end(); it++) {
-		std::string & s = *it;
-		AddComboItem(pCombo, s.c_str());
-	}
+	//for (it = vCom.begin(); it != vCom.end(); it++) {
+	//	std::string & s = *it;
+	//	AddComboItem(pCombo, s.c_str());
+	//}
 
-	if (g_szComPort[dwIndex][0] == 0) {
-		pCombo->SelectItem(0);
-	}
-	else {
-		for (it = vCom.begin(); it != vCom.end(); it++) {
-			std::string & s = *it;
-			if (0 == StrICmp(s.c_str(), g_szComPort[dwIndex])) {
-				pCombo->SelectItem((it - vCom.begin()) + 1);
-			}
-		}
-	}
+	//if (g_szComPort[dwIndex][0] == 0) {
+	//	pCombo->SelectItem(0);
+	//}
+	//else {
+	//	for (it = vCom.begin(); it != vCom.end(); it++) {
+	//		std::string & s = *it;
+	//		if (0 == StrICmp(s.c_str(), g_szComPort[dwIndex])) {
+	//			pCombo->SelectItem((it - vCom.begin()) + 1);
+	//		}
+	//	}
+	//}
 
-	SetComboStyle(pCombo);
-	m_tree->AddNode(RW_COM_PORT_TEXT, pSubTitleNode, 0, pCombo);
+	//SetComboStyle(pCombo);
+	//m_tree->AddNode(RW_COM_PORT_TEXT, pSubTitleNode, 0, pCombo);
+
+	// 床号
+	pEdit = new CEditUI;
+	SetEditStyle(pEdit);
+	strText.Format("%lu", g_dwBedNo[dwIndex]);
+	pEdit->SetText(strText);
+	m_tree->AddNode(READER_ID_TEXT, pSubTitleNode, 0, pEdit);
 }
 
 void  CSettingDlg::SetEditStyle(CEditUI * pEdit) {
@@ -273,7 +286,7 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 			g_dwHighTempAlarm[i] = dwHighAlarm;
 			g_dwCollectInterval[i] = dwInterval;
 			g_dwMyImageMinTemp[i] = dwMinTemp;
-			STRNCPY(g_szComPort[i], strComPort, MAX_COM_PORT_LENGTH);
+			//STRNCPY(g_szComPort[i], strComPort, MAX_COM_PORT_LENGTH);
 		}
 	}
 	PostMessage(WM_CLOSE);
@@ -310,7 +323,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 	int  nSkin = 0;
 	BOOL bAlarmVoiceOff = FALSE;
 
-	bGetCfg = m_tree->GetConfigValue( 1, cfgValue );
+	bGetCfg = m_tree->GetConfigValue( 2, cfgValue );
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%d", &nCols)) {
 		strText.Format("窗格列数请输入数字");
@@ -324,7 +337,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 		return FALSE;
 	}
 
-	bGetCfg = m_tree->GetConfigValue(2, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(3, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%d", &nRows)) {
 		strText.Format("窗格行请输入数字");
@@ -344,7 +357,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 		return FALSE;
 	}
 	
-	bGetCfg = m_tree->GetConfigValue(3, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(4, cfgValue);
 	if ( 0 == cfgValue.m_nComboSel ) {
 		nSkin = SKIN_BLACK;
 	}
@@ -355,7 +368,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 		nSkin = SKIN_BLACK;
 	}
 
-	bGetCfg = m_tree->GetConfigValue(4, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(5, cfgValue);
 	if (0 == cfgValue.m_nComboSel) {
 		bAlarmVoiceOff = FALSE;
 	}
@@ -379,7 +392,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	double dbTemp;
 
 	dwInterval = 10;
-	bool bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 1, cfgValue);
+	bool bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 1, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -424,7 +437,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 
 
 	dwMinTemp = 20;
-	bGetCfg = m_tree->GetConfigValue(6 + nIndex * 6 + 2, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(7 + nIndex * 6 + 2, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -456,7 +469,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 
 
-	bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 3, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 3, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("窗口%d配置，低温报警请输入数字", nIndex + 1);
@@ -471,7 +484,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 	dwLowAlarm = (DWORD)(dbTemp * 100);
 
-	bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 4, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 4, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("窗口%d配置，高温报警请输入数字", nIndex + 1);
@@ -492,12 +505,12 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	dwHighAlarm = (DWORD)(dbTemp * 100);
 
 	// 串口
-	bGetCfg = m_tree->GetConfigValue( 6 + nIndex * 6 + 5, cfgValue);
-	if (0 == cfgValue.m_nComboSel) {
-		strComPort = "";
-	}
-	else {
-		strComPort = cfgValue.m_strEdit;
-	}
+	//bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 5, cfgValue);
+	//if (0 == cfgValue.m_nComboSel) {
+	//	strComPort = "";
+	//}
+	//else {
+	//	strComPort = cfgValue.m_strEdit;
+	//}
 	return TRUE;
 }

@@ -448,8 +448,8 @@ void   CDuiFrameWnd::OnSetting() {
 			dwValue = DEFAULT_MIN_TEMP;
 			g_cfg->SetConfig(strText, g_dwMyImageMinTemp[i], &dwValue);
 
-			strText.Format(CFG_COM_PORT " %d", i + 1);
-			g_cfg->SetConfig(strText, g_szComPort[i], "");
+			//strText.Format(CFG_COM_PORT " %d", i + 1);
+			//g_cfg->SetConfig(strText, g_szComPort[i], "");
 		}
 
 		g_cfg->Save();
