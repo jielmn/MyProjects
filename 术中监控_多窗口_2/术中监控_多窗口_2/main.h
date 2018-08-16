@@ -40,10 +40,17 @@ private:
 	void   UpdateLayout();
 	void   OnUpdateGridScroll(WPARAM wParam, LPARAM lParam);
 	void   OnMyImageClick(const POINT * pPoint);
+	
 	// 新温度数据达到
 	void   OnNewTempData(int nGridIndex, DWORD dwTemp);
 	// 鼠轮
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
+	// launch status
+	void   OnLaunchStatus(WPARAM wParam, LPARAM lParam);
+	// bar tips
+	void   OnBarTips(WPARAM wParam, LPARAM lParam);
+	// 硬件改动
+	void   OnComPortsChanged(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 
@@ -71,6 +78,9 @@ private:
 	CMyImageUI *                       m_pMyImage[MAX_GRID_COUNT];
 	DuiLib::CButtonUI *                m_btnMenu;    // 菜单按钮	
 	CAlarmImageUI *                    m_pAlarmUI[MAX_GRID_COUNT];
+
+	CLabelUI *                         m_lblLaunchStatus;
+	CLabelUI *                         m_lblBarTips;
 
 	int                                m_nState;     // 多格子状态，单格子状态
 	int                                m_nMaxGridIndex; // 最大化格子的序号

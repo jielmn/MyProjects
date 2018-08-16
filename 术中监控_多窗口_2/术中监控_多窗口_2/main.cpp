@@ -99,11 +99,15 @@ void  CDuiFrameWnd::InitWindow() {
 		m_layMain->Add(m_pGrids[nIndex]); 
 	}
 
+	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_LAUNCH_STATUS));
+	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_BAR_TIPS));
+
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
 	m_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl(EDIT_REMARK_NAME));
 	m_edRemark->SetText("");
 	m_edRemark->SetVisible(false);
  
+	OnComPortsChanged( 0,0 );
 	OnChangeSkin(); 
 
 #if TEST_FLAG
@@ -187,6 +191,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_MOUSEWHEEL) {
 		OnMyMouseWheel(wParam, lParam);
+	}
+	else if (uMsg == UM_LAUNCH_STATUS) {
+		OnLaunchStatus(wParam, lParam);
+	}
+	else if (uMsg == UM_BAR_TIPS) {
+		OnBarTips(wParam, lParam);
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		OnComPortsChanged(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -653,6 +666,40 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 			m_pMyImage[i]->MyInvalidate();
 		}
 	}
+}
+
+void  CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM lParam) {
+	CLmnSerialPort::PortStatus eStatus = (CLmnSerialPort::PortStatus)wParam;
+
+	if (eStatus == CLmnSerialPort::OPEN) {
+		m_lblLaunchStatus->SetText("发射器连接OK");
+	}
+	else {
+		m_lblLaunchStatus->SetText("发射器连接断开");
+	}
+}
+
+void   CDuiFrameWnd::OnBarTips(WPARAM wParam, LPARAM lParam) {
+	if (wParam == BAR_TIPS_CLEAR) {
+		m_lblBarTips->SetText(""); 
+	}
+}
+
+
+// 硬件改动
+void   CDuiFrameWnd::OnComPortsChanged(WPARAM wParam, LPARAM lParam) {
+	char szComPort[16];
+	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+	if ( nFindCount > 1 ) {
+		m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+	}
+	else if (0 == nFindCount) {
+		m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+	}
+	else {
+		m_lblBarTips->SetText("");
+	}
+	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
 }
  
 

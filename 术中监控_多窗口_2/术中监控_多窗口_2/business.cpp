@@ -178,13 +178,13 @@ int CBusiness::Init() {
 	}
 	g_thrd_work->Start();
 
-	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		g_thrd_reader[i] = new LmnToolkits::Thread();
-		if (0 == g_thrd_reader[i]) {
-			return -1;
-		}
-		g_thrd_reader[i]->Start();
+	g_thrd_launch = new LmnToolkits::Thread();
+	if (0 == g_thrd_launch) {
+		return -1;
 	}
+	g_thrd_launch->Start();
+	
+	ReconnectLaunchAsyn(200);
 
 	return 0;
 }
@@ -197,17 +197,17 @@ int CBusiness::DeInit() {
 	//	g_thrd_db = 0;
 	//}
 
-	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		g_thrd_reader[i]->Stop();
-		delete g_thrd_reader[i];
-		g_thrd_reader[i] = 0;
-	}
-
 	if (g_thrd_work) {
 		g_thrd_work->Stop();
 		delete g_thrd_work;
 		g_thrd_work = 0;
 	}
+
+	if (g_thrd_launch) {
+		g_thrd_launch->Stop();
+		delete g_thrd_launch;
+		g_thrd_launch = 0;
+	}	
 
 	Clear();
 	return 0;
@@ -269,6 +269,46 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 	return 0;
 }
 
+int   CBusiness::ReconnectLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_RECONNECT_LAUNCH );
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_RECONNECT_LAUNCH );
+	}
+	return 0;
+}
+
+int   CBusiness::ReconnectLaunch() {
+	m_launch.Reconnect();
+	return 0;
+}
+
+int  CBusiness::CheckLaunchStatusAsyn() {
+	g_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS);
+	return 0;
+}
+
+int   CBusiness::CheckLaunchStatus() {
+	m_launch.CheckStatus();
+	return 0;
+}
+
+// 通知界面Launch状态
+int   CBusiness::NotifyUiLaunchStatus(CLmnSerialPort::PortStatus eStatus) {
+	::PostMessage(g_hWnd, UM_LAUNCH_STATUS, eStatus, 0);
+	return 0;
+}
+
+// 通知状态栏其他信息
+int   CBusiness::NotifyUiBarTips(int nIndex) {
+	::PostMessage(g_hWnd, UM_BAR_TIPS, nIndex, 0);
+	return 0;
+}
+
+
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -285,6 +325,18 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAlarmParam * pParam = (CAlarmParam *)pMessageData;
 		Alarm(pParam);
+	}
+	break;
+
+	case MSG_RECONNECT_LAUNCH:
+	{
+		ReconnectLaunch();
+	}
+	break;
+
+	case MSG_CHECK_LAUNCH_STATUS:
+	{
+		CheckLaunchStatus();
 	}
 	break;
 

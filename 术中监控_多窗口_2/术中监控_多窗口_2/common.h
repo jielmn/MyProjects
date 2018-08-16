@@ -115,6 +115,8 @@ using namespace DuiLib;
 #define   EDIT_REMARK_NAME                   "edRemark"
 #define   ALARM_IMAGE_CLASS_NAME             "AlarmImage"
 #define   ALARM_IMAGE_NAME                   "alarm_image"
+#define   LABEL_LAUNCH_STATUS                "lblLaunchStatus"
+#define   LABEL_BAR_TIPS                     "lblBarTips"
 
 
 #define   LAYOUT_MAIN_BK_COLOR_INDEX    0
@@ -190,9 +192,13 @@ using namespace DuiLib;
 #define   SKIN_WHITE_TEXT                 "°×ÐûÖ½"
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
+#define UM_LAUNCH_STATUS                 (WM_USER+2)
+#define UM_BAR_TIPS                      (WM_USER+3)
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
+#define MSG_RECONNECT_LAUNCH              1003
+#define MSG_CHECK_LAUNCH_STATUS           1004
 
 #define EDT_REMARK_WIDTH                  200
 #define EDT_REMARK_HEIGHT                 30
@@ -219,6 +225,10 @@ using namespace DuiLib;
 #define  MAX_AREA_COUNT                       20
 #define  MAX_AREA_ID                          100
 #define  MAX_BED_ID                           200
+
+#define  BAR_TIPS_CLEAR                        0
+#define  BAR_TIPS_TWO_MUCH_CH340               1
+#define  RECONNECT_LAUNCH_TIME_INTERVAL       10000
 
 /* ½á¹¹Ìå */
 typedef struct tagTempData {
@@ -300,7 +310,8 @@ extern IConfig * g_cfg_area;
 extern HWND    g_hWnd;
 //extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_work;
-extern LmnToolkits::Thread *  g_thrd_reader[MAX_GRID_COUNT];
+//extern LmnToolkits::Thread *  g_thrd_reader[MAX_GRID_COUNT];
+extern LmnToolkits::Thread *  g_thrd_launch;
 extern DWORD     g_dwAreaNo;
 extern DWORD     g_dwLayoutColumns;
 extern DWORD     g_dwLayoutRows;
@@ -335,6 +346,9 @@ extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern BOOL GetAllSerialPortName(std::vector<std::string> & vCom);
+extern BOOL EnumPortsWdm(std::vector<std::string> & v);
+extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
+extern BOOL  CheckComPortExist(int nCheckComPort);
 
 // templates
 template <class T>

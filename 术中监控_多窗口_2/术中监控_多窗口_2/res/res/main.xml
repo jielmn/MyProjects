@@ -41,7 +41,10 @@
 	
 		<!-- 状态栏 -->
 		<HorizontalLayout name="layStatus" height="30" bkcolor="#FF3A4F67" inset="10,3,10,3">
-			<Label  text=""  font="4" textcolor="#FFFFFFFF" />
+			<Label name="lblLaunchStatus"  text="发射器连接断开"  font="1" textcolor="#FFFFFFFF" width="300" />
+			<Control width="1" bkimage="sep.png" />
+			<Control width="20" />
+			<Label name="lblBarTips"  text=""  font="1" textcolor="#FFCAF100"  />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="10" />
 		</HorizontalLayout>
