@@ -4,6 +4,7 @@
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
+IConfig * g_cfg_area = 0;
 HWND    g_hWnd = 0;
 //LmnToolkits::Thread *  g_thrd_db = 0;
 LmnToolkits::Thread *  g_thrd_work = 0;
@@ -33,6 +34,8 @@ DWORD     g_dwSkinIndex = 0;
 BOOL      g_bAutoScroll = TRUE;
 char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
 char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
+std::vector<TArea *>  g_vArea;
+char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
 
 
 

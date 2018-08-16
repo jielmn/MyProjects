@@ -431,6 +431,9 @@ void   CDuiFrameWnd::OnSetting() {
 		dwValue = DEFAULT_ALARM_VOICE_SWITCH;
 		g_cfg->SetConfig(CFG_ALARM_VOICE_SWITCH, g_bAlarmVoiceOff, &dwValue);
 
+		dwValue = 0;
+		g_cfg->SetConfig(CFG_AREA_ID_NAME, g_dwAreaNo, &dwValue);
+
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
 			strText.Format(CFG_LOW_ALARM " %d", i + 1);
 			dwValue = DEFAULT_LOW_ALARM;
@@ -448,8 +451,9 @@ void   CDuiFrameWnd::OnSetting() {
 			dwValue = DEFAULT_MIN_TEMP;
 			g_cfg->SetConfig(strText, g_dwMyImageMinTemp[i], &dwValue);
 
-			//strText.Format(CFG_COM_PORT " %d", i + 1);
-			//g_cfg->SetConfig(strText, g_szComPort[i], "");
+			strText.Format(CFG_BED_NO " %d", i + 1);
+			dwValue = i + 1;
+			g_cfg->SetConfig(strText, g_dwBedNo[i], &dwValue);			
 		}
 
 		g_cfg->Save();

@@ -26,12 +26,27 @@ private:
 	void    InitCommonCfg();
 	void    SetEditStyle(CEditUI * pEdit);
 	void    AddComboItem(CComboUI * pCombo, const char * szItem);
+	void    AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag);
 	void    SetComboStyle(CComboUI * pCombo);
 	void    InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex);
 	void    OnBtnOk(DuiLib::TNotifyUI& msg);
 	void    OnMyClick(DuiLib::TNotifyUI& msg);
 	BOOL    GetCommonConfig();
 	BOOL    GetConfig( int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
-		               DWORD & dwHighAlarm, DWORD & dwMinTemp, CDuiString & strComPort );
+		               DWORD & dwHighAlarm, DWORD & dwMinTemp, DWORD & dwBedNo );
+
+
+private:
+	DWORD     m_dwLayoutColumns;
+	DWORD     m_dwLayoutRows;
+	DWORD     m_dwSkinIndex;
+	DWORD     m_bAlarmVoiceOff;
+	DWORD     m_dwAreaNo;
+
+	DWORD     m_dwLowTempAlarm[MAX_GRID_COUNT];
+	DWORD     m_dwHighTempAlarm[MAX_GRID_COUNT];
+	DWORD     m_dwCollectInterval[MAX_GRID_COUNT];
+	DWORD     m_dwMyImageMinTemp[MAX_GRID_COUNT];
+	DWORD     m_dwBedNo[MAX_GRID_COUNT];
 };
 

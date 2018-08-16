@@ -37,7 +37,7 @@ void   CSettingDlg::InitWindow() {
 		InitGridCfg(pTitleNode, i);
 	}
 
-	m_tree->SetMinHeight(7960);
+	m_tree->SetMinHeight(8000);
 	WindowImplBase::InitWindow();   
 }
 
@@ -56,14 +56,34 @@ void  CSettingDlg::InitCommonCfg() {
 	DuiLib::CDuiString  strText;
 
 	CMyTreeCfgUI::Node* pTitleNode = NULL;
+	CComboUI * pCombo = 0;
+	CListLabelElementUI * pElement = 0;
+	CEditUI * pEdit = 0;
+
 	strText.Format(COMMON_SETTING_TEXT);
 	pTitleNode = m_tree->AddNode(strText);
 
-	CEditUI * pEdit = new CEditUI;
-	SetEditStyle(pEdit);
-	strText.Format("%lu", g_dwAreaNo);
-	pEdit->SetText(strText);
-	m_tree->AddNode(AREA_NO_TEXT, pTitleNode, 0, pEdit);
+	// 病区号
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "未设置", 0);
+
+	std::vector<TArea *>::iterator it;
+	int i = 0;
+	int nIndex = 0;
+	for (it = g_vArea.begin(); it != g_vArea.end(); ++it, ++i) {
+		TArea * pArea = *it;
+
+		strText.Format("%s(编号：%lu)", pArea->szAreaName, pArea->dwAreaNo);
+		AddComboItem( pCombo, strText, pArea->dwAreaNo );
+
+		if (g_dwAreaNo == pArea->dwAreaNo) {
+			nIndex = i + 1;
+		}
+	}
+	pCombo->SelectItem(nIndex);
+	SetComboStyle(pCombo);
+	m_tree->AddNode(AREA_NO_TEXT, pTitleNode, 0, pCombo);
+	
 
 	pEdit = new CEditUI;
 	SetEditStyle(pEdit);
@@ -76,9 +96,6 @@ void  CSettingDlg::InitCommonCfg() {
 	strText.Format("%lu", g_dwLayoutRows);
 	pEdit->SetText(strText);
 	m_tree->AddNode(GRIDS_ROWS_TEXT, pTitleNode, 0, pEdit);
-
-	CComboUI * pCombo = 0;
-	CListLabelElementUI * pElement = 0;
 
 	// 皮肤
 	pCombo = new CComboUI;
@@ -257,6 +274,13 @@ void  CSettingDlg::AddComboItem(CComboUI * pCombo, const char * szItem) {
 	pCombo->Add(pElement);
 }
 
+void  CSettingDlg::AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag) {
+	CListLabelElementUI * pElement = new CListLabelElementUI;
+	pElement->SetText(szItem);
+	pElement->SetTag(tag);
+	pCombo->Add(pElement);
+}
+
 void  CSettingDlg::SetComboStyle(CComboUI * pCombo) {
 	pCombo->SetItemTextColor(0xFF386382);
 	pCombo->SetHotItemTextColor(0xFF386382);
@@ -271,24 +295,52 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	DWORD       dwLowAlarm = 0;
 	DWORD       dwHighAlarm = 0;
 	DWORD       dwMinTemp = 0;
-	CDuiString  strComPort;
+	DWORD       dwBedNo = 0;
 
 	if ( !GetCommonConfig() ) {
 		return;
 	}
 
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		if ( !GetConfig(i, dwInterval, dwLowAlarm, dwHighAlarm, dwMinTemp, strComPort) ) {
+		if ( !GetConfig(i, dwInterval, dwLowAlarm, dwHighAlarm, dwMinTemp, dwBedNo) ) {
 			return;
 		}
 		else {
-			g_dwLowTempAlarm[i] = dwLowAlarm;
-			g_dwHighTempAlarm[i] = dwHighAlarm;
-			g_dwCollectInterval[i] = dwInterval;
-			g_dwMyImageMinTemp[i] = dwMinTemp;
-			//STRNCPY(g_szComPort[i], strComPort, MAX_COM_PORT_LENGTH);
+			m_dwLowTempAlarm[i] = dwLowAlarm;
+			m_dwHighTempAlarm[i] = dwHighAlarm;
+			m_dwCollectInterval[i] = dwInterval;
+			m_dwMyImageMinTemp[i] = dwMinTemp;
+			m_dwBedNo[i] = dwBedNo;
 		}
 	}
+
+	DuiLib::CDuiString  strText;
+	DWORD dwCount = m_dwLayoutRows * m_dwLayoutColumns;
+	for ( DWORD i = 0; i < dwCount; ++i ) {
+		if (m_dwBedNo[i] > 0) {
+			for (DWORD j = i + 1; j < dwCount; ++j) {
+				// 如果有重复的bed no
+				if (m_dwBedNo[i] == m_dwBedNo[j]) {
+					strText.Format("窗口%lu和%lu的Reader相关床号配置相同", i + 1, j + 1);
+					::MessageBox(GetHWND(), strText, "配置", 0);
+					return;
+				}
+			}
+		}		
+	}
+
+	g_dwLayoutColumns = m_dwLayoutColumns;
+	g_dwLayoutRows = m_dwLayoutRows;
+	g_dwSkinIndex = m_dwSkinIndex;
+	g_bAlarmVoiceOff = m_bAlarmVoiceOff;
+	g_dwAreaNo = m_dwAreaNo;
+
+	memcpy(g_dwLowTempAlarm, m_dwLowTempAlarm, sizeof(DWORD) * MAX_GRID_COUNT);
+	memcpy(g_dwHighTempAlarm, m_dwHighTempAlarm, sizeof(DWORD) * MAX_GRID_COUNT);
+	memcpy(g_dwCollectInterval, m_dwCollectInterval, sizeof(DWORD) * MAX_GRID_COUNT);
+	memcpy(g_dwMyImageMinTemp, m_dwMyImageMinTemp, sizeof(DWORD) * MAX_GRID_COUNT);
+	memcpy(g_dwBedNo, m_dwBedNo, sizeof(DWORD) * MAX_GRID_COUNT);
+
 	PostMessage(WM_CLOSE);
 }
 
@@ -321,7 +373,11 @@ BOOL  CSettingDlg::GetCommonConfig() {
 	int  nCols = 0;
 	int  nRows = 0;
 	int  nSkin = 0;
+	int  nAreaNo = 0;
 	BOOL bAlarmVoiceOff = FALSE;
+
+	bGetCfg = m_tree->GetConfigValue( 1, cfgValue );
+	nAreaNo = cfgValue.m_tag;
 
 	bGetCfg = m_tree->GetConfigValue( 2, cfgValue );
 	strText = cfgValue.m_strEdit;
@@ -376,20 +432,22 @@ BOOL  CSettingDlg::GetCommonConfig() {
 		bAlarmVoiceOff = TRUE;
 	}
 
-	g_dwLayoutColumns = nCols;
-	g_dwLayoutRows = nRows;
-	g_dwSkinIndex = nSkin;
-	g_bAlarmVoiceOff = bAlarmVoiceOff; 
+	m_dwLayoutColumns = nCols;
+	m_dwLayoutRows = nRows;
+	m_dwSkinIndex = nSkin;
+	m_bAlarmVoiceOff = bAlarmVoiceOff; 
+	m_dwAreaNo = nAreaNo;
 
 	return TRUE;
 }
 
 BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
-	DWORD & dwHighAlarm, DWORD & dwMinTemp, CDuiString & strComPort)
+	DWORD & dwHighAlarm, DWORD & dwMinTemp, DWORD & dwBedNo )
 {
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	CDuiString  strText;
-	double dbTemp;
+	double dbTemp = 0.0;
+	int    nBedNo = 0;
 
 	dwInterval = 10;
 	bool bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 1, cfgValue);
@@ -512,5 +570,21 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	//else {
 	//	strComPort = cfgValue.m_strEdit;
 	//}
+
+	bGetCfg = m_tree->GetConfigValue(7 + nIndex * 6 + 5, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%d", &nBedNo)) {
+		strText.Format("窗口%d配置，Reader相关床位号请输入数字", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if ( nBedNo < 0 || nBedNo > MAX_BED_ID ) {
+		strText.Format("窗口%d配置，Reader相关床位号的范围是0到200(其中0表示没有关联的Reader)", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	dwBedNo = nBedNo;
+
 	return TRUE;
 }

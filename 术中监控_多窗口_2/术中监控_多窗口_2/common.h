@@ -27,6 +27,7 @@ using namespace DuiLib;
 /* 宏 */
 #define   LOG_FILE_NAME           "SurgerySurveil.log"
 #define   CONFIG_FILE_NAME        "SurgerySurveil.cfg"
+#define   AREA_CFG_FILE_NAME      "area.cfg"
 #define   MAIN_FRAME_NAME         "DUIMainFrame_surgery"
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   GLOBAL_LOCK_NAME        "surgery_surveil"
@@ -61,6 +62,11 @@ using namespace DuiLib;
 #define   CFG_SKIN                         "skin"
 #define   CFG_LAST_BED_NAME                "last bed name"
 #define   CFG_LAST_PATIENT_NAME            "last patient name"
+#define   CFG_AREA_ID_NAME                 "area id"
+#define   CFG_LAUNCH_COM_PORT              "launch com port"
+
+#define   CFG_AREA_NAME                    "area name"
+#define   CFG_AREA_NO                      "area no"
 
 #define   DEFAULT_MAIN_LAYOUT_COLUMNS   4
 #define   DEFAULT_MAIN_LAYOUT_ROWS      4
@@ -165,7 +171,7 @@ using namespace DuiLib;
 #define   WINDOW_TITLE_HEIGHT             32
 
 #define   COMMON_SETTING_TEXT             "通用设置"
-#define   AREA_NO_TEXT                    "区域号"
+#define   AREA_NO_TEXT                    "病区号"
 #define   READER_ID_TEXT                  "Reader相关床号"
 #define   GRIDS_COLUMNS_TEXT              "窗格列数"
 #define   GRIDS_ROWS_TEXT                 "窗格行数"
@@ -208,6 +214,11 @@ using namespace DuiLib;
 #define TITLE_FONT_IN_STATE_GRIDS             1
 #define BUTTON_WIDTH_IN_STATE_GRIDS           60
 #define BUTTON_FONT_IN_STATE_GRIDS            1
+
+#define  MAX_AREA_NAME_LENGTH                 64
+#define  MAX_AREA_COUNT                       20
+#define  MAX_AREA_ID                          100
+#define  MAX_BED_ID                           200
 
 /* 结构体 */
 typedef struct tagTempData {
@@ -276,10 +287,16 @@ public:
 	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
 };
 
+typedef struct tagArea {
+	char   szAreaName[MAX_AREA_NAME_LENGTH];
+	DWORD  dwAreaNo;
+}TArea;
+
 
 /* 全局变量 */
 extern ILog    * g_log;
 extern IConfig * g_cfg;
+extern IConfig * g_cfg_area;
 extern HWND    g_hWnd;
 //extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_work;
@@ -309,6 +326,8 @@ extern DWORD     g_dwSkinIndex;
 extern BOOL      g_bAutoScroll;
 extern char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
 extern char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
+extern std::vector<TArea *>  g_vArea;
+extern char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
 
 /* 函数 */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);

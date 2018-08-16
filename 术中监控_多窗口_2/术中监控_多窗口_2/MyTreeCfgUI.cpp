@@ -406,10 +406,11 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 		cfgValue.m_tag = pCtl->GetTag();
 	}
 	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_COMBO ) ) {
+		CComboUI * pThisCtl = (CComboUI*)pCtl;
 		cfgValue.m_eConfigType = ConfigType_COMBO;
 		cfgValue.m_nComboSel = ((CComboUI*)pCtl)->GetCurSel();
 		cfgValue.m_strEdit = ((CComboUI*)pCtl)->GetText();
-		cfgValue.m_tag = pCtl->GetTag();
+		cfgValue.m_tag = pThisCtl->GetItemAt(pThisCtl->GetCurSel())->GetTag();
 	}
 	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_CHECKBOX) ) {
 		cfgValue.m_eConfigType = ConfigType_CHECKBOX;

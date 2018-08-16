@@ -29,6 +29,14 @@ void CBusiness::Clear() {
 		delete g_cfg;
 		g_cfg = 0;
 	}
+
+	if (g_cfg_area) {
+		g_cfg_area->Deinit();
+		delete g_cfg_area;
+		g_cfg_area = 0;
+	}
+
+	ClearVector(g_vArea);
 }
 
 int CBusiness::Init() {
@@ -44,6 +52,12 @@ int CBusiness::Init() {
 	}
 	g_cfg->Init(CONFIG_FILE_NAME);
 
+	g_cfg_area = new FileConfigEx();
+	if (0 == g_cfg_area) {
+		return -1;
+	}
+	g_cfg_area->Init(AREA_CFG_FILE_NAME);
+
 	DWORD  dwCfgValue = 0;
 
 	g_cfg->GetConfig(CFG_MAIN_LAYOUT_COLUMNS, g_dwLayoutColumns,  DEFAULT_MAIN_LAYOUT_COLUMNS);
@@ -56,6 +70,8 @@ int CBusiness::Init() {
 	else if (g_dwMaxPointsCount > 3 * DEFAULT_MAX_POINTS_COUNT) {
 		g_dwMaxPointsCount = 3 * DEFAULT_MAX_POINTS_COUNT;
 	}
+	g_cfg->GetConfig(CFG_AREA_ID_NAME, g_dwAreaNo, 0);
+	
 
 	g_cfg->GetConfig(CFG_MYIMAGE_LEFT_BLANK,  g_dwMyImageLeftBlank,  DEFALUT_MYIMAGE_LEFT_BLANK);
 	g_cfg->GetConfig(CFG_MYIMAGE_RIGHT_BLANK, g_dwMyImageRightBlank, DEFALUT_MYIMAGE_RIGHT_BLANK);
@@ -95,6 +111,43 @@ int CBusiness::Init() {
 		g_cfg->GetConfig(strText, g_szLastPatientName[i], MAX_PATIENT_NAME_LENGTH, "--");
 	}
 
+	DWORD  dwCount = g_dwLayoutColumns * g_dwLayoutRows;
+	// ¸øÄ¬ÈÏµÄ´²ºÅ1, 2, 3
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		if ( g_dwBedNo[i] == 0 ) {
+
+			int j = 0;
+			for ( j = 0; j < MAX_GRID_COUNT; j++) {
+				if ( g_dwBedNo[j] == i + 1 ) {
+					break;
+				}
+			}
+
+			if ( j >= MAX_GRID_COUNT ) {
+				g_dwBedNo[i] = i + 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < MAX_AREA_COUNT; i++) {
+		TArea area;
+		strText.Format(CFG_AREA_NAME " %d", i + 1);
+		g_cfg_area->GetConfig(strText, area.szAreaName, sizeof(area.szAreaName), "");
+		if (area.szAreaName[0] == '\0') {
+			break;
+		}
+
+		strText.Format(CFG_AREA_NO " %d", i + 1);
+		g_cfg_area->GetConfig(strText, area.dwAreaNo, 0);
+		if (0 == area.dwAreaNo || area.dwAreaNo > MAX_AREA_ID ) {
+			break;
+		}
+
+		TArea * pArea = new TArea;
+		memcpy(pArea, &area, sizeof(TArea));
+		g_vArea.push_back(pArea);
+	}
+
 	g_cfg->GetConfig(CFG_ALARM_FILE, g_szAlarmFilePath, sizeof(g_szAlarmFilePath), "");
 	if (g_szAlarmFilePath[0] == '\0') {
 		GetDefaultAlarmFile(g_szAlarmFilePath, sizeof(g_szAlarmFilePath));
@@ -105,6 +158,8 @@ int CBusiness::Init() {
 			GetDefaultAlarmFile(g_szAlarmFilePath, sizeof(g_szAlarmFilePath));
 		}
 	}
+
+	g_cfg->GetConfig(CFG_LAUNCH_COM_PORT, g_szLaunchComPort, sizeof(g_szLaunchComPort), "");
 
 	if ( g_dwLayoutRows * g_dwLayoutColumns > MAX_GRID_COUNT ) {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, "too much columns * rows(%lu * %lu) \n", g_dwLayoutColumns, g_dwLayoutRows );
