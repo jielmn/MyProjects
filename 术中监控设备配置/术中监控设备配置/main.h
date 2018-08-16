@@ -29,6 +29,9 @@ private:
 	void  SetBusy(BOOL bBusy);
 	void  OnQueryGw();
 	void  OnAddArea();
+	void  OnModifyArea();
+	void  OnDeleteArea();
+	void  OnAreasChanged();
 
 	void  OnAreaListMenu(TNotifyUI& msg);
 
@@ -41,9 +44,9 @@ private:
 	DuiLib::CTabLayoutUI *              m_tabs;
 	DuiLib::CComboUI *                  m_reader_com_ports;
 	DuiLib::CComboUI *                  m_gw_com_ports;
-	DuiLib::CEditUI *                   m_edtArea1;
 	DuiLib::CEditUI *                   m_edtBedNo;
-	DuiLib::CEditUI *                   m_edtArea2;
+	DuiLib::CComboUI *                  m_cmbArea1;
+	DuiLib::CComboUI *                  m_cmbArea2;
 	CMyProgress *                       m_progress;
 	DuiLib::CButtonUI *                 m_btnSetting1;
 	DuiLib::CButtonUI *                 m_btnSetting2;

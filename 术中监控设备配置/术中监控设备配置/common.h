@@ -77,6 +77,7 @@ extern std::vector<TArea *>  g_vArea;
 //extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern void  SaveAreas();
+extern DWORD  FindNewAreaId(const std::vector<TArea *> & v);
 
 // templates
 template <class T>

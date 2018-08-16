@@ -74,9 +74,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_reader_com_ports = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbReaderComPort"));
 	m_gw_com_ports = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmGwComPort"));
 
-	m_edtArea1 = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtAreaNo1"));
+	m_cmbArea1 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbArea1"));
 	m_edtBedNo = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtBedNo"));
-	m_edtArea2 = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtAreaNo2"));
+	m_cmbArea2 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbArea2"));
 
 	m_progress = (CMyProgress *)m_PaintManager.FindControl("progress");
 	m_btnSetting1 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting1"));
@@ -100,11 +100,13 @@ void  CDuiFrameWnd::InitWindow() {
 		strText.Format("%lu", pArea->dwAreaNo);
 		pItem->SetText(0, strText);
 		pItem->SetText(1, pArea->szAreaName);
+		pItem->SetTag(pArea->dwAreaNo);
 	}
 	
+	OnAreasChanged();
 
 	WindowImplBase::InitWindow();
-} 
+}  
          
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp("reader_setting", pstrClass)) {
@@ -173,6 +175,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "menu_add_area") {
 		OnAddArea();		
+	}
+	else if (msg.sType == "menu_modify_area") {
+		OnModifyArea();
+	}
+	else if (msg.sType == "menu_delete_area") {
+		OnDeleteArea();
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -306,21 +314,13 @@ void  CDuiFrameWnd::OnSettingReader() {
 	}
 	nPort = m_reader_com_ports->GetItemAt(m_reader_com_ports->GetCurSel())->GetTag();
 
-	strText = m_edtArea1->GetText();
-	if (1 != sscanf(strText, "%d", &nAreaNo)) {
-		MessageBox(GetHWND(), "请输入病区号", "错误", 0);
+	int nSel = m_cmbArea1->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有病区号。请先编辑病区", "错误", 0 );
 		return;
 	}
 
-	if (nAreaNo <= 0) {
-		MessageBox(GetHWND(), "病区号必须是正整数", "错误", 0);
-		return;
-	}
-
-	if (nAreaNo > 100) {
-		MessageBox(GetHWND(), "病区号的范围是1到100", "错误", 0);
-		return;
-	}
+	nAreaNo = m_cmbArea1->GetItemAt(nSel)->GetTag();
 
 	strText = m_edtBedNo->GetText();
 	if (1 != sscanf(strText, "%d", &nBedNo)) {
@@ -360,21 +360,13 @@ void  CDuiFrameWnd::OnSettingGw() {
 	}
 	nPort = m_gw_com_ports->GetItemAt(m_gw_com_ports->GetCurSel())->GetTag();
 
-	strText = m_edtArea2->GetText();
-	if (1 != sscanf(strText, "%d", &nAreaNo)) {
-		MessageBox(GetHWND(), "请输入病区号", "错误", 0);
+	int nSel = m_cmbArea2->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有病区号。请先编辑病区", "错误", 0);
 		return;
 	}
 
-	if (nAreaNo <= 0) {
-		MessageBox(GetHWND(), "病区号必须是正整数", "错误", 0);
-		return;
-	}
-
-	if (nAreaNo > 100) {
-		MessageBox(GetHWND(), "病区号的范围是1到100", "错误", 0);
-		return;
-	}
+	nAreaNo = m_cmbArea2->GetItemAt(nSel)->GetTag();
 
 	CBusiness::GetInstance()->SettingGwAsyn(nAreaNo, nPort);
 
@@ -417,7 +409,7 @@ void  CDuiFrameWnd::OnQueryGw() {
 
 void  CDuiFrameWnd::OnAddArea() {
 	CAreaWnd * pAreaDlg = new CAreaWnd();
-	pAreaDlg->Create(this->m_hWnd, _T("添加区域"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAreaDlg->Create(this->m_hWnd, _T("添加病区"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pAreaDlg->CenterWindow();
 
 	// 如果是确定按钮后关闭
@@ -429,9 +421,94 @@ void  CDuiFrameWnd::OnAddArea() {
 		strText.Format("%lu", pAreaDlg->m_tArea.dwAreaNo);
 		pItem->SetText(0, strText);
 		pItem->SetText(1, pAreaDlg->m_tArea.szAreaName);
+		pItem->SetTag(pAreaDlg->m_tArea.dwAreaNo);
+
+		OnAreasChanged();
 	}
 
 	delete pAreaDlg;
+}
+
+void  CDuiFrameWnd::OnModifyArea() {
+	int nSel = m_lstArea->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中要修改的病区", "错误", 0);
+		return;
+	}
+
+	CListTextElementUI* pItem = (CListTextElementUI*)m_lstArea->GetItemAt(nSel);
+	
+	CAreaWnd * pAreaDlg = new CAreaWnd(FALSE);
+	STRNCPY( pAreaDlg->m_tArea.szAreaName, pItem->GetText(1), sizeof(pAreaDlg->m_tArea.szAreaName) );
+	sscanf( pItem->GetText(0), "%lu", &pAreaDlg->m_tArea.dwAreaNo);
+	pAreaDlg->Create(this->m_hWnd, _T("修改病区"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAreaDlg->CenterWindow();
+
+	// 如果是确定按钮后关闭
+	if (0 == pAreaDlg->ShowModal()) {
+		pItem->SetText(1, pAreaDlg->m_tArea.szAreaName);
+
+		OnAreasChanged();
+	}
+
+	delete pAreaDlg;
+}
+
+void  CDuiFrameWnd::OnDeleteArea() {
+	int nSel = m_lstArea->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中要删除的病区", "错误", 0);
+		return;
+	}
+
+	CListTextElementUI* pItem = (CListTextElementUI*)m_lstArea->GetItemAt(nSel);
+	DWORD dwAreaId = pItem->GetTag();
+
+	if ( IDYES == MessageBox(GetHWND(), "确定要删除吗？", "删除", MB_YESNO | MB_DEFBUTTON2) ) {
+		std::vector<TArea *>::iterator it;
+		for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == dwAreaId) {
+				g_vArea.erase(it);
+				break;
+			}
+		}
+		SaveAreas();
+		m_lstArea->RemoveAt(nSel);
+
+		OnAreasChanged();
+	}
+}
+
+void  CDuiFrameWnd::OnAreasChanged() {
+	DuiLib::CDuiString  strText;
+	std::vector<TArea *>::iterator it;
+
+	m_cmbArea1->RemoveAll();
+	m_cmbArea2->RemoveAll();
+
+	for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+		TArea * pArea = *it;
+
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		strText.Format("%s (编号：%lu)", pArea->szAreaName, pArea->dwAreaNo);
+		pElement->SetText(strText);
+		pElement->SetTag(pArea->dwAreaNo);
+		m_cmbArea1->Add(pElement);
+
+		pElement = new CListLabelElementUI;
+		pElement->SetText(strText);
+		pElement->SetTag(pArea->dwAreaNo);
+		m_cmbArea2->Add(pElement);
+	}
+
+	if (m_cmbArea1->GetCount() > 0) {
+		m_cmbArea1->SelectItem(0);
+	}
+
+	if (m_cmbArea2->GetCount() > 0) {
+		m_cmbArea2->SelectItem(0);
+	}
 }
 
 void  CDuiFrameWnd::OnSettingReaderRet(WPARAM wParm, LPARAM  lParam) {

@@ -29,7 +29,7 @@
 		<VerticalLayout bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10">
 		
 			<HorizontalLayout inset="0,5,0,5" height = "40" >
-				<Label text="病区编号：" width="100" font="2" textcolor="#FF386382"  /><Edit text="" name="edAreaNo"  bordercolor="#FF768D9B" bordersize="1" font="2" textcolor="#FF386382"  />
+				<Label text="病区编号：" width="100" font="2" textcolor="#FF386382"  /><Edit text="" name="edAreaNo"  bordercolor="#FF768D9B" bordersize="1" font="2" textcolor="#FF386382" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC"  />
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="0,5,0,5" height = "40">

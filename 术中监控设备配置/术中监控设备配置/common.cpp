@@ -170,3 +170,37 @@ void  SaveAreas() {
 
 	g_cfg_area->Save();
 }
+
+static DWORD  FindMaxAreaId( const std::vector<TArea *> & v ) {
+	DWORD  dwMax = 0;
+	std::vector<TArea *>::const_iterator  it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TArea * pArea = *it;
+		if (pArea->dwAreaNo > dwMax) {
+			dwMax = pArea->dwAreaNo;
+		}
+	}
+	return dwMax+1;
+}
+
+DWORD  FindNewAreaId(const std::vector<TArea *> & v) {
+	DWORD dwMaxId = FindMaxAreaId(v);
+	if ( dwMaxId <= 100 ) {
+		return dwMaxId;
+	}
+
+	for ( DWORD i = 1; i <= 100; i++ ) {
+		std::vector<TArea *>::const_iterator  it;
+		for (it = v.begin(); it != v.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == i) {
+				break;
+			}
+		}
+		// 如果没有找到相同的id，就用这个id
+		if ( it == v.end() ) {
+			return i;
+		}
+	}
+	return -1;
+}
