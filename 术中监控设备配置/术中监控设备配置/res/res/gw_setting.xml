@@ -13,10 +13,11 @@
 		
 		<HorizontalLayout height="20" />
 		
-		<VerticalLayout height="100" inset="10,0,10,0">
+		<VerticalLayout height="135" inset="10,0,10,0">
 			<Label text="设置注意事项：" font="2" textcolor="#FF386382" />
 			<Label text="1. 发射机和电脑用USB线连接" font="2" textcolor="#FF386382" />
 			<Label text="2. 请发送配置同时，按下发射机的按键" font="2" textcolor="#FFFF0000" />
+			<Label text="3. 断电重启，配置才生效" font="2" textcolor="#FF386382" />
 		</VerticalLayout>
 				
 		<HorizontalLayout height="30" inset="10,0,10,0">
