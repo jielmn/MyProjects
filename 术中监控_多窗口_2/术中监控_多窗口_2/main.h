@@ -51,6 +51,8 @@ private:
 	void   OnBarTips(WPARAM wParam, LPARAM lParam);
 	// 硬件改动
 	void   OnComPortsChanged(WPARAM wParam, LPARAM lParam);
+	// 温度数据
+	void   OnTempData(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 

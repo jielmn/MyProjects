@@ -15,4 +15,19 @@ public:
 
 	// 硬件改动，检查状态
 	int  CheckStatus();
+
+	// 获取温度
+	int  QueryTemperature(const CGetTemperatureParam * pParam);
+
+	// 读取串口数据并处理数据
+	int  ReadComData();
+
+private:
+	DWORD      m_dwGridRetryTime[MAX_GRID_COUNT];
+	CDataBuf   m_recv_buf;
+	DWORD      m_dwLastWriteTick;
+
+private:
+	void   CloseLaunch();
+	BOOL   WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen);
 };

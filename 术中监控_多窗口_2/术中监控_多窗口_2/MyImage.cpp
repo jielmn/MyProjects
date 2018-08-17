@@ -608,27 +608,35 @@ void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void   CAlarmImageUI::HighTempAlarm() {
-	m_nBkImageIndex = 0;
-	m_bSetBkImage = TRUE;
-	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	if (0 != m_nBkImageIndex) {
+		m_nBkImageIndex = 0;
+		m_bSetBkImage = TRUE;
+		m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	}	
 }
 
 void   CAlarmImageUI::LowTempAlarm() {
-	m_nBkImageIndex = 1;
-	m_bSetBkImage = TRUE;
-	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	if (1 != m_nBkImageIndex) {
+		m_nBkImageIndex = 1;
+		m_bSetBkImage = TRUE;
+		m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	}
 }
 
 void  CAlarmImageUI::FailureAlarm() {
-	m_nBkImageIndex = 2;
-	m_bSetBkImage = TRUE;
-	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	if (2 != m_nBkImageIndex) {
+		m_nBkImageIndex = 2;
+		m_bSetBkImage = TRUE;
+		m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	}
 }
 
 void   CAlarmImageUI::StopAlarm() {
-	m_nBkImageIndex = -1;
-	this->SetBkImage("");
-	m_pManager->KillTimer(this, MYIMAGE_TIMER_ID);
+	if (-1 != m_nBkImageIndex) {
+		m_nBkImageIndex = -1;
+		this->SetBkImage("");
+		m_pManager->KillTimer(this, MYIMAGE_TIMER_ID);
+	}
 }
 
 void  CAlarmImageUI::SetState(int nNewState) {

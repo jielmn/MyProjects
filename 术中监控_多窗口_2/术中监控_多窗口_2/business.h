@@ -35,6 +35,17 @@ public:
 	// 通知状态栏其他信息
 	int   NotifyUiBarTips(int nIndex);
 
+	// 获取温度
+	int   QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
+	int   QueryTemperature(const CGetTemperatureParam * pParam);
+
+	// launch 读串口数据
+	int   ReadLaunchAsyn(DWORD dwDelayTime = 0);
+	int   ReadLaunch();
+
+	// 通知界面温度数据
+	int   NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

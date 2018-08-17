@@ -15,7 +15,7 @@ using namespace DuiLib;
 #include "skin.h"
 
 #ifdef   _DEBUG
-#define  TEST_FLAG                1
+#define  TEST_FLAG                0
 #endif
 
 #if TEST_FLAG
@@ -64,6 +64,7 @@ using namespace DuiLib;
 #define   CFG_LAST_PATIENT_NAME            "last patient name"
 #define   CFG_AREA_ID_NAME                 "area id"
 #define   CFG_LAUNCH_COM_PORT              "launch com port"
+#define   CFG_LAUNCH_WRITE_INTERVAL        "launch write interval"
 
 #define   CFG_AREA_NAME                    "area name"
 #define   CFG_AREA_NO                      "area no"
@@ -84,6 +85,7 @@ using namespace DuiLib;
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_X   -35
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y   -8
 #define   DEFAULT_ALARM_VOICE_SWITCH           FALSE
+#define   DEFAULT_LAUNCH_WRITE_INTERVAL        1500
 
 #if 1
 #define   DEFAULT_SKIN                         SKIN_BLACK
@@ -194,11 +196,14 @@ using namespace DuiLib;
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
 #define UM_BAR_TIPS                      (WM_USER+3)
+#define UM_TEMP_DATA                     (WM_USER+4)
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
 #define MSG_RECONNECT_LAUNCH              1003
 #define MSG_CHECK_LAUNCH_STATUS           1004
+#define MSG_GET_TEMPERATURE               2000
+#define MSG_READ_LAUNCH                   3000
 
 #define EDT_REMARK_WIDTH                  200
 #define EDT_REMARK_HEIGHT                 30
@@ -251,6 +256,12 @@ class CUpdateScrollParam : public LmnToolkits::MessageData {
 public:
 	CUpdateScrollParam(int nIndex) : m_nIndex ( nIndex ) { }
 	int     m_nIndex;
+};
+
+class CGetTemperatureParam : public LmnToolkits::MessageData {
+public:
+	CGetTemperatureParam(DWORD dwIndex) : m_dwGridIndex(dwIndex) { }
+	DWORD     m_dwGridIndex;
 };
 
 class CDuiMenu : public DuiLib::WindowImplBase
@@ -339,6 +350,7 @@ extern char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
 extern char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 extern std::vector<TArea *>  g_vArea;
 extern char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
+extern DWORD     g_dwLaunchWriteInterval;
 
 /* º¯Êý */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);

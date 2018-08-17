@@ -41,6 +41,7 @@ char      g_szLastBedName[MAX_GRID_COUNT][MAX_BED_NAME_LENGTH];
 char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 std::vector<TArea *>  g_vArea;
 char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
+DWORD     g_dwLaunchWriteInterval = 0;
 
 
 

@@ -201,6 +201,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == WM_DEVICECHANGE) {
 		OnComPortsChanged(wParam, lParam);
 	}
+	else if (uMsg == UM_TEMP_DATA) {
+		OnTempData(wParam, lParam);
+	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -615,31 +618,39 @@ void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 	assert(nGridIndex >= 0 && nGridIndex < MAX_GRID_COUNT);
 
 	CDuiString  strText;
-	double dTemperature = dwTemp / 100.0;
-	strText.Format("%.2f", dTemperature );
-	m_pLblCurTemp_small[nGridIndex]->SetText( strText);
 
-	if ( dwTemp >= g_dwHighTempAlarm[nGridIndex]) {
-		m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[HIGH_TEMP_ALARM_TEXT_COLOR_INDEX]);
-		m_pAlarmUI[nGridIndex]->HighTempAlarm();
-	}
-	else if (dwTemp <= g_dwLowTempAlarm[nGridIndex]) {
-		m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[LOW_TEMP_ALARM_TEXT_COLOR_INDEX]);
-		m_pAlarmUI[nGridIndex]->LowTempAlarm();
-	}
-	else {
-		m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-		m_pAlarmUI[nGridIndex]->StopAlarm();
-	}
+	if ( dwTemp > 0 ) {
+		double dTemperature = dwTemp / 100.0;
+		strText.Format("%.2f", dTemperature);
+		m_pLblCurTemp_small[nGridIndex]->SetText(strText);
 
-	m_pMyImage[nGridIndex]->AddTemp(dwTemp);
+		if (dwTemp >= g_dwHighTempAlarm[nGridIndex]) {
+			m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[HIGH_TEMP_ALARM_TEXT_COLOR_INDEX]);
+			m_pAlarmUI[nGridIndex]->HighTempAlarm();
+		}
+		else if (dwTemp <= g_dwLowTempAlarm[nGridIndex]) {
+			m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[LOW_TEMP_ALARM_TEXT_COLOR_INDEX]);
+			m_pAlarmUI[nGridIndex]->LowTempAlarm();
+		}
+		else {
+			m_pLblCurTemp_small[nGridIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+			m_pAlarmUI[nGridIndex]->StopAlarm();
+		}
 
-	// 如果报警开关打开
-	if (!g_bAlarmOff) {
-		if (dwTemp < g_dwLowTempAlarm[nGridIndex] || dwTemp > g_dwHighTempAlarm[nGridIndex]) {
-			CBusiness::GetInstance()->AlarmAsyn(g_szAlarmFilePath);
+		m_pMyImage[nGridIndex]->AddTemp(dwTemp);
+
+		// 如果报警开关打开
+		if (!g_bAlarmOff) {
+			if (dwTemp < g_dwLowTempAlarm[nGridIndex] || dwTemp > g_dwHighTempAlarm[nGridIndex]) {
+				CBusiness::GetInstance()->AlarmAsyn(g_szAlarmFilePath);
+			}
 		}
 	}
+	else {
+		m_pLblCurTemp_small[nGridIndex]->SetText("--");
+		m_pAlarmUI[nGridIndex]->FailureAlarm();
+	}
+	
 }
 
 // 鼠轮
@@ -700,6 +711,16 @@ void   CDuiFrameWnd::OnComPortsChanged(WPARAM wParam, LPARAM lParam) {
 		m_lblBarTips->SetText("");
 	}
 	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
+}
+
+// 温度数据
+void   CDuiFrameWnd::OnTempData(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	DWORD  dwTemp     = lParam;
+
+	if (dwTemp > 0) {
+		OnNewTempData(dwGridIndex, dwTemp);
+	}
 }
  
 

@@ -148,6 +148,25 @@ int CBusiness::Init() {
 		g_vArea.push_back(pArea);
 	}
 
+	if (g_dwAreaNo > 0) {
+		std::vector<TArea *>::iterator it;
+		for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == g_dwAreaNo) {
+				break;
+			}
+		}
+
+		// 如果g_dwAreaNo不在g_vArea之内
+		if (it == g_vArea.end()) {
+			TArea * pArea = new TArea;
+			pArea->dwAreaNo = g_dwAreaNo;
+			SNPRINTF(pArea->szAreaName, sizeof(pArea->szAreaName), "(编号：%lu)", g_dwAreaNo );
+			g_vArea.push_back(pArea);
+		}
+	}
+	
+
 	g_cfg->GetConfig(CFG_ALARM_FILE, g_szAlarmFilePath, sizeof(g_szAlarmFilePath), "");
 	if (g_szAlarmFilePath[0] == '\0') {
 		GetDefaultAlarmFile(g_szAlarmFilePath, sizeof(g_szAlarmFilePath));
@@ -160,6 +179,9 @@ int CBusiness::Init() {
 	}
 
 	g_cfg->GetConfig(CFG_LAUNCH_COM_PORT, g_szLaunchComPort, sizeof(g_szLaunchComPort), "");
+
+	g_cfg->GetConfig(CFG_LAUNCH_WRITE_INTERVAL, g_dwLaunchWriteInterval, DEFAULT_LAUNCH_WRITE_INTERVAL);
+	
 
 	if ( g_dwLayoutRows * g_dwLayoutColumns > MAX_GRID_COUNT ) {
 		g_log->Output(ILog::LOG_SEVERITY_ERROR, "too much columns * rows(%lu * %lu) \n", g_dwLayoutColumns, g_dwLayoutRows );
@@ -271,6 +293,8 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 
 int   CBusiness::ReconnectLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 
+	g_thrd_launch->DeleteMessages();
+
 	if (0 == dwDelayTime) {
 		g_thrd_launch->PostMessage(this, MSG_RECONNECT_LAUNCH );
 	}
@@ -307,6 +331,45 @@ int   CBusiness::NotifyUiBarTips(int nIndex) {
 	return 0;
 }
 
+int   CBusiness::QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex) );
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex) );
+	}
+	return 0;
+}
+
+int   CBusiness::QueryTemperature(const CGetTemperatureParam * pParam) {
+	int ret = m_launch.QueryTemperature(pParam);
+	return 0;
+}
+
+// launch 读串口数据
+int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_READ_LAUNCH );
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READ_LAUNCH );
+	}
+	return 0;
+}
+
+int   CBusiness::ReadLaunch() {
+	m_launch.ReadComData();
+	ReadLaunchAsyn(200);
+	return 0;
+}
+
+// 通知界面温度
+// dwTemp如果为0，表示获取温度失败，可能连接不畅
+int   CBusiness::NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp) {
+	::PostMessage(g_hWnd, UM_TEMP_DATA, dwGridIndex, dwTemp);
+	return 0;
+}
+
 
 
 
@@ -340,7 +403,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_READ_LAUNCH:
+	{
+		ReadLaunch();
+	}
+	break;
+
 	default:
-		break;
+	{
+		if ( dwMessageId >= MSG_GET_TEMPERATURE && dwMessageId < MSG_GET_TEMPERATURE + MAX_GRID_COUNT ) {
+			CGetTemperatureParam * pParam = (CGetTemperatureParam *)pMessageData;
+			QueryTemperature(pParam);
+		}
+	}
+	break;
+
 	}
 }
