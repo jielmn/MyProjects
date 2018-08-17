@@ -71,15 +71,7 @@ int  CLaunch::Reconnect() {
 
 	// 通知成功
 	CBusiness::GetInstance()->NotifyUiLaunchStatus(GetStatus());
-	m_recv_buf.Clear();
-
-	// 获取温度
-	DWORD  dwCnt = g_dwLayoutColumns * g_dwLayoutRows;
-	DWORD  dwDelay = 200;
-	for (DWORD i = 0; i < dwCnt; i++) {
-		CBusiness::GetInstance()->QueryTemperatureAsyn(i, dwDelay);
-		dwDelay += 200;
-	}
+	m_recv_buf.Clear();	
 
 	CBusiness::GetInstance()->ReadLaunchAsyn();
 	return 0;
@@ -102,6 +94,37 @@ int  CLaunch::CheckStatus() {
 	return 0;
 }
 
+// 心跳
+int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
+	DWORD  dwGridIndex = pParam->m_dwGridIndex;
+	assert(dwGridIndex < MAX_GRID_COUNT);
+
+	// 如果串口没有打开
+	if (GetStatus() == CLmnSerialPort::CLOSE) {
+		return 0;
+	}
+
+	// 如果病区号没有设置
+	if (0 == g_dwAreaNo) {
+		return 0;
+	}
+
+	// 如果床号没有设置
+	if (0 == g_dwBedNo[dwGridIndex]) {
+		return 0;
+	}
+
+	BYTE  send_buf[8];
+	DWORD dwSendLen = 8;
+
+	memcpy(send_buf, "\x00\x00\x00\x55\x01\x01\xDD\xAA", 8);
+	send_buf[1] = (BYTE)g_dwBedNo[dwGridIndex];
+	send_buf[2] = (BYTE)g_dwAreaNo;
+	//g_log->Output(ILog::LOG_SEVERITY_INFO, "write bed = %lu\n", g_dwBedNo[dwGridIndex]);
+	WriteLaunch(send_buf, dwSendLen);
+	return 0;
+}
+
 // 获取温度
 int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 	DWORD  dwGridIndex = pParam->m_dwGridIndex;
@@ -114,7 +137,6 @@ int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 
 	// 如果病区号没有设置
 	if (0 == g_dwAreaNo) {
-		CBusiness::GetInstance()->QueryTemperatureAsyn(dwGridIndex, NEXT_RETRY_INTERVAL_TIME);
 		return 0;
 	}
 
@@ -151,46 +173,107 @@ int  CLaunch::ReadComData() {
 	}
 
 	// 处理数据
+	//
+	// 温度
 	//  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
 	// -----------------------------------------------------------------------------------------
 	// 55 1A 00 06 01 45 52 00 00 03 00 00 00 00 00 01 8F 50 D9 93 CD 59 02 E0 02 07 08 05 FF 
+	//
+	// 心跳
+	// 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
+	//---------------------------------------------------------
+	// 55 0E 00 06 01 45 52 00 00 03 00 00 00 00 00 01 FF
 
-	if ( m_recv_buf.GetDataLength() >= 29 ) {
-		m_recv_buf.Read(buf, 29);
-		m_recv_buf.Reform();
+	char debug_buf[8192];
 
-		if ( buf[0] == '\x55' && buf[1] == '\x1A' && buf[28] == '\xFF' ) {
-			DWORD  dwBedNo  = buf[2] * 256 + buf[3];
-			DWORD  dwAreaNo = buf[4];
-			DWORD  dwTemp = buf[24] * 1000 + buf[25] * 100 + buf[26] * 10 + buf[27];
-			// 如果病区号相同
-			if ( dwAreaNo == g_dwAreaNo ) {
-				DWORD  dwCnt = g_dwLayoutColumns * g_dwLayoutRows;
-				DWORD  dwGridIndex = -1;
-				for (dwGridIndex = 0; dwGridIndex < dwCnt; dwGridIndex++ ) {
-					// 找到床位号
-					if ( g_dwBedNo[dwGridIndex] == dwBedNo ) {
-						break;
-					}
-				}
+	if ( m_recv_buf.GetDataLength() >= 17 ) {
+		m_recv_buf.Read(buf, 17);
 
-				// 找到
-				if (dwGridIndex != -1) {
-					CBusiness::GetInstance()->NotifyUiTempData(dwGridIndex, dwTemp);
-				}
-			}
-		}
-		// 错误的数据格式
-		else {
-			char tmp[8192];
-			DebugStream(tmp, sizeof(tmp), buf, 29);
-			g_log->Output( ILog::LOG_SEVERITY_ERROR, "错误的数据格式：\n%s\n", tmp );
+		// 数据头错误
+		if (buf[0] != '\x55') {
+			DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+			g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf );
 
 			CloseLaunch();
 			CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
 		}
-	}
+		else {
+			// 如果是心跳数据
+			if ( buf[1] == '\x0E' ) {
+				m_recv_buf.Reform();
+				// 如果错误的数据尾
+				if ( buf[16] != '\xFF' ) {
+					DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+					g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
 
+					CloseLaunch();
+					CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+				}
+				else {
+					WORD   dwBedNo  = buf[2] * 256 + buf[3];
+					DWORD  dwAreaNo = buf[4];
+					// 如果病区号不同
+					if (dwAreaNo != g_dwAreaNo) {
+						DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+						g_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
+					}
+					else {
+						DWORD dwGridIndex = FindGridIndexByBed(dwBedNo);
+						// 如果找到床位号
+						if (dwGridIndex != -1) {
+							CBusiness::GetInstance()->NotifyUiGridReaderStatus(dwGridIndex, READER_STATUS_OPEN);
+						}
+						else {
+							DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+							g_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子心跳：\n%s\n", debug_buf);
+						}
+					}
+				}
+			} // 结束 心跳
+			// 如果是温度数据
+			else if ( buf[1] == '\x1A' ) {
+				// 如果得到足够数据
+				if ( m_recv_buf.GetDataLength() >= 29 - 17 ) {
+					m_recv_buf.Read( buf+17, 12 );
+					m_recv_buf.Reform();
+
+					if (buf[28] != '\xFF') {
+						DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
+						g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
+
+						CloseLaunch();
+						CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+					}
+					else {
+						DWORD  dwBedNo = buf[2] * 256 + buf[3];
+						DWORD  dwAreaNo = buf[4];
+						DWORD  dwTemp = buf[24] * 1000 + buf[25] * 100 + buf[26] * 10 + buf[27];
+
+						// 如果病区号不同
+						if (dwAreaNo != g_dwAreaNo) {
+							DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
+							g_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
+						}
+						else {
+							DWORD dwGridIndex = FindGridIndexByBed(dwBedNo);
+
+							// 找到
+							if (dwGridIndex != -1) {
+								CBusiness::GetInstance()->NotifyUiTempData(dwGridIndex, dwTemp);
+							}
+							else {
+								DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
+								g_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子温度：\n%s\n", debug_buf);
+							}
+						}
+					}
+				}
+				else {
+					m_recv_buf.ResetReadPos();
+				}
+			}
+		}
+	}
 
 	return 0;
 }

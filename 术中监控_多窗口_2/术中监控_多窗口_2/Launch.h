@@ -16,6 +16,9 @@ public:
 	// 硬件改动，检查状态
 	int  CheckStatus();
 
+	// 心跳
+	int  HeartBeat(const CReaderHeartBeatParam * pParam);
+
 	// 获取温度
 	int  QueryTemperature(const CGetTemperatureParam * pParam);
 

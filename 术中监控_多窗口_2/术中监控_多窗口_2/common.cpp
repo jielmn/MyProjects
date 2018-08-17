@@ -366,3 +366,17 @@ BOOL  CheckComPortExist(int nCheckComPort) {
 	
 	return FALSE;
 }
+
+DWORD  FindGridIndexByBed(DWORD dwBedNo) {
+	DWORD  dwCnt = g_dwLayoutColumns * g_dwLayoutRows;
+
+	DWORD  dwGridIndex = 0;
+	for (dwGridIndex = 0; dwGridIndex < dwCnt; dwGridIndex++) {
+		// ÕÒµ½´²Î»ºÅ
+		if (g_dwBedNo[dwGridIndex] == dwBedNo) {
+			return dwGridIndex;
+		}
+	}
+
+	return -1;
+}

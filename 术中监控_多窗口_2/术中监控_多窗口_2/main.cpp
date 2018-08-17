@@ -204,6 +204,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_TEMP_DATA) {
 		OnTempData(wParam, lParam);
 	}
+	else if (uMsg == UM_GRID_READER_STATUS) {
+		OnGridReaderStatus(wParam, lParam);
+	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -616,6 +619,7 @@ void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 
 void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 	assert(nGridIndex >= 0 && nGridIndex < MAX_GRID_COUNT);
+	assert(dwTemp > 0);
 
 	CDuiString  strText;
 
@@ -684,6 +688,14 @@ void  CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM lParam) {
 
 	if (eStatus == CLmnSerialPort::OPEN) {
 		m_lblLaunchStatus->SetText("发射器连接OK");
+
+		// 获取Reder在线状态
+		DWORD  dwCnt = g_dwLayoutColumns * g_dwLayoutRows;
+		DWORD  dwDelay = 200;
+		for (DWORD i = 0; i < dwCnt; i++) {
+			CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, dwDelay);
+			dwDelay += 200;
+		}
 	}
 	else {
 		m_lblLaunchStatus->SetText("发射器连接断开");
@@ -717,9 +729,26 @@ void   CDuiFrameWnd::OnComPortsChanged(WPARAM wParam, LPARAM lParam) {
 void   CDuiFrameWnd::OnTempData(WPARAM wParam, LPARAM lParam) {
 	DWORD dwGridIndex = wParam;
 	DWORD  dwTemp     = lParam;
+	assert(dwTemp > 0);
 
-	if (dwTemp > 0) {
-		OnNewTempData(dwGridIndex, dwTemp);
+	OnNewTempData(dwGridIndex, dwTemp);
+
+	// 获取温度
+	CBusiness::GetInstance()->QueryTemperatureAsyn(dwGridIndex, g_dwCollectInterval[dwGridIndex] * 1000 );
+}
+
+// 格子的Reader状态
+void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	int   nStatus     = lParam;
+
+	if ( nStatus == READER_STATUS_CLOSE ) {
+		m_pAlarmUI[dwGridIndex]->FailureAlarm();
+	}
+	else {
+		m_pAlarmUI[dwGridIndex]->StopAlarm();
+		// 获取温度
+		CBusiness::GetInstance()->QueryTemperatureAsyn(dwGridIndex, 200);
 	}
 }
  

@@ -331,6 +331,24 @@ int   CBusiness::NotifyUiBarTips(int nIndex) {
 	return 0;
 }
 
+// Reader心跳
+int   CBusiness::ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_READER_HEART_BEAT + dwGridIndex, 
+			new CReaderHeartBeatParam(dwGridIndex));
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READER_HEART_BEAT + dwGridIndex, 
+			new CReaderHeartBeatParam(dwGridIndex));
+	}
+	return 0;
+}
+
+int   CBusiness::ReaderHeartBeat(const CReaderHeartBeatParam * pParam) {
+	m_launch.HeartBeat(pParam);
+	return 0;
+}
+
 int   CBusiness::QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
 	if (0 == dwDelayTime) {
 		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex) );
@@ -367,6 +385,12 @@ int   CBusiness::ReadLaunch() {
 // dwTemp如果为0，表示获取温度失败，可能连接不畅
 int   CBusiness::NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp) {
 	::PostMessage(g_hWnd, UM_TEMP_DATA, dwGridIndex, dwTemp);
+	return 0;
+}
+
+// 通知界面格子相关的Reader在线状态
+int   CBusiness::NotifyUiGridReaderStatus(DWORD dwGridIndex, int nStatus) {
+	::PostMessage(g_hWnd, UM_GRID_READER_STATUS, dwGridIndex, nStatus);
 	return 0;
 }
 
@@ -415,6 +439,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 			CGetTemperatureParam * pParam = (CGetTemperatureParam *)pMessageData;
 			QueryTemperature(pParam);
 		}
+		else if (dwMessageId >= MSG_READER_HEART_BEAT && dwMessageId < MSG_READER_HEART_BEAT + MAX_GRID_COUNT) {
+			CReaderHeartBeatParam * pParam = (CReaderHeartBeatParam *)pMessageData;
+			ReaderHeartBeat(pParam);
+		}
+
+
 	}
 	break;
 

@@ -35,6 +35,10 @@ public:
 	// 通知状态栏其他信息
 	int   NotifyUiBarTips(int nIndex);
 
+	// Reader心跳
+	int   ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
+	int   ReaderHeartBeat(const CReaderHeartBeatParam * pParam);
+
 	// 获取温度
 	int   QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
 	int   QueryTemperature(const CGetTemperatureParam * pParam);
@@ -45,6 +49,9 @@ public:
 
 	// 通知界面温度数据
 	int   NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp);
+
+	// 通知界面格子相关的Reader在线状态
+	int   NotifyUiGridReaderStatus(DWORD dwGridIndex, int nStatus);
 
 private:
 	static CBusiness *  pInstance;

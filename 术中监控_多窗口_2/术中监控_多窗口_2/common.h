@@ -197,13 +197,16 @@ using namespace DuiLib;
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
 #define UM_BAR_TIPS                      (WM_USER+3)
 #define UM_TEMP_DATA                     (WM_USER+4)
+#define UM_GRID_READER_STATUS            (WM_USER+5)
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
 #define MSG_RECONNECT_LAUNCH              1003
 #define MSG_CHECK_LAUNCH_STATUS           1004
+#define MSG_READ_LAUNCH                   1005
 #define MSG_GET_TEMPERATURE               2000
-#define MSG_READ_LAUNCH                   3000
+#define MSG_READER_HEART_BEAT             3000
+
 
 #define EDT_REMARK_WIDTH                  200
 #define EDT_REMARK_HEIGHT                 30
@@ -235,6 +238,9 @@ using namespace DuiLib;
 #define  BAR_TIPS_TWO_MUCH_CH340               1
 #define  RECONNECT_LAUNCH_TIME_INTERVAL       10000
 
+#define  READER_STATUS_CLOSE                   0
+#define  READER_STATUS_OPEN                    1
+
 /* ½á¹¹Ìå */
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -261,6 +267,12 @@ public:
 class CGetTemperatureParam : public LmnToolkits::MessageData {
 public:
 	CGetTemperatureParam(DWORD dwIndex) : m_dwGridIndex(dwIndex) { }
+	DWORD     m_dwGridIndex;
+};
+
+class CReaderHeartBeatParam : public LmnToolkits::MessageData {
+public:
+	CReaderHeartBeatParam(DWORD dwIndex) : m_dwGridIndex(dwIndex) { }
 	DWORD     m_dwGridIndex;
 };
 
@@ -361,6 +373,7 @@ extern BOOL GetAllSerialPortName(std::vector<std::string> & vCom);
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
 extern BOOL  CheckComPortExist(int nCheckComPort);
+extern DWORD  FindGridIndexByBed(DWORD dwBedNo);
 
 // templates
 template <class T>

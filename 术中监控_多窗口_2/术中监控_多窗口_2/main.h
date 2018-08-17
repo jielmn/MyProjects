@@ -53,6 +53,8 @@ private:
 	void   OnComPortsChanged(WPARAM wParam, LPARAM lParam);
 	// 温度数据
 	void   OnTempData(WPARAM wParam, LPARAM lParam);
+	// 格子的Reader状态
+	void   OnGridReaderStatus(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 
