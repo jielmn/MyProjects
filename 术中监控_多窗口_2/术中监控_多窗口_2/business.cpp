@@ -333,15 +333,15 @@ int   CBusiness::NotifyUiBarTips(int nIndex) {
 
 // ReaderÐÄÌø
 int   CBusiness::ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
+	// g_thrd_launch->DeleteMessages(MSG_READER_HEART_BEAT + dwGridIndex);
 	if (0 == dwDelayTime) {
 		g_thrd_launch->PostMessage(this, MSG_READER_HEART_BEAT + dwGridIndex, 
-			new CReaderHeartBeatParam(dwGridIndex));
+			new CReaderHeartBeatParam(dwGridIndex), TRUE );
 	}
 	else {
 		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READER_HEART_BEAT + dwGridIndex, 
-			new CReaderHeartBeatParam(dwGridIndex));
+			new CReaderHeartBeatParam(dwGridIndex), TRUE );
 	}
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "launch thread messages count = %lu \n", g_thrd_launch->GetMessagesCount());
 	return 0;
 }
 
@@ -355,11 +355,12 @@ int   CBusiness::ReaderHeartBeat(const CReaderHeartBeatParam * pParam) {
 }
 
 int   CBusiness::QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
+	//g_thrd_launch->DeleteMessages(MSG_GET_TEMPERATURE + dwGridIndex);
 	if (0 == dwDelayTime) {
-		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex), 1 );
+		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex), TRUE, 1 );
 	}
 	else {
-		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex), FALSE, 1 );
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex), TRUE, 1 );
 	}
 	return 0;
 }
@@ -381,6 +382,7 @@ int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 	else {
 		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READ_LAUNCH );
 	}
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "launch thread messages count = %lu \n", g_thrd_launch->GetMessagesCount());
 	return 0;
 }
 
@@ -403,6 +405,16 @@ int   CBusiness::NotifyUiGridReaderStatus(DWORD dwGridIndex, int nStatus) {
 	return 0;
 }
 
+int   CBusiness::DeleteGridActiveMsgAsyn(DWORD dwGridIndex) {
+	g_thrd_launch->DeleteMessages(MSG_READER_HEART_BEAT + dwGridIndex);
+	g_thrd_launch->DeleteMessages(MSG_GET_TEMPERATURE + dwGridIndex);
+	return 0;
+}
+
+int   CBusiness::DeleteGridTempMsgAsyn(DWORD dwGridIndex) {
+	g_thrd_launch->DeleteMessages(MSG_GET_TEMPERATURE + dwGridIndex);
+	return 0;
+}
 
 
 

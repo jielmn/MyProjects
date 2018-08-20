@@ -55,12 +55,16 @@ private:
 	void   OnTempData(WPARAM wParam, LPARAM lParam);
 	// 格子的Reader状态
 	void   OnGridReaderStatus(WPARAM wParam, LPARAM lParam);
+	void   OnGridReaderStatus(DWORD dwGridIndex, int   nStatus, DWORD  dwDelayTime);
+
 	// 检查Reader
 	void   OnCheckReaderTimer(WPARAM wParam, LPARAM lParam);
 	// 
 	void   OnHeatBeatTick(WPARAM wParam, LPARAM lParam);
 	//
 	void   OnTempTick(WPARAM wParam, LPARAM lParam);
+	//
+	void   ReHandleReader( DWORD dwCount, DWORD * pOldIntervals, DWORD * pOldBedNo, DWORD  dwOldAreaNo );
 public:
 	void   OnEdtRemarkKillFocus();
 

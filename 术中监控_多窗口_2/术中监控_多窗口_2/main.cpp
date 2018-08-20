@@ -439,11 +439,42 @@ void   CDuiFrameWnd::OnGridMenu(TNotifyUI& msg) {
 	pMenu->ShowWindow(TRUE);  
 }
 
+void   CDuiFrameWnd::ReHandleReader(DWORD dwCount, DWORD * pOldIntervals, DWORD * pOldBedNo, DWORD  dwOldAreaNo) {
+	DWORD  dwDelay = 200;
+	for (DWORD i = 0; i < dwCount; i++) {
+		// 如果病区改变或者床号改变
+		if ( dwOldAreaNo != g_dwAreaNo || pOldBedNo[i] != g_dwBedNo[i] ) {
+			CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
+			OnGridReaderStatus(i, READER_STATUS_CLOSE, dwDelay);
+			dwDelay += 2000;
+		}
+		else if (pOldIntervals[i] != g_dwCollectInterval[i]) {
+			// 如果是连接状态
+			if ( g_nGridReaderStatus[i] == READER_STATUS_OPEN ) {
+				CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
+				// 获取温度
+				CBusiness::GetInstance()->QueryTemperatureAsyn(i, 200);
+			}			
+		}
+	}
+}
+
 void   CDuiFrameWnd::OnSetting() {
 	CDuiString  strText;
 	DWORD  dwValue = 0;
-	CSettingDlg * pSettingDlg = new CSettingDlg;
 
+	DWORD  dwOldRows = g_dwLayoutRows;
+	DWORD  dwOldCols = g_dwLayoutColumns;
+	DWORD  dwOldAreaNo = g_dwAreaNo;
+	
+	DWORD  dwOldBedNo[MAX_GRID_COUNT];
+	memcpy(dwOldBedNo, g_dwBedNo, sizeof(dwOldBedNo));
+
+	DWORD  dwCollectInterval[MAX_GRID_COUNT];
+	memcpy(dwCollectInterval, g_dwCollectInterval, sizeof(dwCollectInterval));
+
+
+	CSettingDlg * pSettingDlg = new CSettingDlg;
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSettingDlg->CenterWindow();
 	int ret = pSettingDlg->ShowModal();
@@ -493,6 +524,31 @@ void   CDuiFrameWnd::OnSetting() {
 		OnChangeSkin();
 		UpdateLayout();
 		//::InvalidateRect(GetHWND(), 0, TRUE);
+
+		DWORD dwOldCount = dwOldCols * dwOldRows;
+		DWORD dwNewCount = g_dwLayoutColumns * g_dwLayoutRows;
+
+		// 窗格个数不变
+		if (dwOldCount == dwNewCount) {
+			ReHandleReader(dwOldCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo);
+		}
+		// 窗格个数扩大
+		else if (dwOldCount < dwNewCount) {
+			ReHandleReader(dwOldCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo);
+			DWORD dwDelay = 200;
+			for ( DWORD i = dwOldCount; i < dwNewCount; i++ ) {
+				CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, dwDelay);
+				dwDelay += 200;
+			}
+		}
+		// 窗格个数缩小
+		else {
+			ReHandleReader(dwNewCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo);
+			for (DWORD i = dwNewCount; i < dwOldCount; i++) {
+				OnGridReaderStatus(i, READER_STATUS_CLOSE);
+				CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
+			}
+		}
 	}
 
 	delete pSettingDlg;
@@ -752,26 +808,34 @@ void   CDuiFrameWnd::OnTempData(WPARAM wParam, LPARAM lParam) {
 	g_dwLastQueryTick[dwGridIndex] = 0;
 }
 
-// 格子的Reader状态
-void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
-	DWORD dwGridIndex = wParam;
-	int   nStatus     = lParam;
-
-	if ( nStatus == READER_STATUS_CLOSE ) {
-		assert(0);
+void   CDuiFrameWnd::OnGridReaderStatus(DWORD dwGridIndex, int   nStatus, DWORD  dwDelayTime) {
+	if (nStatus == READER_STATUS_CLOSE) {
 		g_nGridReaderStatus[dwGridIndex] = READER_STATUS_CLOSE;
+		g_nQueryTempRetryTime[dwGridIndex] = 0;
+		g_dwLastQueryTick[dwGridIndex] = 0;
+
+		m_pLblCurTemp_small[dwGridIndex]->SetText("--");
 		m_pAlarmUI[dwGridIndex]->FailureAlarm();
-		CBusiness::GetInstance()->ReaderHeartBeatAsyn( dwGridIndex, NEXT_HEAT_BEAT_TIME_ON_FAILURE );
+
+		CBusiness::GetInstance()->ReaderHeartBeatAsyn(dwGridIndex, dwDelayTime);
 	}
 	else {
 		g_nGridReaderStatus[dwGridIndex] = READER_STATUS_OPEN;
+		g_nQueryTempRetryTime[dwGridIndex] = 0;
+		g_dwLastQueryTick[dwGridIndex] = 0;
+
 		m_pAlarmUI[dwGridIndex]->StopAlarm();
 
 		// 获取温度
 		CBusiness::GetInstance()->QueryTemperatureAsyn(dwGridIndex, 200);
-		g_nQueryTempRetryTime[dwGridIndex] = 0;
-		g_dwLastQueryTick[dwGridIndex] = 0;
 	}
+}
+
+// 格子的Reader状态
+void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	int   nStatus     = lParam;
+	OnGridReaderStatus(dwGridIndex, nStatus, NEXT_HEAT_BEAT_TIME_ON_FAILURE);
 }
 
 // 检查Reader
@@ -784,13 +848,7 @@ void   CDuiFrameWnd::OnCheckReaderTimer(WPARAM wParam, LPARAM lParam) {
 			// 如果已经发出了串口请求
 			if ( g_dwLastQueryTick[i] > 0 ) {
 				if ( dwTick - g_dwLastQueryTick[i] > 5000 ) {
-
-					if (i == 0) {
-						int a = 100;
-					}
-
-					CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, NEXT_HEAT_BEAT_TIME_ON_FAILURE);
-					g_dwLastQueryTick[i] = 0;
+					OnGridReaderStatus( i, READER_STATUS_CLOSE );
 				}
 			}
 		}
@@ -807,14 +865,7 @@ void   CDuiFrameWnd::OnCheckReaderTimer(WPARAM wParam, LPARAM lParam) {
 					}
 					// 3次都超时
 					else {
-						g_nGridReaderStatus[i] = READER_STATUS_CLOSE;
-						m_pAlarmUI[i]->FailureAlarm();
-
-						if (i == 0) {
-							int a = 100;
-						}
-
-						CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, NEXT_HEAT_BEAT_TIME_ON_FAILURE);
+						OnGridReaderStatus(i, READER_STATUS_CLOSE);
 					}
 				}
 			}

@@ -53,6 +53,11 @@ public:
 	// 通知界面格子相关的Reader在线状态
 	int   NotifyUiGridReaderStatus(DWORD dwGridIndex, int nStatus);
 
+	// 删除界面格子的心跳，读取温度消息
+	int   DeleteGridActiveMsgAsyn(DWORD dwGridIndex);
+	// 删除界面格子的读取温度消息
+	int   DeleteGridTempMsgAsyn(DWORD dwGridIndex);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
