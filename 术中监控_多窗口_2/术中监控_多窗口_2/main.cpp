@@ -110,10 +110,13 @@ void  CDuiFrameWnd::InitWindow() {
 	OnComPortsChanged( 0,0 );
 	OnChangeSkin(); 
 
+	InitRand(TRUE, 100);
+
 #if TEST_FLAG
 	SetTimer(m_hWnd, TIMER_TEST_ID, TIMER_TEST_INTERVAL, NULL);
-	InitRand(TRUE, 100);
 #endif
+
+	SetTimer(m_hWnd, TIMER_MAIN_CHECK_ID, TIMER_MAIN_CHECK_INTERVAL, NULL);
 
 	WindowImplBase::InitWindow();    
 }
@@ -179,8 +182,11 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		OnDbClick();
 	}
 	else if (uMsg == WM_TIMER) {
+		if ( wParam == TIMER_MAIN_CHECK_ID ) {
+			OnCheckReaderTimer(wParam, lParam);
+		}
 #if TEST_FLAG
-		if (wParam == TIMER_TEST_ID) {
+		else if (wParam == TIMER_TEST_ID) {
 			OnNewTempData(0, GetRand(3200, 4200));
 			OnNewTempData(1, GetRand(3200, 4200));
 		}
@@ -206,6 +212,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_GRID_READER_STATUS) {
 		OnGridReaderStatus(wParam, lParam);
+	}
+	else if (uMsg == UM_QUERY_HEAT_BEAT_TICK) {
+		OnHeatBeatTick(wParam, lParam);
+	}
+	else if (uMsg == UM_QUERY_TEMP_TICK) {
+		OnTempTick(wParam, lParam);
 	}
 	return DuiLib::WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
@@ -730,11 +742,14 @@ void   CDuiFrameWnd::OnTempData(WPARAM wParam, LPARAM lParam) {
 	DWORD dwGridIndex = wParam;
 	DWORD  dwTemp     = lParam;
 	assert(dwTemp > 0);
-
+	// DWORD  dwTick = LmnGetTickCount();
+	
 	OnNewTempData(dwGridIndex, dwTemp);
 
 	// 获取温度
 	CBusiness::GetInstance()->QueryTemperatureAsyn(dwGridIndex, g_dwCollectInterval[dwGridIndex] * 1000 );
+	g_nQueryTempRetryTime[dwGridIndex] = 0;
+	g_dwLastQueryTick[dwGridIndex] = 0;
 }
 
 // 格子的Reader状态
@@ -743,13 +758,83 @@ void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
 	int   nStatus     = lParam;
 
 	if ( nStatus == READER_STATUS_CLOSE ) {
+		assert(0);
+		g_nGridReaderStatus[dwGridIndex] = READER_STATUS_CLOSE;
 		m_pAlarmUI[dwGridIndex]->FailureAlarm();
+		CBusiness::GetInstance()->ReaderHeartBeatAsyn( dwGridIndex, NEXT_HEAT_BEAT_TIME_ON_FAILURE );
 	}
 	else {
+		g_nGridReaderStatus[dwGridIndex] = READER_STATUS_OPEN;
 		m_pAlarmUI[dwGridIndex]->StopAlarm();
+
 		// 获取温度
 		CBusiness::GetInstance()->QueryTemperatureAsyn(dwGridIndex, 200);
+		g_nQueryTempRetryTime[dwGridIndex] = 0;
+		g_dwLastQueryTick[dwGridIndex] = 0;
 	}
+}
+
+// 检查Reader
+void   CDuiFrameWnd::OnCheckReaderTimer(WPARAM wParam, LPARAM lParam) {
+	DWORD  dwTick = LmnGetTickCount();
+	DWORD  dwCnt = g_dwLayoutRows * g_dwLayoutColumns;
+	for (DWORD i = 0; i < dwCnt; i++) {
+		// 如果没有连上
+		if ( g_nGridReaderStatus[i] == READER_STATUS_CLOSE ) {
+			// 如果已经发出了串口请求
+			if ( g_dwLastQueryTick[i] > 0 ) {
+				if ( dwTick - g_dwLastQueryTick[i] > 5000 ) {
+
+					if (i == 0) {
+						int a = 100;
+					}
+
+					CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, NEXT_HEAT_BEAT_TIME_ON_FAILURE);
+					g_dwLastQueryTick[i] = 0;
+				}
+			}
+		}
+		// 如果已经连接上
+		else {
+			// 如果已经发出了串口请求
+			if (g_dwLastQueryTick[i] > 0) {
+				if (dwTick - g_dwLastQueryTick[i] > 5000) {
+					g_nQueryTempRetryTime[i]++;
+					g_dwLastQueryTick[i] = 0;
+					if (g_nQueryTempRetryTime[i] < 3) {
+						// 获取温度
+						CBusiness::GetInstance()->QueryTemperatureAsyn(i, 200);
+					}
+					// 3次都超时
+					else {
+						g_nGridReaderStatus[i] = READER_STATUS_CLOSE;
+						m_pAlarmUI[i]->FailureAlarm();
+
+						if (i == 0) {
+							int a = 100;
+						}
+
+						CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, NEXT_HEAT_BEAT_TIME_ON_FAILURE);
+					}
+				}
+			}
+		}
+	}
+}
+
+// 通知heatbeat的tick
+void   CDuiFrameWnd::OnHeatBeatTick(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	DWORD dwTick      = lParam;
+
+	g_dwLastQueryTick[dwGridIndex] = dwTick;
+}
+
+void   CDuiFrameWnd::OnTempTick(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	DWORD dwTick = lParam;
+
+	g_dwLastQueryTick[dwGridIndex] = dwTick;
 }
  
 

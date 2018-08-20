@@ -23,6 +23,9 @@ using namespace DuiLib;
 #define  TIMER_TEST_INTERVAL      5000
 #endif
 
+#define  TIMER_MAIN_CHECK_ID        100
+#define  TIMER_MAIN_CHECK_INTERVAL  1000
+
 
 /* 宏 */
 #define   LOG_FILE_NAME           "SurgerySurveil.log"
@@ -85,7 +88,7 @@ using namespace DuiLib;
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_X   -35
 #define   DEFAULT_MYIMAGE_TEMP_TEXT_OFFSET_Y   -8
 #define   DEFAULT_ALARM_VOICE_SWITCH           FALSE
-#define   DEFAULT_LAUNCH_WRITE_INTERVAL        1500
+#define   DEFAULT_LAUNCH_WRITE_INTERVAL        2000
 
 #if 1
 #define   DEFAULT_SKIN                         SKIN_BLACK
@@ -198,6 +201,8 @@ using namespace DuiLib;
 #define UM_BAR_TIPS                      (WM_USER+3)
 #define UM_TEMP_DATA                     (WM_USER+4)
 #define UM_GRID_READER_STATUS            (WM_USER+5)
+#define UM_QUERY_HEAT_BEAT_TICK          (WM_USER+6)
+#define UM_QUERY_TEMP_TICK               (WM_USER+7)
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
@@ -240,6 +245,8 @@ using namespace DuiLib;
 
 #define  READER_STATUS_CLOSE                   0
 #define  READER_STATUS_OPEN                    1
+
+#define  NEXT_HEAT_BEAT_TIME_ON_FAILURE        30000
 
 /* 结构体 */
 typedef struct tagTempData {
@@ -325,6 +332,12 @@ typedef struct tagArea {
 	DWORD  dwAreaNo;
 }TArea;
 
+class MyThread : public LmnToolkits::Thread
+{
+public:
+	DWORD   GetMessagesCount();
+};
+
 
 /* 全局变量 */
 extern ILog    * g_log;
@@ -363,6 +376,11 @@ extern char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 extern std::vector<TArea *>  g_vArea;
 extern char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
 extern DWORD     g_dwLaunchWriteInterval;
+
+extern int       g_nGridReaderStatus[MAX_GRID_COUNT];   // 对应的Reader是否在线
+//extern BOOL      g_bQueryTemp[MAX_GRID_COUNT];          // 是否请求了温度数据
+extern int       g_nQueryTempRetryTime[MAX_GRID_COUNT]; // 请求温度过程中，重试了次数
+extern DWORD     g_dwLastQueryTick[MAX_GRID_COUNT];     // 上一次请求心跳/温度的time tick
 
 /* 函数 */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);

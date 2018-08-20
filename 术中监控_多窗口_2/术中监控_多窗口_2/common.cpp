@@ -42,6 +42,10 @@ char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 std::vector<TArea *>  g_vArea;
 char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
 DWORD     g_dwLaunchWriteInterval = 0;
+int       g_nGridReaderStatus[MAX_GRID_COUNT];   // 对应的Reader是否在线
+//BOOL      g_bQueryTemp[MAX_GRID_COUNT];          // 是否请求了温度数据
+int       g_nQueryTempRetryTime[MAX_GRID_COUNT]; // 请求温度过程中，重试了次数
+DWORD     g_dwLastQueryTick[MAX_GRID_COUNT];     // 上一次请求心跳/温度的time tick
 
 
 
@@ -379,4 +383,9 @@ DWORD  FindGridIndexByBed(DWORD dwBedNo) {
 	}
 
 	return -1;
+}
+
+
+DWORD   MyThread::GetMessagesCount() {
+	return 0;
 }

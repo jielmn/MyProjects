@@ -28,7 +28,7 @@ public:
 private:
 	DWORD      m_dwGridRetryTime[MAX_GRID_COUNT];
 	CDataBuf   m_recv_buf;
-	DWORD      m_dwLastWriteTick;
+	//DWORD      m_dwLastWriteTick;
 
 private:
 	void   CloseLaunch();

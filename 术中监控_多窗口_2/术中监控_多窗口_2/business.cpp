@@ -194,13 +194,13 @@ int CBusiness::Init() {
 	//}
 	//g_thrd_db->Start();
 
-	g_thrd_work = new LmnToolkits::Thread();
+	g_thrd_work = new LmnToolkits::PriorityThread();
 	if (0 == g_thrd_work) {
 		return -1;
 	}
 	g_thrd_work->Start();
 
-	g_thrd_launch = new LmnToolkits::Thread();
+	g_thrd_launch = new LmnToolkits::PriorityThread();
 	if (0 == g_thrd_launch) {
 		return -1;
 	}
@@ -341,26 +341,35 @@ int   CBusiness::ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*
 		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READER_HEART_BEAT + dwGridIndex, 
 			new CReaderHeartBeatParam(dwGridIndex));
 	}
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "launch thread messages count = %lu \n", g_thrd_launch->GetMessagesCount());
 	return 0;
 }
 
 int   CBusiness::ReaderHeartBeat(const CReaderHeartBeatParam * pParam) {
-	m_launch.HeartBeat(pParam);
+	DWORD dwTick = LmnGetTickCount();	
+
+	m_launch.HeartBeat(pParam);	
+
+	::PostMessage(g_hWnd, UM_QUERY_HEAT_BEAT_TICK, pParam->m_dwGridIndex, dwTick);
 	return 0;
 }
 
 int   CBusiness::QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
 	if (0 == dwDelayTime) {
-		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex) );
+		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex), 1 );
 	}
 	else {
-		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex) );
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_GET_TEMPERATURE + dwGridIndex, new CGetTemperatureParam(dwGridIndex), FALSE, 1 );
 	}
 	return 0;
 }
 
 int   CBusiness::QueryTemperature(const CGetTemperatureParam * pParam) {
+	DWORD  dwTick = LmnGetTickCount();
+
 	int ret = m_launch.QueryTemperature(pParam);
+
+	::PostMessage(g_hWnd, UM_QUERY_TEMP_TICK, pParam->m_dwGridIndex, dwTick);	
 	return 0;
 }
 
@@ -377,7 +386,7 @@ int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 
 int   CBusiness::ReadLaunch() {
 	m_launch.ReadComData();
-	ReadLaunchAsyn(200);
+	ReadLaunchAsyn(2000);
 	return 0;
 }
 

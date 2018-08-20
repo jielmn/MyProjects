@@ -11,7 +11,7 @@
 
 CLaunch::CLaunch() {
 	memset( m_dwGridRetryTime, 0, sizeof(m_dwGridRetryTime) );
-	m_dwLastWriteTick = 0;
+	//m_dwLastWriteTick = 0;
 }
 
 CLaunch::~CLaunch() {
@@ -25,20 +25,23 @@ void  CLaunch::CloseLaunch() {
 }
 
 BOOL  CLaunch::WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen) {
-	DWORD  dwTick = LmnGetTickCount();
-	if ( m_dwLastWriteTick != 0 ) {
-		// 如果还不到时间间隔
-		DWORD  dwElapsed = dwTick - m_dwLastWriteTick;
-		if ( dwElapsed < g_dwLaunchWriteInterval ) {
-			LmnSleep(g_dwLaunchWriteInterval - dwElapsed);
-		}
-	}
-	m_dwLastWriteTick = dwTick;
+	//DWORD  dwTick = LmnGetTickCount();
+	//if ( m_dwLastWriteTick != 0 ) {
+	//	// 如果还不到时间间隔
+	//	DWORD  dwElapsed = dwTick - m_dwLastWriteTick;
+	//	if ( dwElapsed < g_dwLaunchWriteInterval ) {
+	//		LmnSleep(g_dwLaunchWriteInterval - dwElapsed);
+	//	}
+	//}
+	//m_dwLastWriteTick = dwTick;
 
-	return Write(WriteBuf, WriteDataLen);
+	BOOL bRet = Write(WriteBuf, WriteDataLen);
+	LmnSleep(g_dwLaunchWriteInterval);
+	return bRet;
 }
 
 int  CLaunch::Reconnect() {
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "launch reconnect \n");
 
 	if ( GetStatus() == CLmnSerialPort::OPEN ) {
 		CloseLaunch();
@@ -79,6 +82,7 @@ int  CLaunch::Reconnect() {
 
 // 硬件改动，检查状态
 int  CLaunch::CheckStatus() {
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "check status \n");
 
 	if (GetStatus() == CLmnSerialPort::CLOSE) {
 		return 0;
@@ -96,6 +100,8 @@ int  CLaunch::CheckStatus() {
 
 // 心跳
 int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "query heart beat[%lu] \n", pParam->m_dwGridIndex);
+
 	DWORD  dwGridIndex = pParam->m_dwGridIndex;
 	assert(dwGridIndex < MAX_GRID_COUNT);
 
@@ -113,6 +119,10 @@ int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
 	if (0 == g_dwBedNo[dwGridIndex]) {
 		return 0;
 	}
+
+	// 先处理数据
+	ReadComData();
+
 
 	BYTE  send_buf[8];
 	DWORD dwSendLen = 8;
@@ -127,6 +137,8 @@ int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
 
 // 获取温度
 int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "query temperature[%lu] \n", pParam->m_dwGridIndex);
+
 	DWORD  dwGridIndex = pParam->m_dwGridIndex;
 	assert(dwGridIndex < MAX_GRID_COUNT);
 
@@ -144,6 +156,9 @@ int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 	if (0 == g_dwBedNo[dwGridIndex]) {
 		return 0;
 	}
+
+	// 先处理数据
+	ReadComData();
 
 	BYTE  send_buf[8];
 	DWORD dwSendLen = 8;
@@ -159,6 +174,8 @@ int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 
 // 读取串口数据
 int  CLaunch::ReadComData() {
+	g_log->Output(ILog::LOG_SEVERITY_INFO, "handle read\n");
+
 	// 如果串口没有打开
 	if (GetStatus() == CLmnSerialPort::CLOSE) {
 		return 0;

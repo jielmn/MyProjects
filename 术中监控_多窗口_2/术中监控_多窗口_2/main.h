@@ -55,6 +55,12 @@ private:
 	void   OnTempData(WPARAM wParam, LPARAM lParam);
 	// 格子的Reader状态
 	void   OnGridReaderStatus(WPARAM wParam, LPARAM lParam);
+	// 检查Reader
+	void   OnCheckReaderTimer(WPARAM wParam, LPARAM lParam);
+	// 
+	void   OnHeatBeatTick(WPARAM wParam, LPARAM lParam);
+	//
+	void   OnTempTick(WPARAM wParam, LPARAM lParam);
 public:
 	void   OnEdtRemarkKillFocus();
 
@@ -87,7 +93,7 @@ private:
 	CLabelUI *                         m_lblBarTips;
 
 	int                                m_nState;     // 多格子状态，单格子状态
-	int                                m_nMaxGridIndex; // 最大化格子的序号
+	int                                m_nMaxGridIndex; // 最大化格子的序号	
 public:
 	DuiLib::CEditUI *                  m_edRemark;   // 编辑注释的框
 };
