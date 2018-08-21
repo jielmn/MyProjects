@@ -124,7 +124,8 @@ void CDuiFrameWnd::InitWindow() {
 		}
 	}
 	m_tree->SelectItem(0);	
-	m_tree->SetMinHeight(1100);
+	int a = m_tree->CalculateMinHeight();
+	m_tree->SetFixedHeight(a);
 
 	WindowImplBase::InitWindow();
 }
@@ -137,6 +138,9 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			if (_tcscmp(msg.pSender->GetClass(), DUI_CTR_BUTTON) == 0) {
 				CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)msg.pSender->GetParent()->GetParent()->GetTag();
 				m_tree->ExpandNode(node, !node->data()._expand);
+				//m_tree->SetFixedHeight(200);
+				int a = m_tree->CalculateMinHeight();
+				m_tree->SetFixedHeight(a);
 			}
 		}
 	}

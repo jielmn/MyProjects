@@ -55,6 +55,20 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::Node::get_last_child()
 	}
 	else return this;  
 }
+
+bool CMyTreeCfgUI::Node::IsAllParentsExpanded() {
+	if ( _parent ) {
+		if ( !_parent->data()._expand ) {
+			return false;
+		}
+		else {
+			return _parent->IsAllParentsExpanded();
+		}
+	}
+	else {
+		return true;
+	}
+}
 	
 
 CMyTreeCfgUI::ConfigValue::ConfigValue() {
@@ -170,7 +184,9 @@ void CMyTreeCfgUI::DoEvent(TEventUI& event)
 
 CMyTreeCfgUI::Node* CMyTreeCfgUI::GetRoot() { return _root; }
 
-CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/, void * pUserData /*= 0*/, CControlUI * pConfig /*= NULL*/ )
+CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/, 
+	             void * pUserData /*= 0*/, CControlUI * pConfig /*= NULL*/, DWORD dwTitleFontIndex /*= -1*/, 
+	             DWORD dwTitleColor /*= 0xFF000000*/ )
 {
 	if (!parent) parent = _root;
 
@@ -185,6 +201,8 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	pLayout->Add(place_holder);
 
 	CLabelUI * pTitle = new CLabelUI;
+	pTitle->SetFont(dwTitleFontIndex);
+	pTitle->SetTextColor(dwTitleColor);
 	pLayout->Add(pTitle);
 	pTitle->SetText(text);
 
@@ -340,20 +358,20 @@ int CMyTreeCfgUI::GetItemIndex(CControlUI* pControl) const {
 	return -1;
 }
 
-//int   CMyTreeCfgUI::CalculateMinHeight() {
-//	int nCount = this->GetCount();
-//	int sum = 0;
-//
-//	for (int i = 0; i < nCount; i++) {
-//
-//		if (this->GetItemAt(i)->IsVisible()) {
-//			int nHeight = this->GetItemAt(i)->GetHeight();
-//			sum += nHeight;
-//		}
-//	}
-//
-//	return sum + 2;
-//}
+int   CMyTreeCfgUI::CalculateMinHeight() {
+	int nCount = this->GetCount();
+	int sum = 0;
+
+	for (int i = 0; i < nCount; i++) {
+		Node* node = (Node*)this->GetItemAt(i)->GetTag();
+		if ( node->IsAllParentsExpanded() ) {
+			int nHeight = 26; // this->GetItemAt(i)->GetHeight();
+			sum += nHeight;
+		}
+	}
+
+	return sum + 2;
+}
 
 bool CMyTreeCfgUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CListUI::DoPaint(hDC, rcPaint, pStopControl);
@@ -413,10 +431,16 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 		cfgValue.m_tag = pCtl->GetTag();
 	}
 	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_COMBO ) ) {
+		CComboUI * pCombo = (CComboUI*)pCtl;
 		cfgValue.m_eConfigType = ConfigType_COMBO;
 		cfgValue.m_nComboSel = ((CComboUI*)pCtl)->GetCurSel();
 		cfgValue.m_strEdit = ((CComboUI*)pCtl)->GetText();
-		cfgValue.m_tag = pCtl->GetTag();
+		if (cfgValue.m_nComboSel >= 0) {
+			cfgValue.m_tag = pCombo->GetItemAt(cfgValue.m_nComboSel)->GetTag();
+		}
+		else {
+			cfgValue.m_tag = 0;
+		}
 	}
 	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_CHECKBOX) ) {
 		cfgValue.m_eConfigType = ConfigType_CHECKBOX;

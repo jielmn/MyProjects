@@ -40,6 +40,7 @@ public:
 		void remove_child(Node* child);
 		void remove_all_child();
 		Node* get_last_child();
+		bool IsAllParentsExpanded();
 	};
 
 	enum ConfigType{
@@ -81,7 +82,8 @@ public:
 
 	Node* GetRoot();
 
-	Node* AddNode(LPCTSTR text, Node* parent = NULL, void * pUserData = 0, CControlUI * pConfig = NULL  );
+	Node* AddNode( LPCTSTR pTitleText, Node* parent = NULL, void * pUserData = 0, CControlUI * pConfig = NULL,
+		           DWORD dwTitleFontIndex = -1, DWORD dwTitleColor = 0xFF000000  );
 
 	bool RemoveNode(Node* node);
 
@@ -106,5 +108,5 @@ private:
 	HPEN   m_hPen;
 
 public:
-	// int   CalculateMinHeight();
+	int   CalculateMinHeight();
 };
