@@ -153,3 +153,30 @@ HGDIOBJ  CMySkin::GetGdiObject(DWORD dwIndex) const {
 	}
 	return 0;
 }
+
+const char * CMySkin::GetImageName(DWORD dwIndex) const {
+	if (m_dwSkinIndex == SKIN_BLACK) {
+		switch (dwIndex)
+		{
+		case GRID_READER_SWITCH_SELECTED_INDEX:
+			return "checked_0.png";
+		case GRID_READER_SWITCH_NOT_SELECTED_INDEX:
+			return "not_checked_0.png";
+		default:
+			break;
+		}
+	}
+	else if (m_dwSkinIndex == SKIN_WHITE) {
+		switch (dwIndex)
+		{
+		case GRID_READER_SWITCH_SELECTED_INDEX:
+			return "checked_1.png";
+		case GRID_READER_SWITCH_NOT_SELECTED_INDEX:
+			return "not_checked_1.png";
+		default:
+			break;
+		}
+	}
+	
+	return "";
+}

@@ -27,6 +27,7 @@ private:
 	void   OnBtnBedName(TNotifyUI& msg);
 	void   OnEdtBedNameKillFocus(TNotifyUI& msg);
 	void   OnBtnName(TNotifyUI& msg);
+	void   OnGridReaderSwitch(TNotifyUI& msg);
 	void   OnEdtNameKillFocus(TNotifyUI& msg);
 	void   OnSetting();
 	void   OnAbout();
@@ -90,6 +91,8 @@ private:
 	CLabelUI *                         m_pLblNameTitle_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblCurTempTitle_small[MAX_GRID_COUNT];
 	CMyImageUI *                       m_pMyImage[MAX_GRID_COUNT];
+	COptionUI *                        m_pOptGridReaderSwitch[MAX_GRID_COUNT];
+
 	DuiLib::CButtonUI *                m_btnMenu;    // ²Ëµ¥°´Å¥	
 	CAlarmImageUI *                    m_pAlarmUI[MAX_GRID_COUNT];
 

@@ -113,6 +113,8 @@ using namespace DuiLib;
 #define   LABEL_NAME_TITLE_SMALL_NAME    "lblNameTitle_1"
 #define   LABEL_CUR_TEMP_TITLE_SMALL_NAME    "lblCurTitle_1"
 #define   MYIMAGE_NAME                       "my_image"
+#define   OPT_GRID_READER_SWITCH             "opn_grid_reader_switch_1"
+
 #define   MYIMAGE_CLASS_NAME                 "MyImage"
 #define   BTN_MENU_NAME                      "menubtn"
 #define   MYTREE_CONFIG_NAME                 "CfgTree"
@@ -144,6 +146,9 @@ using namespace DuiLib;
 #define   BRIGHTER_PEN_INDEX            2
 #define   LOW_TEMP_PEN_INDEX            3
 #define   HIGH_TEMP_PEN_INDEX           4
+
+#define   GRID_READER_SWITCH_SELECTED_INDEX          0
+#define   GRID_READER_SWITCH_NOT_SELECTED_INDEX      1
 
 #define   STATE_GRIDS                    0
 #define   STATE_MAXIUM                   1

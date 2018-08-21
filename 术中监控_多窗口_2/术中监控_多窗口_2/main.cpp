@@ -29,6 +29,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 	memset(m_pLblNameTitle_small, 0, sizeof(m_pLblNameTitle_small));
 	memset(m_pLblCurTempTitle_small, 0, sizeof(m_pLblCurTempTitle_small));
 	memset(m_pMyImage, 0, sizeof(m_pMyImage));
+	memset(m_pOptGridReaderSwitch, 0, sizeof(m_pOptGridReaderSwitch));
 	memset(m_pAlarmUI, 0, sizeof(m_pAlarmUI));	
 	m_nState = STATE_GRIDS;	
 	m_nMaxGridIndex = -1;
@@ -89,6 +90,15 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pMyImage[nIndex]->SetIndex(nIndex);
 		m_pMyImage[nIndex]->SetTag(nIndex);
 
+		m_pOptGridReaderSwitch[nIndex] = static_cast<COptionUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, OPT_GRID_READER_SWITCH, 0));
+		m_pOptGridReaderSwitch[nIndex]->SetTag(nIndex);
+		if ( !g_bGridReaderSwitch[nIndex] ) {
+			m_pOptGridReaderSwitch[nIndex]->Selected(false);
+		}
+		else {
+			m_pOptGridReaderSwitch[nIndex]->Selected(true);
+		}
+
 		m_pAlarmUI[nIndex] = static_cast<CAlarmImageUI*>(m_pGrids[nIndex]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
 		m_pAlarmUI[nIndex]->SetTag(nIndex);
 		m_pAlarmUI[nIndex]->FailureAlarm();
@@ -141,6 +151,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == BUTTON_PATIENT_NAME_SMALL_NAME) {
 			OnBtnName(msg);
+		}
+		else if (name == OPT_GRID_READER_SWITCH) {
+			OnGridReaderSwitch(msg);
 		}
 	}
 	else if (msg.sType == "menu_setting") {
@@ -317,6 +330,9 @@ void   CDuiFrameWnd::OnChangeSkin() {
 
 		m_pMyImage[nIndex]->SetBkColor(g_skin[MYIMAGE_BK_COLOR_INDEX]);
 		m_pMyImage[nIndex]->OnChangeSkin();
+
+		m_pOptGridReaderSwitch[nIndex]->SetSelectedImage(g_skin.GetImageName(GRID_READER_SWITCH_SELECTED_INDEX));
+		m_pOptGridReaderSwitch[nIndex]->SetNormalImage(g_skin.GetImageName(GRID_READER_SWITCH_NOT_SELECTED_INDEX));
 	}
 }
 
@@ -346,7 +362,9 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 		m_pLblCurTemp_small[nIndex]->SetFixedWidth(BUTTON_WIDTH_IN_STATE_MAXIUM);
 		m_pLblCurTemp_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_MAXIUM);
 
-		m_pAlarmUI[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM - 2 * 2); 		
+		m_pAlarmUI[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM - 2 * 2); 	
+
+		m_pOptGridReaderSwitch[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM - 2 * 2);
 	}
 	else {
 		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS);
@@ -372,6 +390,8 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 		m_pLblCurTemp_small[nIndex]->SetFont(BUTTON_FONT_IN_STATE_GRIDS);
 
 		m_pAlarmUI[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);
+
+		m_pOptGridReaderSwitch[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);
 	}
 	m_pMyImage[nIndex]->SetState(m_nState);
 	m_pAlarmUI[nIndex]->SetState(m_nState);
@@ -414,6 +434,21 @@ void   CDuiFrameWnd::OnBtnName(TNotifyUI& msg) {
 	m_pEdtName_small[nIndex]->SetText(msg.pSender->GetText());
 	m_pEdtName_small[nIndex]->SetVisible(true);
 	m_pEdtName_small[nIndex]->SetFocus();
+}
+
+void   CDuiFrameWnd::OnGridReaderSwitch(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	bool bChecked = m_pOptGridReaderSwitch[nIndex]->IsSelected();
+
+	g_bGridReaderSwitch[nIndex] = !bChecked ? TRUE : FALSE;
+	DuiLib::CDuiString strText;
+	strText.Format(CFG_GRID_READER_SWITCH " %d", nIndex + 1);
+	DWORD dwValue = TRUE;
+	g_cfg->SetConfig(strText, g_bGridReaderSwitch[nIndex], &dwValue);
+	g_cfg->Save();
+
+	CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(nIndex);
+	OnGridReaderStatus(nIndex, READER_STATUS_CLOSE, 200);
 }
 
 void   CDuiFrameWnd::OnEdtNameKillFocus(TNotifyUI& msg) {
@@ -590,6 +625,9 @@ void   CDuiFrameWnd::OnDbClick() {
 		if ( 0 == strcmp( pFindControl->GetClass(), DUI_CTR_BUTTON ) ) {
 			return;
 		}
+		else if (0 == strcmp(pFindControl->GetClass(), DUI_CTR_OPTION)) {
+			return;
+		}
 	}
 
 	while (pFindControl) {
@@ -701,6 +739,11 @@ void  CDuiFrameWnd::OnNewTempData(int nGridIndex, DWORD dwTemp) {
 	CDuiString  strText;
 
 	if ( dwTemp > 0 ) {
+		// 如果开关没有打开，或者病区号为0， 或者床位号为0。丢掉数据
+		if ( !g_bGridReaderSwitch[nGridIndex] || g_dwAreaNo == 0 || g_dwBedNo[nGridIndex] == 0 ) {
+			return;
+		}
+
 		double dTemperature = dwTemp / 100.0;
 		strText.Format("%.2f", dTemperature);
 		m_pLblCurTemp_small[nGridIndex]->SetText(strText);

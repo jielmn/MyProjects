@@ -21,9 +21,12 @@
 					
 					<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" />
 					<Label   name="lblCur_1"   text="36.50"    textcolor="#FFFFFFFF" width="50" font="1" />
-					<Control width="10" />
+					<Control width="10" />					
 					
 					<AlarmImage name="alarm_image" width="30" />
+					
+					<Control />			
+					<Option width="30" name="opn_grid_reader_switch_1" normalimage="not_checked_0.png" selectedimage="checked_0.png" selected="true" />
 					
 				</HorizontalLayout>
 				

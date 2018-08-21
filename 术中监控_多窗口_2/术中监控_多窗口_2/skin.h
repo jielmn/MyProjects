@@ -10,6 +10,7 @@ public:
 	DWORD  GetSkin() const;
 	DWORD  operator [] (DWORD dwPartIndex) const;
 	HGDIOBJ  GetGdiObject(DWORD dwIndex) const;
+	const char * GetImageName(DWORD dwIndex) const;
 
 private:
 	DWORD        m_dwSkinIndex;
