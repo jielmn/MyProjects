@@ -439,11 +439,13 @@ void   CDuiFrameWnd::OnGridMenu(TNotifyUI& msg) {
 	pMenu->ShowWindow(TRUE);  
 }
 
-void   CDuiFrameWnd::ReHandleReader(DWORD dwCount, DWORD * pOldIntervals, DWORD * pOldBedNo, DWORD  dwOldAreaNo) {
+void   CDuiFrameWnd::ReHandleReader( DWORD dwCount, DWORD * pOldIntervals, DWORD * pOldBedNo, 
+	                                 DWORD  dwOldAreaNo, BOOL * pbOldGridReaderSwitch) {
 	DWORD  dwDelay = 200;
 	for (DWORD i = 0; i < dwCount; i++) {
-		// 如果病区改变或者床号改变
-		if ( dwOldAreaNo != g_dwAreaNo || pOldBedNo[i] != g_dwBedNo[i] ) {
+		// 如果病区改变或者床号改变或者开关改变
+		if ( dwOldAreaNo != g_dwAreaNo || pOldBedNo[i] != g_dwBedNo[i] 
+			 || pbOldGridReaderSwitch[i] != g_bGridReaderSwitch[i] ) {
 			CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
 			OnGridReaderStatus(i, READER_STATUS_CLOSE, dwDelay);
 			dwDelay += 2000;
@@ -472,6 +474,9 @@ void   CDuiFrameWnd::OnSetting() {
 
 	DWORD  dwCollectInterval[MAX_GRID_COUNT];
 	memcpy(dwCollectInterval, g_dwCollectInterval, sizeof(dwCollectInterval));
+
+	BOOL   bGridReaderSwitch[MAX_GRID_COUNT];
+	memcpy(bGridReaderSwitch, g_bGridReaderSwitch, sizeof(bGridReaderSwitch));
 
 
 	CSettingDlg * pSettingDlg = new CSettingDlg;
@@ -515,7 +520,11 @@ void   CDuiFrameWnd::OnSetting() {
 
 			strText.Format(CFG_BED_NO " %d", i + 1);
 			dwValue = i + 1;
-			g_cfg->SetConfig(strText, g_dwBedNo[i], &dwValue);			
+			g_cfg->SetConfig(strText, g_dwBedNo[i], &dwValue);		
+
+			strText.Format(CFG_GRID_READER_SWITCH " %d", i + 1);
+			dwValue = TRUE;
+			g_cfg->SetConfig(strText, g_bGridReaderSwitch[i], &dwValue);
 		}
 
 		g_cfg->Save();
@@ -530,11 +539,11 @@ void   CDuiFrameWnd::OnSetting() {
 
 		// 窗格个数不变
 		if (dwOldCount == dwNewCount) {
-			ReHandleReader(dwOldCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo);
+			ReHandleReader(dwOldCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo, bGridReaderSwitch);
 		}
 		// 窗格个数扩大
 		else if (dwOldCount < dwNewCount) {
-			ReHandleReader(dwOldCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo);
+			ReHandleReader(dwOldCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo, bGridReaderSwitch);
 			DWORD dwDelay = 200;
 			for ( DWORD i = dwOldCount; i < dwNewCount; i++ ) {
 				CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, dwDelay);
@@ -543,7 +552,7 @@ void   CDuiFrameWnd::OnSetting() {
 		}
 		// 窗格个数缩小
 		else {
-			ReHandleReader(dwNewCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo);
+			ReHandleReader(dwNewCount, dwCollectInterval, dwOldBedNo, dwOldAreaNo, bGridReaderSwitch );
 			for (DWORD i = dwNewCount; i < dwOldCount; i++) {
 				OnGridReaderStatus(i, READER_STATUS_CLOSE);
 				CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
@@ -814,6 +823,7 @@ void   CDuiFrameWnd::OnGridReaderStatus(DWORD dwGridIndex, int   nStatus, DWORD 
 		g_nQueryTempRetryTime[dwGridIndex] = 0;
 		g_dwLastQueryTick[dwGridIndex] = 0;
 
+		m_pLblCurTemp_small[dwGridIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblCurTemp_small[dwGridIndex]->SetText("--");
 		m_pAlarmUI[dwGridIndex]->FailureAlarm();
 

@@ -120,6 +120,11 @@ int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
 		return 0;
 	}
 
+	// 如果没有打开reader开关
+	if ( !g_bGridReaderSwitch[dwGridIndex] ) {
+		return 0;
+	}
+
 	// 先处理数据
 	ReadComData();
 
@@ -157,6 +162,11 @@ int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 		return 0;
 	}
 
+	// 如果没有打开reader开关
+	if (!g_bGridReaderSwitch[dwGridIndex]) {
+		return 0;
+	}
+
 	// 先处理数据
 	ReadComData();
 
@@ -181,7 +191,7 @@ int  CLaunch::ReadComData() {
 		return 0;
 	}
 
-	char buf[8192];
+	BYTE buf[8192];
 	DWORD  dwBufLen = sizeof(buf);
 	if ( Read(buf, dwBufLen) ) {
 		if (dwBufLen > 0) {
@@ -207,7 +217,7 @@ int  CLaunch::ReadComData() {
 		m_recv_buf.Read(buf, 17);
 
 		// 数据头错误
-		if (buf[0] != '\x55') {
+		if (buf[0] != (BYTE)'\x55') {
 			DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
 			g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf );
 
@@ -216,10 +226,10 @@ int  CLaunch::ReadComData() {
 		}
 		else {
 			// 如果是心跳数据
-			if ( buf[1] == '\x0E' ) {
+			if ( buf[1] == (BYTE)'\x0E' ) {
 				m_recv_buf.Reform();
 				// 如果错误的数据尾
-				if ( buf[16] != '\xFF' ) {
+				if ( buf[16] != (BYTE)'\xFF' ) {
 					DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
 					g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
 
@@ -248,13 +258,13 @@ int  CLaunch::ReadComData() {
 				}
 			} // 结束 心跳
 			// 如果是温度数据
-			else if ( buf[1] == '\x1A' ) {
+			else if ( buf[1] == (BYTE)'\x1A' ) {
 				// 如果得到足够数据
 				if ( m_recv_buf.GetDataLength() >= 29 - 17 ) {
 					m_recv_buf.Read( buf+17, 12 );
 					m_recv_buf.Reform();
 
-					if (buf[28] != '\xFF') {
+					if (buf[28] != (BYTE)'\xFF') {
 						DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
 						g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
 

@@ -33,7 +33,7 @@ private:
 	void    OnMyClick(DuiLib::TNotifyUI& msg);
 	BOOL    GetCommonConfig();
 	BOOL    GetConfig( int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
-		               DWORD & dwHighAlarm, DWORD & dwMinTemp, DWORD & dwBedNo );
+		               DWORD & dwHighAlarm, DWORD & dwMinTemp, DWORD & dwBedNo,BOOL & bSwitch);
 
 
 private:
@@ -48,5 +48,6 @@ private:
 	DWORD     m_dwCollectInterval[MAX_GRID_COUNT];
 	DWORD     m_dwMyImageMinTemp[MAX_GRID_COUNT];
 	DWORD     m_dwBedNo[MAX_GRID_COUNT];
+	BOOL      m_bGridReaderSwitch[MAX_GRID_COUNT];
 };
 

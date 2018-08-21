@@ -2,6 +2,7 @@
 
 #define EIDT_TEXT_COLOR    0xFF386382
 #define EDIT_FONT_INDEX    2
+#define GRID_SETTING_ITEMS_COUNT  7
 
 CSettingDlg::CSettingDlg() {
 
@@ -37,7 +38,7 @@ void   CSettingDlg::InitWindow() {
 		InitGridCfg(pTitleNode, i);
 	}
 
-	m_tree->SetMinHeight(8000);
+	m_tree->SetMinHeight(9300);
 	WindowImplBase::InitWindow();   
 }
 
@@ -139,9 +140,21 @@ void   CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	CComboUI * pCombo = 0;
 	CListLabelElementUI * pElement = 0;
 
+	// 启用/禁用
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "启用");
+	AddComboItem(pCombo, "禁用");
+	if ( g_bGridReaderSwitch[dwIndex] ) {
+		pCombo->SelectItem(0);
+	}
+	else {
+		pCombo->SelectItem(1);
+	}
+	SetComboStyle(pCombo);
+	m_tree->AddNode(GRID_READER_SWITCH_TEXT, pSubTitleNode, 0, pCombo);
+
 	// 间隔时间
 	pCombo = new CComboUI;
-
 	AddComboItem(pCombo, "10秒");
 	AddComboItem(pCombo, "1分钟");
 	AddComboItem(pCombo, "5分钟");
@@ -215,46 +228,6 @@ void   CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	pEdit->SetText(strText);
 	m_tree->AddNode(HIGH_ALARM_TEXT, pSubTitleNode, 0, pEdit);
 
-	// 串口
-	//std::vector<std::string>  vCom;
-	//GetAllSerialPortName(vCom);
-
-	//std::vector<std::string>::iterator it;
-	//if (g_szComPort[dwIndex][0] != 0) {
-	//	for (it = vCom.begin(); it != vCom.end(); it++) {
-	//		std::string & s = *it;
-	//		if (0 == StrICmp(s.c_str(), g_szComPort[dwIndex])) {
-	//			break;
-	//		}
-	//	}
-	//	if (it == vCom.end()) {
-	//		vCom.push_back(g_szComPort[dwIndex]);
-	//	}
-	//}
-
-	//pCombo = new CComboUI;
-	//AddComboItem( pCombo, ANY_COM_PORT_TEXT);
-
-	//for (it = vCom.begin(); it != vCom.end(); it++) {
-	//	std::string & s = *it;
-	//	AddComboItem(pCombo, s.c_str());
-	//}
-
-	//if (g_szComPort[dwIndex][0] == 0) {
-	//	pCombo->SelectItem(0);
-	//}
-	//else {
-	//	for (it = vCom.begin(); it != vCom.end(); it++) {
-	//		std::string & s = *it;
-	//		if (0 == StrICmp(s.c_str(), g_szComPort[dwIndex])) {
-	//			pCombo->SelectItem((it - vCom.begin()) + 1);
-	//		}
-	//	}
-	//}
-
-	//SetComboStyle(pCombo);
-	//m_tree->AddNode(RW_COM_PORT_TEXT, pSubTitleNode, 0, pCombo);
-
 	// 床号
 	pEdit = new CEditUI;
 	SetEditStyle(pEdit);
@@ -296,13 +269,14 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	DWORD       dwHighAlarm = 0;
 	DWORD       dwMinTemp = 0;
 	DWORD       dwBedNo = 0;
+	BOOL        bSwitch = TRUE;
 
 	if ( !GetCommonConfig() ) {
 		return;
 	}
 
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		if ( !GetConfig(i, dwInterval, dwLowAlarm, dwHighAlarm, dwMinTemp, dwBedNo) ) {
+		if ( !GetConfig(i, dwInterval, dwLowAlarm, dwHighAlarm, dwMinTemp, dwBedNo, bSwitch) ) {
 			return;
 		}
 		else {
@@ -311,6 +285,7 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 			m_dwCollectInterval[i] = dwInterval;
 			m_dwMyImageMinTemp[i] = dwMinTemp;
 			m_dwBedNo[i] = dwBedNo;
+			m_bGridReaderSwitch[i] = bSwitch;
 		}
 	}
 
@@ -340,6 +315,7 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	memcpy(g_dwCollectInterval, m_dwCollectInterval, sizeof(DWORD) * MAX_GRID_COUNT);
 	memcpy(g_dwMyImageMinTemp, m_dwMyImageMinTemp, sizeof(DWORD) * MAX_GRID_COUNT);
 	memcpy(g_dwBedNo, m_dwBedNo, sizeof(DWORD) * MAX_GRID_COUNT);
+	memcpy(g_bGridReaderSwitch, m_bGridReaderSwitch, sizeof(BOOL) * MAX_GRID_COUNT);
 
 	PostMessage(WM_CLOSE);
 }
@@ -442,15 +418,31 @@ BOOL  CSettingDlg::GetCommonConfig() {
 }
 
 BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
-	DWORD & dwHighAlarm, DWORD & dwMinTemp, DWORD & dwBedNo )
+	DWORD & dwHighAlarm, DWORD & dwMinTemp, DWORD & dwBedNo, BOOL & bSwitch )
 {
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	CDuiString  strText;
 	double dbTemp = 0.0;
 	int    nBedNo = 0;
+	bool   bGetCfg = false;
+
+	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 1, cfgValue);
+	switch (cfgValue.m_nComboSel)
+	{
+	case 0:
+		bSwitch = TRUE;
+		break;
+
+	case 1:
+		bSwitch = FALSE;
+		break;
+
+	default:
+		break;
+	}
 
 	dwInterval = 10;
-	bool bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 1, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 2, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -495,7 +487,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 
 
 	dwMinTemp = 20;
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * 6 + 2, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 3, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -527,7 +519,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 
 
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 3, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 4, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("窗口%d配置，低温报警请输入数字", nIndex + 1);
@@ -542,7 +534,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 	dwLowAlarm = (DWORD)(dbTemp * 100);
 
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 4, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 5, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("窗口%d配置，高温报警请输入数字", nIndex + 1);
@@ -562,16 +554,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 	dwHighAlarm = (DWORD)(dbTemp * 100);
 
-	// 串口
-	//bGetCfg = m_tree->GetConfigValue( 7 + nIndex * 6 + 5, cfgValue);
-	//if (0 == cfgValue.m_nComboSel) {
-	//	strComPort = "";
-	//}
-	//else {
-	//	strComPort = cfgValue.m_strEdit;
-	//}
-
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * 6 + 5, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 6, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%d", &nBedNo)) {
 		strText.Format("窗口%d配置，Reader相关床位号请输入数字", nIndex + 1);

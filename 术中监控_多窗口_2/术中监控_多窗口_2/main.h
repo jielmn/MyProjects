@@ -64,7 +64,7 @@ private:
 	//
 	void   OnTempTick(WPARAM wParam, LPARAM lParam);
 	//
-	void   ReHandleReader( DWORD dwCount, DWORD * pOldIntervals, DWORD * pOldBedNo, DWORD  dwOldAreaNo );
+	void   ReHandleReader( DWORD dwCount, DWORD * pOldIntervals, DWORD * pOldBedNo, DWORD  dwOldAreaNo, BOOL * pbOldGridReaderSwitch );
 public:
 	void   OnEdtRemarkKillFocus();
 

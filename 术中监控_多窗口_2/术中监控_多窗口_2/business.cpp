@@ -102,7 +102,10 @@ int CBusiness::Init() {
 		//g_cfg->GetConfig(strText, g_szComPort[i], MAX_COM_PORT_LENGTH, "");
 
 		strText.Format(CFG_BED_NO " %d", i + 1);
-		g_cfg->GetConfig(strText, g_dwBedNo[i], 0);
+		g_cfg->GetConfig(strText, g_dwBedNo[i], -1);
+
+		strText.Format(CFG_GRID_READER_SWITCH " %d", i + 1);
+		g_cfg->GetConfig(strText, g_bGridReaderSwitch[i], TRUE);
 
 		strText.Format(CFG_LAST_BED_NAME " %d", i + 1);
 		g_cfg->GetConfig(strText, g_szLastBedName[i], MAX_BED_NAME_LENGTH, "--");
@@ -114,7 +117,7 @@ int CBusiness::Init() {
 	DWORD  dwCount = g_dwLayoutColumns * g_dwLayoutRows;
 	// ¸øÄ¬ÈÏµÄ´²ºÅ1, 2, 3
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		if ( g_dwBedNo[i] == 0 ) {
+		if ( g_dwBedNo[i] == -1 ) {
 
 			int j = 0;
 			for ( j = 0; j < MAX_GRID_COUNT; j++) {

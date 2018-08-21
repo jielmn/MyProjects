@@ -55,6 +55,7 @@ using namespace DuiLib;
 #define   CFG_MIN_TEMP             "min temperature degree"
 #define   CFG_COM_PORT             "com port"
 #define   CFG_BED_NO               "bed no"
+#define   CFG_GRID_READER_SWITCH   "grid reader switch"
 #define   CFG_MYIMAGE_LEFT_BLANK   "my image left"
 #define   CFG_MYIMAGE_RIGHT_BLANK  "my image right"
 #define   CFG_MYIMAGE_TIME_TEXT_OFFSET_X   "time text offset x"
@@ -187,6 +188,7 @@ using namespace DuiLib;
 #define   SWITCH_ON_TEXT                  "开"
 #define   SWITCH_OFF_TEXT                 "关"
 #define   GRIDS_SETTING_TEXT              "窗格"
+#define   GRID_READER_SWITCH_TEXT         "是否启用"
 #define   COLLECT_INTERVAL_TEXT           "采样间隔"
 #define   MIN_TEMPERATURE_TEXT            "显示的最低温度"
 #define   LOW_ALARM_TEXT                  "低温报警"
@@ -367,6 +369,7 @@ extern BOOL      g_bAlarmOff;   // 报警开关是否打开
 extern char      g_szAlarmFilePath[MAX_ALARM_PATH_LENGTH];
 //extern char      g_szComPort[MAX_GRID_COUNT][MAX_COM_PORT_LENGTH];
 extern DWORD     g_dwBedNo[MAX_GRID_COUNT];
+extern DWORD     g_bGridReaderSwitch[MAX_GRID_COUNT];
 extern CMySkin   g_skin;
 extern BOOL      g_bAlarmVoiceOff;
 extern DWORD     g_dwSkinIndex;

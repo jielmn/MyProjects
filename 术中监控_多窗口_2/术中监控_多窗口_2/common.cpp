@@ -33,6 +33,7 @@ BOOL      g_bAlarmOff = FALSE;   // 报警开关是否打开
 char      g_szAlarmFilePath[MAX_ALARM_PATH_LENGTH];
 //char      g_szComPort[MAX_GRID_COUNT][MAX_COM_PORT_LENGTH];
 DWORD     g_dwBedNo[MAX_GRID_COUNT];
+DWORD     g_bGridReaderSwitch[MAX_GRID_COUNT];
 CMySkin   g_skin;
 BOOL      g_bAlarmVoiceOff = FALSE;
 DWORD     g_dwSkinIndex = 0;
