@@ -4,8 +4,10 @@
 
 		<HorizontalLayout height="20" />
 		
-		<VerticalLayout height="35" inset="10,0,10,0">
-			<Label text="注意事项：右键操作" font="2" textcolor="#FF386382" />
+		<VerticalLayout height="100" inset="10,0,10,0">
+			<Label text="注意事项：" font="2" textcolor="#FF386382" />
+			<Label text="1.右键进行增、删、改操作" font="2" textcolor="#FF386382" />
+			<Label text="2.完成病区配置后，把area.cfg复制到术中监控软件所在的目录下，供其所用" font="2" textcolor="#FF386382" />
 		</VerticalLayout>
 		
 		<HorizontalLayout height="20" />

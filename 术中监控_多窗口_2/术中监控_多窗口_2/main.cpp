@@ -342,6 +342,7 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 	if (m_nState == STATE_MAXIUM) {
 		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM);
 		m_pLblIndexes_small[nIndex]->SetFont(INDEX_FONT_IN_STATE_MAXIUM);
+		m_pLblIndexes_small[nIndex]->SetFixedWidth(100);
 
 		m_pLblBedTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_MAXIUM);
 		m_pLblBedTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_MAXIUM);
@@ -369,6 +370,7 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 	else {
 		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS);
 		m_pLblIndexes_small[nIndex]->SetFont(INDEX_FONT_IN_STATE_GRIDS);
+		m_pLblIndexes_small[nIndex]->SetFixedWidth(40);
 
 		m_pLblBedTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_GRIDS);
 		m_pLblBedTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_GRIDS);
@@ -483,16 +485,17 @@ void   CDuiFrameWnd::ReHandleReader( DWORD dwCount, DWORD * pOldIntervals, DWORD
 			 || pbOldGridReaderSwitch[i] != g_bGridReaderSwitch[i] ) {
 			CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
 			OnGridReaderStatus(i, READER_STATUS_CLOSE, dwDelay);
-			dwDelay += 2000;
+			dwDelay += 200;
 		}
 		else if (pOldIntervals[i] != g_dwCollectInterval[i]) {
 			// 如果是连接状态
 			if ( g_nGridReaderStatus[i] == READER_STATUS_OPEN ) {
 				CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
 				// 获取温度
-				CBusiness::GetInstance()->QueryTemperatureAsyn(i, 200);
+				CBusiness::GetInstance()->QueryTemperatureAsyn(i, g_dwCollectInterval[i] * 1000);
 			}			
 		}
+		m_pMyImage[i]->MyInvalidate();
 	}
 }
 
@@ -583,6 +586,7 @@ void   CDuiFrameWnd::OnSetting() {
 			for ( DWORD i = dwOldCount; i < dwNewCount; i++ ) {
 				CBusiness::GetInstance()->ReaderHeartBeatAsyn(i, dwDelay);
 				dwDelay += 200;
+				m_pMyImage[i]->MyInvalidate();
 			}
 		}
 		// 窗格个数缩小
@@ -591,6 +595,7 @@ void   CDuiFrameWnd::OnSetting() {
 			for (DWORD i = dwNewCount; i < dwOldCount; i++) {
 				OnGridReaderStatus(i, READER_STATUS_CLOSE);
 				CBusiness::GetInstance()->DeleteGridActiveMsgAsyn(i);
+				m_pMyImage[i]->MyInvalidate();
 			}
 		}
 	}

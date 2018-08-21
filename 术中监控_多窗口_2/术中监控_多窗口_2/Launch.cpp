@@ -100,7 +100,7 @@ int  CLaunch::CheckStatus() {
 
 // 心跳
 int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "query heart beat[%lu] \n", pParam->m_dwGridIndex);
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "query heart beat[%lu] \n", pParam->m_dwGridIndex);
 
 	DWORD  dwGridIndex = pParam->m_dwGridIndex;
 	assert(dwGridIndex < MAX_GRID_COUNT);
@@ -142,7 +142,7 @@ int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
 
 // 获取温度
 int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "query temperature[%lu] \n", pParam->m_dwGridIndex);
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "query temperature[%lu] \n", pParam->m_dwGridIndex);
 
 	DWORD  dwGridIndex = pParam->m_dwGridIndex;
 	assert(dwGridIndex < MAX_GRID_COUNT);
@@ -184,7 +184,7 @@ int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 
 // 读取串口数据
 int  CLaunch::ReadComData() {
-	g_log->Output(ILog::LOG_SEVERITY_INFO, "handle read\n");
+	// g_log->Output(ILog::LOG_SEVERITY_INFO, "handle read\n");
 
 	// 如果串口没有打开
 	if (GetStatus() == CLmnSerialPort::CLOSE) {
