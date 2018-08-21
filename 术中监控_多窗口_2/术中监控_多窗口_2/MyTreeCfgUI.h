@@ -40,6 +40,7 @@ public:
 		void remove_child(Node* child);
 		void remove_all_child();
 		Node* get_last_child();
+		bool IsAllParentsExpanded();
 	};
 
 	enum ConfigType{
@@ -104,4 +105,7 @@ private:
 
 	DWORD  m_dwFixedLeft;
 	HPEN   m_hPen;
+
+public:
+	int   CalculateMinHeight();
 };

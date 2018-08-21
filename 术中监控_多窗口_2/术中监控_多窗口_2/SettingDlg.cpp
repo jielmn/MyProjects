@@ -38,7 +38,8 @@ void   CSettingDlg::InitWindow() {
 		InitGridCfg(pTitleNode, i);
 	}
 
-	m_tree->SetMinHeight(9300);
+	int nHeight = m_tree->CalculateMinHeight();
+	m_tree->SetFixedHeight(nHeight);
 	WindowImplBase::InitWindow();   
 }
 
@@ -334,6 +335,8 @@ void  CSettingDlg::OnMyClick(DuiLib::TNotifyUI& msg) {
 				if (_tcscmp(msg.pSender->GetClass(), DUI_CTR_BUTTON) == 0) {
 					CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)msg.pSender->GetParent()->GetParent()->GetTag();
 					m_tree->ExpandNode(node, !node->data()._expand);
+					int nHeight = m_tree->CalculateMinHeight();
+					m_tree->SetFixedHeight(nHeight);
 				}
 			}
 		}
