@@ -564,7 +564,7 @@ void  CDuiFrameWnd::OnDeviceChanged(WPARAM wParm, LPARAM  lParam) {
 
 void  CDuiFrameWnd::OnAreaListMenu(TNotifyUI& msg) {
 	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
-	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_area.xml"), msg.pSender);
 	pMenu->Init(*this, pt);
 	pMenu->ShowWindow(TRUE);
 }
