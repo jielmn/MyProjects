@@ -96,10 +96,11 @@
       <AdditionalDependencies>duilibd.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>del /Q ..\Debug\res\*.*</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy res\res  ..\Debug\res /dseiy</Command>
+      <Command>xcopy res\proj_tree_config_res  ..\Debug\res\proj_tree_config_res /dseiy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,10 +136,11 @@
       <AdditionalDependencies>duilib.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>del /Q ..\Release\res\*.*</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy res\res  ..\Release\res /dseiy</Command>
+      <Command>xcopy res\proj_tree_config_res  ..\Release\res\proj_tree_config_res /dseiy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

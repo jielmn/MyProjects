@@ -60,7 +60,7 @@ class CDuiFrameWnd : public WindowImplBase
 public:
 	virtual LPCTSTR    GetWindowClassName() const { return _T("DUIMainFrame"); }
 	virtual CDuiString GetSkinFile() { return _T("mainframe_menu.xml"); }
-	virtual CDuiString GetSkinFolder() { return _T("res"); }
+	virtual CDuiString GetSkinFolder() { return _T("res\\proj_menu_res"); }
 
 	virtual void    Notify(TNotifyUI& msg) {
 		if (msg.sType == _T("click"))

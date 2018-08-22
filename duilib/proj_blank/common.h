@@ -13,7 +13,7 @@
 #define   CONFIG_FILE_NAME        "blank.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               "mainframe_blank.xml"
-#define   SKIN_FOLDER             "res"
+#define   SKIN_FOLDER             "res\\proj_blank_res"
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
