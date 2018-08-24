@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<HorizontalLayout height="50" inset="30,10,0,10" name="layReader" >		
+	<HorizontalLayout height="50" inset="30,10,0,10" name="layReader" >	
+		<VerticalLayout width="30">
+			<Control />
+			<Control name="indicator" width="20" height="12" bkcolor="#FFFF0000" />
+			<Control />
+		</VerticalLayout>		
 		<Option width="30" name="opn_reader_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="true" />
 		<Control width="10" />
 		<Edit name="edtReaderName" text="--"    textcolor="#FF000000" width="105" font="1" visible="false" />		

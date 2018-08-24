@@ -33,7 +33,7 @@
 		<!-- 客户区 -->
 		<HorizontalLayout bkcolor="#FF192431" inset="0,0,0,0" >
 			
-			<VerticalLayout width="340" bkcolor="#FF192431" bkcolor2="#FF293441" inset="0,10,0,10" >
+			<VerticalLayout width="370" bkcolor="#FF192431" bkcolor2="#FF293441" inset="0,10,0,10" >
 				
 				<HorizontalLayout height="30" inset="10,0,10,0" >
 					<Label text="个人信息"   textcolor="#FFFFFFFF" width="200" font="2" />

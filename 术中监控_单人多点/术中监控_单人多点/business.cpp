@@ -52,10 +52,20 @@ int CBusiness::Init() {
 	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
 		strText.Format("%s %lu", CFG_READER_NAME, i + 1);
 		g_cfg->GetConfig(strText, g_data.m_szReaderName[i], sizeof(g_data.m_szReaderName[i]), "--");
+
+		strText.Format("%s %lu", CFG_LOW_TEMP_ALARM, i + 1);
+		g_cfg->GetConfig(strText, g_data.m_dwLowTempAlarm[i], DEFAULT_LOW_TEMP_ALARM);
+
+		strText.Format("%s %lu", CFG_HIGH_TEMP_ALARM, i + 1);
+		g_cfg->GetConfig(strText, g_data.m_dwHighTempAlarm[i], DEFAULT_HIGH_TEMP_ALARM);
+
+		strText.Format("%s %lu", CFG_ARGB, i + 1);
+		g_cfg->GetConfig(strText, g_data.m_argb[i], g_default_argb[i]);
 	}
 
 	g_cfg->GetConfig(CFG_SHOWING_LOWEST_TEMP, g_data.m_dwMyImageMinTemp,       DEFAULT_LOWEST_TEMP);
 	g_cfg->GetConfig(CFG_MYIMAGE_LEFT_BLANK,  g_data.m_dwMyImageLeftBlank,     DEFAULT_MYIMAGE_LEFT_BLANK);
+	g_cfg->GetConfig(CFG_MYIMAGE_RIGHT_BLANK, g_data.m_dwMyImageRightBlank,    DEFAULT_MYIMAGE_RIGHT_BLANK);
 	g_cfg->GetConfig(CFG_COLLECT_INTERVAL,    g_data.m_dwCollectInterval,      DEFAULT_COLLECT_INTERVAL);
 	g_cfg->GetConfig(CFG_ONCE_COLLECT_WIDTH,  g_data.m_dwCollectIntervalWidth, DEFAULT_COLLECT_INTERVAL_WIDTH);
 

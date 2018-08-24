@@ -35,6 +35,8 @@ private:
 	void   OnKillFocusPatientAge(TNotifyUI& msg);
 	void   OnBtnReaderName(TNotifyUI& msg);
 	void   OnKillFocusReaderName(TNotifyUI& msg);
+	void   OnBtnMenu(TNotifyUI& msg);
+	void   OnSetting();
 
 private:
 	CDialogBuilderCallbackEx               m_callback;
@@ -47,6 +49,7 @@ private:
 	CButtonUI *                            m_pUiBtnReaderNames[MAX_READERS_COUNT];
 	CEditUI *                              m_pUiEdtReaderNames[MAX_READERS_COUNT];
 	CHorizontalLayoutUI *                  m_pUiLayReader[MAX_READERS_COUNT];
+	CControlUI *                           m_pUiIndicator[MAX_READERS_COUNT];
 
 	CButtonUI *                            m_pUiBtnPatientName;
 	CEditUI *                              m_pUiEdtPatientName;
@@ -54,6 +57,7 @@ private:
 	CEditUI *                              m_pUiEdtSex;
 	CButtonUI *                            m_pUiBtnAge;
 	CEditUI *                              m_pUiEdtAge;
-
 	CMyImageUI *                           m_pUiMyImage;
+
+	CButtonUI *                            m_btnMenu;    // ²Ëµ¥°´Å¥	
 };

@@ -15,11 +15,21 @@ public:
 private:
 	time_t    GetFirstTime();
 	time_t    GetLastTime();
+	void      DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
+	int       CalcMinWidth();
 
 private:
 	vector<TempData *>           m_vTempData[MAX_READERS_COUNT];
+	DWORD                        m_dwSelectedReaderIndex;
 
 private:
 	HPEN                         m_hCommonThreadPen;
 	HPEN                         m_hBrighterThreadPen;
+	HBRUSH                       m_hCommonBrush;
+	HPEN                         m_hLowTempAlarmPen;
+	HPEN                         m_hHighTempAlarmPen;
+	Pen *                        m_temperature_pen[MAX_READERS_COUNT];
+	SolidBrush *                 m_temperature_brush[MAX_READERS_COUNT];
+	Pen                          m_remark_pen;
+	SolidBrush                   m_remark_brush;
 };

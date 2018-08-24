@@ -12,11 +12,17 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#ifdef _DEBUG
+#define TEST_FLAG                1
+#endif
+
 #define   LOG_FILE_NAME           "single_patient_multi_points.log"
 #define   CONFIG_FILE_NAME        "single_patient_multi_points.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               "main.xml"
 #define   SKIN_FOLDER             "res\\single_patient_multi_points_res"
+#define   SETTING_FRAME_NAME      "DUISettingFrame"
+#define   SETTING_FILE            "Setting.xml"
 
 #define   MAX_READERS_COUNT       9
 #define   READER_FILE_NAME        "reader.xml"
@@ -37,6 +43,11 @@ using namespace DuiLib;
 #define   BTN_PATIENT_AGE          "btnAge"
 #define   EDT_PATIENT_AGE          "edtAge"
 #define   MYIMAGE_NAME             "image0"
+#define   CTL_INDICATOR_NAME       "indicator"
+#define   BUTTON_OK_NAME           "btnOK"
+#define   MYTREE_CONFIG_NAME       "CfgTree"
+#define   MYTREE_CLASS_NAME        "MyTree"
+#define   BTN_MENU_NAME            "menubtn"
 
 #define   CFG_PATIENT_NAME         "patient name"
 #define   CFG_PATIENT_SEX          "patient sex"
@@ -44,19 +55,43 @@ using namespace DuiLib;
 #define   CFG_READER_NAME          "reader name"
 #define   CFG_SHOWING_LOWEST_TEMP  "showing lowest temp"
 #define   CFG_MYIMAGE_LEFT_BLANK   "myimage left blank"
+#define   CFG_MYIMAGE_RIGHT_BLANK  "myimage right blank"
 #define   CFG_COLLECT_INTERVAL     "collect interval"
 #define   CFG_ONCE_COLLECT_WIDTH   "once collect width"
+#define   CFG_LOW_TEMP_ALARM       "low temp alarm"
+#define   CFG_HIGH_TEMP_ALARM      "high temp alarm"
+#define   CFG_ARGB                 "argb"
 
 #define   DEFAULT_LOWEST_TEMP            28
-#define   DEFAULT_MYIMAGE_LEFT_BLANK     100
-#define   DEFAULT_COLLECT_INTERVAL       10
+#define   DEFAULT_MYIMAGE_LEFT_BLANK     50
+#define   DEFAULT_MYIMAGE_RIGHT_BLANK    100
+#define   DEFAULT_COLLECT_INTERVAL       60
 #define   DEFAULT_COLLECT_INTERVAL_WIDTH 100
+#define   DEFAULT_LOW_TEMP_ALARM         3500
+#define   DEFAULT_HIGH_TEMP_ALARM        4000
 
 #define   MAX_TEMPERATURE                42
-#define   MIN_MYIMAGE_VMARGIN            20              // 图像的上、下至少留出的空白
+#define   MIN_MYIMAGE_VMARGIN            30              // 图像的上、下至少留出的空白
 #define   MIN_TEMP_V_INTERVAL            30
+#define   DEFAULT_POINT_RADIUS           6
+
+#define   EDT_REMARK_WIDTH               200
+#define   EDT_REMARK_HEIGHT              30
+#define   EDT_REMARK_Y_OFFSET            -50
 
 #define   MAX_REMARK_LENGTH              28
+#define   MAX_AREA_NAME_LENGTH           64
+
+#define   COMMON_SETTING_TEXT            "通用设置"
+#define   AREA_NO_TEXT                   "病区号"
+#define   SWITCH_ON_TEXT                 "开"
+#define   SWITCH_OFF_TEXT                "关"
+#define   ALARM_VOICE_SWITCH_TEXT        "报警声音开关"
+#define   LOW_ALARM_TEXT                 "低温报警"
+#define   HIGH_ALARM_TEXT                "高温报警"
+#define   READER_ID_TEXT                 "Reader相关床号"
+#define   MAX_AREA_ID                    100
+#define   MAX_BED_ID                     200
 
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -64,6 +99,11 @@ typedef struct tagTempData {
 	time_t   tTime;
 	char     szRemark[MAX_REMARK_LENGTH];
 }TempData;
+
+typedef struct tagArea {
+	char   szAreaName[MAX_AREA_NAME_LENGTH];
+	DWORD  dwAreaNo;
+}TArea;
 
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
@@ -77,6 +117,36 @@ private:
 	DuiLib::CPaintManagerUI *  m_pManager;
 };
 
+class CGraphicsRoundRectPath : public GraphicsPath
+{
+
+public:
+	CGraphicsRoundRectPath();
+
+public:
+	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
+};
+
+class CDuiMenu : public DuiLib::WindowImplBase
+{
+protected:
+	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
+	DuiLib::CDuiString  m_strXMLPath;
+	DuiLib::CControlUI * m_pOwner;
+
+public:
+	explicit CDuiMenu(LPCTSTR pszXMLPath, DuiLib::CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
+	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
+	virtual DuiLib::CDuiString GetSkinFolder() { return _T(""); }
+	virtual DuiLib::CDuiString GetSkinFile() { return m_strXMLPath; }
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
+
+	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void Init(HWND hWndParent, POINT ptPos);
+	virtual void  Notify(DuiLib::TNotifyUI& msg);
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+};
+
 
 class  CGlobalData {
 public:
@@ -87,8 +157,16 @@ public:
 	char           m_szReaderName[MAX_READERS_COUNT][32];
 	DWORD          m_dwMyImageMinTemp;
 	DWORD          m_dwMyImageLeftBlank;
+	DWORD          m_dwMyImageRightBlank;
 	DWORD          m_dwCollectInterval;
 	DWORD          m_dwCollectIntervalWidth;
+	DWORD          m_dwLowTempAlarm[MAX_READERS_COUNT];
+	DWORD          m_dwHighTempAlarm[MAX_READERS_COUNT];
+	ARGB           m_argb[MAX_READERS_COUNT];
+	DWORD          m_dwAreaNo;
+	DWORD          m_bAlarmVoiceOff;
+	BOOL           m_bReaderSwitch[MAX_READERS_COUNT];
+	DWORD          m_dwBedNo[MAX_READERS_COUNT];
 };
 
 extern ILog    * g_log;
@@ -96,9 +174,12 @@ extern IConfig * g_cfg;
 extern LmnToolkits::Thread *  g_thrd_db;
 extern HWND    g_hWnd;
 extern CGlobalData  g_data;
+extern ARGB g_default_argb[MAX_READERS_COUNT];
+extern std::vector<TArea *>  g_vArea;
 
 //extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
+extern time_t  DateTime2String(const char * szDatetime);
 
 // templates
 template <class T>

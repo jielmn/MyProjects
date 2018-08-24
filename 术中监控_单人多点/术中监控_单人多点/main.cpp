@@ -11,6 +11,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "SettingDlg.h"
 
 CDuiFrameWnd::CDuiFrameWnd() :m_callback(&m_PaintManager) {
 	m_layReaders = 0;
@@ -42,14 +43,18 @@ void  CDuiFrameWnd::InitWindow() {
 	m_pUiBtnPatientName->SetText(g_data.m_szPatietName);
 	m_pUiBtnSex->SetText(g_data.m_szPatietSex);
 	m_pUiBtnAge->SetText(g_data.m_szPatietAge);
-
 	m_pUiMyImage = static_cast<CMyImageUI*>(m_PaintManager.FindControl(MYIMAGE_NAME));
+
+	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
 
 	m_layReaders = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_READERS));
 	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
 		CDialogBuilder builder;
 		m_pUiReaders[i] = builder.Create(READER_FILE_NAME, (UINT)0, &m_callback, &m_PaintManager);
 		m_pUiReaders[i]->SetTag(i);
+
+		m_pUiIndicator[i] = static_cast<CHorizontalLayoutUI*>(m_pUiReaders[i]->FindControl(MY_FINDCONTROLPROC, CTL_INDICATOR_NAME, 0));
+		m_pUiIndicator[i]->SetTag(i);
 
 		m_pUiLayReader[i] = static_cast<CHorizontalLayoutUI*>(m_pUiReaders[i]->FindControl(MY_FINDCONTROLPROC, LAY_READER_NAME, 0));
 		m_pUiLayReader[i]->SetTag(i);
@@ -69,6 +74,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pUiAlarms[i] = static_cast<CAlarmImageUI*>(m_pUiReaders[i]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
 		m_pUiAlarms[i]->SetTag(i);
 
+		m_pUiIndicator[i]->SetBkColor(g_data.m_argb[i]);
 		m_pUiReaderTemp[i]->SetText("--"); 
 		m_pUiBtnReaderNames[i]->SetText(g_data.m_szReaderName[i]);
 		m_pUiAlarms[i]->FailureAlarm();
@@ -103,6 +109,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == BTN_READER_NAME) {
 			OnBtnReaderName(msg);
 		}
+		else if (name == BTN_MENU_NAME ) {
+			OnBtnMenu(msg);
+		}
 	}
 	else if (msg.sType == "killfocus") {
 		if (name == EDT_PATIENT_NAME) {
@@ -117,7 +126,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == EDT_READER_NAME) {
 			OnKillFocusReaderName(msg);
 		}
-
+	}
+	else if (msg.sType == "menu_setting") {
+		OnSetting();
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -237,7 +248,24 @@ void  CDuiFrameWnd::OnKillFocusReaderName(TNotifyUI& msg) {
 	m_pUiBtnReaderNames[nIndex]->SetVisible(true); 
 }
 
+void  CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
+	RECT r = m_btnMenu->GetPos();
+	POINT pt = { r.left, r.bottom };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
 
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
+}
+
+void  CDuiFrameWnd::OnSetting() {
+	CSettingDlg * pSettingDlg = new CSettingDlg;
+	pSettingDlg->Create(this->m_hWnd, _T("ÉèÖÃ"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pSettingDlg->CenterWindow();
+	int ret = pSettingDlg->ShowModal();
+	delete pSettingDlg;
+}
+
+  
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
