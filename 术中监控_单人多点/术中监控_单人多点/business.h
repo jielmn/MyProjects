@@ -14,6 +14,14 @@ public:
 	int Init();
 	int DeInit();
 
+	// 调整滑动条
+	int    UpdateScrollAsyn(DWORD dwDelay = 0);
+	int    UpdateScroll();
+
+	// 报警
+	int   AlarmAsyn(const char * szAlarmFile);
+	int   Alarm(const CAlarmParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -21,6 +29,9 @@ private:
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
 	BOOL CanBeFreed() { return false; }
+
+private:
+	char     m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 };
 
 

@@ -4,7 +4,9 @@
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
-LmnToolkits::Thread *  g_thrd_db = 0;
+IConfig * g_cfg_area = 0;
+//LmnToolkits::Thread *  g_thrd_db = 0;
+LmnToolkits::Thread *  g_thrd_work = 0;
 HWND    g_hWnd = 0;
 CGlobalData  g_data;
 ARGB g_default_argb[MAX_READERS_COUNT] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0xFF51786C, 0xFFFFFF00, 0xFFCA5100, 0xFFFF00FF,
@@ -115,4 +117,17 @@ void  CDuiMenu::Notify(DuiLib::TNotifyUI& msg) {
 LRESULT CDuiMenu::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return __super::HandleMessage(uMsg, wParam, lParam);
+}
+
+char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize) {
+	char buf[8192];
+
+	GetModuleFileName(0, buf, sizeof(buf));
+	const char * pStr = strrchr(buf, '\\');
+	assert(pStr);
+	DWORD  dwTemp = pStr - buf;
+	buf[dwTemp] = '\0';
+
+	SNPRINTF(szDefaultFile, dwSize, "%s%s", buf, DEFAULT_ALARM_FILE_PATH);
+	return szDefaultFile;
 }

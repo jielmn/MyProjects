@@ -2,7 +2,9 @@
 
 #define EIDT_TEXT_COLOR    0xFF386382
 #define EDIT_FONT_INDEX    2
-#define GRID_SETTING_ITEMS_COUNT  7
+
+#define COMMON_ITEMS_COUNT   4
+#define GRID_SETTING_ITEMS_COUNT  3
 
 CSettingDlg::CSettingDlg() {
 
@@ -86,7 +88,59 @@ void  CSettingDlg::InitCommonCfg() {
 	SetComboStyle(pCombo);
 	m_tree->AddNode(AREA_NO_TEXT, pTitleNode, 0, pCombo);
 
-	// 2. 报警声音开关
+	// 2. 采集间隔
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "10秒", 10);
+	AddComboItem(pCombo, "1分钟", 60);
+	AddComboItem(pCombo, "5分钟", 300);
+	AddComboItem(pCombo, "15分钟", 900);
+	AddComboItem(pCombo, "30分钟", 1800);
+	AddComboItem(pCombo, "1小时", 3600);
+	if (g_data.m_dwCollectInterval <= 10) {
+		pCombo->SelectItem(0);
+	}
+	else if(g_data.m_dwCollectInterval <= 60 ) {
+		pCombo->SelectItem(1);
+	}
+	else if (g_data.m_dwCollectInterval <= 300 ) {
+		pCombo->SelectItem(2);
+	}
+	else if (g_data.m_dwCollectInterval <= 900 ) {
+		pCombo->SelectItem(3);
+	}
+	else if (g_data.m_dwCollectInterval <= 1800 ) {
+		pCombo->SelectItem(4);
+	}
+	else {
+		pCombo->SelectItem(5);
+	}
+	SetComboStyle(pCombo);
+	m_tree->AddNode("采集体温间隔", pTitleNode, 0, pCombo);
+
+
+	// 3. 显示最低温度
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "20℃", 20);
+	AddComboItem(pCombo, "24℃", 24);
+	AddComboItem(pCombo, "28℃", 28);
+	AddComboItem(pCombo, "32℃", 32);
+
+	if ( g_data.m_dwMyImageMinTemp <= 20) {
+		pCombo->SelectItem(0);
+	}
+	else if (g_data.m_dwMyImageMinTemp <= 24) {
+		pCombo->SelectItem(1);
+	}
+	else if (g_data.m_dwMyImageMinTemp <= 28) {
+		pCombo->SelectItem(2);
+	}
+	else {
+		pCombo->SelectItem(3);
+	}
+	SetComboStyle(pCombo);
+	m_tree->AddNode("显示的最低温度", pTitleNode, 0, pCombo);
+
+	// 4. 报警声音开关
 	pCombo = new CComboUI;
 	AddComboItem(pCombo, SWITCH_ON_TEXT);
 	AddComboItem(pCombo, SWITCH_OFF_TEXT);
@@ -110,19 +164,6 @@ void   CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 
 	CComboUI * pCombo = 0;
 	CListLabelElementUI * pElement = 0;
-
-	// 启用/禁用
-	pCombo = new CComboUI;
-	AddComboItem(pCombo, "启用");
-	AddComboItem(pCombo, "禁用");
-	if ( g_data.m_bReaderSwitch[dwIndex] ) {
-		pCombo->SelectItem(0);
-	}
-	else {
-		pCombo->SelectItem(1);
-	}
-	SetComboStyle(pCombo);
-	m_tree->AddNode("是否启用", pSubTitleNode, 0, pCombo);
 
 	// 低温报警
 	CEditUI * pEdit = new CEditUI;
@@ -174,28 +215,22 @@ void  CSettingDlg::SetComboStyle(CComboUI * pCombo) {
 }
 
 void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
-	DWORD       dwInterval = 0;
 	DWORD       dwLowAlarm = 0;
 	DWORD       dwHighAlarm = 0;
-	DWORD       dwMinTemp = 0;
 	DWORD       dwBedNo = 0;
-	BOOL        bSwitch = TRUE;
-
-	return;
 
 	if ( !GetCommonConfig() ) {
 		return;
 	}
 
 	for (int i = 0; i < MAX_READERS_COUNT; i++) {
-		if ( !GetConfig(i, dwLowAlarm, dwHighAlarm, dwBedNo, bSwitch) ) {
+		if ( !GetConfig(i, dwLowAlarm, dwHighAlarm, dwBedNo ) ) {
 			return;
 		}
 		else {
 			m_dwLowTempAlarm[i] = dwLowAlarm;
 			m_dwHighTempAlarm[i] = dwHighAlarm;
 			m_dwBedNo[i] = dwBedNo;
-			m_bReaderSwitch[i] = bSwitch;
 		}
 	}
 
@@ -213,6 +248,15 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 			}
 		}		
 	}
+
+	g_data.m_bAlarmVoiceOff = m_bAlarmVoiceOff;
+	g_data.m_dwAreaNo = m_dwAreaNo;
+	g_data.m_dwMyImageMinTemp = m_dwMyImageMinTemp;
+	g_data.m_dwCollectInterval = m_dwCollectInterval;
+
+	memcpy( g_data.m_dwLowTempAlarm,  m_dwLowTempAlarm,  sizeof(DWORD) * MAX_READERS_COUNT);
+	memcpy( g_data.m_dwHighTempAlarm, m_dwHighTempAlarm, sizeof(DWORD) * MAX_READERS_COUNT);
+	memcpy( g_data.m_dwBedNo,         m_dwBedNo,         sizeof(DWORD) * MAX_READERS_COUNT);
 
 	PostMessage(WM_CLOSE);
 }
@@ -245,16 +289,21 @@ BOOL  CSettingDlg::GetCommonConfig() {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
-	int  nCols = 0;
-	int  nRows = 0;
-	int  nSkin = 0;
 	int  nAreaNo = 0;
+	int  nCollectInterval = 0;
+	int  nMinTemp = 0;
 	BOOL bAlarmVoiceOff = FALSE;
 
 	bGetCfg = m_tree->GetConfigValue( 1, cfgValue );
 	nAreaNo = cfgValue.m_tag;
 
 	bGetCfg = m_tree->GetConfigValue(2, cfgValue);
+	nCollectInterval = cfgValue.m_tag;
+
+	bGetCfg = m_tree->GetConfigValue(3, cfgValue);
+	nMinTemp = cfgValue.m_tag;
+
+	bGetCfg = m_tree->GetConfigValue(4, cfgValue);
 	if (0 == cfgValue.m_nComboSel) {
 		bAlarmVoiceOff = FALSE;
 	}
@@ -264,12 +313,13 @@ BOOL  CSettingDlg::GetCommonConfig() {
 
 	m_bAlarmVoiceOff = bAlarmVoiceOff; 
 	m_dwAreaNo = nAreaNo;
+	m_dwCollectInterval = nCollectInterval;
+	m_dwMyImageMinTemp = nMinTemp;
 
 	return TRUE;
 }
 
-BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwLowAlarm,
-	DWORD & dwHighAlarm, DWORD & dwBedNo, BOOL & bSwitch )
+BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwLowAlarm, DWORD & dwHighAlarm, DWORD & dwBedNo  )
 {
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	CDuiString  strText;
@@ -277,22 +327,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwLowAlarm,
 	int    nBedNo = 0;
 	bool   bGetCfg = false;
 
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 1, cfgValue);
-	switch (cfgValue.m_nComboSel)
-	{
-	case 0:
-		bSwitch = TRUE;
-		break;
-
-	case 1:
-		bSwitch = FALSE;
-		break;
-
-	default:
-		break;
-	}
-
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 4, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( (COMMON_ITEMS_COUNT + 2)  + nIndex * (GRID_SETTING_ITEMS_COUNT + 1) + 1, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("读卡器%d配置，低温报警请输入数字", nIndex + 1);
@@ -307,7 +342,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwLowAlarm,
 	}
 	dwLowAlarm = (DWORD)(dbTemp * 100);
 
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 5, cfgValue);
+	bGetCfg = m_tree->GetConfigValue((COMMON_ITEMS_COUNT + 2) + nIndex * (GRID_SETTING_ITEMS_COUNT + 1) + 2, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("读卡器%d配置，高温报警请输入数字", nIndex + 1);
@@ -327,10 +362,10 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwLowAlarm,
 	}
 	dwHighAlarm = (DWORD)(dbTemp * 100);
 
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 6, cfgValue);
+	bGetCfg = m_tree->GetConfigValue((COMMON_ITEMS_COUNT + 2) + nIndex * (GRID_SETTING_ITEMS_COUNT + 1) + 3, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%d", &nBedNo)) {
-		strText.Format("窗口%d配置，Reader相关床位号请输入数字", nIndex + 1);
+		strText.Format("读卡器%d配置，Reader相关床位号请输入数字", nIndex + 1);
 		::MessageBox(this->GetHWND(), strText, "设置", 0);
 		return FALSE;
 	}

@@ -11,6 +11,8 @@ public:
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
+	void  MyInvalidate();
+	void  SelectedReader(int nIndex);
 
 private:
 	time_t    GetFirstTime();
@@ -21,6 +23,8 @@ private:
 private:
 	vector<TempData *>           m_vTempData[MAX_READERS_COUNT];
 	DWORD                        m_dwSelectedReaderIndex;
+	DWORD                        m_dwNextTempIndex;
+	BOOL                         m_bSetParentScrollPos;
 
 private:
 	HPEN                         m_hCommonThreadPen;

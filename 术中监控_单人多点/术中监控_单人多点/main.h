@@ -38,6 +38,13 @@ private:
 	void   OnBtnMenu(TNotifyUI& msg);
 	void   OnSetting();
 
+	// 新温度数据达到
+	void   OnNewTempData(int nIndex, DWORD dwTemp);
+	// 更新MyImage Scroll
+	void   OnUpdateImageScroll();
+	// 定时器
+	void   OnMyTimer(DWORD dwTimerId);
+
 private:
 	CDialogBuilderCallbackEx               m_callback;
 

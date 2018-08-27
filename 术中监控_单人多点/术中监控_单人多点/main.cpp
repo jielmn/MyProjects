@@ -84,6 +84,13 @@ void  CDuiFrameWnd::InitWindow() {
 
 	OnLayReaderSelected(0);
 
+	InitRand(TRUE, 1);
+#if TEST_FLAG
+	SetTimer(m_hWnd, TIMER_TEST_ID_1, TIMER_TEST_INTERVAL_1, NULL);
+	SetTimer(m_hWnd, TIMER_TEST_ID_2, TIMER_TEST_INTERVAL_2, NULL);
+	SetTimer(m_hWnd, TIMER_TEST_ID_3, TIMER_TEST_INTERVAL_3, NULL);
+#endif
+
 	WindowImplBase::InitWindow();
 }
                  
@@ -130,12 +137,21 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
 	}
+	else if (msg.sType == "menu") {
+		int a = 100;
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if ( uMsg == WM_LBUTTONDOWN ) {
 		OnMyLButtonDown(wParam, lParam);
+	}
+	else if (uMsg == UM_UPDATE_SCROLL) {
+		OnUpdateImageScroll();
+	}
+	else if (uMsg == WM_TIMER) {
+		OnMyTimer(wParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -171,12 +187,14 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex) {
 	assert(dwIndex < MAX_READERS_COUNT);
 	for ( DWORD i = 0; i < MAX_READERS_COUNT; i++ ) {
 		if ( i == dwIndex ) {
-			m_pUiLayReader[i]->SetBkColor(0xFF007ACC);
+			m_pUiLayReader[i]->SetBkColor( 0xFF444444 /*0xFF007ACC*/);
 		}
 		else {
 			m_pUiLayReader[i]->SetBkColor(0);
 		}
 	}
+	m_pUiMyImage->SelectedReader(dwIndex);
+	m_pUiMyImage->MyInvalidate();
 }
   
 void  CDuiFrameWnd::OnBtnPatientName(TNotifyUI& msg) {
@@ -258,11 +276,107 @@ void  CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
 }
 
 void  CDuiFrameWnd::OnSetting() {
+	CDuiString  strText;
+	DWORD  dwValue = 0;
+
+	CGlobalData  oldData = g_data;
+
 	CSettingDlg * pSettingDlg = new CSettingDlg;
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSettingDlg->CenterWindow();
 	int ret = pSettingDlg->ShowModal();
+	// 如果OK
+	if (0 == ret) {
+		dwValue = 0;
+		g_cfg->SetConfig(CFG_AREA_ID_NAME, g_data.m_dwAreaNo, &dwValue);
+
+		dwValue = DEFAULT_LOWEST_TEMP;
+		g_cfg->SetConfig(CFG_SHOWING_LOWEST_TEMP, g_data.m_dwMyImageMinTemp, &dwValue);
+
+		dwValue = DEFAULT_COLLECT_INTERVAL;
+		g_cfg->SetConfig(CFG_COLLECT_INTERVAL, g_data.m_dwCollectInterval, &dwValue);
+
+		dwValue = DEFAULT_ALARM_VOICE_SWITCH;
+		g_cfg->SetConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_bAlarmVoiceOff, &dwValue);
+
+		for (int i = 0; i < MAX_READERS_COUNT; i++) {
+			strText.Format("%s %lu", CFG_LOW_TEMP_ALARM, i + 1);
+			dwValue = DEFAULT_LOW_TEMP_ALARM;
+			g_cfg->SetConfig(strText, g_data.m_dwLowTempAlarm[i], &dwValue);
+
+			strText.Format("%s %lu", CFG_HIGH_TEMP_ALARM, i + 1);
+			dwValue = DEFAULT_HIGH_TEMP_ALARM;
+			g_cfg->SetConfig(strText, g_data.m_dwHighTempAlarm[i], &dwValue);
+
+			strText.Format(CFG_BED_NO " %d", i + 1);
+			dwValue = i + 1;
+			g_cfg->SetConfig(strText, g_data.m_dwBedNo[i], &dwValue);
+		}
+		g_cfg->Save();
+		m_pUiMyImage->MyInvalidate();
+	}
+
 	delete pSettingDlg;
+}
+
+// 新温度数据达到
+void   CDuiFrameWnd::OnNewTempData(int nRederIndex, DWORD dwTemp) {
+	CDuiString  strText;
+
+	// 如果开关没有打开，或者病区号为0， 或者床位号为0。丢掉数据
+	if ( !g_data.m_bReaderSwitch[nRederIndex] || g_data.m_dwAreaNo == 0 || g_data.m_dwBedNo[nRederIndex] == 0) {
+		return;
+	}
+
+	double dTemperature = dwTemp / 100.0;
+	strText.Format("%.2f", dTemperature);
+	m_pUiReaderTemp[nRederIndex]->SetText(strText);
+
+	if (dwTemp >= g_data.m_dwHighTempAlarm[nRederIndex]) {
+		m_pUiReaderTemp[nRederIndex]->SetTextColor(0xFFFC235C);
+		m_pUiAlarms[nRederIndex]->HighTempAlarm();
+	}
+	else if (dwTemp <= g_data.m_dwLowTempAlarm[nRederIndex]) {
+		m_pUiReaderTemp[nRederIndex]->SetTextColor(0xFF02A5F1);
+		m_pUiAlarms[nRederIndex]->LowTempAlarm();
+	}
+	else {
+		m_pUiReaderTemp[nRederIndex]->SetTextColor(0xFFFFFFFF);
+		m_pUiAlarms[nRederIndex]->StopAlarm();
+	}
+
+	m_pUiMyImage->AddTemp(nRederIndex, dwTemp);
+
+	// 如果报警开关打开
+	if (!g_data.m_bAlarmVoiceOff ) {
+		if (dwTemp < g_data.m_dwLowTempAlarm[nRederIndex] || dwTemp > g_data.m_dwHighTempAlarm[nRederIndex]) {
+			CBusiness::GetInstance()->AlarmAsyn( g_data.m_szAlarmFilePath );
+		}
+	}
+}
+
+void   CDuiFrameWnd::OnUpdateImageScroll() {
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_pUiMyImage->GetParent();
+	SIZE tParentScrollPos = pParent->GetScrollPos();
+	SIZE tParentScrollRange = pParent->GetScrollRange();
+	if (tParentScrollPos.cx != tParentScrollRange.cx) {
+		pParent->SetScrollPos(tParentScrollRange);
+	}
+}
+
+// 定时器
+void   CDuiFrameWnd::OnMyTimer(DWORD dwTimerId) {
+#if TEST_FLAG
+	if (dwTimerId == TIMER_TEST_ID_1) {
+		OnNewTempData(0, GetRand(3200, 3500));
+	}
+	else if (dwTimerId == TIMER_TEST_ID_2) {
+		OnNewTempData(1, GetRand(3400, 3700));
+	}
+	else if (dwTimerId == TIMER_TEST_ID_3) {
+		OnNewTempData(2, GetRand(3600, 3900));
+	}
+#endif
 }
 
   

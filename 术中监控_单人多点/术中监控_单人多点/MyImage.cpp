@@ -1,5 +1,6 @@
 #include <time.h>
 #include "MyImage.h"
+#include "business.h"
 
 CMyImageUI::CMyImageUI() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 						   m_remark_brush(Gdiplus::Color(0x803D5E49))
@@ -16,10 +17,13 @@ CMyImageUI::CMyImageUI() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0x02, 0xA5, 0xF1));
 	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0xFC, 0x23, 0x5C));
 
+	m_dwNextTempIndex = 0;
+	m_bSetParentScrollPos = FALSE;
 
 
 
-#if TEST_FLAG
+//#if TEST_FLAG
+#if 0
 	TempData * pData = 0;
 	int nIndex = 0;
 
@@ -305,6 +309,14 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	SIZE tParentScrollPos = pParent->GetScrollPos();
 	SIZE tParentScrollRange = pParent->GetScrollRange();
 
+	if (tParentScrollPos.cx != tParentScrollRange.cx) {
+		if (m_bSetParentScrollPos)
+		{
+			CBusiness::GetInstance()->UpdateScrollAsyn();
+			m_bSetParentScrollPos = FALSE;
+		}
+	}
+
 	RECT rect   = this->GetPos();
 	int  width  = pParent->GetWidth();
 	int  height = rect.bottom - rect.top; 
@@ -527,7 +539,29 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void  CMyImageUI::AddTemp(DWORD dwIndex, DWORD dwTemp) {
+	time_t now = time(0);
 
+	TempData * pTemp = new TempData;
+	pTemp->dwTemperature = dwTemp;
+	pTemp->tTime = now;
+	pTemp->dwIndex = m_dwNextTempIndex;
+	m_dwNextTempIndex++;
+	// skip -1 index
+	if (m_dwNextTempIndex == -1) {
+		m_dwNextTempIndex = 0;
+	}
+	pTemp->szRemark[0] = '\0';
+
+	if ( m_vTempData[dwIndex].size() >= 1500 ) {
+		vector<TempData *>::iterator it = m_vTempData[dwIndex].begin();
+		TempData * pData = *it;
+		m_vTempData[dwIndex].erase(it);
+		delete pData;
+	}
+	m_vTempData[dwIndex].push_back(pTemp);
+
+	// ÖØ»æ
+	MyInvalidate();
 }
 
 time_t  CMyImageUI::GetFirstTime() {
@@ -598,4 +632,15 @@ int   CMyImageUI::CalcMinWidth() {
 
 	int nWidth = (int)((double)(tLastTime - tFirstTime) / dwInterval * dwUnitWidth);
 	return nWidth + dwLeftColumnWidth + g_data.m_dwMyImageRightBlank;
+}
+
+void  CMyImageUI::MyInvalidate() {
+	int nMinWidth = CalcMinWidth();
+	this->SetMinWidth(nMinWidth);
+	Invalidate();
+	m_bSetParentScrollPos = TRUE;
+}
+
+void  CMyImageUI::SelectedReader(int nIndex) {
+	m_dwSelectedReaderIndex = nIndex;
 }

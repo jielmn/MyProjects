@@ -16,6 +16,15 @@ using namespace DuiLib;
 #define TEST_FLAG                1
 #endif
 
+#if TEST_FLAG
+#define  TIMER_TEST_ID_1            1
+#define  TIMER_TEST_ID_2            2
+#define  TIMER_TEST_ID_3            3
+#define  TIMER_TEST_INTERVAL_1      10000
+#define  TIMER_TEST_INTERVAL_2      12000
+#define  TIMER_TEST_INTERVAL_3      15000
+#endif
+
 #define   LOG_FILE_NAME           "single_patient_multi_points.log"
 #define   CONFIG_FILE_NAME        "single_patient_multi_points.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
@@ -23,6 +32,7 @@ using namespace DuiLib;
 #define   SKIN_FOLDER             "res\\single_patient_multi_points_res"
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   SETTING_FILE            "Setting.xml"
+#define   AREA_CFG_FILE_NAME      "area.cfg"
 
 #define   MAX_READERS_COUNT       9
 #define   READER_FILE_NAME        "reader.xml"
@@ -61,6 +71,13 @@ using namespace DuiLib;
 #define   CFG_LOW_TEMP_ALARM       "low temp alarm"
 #define   CFG_HIGH_TEMP_ALARM      "high temp alarm"
 #define   CFG_ARGB                 "argb"
+#define   CFG_AREA_NAME            "area name"
+#define   CFG_AREA_NO              "area no"
+#define   CFG_BED_NO               "bed no"
+#define   CFG_AREA_ID_NAME         "area id"
+#define   CFG_ALARM_VOICE_SWITCH   "alarm voice switch"
+#define   CFG_READER_SWITCH        "reader switch"
+#define   CFG_ALARM_FILE           "alarm file"
 
 #define   DEFAULT_LOWEST_TEMP            28
 #define   DEFAULT_MYIMAGE_LEFT_BLANK     50
@@ -69,6 +86,8 @@ using namespace DuiLib;
 #define   DEFAULT_COLLECT_INTERVAL_WIDTH 100
 #define   DEFAULT_LOW_TEMP_ALARM         3500
 #define   DEFAULT_HIGH_TEMP_ALARM        4000
+#define   DEFAULT_ALARM_VOICE_SWITCH     FALSE
+#define   DEFAULT_ALARM_FILE_PATH        "\\res\\single_patient_multi_points_res\\1.wav"
 
 #define   MAX_TEMPERATURE                42
 #define   MIN_MYIMAGE_VMARGIN            30              // 图像的上、下至少留出的空白
@@ -92,6 +111,13 @@ using namespace DuiLib;
 #define   READER_ID_TEXT                 "Reader相关床号"
 #define   MAX_AREA_ID                    100
 #define   MAX_BED_ID                     200
+#define   MAX_AREA_COUNT                 99
+#define   MAX_ALARM_PATH_LENGTH          256
+
+#define MSG_UPDATE_SCROLL                 1001
+#define MSG_ALARM                         1002
+
+#define UM_UPDATE_SCROLL                 (WM_USER+1)
 
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -147,12 +173,22 @@ public:
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
+class CAlarmParam : public LmnToolkits::MessageData {
+public:
+	CAlarmParam(const char * szAlarmFile) {
+		strncpy_s(m_szAlarmFile, szAlarmFile, sizeof(m_szAlarmFile));
+	}
+	~CAlarmParam() {}
+	char    m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
+};
+
 
 class  CGlobalData {
 public:
 	char           m_szPatietName[32];
 	char           m_szPatietSex[32];
 	char           m_szPatietAge[32];
+	char           m_szAlarmFilePath[MAX_ALARM_PATH_LENGTH];
 
 	char           m_szReaderName[MAX_READERS_COUNT][32];
 	DWORD          m_dwMyImageMinTemp;
@@ -171,7 +207,9 @@ public:
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
-extern LmnToolkits::Thread *  g_thrd_db;
+extern IConfig * g_cfg_area;
+//extern LmnToolkits::Thread *  g_thrd_db;
+extern LmnToolkits::Thread *  g_thrd_work;
 extern HWND    g_hWnd;
 extern CGlobalData  g_data;
 extern ARGB g_default_argb[MAX_READERS_COUNT];
@@ -180,6 +218,7 @@ extern std::vector<TArea *>  g_vArea;
 //extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern time_t  DateTime2String(const char * szDatetime);
+extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 
 // templates
 template <class T>

@@ -33,7 +33,7 @@ private:
 	void    OnMyClick(DuiLib::TNotifyUI& msg);
 	BOOL    GetCommonConfig();
 	BOOL    GetConfig( int nIndex, DWORD & dwLowAlarm, DWORD & dwHighAlarm, 
-		               DWORD & dwBedNo,BOOL & bSwitch );
+		               DWORD & dwBedNo );
 
 
 private:
@@ -45,6 +45,5 @@ private:
 	DWORD     m_dwLowTempAlarm[MAX_READERS_COUNT];
 	DWORD     m_dwHighTempAlarm[MAX_READERS_COUNT];
 	DWORD     m_dwBedNo[MAX_READERS_COUNT];
-	BOOL      m_bReaderSwitch[MAX_READERS_COUNT];
 };
 
