@@ -44,6 +44,12 @@ private:
 	void   OnUpdateImageScroll();
 	// ¶¨Ê±Æ÷
 	void   OnMyTimer(DWORD dwTimerId);
+	//
+	void   OnMyImageMenu(TNotifyUI& msg);
+	//
+	void   OnExportExcel();
+	//
+	void   OnMyImageClick(const POINT * pPoint);
 
 private:
 	CDialogBuilderCallbackEx               m_callback;

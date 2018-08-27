@@ -12,6 +12,7 @@
 #include "business.h"
 #include "resource.h"
 #include "SettingDlg.h"
+#include "LmnTelSvr.h"
 
 CDuiFrameWnd::CDuiFrameWnd() :m_callback(&m_PaintManager) {
 	m_layReaders = 0;
@@ -82,6 +83,10 @@ void  CDuiFrameWnd::InitWindow() {
 		m_layReaders->Add(m_pUiReaders[i]); 
 	}
 
+	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl(EDIT_REMARK_NAME));
+	g_edRemark->SetText("");
+	g_edRemark->SetVisible(false);
+
 	OnLayReaderSelected(0);
 
 	InitRand(TRUE, 1);
@@ -119,6 +124,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == BTN_MENU_NAME ) {
 			OnBtnMenu(msg);
 		}
+		else if ( name == MYIMAGE_NAME ) {
+			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+			OnMyImageClick(&pt);
+		}
 	}
 	else if (msg.sType == "killfocus") {
 		if (name == EDT_PATIENT_NAME) {
@@ -133,12 +142,20 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == EDT_READER_NAME) {
 			OnKillFocusReaderName(msg);
 		}
+		else if (name == EDIT_REMARK_NAME){
+			OnEdtRemarkKillFocus(m_pUiMyImage);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
 	}
 	else if (msg.sType == "menu") {
-		int a = 100;
+		if (name == MYIMAGE_NAME) {
+			OnMyImageMenu(msg);
+		}
+	}
+	else if (msg.sType == "menu_export_excel") {
+		OnExportExcel();
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -356,6 +373,10 @@ void   CDuiFrameWnd::OnNewTempData(int nRederIndex, DWORD dwTemp) {
 }
 
 void   CDuiFrameWnd::OnUpdateImageScroll() {
+	if (!g_data.m_bAutoScroll) {
+		return;
+	}
+
 	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_pUiMyImage->GetParent();
 	SIZE tParentScrollPos = pParent->GetScrollPos();
 	SIZE tParentScrollRange = pParent->GetScrollRange();
@@ -379,6 +400,22 @@ void   CDuiFrameWnd::OnMyTimer(DWORD dwTimerId) {
 #endif
 }
 
+//
+void   CDuiFrameWnd::OnMyImageMenu(TNotifyUI& msg) {
+	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_image.xml"), msg.pSender);
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
+}
+
+//
+void   CDuiFrameWnd::OnExportExcel() {
+
+}
+
+void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {
+	m_pUiMyImage->OnMyClick(pPoint);
+}
   
 
 
@@ -390,6 +427,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
+
+	DWORD  dwPort = 0;
+	g_cfg->GetConfig(CFG_TELNET_PORT, dwPort, 1235);
+	JTelSvrStart((unsigned short)dwPort, 10);
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));

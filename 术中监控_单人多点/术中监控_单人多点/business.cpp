@@ -156,6 +156,8 @@ int CBusiness::Init() {
 		}
 	}
 
+	g_data.m_bAutoScroll = TRUE;
+
 	g_thrd_work = new LmnToolkits::Thread();
 	if (0 == g_thrd_work) {
 		return -1;

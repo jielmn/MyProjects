@@ -1,6 +1,7 @@
 #include <time.h>
 #include "common.h"
 #include "AlarmImage.h"
+#include "MyImage.h"
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
@@ -12,6 +13,7 @@ CGlobalData  g_data;
 ARGB g_default_argb[MAX_READERS_COUNT] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0xFF51786C, 0xFFFFFF00, 0xFFCA5100, 0xFFFF00FF,
 										   0xFFA5A852,0xFFCCCCCC };
 std::vector<TArea *>  g_vArea;
+DuiLib::CEditUI * g_edRemark = 0;
 
 //char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 //	struct tm  tmp;
@@ -130,4 +132,14 @@ char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize) {
 
 	SNPRINTF(szDefaultFile, dwSize, "%s%s", buf, DEFAULT_ALARM_FILE_PATH);
 	return szDefaultFile;
+}
+
+void  OnEdtRemarkKillFocus(CControlUI * pUiImage) {
+	DuiLib::CDuiString  strRemark = g_edRemark->GetText();
+	g_edRemark->SetText("");
+	g_edRemark->SetVisible(false);
+	g_data.m_bAutoScroll = TRUE;
+
+	CMyImageUI * pImage = (CMyImageUI *)pUiImage;
+	pImage->SetRemark(strRemark);
 }

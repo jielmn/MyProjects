@@ -68,15 +68,13 @@
 			</VerticalLayout>
 			
 			
-
-				
 			<VerticalLayout inset="10,0,10,10" >
 				<HorizontalLayout height="40">
 					<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
 				</HorizontalLayout>
 			
 				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
-					<MyImage name="image0" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
+					<MyImage name="image0" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" menu="true" /> 
 				</VerticalLayout>
 			</VerticalLayout>
 				
@@ -84,6 +82,7 @@
 						
 		</HorizontalLayout>		
 
+		<Edit name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" />
 	</VerticalLayout>
 	
 	<!-- 状态栏 -->

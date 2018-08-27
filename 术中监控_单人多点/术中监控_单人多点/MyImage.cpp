@@ -1,6 +1,7 @@
 #include <time.h>
 #include "MyImage.h"
 #include "business.h"
+#include "LmnTelSvr.h"
 
 CMyImageUI::CMyImageUI() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 						   m_remark_brush(Gdiplus::Color(0x803D5E49))
@@ -19,6 +20,7 @@ CMyImageUI::CMyImageUI() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 
 	m_dwNextTempIndex = 0;
 	m_bSetParentScrollPos = FALSE;
+	m_dwCurTempIndex = -1;
 
 
 
@@ -442,6 +444,14 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 					middle + (nGridCount / 2) * nGridHeight + rect.top + 5,
 					strText, strText.GetLength());
 
+				//strText = "1234567890abcdefghijklmn";
+				//RECT rectRemark;
+				//rectRemark.left = nTextX;
+				//rectRemark.top = middle + (nGridCount / 2) * nGridHeight + rect.top + 5;
+				//rectRemark.right = rectRemark.left + 100;
+				//rectRemark.bottom = rectRemark.top + 20;
+				//::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+
 				nLastX = nX;
 			}
 		}
@@ -526,7 +536,12 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
 				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
 				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+				//if (rectRemark.left < rect.right - width)
+				//	rectRemark.left = rect.right - width;
+				//if (rectRemark.right < rectRemark.left)
+				//	rectRemark.right = rectRemark.left;
 				::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+				//::TextOut(hDC, rectRemark.left, rectRemark.top, strText, strText.GetLength());
 			}
 		}
 	}
@@ -535,6 +550,12 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 }
 
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN)
+	{
+		//告诉UIManager这个消息需要处理
+		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+		return;
+	}
 	DuiLib::CControlUI::DoEvent(event);	
 }
 
@@ -643,4 +664,89 @@ void  CMyImageUI::MyInvalidate() {
 
 void  CMyImageUI::SelectedReader(int nIndex) {
 	m_dwSelectedReaderIndex = nIndex;
+}
+
+void  CMyImageUI::OnMyClick(const POINT * pPoint) {
+	// 找到点击了哪个点
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+	int nMinTemp    = g_data.m_dwMyImageMinTemp;
+	int nGridCount  = MAX_TEMPERATURE - nMinTemp;
+	int nMiddleTemp = (MAX_TEMPERATURE + nMinTemp) / 2;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	time_t  tFirstTime = GetFirstTime();
+	time_t  tLastTime = GetLastTime();
+
+	int middle  = height / 2;
+	int nRadius = 6;
+	vector<TempData *>::iterator it;
+
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+
+			int nDiff = (int)(pItem->tTime - tFirstTime);
+			int nX = (int)(((double)nDiff / g_data.m_dwCollectInterval) *  g_data.m_dwCollectIntervalWidth );
+			int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+			int nX1 = nX + g_data.m_dwMyImageLeftBlank + rect.left;
+			int nY1 = nY + middle + rect.top;
+
+			if (pPoint->x >= nX1 - 6 && pPoint->x <= nX1 + 6
+				&& pPoint->y >= nY1 - 6 && pPoint->y <= nY1 + 6 ) {
+				//JTelSvrPrint("you clicked the point!");
+
+				// 如果之前在编辑状态
+				if ( g_edRemark->IsVisible()) {
+					OnEdtRemarkKillFocus(this);
+				}
+
+				m_dwCurTempIndex = pItem->dwIndex;
+				RECT rectRemark;
+				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2 + 1;
+				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET + 3;
+				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH - 2;
+				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT - 6;
+				g_edRemark->SetPos(rectRemark);
+				g_edRemark->SetText(pItem->szRemark);
+				g_edRemark->SetVisible(true);
+				g_edRemark->SetFocus();
+
+				g_data.m_bAutoScroll = FALSE;
+				break;
+			}
+		}
+	}	
+}
+
+void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
+	assert(m_dwCurTempIndex != -1);
+	if (m_dwCurTempIndex == -1) {
+		return;
+	}
+
+	vector<TempData *>::iterator it;
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+			if (pItem->dwIndex == m_dwCurTempIndex) {
+				STRNCPY(pItem->szRemark, strRemark, sizeof(pItem->szRemark));
+				return;
+			}
+		}
+	}	
 }

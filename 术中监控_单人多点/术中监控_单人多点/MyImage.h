@@ -13,6 +13,8 @@ public:
 	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
 	void  MyInvalidate();
 	void  SelectedReader(int nIndex);
+	void  OnMyClick(const POINT * pPoint);
+	void  SetRemark(DuiLib::CDuiString & strRemark);
 
 private:
 	time_t    GetFirstTime();
@@ -25,6 +27,7 @@ private:
 	DWORD                        m_dwSelectedReaderIndex;
 	DWORD                        m_dwNextTempIndex;
 	BOOL                         m_bSetParentScrollPos;
+	DWORD                        m_dwCurTempIndex;
 
 private:
 	HPEN                         m_hCommonThreadPen;

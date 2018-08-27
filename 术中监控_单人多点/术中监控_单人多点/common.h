@@ -16,13 +16,15 @@ using namespace DuiLib;
 #define TEST_FLAG                1
 #endif
 
+#define TEST_FLAG                1
+
 #if TEST_FLAG
 #define  TIMER_TEST_ID_1            1
 #define  TIMER_TEST_ID_2            2
 #define  TIMER_TEST_ID_3            3
-#define  TIMER_TEST_INTERVAL_1      10000
-#define  TIMER_TEST_INTERVAL_2      12000
-#define  TIMER_TEST_INTERVAL_3      15000
+#define  TIMER_TEST_INTERVAL_1      3000
+#define  TIMER_TEST_INTERVAL_2      4000
+#define  TIMER_TEST_INTERVAL_3      5000
 #endif
 
 #define   LOG_FILE_NAME           "single_patient_multi_points.log"
@@ -58,6 +60,7 @@ using namespace DuiLib;
 #define   MYTREE_CONFIG_NAME       "CfgTree"
 #define   MYTREE_CLASS_NAME        "MyTree"
 #define   BTN_MENU_NAME            "menubtn"
+#define   EDIT_REMARK_NAME         "edRemark"
 
 #define   CFG_PATIENT_NAME         "patient name"
 #define   CFG_PATIENT_SEX          "patient sex"
@@ -78,6 +81,7 @@ using namespace DuiLib;
 #define   CFG_ALARM_VOICE_SWITCH   "alarm voice switch"
 #define   CFG_READER_SWITCH        "reader switch"
 #define   CFG_ALARM_FILE           "alarm file"
+#define   CFG_TELNET_PORT          "telnet port"
 
 #define   DEFAULT_LOWEST_TEMP            28
 #define   DEFAULT_MYIMAGE_LEFT_BLANK     50
@@ -203,6 +207,8 @@ public:
 	DWORD          m_bAlarmVoiceOff;
 	BOOL           m_bReaderSwitch[MAX_READERS_COUNT];
 	DWORD          m_dwBedNo[MAX_READERS_COUNT];
+
+	BOOL           m_bAutoScroll;                // 自动更新滑动条
 };
 
 extern ILog    * g_log;
@@ -214,11 +220,13 @@ extern HWND    g_hWnd;
 extern CGlobalData  g_data;
 extern ARGB g_default_argb[MAX_READERS_COUNT];
 extern std::vector<TArea *>  g_vArea;
+extern DuiLib::CEditUI * g_edRemark;
 
 //extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern time_t  DateTime2String(const char * szDatetime);
 extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
+extern void  OnEdtRemarkKillFocus(CControlUI * pUiImage);
 
 // templates
 template <class T>
