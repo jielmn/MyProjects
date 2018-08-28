@@ -29,6 +29,14 @@ void CBusiness::Clear() {
 		delete g_cfg;
 		g_cfg = 0;
 	}
+
+	if (g_cfg_area) {
+		g_cfg_area->Deinit();
+		delete g_cfg_area;
+		g_cfg_area = 0;
+	}
+
+	ClearVector(g_vArea);
 }
 
 int CBusiness::Init() {
@@ -164,6 +172,14 @@ int CBusiness::Init() {
 	}
 	g_thrd_work->Start();
 
+	g_thrd_launch = new LmnToolkits::Thread();
+	if (0 == g_thrd_launch) {
+		return -1;
+	}
+	g_thrd_launch->Start();
+	
+	ReconnectLaunchAsyn(200);
+
 	return 0;
 }
 
@@ -173,6 +189,12 @@ int CBusiness::DeInit() {
 		g_thrd_work->Stop();
 		delete g_thrd_work;
 		g_thrd_work = 0;
+	}
+
+	if (g_thrd_launch) {
+		g_thrd_launch->Stop();
+		delete g_thrd_launch;
+		g_thrd_launch = 0;
 	}
 
 	Clear();
@@ -236,6 +258,58 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 	return 0;
 }
 
+// 重连发射器
+int   CBusiness::ReconnectLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+	g_thrd_launch->DeleteMessages();
+
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_RECONNECT_LAUNCH);
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_RECONNECT_LAUNCH);
+	}
+	return 0;
+}
+
+int   CBusiness::ReconnectLaunch() {
+	int ret = m_launch.Reconnect();
+	// 失败后重连
+	if (0 != ret) {
+		ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+	}
+	else {
+		// 通知成功
+		NotifyUiLaunchStatus( m_launch.GetStatus() );
+		ReadLaunchAsyn(2000);
+	}
+	
+	return 0;
+}
+
+// 通知界面Launch状态
+int   CBusiness::NotifyUiLaunchStatus(CLmnSerialPort::PortStatus eStatus) {
+	::PostMessage(g_hWnd, UM_LAUNCH_STATUS, eStatus, 0);
+	return 0;
+}
+
+// launch 读串口数据
+int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+	return 0;
+}
+
+int   CBusiness::ReadLaunch() {
+	return 0;
+}
+
+// 通知界面格子相关的Reader在线状态
+int   CBusiness::NotifyUiReaderStatus(DWORD dwGridIndex, int nStatus) {
+	return 0;
+}
+
+// 通知界面温度数据
+int   CBusiness::NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp) {
+	return 0;
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -251,6 +325,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAlarmParam * pParam = (CAlarmParam *)pMessageData;
 		Alarm(pParam);
+	}
+	break;
+
+	case MSG_RECONNECT_LAUNCH:
+	{
+		ReconnectLaunch();
 	}
 	break;
 

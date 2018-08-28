@@ -50,6 +50,8 @@ private:
 	void   OnExportExcel();
 	//
 	void   OnMyImageClick(const POINT * pPoint);
+	// launch status
+	void   OnLaunchStatus(WPARAM wParam, LPARAM lParam);
 
 private:
 	CDialogBuilderCallbackEx               m_callback;
@@ -73,4 +75,5 @@ private:
 	CMyImageUI *                           m_pUiMyImage;
 
 	CButtonUI *                            m_btnMenu;    // ²Ëµ¥°´Å¥	
+	CLabelUI *                             lblLaunchStatus;
 };

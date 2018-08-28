@@ -47,6 +47,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_pUiMyImage = static_cast<CMyImageUI*>(m_PaintManager.FindControl(MYIMAGE_NAME));
 
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
+	lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_LAUNCH_STATUS));
 
 	m_layReaders = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_READERS));
 	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
@@ -169,6 +170,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_TIMER) {
 		OnMyTimer(wParam);
+	}
+	else if (uMsg == UM_LAUNCH_STATUS) {
+		OnLaunchStatus(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -416,7 +420,18 @@ void   CDuiFrameWnd::OnExportExcel() {
 void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {
 	m_pUiMyImage->OnMyClick(pPoint);
 }
-  
+
+// launch status
+void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM lParam) {
+	CLmnSerialPort::PortStatus eStatus = (CLmnSerialPort::PortStatus)wParam;
+
+	if (eStatus == CLmnSerialPort::OPEN) {
+		lblLaunchStatus->SetText("发射器连接OK");
+	}
+	else {
+		lblLaunchStatus->SetText("发射器连接断开");
+	}
+}
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

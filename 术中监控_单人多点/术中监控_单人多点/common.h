@@ -36,6 +36,7 @@ using namespace DuiLib;
 
 #define   MAX_READERS_COUNT       9
 #define   READER_FILE_NAME        "reader.xml"
+#define   MAX_GRID_COUNT          MAX_READERS_COUNT
 
 #define   LAYOUT_READERS          "layReaders"
 #define   ALARM_IMAGE_CLASS_NAME   "AlarmImage"
@@ -59,6 +60,7 @@ using namespace DuiLib;
 #define   MYTREE_CLASS_NAME        "MyTree"
 #define   BTN_MENU_NAME            "menubtn"
 #define   EDIT_REMARK_NAME         "edRemark"
+#define   LBL_LAUNCH_STATUS        "lblReaderStatus"
 
 #define   CFG_PATIENT_NAME         "patient name"
 #define   CFG_PATIENT_SEX          "patient sex"
@@ -115,11 +117,17 @@ using namespace DuiLib;
 #define   MAX_BED_ID                     200
 #define   MAX_AREA_COUNT                 99
 #define   MAX_ALARM_PATH_LENGTH          256
+#define   MAX_COM_PORT_LENGTH            8
+#define  RECONNECT_LAUNCH_TIME_INTERVAL  10000
+#define  READER_STATUS_CLOSE             0
+#define  READER_STATUS_OPEN              1
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
+#define MSG_RECONNECT_LAUNCH              1003
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
+#define UM_LAUNCH_STATUS                 (WM_USER+2)
 
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -184,6 +192,18 @@ public:
 	char    m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 };
 
+class CReaderHeartBeatParam : public LmnToolkits::MessageData {
+public:
+	CReaderHeartBeatParam(DWORD dwIndex) : m_dwGridIndex(dwIndex) { }
+	DWORD     m_dwGridIndex;
+};
+
+class CGetTemperatureParam : public LmnToolkits::MessageData {
+public:
+	CGetTemperatureParam(DWORD dwIndex) : m_dwGridIndex(dwIndex) { }
+	DWORD     m_dwGridIndex;
+};
+
 
 class  CGlobalData {
 public:
@@ -207,6 +227,7 @@ public:
 	DWORD          m_dwBedNo[MAX_READERS_COUNT];
 
 	BOOL           m_bAutoScroll;                // 自动更新滑动条
+	char           m_szLaunchComPort[MAX_COM_PORT_LENGTH];
 };
 
 extern ILog    * g_log;
@@ -214,6 +235,7 @@ extern IConfig * g_cfg;
 extern IConfig * g_cfg_area;
 //extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_work;
+extern LmnToolkits::Thread *  g_thrd_launch;
 extern HWND    g_hWnd;
 extern CGlobalData  g_data;
 extern ARGB g_default_argb[MAX_READERS_COUNT];
@@ -227,6 +249,10 @@ extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern void  OnEdtRemarkKillFocus(CControlUI * pUiImage);
 extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern BOOL EnumPortsWdm(std::vector<std::string> & v);
+extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
+extern BOOL  CheckComPortExist(int nCheckComPort);
+extern DWORD  FindGridIndexByBed(DWORD dwBedNo);
 
 // templates
 template <class T>
