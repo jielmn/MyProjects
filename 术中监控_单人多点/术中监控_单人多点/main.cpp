@@ -174,6 +174,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_LAUNCH_STATUS) {
 		OnLaunchStatus(wParam, lParam);
 	}
+	else if (uMsg == UM_GRID_READER_STATUS) {
+		OnGridReaderStatus(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
    
@@ -431,6 +434,10 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM lParam) {
 	else {
 		lblLaunchStatus->SetText("发射器连接断开");
 	}
+}
+
+void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
+
 }
 
 

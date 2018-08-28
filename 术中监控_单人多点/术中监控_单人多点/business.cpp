@@ -281,6 +281,14 @@ int   CBusiness::ReconnectLaunch() {
 		// 通知成功
 		NotifyUiLaunchStatus( m_launch.GetStatus() );
 		ReadLaunchAsyn(2000);
+
+		// 获取Reder在线状态
+		DWORD  dwCnt = MAX_READERS_COUNT;
+		DWORD  dwDelay = 200;
+		for (DWORD i = 0; i < dwCnt; i++) {
+			ReaderHeartBeatAsyn(i, dwDelay);
+			dwDelay += 200;
+		}
 	}
 	
 	return 0;
@@ -303,11 +311,32 @@ int   CBusiness::ReadLaunch() {
 
 // 通知界面格子相关的Reader在线状态
 int   CBusiness::NotifyUiReaderStatus(DWORD dwGridIndex, int nStatus) {
+	::PostMessage(g_hWnd, UM_GRID_READER_STATUS, dwGridIndex, nStatus);
 	return 0;
 }
 
 // 通知界面温度数据
 int   CBusiness::NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp) {
+	return 0;
+}
+
+// Reader心跳
+int   CBusiness::ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_READER_HEART_BEAT + dwGridIndex,
+			new CReaderHeartBeatParam(dwGridIndex), TRUE);
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READER_HEART_BEAT + dwGridIndex,
+			new CReaderHeartBeatParam(dwGridIndex), TRUE);
+	}
+	return 0;
+}
+
+int   CBusiness::ReaderHeartBeat(const CReaderHeartBeatParam * pParam) {
+	DWORD dwTick = LmnGetTickCount();
+	m_launch.HeartBeat(pParam);
+	//::PostMessage(g_hWnd, UM_QUERY_HEAT_BEAT_TICK, pParam->m_dwGridIndex, dwTick);
 	return 0;
 }
 
@@ -335,6 +364,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	break;
 
 	default:
-		break;
+	{
+		if (dwMessageId >= MSG_READER_HEART_BEAT && dwMessageId < MSG_READER_HEART_BEAT + MAX_GRID_COUNT) {
+			CReaderHeartBeatParam * pParam = (CReaderHeartBeatParam *)pMessageData;
+			ReaderHeartBeat(pParam);
+		}
+	}
+	break;
+
 	}
 }

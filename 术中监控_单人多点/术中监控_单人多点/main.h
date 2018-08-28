@@ -52,6 +52,8 @@ private:
 	void   OnMyImageClick(const POINT * pPoint);
 	// launch status
 	void   OnLaunchStatus(WPARAM wParam, LPARAM lParam);
+	// ¸ñ×ÓµÄReader×´Ì¬
+	void   OnGridReaderStatus(WPARAM wParam, LPARAM lParam);
 
 private:
 	CDialogBuilderCallbackEx               m_callback;

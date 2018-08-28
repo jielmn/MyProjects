@@ -39,6 +39,10 @@ public:
 
 	// 通知界面温度数据
 	int   NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp);
+
+	// Reader心跳
+	int   ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
+	int   ReaderHeartBeat(const CReaderHeartBeatParam * pParam);
 private:
 	static CBusiness *  pInstance;
 	void Clear();

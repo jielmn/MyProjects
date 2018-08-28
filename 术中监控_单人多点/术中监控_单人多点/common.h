@@ -125,9 +125,12 @@ using namespace DuiLib;
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
 #define MSG_RECONNECT_LAUNCH              1003
+#define MSG_GET_TEMPERATURE               2000
+#define MSG_READER_HEART_BEAT             3000
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
+#define UM_GRID_READER_STATUS            (WM_USER+3)
 
 typedef struct tagTempData {
 	DWORD    dwIndex;
