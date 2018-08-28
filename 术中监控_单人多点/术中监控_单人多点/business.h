@@ -63,6 +63,7 @@ private:
 private:
 	char     m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 	CLaunch  m_launch;
+	int      m_nCurQueryIndex;
 };
 
 

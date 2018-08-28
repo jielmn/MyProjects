@@ -11,6 +11,7 @@ CBusiness *  CBusiness::GetInstance() {
 
 CBusiness::CBusiness() : m_launch(this) {
 	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
+	m_nCurQueryIndex = -1;
 }
 
 CBusiness::~CBusiness() {
@@ -288,6 +289,8 @@ int   CBusiness::ReconnectLaunch() {
 			ReaderHeartBeatAsyn(i, dwDelay);
 			dwDelay += 200;
 		}
+
+		// »ñÈ¡ÎÂ¶È
 	}
 	
 	return 0;
@@ -374,18 +377,11 @@ void  CBusiness::OnReceiveWrongFormat() {
 
 void  CBusiness::OnHeartBeatOk(DWORD  dwIndex) {
 	NotifyUiReaderStatus(dwIndex, READER_STATUS_OPEN);
-	DWORD  dwTick = LmnGetTickCount();
-	char buf[256];
-	SNPRINTF(buf, sizeof(buf), "query temp tick = %lu, dwIndex = %lu \n", dwTick, dwIndex);
-	OutputDebugString(buf);
-	QueryTemperatureAsyn(dwIndex);
+	// QueryTemperatureAsyn(dwIndex);
 }
 
 void  CBusiness::OnTempOk(DWORD dwIndex, DWORD dwTemp) {
 	DWORD  dwTick = LmnGetTickCount();
-	char buf[256];
-	SNPRINTF( buf, sizeof(buf), "resp temp tick = %lu, dwIndex = %lu \n", dwTick, dwIndex );
-	OutputDebugString(buf);
 	NotifyUiTempData(dwIndex, dwTemp);
 }
 
