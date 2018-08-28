@@ -16,8 +16,6 @@ using namespace DuiLib;
 #define TEST_FLAG                1
 #endif
 
-#define TEST_FLAG                1
-
 #if TEST_FLAG
 #define  TIMER_TEST_ID_1            1
 #define  TIMER_TEST_ID_2            2
@@ -227,6 +225,8 @@ extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubC
 extern time_t  DateTime2String(const char * szDatetime);
 extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern void  OnEdtRemarkKillFocus(CControlUI * pUiImage);
+extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>

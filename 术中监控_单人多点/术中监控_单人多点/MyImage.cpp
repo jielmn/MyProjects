@@ -2,6 +2,7 @@
 #include "MyImage.h"
 #include "business.h"
 #include "LmnTelSvr.h"
+#include "LmnExcel.h"
 
 CMyImageUI::CMyImageUI() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 						   m_remark_brush(Gdiplus::Color(0x803D5E49))
@@ -745,5 +746,103 @@ void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 }
 
 void  CMyImageUI::ExportExcel(const char * szPatientName) {
+	CDuiString strText;
 
+	if (!CExcel::IfExcelInstalled()) {
+		::MessageBox(g_hWnd, "没有检测到系统安装了excel", "保存excel", 0);
+		return;
+	}
+
+	DWORD  dwDataCnt = 0;
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		dwDataCnt += m_vTempData[i].size();
+	}
+	if (dwDataCnt == 0) {
+		strText.Format("没有温度数据，放弃保存excel" );
+		::MessageBox(g_hWnd, strText, "保存excel", 0);
+		return;
+	}
+
+	OPENFILENAME ofn = { 0 };
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+
+	char szTime[256];
+	time_t now = time(0);
+	Date2String_1(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s_%s", szPatientName, szTime);
+
+	ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
+	ofn.hwndOwner = g_hWnd;//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
+	ofn.lpstrFilter = TEXT("Excel Flie(*.xls)\0*.xls\0Excel Flie(*.xlsx)\0*.xlsx\0\0");//设置过滤  
+	ofn.nFilterIndex = 1;//过滤器索引  
+	ofn.lpstrFile = strFilename;//接收返回的文件名，注意第一个字符需要为NULL  
+	ofn.nMaxFile = sizeof(strFilename);//缓冲区长度  
+	ofn.lpstrInitialDir = CPaintManagerUI::GetInstancePath();
+	ofn.lpstrTitle = TEXT("请选择一个文件");//使用系统默认标题留空即可  
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;//文件、目录必须存在，隐藏只读选项  
+	if (!GetSaveFileName(&ofn))
+	{
+		return;
+	}
+
+	CExcel  excel;
+	excel.WriteGrid(0, 0, "姓名");
+	excel.WriteGrid(0, 1, szPatientName);
+
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		char tmp[64];
+		SNPRINTF(tmp, sizeof(tmp), "时间%lu", i + 1);
+		excel.WriteGrid(2, 0+i*4, tmp);
+
+		SNPRINTF(tmp, sizeof(tmp), "体温%lu", i + 1);
+		excel.WriteGrid(2, 1 + i * 4, tmp);
+
+		SNPRINTF(tmp, sizeof(tmp), "注释%lu", i + 1);
+		excel.WriteGrid(2, 2 + i * 4, tmp);
+	}	
+
+	std::vector<const char *> vValues;
+	vector<TempData *>::iterator it;
+	std::vector<const char *>::iterator  ix;
+
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+
+			char * p = new char[32];
+			Time2String(p, 32, &pItem->tTime);
+			vValues.push_back(p);
+
+			p = new char[8];
+			SNPRINTF(p, 8, "%.2f", pItem->dwTemperature / 100.0);
+			vValues.push_back(p);
+
+			if (pItem->szRemark[0] != 0) {
+				p = new char[MAX_REMARK_LENGTH];
+				STRNCPY(p, pItem->szRemark, MAX_REMARK_LENGTH);
+				vValues.push_back(p);
+			}
+			else {
+				vValues.push_back(0);
+			}
+		}
+
+		excel.WriteRange(3, 0+i*4, vTempData.size() + 3 - 1, 2+i*4, vValues);
+		
+		for (ix = vValues.begin(); ix != vValues.end(); ++ix) {
+			if (*ix != 0) {
+				delete[] * ix;
+			}
+		}
+		vValues.clear();
+	}
+	
+	int ret = excel.SaveAs(strFilename);
+	excel.Quit();
+
+	if (ret != 0) {
+		strText.Format("保存excel数据失败。请确保excel文件没有打开");
+		::MessageBox(g_hWnd, strText, "保存excel", 0);
+	}
 }
