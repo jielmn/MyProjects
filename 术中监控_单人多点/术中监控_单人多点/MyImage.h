@@ -15,6 +15,7 @@ public:
 	void  SelectedReader(int nIndex);
 	void  OnMyClick(const POINT * pPoint);
 	void  SetRemark(DuiLib::CDuiString & strRemark);
+	void  ExportExcel(const char * szPatientName);
 
 private:
 	time_t    GetFirstTime();

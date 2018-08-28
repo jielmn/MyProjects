@@ -410,7 +410,7 @@ void   CDuiFrameWnd::OnMyImageMenu(TNotifyUI& msg) {
 
 //
 void   CDuiFrameWnd::OnExportExcel() {
-
+	m_pUiMyImage->ExportExcel(m_pUiBtnPatientName->GetText());
 }
 
 void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {

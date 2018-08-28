@@ -444,14 +444,6 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 					middle + (nGridCount / 2) * nGridHeight + rect.top + 5,
 					strText, strText.GetLength());
 
-				//strText = "1234567890abcdefghijklmn";
-				//RECT rectRemark;
-				//rectRemark.left = nTextX;
-				//rectRemark.top = middle + (nGridCount / 2) * nGridHeight + rect.top + 5;
-				//rectRemark.right = rectRemark.left + 100;
-				//rectRemark.bottom = rectRemark.top + 20;
-				//::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-
 				nLastX = nX;
 			}
 		}
@@ -532,16 +524,17 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 				strText = pItem->szRemark;
 				RECT rectRemark;
-				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;				
 				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
 				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
-				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
-				//if (rectRemark.left < rect.right - width)
-				//	rectRemark.left = rect.right - width;
-				//if (rectRemark.right < rectRemark.left)
-				//	rectRemark.right = rectRemark.left;
+				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;				
+				if (rectRemark.left < rectLeft.left) {
+					rectRemark.left = rectLeft.left;
+				}
+				if (rectRemark.right < rectRemark.left) {
+					rectRemark.right = rectRemark.left;
+				}
 				::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
-				//::TextOut(hDC, rectRemark.left, rectRemark.top, strText, strText.GetLength());
 			}
 		}
 	}
@@ -749,4 +742,8 @@ void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 			}
 		}
 	}	
+}
+
+void  CMyImageUI::ExportExcel(const char * szPatientName) {
+
 }
