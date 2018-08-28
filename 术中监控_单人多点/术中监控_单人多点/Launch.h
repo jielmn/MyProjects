@@ -2,12 +2,13 @@
 
 #include "common.h"
 #include "LmnSerialPort.h"
+#include "sigslot.h"
 
 class CBusiness;
 
 class  CLaunch : public CLmnSerialPort {
 public:
-	CLaunch( );
+	CLaunch(CBusiness * pBusiness);
 	~CLaunch();
 
 	// ÖØÁ¬
@@ -30,7 +31,14 @@ private:
 	CDataBuf   m_recv_buf;
 	//DWORD      m_dwLastWriteTick;
 
-private:
+public:
 	void   CloseLaunch();
+
+private:
 	BOOL   WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen);
+
+private:
+	sigslot::signal0<>                               sigWrongFormat;
+	sigslot::signal1<DWORD>                          sigHeartBeatOk;
+	sigslot::signal2<DWORD, DWORD>                   sigTempOk;
 };

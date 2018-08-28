@@ -4,8 +4,9 @@
 #include "LmnThread.h"
 #include "common.h"
 #include "Launch.h"
+#include "sigslot.h"
 
-class CBusiness : public LmnToolkits::MessageHandler {
+class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
 public:
 	CBusiness();
@@ -43,6 +44,14 @@ public:
 	// Reader心跳
 	int   ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
 	int   ReaderHeartBeat(const CReaderHeartBeatParam * pParam);
+
+	// 获取温度
+	int   QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
+	int   QueryTemperature(const CGetTemperatureParam * pParam);
+
+	void  OnReceiveWrongFormat();
+	void  OnHeartBeatOk(DWORD  dwIndex);
+	void  OnTempOk(DWORD dwIndex, DWORD dwTemp);
 private:
 	static CBusiness *  pInstance;
 	void Clear();

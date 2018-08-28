@@ -9,9 +9,11 @@
 // 当由于没有病区号，重试的间隔
 #define  NEXT_RETRY_INTERVAL_TIME        2000
 
-CLaunch::CLaunch() {
+CLaunch::CLaunch(CBusiness * pBusiness) {
 	memset( m_dwGridRetryTime, 0, sizeof(m_dwGridRetryTime) );
-	//m_dwLastWriteTick = 0;
+	sigWrongFormat.connect(pBusiness, &CBusiness::OnReceiveWrongFormat );
+	sigHeartBeatOk.connect(pBusiness, &CBusiness::OnHeartBeatOk);
+	sigTempOk.connect(pBusiness, &CBusiness::OnTempOk);
 }
 
 CLaunch::~CLaunch() {
@@ -21,7 +23,6 @@ CLaunch::~CLaunch() {
 void  CLaunch::CloseLaunch() {
 	CloseUartPort();
 	m_recv_buf.Clear();
-	CBusiness::GetInstance()->NotifyUiLaunchStatus(GetStatus());
 }
 
 BOOL  CLaunch::WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen) {
@@ -115,7 +116,6 @@ int  CLaunch::HeartBeat(const CReaderHeartBeatParam * pParam) {
 	// 先处理数据
 	ReadComData();
 
-
 	BYTE  send_buf[8];
 	DWORD dwSendLen = 8;
 
@@ -207,9 +207,7 @@ int  CLaunch::ReadComData() {
 		if (buf[0] != (BYTE)'\x55') {
 			DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
 			g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf );
-
-			CloseLaunch();
-			CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+			sigWrongFormat.emit();
 		}
 		else {
 			// 如果是心跳数据
@@ -219,9 +217,7 @@ int  CLaunch::ReadComData() {
 				if ( buf[16] != (BYTE)'\xFF' ) {
 					DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
 					g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
-
-					CloseLaunch();
-					CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+					sigWrongFormat.emit();
 				}
 				else {
 					WORD   dwBedNo  = buf[2] * 256 + buf[3];
@@ -235,7 +231,7 @@ int  CLaunch::ReadComData() {
 						DWORD dwGridIndex = FindGridIndexByBed(dwBedNo);
 						// 如果找到床位号
 						if (dwGridIndex != -1) {
-							CBusiness::GetInstance()->NotifyUiReaderStatus(dwGridIndex, READER_STATUS_OPEN);
+							sigHeartBeatOk.emit(dwGridIndex);							
 						}
 						else {
 							DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
@@ -254,9 +250,7 @@ int  CLaunch::ReadComData() {
 					if (buf[28] != (BYTE)'\xFF') {
 						DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
 						g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
-
-						CloseLaunch();
-						CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+						sigWrongFormat.emit();
 					}
 					else {
 						DWORD  dwBedNo = buf[2] * 256 + buf[3];
@@ -273,7 +267,7 @@ int  CLaunch::ReadComData() {
 
 							// 找到
 							if (dwGridIndex != -1) {
-								CBusiness::GetInstance()->NotifyUiTempData(dwGridIndex, dwTemp);
+								sigTempOk.emit(dwGridIndex, dwTemp);
 							}
 							else {
 								DebugStream(debug_buf, sizeof(debug_buf), buf, 29);

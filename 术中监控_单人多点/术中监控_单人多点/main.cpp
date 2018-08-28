@@ -437,7 +437,19 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM lParam) {
 }
 
 void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	int   nStatus = lParam;
 
+	if (nStatus == READER_STATUS_CLOSE) {
+		m_pUiReaderTemp[dwGridIndex]->SetTextColor(0xFFFFFFFF);
+		m_pUiReaderTemp[dwGridIndex]->SetText("--");
+		m_pUiAlarms[dwGridIndex]->FailureAlarm();
+	}
+	else {
+		m_pUiReaderTemp[dwGridIndex]->SetTextColor(0xFFFFFFFF);
+		m_pUiReaderTemp[dwGridIndex]->SetText("--");
+		m_pUiAlarms[dwGridIndex]->StopAlarm();
+	}
 }
 
 

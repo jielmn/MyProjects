@@ -13,7 +13,7 @@
 using namespace DuiLib;
 
 #ifdef _DEBUG
-#define TEST_FLAG                1
+#define TEST_FLAG                0
 #endif
 
 #if TEST_FLAG
@@ -125,6 +125,7 @@ using namespace DuiLib;
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
 #define MSG_RECONNECT_LAUNCH              1003
+#define MSG_READ_LAUNCH                   1005
 #define MSG_GET_TEMPERATURE               2000
 #define MSG_READER_HEART_BEAT             3000
 
