@@ -37,6 +37,7 @@ private:
 	void   OnKillFocusReaderName(TNotifyUI& msg);
 	void   OnBtnMenu(TNotifyUI& msg);
 	void   OnSetting();
+	void   OnReaderSwitch(TNotifyUI& msg);
 
 	// 新温度数据达到
 	void   OnNewTempData(int nIndex, DWORD dwTemp);

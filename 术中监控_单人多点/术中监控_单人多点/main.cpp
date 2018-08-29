@@ -81,6 +81,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pUiReaderTemp[i]->SetText("--"); 
 		m_pUiBtnReaderNames[i]->SetText(g_data.m_szReaderName[i]);
 		m_pUiAlarms[i]->FailureAlarm();
+		m_pUiReaderSwitch[i]->Selected(g_data.m_bReaderSwitch[i]?true:false);
 		
 		m_layReaders->Add(m_pUiReaders[i]); 
 	}
@@ -131,6 +132,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if ( name == MYIMAGE_NAME ) {
 			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
 			OnMyImageClick(&pt);
+		}
+		else if (name == READER_SWITCH_NAME){
+			OnReaderSwitch(msg);
 		}
 	}
 	else if (msg.sType == "killfocus") {
@@ -514,6 +518,16 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 	}
 }
 
+void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	g_data.m_bReaderSwitch[nIndex] = m_pUiReaderSwitch[nIndex]->IsSelected() ? FALSE : TRUE ;
+
+	DuiLib::CDuiString  strText;
+	strText.Format(CFG_READER_SWITCH " %d", nIndex + 1);
+	DWORD  dwDefault = TRUE;
+	g_cfg->SetConfig(strText, g_data.m_bReaderSwitch[nIndex], &dwDefault);
+	g_cfg->Save();
+}
 
 
 
