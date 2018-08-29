@@ -47,7 +47,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_pUiMyImage = static_cast<CMyImageUI*>(m_PaintManager.FindControl(MYIMAGE_NAME));
 
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
-	lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_LAUNCH_STATUS));
+	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_LAUNCH_STATUS));
+	m_lblBartips = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_BAR_TIPS));
 
 	m_layReaders = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_READERS));
 	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
@@ -90,6 +91,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	OnLayReaderSelected(0);
 
+	OnMyDeviceChanged();
+	  
 	InitRand(TRUE, 1);
 #if TEST_FLAG
 	SetTimer(m_hWnd, TIMER_TEST_ID_1, TIMER_TEST_INTERVAL_1, NULL);
@@ -176,6 +179,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_GRID_READER_STATUS) {
 		OnGridReaderStatus(wParam, lParam);
+	}
+	else if (uMsg == UM_TEMP_DATA) {
+		OnTempData(wParam, lParam);
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		OnMyDeviceChanged();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -429,10 +438,10 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM lParam) {
 	CLmnSerialPort::PortStatus eStatus = (CLmnSerialPort::PortStatus)wParam;
 
 	if (eStatus == CLmnSerialPort::OPEN) {
-		lblLaunchStatus->SetText("发射器连接OK");
+		m_lblLaunchStatus->SetText("发射器连接OK");
 	}
 	else {
-		lblLaunchStatus->SetText("发射器连接断开");
+		m_lblLaunchStatus->SetText("发射器连接断开");
 	}
 }
 
@@ -450,6 +459,29 @@ void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
 		m_pUiReaderTemp[dwGridIndex]->SetText("--");
 		m_pUiAlarms[dwGridIndex]->StopAlarm();
 	}
+}
+
+// 温度数据
+void   CDuiFrameWnd::OnTempData(WPARAM wParam, LPARAM lParam) {
+	DWORD dwGridIndex = wParam;
+	DWORD  dwTemp = lParam;
+	OnNewTempData(dwGridIndex, dwTemp);
+}
+ 
+// 
+void   CDuiFrameWnd::OnMyDeviceChanged() {
+	char szComPort[16];
+	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+	if (nFindCount > 1) {
+		m_lblBartips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+	}
+	else if (0 == nFindCount) {
+		m_lblBartips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+	}
+	else {
+		m_lblBartips->SetText("");
+	}
+	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
 }
 
 

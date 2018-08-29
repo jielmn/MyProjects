@@ -49,12 +49,21 @@ public:
 	int   QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime = 0);
 	int   QueryTemperature(const CGetTemperatureParam * pParam);
 
-	void  OnReceiveWrongFormat();
-	void  OnHeartBeatOk(DWORD  dwIndex);
-	void  OnTempOk(DWORD dwIndex, DWORD dwTemp);
+	// 获取一轮中的温度
+	int   QueryRoundTemperatureAsyn(DWORD dwDelayTime = 0);
+	int   QueryRoundTemperature();
+
+	// 硬件改动，检查状态
+	int   CheckLaunchStatusAsyn();
+	int   CheckLaunchStatus();
+
+	void  OnLaunchError();
+	void  OnHeartBeatRet(DWORD  dwIndex, int nRet);
+	void  OnTempRet(DWORD dwIndex, DWORD dwTemp);
 private:
 	static CBusiness *  pInstance;
 	void Clear();
+	BOOL  IsGetAllQueryRet();
 
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
@@ -63,7 +72,9 @@ private:
 private:
 	char     m_szAlarmFile[MAX_ALARM_PATH_LENGTH];
 	CLaunch  m_launch;
-	int      m_nCurQueryIndex;
+
+	BOOL     m_bFirstHeartBeats;              // 第一次请求心跳。查询完后请求温度
+	BOOL     m_bQueryRet[MAX_READERS_COUNT];  // 批量的查询结果完成
 };
 
 

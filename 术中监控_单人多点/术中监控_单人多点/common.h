@@ -61,6 +61,7 @@ using namespace DuiLib;
 #define   BTN_MENU_NAME            "menubtn"
 #define   EDIT_REMARK_NAME         "edRemark"
 #define   LBL_LAUNCH_STATUS        "lblReaderStatus"
+#define   LBL_BAR_TIPS             "lblBartips"
 
 #define   CFG_PATIENT_NAME         "patient name"
 #define   CFG_PATIENT_SEX          "patient sex"
@@ -118,20 +119,25 @@ using namespace DuiLib;
 #define   MAX_AREA_COUNT                 99
 #define   MAX_ALARM_PATH_LENGTH          256
 #define   MAX_COM_PORT_LENGTH            8
-#define  RECONNECT_LAUNCH_TIME_INTERVAL  10000
-#define  READER_STATUS_CLOSE             0
-#define  READER_STATUS_OPEN              1
+#define   RECONNECT_LAUNCH_TIME_INTERVAL 10000
+#define   READER_STATUS_CLOSE            0
+#define   READER_STATUS_OPEN             1
+#define   READ_LAUNCH_INTERVAL           1000
+#define   NEXT_HEART_BEAT_TIME           30000
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
 #define MSG_RECONNECT_LAUNCH              1003
+#define MSG_CHECK_LAUNCH_STATUS           1004
 #define MSG_READ_LAUNCH                   1005
+#define MSG_ROUND_TEMP                    1006
 #define MSG_GET_TEMPERATURE               2000
 #define MSG_READER_HEART_BEAT             3000
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
 #define UM_GRID_READER_STATUS            (WM_USER+3)
+#define UM_TEMP_DATA                     (WM_USER+4)
 
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -230,8 +236,11 @@ public:
 	BOOL           m_bReaderSwitch[MAX_READERS_COUNT];
 	DWORD          m_dwBedNo[MAX_READERS_COUNT];
 
-	BOOL           m_bAutoScroll;                // 自动更新滑动条
+	BOOL           m_bAutoScroll;                           // 自动更新滑动条
 	char           m_szLaunchComPort[MAX_COM_PORT_LENGTH];
+	int            m_nReaderStatus[MAX_GRID_COUNT];        // 对应的Reader是否在线
+	int            m_nQueryTempRetryTime[MAX_GRID_COUNT];  // 请求温度过程中，重试了次数
+	DWORD          m_dwLastQueryTick[MAX_GRID_COUNT];      // 上一次请求心跳/温度的time tick
 };
 
 extern ILog    * g_log;

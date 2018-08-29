@@ -38,7 +38,7 @@ private:
 	BOOL   WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen);
 
 private:
-	sigslot::signal0<>                               sigWrongFormat;
-	sigslot::signal1<DWORD>                          sigHeartBeatOk;
-	sigslot::signal2<DWORD, DWORD>                   sigTempOk;
+	sigslot::signal0<>                               sigLaunchError;
+	sigslot::signal2<DWORD, int>                     sigHeartBeatRet;
+	sigslot::signal2<DWORD, DWORD>                   sigTempRet;
 };

@@ -87,7 +87,10 @@
 	
 	<!-- 状态栏 -->
 	<HorizontalLayout height="30" bkcolor="#FF3A4F67" inset="10,3,10,3">
-		<Label name="lblReaderStatus"    text="读卡器连接失败"  width="250" font="4" textcolor="#FFFFFFFF" />
+		<Label name="lblReaderStatus"   text="发射器连接失败"  width="250" font="4" textcolor="#FFFFFFFF" />
+		<Control width="1" bkimage="sep.png" />
+		<Control width="20" />
+		<Label name="lblBartips"    text=""  font="4" textcolor="#FFCAF100" />
 		<Control width="1" bkimage="sep.png" />
 	</HorizontalLayout>
 	

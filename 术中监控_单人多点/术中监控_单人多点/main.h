@@ -54,7 +54,10 @@ private:
 	void   OnLaunchStatus(WPARAM wParam, LPARAM lParam);
 	// 格子的Reader状态
 	void   OnGridReaderStatus(WPARAM wParam, LPARAM lParam);
-
+	// 温度数据
+	void   OnTempData(WPARAM wParam, LPARAM lParam);
+	// 
+	void   OnMyDeviceChanged();
 private:
 	CDialogBuilderCallbackEx               m_callback;
 
@@ -77,5 +80,6 @@ private:
 	CMyImageUI *                           m_pUiMyImage;
 
 	CButtonUI *                            m_btnMenu;    // 菜单按钮	
-	CLabelUI *                             lblLaunchStatus;
+	CLabelUI *                             m_lblLaunchStatus;
+	CLabelUI *                             m_lblBartips;
 };

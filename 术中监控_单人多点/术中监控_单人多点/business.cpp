@@ -1,4 +1,5 @@
 #include "business.h"
+#include "LmnTelSvr.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -11,7 +12,8 @@ CBusiness *  CBusiness::GetInstance() {
 
 CBusiness::CBusiness() : m_launch(this) {
 	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
-	m_nCurQueryIndex = -1;
+	m_bFirstHeartBeats = TRUE;
+	memset(m_bQueryRet, 0, sizeof(m_bQueryRet));
 }
 
 CBusiness::~CBusiness() {
@@ -165,6 +167,10 @@ int CBusiness::Init() {
 	}
 
 	g_data.m_bAutoScroll = TRUE;
+	memset(g_data.m_szLaunchComPort, 0, sizeof(g_data.m_szLaunchComPort));
+	memset(g_data.m_nReaderStatus, 0, sizeof(g_data.m_nReaderStatus));
+	memset(g_data.m_nQueryTempRetryTime, 0, sizeof(g_data.m_nQueryTempRetryTime));
+	memset(g_data.m_dwLastQueryTick, 0, sizeof(g_data.m_dwLastQueryTick));
 
 	g_thrd_work = new LmnToolkits::PriorityThread();
 	if (0 == g_thrd_work) {
@@ -280,17 +286,13 @@ int   CBusiness::ReconnectLaunch() {
 	else {
 		// 通知成功
 		NotifyUiLaunchStatus( m_launch.GetStatus() );
-		ReadLaunchAsyn(2000);
+		ReadLaunchAsyn(READ_LAUNCH_INTERVAL);
 
 		// 获取Reder在线状态
 		DWORD  dwCnt = MAX_READERS_COUNT;
-		DWORD  dwDelay = 200;
 		for (DWORD i = 0; i < dwCnt; i++) {
-			ReaderHeartBeatAsyn(i, dwDelay);
-			dwDelay += 200;
+			ReaderHeartBeatAsyn(i);
 		}
-
-		// 获取温度
 	}
 	
 	return 0;
@@ -314,8 +316,9 @@ int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 }
 
 int   CBusiness::ReadLaunch() {
+	//JTelSvrPrint("launch thread message count = %lu", g_thrd_launch->GetMessagesCount());
 	m_launch.ReadComData();
-	ReadLaunchAsyn(2000);
+	ReadLaunchAsyn(READ_LAUNCH_INTERVAL);
 	return 0;
 }
 
@@ -327,6 +330,7 @@ int   CBusiness::NotifyUiReaderStatus(DWORD dwGridIndex, int nStatus) {
 
 // 通知界面温度数据
 int   CBusiness::NotifyUiTempData(DWORD dwGridIndex, DWORD  dwTemp) {
+	::PostMessage(g_hWnd, UM_TEMP_DATA, dwGridIndex, dwTemp);
 	return 0;
 }
 
@@ -344,9 +348,8 @@ int   CBusiness::ReaderHeartBeatAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0*
 }
 
 int   CBusiness::ReaderHeartBeat(const CReaderHeartBeatParam * pParam) {
-	DWORD dwTick = LmnGetTickCount();
+	g_data.m_dwLastQueryTick[pParam->m_dwGridIndex] = LmnGetTickCount();
 	m_launch.HeartBeat(pParam);
-	//::PostMessage(g_hWnd, UM_QUERY_HEAT_BEAT_TICK, pParam->m_dwGridIndex, dwTick);
 	return 0;
 }
 
@@ -362,27 +365,133 @@ int   CBusiness::QueryTemperatureAsyn(DWORD dwGridIndex, DWORD dwDelayTime /*= 0
 }
 
 int   CBusiness::QueryTemperature(const CGetTemperatureParam * pParam) {
-	DWORD  dwTick = LmnGetTickCount();
+	g_data.m_dwLastQueryTick[pParam->m_dwGridIndex] = LmnGetTickCount();
 	int ret = m_launch.QueryTemperature(pParam);
-	//::PostMessage(g_hWnd, UM_QUERY_TEMP_TICK, pParam->m_dwGridIndex, dwTick);
 	return 0;
 }
 
 // 从发射器收到错误的格式
-void  CBusiness::OnReceiveWrongFormat() {
+void  CBusiness::OnLaunchError() {
 	m_launch.CloseLaunch();
 	NotifyUiLaunchStatus(m_launch.GetStatus());
 	ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+	for ( DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		g_data.m_nReaderStatus[i] = READER_STATUS_CLOSE;
+		g_data.m_nQueryTempRetryTime[i] = 0;
+		g_data.m_dwLastQueryTick[i] = 0;
+		NotifyUiReaderStatus(i, READER_STATUS_CLOSE);
+	}
 }
 
-void  CBusiness::OnHeartBeatOk(DWORD  dwIndex) {
-	NotifyUiReaderStatus(dwIndex, READER_STATUS_OPEN);
-	// QueryTemperatureAsyn(dwIndex);
+void  CBusiness::OnHeartBeatRet(DWORD  dwIndex, int nRet) {
+	//JTelSvrPrint("OnHeartBeatRet: index,%lu  ret: %d", dwIndex, nRet);
+
+	g_data.m_dwLastQueryTick[dwIndex] = 0;
+	g_data.m_nQueryTempRetryTime[dwIndex] = 0;
+
+	if (0 == nRet) {
+		g_data.m_nReaderStatus[dwIndex] = READER_STATUS_OPEN;		
+		NotifyUiReaderStatus(dwIndex, READER_STATUS_OPEN);
+	}
+	else {
+		g_data.m_nReaderStatus[dwIndex] = READER_STATUS_CLOSE;
+		NotifyUiReaderStatus(dwIndex, READER_STATUS_CLOSE);
+		// 下一次心跳
+		ReaderHeartBeatAsyn(dwIndex, NEXT_HEART_BEAT_TIME);
+	}
+
+	// 如果是第一次全体请求心跳
+	if (m_bFirstHeartBeats) {
+		m_bQueryRet[dwIndex] = TRUE;
+		// 如果所有一批请求都得到结果
+		if ( IsGetAllQueryRet() ) {
+			m_bFirstHeartBeats = FALSE;
+			QueryRoundTemperatureAsyn();
+		}
+	}
 }
 
-void  CBusiness::OnTempOk(DWORD dwIndex, DWORD dwTemp) {
-	DWORD  dwTick = LmnGetTickCount();
-	NotifyUiTempData(dwIndex, dwTemp);
+// dwTemp为-1表示失败（超时3次没有获取到温度）
+void  CBusiness::OnTempRet(DWORD dwIndex, DWORD dwTemp) {
+	g_data.m_dwLastQueryTick[dwIndex] = 0;
+	g_data.m_nQueryTempRetryTime[dwIndex] = 0;
+
+	// 获取温度成功
+	if ( dwTemp != -1 ) {
+		NotifyUiTempData(dwIndex, dwTemp);
+	}
+	// 获取温度失败
+	else {
+		g_data.m_nReaderStatus[dwIndex] = READER_STATUS_CLOSE;
+		NotifyUiReaderStatus(dwIndex, READER_STATUS_CLOSE);
+		// 下一次心跳
+		ReaderHeartBeatAsyn(dwIndex, NEXT_HEART_BEAT_TIME);
+	}
+
+	m_bQueryRet[dwIndex] = TRUE;
+	// 如果所有一批请求都得到结果
+	if (IsGetAllQueryRet()) {
+		QueryRoundTemperatureAsyn(g_data.m_dwCollectInterval * 1000);
+	}
+
+}
+
+// 是否得到所有的请求（判断一批请求结束）
+BOOL  CBusiness::IsGetAllQueryRet() {
+	DWORD i = 0;
+	for ( i = 0; i < MAX_READERS_COUNT; i++) {
+		if (!m_bQueryRet[i]) {
+			break;
+		}
+	}
+	if (i >= MAX_READERS_COUNT) {
+		return TRUE;
+	}
+	else {
+		return FALSE;
+	}
+}
+
+// 获取一轮中的温度
+int   CBusiness::QueryRoundTemperatureAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_ROUND_TEMP,0,TRUE,5);
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_ROUND_TEMP,0,TRUE,5);
+	}
+	return 0;
+}
+
+int   CBusiness::QueryRoundTemperature() {
+	memset(m_bQueryRet, 0, sizeof(m_bQueryRet));
+
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		if (g_data.m_nReaderStatus[i] == READER_STATUS_OPEN) {
+			QueryTemperatureAsyn(i);
+		}
+		// 如果close状态，则认为获得结果
+		else {
+			m_bQueryRet[i] = TRUE;
+		}
+	}
+
+	// 如果全部读卡器为close状态，则等一段时间获取下一轮温度
+	if ( IsGetAllQueryRet() ) {
+		QueryRoundTemperatureAsyn( g_data.m_dwCollectInterval * 1000 );
+	}
+	return 0;
+}
+
+// 硬件改动，检查状态
+int   CBusiness::CheckLaunchStatusAsyn() {
+	g_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE );
+	return 0;
+}
+
+int   CBusiness::CheckLaunchStatus() {
+	m_launch.CheckStatus();
+	return 0;
 }
 
 // 消息处理
@@ -411,6 +520,18 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_LAUNCH:
 	{
 		ReadLaunch();
+	}
+	break;
+
+	case MSG_ROUND_TEMP:
+	{
+		QueryRoundTemperature();
+	}
+	break;
+
+	case MSG_CHECK_LAUNCH_STATUS:
+	{
+		CheckLaunchStatus();
 	}
 	break;
 

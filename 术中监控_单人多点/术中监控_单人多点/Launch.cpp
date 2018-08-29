@@ -1,5 +1,6 @@
 #include "Launch.h"
 #include "business.h"
+#include "LmnTelSvr.h"
 
 // 测温如果失败，则连续再测量2次。
 // 如果连续3次失败，则认为连接有问题
@@ -11,9 +12,9 @@
 
 CLaunch::CLaunch(CBusiness * pBusiness) {
 	memset( m_dwGridRetryTime, 0, sizeof(m_dwGridRetryTime) );
-	sigWrongFormat.connect(pBusiness, &CBusiness::OnReceiveWrongFormat );
-	sigHeartBeatOk.connect(pBusiness, &CBusiness::OnHeartBeatOk);
-	sigTempOk.connect(pBusiness, &CBusiness::OnTempOk);
+	sigLaunchError.connect(pBusiness, &CBusiness::OnLaunchError);
+	sigHeartBeatRet.connect(pBusiness, &CBusiness::OnHeartBeatRet);
+	sigTempRet.connect(pBusiness, &CBusiness::OnTempRet);
 }
 
 CLaunch::~CLaunch() {
@@ -59,12 +60,7 @@ int  CLaunch::Reconnect() {
 	if (!bRet) {
 		return -1;
 	}
-
-	// 通知成功
-	CBusiness::GetInstance()->NotifyUiLaunchStatus(GetStatus());
 	m_recv_buf.Clear();	
-
-	CBusiness::GetInstance()->ReadLaunchAsyn();
 	return 0;
 }
 
@@ -72,16 +68,16 @@ int  CLaunch::Reconnect() {
 int  CLaunch::CheckStatus() {
 	g_log->Output(ILog::LOG_SEVERITY_INFO, "check status \n");
 
-	if (GetStatus() == CLmnSerialPort::CLOSE) {
-		return 0;
-	}
+	//if (GetStatus() == CLmnSerialPort::CLOSE) {
+	//	return 0;
+	//}
 
-	// 如果串口已经不在
-	if ( !CheckComPortExist( this->GetPort() ) ) {
-		CloseUartPort();
-		CBusiness::GetInstance()->NotifyUiLaunchStatus(GetStatus());
-		CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
-	}
+	//// 如果串口已经不在
+	//if ( !CheckComPortExist( this->GetPort() ) ) {
+	//	CloseUartPort();
+	//	CBusiness::GetInstance()->NotifyUiLaunchStatus(GetStatus());
+	//	CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+	//}
 
 	return 0;
 }
@@ -172,6 +168,7 @@ int  CLaunch::QueryTemperature(const CGetTemperatureParam * pParam) {
 // 读取串口数据
 int  CLaunch::ReadComData() {
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "handle read\n");
+	//JTelSvrPrint("handle read");
 
 	// 如果串口没有打开
 	if (GetStatus() == CLmnSerialPort::CLOSE) {
@@ -207,7 +204,7 @@ int  CLaunch::ReadComData() {
 		if (buf[0] != (BYTE)'\x55') {
 			DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
 			g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf );
-			sigWrongFormat.emit();
+			sigLaunchError.emit();
 		}
 		else {
 			// 如果是心跳数据
@@ -217,7 +214,7 @@ int  CLaunch::ReadComData() {
 				if ( buf[16] != (BYTE)'\xFF' ) {
 					DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
 					g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
-					sigWrongFormat.emit();
+					sigLaunchError.emit();
 				}
 				else {
 					WORD   dwBedNo  = buf[2] * 256 + buf[3];
@@ -231,7 +228,7 @@ int  CLaunch::ReadComData() {
 						DWORD dwGridIndex = FindGridIndexByBed(dwBedNo);
 						// 如果找到床位号
 						if (dwGridIndex != -1) {
-							sigHeartBeatOk.emit(dwGridIndex);							
+							sigHeartBeatRet.emit(dwGridIndex,0);							
 						}
 						else {
 							DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
@@ -250,7 +247,7 @@ int  CLaunch::ReadComData() {
 					if (buf[28] != (BYTE)'\xFF') {
 						DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
 						g_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
-						sigWrongFormat.emit();
+						sigLaunchError.emit();
 					}
 					else {
 						DWORD  dwBedNo = buf[2] * 256 + buf[3];
@@ -267,7 +264,7 @@ int  CLaunch::ReadComData() {
 
 							// 找到
 							if (dwGridIndex != -1) {
-								sigTempOk.emit(dwGridIndex, dwTemp);
+								sigTempRet.emit(dwGridIndex, dwTemp);
 							}
 							else {
 								DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
@@ -278,6 +275,39 @@ int  CLaunch::ReadComData() {
 				}
 				else {
 					m_recv_buf.ResetReadPos();
+				}
+			}
+		}
+	}
+
+	DWORD   dwCurTick = LmnGetTickCount();
+
+	// 处理超时问题
+	for ( DWORD i = 0; i < MAX_READERS_COUNT; i++ ) {
+		// 如果是close状态
+		if ( g_data.m_nReaderStatus[i] == READER_STATUS_CLOSE ) {
+			// 如果已经请求了心跳
+			if ( g_data.m_dwLastQueryTick[i] != 0 ) {
+				// 如果请求心跳超时
+				if ( dwCurTick - g_data.m_dwLastQueryTick[i] >= 3500 ) {
+					sigHeartBeatRet.emit(i, -1);
+				}
+			}
+		}
+		// 如果是open状态
+		else {
+			// 如果已经请求了温度
+			if (g_data.m_dwLastQueryTick[i] != 0) {
+				// 如果请求温度超时
+				if (dwCurTick - g_data.m_dwLastQueryTick[i] >= 3500) {					
+					g_data.m_nQueryTempRetryTime[i]++;
+					g_data.m_dwLastQueryTick[i] = 0;
+					if ( g_data.m_nQueryTempRetryTime[i] >= 3 ) {
+						sigTempRet.emit(i, -1);
+					}
+					else {
+						CBusiness::GetInstance()->QueryTemperatureAsyn(i);
+					}
 				}
 			}
 		}
