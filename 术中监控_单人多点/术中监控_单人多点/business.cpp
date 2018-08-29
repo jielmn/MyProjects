@@ -267,6 +267,7 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 // ÖØÁ¬·¢ÉäÆ÷
 int   CBusiness::ReconnectLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 	g_thrd_launch->DeleteMessages();
+	OnLaunchError();
 
 	if (0 == dwDelayTime) {
 		g_thrd_launch->PostMessage(this, MSG_RECONNECT_LAUNCH);

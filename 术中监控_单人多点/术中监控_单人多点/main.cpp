@@ -357,6 +357,11 @@ void  CDuiFrameWnd::OnSetting() {
 		}
 		g_cfg->Save();
 		m_pUiMyImage->MyInvalidate();
+
+		// 如果病区号更新
+		if ( oldData.m_dwAreaNo != g_data.m_dwAreaNo ) {
+			CBusiness::GetInstance()->ReconnectLaunchAsyn();
+		}
 	}
 
 	delete pSettingDlg;
