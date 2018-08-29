@@ -186,6 +186,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == WM_DEVICECHANGE) {
 		OnMyDeviceChanged();
 	}
+	else if (uMsg == WM_MOUSEWHEEL) {
+		OnMyMouseWheel(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
    
@@ -296,7 +299,10 @@ void  CDuiFrameWnd::OnKillFocusReaderName(TNotifyUI& msg) {
 
 	msg.pSender->SetVisible(false);
 	m_pUiBtnReaderNames[nIndex]->SetText(msg.pSender->GetText());
-	m_pUiBtnReaderNames[nIndex]->SetVisible(true); 
+	m_pUiBtnReaderNames[nIndex]->SetVisible(true);
+
+	STRNCPY( g_data.m_szReaderName[nIndex], msg.pSender->GetText(), sizeof(g_data.m_szReaderName[nIndex]) );
+	m_pUiMyImage->MyInvalidate();
 }
 
 void  CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
@@ -483,6 +489,34 @@ void   CDuiFrameWnd::OnMyDeviceChanged() {
 	}
 	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
 }
+
+// ÊóÂÖ
+void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
+	int nDirectory = (int)wParam;
+	BOOL bChanged = FALSE;
+	if (nDirectory > 0)
+	{
+		if ( g_data.m_dwCollectIntervalWidth >= 15) {
+			g_data.m_dwCollectIntervalWidth -= 5;
+			bChanged = TRUE;
+		}
+	}
+	else
+	{
+		if (g_data.m_dwCollectIntervalWidth < DEFAULT_COLLECT_INTERVAL_WIDTH ) {
+			g_data.m_dwCollectIntervalWidth += 5;
+			bChanged = TRUE;
+		}
+	}
+
+	if (bChanged) {
+		m_pUiMyImage->MyInvalidate();
+	}
+}
+
+
+
+
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

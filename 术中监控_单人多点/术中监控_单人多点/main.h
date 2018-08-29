@@ -58,6 +58,8 @@ private:
 	void   OnTempData(WPARAM wParam, LPARAM lParam);
 	// 
 	void   OnMyDeviceChanged();
+	//  Û¬÷
+	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 private:
 	CDialogBuilderCallbackEx               m_callback;
 

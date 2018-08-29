@@ -484,7 +484,13 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_dwLowTempAlarm[m_dwSelectedReaderIndex]) / 100.0 * nGridHeight);
 	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
 	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
-	strText = "低温报警";
+	if (    g_data.m_szReaderName[m_dwSelectedReaderIndex][0] == '\0' 
+		 || 0 == strcmp(g_data.m_szReaderName[m_dwSelectedReaderIndex], "--") ) {
+		strText.Format("No.%lu_低温报警", m_dwSelectedReaderIndex + 1);
+	}
+	else {
+		strText.Format("%s_低温报警", g_data.m_szReaderName[m_dwSelectedReaderIndex] );
+	}
 	::TextOut(hDC, rectLeft.right + 5,
 		middle + nY + rect.top + 5,
 		strText, strText.GetLength());
@@ -494,7 +500,13 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_dwHighTempAlarm[m_dwSelectedReaderIndex]) / 100.0 * nGridHeight);
 	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
 	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
-	strText = "高温报警";
+	if (g_data.m_szReaderName[m_dwSelectedReaderIndex][0] == '\0'
+		|| 0 == strcmp(g_data.m_szReaderName[m_dwSelectedReaderIndex], "--")) {
+		strText.Format("No.%lu_高温报警", m_dwSelectedReaderIndex + 1);
+	}
+	else {
+		strText.Format("%s_高温报警", g_data.m_szReaderName[m_dwSelectedReaderIndex]);
+	}
 	::TextOut(hDC, rectLeft.right + 5,
 		middle + nY + rect.top + (-20),
 		strText, strText.GetLength());

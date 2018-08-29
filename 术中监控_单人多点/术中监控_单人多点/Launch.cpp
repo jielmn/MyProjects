@@ -68,16 +68,22 @@ int  CLaunch::Reconnect() {
 int  CLaunch::CheckStatus() {
 	g_log->Output(ILog::LOG_SEVERITY_INFO, "check status \n");
 
-	//if (GetStatus() == CLmnSerialPort::CLOSE) {
-	//	return 0;
-	//}
-
-	//// 如果串口已经不在
-	//if ( !CheckComPortExist( this->GetPort() ) ) {
-	//	CloseUartPort();
-	//	CBusiness::GetInstance()->NotifyUiLaunchStatus(GetStatus());
-	//	CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
-	//}
+	// 关闭状态
+	if (GetStatus() == CLmnSerialPort::CLOSE) {
+		char szComPort[16];
+		int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+		// 如果找到1个ch340串口，立即连接发射器
+		if ( 1 == nFindCount ) {
+			CBusiness::GetInstance()->ReconnectLaunchAsyn();
+		}
+	}
+	// 打开状态
+	else {
+		// 如果串口已经不在
+		if (!CheckComPortExist(this->GetPort())) {
+			sigLaunchError.emit();
+		}
+	}
 
 	return 0;
 }

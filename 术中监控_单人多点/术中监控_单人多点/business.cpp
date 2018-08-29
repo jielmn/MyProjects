@@ -184,7 +184,7 @@ int CBusiness::Init() {
 	}
 	g_thrd_launch->Start();
 	
-	ReconnectLaunchAsyn(200);
+	// ReconnectLaunchAsyn(200);
 
 	return 0;
 }
@@ -374,7 +374,8 @@ int   CBusiness::QueryTemperature(const CGetTemperatureParam * pParam) {
 void  CBusiness::OnLaunchError() {
 	m_launch.CloseLaunch();
 	NotifyUiLaunchStatus(m_launch.GetStatus());
-	ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+	// ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+	m_bFirstHeartBeats = TRUE;
 	for ( DWORD i = 0; i < MAX_READERS_COUNT; i++) {
 		g_data.m_nReaderStatus[i] = READER_STATUS_CLOSE;
 		g_data.m_nQueryTempRetryTime[i] = 0;
