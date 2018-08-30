@@ -132,19 +132,7 @@ void CDuiFrameWnd::InitWindow() {
 
 void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
-	if (msg.sType == "click") {
-		int index = m_tree->GetItemIndex(msg.pSender);
-		if (index != -1) {
-			if (_tcscmp(msg.pSender->GetClass(), DUI_CTR_BUTTON) == 0) {
-				CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)msg.pSender->GetParent()->GetParent()->GetTag();
-				m_tree->ExpandNode(node, !node->data()._expand);
-				//m_tree->SetFixedHeight(200);
-				int a = m_tree->CalculateMinHeight();
-				m_tree->SetFixedHeight(a);
-			}
-		}
-	}
-	else if (msg.sType == "itemselect") {
+	if (msg.sType == "itemselect") {
 		int nIndex = m_tree->GetCurSel();
 		if (nIndex >= 0) {
 			CControlUI * pControl = m_tree->GetItemAt(nIndex);

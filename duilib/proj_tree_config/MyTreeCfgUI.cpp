@@ -79,7 +79,24 @@ CMyTreeCfgUI::ConfigValue::ConfigValue() {
 
 
 
+class CMyExpandButtonUI : public CButtonUI {
+public:
+	CMyExpandButtonUI( CMyTreeCfgUI * p ) {
+		sigClick.connect(p, &CMyTreeCfgUI::OnExpandClick);
+	}
 
+	void DoEvent(TEventUI& event) {	
+		if (event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK)
+		{			
+			sigClick.emit(this);
+			return;
+		}
+		CButtonUI::DoEvent(event);
+	}	
+
+private:
+	sigslot::signal1<CControlUI *>     sigClick;
+};
 
 
 
@@ -234,7 +251,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 		CListContainerElementUI * parent_element = parent->data()._pListElement;
 		if (parent_element) {
 			CHorizontalLayoutUI * layout_parent = (CHorizontalLayoutUI *)parent_element->GetItemAt(0);
-			CButtonUI * btn_expand = new CButtonUI;
+			CButtonUI * btn_expand = new CMyExpandButtonUI(this);
 			btn_expand->SetFixedWidth(15);
 			btn_expand->SetFixedHeight(15);
 			btn_expand->SetBkImage("collapse.png");
@@ -452,4 +469,10 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 	}
 
 	return true;
+}
+
+void  CMyTreeCfgUI::OnExpandClick(CControlUI* pSender) {
+	CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)pSender->GetParent()->GetParent()->GetTag();
+	ExpandNode(node, !node->data()._expand);
+	SetFixedHeight(CalculateMinHeight());
 }

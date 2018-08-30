@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Windows.h"
+#include "sigslot.h"
+
 #include "UIlib.h"
 using namespace DuiLib;
 
 
-class CMyTreeCfgUI : public CListUI
+
+class CMyTreeCfgUI : public CListUI, public sigslot::has_slots<>
 {
 
 public:
@@ -96,6 +99,8 @@ public:
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
 	bool GetConfigValue(int nIndex, ConfigValue & cfgValue);
+
+	void OnExpandClick(CControlUI* pSender);
 
 private:
 	Node* _root;
