@@ -362,6 +362,10 @@ void  CDuiFrameWnd::OnSetting() {
 		if ( oldData.m_dwAreaNo != g_data.m_dwAreaNo ) {
 			CBusiness::GetInstance()->ReconnectLaunchAsyn();
 		}
+		// 如果时间间隔改变
+		else if (oldData.m_dwCollectInterval != g_data.m_dwCollectInterval) {
+			CBusiness::GetInstance()->ReconnectLaunchAsyn();
+		}
 	}
 
 	delete pSettingDlg;
@@ -480,6 +484,11 @@ void   CDuiFrameWnd::OnGridReaderStatus(WPARAM wParam, LPARAM lParam) {
 void   CDuiFrameWnd::OnTempData(WPARAM wParam, LPARAM lParam) {
 	DWORD dwGridIndex = wParam;
 	DWORD  dwTemp = lParam;
+	// 如果开关已经关闭
+	if (!g_data.m_bReaderSwitch[dwGridIndex]) {
+		return;
+	}
+
 	OnNewTempData(dwGridIndex, dwTemp);
 }
  
