@@ -178,7 +178,7 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyTree")) {
-		return new CMyTreeCfgUI();
+		return new CMyTreeCfgUI(140);
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }

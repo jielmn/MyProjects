@@ -112,7 +112,7 @@ private:
 
 
 
-CMyTreeCfgUI::CMyTreeCfgUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
+CMyTreeCfgUI::CMyTreeCfgUI(DWORD  dwFixedLeft /*= 160*/) : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
 {
 	SetItemShowHtml(true);
 
@@ -122,7 +122,7 @@ CMyTreeCfgUI::CMyTreeCfgUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0),
 	_root->data()._pListElement = NULL;
 	_root->data()._pUserData = 0;
 
-	m_dwFixedLeft = 160;
+	m_dwFixedLeft = dwFixedLeft;
 
 	m_hPen = CreatePen(PS_DOT, 1, RGB(0x99, 0x99, 0x99));
 }

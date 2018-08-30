@@ -64,7 +64,7 @@ public:
 		UINT_PTR    m_tag;
 	};
 
-	CMyTreeCfgUI();
+	CMyTreeCfgUI(DWORD  dwFixedLeft = 160);
 
 	~CMyTreeCfgUI();
 
