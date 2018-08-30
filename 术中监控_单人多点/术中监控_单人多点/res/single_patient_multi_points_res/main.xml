@@ -82,7 +82,7 @@
 						
 		</HorizontalLayout>		
 
-		<Edit name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" maxchar="27" />
+		<Edit name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" maxchar="26" />
 	</VerticalLayout>
 	
 	<!-- 状态栏 -->
