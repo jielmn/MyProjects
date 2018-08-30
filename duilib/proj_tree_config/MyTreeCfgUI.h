@@ -86,7 +86,8 @@ public:
 	Node* GetRoot();
 
 	Node* AddNode( LPCTSTR pTitleText, Node* parent = NULL, void * pUserData = 0, CControlUI * pConfig = NULL,
-		           DWORD dwTitleFontIndex = -1, DWORD dwTitleColor = 0xFF000000  );
+		           DWORD dwTitleFontIndex = -1, DWORD dwTitleColor = 0xFF000000, DWORD  dwCfgFontIndex = -1,
+		           DWORD dwCfgColor=0xFF000000 );
 
 	bool RemoveNode(Node* node);
 
@@ -110,6 +111,7 @@ private:
 	DWORD m_dwDelayLeft;
 
 	DWORD  m_dwFixedLeft;
+	DWORD  m_dwFixedItemHeight;
 	HPEN   m_hPen;
 
 public:

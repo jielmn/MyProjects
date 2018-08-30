@@ -70,10 +70,10 @@ void CDuiFrameWnd::InitWindow() {
 	CMyTreeCfgUI::Node* pGameNode = NULL;
 	CMyTreeCfgUI::Node* pServerNode = NULL;
 	CMyTreeCfgUI::Node* pRoomNode = NULL;
-	CMyTreeCfgUI::Node* pRoomNode1 = NULL;
+	CMyTreeCfgUI::Node* pRoomNode1 = NULL; 
 
 	CDuiString  strText;
-	m_tree->AddNode(_T("参数设置123"));
+	m_tree->AddNode(_T("参数设置123"),0,0,0,1,0xFFFF0000); 
 
 	CEditUI * pEdit = new CEditUI;
 	pEdit->SetText("请输入123");
@@ -97,13 +97,10 @@ void CDuiFrameWnd::InitWindow() {
 			if (j == 0) {
 				CEditUI * pEdit = new CEditUI;
 				pEdit->SetText("请输入");
-				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pEdit);
+				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pEdit,-1,0xFF000000,1,0xFFFF0000);
 			}
 			else if (j == 1) {
 				CCheckBoxUI * pCheckBox = new CCheckBoxUI;
-				//pCheckBox->SetText("请输入");
-				pCheckBox->SetAttribute("normalimage", "file='checkbox_unchecked.png' dest='0,2,16,18'");
-				pCheckBox->SetAttribute("selectedimage", "file='checkbox_checked.png' dest='0,2,16,18'");
 				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pCheckBox);
 			}
 			else {
@@ -117,9 +114,7 @@ void CDuiFrameWnd::InitWindow() {
 				pCombo->Add(pElement);
 				pCombo->SelectItem(0);
 
-				pCombo->SetAttributeList("normalimage=\"file = 'Combo_nor.bmp' corner = '2,2,24,2'\" hotimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" pushedimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" textpadding=\"5, 1, 5, 1\" ");
-
-				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pCombo);
+				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pCombo, -1, 0xFF0000FF,1,0xFF0000FF);
 			}
 		}
 	}
@@ -178,7 +173,7 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyTree")) {
-		return new CMyTreeCfgUI(140);
+		return new CMyTreeCfgUI(120);
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }

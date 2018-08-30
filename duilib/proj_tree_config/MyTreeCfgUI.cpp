@@ -123,7 +123,7 @@ CMyTreeCfgUI::CMyTreeCfgUI(DWORD  dwFixedLeft /*= 160*/) : _root(NULL), m_dwDela
 	_root->data()._pUserData = 0;
 
 	m_dwFixedLeft = dwFixedLeft;
-
+	m_dwFixedItemHeight = 26;
 	m_hPen = CreatePen(PS_DOT, 1, RGB(0x99, 0x99, 0x99));
 }
 
@@ -203,12 +203,12 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::GetRoot() { return _root; }
 
 CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/, 
 	             void * pUserData /*= 0*/, CControlUI * pConfig /*= NULL*/, DWORD dwTitleFontIndex /*= -1*/, 
-	             DWORD dwTitleColor /*= 0xFF000000*/ )
+	DWORD dwTitleColor /*= 0xFF000000*/, DWORD  dwCfgFontIndex /*= -1*/, DWORD dwCfgColor /*= 0xFF000000*/)
 {
 	if (!parent) parent = _root;
 
 	CListContainerElementUI* pListContainerElement = new CListContainerElementUI;
-	pListContainerElement->SetMinHeight(26);
+	pListContainerElement->SetMinHeight(m_dwFixedItemHeight);
 
 	CHorizontalLayoutUI * pLayout = new CHorizontalLayoutUI;
 	pListContainerElement->Add(pLayout);
@@ -226,6 +226,27 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	if (pConfig) {
 		pConfig->SetAttribute("padding", "10,3,10,3");
 		pLayout->Add(pConfig);
+
+		if ( 0 == strcmp( pConfig->GetClass(),DUI_CTR_EDIT ) ) {
+			CEditUI * pEdit = (CEditUI *)pConfig;
+			pEdit->SetFont(dwCfgFontIndex);
+			pEdit->SetTextColor(dwCfgColor);
+		}
+		else if ( 0 == strcmp(pConfig->GetClass(), DUI_CTR_COMBO) ) {
+			CComboUI * pCombo = (CComboUI *)pConfig;
+			pCombo->SetItemFont(dwCfgFontIndex);
+			pCombo->SetSelectedItemTextColor(dwCfgColor);
+			pCombo->SetItemTextColor(dwCfgColor);
+			pCombo->SetAttributeList("hotimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" pushedimage=\"file = 'Combo_over.bmp' corner = '2,2,24,2'\" textpadding=\"5, 1, 5, 1\" ");
+		}
+		else if ( 0 == strcmp(pConfig->GetClass(), DUI_CTR_CHECKBOX) ) {
+			CCheckBoxUI * pCheckBox = (CCheckBoxUI *)pConfig;
+			pCheckBox->SetAttribute("normalimage", "file='checkbox_unchecked.png' dest='0,2,16,18'");
+			pCheckBox->SetAttribute("selectedimage", "file='checkbox_checked.png' dest='0,2,16,18'");
+		}
+		else {
+			assert(0);
+		}
 	}
 	
 	Node* node = new Node;
@@ -382,7 +403,7 @@ int   CMyTreeCfgUI::CalculateMinHeight() {
 	for (int i = 0; i < nCount; i++) {
 		Node* node = (Node*)this->GetItemAt(i)->GetTag();
 		if ( node->IsAllParentsExpanded() ) {
-			int nHeight = 26; // this->GetItemAt(i)->GetHeight();
+			int nHeight = m_dwFixedItemHeight; // this->GetItemAt(i)->GetHeight();
 			sum += nHeight;
 		}
 	}
