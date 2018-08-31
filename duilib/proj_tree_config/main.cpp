@@ -119,9 +119,6 @@ void CDuiFrameWnd::InitWindow() {
 		}
 	}
 	m_tree->SelectItem(0);	
-	int a = m_tree->CalculateMinHeight();
-	m_tree->SetFixedHeight(a);
-
 	WindowImplBase::InitWindow();
 }
 

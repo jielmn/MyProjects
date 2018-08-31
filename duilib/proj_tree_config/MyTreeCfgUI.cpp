@@ -298,6 +298,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 	}
 
 	parent->add_child(node);
+	SetFixedHeight(CalculateMinHeight());
 
 	return node;
 }
@@ -324,6 +325,8 @@ bool CMyTreeCfgUI::RemoveNode(CMyTreeCfgUI::Node* node)
 	}
 	
 	delete node;
+
+	SetFixedHeight(CalculateMinHeight());
 	return true;
 }
 
@@ -356,7 +359,8 @@ void CMyTreeCfgUI::ExpandNode(CMyTreeCfgUI::Node* node, bool expand)
 			control->SetInternVisible(local_parent->data()._expand && local_parent->data()._pListElement->IsVisible());
 		}
 	}
-	NeedUpdate();
+	SetFixedHeight(CalculateMinHeight());
+	NeedUpdate();	
 }
 
 SIZE CMyTreeCfgUI::GetExpanderSizeX(CMyTreeCfgUI::Node* node) const
@@ -494,6 +498,5 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 
 void  CMyTreeCfgUI::OnExpandClick(CControlUI* pSender) {
 	CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)pSender->GetParent()->GetParent()->GetTag();
-	ExpandNode(node, !node->data()._expand);
-	SetFixedHeight(CalculateMinHeight());
+	ExpandNode(node, !node->data()._expand);	
 }

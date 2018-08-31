@@ -114,6 +114,6 @@ private:
 	DWORD  m_dwFixedItemHeight;
 	HPEN   m_hPen;
 
-public:
+private:
 	int   CalculateMinHeight();
 };
