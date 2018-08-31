@@ -74,18 +74,17 @@ void CDuiFrameWnd::InitWindow() {
 
 	CDuiString  strText;
 	pCategoryNode = m_tree->AddNode(_T("{x 4}{i gameicons.png 18 3}{x 4}推荐游戏"));
-	for (int i = 0; i < 2; ++i) 
+	for (int i = 0; i < 4; ++i) 
 	{
 		strText.Format("{x 4}{i gameicons.png 18 10}{x 4}四人斗地主 %d", i + 1);
 		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i+1) );
-		for (int j = 0; j < 2; ++j)
+		for (int j = 0; j < 8; ++j)
 		{
 			strText.Format("{x 4}{i gameicons.png 18 10}{x 4}测试服务器 %d_%d", i+1, j + 1);
 			pServerNode = m_tree->AddNode(strText, pGameNode, (void *)((i+1)*10+j+1) );
 		}
 	}
 	m_tree->SelectItem(0); 
-
 	WindowImplBase::InitWindow();      
 }
 
@@ -156,7 +155,7 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyTree")) {
-		return new CMyTreeUI();
+		return new CMyTreeUI(36,"file='tree_top.png' corner='2,1,2,1' fade='100'");
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }

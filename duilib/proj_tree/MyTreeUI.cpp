@@ -1,4 +1,5 @@
 #include "MyTreeUI.h"
+#include "LmnCommon.h"
 
 void CMyTreeUI::Node::set_parent(CMyTreeUI::Node* parent) {
 	_parent = parent;
@@ -53,6 +54,20 @@ CMyTreeUI::Node* CMyTreeUI::Node::get_last_child()
 	}
 	else return this;  
 }
+
+bool CMyTreeUI::Node::IsAllParentsExpanded() {
+	if (_parent) {
+		if (!_parent->data()._expand) {
+			return false;
+		}
+		else {
+			return _parent->IsAllParentsExpanded();
+		}
+	}
+	else {
+		return true;
+	}
+}
 	
 
 
@@ -75,7 +90,7 @@ CMyTreeUI::Node* CMyTreeUI::Node::get_last_child()
 
 
 
-CMyTreeUI::CMyTreeUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
+CMyTreeUI::CMyTreeUI(DWORD dwFixedItemHeight /*= 26*/, const char * szRootBkImage /*= 0 */ ) : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
 {
 	SetItemShowHtml(true);
 
@@ -84,6 +99,16 @@ CMyTreeUI::CMyTreeUI() : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwD
 	_root->data()._expand = true;
 	_root->data()._pListElement = NULL;
 	_root->data()._pUserData = 0;
+
+	m_dwFixedItemHeight = dwFixedItemHeight;
+	// "file='tree_top.png' corner='2,1,2,1' fade='100'"
+	if (0 == szRootBkImage) {
+		memset(m_szRootBkImage, 0, sizeof(m_szRootBkImage));
+	}
+	else {
+		STRNCPY(m_szRootBkImage, szRootBkImage, sizeof(m_szRootBkImage));
+	}
+	
 }
 
 CMyTreeUI::~CMyTreeUI() { if (_root) delete _root; }
@@ -200,8 +225,10 @@ CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/, void 
 	//else pListElement->SetFixedHeight(24);
 	pListElement->SetTag((UINT_PTR)node);
 	if (node->data()._level == 0) {
-		pListElement->SetBkImage(_T("file='tree_top.png' corner='2,1,2,1' fade='100'"));
+		//pListElement->SetBkImage(_T("file='tree_top.png' corner='2,1,2,1' fade='100'"));
+		pListElement->SetBkImage(m_szRootBkImage);
 	}
+	pListElement->SetFixedHeight(m_dwFixedItemHeight);
 
 	int index = 0;
 	if (parent->has_children()) {
@@ -218,6 +245,7 @@ CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/, void 
 		node = NULL;
 	}
 	parent->add_child(node);
+	SetFixedHeight(CalculateMinHeight());
 	return node;
 }
 
@@ -243,6 +271,7 @@ bool CMyTreeUI::RemoveNode(CMyTreeUI::Node* node)
 	}
 	
 	delete node;
+	SetFixedHeight(CalculateMinHeight());
 	return true;
 }
 
@@ -279,6 +308,8 @@ void CMyTreeUI::ExpandNode(CMyTreeUI::Node* node, bool expand)
 			control->SetInternVisible(local_parent->data()._expand && local_parent->data()._pListElement->IsVisible());
 		}
 	}
+
+	SetFixedHeight(CalculateMinHeight());
 	NeedUpdate();
 }
 
@@ -293,4 +324,19 @@ SIZE CMyTreeUI::GetExpanderSizeX(CMyTreeUI::Node* node) const
 	return szExpander;
 }
 
+
+int  CMyTreeUI::CalculateMinHeight() {
+	int nCount = this->GetCount();
+	int sum = 0;
+
+	for (int i = 0; i < nCount; i++) {
+		Node* node = (Node*)this->GetItemAt(i)->GetTag();
+		if (node->IsAllParentsExpanded()) {
+			int nHeight = m_dwFixedItemHeight; // this->GetItemAt(i)->GetHeight();
+			sum += nHeight;
+		}
+	}
+
+	return sum + 2;
+}
 

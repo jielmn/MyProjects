@@ -41,9 +41,10 @@ public:
 		void remove_child(Node* child);
 		void remove_all_child();
 		Node* get_last_child();
+		bool IsAllParentsExpanded();
 	};
 
-	CMyTreeUI();
+	CMyTreeUI( DWORD dwFixedItemHeight=26, const char * szRootBkImage=0 );
 
 	~CMyTreeUI();
 
@@ -73,9 +74,15 @@ public:
 	SIZE GetExpanderSizeX(Node* node) const;
 
 private:
+	int   CalculateMinHeight();
+
+private:
 	Node* _root;
 
 	LONG m_dwDelayDeltaY;
 	DWORD m_dwDelayNum;
 	DWORD m_dwDelayLeft;
+
+	DWORD  m_dwFixedItemHeight;
+	char   m_szRootBkImage[128];
 };
