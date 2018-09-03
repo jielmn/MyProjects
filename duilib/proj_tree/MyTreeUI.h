@@ -44,7 +44,15 @@ public:
 		bool IsAllParentsExpanded();
 	};
 
-	CMyTreeUI( DWORD dwFixedItemHeight=26, const char * szRootBkImage=0, DWORD dwItemFont = -1, DWORD dwItemTextColor = 0xFF000000 );
+	struct ImageListData {
+		char    szImageFileName[128];
+		DWORD   dwImagesCount;
+		DWORD   dwImageIndex;
+	};
+
+	CMyTreeUI( DWORD dwFixedItemHeight=26, const char * szRootBkImage=0, 
+		DWORD dwItemFont = -1, DWORD dwItemTextColor = 0xFF000000, 
+		DWORD dwSelectedItemTextColor = 0xFF000000, DWORD dwHotItemTextColor = 0xFF000000 );
 
 	~CMyTreeUI();
 
@@ -65,7 +73,7 @@ public:
 
 	Node* GetRoot();
 
-	Node* AddNode(LPCTSTR text, Node* parent = NULL, void * pUserData = 0);
+	Node* AddNode(LPCTSTR text, Node* parent = NULL, void * pUserData = 0, ImageListData * pImageListData = 0);
 
 	bool RemoveNode(Node* node);
 
@@ -85,4 +93,7 @@ private:
 
 	DWORD  m_dwFixedItemHeight;
 	char   m_szRootBkImage[128];
+	DWORD  m_dwFixedImageMargin;
+	DWORD  m_dwFirstItemMargin;
+	DWORD  m_dwItemMargin;
 };

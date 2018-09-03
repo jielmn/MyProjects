@@ -3,6 +3,7 @@
 #endif
 
 #include "main.h"
+#include "LmnCommon.h"
 #pragma comment(lib,"User32.lib")
 
 // menu
@@ -73,15 +74,20 @@ void CDuiFrameWnd::InitWindow() {
 	CMyTreeUI::Node* pRoomNode1 = NULL;
 
 	CDuiString  strText;
-	pCategoryNode = m_tree->AddNode(_T("{x 4}{i gameicons.png 18 3}{x 4}推荐游戏"));
+	CMyTreeUI::ImageListData  image_list;
+	STRNCPY(image_list.szImageFileName, "gameicons.png", sizeof(image_list.szImageFileName));
+	image_list.dwImagesCount = 18;
+	image_list.dwImageIndex = 3;
+	pCategoryNode = m_tree->AddNode(_T("推荐游戏"), 0, 0, &image_list);
 	for (int i = 0; i < 4; ++i) 
 	{
-		strText.Format("{x 4}{i gameicons.png 18 10}{x 4}四人斗地主 %d", i + 1);
-		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i+1) );
+		image_list.dwImageIndex = 10;
+		strText.Format("四人斗地主 %d", i + 1);
+		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i+1), &image_list );
 		for (int j = 0; j < 8; ++j)
 		{
-			strText.Format("{x 4}{i gameicons.png 18 10}{x 4}测试服务器 %d_%d", i+1, j + 1);
-			pServerNode = m_tree->AddNode(strText, pGameNode, (void *)((i+1)*10+j+1) );
+			strText.Format("测试服务器 %d_%d", i+1, j + 1);
+			pServerNode = m_tree->AddNode(strText, pGameNode, (void *)((i+1)*10+j+1), &image_list );
 		}
 	}
 	m_tree->SelectItem(0); 
@@ -144,9 +150,14 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if ( msg.sType == "menu_add" ) {
 		int nIndex = m_tree->GetCurSel();
 		if (nIndex >= 0) {
+			CMyTreeUI::ImageListData  image_list;
+			STRNCPY(image_list.szImageFileName, "gameicons.png", sizeof(image_list.szImageFileName));
+			image_list.dwImagesCount = 18;
+			image_list.dwImageIndex = 10;
+
 			CListLabelElementUI * pElement = (CListLabelElementUI *)m_tree->GetItemAt(nIndex);
 			CMyTreeUI::Node* node = (CMyTreeUI::Node*)pElement->GetTag();
-			m_tree->AddNode("{x 4}{i gameicons.png 18 10}{x 4}新增加的", node );
+			m_tree->AddNode("新增加的", node, 0, &image_list);
 			m_tree->ExpandNode(node, true);
 		}
 	}
@@ -155,7 +166,7 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyTree")) {
-		return new CMyTreeUI(36,"file='tree_top.png' corner='2,1,2,1' fade='100'",1,0xFF0000FF);
+		return new CMyTreeUI(36,"file='tree_top.png' corner='2,1,2,1' fade='100'",1,0xFF0000FF, 0xFFFF0000, 0xFF00FF00 );
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
