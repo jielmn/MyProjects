@@ -89,7 +89,7 @@ public:
 			CMyTreeUI::Node* node = (CMyTreeUI::Node*)GetTag();
 			SIZE sz = m_tree->GetExpanderSizeX(node);
 			SIZE sy = m_tree->GetExpanderSizeY(node);
-			if ( pt.x >= sz.cx && pt.x < sz.cy && pt.y >= sy.cx && pt.y < sz.cy )
+			if ( pt.x >= sz.cx && pt.x < sz.cy && pt.y >= sy.cx && pt.y < sy.cy )
 				m_tree->ExpandNode(node, !node->data()._expand);
 		}
 		CListLabelElementUI::DoEvent(event);
