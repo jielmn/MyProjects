@@ -80,7 +80,7 @@ public:
 	void ExpandNode(Node* node, bool expand);
 
 	SIZE GetExpanderSizeX(Node* node) const;
-
+	SIZE GetExpanderSizeY(Node* node) const;
 private:
 	int   CalculateMinHeight();
 

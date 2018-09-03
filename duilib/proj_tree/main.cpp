@@ -96,26 +96,7 @@ void CDuiFrameWnd::InitWindow() {
 
 void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
-	if ( msg.sType == _T("itemclick")) {
-		if (m_tree->GetItemIndex(msg.pSender) != -1)
-		{
-			if (_tcscmp(msg.pSender->GetClass(), DUI_CTR_LISTLABELELEMENT) == 0) {
-				CDuiString strText;
-				CMyTreeUI::Node* node = (CMyTreeUI::Node*)msg.pSender->GetTag();
-				strText.Format("%d", (int)node->data()._pUserData);
-				m_view->SetText(strText);
-
-				POINT pt = { 0 };
-				::GetCursorPos(&pt);
-				::ScreenToClient(m_PaintManager.GetPaintWindow(), &pt);
-				pt.x -= msg.pSender->GetX();
-				SIZE sz = m_tree->GetExpanderSizeX(node);
-				if (pt.x >= sz.cx && pt.x < sz.cy) 
-					m_tree->ExpandNode(node, !node->data()._expand);
-			}
-		}
-	}
-	else if ( msg.sType == _T("menu") ) {
+	if ( msg.sType == _T("menu") ) {
 		if ( name == "tree1" )
 		{
 			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };

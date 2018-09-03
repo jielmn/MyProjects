@@ -71,6 +71,33 @@ bool CMyTreeUI::Node::IsAllParentsExpanded() {
 	
 
 
+class CMyListElement : public CListLabelElementUI {
+public:
+	CMyListElement(CMyTreeUI * p) {
+		m_tree = p;
+	}
+
+	void DoEvent(TEventUI& event) {
+		if (event.Type == UIEVENT_BUTTONDOWN || event.Type == UIEVENT_DBLCLICK)
+		{
+			POINT pt = { 0 };
+			::GetCursorPos(&pt);
+			::ScreenToClient(m_pManager->GetPaintWindow(), &pt);
+			pt.x -= GetX();
+			pt.y -= GetY();
+
+			CMyTreeUI::Node* node = (CMyTreeUI::Node*)GetTag();
+			SIZE sz = m_tree->GetExpanderSizeX(node);
+			SIZE sy = m_tree->GetExpanderSizeY(node);
+			if ( pt.x >= sz.cx && pt.x < sz.cy && pt.y >= sy.cx && pt.y < sz.cy )
+				m_tree->ExpandNode(node, !node->data()._expand);
+		}
+		CListLabelElementUI::DoEvent(event);
+	}
+
+private:
+	CMyTreeUI *                        m_tree;
+};
 
 
 
@@ -200,8 +227,9 @@ CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/, void 
 	CDuiString  strText;
 
 	if (!parent) parent = _root;
-
-	CListLabelElementUI* pListElement = new CListLabelElementUI;
+	
+	//CListLabelElementUI* pListElement = new CListLabelElementUI;
+	CMyListElement* pListElement = new CMyListElement(this);
 	Node* node = new Node;
 	node->data()._level = parent->data()._level + 1;
 	if (node->data()._level == 0) node->data()._expand = true;
@@ -347,6 +375,15 @@ SIZE CMyTreeUI::GetExpanderSizeX(CMyTreeUI::Node* node) const
 	return szExpander;
 }
 
+SIZE CMyTreeUI::GetExpanderSizeY(Node* node) const {
+	if (!node || node == _root) return CDuiSize();
+
+	SIZE szExpander = { 0 };
+	szExpander.cx = (m_dwFixedItemHeight - 16) / 2;
+	szExpander.cy = szExpander.cx + 16;
+	return szExpander;
+}
+
 
 int  CMyTreeUI::CalculateMinHeight() {
 	int nCount = this->GetCount();
@@ -362,4 +399,3 @@ int  CMyTreeUI::CalculateMinHeight() {
 
 	return sum + 2;
 }
-
