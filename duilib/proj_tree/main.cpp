@@ -155,7 +155,7 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyTree")) {
-		return new CMyTreeUI(36,"file='tree_top.png' corner='2,1,2,1' fade='100'");
+		return new CMyTreeUI(36,"file='tree_top.png' corner='2,1,2,1' fade='100'",1,0xFF0000FF);
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }

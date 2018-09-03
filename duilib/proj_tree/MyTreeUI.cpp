@@ -90,7 +90,7 @@ bool CMyTreeUI::Node::IsAllParentsExpanded() {
 
 
 
-CMyTreeUI::CMyTreeUI(DWORD dwFixedItemHeight /*= 26*/, const char * szRootBkImage /*= 0 */ ) : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
+CMyTreeUI::CMyTreeUI(DWORD dwFixedItemHeight /*= 26*/, const char * szRootBkImage /*= 0 */, DWORD dwItemFont /*= -1*/, DWORD dwItemTextColor /*= 0xFF000000*/) : _root(NULL), m_dwDelayDeltaY(0), m_dwDelayNum(0), m_dwDelayLeft(0)
 {
 	SetItemShowHtml(true);
 
@@ -109,6 +109,8 @@ CMyTreeUI::CMyTreeUI(DWORD dwFixedItemHeight /*= 26*/, const char * szRootBkImag
 		STRNCPY(m_szRootBkImage, szRootBkImage, sizeof(m_szRootBkImage));
 	}
 	
+	this->SetItemFont(dwItemFont);
+	this->SetItemTextColor(dwItemTextColor); 
 }
 
 CMyTreeUI::~CMyTreeUI() { if (_root) delete _root; }
@@ -182,6 +184,8 @@ void CMyTreeUI::DoEvent(TEventUI& event)
 
 CMyTreeUI::Node* CMyTreeUI::GetRoot() { return _root; }
 
+
+// text: "{x 4}{i gameicons.png 18 3}{x 4}ÍÆ¼öÓÎÏ·"
 CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/, void * pUserData /*= 0*/)
 {
 	if (!parent) parent = _root;
@@ -194,6 +198,7 @@ CMyTreeUI::Node* CMyTreeUI::AddNode(LPCTSTR text, Node* parent /*= NULL*/, void 
 	node->data()._text = text;
 	node->data()._pListElement = pListElement;
 	node->data()._pUserData = pUserData;
+	
 
 	if (parent != _root) {
 		if (!(parent->data()._expand && parent->data()._pListElement->IsVisible()))

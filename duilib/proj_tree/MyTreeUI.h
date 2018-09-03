@@ -44,7 +44,7 @@ public:
 		bool IsAllParentsExpanded();
 	};
 
-	CMyTreeUI( DWORD dwFixedItemHeight=26, const char * szRootBkImage=0 );
+	CMyTreeUI( DWORD dwFixedItemHeight=26, const char * szRootBkImage=0, DWORD dwItemFont = -1, DWORD dwItemTextColor = 0xFF000000 );
 
 	~CMyTreeUI();
 
