@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+  <Font id="0" name="微软雅黑" size="12" bold="false" default="true" />
+  <Font id="1" name="微软雅黑" size="12" bold="true"/>
+  <Default name="Menu"        value="inset=&quot;2,2,2,2&quot; itemtextpadding=&quot;30,0,0,0&quot; bkimage=&quot;file='menu_bk.png'  corner='30,8,8,8'&quot; hole=&quot;false&quot;" />
+  <!--<Default name="MenuElement" value="inset=&quot;2,2,2,2&quot; itemtextpadding=&quot;30,0,0,0&quot; bkimage=&quot;file='menu_bk.png'  corner='30,8,8,8'&quot; hole=&quot;false&quot;" />-->
+  
+  <Menu>
+	<MenuElement text="hello"  name="munu_hello" >
+		<HorizontalLayout>
+			<Label />
+			<Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
+		</HorizontalLayout>
+		<MenuElement text="world"  name="munu_world" >
+			<HorizontalLayout>
+				<Label />
+				<Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
+			</HorizontalLayout>
+			<MenuElement text="hello"  name="munu_hello" />
+		</MenuElement>
+	</MenuElement>
+  </Menu>
+</Window>
