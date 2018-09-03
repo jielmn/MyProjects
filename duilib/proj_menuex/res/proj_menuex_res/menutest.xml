@@ -4,46 +4,53 @@
   <Font id="1" name="微软雅黑" size="12" bold="true"/>
   <Default name="Menu" value="inset=&quot;2,2,2,2&quot; itemtextpadding=&quot;30,0,0,0&quot; bkimage=&quot;file='menu_bk.png'  corner='30,8,8,8'&quot; hole=&quot;false&quot;" />
   <Menu>
-    <MenuElement text="   菜单测试1   " >
+    <MenuElement text="菜单测试1" >
       <HorizontalLayout>
         <Label />
-        <Label width="20"  bkimage="file='tree_expand.png'  source='0,0,16,16' dest='0,5,15,20'"/>
+        <Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
       </HorizontalLayout>
-      <MenuElement text="     菜单测试2        ">
+      <MenuElement text="菜单测试2">
         <HorizontalLayout>
           <Label />
-          <Label width="20"  bkimage="file='tree_expand.png'  source='0,0,16,16' dest='0,5,15,20'"/>
+          <Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
         </HorizontalLayout>
-        <MenuElement text="     菜单测试3        "  name="munu_test_3" />
-        <MenuElement text="     菜单测试4        "  name="munu_test_4" />
+        <MenuElement text="菜单测试3" >
+			<HorizontalLayout>
+				<Label />
+				<Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
+			</HorizontalLayout>
+			<MenuElement text="菜单测试3_1"  name="munu_test_3_1" />
+			<MenuElement text="菜单测试3_2"  name="munu_test_3_2" />
+		</MenuElement>
+        <MenuElement text="菜单测试4"  name="munu_test_4" />
       </MenuElement>
-      <MenuElement text="     菜单测试5        " name="munu_test_5" />
+      <MenuElement text="菜单测试5" name="munu_test_5" />
     </MenuElement> 
 	
-	<MenuElement text="   菜单测试a   " name="munu_test_1">
+	<MenuElement text="菜单测试a" name="munu_test_1">
       <HorizontalLayout>
         <Label />
-        <Label width="20"  bkimage="file='tree_expand.png'  source='0,0,16,16' dest='0,5,15,20'"/>
+        <Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
       </HorizontalLayout>
-      <MenuElement text="     菜单测试b        ">
+      <MenuElement text="菜单测试b">
         <HorizontalLayout>
           <Label />
-          <Label width="20"  bkimage="file='tree_expand.png'  source='0,0,16,16' dest='0,5,15,20'"/>
+          <Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
         </HorizontalLayout>
-        <MenuElement text="     菜单测试c        "  name="munu_test_c" />
-        <MenuElement text="     菜单测试d        "  name="munu_test_d" />
+        <MenuElement text="菜单测试c"  name="munu_test_c" />
+        <MenuElement text="菜单测试d"  name="munu_test_d" />
       </MenuElement>
-      <MenuElement text="     菜单测试X        " >
+      <MenuElement text="菜单测试X" >
         <HorizontalLayout>
           <Label />
-          <Label width="20"  bkimage="file='tree_expand.png'  source='0,0,16,16' dest='0,5,15,20'"/>
+          <Label width="16"  bkimage="file='tree_expand.png' source='0,0,16,16' dest='0,5,16,21'"/>
         </HorizontalLayout>
-        <MenuElement text="     菜单测试e        "  name="munu_test_e" />
-        <MenuElement text="     菜单测试f       "   name="munu_test_f" />
+        <MenuElement text="菜单测试e"  name="munu_test_e" />
+        <MenuElement text="菜单测试f"   name="munu_test_f" />
       </MenuElement>
     </MenuElement>
 	
-	<MenuElement text="   hello   "  name="munu_hello" />
-	<MenuElement text="   world   "  name="munu_world" />
+	<MenuElement text="hello"  name="munu_hello" />
+	<MenuElement text="world"  name="munu_world" />
   </Menu>
 </Window>

@@ -107,6 +107,8 @@ SIZE CMenuUI::EstimateSize(SIZE szAvailable)
 		if( cxFixed < sz.cx )
 			cxFixed = sz.cx;
     }
+	cxFixed += 4;  
+	cyFixed += 4;
     return CDuiSize(cxFixed, cyFixed);
 }
 
@@ -242,10 +244,16 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// reassigned by this operation - which is why it is important to reassign
 			// the items back to the righfull owner/manager when the window closes.
 			m_pLayout = new CMenuUI();
-			m_pLayout->SetManager(&m_pm, NULL, true);
+			m_pLayout->SetManager(&m_pm, NULL, true); 
+
+			static char s_szDefaultAttributes[8192];
 			LPCTSTR pDefaultAttributes = m_pOwner->GetManager()->GetDefaultAttributeList(kMenuUIInterfaceName);
 			if( pDefaultAttributes ) {
 				m_pLayout->SetAttributeList(pDefaultAttributes);
+				strncpy(s_szDefaultAttributes, pDefaultAttributes, sizeof(s_szDefaultAttributes) - 1);
+			}
+			else {
+				m_pLayout->SetAttributeList(s_szDefaultAttributes);
 			}
 			m_pLayout->SetBkColor(0xFFFFFFFF);
 			m_pLayout->SetBorderColor(0xFF85E4FF);
@@ -289,7 +297,7 @@ LRESULT CMenuWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 			cyFixed += 4;
-			cxFixed += 4;
+			cxFixed += 4;   
 
 			RECT rcWindow;
 			GetWindowRect(m_pOwner->GetManager()->GetPaintWindow(), &rcWindow);

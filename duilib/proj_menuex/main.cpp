@@ -7,7 +7,7 @@
 void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 	if ( strcmp(msg.sType, "click") == 0 ) {
-		if ( strcmp(msg.pSender->GetName(), _T("btnFile")) == 0 || strcmp(msg.pSender->GetName(), _T("btnEdit")) == 0)
+		if ( strcmp(msg.pSender->GetName(), _T("btnFile")) == 0 )
 		{
 			RECT r = m_PaintManager.FindControl(msg.pSender->GetName())->GetPos();
 			POINT point = { r.left, r.bottom };
@@ -22,7 +22,23 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 			//使用文件方式
 			STRINGorID xml("menutest.xml");
-			pMenu->Init(NULL, xml, 0, point);       
+			pMenu->Init(NULL, xml, 0, point);        
+		}
+		else if ( strcmp(msg.pSender->GetName(), _T("btnEdit")) == 0 ) {
+			RECT r = m_PaintManager.FindControl(msg.pSender->GetName())->GetPos();
+			POINT point = { r.left, r.bottom };
+
+			CMenuWnd* pMenu = new CMenuWnd(m_hWnd, msg.pSender);
+			// CDuiPoint point = msg.ptMouse;
+			ClientToScreen(m_hWnd, &point);
+
+			//使用资源方式
+			//STRINGorID xml(IDR_XML1);
+			//pMenu->Init(NULL, xml, "xml", point);
+
+			//使用文件方式
+			STRINGorID xml("menutest_1.xml");
+			pMenu->Init(NULL, xml, 0, point); 
 		}
 	}
 	else if (0 == strcmp(msg.sType, "munu_test_3")) {
