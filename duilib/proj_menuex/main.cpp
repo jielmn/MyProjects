@@ -15,8 +15,14 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			CMenuWnd* pMenu = new CMenuWnd(m_hWnd, msg.pSender);
 			// CDuiPoint point = msg.ptMouse;
 			ClientToScreen(m_hWnd, &point);
-			STRINGorID xml(IDR_XML1);
-			pMenu->Init(NULL, xml, "xml", point);      
+
+			//使用资源方式
+			//STRINGorID xml(IDR_XML1);
+			//pMenu->Init(NULL, xml, "xml", point);
+
+			//使用文件方式
+			STRINGorID xml("menutest.xml");
+			pMenu->Init(NULL, xml, 0, point);       
 		}
 	}
 	else if (0 == strcmp(msg.sType, "munu_test_3")) {
