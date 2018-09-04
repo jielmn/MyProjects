@@ -11,7 +11,9 @@ using namespace DuiLib;
 class CMyProgress : public CProgressUI
 {
 public:
-	CMyProgress(CPaintManagerUI *p,CDuiString sForeImage) :m_pManager(p), m_nPos(0),m_sForeImage(sForeImage) {
+	CMyProgress() : m_nPos(0) {
+		m_sForeImage = "progress_fore_1.png";
+		this->SetBkImage("file='progress_back.png' corner='5,5,5,5'");   
 	}
 	~CMyProgress() {}
 
@@ -21,7 +23,7 @@ public:
 			const int MARGIN = 3;
 			const int STEP = 4;
 			CDuiString imageProp;
-			const int PROGRESS_WIDTH = 36;
+			const int PROGRESS_WIDTH = 144; 
 			const int PROGRESS_HEIGHT = 7;
 			const int HORIZONTAL_MARGIN = 3;
 
@@ -65,15 +67,16 @@ public:
 
 	void Start() {
 		if (m_pManager) {
-			m_pManager->SetTimer(this, 10, 50);
+			m_pManager->SetTimer(this, 10, 200);
 		}
 		m_nPos = 0;
 	}
 private:
-	CPaintManagerUI * m_pManager;
 	int               m_nPos;
 	CDuiString        m_sForeImage;
 };
+
+
 
 
 class CDuiFrameWnd : public WindowImplBase
@@ -107,7 +110,7 @@ public:
 
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass) {
 		if (0 == _stricmp("MyProgress", pstrClass)) {
-			return new CMyProgress(&m_PaintManager,"progress_fore.png");
+			return new CMyProgress();
 		}
 		return 0;
 	}
