@@ -96,10 +96,11 @@
       <AdditionalDependencies>duilibd.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\res ..\Debug\res /dseiy</Command>
+      <Command>xcopy res\proj_wait_progress_res  ..\Debug\res\proj_wait_progress_res /dseiy</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>del /Q ..\Debug\res\*.*</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +136,7 @@
       <AdditionalDependencies>duilib.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\res  ..\Release\res /dseiy</Command>
+      <Command>xcopy res\proj_wait_progress_res  ..\Release\res\proj_wait_progress_res /dseiy</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
