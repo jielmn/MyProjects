@@ -15,7 +15,7 @@
         <!-- 客户区 -->
     <HorizontalLayout>
         <Button name="btnHello"  text="Hello World" />
-		<MyProgress name="btnHello1"  bkimage="file='progress_back.png' corner='5,5,5,5'" width="200" height="30" visible="false" />
+		<MyProgress name="btnHello1"  width="500" height="30" visible="false" />
     </HorizontalLayout>
     </VerticalLayout>
 </Window>
