@@ -36,7 +36,11 @@ int CBusiness::Init() {
 	if (0 == g_log) {
 		return -1;
 	}
+#ifdef _DEBUG
 	g_log->Init(LOG_FILE_NAME);
+#else
+	g_log->Init(LOG_FILE_NAME, 0, ILog::LOG_SEVERITY_INFO, TRUE);
+#endif
 
 	g_cfg = new FileConfigEx();
 	if (0 == g_cfg) {
