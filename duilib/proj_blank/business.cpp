@@ -18,51 +18,52 @@ CBusiness::~CBusiness() {
 }
 
 void CBusiness::Clear() {
-	if (g_log) {
-		g_log->Deinit();
-		delete g_log;
-		g_log = 0;
+	if (g_data.m_log) {
+		g_data.m_log->Deinit();
+		delete g_data.m_log;
+		g_data.m_log = 0;
 	}
 
-	if (g_cfg) {
-		g_cfg->Deinit();
-		delete g_cfg;
-		g_cfg = 0;
+	if (g_data.m_cfg) {
+		g_data.m_cfg->Deinit();
+		delete g_data.m_cfg;
+		g_data.m_cfg = 0;
 	}
 }
 
 int CBusiness::Init() {
-	g_log = new FileLog();
-	if (0 == g_log) {
+	g_data.m_log = new FileLog();
+	if (0 == g_data.m_log) {
 		return -1;
 	}
+
 #ifdef _DEBUG
-	g_log->Init(LOG_FILE_NAME);
+	g_data.m_log->Init(LOG_FILE_NAME);
 #else
 	g_log->Init(LOG_FILE_NAME, 0, ILog::LOG_SEVERITY_INFO, TRUE);
 #endif
 
-	g_cfg = new FileConfigEx();
-	if (0 == g_cfg) {
+	g_data.m_cfg = new FileConfigEx();
+	if (0 == g_data.m_cfg) {
 		return -1;
 	}
-	g_cfg->Init(CONFIG_FILE_NAME);
+	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
-	g_thrd_db = new LmnToolkits::Thread();
-	if (0 == g_thrd_db) {
+	g_data.m_thrd_db = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_db) {
 		return -1;
 	}
-	g_thrd_db->Start();
+	g_data.m_thrd_db->Start();
 
 	return 0;
 }
 
 int CBusiness::DeInit() {
 
-	if (g_thrd_db) {
-		g_thrd_db->Stop();
-		delete g_thrd_db;
-		g_thrd_db = 0;
+	if (g_data.m_thrd_db) {
+		g_data.m_thrd_db->Stop();
+		delete g_data.m_thrd_db;
+		g_data.m_thrd_db = 0;
 	}
 
 	Clear();

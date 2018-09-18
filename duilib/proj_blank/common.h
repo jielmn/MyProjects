@@ -15,12 +15,23 @@
 #define   SKIN_FILE               "mainframe_blank.xml"
 #define   SKIN_FOLDER             "res\\proj_blank_res"
 
-extern ILog    * g_log;
-extern IConfig * g_cfg;
-extern LmnToolkits::Thread *  g_thrd_db;
 
+class  CGlobalData {
+public:
+	ILog    *                 m_log;
+	IConfig *                 m_cfg;
+	LmnToolkits::Thread *     m_thrd_db;
 
-//extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
+public:
+	CGlobalData() {
+		m_log = 0;
+		m_cfg = 0;
+		m_thrd_db = 0;
+	}
+};
+
+extern CGlobalData  g_data;
+
 
 // templates
 template <class T>

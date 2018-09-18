@@ -3,8 +3,9 @@
 #include "LmnCommon.h"
 #include "LmnThread.h"
 #include "common.h"
+#include "sigslot.h"
 
-class CBusiness : public LmnToolkits::MessageHandler {
+class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
 public:
 	CBusiness();
