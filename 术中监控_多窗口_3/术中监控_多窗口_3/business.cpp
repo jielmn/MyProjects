@@ -52,6 +52,12 @@ int CBusiness::Init() {
 
 	g_data.m_dwLayoutColumns = 2;
 	g_data.m_dwLayoutRows = 2;
+
+#if 1
+	g_data.m_skin.SetSkin(CMySkin::SKIN_WHITE);
+#else
+	g_data.m_skin.SetSkin(CMySkin::SKIN_BLACK);
+#endif
 	
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		

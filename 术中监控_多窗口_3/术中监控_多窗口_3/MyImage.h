@@ -5,12 +5,7 @@ class CDuiFrameWnd;
 
 class CMyImageUI : public DuiLib::CControlUI
 {
-
+public:
+	void  OnChangeSkin();
 };
 
-
-
-class CAlarmImageUI : public DuiLib::CControlUI
-{
-
-};

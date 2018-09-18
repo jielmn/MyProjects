@@ -1,6 +1,7 @@
 #include <time.h>
 #include "common.h"
 #include "MyImage.h"
+#include "AlarmImage.h"
 
 CGlobalData  g_data;
 
