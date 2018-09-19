@@ -82,3 +82,58 @@ const char * CMySkin::GetImageName(CMySkin::ENUM_IMG_NAME e) const {
 
 	return "";
 }
+
+
+DWORD  CMySkin::GetReaderIndicator(DWORD dwReaderIndex) const {
+	if (m_skin == SKIN_BLACK) {
+		switch (dwReaderIndex)
+		{
+		case 0:
+			return 0xFF00FF00;
+		case 1:
+			return 0xFF1b9375;
+		case 2:
+			return 0xFF00FFFF;
+		case 3:
+			return 0xFF51786C;
+		case 4:
+			return 0xFFFFFF00;
+		case 5:
+			return 0xFFCA5100;
+		case 6:
+			return 0xFFFF00FF;
+		case 7:
+			return 0xFFA5A852;
+		case 8:
+			return 0xFFCCCCCC;
+		default:
+			break;
+		}
+	}
+	else if (m_skin == SKIN_WHITE) {
+		switch (dwReaderIndex)
+		{
+		case 0:
+			return 0xFF00FF00;
+		case 1:
+			return 0xFF1b9375;
+		case 2:
+			return 0xFF00FFFF;
+		case 3:
+			return 0xFF51786C;
+		case 4:
+			return 0xFFFFFF00;
+		case 5:
+			return 0xFFCA5100;
+		case 6:
+			return 0xFFFF00FF;
+		case 7:
+			return 0xFFA5A852;
+		case 8:
+			return 0xFFCCCCCC;
+		default:
+			break;
+		}
+	}
+	return 0;
+}

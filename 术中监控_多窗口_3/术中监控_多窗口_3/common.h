@@ -19,6 +19,8 @@ using namespace DuiLib;
 #define   SKIN_FILE               "mainframe.xml"
 #define   SKIN_FOLDER             "res\\surgery_res_3"
 #define   MAX_GRID_COUNT          50
+#define   MAX_READERS_PER_GRID    9
+#define   READER_FILE_NAME        "reader.xml"
 
 // ¿Ø¼þÏà¹Ø
 #define   LAYOUT_MAIN_NAME         "layMain"
@@ -42,6 +44,14 @@ using namespace DuiLib;
 #define   MYIMAGE_NAME             "my_image_1"
 #define   OPT_GRID_SWITCH          "opn_grid_switch_1"
 #define   ALARM_NAME               "alarm_1"
+#define   LAYOUT_READERS           "layReaders"
+#define   CTL_INDICATOR_NAME       "indicator"
+#define   LAY_READER_NAME          "layReader"
+#define   READER_SWITCH_NAME       "opn_reader_switch"
+#define   READER_TEMP_NAME         "lblReaderTemp"
+#define   BTN_READER_NAME          "btnReaderName"
+#define   EDT_READER_NAME          "edtReaderName"
+#define   ALARM_IMAGE_NAME         "alarm_image"
 #define   LAYOUT_WINDOW_HMARGIN    10
 #define   LAYOUT_WINDOW_VMARGIN    1
 #define   STATUS_PANE_HEIGHT       30

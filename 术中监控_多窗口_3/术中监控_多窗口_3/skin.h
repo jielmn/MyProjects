@@ -29,6 +29,7 @@ public:
 	ENUM_SKIN  GetSkin() const;
 	DWORD  operator [] (ENUM_UI eUI) const;
 	const char * GetImageName(ENUM_IMG_NAME e) const;
+	DWORD  GetReaderIndicator( DWORD dwReaderIndex ) const;
 
 private:
 	ENUM_SKIN     m_skin;

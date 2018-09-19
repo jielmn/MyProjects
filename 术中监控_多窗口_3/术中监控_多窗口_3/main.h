@@ -24,6 +24,7 @@ public:
 	virtual LRESULT OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual void     OnFinalMessage(HWND hWnd);
 
 private:
 	CDialogBuilderCallbackEx           m_callback;
@@ -45,7 +46,17 @@ private:
 	CMyImageUI *                       m_MyImage[MAX_GRID_COUNT];
 	COptionUI *                        m_OptGridSwitch[MAX_GRID_COUNT];
 	CAlarmImageUI *                    m_MyAlarm[MAX_GRID_COUNT];
+	DuiLib::CVerticalLayoutUI *        m_layReaders[MAX_GRID_COUNT];
+	CControlUI *                       m_UiReaders[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	COptionUI *                        m_UiReaderSwitch[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CAlarmImageUI *                    m_UiAlarms[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CLabelUI *                         m_UiReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CButtonUI *                        m_UiBtnReaderNames[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CEditUI *                          m_UiEdtReaderNames[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CHorizontalLayoutUI *              m_UiLayReader[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CControlUI *                       m_UiIndicator[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	ENUM_GRID_STATUS                   m_eGridStatus;
+	DWORD                              m_dwInflateGridIndex;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -53,5 +64,8 @@ private:
 	void   ReLayout(DWORD dwWidth, DWORD dwHeight);
 	void   OnChangeSkin();
 	void   OnDbClick();
+	void   OnGridInflate(DWORD dwIndex);
+	void   OnGridInflateSub(DWORD dwIndex);
+	void   OnEdtRemarkKillFocus();
 
 };
