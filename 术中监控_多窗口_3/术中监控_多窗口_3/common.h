@@ -21,6 +21,8 @@ using namespace DuiLib;
 #define   MAX_GRID_COUNT          50
 #define   MAX_READERS_PER_GRID    9
 #define   READER_FILE_NAME        "reader.xml"
+#define   SETTING_FRAME_NAME      "DUISettingFrame"
+#define   SETTING_FILE            "Setting.xml"
 
 // 控件相关
 #define   LAYOUT_MAIN_NAME         "layMain"
@@ -52,6 +54,9 @@ using namespace DuiLib;
 #define   BTN_READER_NAME          "btnReaderName"
 #define   EDT_READER_NAME          "edtReaderName"
 #define   ALARM_IMAGE_NAME         "alarm_image"
+#define   BTN_MENU_NAME            "menubtn"
+#define   MYTREE_CONFIG_NAME       "CfgTree"
+#define   MYTREE_CLASS_NAME        "MyTree"
 #define   LAYOUT_WINDOW_HMARGIN    10
 #define   LAYOUT_WINDOW_VMARGIN    1
 #define   STATUS_PANE_HEIGHT       30
@@ -72,6 +77,26 @@ public:
 private:
 	DuiLib::CPaintManagerUI *  m_pManager;
 	CDuiFrameWnd *             m_pMainWnd;
+};
+
+class CDuiMenu : public DuiLib::WindowImplBase
+{
+protected:
+	virtual ~CDuiMenu() {};        // 私有化析构函数，这样此对象只能通过new来生成，而不能直接定义变量。就保证了delete this不会出错
+	DuiLib::CDuiString  m_strXMLPath;
+	DuiLib::CControlUI * m_pOwner;
+
+public:
+	explicit CDuiMenu(LPCTSTR pszXMLPath, DuiLib::CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner) {}
+	virtual LPCTSTR    GetWindowClassName()const { return _T("CDuiMenu "); }
+	virtual DuiLib::CDuiString GetSkinFolder() { return _T(""); }
+	virtual DuiLib::CDuiString GetSkinFile() { return m_strXMLPath; }
+	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
+
+	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void Init(HWND hWndParent, POINT ptPos);
+	virtual void  Notify(DuiLib::TNotifyUI& msg);
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 class  CGlobalData {

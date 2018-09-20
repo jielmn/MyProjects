@@ -55,6 +55,7 @@ private:
 	CEditUI *                          m_UiEdtReaderNames[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CHorizontalLayoutUI *              m_UiLayReader[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CControlUI *                       m_UiIndicator[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	DuiLib::CButtonUI *                m_btnMenu;    // ²Ëµ¥°´Å¥	
 	ENUM_GRID_STATUS                   m_eGridStatus;
 	DWORD                              m_dwInflateGridIndex;
 
@@ -67,5 +68,8 @@ private:
 	void   OnGridInflate(DWORD dwIndex);
 	void   OnGridInflateSub(DWORD dwIndex);
 	void   OnEdtRemarkKillFocus();
+	void   OnBtnMenu(TNotifyUI& msg);
+	void   OnSetting();
+	void   OnAbout();
 
 };

@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include <assert.h>
+#include "SettingDlg.h"
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_eGridStatus = GRID_STATUS_GRIDS;
@@ -144,6 +145,8 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 	} 
 
+	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
+
 	OnChangeSkin();
 
 	WindowImplBase::InitWindow();
@@ -158,6 +161,19 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	DuiLib::CDuiString & name = msg.pSender->GetName();
+
+	if ( msg.sType == "click" ) {
+		if (name == BTN_MENU_NAME) {
+			OnBtnMenu(msg);
+		}
+	}
+	else if (msg.sType == "menu_setting") {
+		OnSetting();
+	}
+	else if (msg.sType == "menu_about") {
+		OnAbout();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -314,6 +330,32 @@ void   CDuiFrameWnd::OnGridInflateSub( DWORD dwIndex ) {
 void   CDuiFrameWnd::OnEdtRemarkKillFocus() {
 
 }      
+
+void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
+	RECT r = m_btnMenu->GetPos();
+	POINT pt = { r.left, r.bottom };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE); 
+}
+
+void   CDuiFrameWnd::OnSetting() {
+	CDuiString  strText;
+	DWORD  dwValue = 0;
+
+	CGlobalData  oldData = g_data;
+
+	CSettingDlg * pSettingDlg = new CSettingDlg;
+	pSettingDlg->Create(this->m_hWnd, _T("ÉèÖÃ"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pSettingDlg->CenterWindow();
+	int ret = pSettingDlg->ShowModal();
+	delete pSettingDlg;
+}
+
+void   CDuiFrameWnd::OnAbout() {
+
+}
 
 
 
