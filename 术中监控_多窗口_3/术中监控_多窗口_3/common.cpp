@@ -4,6 +4,7 @@
 #include "AlarmImage.h"
 
 CGlobalData  g_data;
+std::vector<TArea *>  g_vArea;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;

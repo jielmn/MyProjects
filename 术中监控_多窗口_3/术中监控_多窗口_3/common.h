@@ -23,6 +23,9 @@ using namespace DuiLib;
 #define   READER_FILE_NAME        "reader.xml"
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   SETTING_FILE            "Setting.xml"
+#define   MAX_AREA_COUNT          20
+#define   AREA_CFG_FILE_NAME      "area.cfg"
+#define   MAX_AREA_ID             100
 
 // 控件相关
 #define   LAYOUT_MAIN_NAME         "layMain"
@@ -62,7 +65,20 @@ using namespace DuiLib;
 #define   STATUS_PANE_HEIGHT       30
 #define   WINDOW_TITLE_HEIGHT      32
 
+// CONFIG
+#define   CFG_MAIN_LAYOUT_COLUMNS       "main layout columns"
+#define   CFG_MAIN_LAYOUT_ROWS          "main layout rows"
+#define   DEFAULT_MAIN_LAYOUT_COLUMNS   2
+#define   DEFAULT_MAIN_LAYOUT_ROWS      2
+#define   CFG_AREA_ID_NAME              "area id"
+#define   CFG_ALARM_VOICE_SWITCH        "alarm voice switch"
+#define   DEFAULT_ALARM_VOICE_SWITCH    FALSE
+#define   CFG_SKIN                      "skin"
+#define   DEFAULT_SKIN                  0
+#define   CFG_AREA_NAME                 "area name"
+#define   CFG_AREA_NO                   "area no"
 
+// 其他
 
 // 类
 class CDuiFrameWnd;
@@ -108,10 +124,20 @@ public:
 	DWORD     m_dwLayoutColumns;
 	DWORD     m_dwLayoutRows;
 	CMySkin   m_skin;
+	DWORD     m_dwAreaNo;
+	BOOL      m_bAlarmVoiceOff;
+	DWORD     m_dwSkinIndex;
 	BOOL      m_bGridReaderSwitch[MAX_GRID_COUNT];
 };
 
+#define  MAX_AREA_NAME_LENGTH   64
+typedef struct tagArea {
+	char   szAreaName[MAX_AREA_NAME_LENGTH];
+	DWORD  dwAreaNo;
+}TArea;
+
 extern CGlobalData  g_data;
+extern std::vector<TArea *>  g_vArea;
 
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);

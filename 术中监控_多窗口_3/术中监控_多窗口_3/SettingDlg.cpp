@@ -69,24 +69,36 @@ void  CSettingDlg::InitCommonCfg() {
 	CListLabelElementUI * pElement = 0;
 	CEditUI * pEdit = 0;
 	CCheckBoxUI * pCheckBox = 0;	
+	std::vector<TArea *>::iterator it;
+	int i = 0;
+	int nIndex = 0;
 
 	strText.Format("通用设置");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
 
 	// 病区号
 	pCombo = new CComboUI;
-	AddComboItem(pCombo, "未设置", 0);  
-	pCombo->SelectItem(0);
+	AddComboItem(pCombo, "未设置", 0);  	
+	for (it = g_vArea.begin(); it != g_vArea.end(); ++it, ++i) {
+		TArea * pArea = *it;
+
+		strText.Format("%s(编号：%lu)", pArea->szAreaName, pArea->dwAreaNo);
+		AddComboItem(pCombo, strText, pArea->dwAreaNo);
+		if ( g_data.m_dwAreaNo == pArea->dwAreaNo) {
+			nIndex = i + 1;
+		}
+	}
+	pCombo->SelectItem(nIndex);
 	m_tree->AddNode("病区号", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 行、列
 	pEdit = new CEditUI;
-	strText.Format("%lu", 0);
+	strText.Format("%lu", g_data.m_dwLayoutColumns);
 	pEdit->SetText(strText);
 	m_tree->AddNode("窗格列数", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
 	pEdit = new CEditUI;
-	strText.Format("%lu", 0);
+	strText.Format("%lu", g_data.m_dwLayoutRows);
 	pEdit->SetText(strText);
 	m_tree->AddNode("窗格行数", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
@@ -94,11 +106,12 @@ void  CSettingDlg::InitCommonCfg() {
 	pCombo = new CComboUI;
 	AddComboItem(pCombo, "黑曜石", 0);
 	AddComboItem(pCombo, "白宣纸", 1);
-	pCombo->SelectItem(0);
+	pCombo->SelectItem(g_data.m_dwSkinIndex);
 	m_tree->AddNode("选择皮肤", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 报警声音开关 
 	pCheckBox = new CCheckBoxUI;
+	pCheckBox->Selected(g_data.m_bAlarmVoiceOff ? false : true);
 	m_tree->AddNode("报警声音开关", pTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382 );
 }
 

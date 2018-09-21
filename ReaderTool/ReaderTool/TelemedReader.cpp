@@ -261,7 +261,9 @@ int  CTelemedReader::SetReaderId(const CReaderIdParam * pParam) {
 
 	int nId = pParam->m_nId;
 
-	// 55 03 01    D0 00 00 02    DD AA
+	// 55 03 01    10 01 00 02    DD AA
+	// 55 03 01    03 00 01 40    DD AA
+
 	BYTE buf[8192];
 	buf[0] = 0x55;
 	buf[1] = 0x03;

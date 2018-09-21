@@ -29,6 +29,8 @@ void CBusiness::Clear() {
 		delete g_data.m_cfg;
 		g_data.m_cfg = 0;
 	}
+
+	ClearVector(g_vArea);
 }
 
 int CBusiness::Init() {
@@ -50,24 +52,75 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
-	g_data.m_dwLayoutColumns = 2;
-	g_data.m_dwLayoutRows = 2;
-
-#if 0
-	g_data.m_skin.SetSkin(CMySkin::SKIN_WHITE);
-#else
-	g_data.m_skin.SetSkin(CMySkin::SKIN_BLACK);
-#endif
+	DWORD  dwCfgValue = 0;
+	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_COLUMNS, g_data.m_dwLayoutColumns, DEFAULT_MAIN_LAYOUT_COLUMNS);
+	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_ROWS, g_data.m_dwLayoutRows, DEFAULT_MAIN_LAYOUT_ROWS);
+	g_data.m_cfg->GetConfig(CFG_AREA_ID_NAME, g_data.m_dwAreaNo, 0);
+	g_data.m_cfg->GetConfig(CFG_ALARM_VOICE_SWITCH, dwCfgValue, DEFAULT_ALARM_VOICE_SWITCH);
+	g_data.m_bAlarmVoiceOff = dwCfgValue;
+	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_dwSkinIndex, DEFAULT_SKIN);
+	g_data.m_skin.SetSkin( (CMySkin::ENUM_SKIN)g_data.m_dwSkinIndex );
 	
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		
 	}
 
-	//g_thrd_db = new LmnToolkits::Thread();
-	//if (0 == g_thrd_db) {
-	//	return -1;
-	//}
-	//g_thrd_db->Start();
+	// 校验
+	if (g_data.m_dwLayoutColumns == 0 || g_data.m_dwLayoutRows == 0 || g_data.m_dwLayoutColumns * g_data.m_dwLayoutRows > MAX_GRID_COUNT) {
+		g_data.m_dwLayoutColumns = DEFAULT_MAIN_LAYOUT_COLUMNS;
+		g_data.m_dwLayoutRows = DEFAULT_MAIN_LAYOUT_ROWS;
+	}
+
+	if ( g_data.m_dwSkinIndex > 1 ) {
+		g_data.m_dwSkinIndex = 0;
+	}
+
+	// 区号列表
+	IConfig * cfg_area = new FileConfigEx();
+	if (0 == cfg_area) {
+		return -1;
+	}
+	cfg_area->Init(AREA_CFG_FILE_NAME);
+
+	for (int i = 0; i < MAX_AREA_COUNT; i++) {
+		TArea area;
+		strText.Format(CFG_AREA_NAME " %d", i + 1);
+		cfg_area->GetConfig(strText, area.szAreaName, sizeof(area.szAreaName), "");
+		if (area.szAreaName[0] == '\0') {
+			break;
+		}
+
+		strText.Format(CFG_AREA_NO " %d", i + 1);
+		cfg_area->GetConfig(strText, area.dwAreaNo, 0);
+		if (0 == area.dwAreaNo || area.dwAreaNo > MAX_AREA_ID) {
+			break;
+		}
+
+		TArea * pArea = new TArea;
+		memcpy(pArea, &area, sizeof(TArea));
+		g_vArea.push_back(pArea);
+	}
+	cfg_area->Deinit();
+	delete cfg_area;
+
+	if ( g_data.m_dwAreaNo > 0) {
+		std::vector<TArea *>::iterator it;
+		for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == g_data.m_dwAreaNo) {
+				break;
+			}
+		}
+
+		// 如果g_dwAreaNo不在g_vArea之内
+		if (it == g_vArea.end()) {
+			TArea * pArea = new TArea;
+			pArea->dwAreaNo = g_data.m_dwAreaNo;
+			SNPRINTF(pArea->szAreaName, sizeof(pArea->szAreaName), "(编号：%lu)", g_data.m_dwAreaNo);
+			g_vArea.push_back(pArea);
+		}
+	}
+	// END OF 区号
 
 	return 0;
 }
