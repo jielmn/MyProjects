@@ -23,6 +23,7 @@ public:
 
 private:
 
+	DuiLib::CButtonUI *              m_btnSetBluetoothName;
 	DuiLib::CButtonUI *              m_btnSetBluetooth;
 	DuiLib::CButtonUI *              m_btnSetId;
 	DuiLib::CButtonUI *              m_btnSetTime;
@@ -30,6 +31,7 @@ private:
 	DuiLib::CButtonUI *              m_btnClear;
 	DuiLib::CButtonUI *              m_btnGetData;
 
+	DuiLib::CEditUI *                m_edBlueToothName;
 	DuiLib::CEditUI *                m_edVersion;
 	DuiLib::CEditUI *                m_edId;
 	DuiLib::COptionUI *              m_opNormalMode;
@@ -64,6 +66,9 @@ private:
 	void  OnSetReaderBlueToothRet(int ret);
 	void  OnSetReaderBlueToothRetMsg(int ret);
 
+	void  OnSetReaderBlueToothNameRet(int ret);
+	void  OnSetReaderBlueToothNameRetMsg(int ret);
+
 private:
 	void  OnSetReaderId();
 	void  OnSetReaderTime();
@@ -71,4 +76,5 @@ private:
 	void  OnClearReader();
 	void  OnGetData();
 	void  OnSetBluetooth();
+	void  OnSetBlueToothName();
 };

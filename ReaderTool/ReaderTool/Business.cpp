@@ -178,6 +178,17 @@ int CBusiness::SetReaderBluetooth(const CReaderBlueToothParam * pParam) {
 	return 0;
 }
 
+int CBusiness::SetReaderBluetoothNameAsyn(const char * szBlueToothName) {
+	m_thrd_reader.PostMessage(this, MSG_SET_READER_BLUE_TOOTH_NAME, new CReaderBlueToothNameParam(szBlueToothName));
+	return 0;
+}
+
+int CBusiness::SetReaderBluetoothName(const CReaderBlueToothNameParam * pParam ) {
+	int ret = m_Reader.SetReaderBluetoothName(pParam);
+	m_sigSetReaderBlueToothNameRet.emit(ret);  
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -232,6 +243,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CReaderBlueToothParam * pParam = (CReaderBlueToothParam *)pMessageData;
 		SetReaderBluetooth(pParam);
+	}
+	break;
+
+	case MSG_SET_READER_BLUE_TOOTH_NAME:
+	{
+		CReaderBlueToothNameParam * pParam = (CReaderBlueToothNameParam *)pMessageData;
+		SetReaderBluetoothName(pParam);
 	}
 	break;
 

@@ -12,6 +12,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigClearReaderRet.connect(this, &CDuiFrameWnd::OnClearReaderRet);
 	CBusiness::GetInstance()->m_sigGetReaderDataRet.connect(this, &CDuiFrameWnd::OnGetReaderDataRet);
 	CBusiness::GetInstance()->m_sigSetReaderBlueToothRet.connect(this, &CDuiFrameWnd::OnSetReaderBlueToothRet);
+	CBusiness::GetInstance()->m_sigSetReaderBlueToothNameRet.connect(this, &CDuiFrameWnd::OnSetReaderBlueToothNameRet);
 }
   
 void  CDuiFrameWnd::InitWindow() {
@@ -19,6 +20,7 @@ void  CDuiFrameWnd::InitWindow() {
 	//m_PaintManager.FindControl("maxbtn")->SetEnabled(false);
 	DuiLib::CDuiString  strText;
 
+	m_btnSetBluetoothName = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderBlueToothName");
 	m_btnSetBluetooth = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderBluetooth");
 	m_btnSetId = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderId");
 	m_btnSetTime = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderTime");
@@ -26,6 +28,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnClear = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnClear");
 	m_btnGetData = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnGetData");
 
+	m_edBlueToothName = (DuiLib::CEditUI *)m_PaintManager.FindControl("edReaderBlueToothName");
 	m_edVersion = (DuiLib::CEditUI *)m_PaintManager.FindControl("edReaderVersion");
 	m_edId = (DuiLib::CEditUI *)m_PaintManager.FindControl("edReaderId");
 	m_opNormalMode = (DuiLib::COptionUI *)m_PaintManager.FindControl("btnNormal");
@@ -61,6 +64,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnSetReaderBluetooth") {
 			OnSetBluetooth();
+		}
+		else if (name == "btnSetReaderBlueToothName") {
+			OnSetBlueToothName();
 		}
 	}
 	else if ( msg.sType == "textchanged") {
@@ -101,6 +107,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_READER_BLUE_TOOTH_RET) {
 		OnSetReaderBlueToothRetMsg(wParam);
+	}  
+	else if (uMsg == UM_READER_BLUE_TOOTH_NAME_RET) {
+		OnSetReaderBlueToothNameRetMsg(wParam);
 	}
 	else if (uMsg == UM_GET_READER_DATA_RET) {
 		int ret = wParam;
@@ -124,6 +133,7 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnClear->SetEnabled(false);
 		m_btnGetData->SetEnabled(false);
 		m_btnSetBluetooth->SetEnabled(false);
+		m_btnSetBluetoothName->SetEnabled(false);
 
 		m_progress->SetVisible(true);
 		m_progress->Start();
@@ -135,6 +145,7 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnClear->SetEnabled(true);
 		m_btnGetData->SetEnabled(true);
 		m_btnSetBluetooth->SetEnabled(true);
+		m_btnSetBluetoothName->SetEnabled(true);
 
 		m_progress->Stop();
 		m_progress->SetVisible(false);
@@ -201,6 +212,21 @@ void  CDuiFrameWnd::OnSetReaderBlueToothRetMsg(int ret) {
 	}
 	else {
 		MessageBox(GetHWND(), GetErrorDescription(ret), "ÉèÖÃReader À¶ÑÀ", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSetReaderBlueToothNameRet(int ret) {
+	::PostMessage(GetHWND(), UM_READER_BLUE_TOOTH_NAME_RET, (WPARAM)ret, 0);
+}
+
+void  CDuiFrameWnd::OnSetReaderBlueToothNameRetMsg(int ret) {
+	SetBusy(FALSE);
+
+	if (0 == ret) {
+		MessageBox(GetHWND(), "ÉèÖÃReader À¶ÑÀÃû³Æ³É¹¦", "ÉèÖÃReader À¶ÑÀÃû³Æ", 0);
+	}
+	else {
+		MessageBox(GetHWND(), GetErrorDescription(ret), "ÉèÖÃReader À¶ÑÀÃû³Æ", 0);
 	}
 }
 
@@ -356,6 +382,19 @@ void  CDuiFrameWnd::OnGetData() {
 void  CDuiFrameWnd::OnSetBluetooth() {
 	BOOL b = m_opBlueTooth->IsSelected() ? TRUE : FALSE ;
 	CBusiness::GetInstance()->SetReaderBluetoothAsyn(b);
+	SetBusy(TRUE);
+}
+
+void  CDuiFrameWnd::OnSetBlueToothName() {
+	DuiLib::CDuiString  strText;
+	strText = m_edBlueToothName->GetText();
+
+	if (strText.GetLength() == 0) {
+		::MessageBox(GetHWND(), "Reader À¶ÑÀÃû³Æ²»ÄÜÎª¿Õ", "ÉèÖÃReader À¶ÑÀÃû³Æ", 0);
+		return;
+	}
+
+	CBusiness::GetInstance()->SetReaderBluetoothNameAsyn(strText );
 	SetBusy(TRUE);
 }
                     

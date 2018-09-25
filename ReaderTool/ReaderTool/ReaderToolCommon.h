@@ -14,6 +14,7 @@
 #define  MSG_CLEAR_READER                  6
 #define  MSG_GET_READER_DATA               7
 #define  MSG_SET_READER_BLUE_TOOTH         8
+#define  MSG_SET_READER_BLUE_TOOTH_NAME    9
 
 #define  UM_READER_STATUS                  (WM_USER+1)
 #define  UM_READER_ID_RET                  (WM_USER+2)
@@ -22,6 +23,7 @@
 #define  UM_CLEAR_READER_RET               (WM_USER+5)
 #define  UM_GET_READER_DATA_RET            (WM_USER+6)
 #define  UM_READER_BLUE_TOOTH_RET          (WM_USER+7)
+#define  UM_READER_BLUE_TOOTH_NAME_RET     (WM_USER+8)
 
 class CReaderIdParam : public LmnToolkits::MessageData {
 public:
@@ -55,6 +57,14 @@ public:
 		m_bEnable = b;
 	}
 	BOOL   m_bEnable;
+};
+
+class CReaderBlueToothNameParam : public LmnToolkits::MessageData {
+public:
+	CReaderBlueToothNameParam(const char * szName) {
+		STRNCPY(m_szName, szName, sizeof(m_szName));
+	}
+	char   m_szName[256];
 };
 
 typedef struct tagTagId {

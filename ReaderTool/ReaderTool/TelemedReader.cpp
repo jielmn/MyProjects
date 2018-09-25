@@ -132,11 +132,16 @@ int  CTelemedReader::ReadHeartbeatRet() {
 	return ERROR_FAILED_TO_RECEIVE_OR_WRONG_FORMAT;
 }
 
+// 在本工程中， dwMaxDataLength > 19
+// 除掉可能的Reader自动上报的温度(自动上报温度的长度是19字节)
 void  CTelemedReader::ReceiveAsPossible(DWORD  dwWaitTime, DWORD dwMaxDataLength /*= 0*/) {
 	BYTE   buf[8192];
 	DWORD  dwLeft = dwMaxDataLength;           // 剩余的字节数
 	DWORD  dwWaitedTime = 0;                   // 已经等待的时间
 	DWORD  dwReadLen = 0;
+
+	assert( dwMaxDataLength > 0 );
+	assert(0 == m_received_data.GetReadPos());
 
 	do
 	{
@@ -168,9 +173,32 @@ void  CTelemedReader::ReceiveAsPossible(DWORD  dwWaitTime, DWORD dwMaxDataLength
 
 		// 如果对字节数目有限制
 		if (dwMaxDataLength > 0) {
+
 			// 如果已经读到最大数据(防止死循环)
 			if (0 == dwLeft) {
-				break;
+
+				const BYTE * pData = (const BYTE *)m_received_data.GetData();
+				DWORD dwDataLen = m_received_data.GetDataLength();
+
+				// 去除Reader主动上报的19字节
+				while (dwDataLen >= 19) {
+					// 如果是主动上传的温度数据
+					if (pData[0] == 0x02 && pData[17] == 0x0D && pData[18] == 0x0A) {
+						m_received_data.SetReadPos(19);
+						m_received_data.Reform();
+
+						dwLeft += 19;
+						pData = (const BYTE *)m_received_data.GetData();
+						dwDataLen = m_received_data.GetDataLength();
+					}
+					else {
+						break;
+					}
+				}
+
+				if (0 == dwLeft) {
+					break;
+				}
 			}
 		}
 
@@ -473,6 +501,7 @@ int CTelemedReader::GetReaderData(std::vector<TempItem* > & vRet) {
 	DWORD  dwCnt = pData[16] * 256 + pData[17];
 	// 0条记录
 	if (0 == dwCnt) {
+		m_received_data.Reform();
 		return 0;
 	}
 
@@ -485,9 +514,11 @@ int CTelemedReader::GetReaderData(std::vector<TempItem* > & vRet) {
 	// 剩余的数据长度
 	DWORD  dwExpectedLength = 28 * (dwCnt - 1);
 	if (0 == dwExpectedLength) {
+		m_received_data.Reform();
 		return 0;
 	}
 
+	// dwExpectedLength >= 28
 	ReceiveAsPossible(SERIAL_PORT_READ_MASSIVE_DATA_TIME, dwExpectedLength);
 
 	// 如果数据未达到
@@ -562,5 +593,37 @@ int CTelemedReader::SetReaderBluetooth(const CReaderBlueToothParam * pParam) {
 		return ERROR_FAIL;
 	}
 
+	return 0;
+}
+
+int CTelemedReader::SetReaderBluetoothName(const CReaderBlueToothNameParam * pParam) {
+
+	if (m_eStatus == STATUS_CLOSE) {
+		return ERROR_DISCONNECTED;
+	}
+
+	BYTE  byNameLen = (BYTE)strlen(pParam->m_szName);
+
+	//	55 01 05   05 E0 02 59 E3 7E    DD AA
+
+	BYTE buf[8192];
+	buf[0] = 0x55;
+	buf[1] = 0x01;
+	buf[2] = 0x05;
+
+	buf[3] = byNameLen;
+	memcpy( buf + 4, pParam->m_szName, byNameLen);
+
+
+	buf[4 + byNameLen] = 0xDD;
+	buf[5 + byNameLen] = 0xAA;
+
+	DWORD dwWrited = 5 + 1 + byNameLen;
+	BOOL bRet = Write(buf, dwWrited);
+	if (!bRet) {
+		Clear();
+		m_sigStatusChange.emit(m_eStatus);
+		return ERROR_FAIL;
+	}
 	return 0;
 }

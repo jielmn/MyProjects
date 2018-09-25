@@ -47,6 +47,8 @@ public:
 	int GetReaderData( std::vector<TempItem* > & vRet );
 	//
 	int SetReaderBluetooth(const CReaderBlueToothParam * pParam);
+	//
+	int SetReaderBluetoothName(const CReaderBlueToothNameParam * pParam);
 
 private:
 	TELEMED_READER_STATUS     m_eStatus;

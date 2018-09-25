@@ -50,6 +50,10 @@ public:
 	int SetReaderBluetoothAsyn( BOOL bEnable );
 	int SetReaderBluetooth(const CReaderBlueToothParam * pParam);
 
+	// …Ë÷√¿∂—¿√˚≥∆
+	int SetReaderBluetoothNameAsyn(const char * szBlueToothName);
+	int SetReaderBluetoothName(const CReaderBlueToothNameParam * pParam);
+
 public:
 	sigslot::signal1<CTelemedReader::TELEMED_READER_STATUS>            m_sigReaderStatusChange;
 	sigslot::signal1<int>                                              m_sigSetReaderIdRet;
@@ -58,6 +62,7 @@ public:
 	sigslot::signal1<int>                                              m_sigClearReaderRet;
 	sigslot::signal2<int, const std::vector<TempItem* > &>             m_sigGetReaderDataRet;
 	sigslot::signal1<int>                                              m_sigSetReaderBlueToothRet;
+	sigslot::signal1<int>                                              m_sigSetReaderBlueToothNameRet;
 
 private:
 	static CBusiness *  pInstance;
