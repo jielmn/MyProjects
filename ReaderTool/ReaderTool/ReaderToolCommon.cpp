@@ -4,6 +4,7 @@
 
 ILog    * g_log = 0;
 IConfig * g_cfg = 0;
+DWORD     g_dwReaderVersion = 0;
 
 const char * GetErrorDescription( int e )  {
 	const char * szMsg = 0;

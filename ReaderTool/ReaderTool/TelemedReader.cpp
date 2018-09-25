@@ -6,7 +6,7 @@
 #include "LmnString.h"
 
 #define SERIAL_PORT_SLEEP_TIME  5000
-#define SERIAL_PORT_READ_MASSIVE_DATA_TIME         60000
+#define SERIAL_PORT_READ_MASSIVE_DATA_TIME         600000
 
 #define READER_TAIL             "\x0d\x0a"
 
@@ -260,6 +260,7 @@ int  CTelemedReader::SetReaderId(const CReaderIdParam * pParam) {
 	}
 
 	int nId = pParam->m_nId;
+	int nVersion = pParam->m_nVersion;
 
 	// 55 03 01    10 01 00 02    DD AA
 	// 55 03 01    03 00 01 40    DD AA
@@ -269,8 +270,10 @@ int  CTelemedReader::SetReaderId(const CReaderIdParam * pParam) {
 	buf[1] = 0x03;
 	buf[2] = 0x01;
 
-	buf[3] = 0x10;
-	buf[4] = 0x01;
+	//buf[3] = 0x10;
+	//buf[4] = 0x01;
+	buf[3] = (BYTE)nVersion;
+	buf[4] = 0x00;
 	buf[5] = (nId >> 8) & 0xFF;
 	buf[6] = nId & 0xFF;
 
@@ -530,4 +533,34 @@ void  CTelemedReader::FillTempItem(TempItem * pItem, const BYTE * pData, DWORD d
 
 	memcpy( pItem->tCardId.abyUid, pData + 18, 8 );
 	pItem->tCardId.dwLen = 8;
+}
+
+int CTelemedReader::SetReaderBluetooth(const CReaderBlueToothParam * pParam) {
+	if (m_eStatus == STATUS_CLOSE) {
+		return ERROR_DISCONNECTED;
+	}
+
+	BOOL bEnable = pParam->m_bEnable;
+
+	//	55 01 07 DD AA   close
+	//	55 01 08 DD AA   open
+
+	BYTE buf[8192];
+	buf[0] = 0x55;
+	buf[1] = 0x01;
+
+	buf[2] = ( bEnable ? 0x08 : 0x07);
+
+	buf[3] = 0xDD;
+	buf[4] = 0xAA;
+
+	DWORD dwWrited = 5;
+	BOOL bRet = Write(buf, dwWrited);
+	if (!bRet) {
+		Clear();
+		m_sigStatusChange.emit(m_eStatus);
+		return ERROR_FAIL;
+	}
+
+	return 0;
 }

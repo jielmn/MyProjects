@@ -11,25 +11,32 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	CBusiness::GetInstance()->m_sigSetReaderModeRet.connect(this, &CDuiFrameWnd::OnSetReaderModeRet);
 	CBusiness::GetInstance()->m_sigClearReaderRet.connect(this, &CDuiFrameWnd::OnClearReaderRet);
 	CBusiness::GetInstance()->m_sigGetReaderDataRet.connect(this, &CDuiFrameWnd::OnGetReaderDataRet);
+	CBusiness::GetInstance()->m_sigSetReaderBlueToothRet.connect(this, &CDuiFrameWnd::OnSetReaderBlueToothRet);
 }
   
 void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 	//m_PaintManager.FindControl("maxbtn")->SetEnabled(false);
+	DuiLib::CDuiString  strText;
 
+	m_btnSetBluetooth = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderBluetooth");
 	m_btnSetId = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderId");
 	m_btnSetTime = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderTime");
 	m_btnSetMode = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnSetReaderMode");
 	m_btnClear = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnClear");
 	m_btnGetData = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnGetData");
 
+	m_edVersion = (DuiLib::CEditUI *)m_PaintManager.FindControl("edReaderVersion");
 	m_edId = (DuiLib::CEditUI *)m_PaintManager.FindControl("edReaderId");
 	m_opNormalMode = (DuiLib::COptionUI *)m_PaintManager.FindControl("btnNormal");
 	m_lstData = (DuiLib::CListUI *)m_PaintManager.FindControl("data_list");
 	m_lblReaderStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblReaderStatus");
+	m_opBlueTooth = (DuiLib::COptionUI *)m_PaintManager.FindControl("opBluetooth");
 
 	m_progress = (CMyProgress *)m_PaintManager.FindControl("progress");
 
+	strText.Format("%lu", g_dwReaderVersion);
+	m_edVersion->SetText(strText);
 	DuiLib::WindowImplBase::InitWindow(); 
 }
 
@@ -51,6 +58,16 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnGetData") {
 			OnGetData();
+		}
+		else if (name == "btnSetReaderBluetooth") {
+			OnSetBluetooth();
+		}
+	}
+	else if ( msg.sType == "textchanged") {
+		if (name == "edReaderVersion") {
+			strText = m_edVersion->GetText();
+			g_cfg->SetConfig("reader version", (const char *)strText);
+			g_cfg->Save();
 		}
 	}
 
@@ -82,6 +99,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_CLEAR_READER_RET) {
 		OnClearReaderRetMsg(wParam);
 	}
+	else if (uMsg == UM_READER_BLUE_TOOTH_RET) {
+		OnSetReaderBlueToothRetMsg(wParam);
+	}
 	else if (uMsg == UM_GET_READER_DATA_RET) {
 		int ret = wParam;
 		std::vector<TempItem* > * pvRet = (std::vector<TempItem* > *)lParam;
@@ -103,6 +123,7 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnSetMode->SetEnabled(false);
 		m_btnClear->SetEnabled(false);
 		m_btnGetData->SetEnabled(false);
+		m_btnSetBluetooth->SetEnabled(false);
 
 		m_progress->SetVisible(true);
 		m_progress->Start();
@@ -113,12 +134,13 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnSetMode->SetEnabled(true);
 		m_btnClear->SetEnabled(true);
 		m_btnGetData->SetEnabled(true);
+		m_btnSetBluetooth->SetEnabled(true);
 
 		m_progress->Stop();
 		m_progress->SetVisible(false);
 	}
 }
-
+       
 void  CDuiFrameWnd::OnReaderStatusChange(CTelemedReader::TELEMED_READER_STATUS eNewStatus) {
 	::PostMessage(GetHWND(), UM_READER_STATUS, (WPARAM)eNewStatus, 0);
 }
@@ -164,6 +186,21 @@ void  CDuiFrameWnd::OnSetReaderTimeRetMsg(int ret) {
 	}
 	else {
 		MessageBox(GetHWND(), GetErrorDescription(ret), "设置Reader Time", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSetReaderBlueToothRet(int ret) {
+	::PostMessage(GetHWND(), UM_READER_BLUE_TOOTH_RET, (WPARAM)ret, 0);
+}
+
+void  CDuiFrameWnd::OnSetReaderBlueToothRetMsg(int ret) {
+	SetBusy(FALSE);
+
+	if (0 == ret) {
+		MessageBox(GetHWND(), "设置Reader 蓝牙成功", "设置Reader 蓝牙", 0);
+	}
+	else {
+		MessageBox(GetHWND(), GetErrorDescription(ret), "设置Reader 蓝牙", 0);
 	}
 }
 
@@ -259,19 +296,31 @@ void  CDuiFrameWnd::OnGetReaderDataRetMsg(int ret, const std::vector<TempItem* >
 void  CDuiFrameWnd::OnSetReaderId() {
 	DuiLib::CDuiString  strText;
 	int  nId = 0;
+	int  nVersion = 0;
 
 	strText = m_edId->GetText();
 	if (1 != sscanf(strText, "%d", &nId)) {
-		::MessageBox(GetHWND(), "Reader格式不对，请输入数字(0~65535)", "设置Reader ID", 0);
+		::MessageBox(GetHWND(), "Reader ID格式不对，请输入数字(0~65535)", "设置Reader ID", 0);
 		return;
 	}
 
 	if (nId < 0 || nId > 65535) {
-		::MessageBox(GetHWND(), "Reader格式不对，请输入数字(0~65535)", "设置Reader ID", 0);
+		::MessageBox(GetHWND(), "Reader ID格式不对，请输入数字(0~65535)", "设置Reader ID", 0);
 		return;
 	}
 
-	CBusiness::GetInstance()->SetReaderIdAsyn(nId);
+	strText = m_edVersion->GetText();
+	if (1 != sscanf(strText, "%d", &nVersion)) {
+		::MessageBox(GetHWND(), "Reader 版本号格式不对，请输入数字(0~65535)", "设置Reader 版本号", 0);
+		return;
+	}
+
+	if (nVersion < 0 || nVersion > 256) {
+		::MessageBox(GetHWND(), "Reader 版本号格式不对，请输入数字(0~65535)", "设置Reader 版本号", 0);
+		return;
+	}
+	     
+	CBusiness::GetInstance()->SetReaderIdAsyn(nId, nVersion);
 	SetBusy(TRUE);
 }
 
@@ -301,6 +350,12 @@ void  CDuiFrameWnd::OnGetData() {
 	m_lstData->RemoveAll();
 
 	CBusiness::GetInstance()->GetReaderDataAsyn();
+	SetBusy(TRUE);
+}
+
+void  CDuiFrameWnd::OnSetBluetooth() {
+	BOOL b = m_opBlueTooth->IsSelected() ? TRUE : FALSE ;
+	CBusiness::GetInstance()->SetReaderBluetoothAsyn(b);
 	SetBusy(TRUE);
 }
                     

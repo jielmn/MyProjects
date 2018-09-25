@@ -13,6 +13,7 @@
 #define  MSG_SET_READER_MODE               5
 #define  MSG_CLEAR_READER                  6
 #define  MSG_GET_READER_DATA               7
+#define  MSG_SET_READER_BLUE_TOOTH         8
 
 #define  UM_READER_STATUS                  (WM_USER+1)
 #define  UM_READER_ID_RET                  (WM_USER+2)
@@ -20,13 +21,16 @@
 #define  UM_READER_MODE_RET                (WM_USER+4)
 #define  UM_CLEAR_READER_RET               (WM_USER+5)
 #define  UM_GET_READER_DATA_RET            (WM_USER+6)
+#define  UM_READER_BLUE_TOOTH_RET          (WM_USER+7)
 
 class CReaderIdParam : public LmnToolkits::MessageData {
 public:
-	CReaderIdParam(int nId) {
+	CReaderIdParam(int nId, int nVersion) {
 		m_nId = nId;
+		m_nVersion = nVersion;
 	}
 	int     m_nId;
+	int     m_nVersion;
 };
 
 class CReaderTimeParam : public LmnToolkits::MessageData {
@@ -45,6 +49,14 @@ public:
 	int     m_nMode;
 };
 
+class CReaderBlueToothParam : public LmnToolkits::MessageData {
+public:
+	CReaderBlueToothParam(BOOL b) {
+		m_bEnable = b;
+	}
+	BOOL   m_bEnable;
+};
+
 typedef struct tagTagId {
 	BYTE    abyUid[8];
 	DWORD   dwLen;
@@ -59,6 +71,7 @@ typedef struct tagTempItem {
 
 extern ILog    * g_log;
 extern IConfig * g_cfg;
+extern DWORD     g_dwReaderVersion;
 
 const char * GetErrorDescription( int e );
 char * DateTime2Str(char * szDest, DWORD dwDestSize, const time_t * t);

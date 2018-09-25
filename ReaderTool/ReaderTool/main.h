@@ -23,16 +23,19 @@ public:
 
 private:
 
+	DuiLib::CButtonUI *              m_btnSetBluetooth;
 	DuiLib::CButtonUI *              m_btnSetId;
 	DuiLib::CButtonUI *              m_btnSetTime;
 	DuiLib::CButtonUI *              m_btnSetMode;
 	DuiLib::CButtonUI *              m_btnClear;
 	DuiLib::CButtonUI *              m_btnGetData;
 
+	DuiLib::CEditUI *                m_edVersion;
 	DuiLib::CEditUI *                m_edId;
 	DuiLib::COptionUI *              m_opNormalMode;
 	DuiLib::CListUI *                m_lstData;
 	DuiLib::CLabelUI *               m_lblReaderStatus;
+	DuiLib::COptionUI *              m_opBlueTooth;
 
 	CMyProgress *                    m_progress;
 
@@ -58,10 +61,14 @@ private:
 	void  OnGetReaderDataRet(int, const std::vector<TempItem* > &);
 	void  OnGetReaderDataRetMsg(int, const std::vector<TempItem* > *);
 
+	void  OnSetReaderBlueToothRet(int ret);
+	void  OnSetReaderBlueToothRetMsg(int ret);
+
 private:
 	void  OnSetReaderId();
 	void  OnSetReaderTime();
 	void  OnSetReaderMode();
 	void  OnClearReader();
 	void  OnGetData();
+	void  OnSetBluetooth();
 };

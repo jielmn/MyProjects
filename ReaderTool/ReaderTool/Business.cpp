@@ -35,6 +35,8 @@ int CBusiness::Init() {
 	}
 	g_cfg->Init("ReaderTool.cfg");
 
+	g_cfg->GetConfig("reader version", g_dwReaderVersion, 3);
+
 	m_thrd_reader.Start();
 
 	ReconnectReaderAsyn(200);
@@ -103,8 +105,8 @@ int  CBusiness::ReaderHeatbeat() {
 }
 
 // 设置Reader Id
-int  CBusiness::SetReaderIdAsyn(int nId) {
-	m_thrd_reader.PostMessage(this, MSG_SET_READER_ID, new CReaderIdParam(nId) );
+int  CBusiness::SetReaderIdAsyn(int nId, int nVersion) {
+	m_thrd_reader.PostMessage(this, MSG_SET_READER_ID, new CReaderIdParam(nId, nVersion) );
 	return 0;
 }
 
@@ -165,6 +167,17 @@ int  CBusiness::GetReaderData() {
 	return 0;
 }
 
+int CBusiness::SetReaderBluetoothAsyn(BOOL bEnable) {
+	m_thrd_reader.PostMessage(this, MSG_SET_READER_BLUE_TOOTH, new CReaderBlueToothParam(bEnable));
+	return 0;
+}
+
+int CBusiness::SetReaderBluetooth(const CReaderBlueToothParam * pParam) {
+	int ret = m_Reader.SetReaderBluetooth(pParam);
+	m_sigSetReaderBlueToothRet.emit(ret);
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -212,6 +225,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_GET_READER_DATA:
 	{
 		GetReaderData();
+	}
+	break;
+
+	case MSG_SET_READER_BLUE_TOOTH:
+	{
+		CReaderBlueToothParam * pParam = (CReaderBlueToothParam *)pMessageData;
+		SetReaderBluetooth(pParam);
 	}
 	break;
 
