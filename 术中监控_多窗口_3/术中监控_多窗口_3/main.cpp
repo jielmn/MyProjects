@@ -29,7 +29,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layMain = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(LAYOUT_MAIN_NAME));
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
 
-	m_layMain->SetFixedColumns(g_data.m_dwLayoutColumns);
+	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 		CDialogBuilder builder;
 		m_pGrids[i] = builder.Create(MYCHART_XML_FILE, (UINT)0, &m_callback, &m_PaintManager);
@@ -134,7 +134,7 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 		/* END 最大化显示 */
 
-		if ( i >= g_data.m_dwLayoutColumns * g_data.m_dwLayoutRows ) {
+		if ( i >= g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows ) {
 			m_pGrids[i]->SetVisible(false);
 		}
 		m_layMain->Add(m_pGrids[i]);
@@ -213,12 +213,12 @@ void   CDuiFrameWnd::ReLayout(DWORD dwWidth, DWORD dwHeight) {
 
 	SIZE s;
 	if (GRID_STATUS_GRIDS == m_eGridStatus) {
-		s.cx = (dwWidth - 1) / g_data.m_dwLayoutColumns + 1;
-		s.cy = (dwHeight - 1) / g_data.m_dwLayoutRows + 1;
+		s.cx = (dwWidth - 1) / g_data.m_CfgData.m_dwLayoutColumns + 1;
+		s.cy = (dwHeight - 1) / g_data.m_CfgData.m_dwLayoutRows + 1;
 		m_layMain->SetItemSize(s);
 
 		// 重新修正标题栏的高度
-		m_layStatus->SetFixedHeight(STATUS_PANE_HEIGHT - (s.cy * g_data.m_dwLayoutRows - dwHeight));
+		m_layStatus->SetFixedHeight(STATUS_PANE_HEIGHT - (s.cy * g_data.m_CfgData.m_dwLayoutRows - dwHeight));
 	}
 	else {
 		s.cx = dwWidth;
@@ -305,7 +305,7 @@ void  CDuiFrameWnd::OnGridInflate(DWORD dwIndex) {
 			}
 		}
 
-		m_layMain->SetFixedColumns( g_data.m_dwLayoutColumns);
+		m_layMain->SetFixedColumns( g_data.m_CfgData.m_dwLayoutColumns );
 		m_eGridStatus = GRID_STATUS_GRIDS;
 		m_dwInflateGridIndex = -1;
 		OnGridInflateSub(dwIndex);
@@ -343,13 +343,73 @@ void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
 void   CDuiFrameWnd::OnSetting() {
 	CDuiString  strText;
 	DWORD  dwValue = 0;
+	BOOL   bValue = FALSE;
 
-	CGlobalData  oldData = g_data;
+	CfgData  oldData = g_data.m_CfgData;
 
 	CSettingDlg * pSettingDlg = new CSettingDlg;
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSettingDlg->CenterWindow();
 	int ret = pSettingDlg->ShowModal();
+	// 如果是click ok
+	if (0 == ret) {
+		g_data.m_CfgData = pSettingDlg->m_data;
+
+		dwValue = DEFAULT_MAIN_LAYOUT_COLUMNS;
+		g_data.m_cfg->SetConfig( CFG_MAIN_LAYOUT_COLUMNS, g_data.m_CfgData.m_dwLayoutColumns, &dwValue);
+
+		dwValue = DEFAULT_MAIN_LAYOUT_ROWS;
+		g_data.m_cfg->SetConfig(CFG_MAIN_LAYOUT_ROWS, g_data.m_CfgData.m_dwLayoutRows, &dwValue);
+
+		dwValue = 0;
+		g_data.m_cfg->SetConfig(CFG_AREA_ID_NAME, g_data.m_CfgData.m_dwAreaNo, &dwValue);
+
+		bValue = FALSE;
+		g_data.m_cfg->SetBooleanConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_CfgData.m_bAlarmVoiceOff, &bValue);
+
+		dwValue = DEFAULT_SKIN;
+		g_data.m_cfg->SetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, &dwValue);
+
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
+			bValue = FALSE;
+			g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_bSwitch, &bValue);
+
+			strText.Format("%s %lu", CFG_COLLECT_INTERVAL, i + 1);
+			dwValue = 0;
+			g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval, &dwValue);
+
+			strText.Format("%s %lu", CFG_MIN_TEMP, i + 1);
+			dwValue = DEFAULT_MIN_TEMP_INDEX;
+			g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, &dwValue);
+
+			for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
+				strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
+				bValue = DEFAULT_READER_SWITCH;
+				g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, &bValue);
+
+				strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
+				dwValue = 3500;
+				g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm, &dwValue);
+
+				strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
+				dwValue = 4000;
+				g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
+
+				strText.Format("%s %lu %lu", CFG_BED_NO, i + 1, j + 1);
+				dwValue = 0;
+				g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, &dwValue);
+			}
+		}
+
+		g_data.m_cfg->Save();
+
+		// 程序内存变动
+		if (oldData.m_dwSkinIndex != g_data.m_CfgData.m_dwSkinIndex) {
+			g_data.m_skin.SetSkin((CMySkin::ENUM_SKIN)g_data.m_CfgData.m_dwSkinIndex);
+			OnChangeSkin();
+		}
+	}
 	delete pSettingDlg;
 }
 

@@ -77,6 +77,15 @@ using namespace DuiLib;
 #define   DEFAULT_SKIN                  0
 #define   CFG_AREA_NAME                 "area name"
 #define   CFG_AREA_NO                   "area no"
+#define   CFG_GRID_SWITCH               "grid switch"
+#define   DEFAULT_READER_SWITCH         FALSE
+#define   CFG_COLLECT_INTERVAL          "collect interval"
+#define   CFG_MIN_TEMP                  "min temperature"
+#define   CFG_READER_SWITCH             "reader switch"
+#define   CFG_LOW_TEMP_ALARM            "low temperature alarm"
+#define   CFG_HIGH_TEMP_ALARM           "high temperature alarm"
+#define   CFG_BED_NO                    "bed no"
+#define   DEFAULT_MIN_TEMP_INDEX        2
 
 // ÆäËû
 
@@ -115,19 +124,39 @@ public:
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
+typedef struct tagReaderCfg
+{
+	BOOL      m_bSwitch;
+	DWORD     m_dwLowTempAlarm;
+	DWORD     m_dwHighTempAlarm;
+	DWORD     m_dwBed;
+}ReaderCfg;
+
+typedef struct tagGridCfg
+{
+	BOOL        m_bSwitch;
+	DWORD       m_dwCollectInterval;
+	DWORD       m_dwMinTemp;
+	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];
+}GridCfg;
+
+typedef struct tagCfgData {
+	DWORD     m_dwAreaNo;
+	DWORD     m_dwLayoutColumns;
+	DWORD     m_dwLayoutRows;
+	DWORD     m_dwSkinIndex;
+	BOOL      m_bAlarmVoiceOff;
+	GridCfg   m_GridCfg[MAX_GRID_COUNT];
+}CfgData;
+
 class  CGlobalData {
 public:
 	HWND      m_hWnd;
 	ILog    * m_log;
 	IConfig * m_cfg;
-
-	DWORD     m_dwLayoutColumns;
-	DWORD     m_dwLayoutRows;
 	CMySkin   m_skin;
-	DWORD     m_dwAreaNo;
-	BOOL      m_bAlarmVoiceOff;
-	DWORD     m_dwSkinIndex;
-	BOOL      m_bGridReaderSwitch[MAX_GRID_COUNT];
+
+	CfgData   m_CfgData;
 };
 
 #define  MAX_AREA_NAME_LENGTH   64

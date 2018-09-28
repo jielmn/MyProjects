@@ -52,27 +52,65 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
-	DWORD  dwCfgValue = 0;
-	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_COLUMNS, g_data.m_dwLayoutColumns, DEFAULT_MAIN_LAYOUT_COLUMNS);
-	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_ROWS, g_data.m_dwLayoutRows, DEFAULT_MAIN_LAYOUT_ROWS);
-	g_data.m_cfg->GetConfig(CFG_AREA_ID_NAME, g_data.m_dwAreaNo, 0);
-	g_data.m_cfg->GetConfig(CFG_ALARM_VOICE_SWITCH, dwCfgValue, DEFAULT_ALARM_VOICE_SWITCH);
-	g_data.m_bAlarmVoiceOff = dwCfgValue;
-	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_dwSkinIndex, DEFAULT_SKIN);
-	g_data.m_skin.SetSkin( (CMySkin::ENUM_SKIN)g_data.m_dwSkinIndex );
+	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_COLUMNS, g_data.m_CfgData.m_dwLayoutColumns, DEFAULT_MAIN_LAYOUT_COLUMNS);
+	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_ROWS, g_data.m_CfgData.m_dwLayoutRows, DEFAULT_MAIN_LAYOUT_ROWS);
+	g_data.m_cfg->GetConfig(CFG_AREA_ID_NAME, g_data.m_CfgData.m_dwAreaNo, 0);
+	g_data.m_cfg->GetBooleanConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_CfgData.m_bAlarmVoiceOff, DEFAULT_ALARM_VOICE_SWITCH);
+
+	// 皮肤
+	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, DEFAULT_SKIN);
+	if (g_data.m_CfgData.m_dwSkinIndex > 1) {
+		g_data.m_CfgData.m_dwSkinIndex = 0;
+	}
+	g_data.m_skin.SetSkin( (CMySkin::ENUM_SKIN)g_data.m_CfgData.m_dwSkinIndex );
+	// end of 皮肤
 	
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		
+		strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
+		g_data.m_cfg->GetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_bSwitch, DEFAULT_READER_SWITCH);
+
+		strText.Format("%s %lu", CFG_COLLECT_INTERVAL, i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval, 0);
+		if ( g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval > 6 ) {
+			g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval = 0;
+		}
+
+		strText.Format("%s %lu", CFG_MIN_TEMP, i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, DEFAULT_MIN_TEMP_INDEX);
+		if (g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp > 4) {
+			g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp = 0;
+		}
+
+		for ( int j = 0; j < MAX_READERS_PER_GRID; j++ ) {
+			strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
+			g_data.m_cfg->GetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, DEFAULT_READER_SWITCH);
+
+			strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
+			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm, 3500);
+			if ( g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm > 4200 ) {
+				g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm = 3500;
+			}
+
+			strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
+			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, 4000);
+			if (g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm > 4200) {
+				g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm = 4000;
+			}
+
+			if (g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm > g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm) {
+				g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm;
+			}
+
+			strText.Format("%s %lu %lu", CFG_BED_NO, i + 1, j + 1);
+			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, 0);
+		}
 	}
 
 	// 校验
-	if (g_data.m_dwLayoutColumns == 0 || g_data.m_dwLayoutRows == 0 || g_data.m_dwLayoutColumns * g_data.m_dwLayoutRows > MAX_GRID_COUNT) {
-		g_data.m_dwLayoutColumns = DEFAULT_MAIN_LAYOUT_COLUMNS;
-		g_data.m_dwLayoutRows = DEFAULT_MAIN_LAYOUT_ROWS;
-	}
-
-	if ( g_data.m_dwSkinIndex > 1 ) {
-		g_data.m_dwSkinIndex = 0;
+	if (   g_data.m_CfgData.m_dwLayoutColumns == 0 || g_data.m_CfgData.m_dwLayoutRows == 0 
+		|| g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows > MAX_GRID_COUNT) {
+		g_data.m_CfgData.m_dwLayoutColumns = DEFAULT_MAIN_LAYOUT_COLUMNS;
+		g_data.m_CfgData.m_dwLayoutRows = DEFAULT_MAIN_LAYOUT_ROWS;
 	}
 
 	// 区号列表
@@ -103,11 +141,11 @@ int CBusiness::Init() {
 	cfg_area->Deinit();
 	delete cfg_area;
 
-	if ( g_data.m_dwAreaNo > 0) {
+	if ( g_data.m_CfgData.m_dwAreaNo > 0) {
 		std::vector<TArea *>::iterator it;
 		for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
 			TArea * pArea = *it;
-			if (pArea->dwAreaNo == g_data.m_dwAreaNo) {
+			if (pArea->dwAreaNo == g_data.m_CfgData.m_dwAreaNo) {
 				break;
 			}
 		}
@@ -115,8 +153,8 @@ int CBusiness::Init() {
 		// 如果g_dwAreaNo不在g_vArea之内
 		if (it == g_vArea.end()) {
 			TArea * pArea = new TArea;
-			pArea->dwAreaNo = g_data.m_dwAreaNo;
-			SNPRINTF(pArea->szAreaName, sizeof(pArea->szAreaName), "(编号：%lu)", g_data.m_dwAreaNo);
+			pArea->dwAreaNo = g_data.m_CfgData.m_dwAreaNo;
+			SNPRINTF(pArea->szAreaName, sizeof(pArea->szAreaName), "(编号：%lu)", g_data.m_CfgData.m_dwAreaNo);
 			g_vArea.push_back(pArea);
 		}
 	}

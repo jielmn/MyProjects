@@ -14,13 +14,7 @@ CSettingDlg::CSettingDlg() {
 void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
 	if ( msg.sType == "click" && name == "btnOK" ) {
-		//int a = m_tree->CalculateMinHeight();
-		//DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_tree->GetParent();
-		//SIZE tParentScrollPos = pParent->GetScrollPos();
-		//SIZE tParentScrollRange = pParent->GetScrollRange();
-		//int b = 100;
-
-		//m_tree->SetMinHeight(40000);
+		OnBtnOk(msg);
 	}
 	WindowImplBase::Notify(msg); 
 }
@@ -84,7 +78,7 @@ void  CSettingDlg::InitCommonCfg() {
 
 		strText.Format("%s(编号：%lu)", pArea->szAreaName, pArea->dwAreaNo);
 		AddComboItem(pCombo, strText, pArea->dwAreaNo);
-		if ( g_data.m_dwAreaNo == pArea->dwAreaNo) {
+		if ( g_data.m_CfgData.m_dwAreaNo == pArea->dwAreaNo) {
 			nIndex = i + 1;
 		}
 	}
@@ -93,12 +87,12 @@ void  CSettingDlg::InitCommonCfg() {
 
 	// 行、列
 	pEdit = new CEditUI;
-	strText.Format("%lu", g_data.m_dwLayoutColumns);
+	strText.Format("%lu", g_data.m_CfgData.m_dwLayoutColumns);
 	pEdit->SetText(strText);
 	m_tree->AddNode("窗格列数", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
 	pEdit = new CEditUI;
-	strText.Format("%lu", g_data.m_dwLayoutRows);
+	strText.Format("%lu", g_data.m_CfgData.m_dwLayoutRows);
 	pEdit->SetText(strText);
 	m_tree->AddNode("窗格行数", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
@@ -106,12 +100,12 @@ void  CSettingDlg::InitCommonCfg() {
 	pCombo = new CComboUI;
 	AddComboItem(pCombo, "黑曜石", 0);
 	AddComboItem(pCombo, "白宣纸", 1);
-	pCombo->SelectItem(g_data.m_dwSkinIndex);
+	pCombo->SelectItem(g_data.m_CfgData.m_dwSkinIndex);
 	m_tree->AddNode("选择皮肤", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 报警声音开关 
 	pCheckBox = new CCheckBoxUI;
-	pCheckBox->Selected(g_data.m_bAlarmVoiceOff ? false : true);
+	pCheckBox->Selected(g_data.m_CfgData.m_bAlarmVoiceOff ? true : false);
 	m_tree->AddNode("报警声音开关", pTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382 );
 }
 
@@ -129,6 +123,7 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 
 	// 启用/禁用
 	pCheckBox = new CCheckBoxUI;
+	pCheckBox->Selected(g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ? true : false);
 	m_tree->AddNode("是否启用全部读卡器", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 间隔时间
@@ -140,7 +135,7 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	AddComboItem(pCombo, "30分钟", 4);
 	AddComboItem(pCombo, "1小时", 5);
 
-	pCombo->SelectItem(0);
+	pCombo->SelectItem(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
 	m_tree->AddNode("采样间隔", pSubTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 显示最低温度
@@ -149,7 +144,7 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	AddComboItem(pCombo, "24℃", 1);
 	AddComboItem(pCombo, "28℃", 2);
 	AddComboItem(pCombo, "32℃", 3);
-	pCombo->SelectItem(0);
+	pCombo->SelectItem(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
 	m_tree->AddNode("显示的最低温度", pSubTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	CMyTreeCfgUI::Node* pSubTitleNode_1 = NULL;
@@ -163,23 +158,24 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 		pSubTitleNode_2 = m_tree->AddNode(strText, pSubTitleNode_1, 0, 0, 3, 0xFF666666);
 
 		pCheckBox = new CCheckBoxUI;
+		pCheckBox->Selected(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ? true : false);
 		m_tree->AddNode("是否启用", pSubTitleNode_2, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
 
 		// 低温报警
 		pEdit = new CEditUI;
-		strText.Format("%.2f", 35.0);
+		strText.Format("%.2f", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwLowTempAlarm / 100.0 );
 		pEdit->SetText(strText);
 		m_tree->AddNode("低温报警", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
 		// 高温报警
 		pEdit = new CEditUI;
-		strText.Format("%.2f", 40.0);
+		strText.Format("%.2f", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwHighTempAlarm / 100.0);
 		pEdit->SetText(strText);
 		m_tree->AddNode("高温报警", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
 		// 床号
 		pEdit = new CEditUI;
-		strText.Format("%lu", 0);
+		strText.Format("%lu", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwBed);
 		pEdit->SetText(strText);
 		m_tree->AddNode("Reader相关床号", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
@@ -189,5 +185,163 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	}
 
 	m_tree->ExpandNode(pSubTitleNode, false);
+}
+
+void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
+	m_data = g_data.m_CfgData;
+
+	if (!GetCommonConfig()) {
+		return;
+	}
+
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		if ( !GetGridConfig(i) ) {
+			return;
+		}
+	}
+
+	PostMessage(WM_CLOSE);
+}
+
+BOOL  CSettingDlg::GetCommonConfig() {
+	CDuiString  strText;
+	CMyTreeCfgUI::ConfigValue  cfgValue;
+	bool bGetCfg = false;
+	int  nCfgRowIndex = 1;
+	int  nNumber = 0;
+
+	// 区号
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_dwAreaNo = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	//列数
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%d", &nNumber)) {
+		strText.Format("窗格列数请输入数字");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (nNumber <= 0) {
+		strText.Format("窗格列数请输入正数");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	m_data.m_dwLayoutColumns = nNumber;
+	nCfgRowIndex++;
+
+	// 行数
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%d", &nNumber)) {
+		strText.Format("窗格行请输入数字");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (nNumber <= 0) {
+		strText.Format("窗格行数请输入正数");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	m_data.m_dwLayoutRows = nNumber;
+
+	if (m_data.m_dwLayoutColumns * m_data.m_dwLayoutRows > MAX_GRID_COUNT) {
+		strText.Format("窗口列数(%d) * 窗口行数(%d) = (%d)。请保证小于(%d)", m_data.m_dwLayoutColumns, m_data.m_dwLayoutRows,
+			   m_data.m_dwLayoutColumns * m_data.m_dwLayoutRows, MAX_GRID_COUNT);
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	nCfgRowIndex++;
+
+	// 皮肤
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_dwSkinIndex = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	// 报警声
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_bAlarmVoiceOff = cfgValue.m_bCheckbox;
+
+	return TRUE;
+}
+
+BOOL  CSettingDlg::GetGridConfig(int nIndex) {
+	CDuiString  strText;
+	CMyTreeCfgUI::ConfigValue  cfgValue;
+	bool bGetCfg = false;
+	int  nCfgRowIndex = 7 + 50 * nIndex + 2 - 1;
+	int  nNumber = 0;
+	double dNumber = 0.0;
+
+	// 格子开关
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_GridCfg[nIndex].m_bSwitch = cfgValue.m_bCheckbox;
+	nCfgRowIndex++;
+
+	// 采集间隔
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_GridCfg[nIndex].m_dwCollectInterval = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	// 最低显示可读
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_GridCfg[nIndex].m_dwMinTemp = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	// 获取Reader配置
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 5 * i + 2, cfgValue);
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_bSwitch = cfgValue.m_bCheckbox;
+
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 5 * i + 3, cfgValue);
+		strText = cfgValue.m_strEdit;
+		if (1 != sscanf_s(strText, "%lf", &dNumber)) {
+			strText.Format("窗口%d读卡器%d配置，低温报警请输入数字", nIndex + 1, i+1);
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+
+		if (dNumber > 42 || dNumber < 20) {
+			strText.Format("窗口%d读卡器%d配置，低温报警请输入范围(20~42)", nIndex + 1, i+1);
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwLowTempAlarm = (DWORD)(dNumber * 100);
+		
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 5 * i + 4, cfgValue);
+		strText = cfgValue.m_strEdit;
+		if (1 != sscanf_s(strText, "%lf", &dNumber)) {
+			strText.Format("窗口%d读卡器%d配置，高温报警请输入数字", nIndex + 1, i + 1);
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+
+		if (dNumber > 42 || dNumber < 20) {
+			strText.Format("窗口%d读卡器%d配置，高温报警请输入范围(20~42)", nIndex + 1, i + 1);
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwHighTempAlarm = (DWORD)(dNumber * 100);
+
+		if (m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwHighTempAlarm < m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwLowTempAlarm) {
+			strText.Format("窗口%d读卡器%d配置，高温报警请大于低温报警",  nIndex + 1, i+1);
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 5 * i + 5, cfgValue);
+		strText = cfgValue.m_strEdit;
+		if (1 != sscanf_s(strText, "%d", &nNumber)) {
+			strText.Format("窗口%d读卡器%d配置，床号请输入数字", nIndex + 1, i + 1);
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwBed = nNumber;
+	}
+
+	return TRUE;
 }
 
