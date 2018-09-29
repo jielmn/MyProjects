@@ -81,6 +81,12 @@ int CBusiness::Init() {
 			g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp = 0;
 		}
 
+		strText.Format("%s %lu", CFG_BED_NAME, i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szBed, MAX_BED_LENGTH, "--" );
+
+		strText.Format("%s %lu", CFG_PATIENT_NAME, i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szName, MAX_NAME_LENGTH, "--");
+
 		for ( int j = 0; j < MAX_READERS_PER_GRID; j++ ) {
 			strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
 			g_data.m_cfg->GetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, DEFAULT_READER_SWITCH);

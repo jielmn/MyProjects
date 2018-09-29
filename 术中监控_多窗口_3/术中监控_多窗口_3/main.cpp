@@ -47,21 +47,25 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblIndex_grid[i]->SetTag(i);
 		m_LblIndex_grid[i]->SetText(strText);		
 
-		m_BtnBed_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_BED_NAME, 0));
+		m_BtnBed_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_BED_NAME_GRID, 0));
 		m_BtnBed_grid[i]->SetTag(i);
 		m_BtnBed_grid[i]->SetVisible(true);
+		m_BtnBed_grid[i]->SetText( g_data.m_CfgData.m_GridCfg[i].m_szBed );
 
-		m_EdtBed_grid[i] = static_cast<CEditUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, EDIT_BED_NAME, 0));
+		m_EdtBed_grid[i] = static_cast<CEditUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, EDIT_BED_NAME_GRID, 0));
 		m_EdtBed_grid[i]->SetTag(i);
 		m_EdtBed_grid[i]->SetVisible(false);
+		m_EdtBed_grid[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szBed);
 
-		m_BtnName_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_NAME_NAME, 0));
+		m_BtnName_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_NAME_NAME_GRID, 0));
 		m_BtnName_grid[i]->SetTag(i);
 		m_BtnName_grid[i]->SetVisible(true);
+		m_BtnName_grid[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szName);
 
-		m_EdtName_grid[i] = static_cast<CEditUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, EDIT_NAME_NAME, 0));
+		m_EdtName_grid[i] = static_cast<CEditUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, EDIT_NAME_NAME_GRID, 0));
 		m_EdtName_grid[i]->SetTag(i);
 		m_EdtName_grid[i]->SetVisible(false);
+		m_EdtName_grid[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szName);
 
 		m_LblCurTemp_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID, 0));
 		m_LblCurTemp_grid[i]->SetTag(i);
@@ -76,14 +80,15 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblCurTempTitle_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TITLE_GRID, 0));
 		m_LblCurTempTitle_grid[i]->SetTag(i);
 
-		m_MyImage[i] = static_cast<CMyImageUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, MYIMAGE_NAME, 0));
-		m_MyImage[i]->SetTag(i);
+		m_MyImage_grid[i] = static_cast<CMyImageUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, MYIMAGE_NAME, 0));
+		m_MyImage_grid[i]->SetTag(i);
 
-		m_OptGridSwitch[i] = static_cast<COptionUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, OPT_GRID_SWITCH, 0));
-		m_OptGridSwitch[i]->SetTag(i);
+		m_OptGridSwitch_grid[i] = static_cast<COptionUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, OPT_GRID_SWITCH_GRID, 0));
+		m_OptGridSwitch_grid[i]->SetTag(i);
+		m_OptGridSwitch_grid[i]->Selected(g_data.m_CfgData.m_GridCfg[i].m_bSwitch ? true : false);
 
-		m_MyAlarm[i] = static_cast<CAlarmImageUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, ALARM_NAME, 0));
-		m_MyAlarm[i]->SetTag(i);
+		m_MyAlarm_grid[i] = static_cast<CAlarmImageUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, ALARM_NAME, 0));
+		m_MyAlarm_grid[i]->SetTag(i);
 		/* END 多窗格显示 */
 
 		/* 最大化显示 */
@@ -95,6 +100,10 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblIndex_maxium[i]->SetTag(i);
 		strText.Format("%lu", i + 1);
 		m_LblIndex_maxium[i]->SetText(strText);
+
+		m_OptGridSwitch_max[i] = static_cast<COptionUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, OPT_GRID_SWITCH_MAX, 0));
+		m_OptGridSwitch_max[i]->SetTag(i);
+		m_OptGridSwitch_max[i]->Selected(g_data.m_CfgData.m_GridCfg[i].m_bSwitch ? true : false);		
 
 		m_layReaders[i] = static_cast<CVerticalLayoutUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LAYOUT_READERS, 0));
 		m_layReaders[i]->SetTag(i);
@@ -112,7 +121,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 			m_UiReaderSwitch[i][j] = static_cast<COptionUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, READER_SWITCH_NAME, 0));
 			m_UiReaderSwitch[i][j]->SetTag(j);
-
+			
 			m_UiReaderTemp[i][j] = static_cast<CLabelUI *>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, READER_TEMP_NAME, 0));
 			m_UiReaderTemp[i][j]->SetTag(j);
 
@@ -128,7 +137,7 @@ void  CDuiFrameWnd::InitWindow() {
 			m_UiIndicator[i][j]->SetBkColor( g_data.m_skin.GetReaderIndicator(j) );
 			m_UiReaderTemp[i][j]->SetText("--");
 			m_UiBtnReaderNames[i][j]->SetText("--");
-			m_UiReaderSwitch[i][j]->Selected(true);
+			m_UiReaderSwitch[i][j]->Selected(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch ? true : false);
 
 			m_layReaders[i]->Add(m_UiReaders[i][j]);
 		}
@@ -139,7 +148,7 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 		m_layMain->Add(m_pGrids[i]);
 		 
-		m_MyAlarm[i]->StartAlarm(CAlarmImageUI::DISCONNECTED);
+		m_MyAlarm_grid[i]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			m_UiAlarms[i][j]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		}
@@ -167,12 +176,26 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (name == BTN_MENU_NAME) {
 			OnBtnMenu(msg);
 		}
+		else if (name == BUTTON_BED_NAME_GRID) {
+			OnBtnBed_grid(msg);
+		}
+		else if (name == BUTTON_NAME_NAME_GRID) {
+			OnBtnName_grid(msg);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
 	}
 	else if (msg.sType == "menu_about") {
 		OnAbout();
+	}
+	else if (msg.sType == "killfocus") {
+		if ( name == EDIT_BED_NAME_GRID ) {
+			OnEdtBedKillFocus_grid(msg);
+		}
+		else if (name == EDIT_NAME_NAME_GRID) {
+			OnEdtNameKillFocus_grid(msg);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -246,10 +269,10 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_LblBedTitle_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_LblNameTitle_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_LblCurTempTitle_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-		m_MyImage[i]->SetBkColor(g_data.m_skin[CMySkin::MYIMAGE_BK]);
-		m_MyImage[i]->OnChangeSkin();
-		m_OptGridSwitch[i]->SetSelectedImage(g_data.m_skin.GetImageName(CMySkin::OPT_SELECTED));
-		m_OptGridSwitch[i]->SetNormalImage(g_data.m_skin.GetImageName(CMySkin::OPT_NOT_SELECTED));
+		m_MyImage_grid[i]->SetBkColor(g_data.m_skin[CMySkin::MYIMAGE_BK]);
+		m_MyImage_grid[i]->OnChangeSkin();
+		m_OptGridSwitch_grid[i]->SetSelectedImage(g_data.m_skin.GetImageName(CMySkin::OPT_SELECTED));
+		m_OptGridSwitch_grid[i]->SetNormalImage(g_data.m_skin.GetImageName(CMySkin::OPT_NOT_SELECTED));
 	} 
 }
 
@@ -417,6 +440,49 @@ void   CDuiFrameWnd::OnAbout() {
 
 }
 
+void   CDuiFrameWnd::OnBtnBed_grid(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	msg.pSender->SetVisible(false);
+	m_EdtBed_grid[nIndex]->SetText(msg.pSender->GetText());
+	m_EdtBed_grid[nIndex]->SetVisible(true);
+	m_EdtBed_grid[nIndex]->SetFocus();
+}
+
+void   CDuiFrameWnd::OnEdtBedKillFocus_grid(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	STRNCPY( g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, msg.pSender->GetText(), MAX_BED_LENGTH);
+
+	CDuiString  strText;
+	strText.Format(CFG_BED_NAME " %d", nIndex + 1);
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "");
+	g_data.m_cfg->Save();
+
+	msg.pSender->SetVisible(false);
+	m_BtnBed_grid[nIndex]->SetText(msg.pSender->GetText());
+	m_BtnBed_grid[nIndex]->SetVisible(true);
+}
+
+void  CDuiFrameWnd::OnBtnName_grid(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	msg.pSender->SetVisible(false);
+	m_EdtName_grid[nIndex]->SetText(msg.pSender->GetText());
+	m_EdtName_grid[nIndex]->SetVisible(true);
+	m_EdtName_grid[nIndex]->SetFocus();
+}
+
+void   CDuiFrameWnd::OnEdtNameKillFocus_grid(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	STRNCPY(g_data.m_CfgData.m_GridCfg[nIndex].m_szName, msg.pSender->GetText(), MAX_NAME_LENGTH);
+
+	CDuiString  strText;
+	strText.Format(CFG_PATIENT_NAME " %d", nIndex + 1);
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_szName, "");
+	g_data.m_cfg->Save();
+
+	msg.pSender->SetVisible(false);
+	m_BtnName_grid[nIndex]->SetText(msg.pSender->GetText());
+	m_BtnName_grid[nIndex]->SetVisible(true);
+}
 
 
 

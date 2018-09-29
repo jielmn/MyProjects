@@ -43,9 +43,10 @@ private:
 	CLabelUI *                         m_LblBedTitle_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblNameTitle_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblCurTempTitle_grid[MAX_GRID_COUNT];
-	CMyImageUI *                       m_MyImage[MAX_GRID_COUNT];
-	COptionUI *                        m_OptGridSwitch[MAX_GRID_COUNT];
-	CAlarmImageUI *                    m_MyAlarm[MAX_GRID_COUNT];
+	CMyImageUI *                       m_MyImage_grid[MAX_GRID_COUNT];
+	COptionUI *                        m_OptGridSwitch_grid[MAX_GRID_COUNT];
+	CAlarmImageUI *                    m_MyAlarm_grid[MAX_GRID_COUNT];
+	COptionUI *                        m_OptGridSwitch_max[MAX_GRID_COUNT];
 	DuiLib::CVerticalLayoutUI *        m_layReaders[MAX_GRID_COUNT];
 	CControlUI *                       m_UiReaders[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	COptionUI *                        m_UiReaderSwitch[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
@@ -71,5 +72,10 @@ private:
 	void   OnBtnMenu(TNotifyUI& msg);
 	void   OnSetting();
 	void   OnAbout();
+
+	void   OnBtnBed_grid(TNotifyUI& msg);
+	void   OnEdtBedKillFocus_grid(TNotifyUI& msg);
+	void   OnBtnName_grid(TNotifyUI& msg);
+	void   OnEdtNameKillFocus_grid(TNotifyUI& msg);
 
 };

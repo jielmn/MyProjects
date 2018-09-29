@@ -26,6 +26,8 @@ using namespace DuiLib;
 #define   MAX_AREA_COUNT          20
 #define   AREA_CFG_FILE_NAME      "area.cfg"
 #define   MAX_AREA_ID             100
+#define   MAX_BED_LENGTH          16
+#define   MAX_NAME_LENGTH         16
 
 // 控件相关
 #define   LAYOUT_MAIN_NAME         "layMain"
@@ -38,17 +40,18 @@ using namespace DuiLib;
 #define   LAYOUT_MAXIUM_NAME       "lay_2"
 #define   LABEL_INDEX_NAME_GRID    "lblIndex_1"
 #define   LABEL_INDEX_NAME_MAXIUM  "lblIndex_2"
-#define   BUTTON_BED_NAME          "btnBed_1"
-#define   EDIT_BED_NAME            "edtBed_1"
-#define   BUTTON_NAME_NAME         "btnName_1"
-#define   EDIT_NAME_NAME           "edtName_1"
+#define   BUTTON_BED_NAME_GRID     "btnBed_1"
+#define   EDIT_BED_NAME_GRID       "edtBed_1"
+#define   BUTTON_NAME_NAME_GRID    "btnName_1"
+#define   EDIT_NAME_NAME_GRID      "edtName_1"
 #define   LABEL_CUR_TEMP_GRID      "lblCur_1"
 #define   LABEL_BED_TITLE_GRID     "lblBedTitle_1"
 #define   LABEL_NAME_TITLE_GRID    "lblNameTitle_1"
 #define   LABEL_CUR_TITLE_GRID     "lblCurTitle_1"
 #define   MYIMAGE_NAME             "my_image_1"
-#define   OPT_GRID_SWITCH          "opn_grid_switch_1"
+#define   OPT_GRID_SWITCH_GRID     "opn_grid_switch_1"
 #define   ALARM_NAME               "alarm_1"
+#define   OPT_GRID_SWITCH_MAX      "opn_grid_switch_2"
 #define   LAYOUT_READERS           "layReaders"
 #define   CTL_INDICATOR_NAME       "indicator"
 #define   LAY_READER_NAME          "layReader"
@@ -86,6 +89,8 @@ using namespace DuiLib;
 #define   CFG_HIGH_TEMP_ALARM           "high temperature alarm"
 #define   CFG_BED_NO                    "bed no"
 #define   DEFAULT_MIN_TEMP_INDEX        2
+#define   CFG_BED_NAME                  "bed name"
+#define   CFG_PATIENT_NAME              "patient name"
 
 // 其他
 
@@ -137,6 +142,8 @@ typedef struct tagGridCfg
 	BOOL        m_bSwitch;
 	DWORD       m_dwCollectInterval;
 	DWORD       m_dwMinTemp;
+	char        m_szBed[MAX_BED_LENGTH];
+	char        m_szName[MAX_NAME_LENGTH];
 	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];
 }GridCfg;
 
