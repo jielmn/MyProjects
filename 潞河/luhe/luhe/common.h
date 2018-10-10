@@ -9,9 +9,10 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#define   GLOBAL_LOCK_NAME        "LUHE"
 #define   LOG_FILE_NAME           "luhe.log"
 #define   CONFIG_FILE_NAME        "luhe.cfg"
-#define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
+#define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame_LUHE"
 #define   SKIN_FILE               "mainframe_luhe.xml"
 #define   SKIN_FOLDER             "proj_luhe_res"
 

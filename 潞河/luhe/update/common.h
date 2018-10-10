@@ -9,12 +9,16 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#define   GLOBAL_LOCK_NAME        "UPDATE_LUHE"
 #define   LOG_FILE_NAME           "update.log"
 #define   CONFIG_FILE_NAME        "update.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               "mainframe_update.xml"
 #define   SKIN_FOLDER             "proj_update_res"
 
+#define   UM_TRAY                 (WM_USER+1)
+#define   UM_ONCLOSE              (WM_USER+2)
+#define   UM_OTHER                (WM_USER+3)
 
 class  CGlobalData {
 public:

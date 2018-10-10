@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.h"
-
 #include "resource.h"
 #include "UIlib.h"
 using namespace DuiLib;
@@ -31,9 +30,16 @@ public:
 	}
 #endif
 
+
 	virtual void    Notify(TNotifyUI& msg);
 	virtual void    InitWindow();
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual void OnFinalMessage(HWND hWnd);
 
+	void    AddTray(HICON hIcon);
+	void    OnTrayMsg(WPARAM wParam, LPARAM  lParam);
+
+private:
+	NOTIFYICONDATA  m_nid;
 };
