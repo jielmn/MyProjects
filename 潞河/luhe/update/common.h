@@ -9,15 +9,11 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
-#define   LOG_FILE_NAME           "luhe.log"
-#define   CONFIG_FILE_NAME        "luhe.cfg"
+#define   LOG_FILE_NAME           "update.log"
+#define   CONFIG_FILE_NAME        "update.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
-#define   SKIN_FILE               "mainframe_luhe.xml"
-#define   SKIN_FOLDER             "proj_luhe_res"
-
-#define   UM_TRAY                 (WM_USER+1)
-#define   UM_ONCLOSE              (WM_USER+2)
-#define   UM_OTHER                (WM_USER+3)
+#define   SKIN_FILE               "mainframe_update.xml"
+#define   SKIN_FOLDER             "proj_update_res"
 
 
 class  CGlobalData {
