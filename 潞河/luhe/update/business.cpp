@@ -49,6 +49,8 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
+	g_data.m_cfg->GetConfig("server address", g_data.m_szServerAddr, sizeof(g_data.m_szServerAddr), "");
+
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
 		return -1;

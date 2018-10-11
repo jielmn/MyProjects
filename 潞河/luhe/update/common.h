@@ -19,12 +19,25 @@
 #define   UM_TRAY                 (WM_USER+1)
 #define   UM_ONCLOSE              (WM_USER+2)
 #define   UM_OTHER                (WM_USER+3)
+#define   UM_UPDATE_RET           (WM_USER+4)
+
+#define  TIMER_UPDATE_CHECK_ID        100
+#define  TIMER_UPDATE_CHECK_INTERVAL  5000
+
+#define  FETCH_STATION               1
+#define  STATE_OK                    0
+#define  STATE_FETCH                 1
+
+#define  STATION_EXE_NAME           "TelemedStation.exe"
+#define  STATION_CLASS_WINDOW_NAME  "DUIMainFrame_STATION"
 
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
+
+	char                      m_szServerAddr[64];
 
 public:
 	CGlobalData() {

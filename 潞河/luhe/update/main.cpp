@@ -9,11 +9,33 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "httpstack.h"
+
+void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen, 
+	          const char * szHeader, DWORD dwHeaderLen, void * context ) {
+	int nCmd = (int)context;
+	// 如果是获取更新版本
+	if ( nCmd == FETCH_STATION ) {
+		if ( nError == 0 ) {
+			FILE * fp = fopen(STATION_EXE_NAME, "wb");
+			// 如果打开文件失败，则更新失败
+			if ( 0 == fp ) {
+
+			}
+			fwrite(szData, 1, dwDataLen, fp);
+			fclose(fp);
+			// 更新成功
+		}
+	}
+}
+
 
 
 
 CDuiFrameWnd::CDuiFrameWnd() {
+	m_nState = STATE_OK;
 
+	InitHttpStack(OnHttp);
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -26,29 +48,9 @@ void  CDuiFrameWnd::InitWindow() {
 	dwStyle = dwStyle | WS_EX_TOOLWINDOW;
 	::SetWindowLong( m_hWnd, GWL_EXSTYLE, dwStyle);
 
+	LaunchStation();
 
-	TCHAR szCommandLine[MAX_PATH];
-	memset(szCommandLine, 0, sizeof(szCommandLine));
-	lstrcpy(szCommandLine, _T("luhe.exe"));//要启动的进程
-	STARTUPINFO si = { sizeof(si) };
-	PROCESS_INFORMATION pi;
-	BOOL bRet = CreateProcess(
-		NULL,					// name of executable module
-		szCommandLine,			// command line string
-		NULL,					// process attributes
-		NULL,					// thread attributes
-		FALSE,					// handle inheritance option
-		0, //CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE,//0,		UNICODE版本下				// creation flags
-		NULL,					// new environment block
-		NULL,					// current directory name
-		&si,					// startup information
-		&pi); 				    // process information
-	if (!bRet)
-	{
-		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to launch luhe.exe \n");
-		this->PostMessage(WM_CLOSE);
-	}
-
+	SetTimer(m_hWnd, TIMER_UPDATE_CHECK_ID, TIMER_UPDATE_CHECK_INTERVAL, NULL);
 	WindowImplBase::InitWindow();
 }
 
@@ -68,6 +70,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if ( uMsg == UM_TRAY ) {
 		OnTrayMsg(wParam, lParam);
+	}
+	else if (uMsg == WM_TIMER) {
+		if (wParam == TIMER_UPDATE_CHECK_ID) {
+			OnUpdateCheck();
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -129,6 +136,84 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 	}
 }
 
+void   CDuiFrameWnd::OnUpdateCheck() {
+	// 如果未知服务器地址
+	if ( g_data.m_szServerAddr[0] == '\0' ) {
+		return;
+	}
+
+	// 如果状态不为OK
+	if ( m_nState != STATE_OK ) {
+		return;
+	}
+
+	// 获取本地版本号
+
+	// 获取服务器版本号
+
+	// 比较版本号，是否需要升级
+
+	// 升级处理
+	// 1. 查看433进程是否存在，如果存在，则关闭进程	
+	HWND hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+	if (0 != hWnd) {
+		::PostMessage(hWnd, WM_CLOSE, 0, 0);
+
+		// 查看进程是否关闭
+		hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+		while (hWnd) {
+			Sleep(1000);
+			hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+		}		
+	}
+
+	// 2.重命名原433程序为old.exe
+	DeleteFile("old.exe");
+	MoveFile(STATION_EXE_NAME, "old.exe");
+
+	// 从服务器上下载最新版本
+	std::string strUrl = g_data.m_szServerAddr;
+	strUrl += "/";
+	strUrl += STATION_EXE_NAME;
+	CHttp::GetInstance()->Get(strUrl, (void *)FETCH_STATION);
+
+	m_nState = STATE_FETCH;
+
+	// 如果从服务器获取最新版本失败
+	//if ( !bFetch ) {
+	//	// 名字还原
+	//	MoveFile("old.exe", STATION_EXE_NAME);
+	//	LaunchStation();
+	//	return;
+	//}
+
+	//LaunchStation();
+}
+
+void   CDuiFrameWnd::LaunchStation() {
+	TCHAR szCommandLine[MAX_PATH];
+	memset(szCommandLine, 0, sizeof(szCommandLine));
+	lstrcpy(szCommandLine, _T(STATION_EXE_NAME));//要启动的进程
+	STARTUPINFO si = { sizeof(si) };
+	PROCESS_INFORMATION pi;
+	BOOL bRet = CreateProcess(
+		NULL,					// name of executable module
+		szCommandLine,			// command line string
+		NULL,					// process attributes
+		NULL,					// thread attributes
+		FALSE,					// handle inheritance option
+		0, //CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE,//0,		UNICODE版本下				// creation flags
+		NULL,					// new environment block
+		NULL,					// current directory name
+		&si,					// startup information
+		&pi); 				    // process information
+	if (!bRet)
+	{
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to launch %s \n", STATION_EXE_NAME);
+		this->PostMessage(WM_CLOSE);
+	}
+}
+
 
 
 
@@ -145,6 +230,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		return 0;
 	}
 
+	char szCurDir[MAX_PATH];
+	GetModuleFileName(NULL, szCurDir, MAX_PATH);
+	char * pos = strrchr(szCurDir, '\\');
+	if (pos) {
+		*pos = '\0';
+		SetCurrentDirectory(szCurDir);
+	}
+	
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");

@@ -42,4 +42,9 @@ public:
 
 private:
 	NOTIFYICONDATA  m_nid;
+	int             m_nState;
+
+private:
+	void   OnUpdateCheck();
+	void   LaunchStation();
 };
