@@ -61,7 +61,7 @@ void  CDuiFrameWnd::AddTray(HICON hIcon) {
 	m_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	m_nid.uCallbackMessage = UM_TRAY;                         // 自定义的消息名称
 	m_nid.hIcon = hIcon;
-	STRNCPY(m_nid.szTip, "my tray", sizeof(m_nid.szTip));     // 信息提示
+	STRNCPY(m_nid.szTip, "433接收器", sizeof(m_nid.szTip));     // 信息提示
 	Shell_NotifyIcon(NIM_ADD, &m_nid);                        // 在托盘区添加图标
 	ShowWindow(false);
 }

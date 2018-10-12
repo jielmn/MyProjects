@@ -50,6 +50,10 @@ int CBusiness::Init() {
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
 	g_data.m_cfg->GetConfig("server address", g_data.m_szServerAddr, sizeof(g_data.m_szServerAddr), "");
+	DWORD dwLen = strlen(g_data.m_szServerAddr);
+	if ( dwLen > 0 && (g_data.m_szServerAddr[dwLen - 1] == '/' || g_data.m_szServerAddr[dwLen - 1] == '\\' ) ) {
+		g_data.m_szServerAddr[dwLen - 1] = '\0';
+	}
 
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {

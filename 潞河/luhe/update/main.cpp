@@ -16,15 +16,40 @@ void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	int nCmd = (int)context;
 	// 如果是获取更新版本
 	if ( nCmd == FETCH_STATION ) {
+		// 获取更新版本成功
 		if ( nError == 0 ) {
+			// 把原433程序改名
+			DeleteFile("old.exe");
+			MoveFile(STATION_EXE_NAME, "old.exe");
+
 			FILE * fp = fopen(STATION_EXE_NAME, "wb");
 			// 如果打开文件失败，则更新失败
 			if ( 0 == fp ) {
-
+				MoveFile("old.exe", STATION_EXE_NAME);
+				::PostMessage(g_data.m_hWnd, UM_UPDATE_RET, 1, 0);								
+				return;
 			}
 			fwrite(szData, 1, dwDataLen, fp);
 			fclose(fp);
 			// 更新成功
+			::PostMessage(g_data.m_hWnd, UM_UPDATE_RET, 0, 0);
+		}
+		// 获取更新版本失败
+		else {
+			::PostMessage(g_data.m_hWnd, UM_UPDATE_RET, 2, 0);
+		}
+	}
+	else if (nCmd == FETCH_VERSION) {
+		// 获取版本号成功
+		if (nError == 0) {
+			char * pVersion = new char[dwDataLen + 1];
+			memcpy(pVersion, szData, dwDataLen);
+			pVersion[dwDataLen] = '\0';
+			::PostMessage(g_data.m_hWnd, UM_VERSION_RET, 0, (LPARAM)pVersion);
+		}
+		// 获取版本号失败
+		else {
+			::PostMessage(g_data.m_hWnd, UM_VERSION_RET, -1, 0);
 		}
 	}
 }
@@ -34,7 +59,7 @@ void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_nState = STATE_OK;
-
+	memset(m_szRemoteVersion, 0, sizeof(m_szRemoteVersion));
 	InitHttpStack(OnHttp);
 }
 
@@ -43,6 +68,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	g_data.m_hWnd = this->GetHWND();
 
 	DWORD dwStyle = ::GetWindowLong(m_hWnd, GWL_EXSTYLE);
 	dwStyle = dwStyle | WS_EX_TOOLWINDOW;
@@ -75,6 +101,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (wParam == TIMER_UPDATE_CHECK_ID) {
 			OnUpdateCheck();
 		}
+	}
+	else if (uMsg == UM_UPDATE_RET) {
+		OnUpdateRet(wParam, lParam);
+	}
+	else if (uMsg == UM_VERSION_RET) {
+		OnVersionRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -147,47 +179,11 @@ void   CDuiFrameWnd::OnUpdateCheck() {
 		return;
 	}
 
-	// 获取本地版本号
-
 	// 获取服务器版本号
-
-	// 比较版本号，是否需要升级
-
-	// 升级处理
-	// 1. 查看433进程是否存在，如果存在，则关闭进程	
-	HWND hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
-	if (0 != hWnd) {
-		::PostMessage(hWnd, WM_CLOSE, 0, 0);
-
-		// 查看进程是否关闭
-		hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
-		while (hWnd) {
-			Sleep(1000);
-			hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
-		}		
-	}
-
-	// 2.重命名原433程序为old.exe
-	DeleteFile("old.exe");
-	MoveFile(STATION_EXE_NAME, "old.exe");
-
-	// 从服务器上下载最新版本
 	std::string strUrl = g_data.m_szServerAddr;
-	strUrl += "/";
-	strUrl += STATION_EXE_NAME;
-	CHttp::GetInstance()->Get(strUrl, (void *)FETCH_STATION);
-
-	m_nState = STATE_FETCH;
-
-	// 如果从服务器获取最新版本失败
-	//if ( !bFetch ) {
-	//	// 名字还原
-	//	MoveFile("old.exe", STATION_EXE_NAME);
-	//	LaunchStation();
-	//	return;
-	//}
-
-	//LaunchStation();
+	strUrl += "/version.txt";
+	CHttp::GetInstance()->Get(strUrl, (void *)FETCH_VERSION);
+	m_nState = STATE_GET_VERSION;
 }
 
 void   CDuiFrameWnd::LaunchStation() {
@@ -214,6 +210,69 @@ void   CDuiFrameWnd::LaunchStation() {
 	}
 }
 
+void   CDuiFrameWnd::OnUpdateRet(WPARAM wParam, LPARAM lParam) {
+	int nRet = wParam;
+	if ( 0 == nRet ) {
+		g_data.m_cfg->SetConfig("station version", m_szRemoteVersion);
+		g_data.m_cfg->Save();
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "update OK \n");
+	}
+
+	LaunchStation();
+
+	m_nState = STATE_OK;
+}
+
+void  CDuiFrameWnd::OnVersionRet(WPARAM wParam, LPARAM lParam) {
+	int nRet = wParam;
+	char * pVersion = (char *)lParam;
+
+	// 获取版本号成功
+	if (0 == nRet) {
+		assert(pVersion);
+
+		char szVersion[256];
+		g_data.m_cfg->GetConfig("station version", szVersion, sizeof(szVersion), "");
+		// 如果版本号相同
+		if ( 0 == StrICmp(szVersion, pVersion) ) {
+			m_nState = STATE_OK;
+		}
+		// 版本号不同
+		else {
+			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "remote version is different from local. start updating \n");
+			STRNCPY(m_szRemoteVersion, pVersion, sizeof(m_szRemoteVersion));
+
+			// 1. 查看433进程是否存在，如果存在，则关闭进程	
+			HWND hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+			if (0 != hWnd) {
+				::PostMessage(hWnd, WM_CLOSE, 0, 0);
+
+				// 查看进程是否关闭
+				hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+				while (hWnd) {
+					Sleep(1000);
+					hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+				}
+			}
+
+			// 2. 从服务器上下载最新版本
+			std::string strUrl = g_data.m_szServerAddr;
+			strUrl += "/";
+			strUrl += STATION_EXE_NAME;
+			CHttp::GetInstance()->Get(strUrl, (void *)FETCH_STATION);
+			m_nState = STATE_FETCH;
+		}
+	}
+	// 获取版本号失败
+	else {
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to get remote version \n");
+		m_nState = STATE_OK;
+	}
+
+	if (pVersion) {
+		delete[] pVersion;
+	}
+}
 
 
 

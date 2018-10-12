@@ -43,8 +43,11 @@ public:
 private:
 	NOTIFYICONDATA  m_nid;
 	int             m_nState;
+	char            m_szRemoteVersion[256];
 
 private:
 	void   OnUpdateCheck();
 	void   LaunchStation();
+	void   OnUpdateRet(WPARAM wParam, LPARAM lParam);
+	void   OnVersionRet(WPARAM wParam, LPARAM lParam);
 };
