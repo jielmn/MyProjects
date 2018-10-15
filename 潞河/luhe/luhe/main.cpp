@@ -9,7 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
-
+#include "LmnTelSvr.h"
 
 
 CDuiFrameWnd::CDuiFrameWnd() {
@@ -112,7 +112,10 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 
 
 
-
+// integer, text arguments
+void PrintStatus(int nCnt, void * args[]) {
+	CBusiness::GetInstance()->PrintStatusAsyn();
+}
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -128,6 +131,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
+
+	JTelSvrRegCommand("status", "check status", PrintStatus, 0);
+
+	DWORD  dwPort = 0;
+	g_data.m_cfg->GetConfig("telnet port", dwPort, 1207);
+	JTelSvrStart((unsigned short)dwPort, 10);
+
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
