@@ -24,7 +24,8 @@ create table TEMPERMONITOR
   mtime      timestamp not null,
   nurseid    VARCHAR(16),
   bodyindex  tinyint not null default 0,
-  islast     tinyint not null default 0
+  islast     tinyint not null default 0,
+  isbind     tinyint not null default 0
 );
 
 create table PATIENTRELTAG
