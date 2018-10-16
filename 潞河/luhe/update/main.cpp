@@ -181,7 +181,7 @@ void   CDuiFrameWnd::OnUpdateCheck() {
 
 	// 获取服务器版本号
 	std::string strUrl = g_data.m_szServerAddr;
-	strUrl += "/version.txt";
+	strUrl += "/update/version.txt";
 	CHttp::GetInstance()->Get(strUrl, (void *)FETCH_VERSION);
 	m_nState = STATE_GET_VERSION;
 }
@@ -257,7 +257,7 @@ void  CDuiFrameWnd::OnVersionRet(WPARAM wParam, LPARAM lParam) {
 
 			// 2. 从服务器上下载最新版本
 			std::string strUrl = g_data.m_szServerAddr;
-			strUrl += "/";
+			strUrl += "/update/";
 			strUrl += STATION_EXE_NAME;
 			CHttp::GetInstance()->Get(strUrl, (void *)FETCH_STATION);
 			m_nState = STATE_FETCH;

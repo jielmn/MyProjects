@@ -10,6 +10,32 @@
 #include "business.h"
 #include "resource.h"
 #include "LmnTelSvr.h"
+#include "httpstack.h"
+
+
+void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
+	const char * szHeader, DWORD dwHeaderLen, void * context) {
+	TempItem * pItem = (TempItem *)context;
+
+	if (nError == 0) {
+		int n = 0;
+		char szMsg[64] = { 0 };
+		memcpy(szMsg, szData, min(dwDataLen, sizeof(szMsg) - 1));
+		sscanf(szMsg, "%d", &n);
+
+		if ( n == 0) {
+			JTelSvrPrint("send temp to server OK.");
+		}
+		else {
+			JTelSvrPrint("send temp to server FAIL, error = %d", n);
+		}
+	}
+	else {
+		JTelSvrPrint("send temp to server FAIL.");
+	}
+
+	delete pItem;
+}
 
 
 CDuiFrameWnd::CDuiFrameWnd() {
@@ -127,6 +153,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		return 0;
 	}
+
+	InitHttpStack(OnHttp);
 
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();

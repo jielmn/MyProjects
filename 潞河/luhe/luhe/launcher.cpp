@@ -1,6 +1,8 @@
+#include <time.h>
 #include "common.h"
 #include "launcher.h"
-
+#include "httpstack.h"
+#include "LmnTelSvr.h"
 
 CLaunch::CLaunch() {
 
@@ -55,6 +57,57 @@ int  CLaunch::Reconnect() {
 	// 通知成功
 	m_sigStatus.emit(GetStatus());
 	m_recv_buf.Clear();
+
+	return 0;
+}
+
+// 获取数据
+int  CLaunch::GetData() {
+
+	// 如果串口没有打开
+	if (GetStatus() == CLmnSerialPort::CLOSE) {
+		return 0;
+	}
+
+	BYTE buf[8192];
+	DWORD  dwBufLen = sizeof(buf);
+	if (Read(buf, dwBufLen)) {
+		if (dwBufLen > 0) {
+			m_recv_buf.Append(buf, dwBufLen);
+		}
+	}
+
+	const DWORD  dwItemLen = 4;
+	CLmnString strText;
+
+	// 如果获取一条温度数据
+	if ( m_recv_buf.GetDataLength() >= dwItemLen ) {
+		m_recv_buf.Read( buf, dwItemLen );
+		DWORD  dwTemp = (buf[0] - '0') * 1000 + (buf[1] - '0') * 100 + (buf[2] - '0') * 10 + (buf[3] - '0') ;
+
+		TempItem * pItem = new TempItem;
+		memset(pItem, 0, sizeof(TempItem));
+		pItem->dwTemp = dwTemp;
+		pItem->tTime = time(0);
+
+		// 如果有服务器地址
+		if (g_data.m_szServerAddr[0] != '\0') {
+			std::string strUrl = g_data.m_szServerAddr;
+			strUrl += "/main?type=upload&temp=";
+			strUrl += strText.Format("%lu", pItem->dwTemp);
+			strUrl += "&time=";
+			strUrl += strText.Format("%lu", (DWORD)pItem->tTime);
+			strUrl += "&bind=";
+			strUrl += strText.Format("%d", g_data.m_bBindingReader) ;
+
+			CHttp::GetInstance()->Get(strUrl, (void *)pItem);
+		}
+		else {
+			JTelSvrPrint("server address is empty.");
+		}
+	}
+	m_recv_buf.Reform();
+
 
 	return 0;
 }

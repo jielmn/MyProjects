@@ -12,6 +12,9 @@ public:
 	// 重连
 	int  Reconnect();
 
+	// 获取数据
+	int  GetData();
+
 public:
 	sigslot::signal1<CLmnSerialPort::PortStatus>             m_sigStatus;
 	sigslot::signal1<DWORD>                                  m_sigReconnect;

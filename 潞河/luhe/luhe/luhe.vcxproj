@@ -95,7 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Shell32.lib;Ws2_32.lib;Setupapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Shell32.lib;Ws2_32.lib;Setupapi.lib;Secur32.lib;Crypt32.lib;Ws2_32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\proj_luhe_res  ..\Debug\res\proj_luhe_res /dseiy</Command>
@@ -131,7 +131,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Shell32.lib;Ws2_32.lib;Setupapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Shell32.lib;Ws2_32.lib;Setupapi.lib;Secur32.lib;Crypt32.lib;Ws2_32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -159,15 +159,21 @@
   <ItemGroup>
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="httpstack.cpp" />
     <ClCompile Include="launcher.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="seli.cpp" />
+    <ClCompile Include="ssl_adapter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="httpstack.h" />
     <ClInclude Include="launcher.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="seli.h" />
+    <ClInclude Include="ssl_adapter.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="luhe.rc" />

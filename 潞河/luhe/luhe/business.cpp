@@ -31,6 +31,12 @@ void CBusiness::Clear() {
 		delete g_data.m_cfg;
 		g_data.m_cfg = 0;
 	}
+
+	if (g_data.m_update_cfg) {
+		g_data.m_update_cfg->Deinit();
+		delete g_data.m_update_cfg;
+		g_data.m_update_cfg = 0;
+	}
 }
 
 int CBusiness::Init() {
@@ -50,6 +56,21 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
+
+	g_data.m_update_cfg = new FileConfigEx();
+	if (0 == g_data.m_update_cfg) {
+		return -1;
+	}
+	g_data.m_update_cfg->Init(UPDATE_FILE_NAME);
+
+	g_data.m_update_cfg->GetConfig("server address", g_data.m_szServerAddr, sizeof(g_data.m_szServerAddr), "");
+	DWORD dwLen = strlen(g_data.m_szServerAddr);
+	if (dwLen > 0 && (g_data.m_szServerAddr[dwLen - 1] == '/' || g_data.m_szServerAddr[dwLen - 1] == '\\')) {
+		g_data.m_szServerAddr[dwLen - 1] = '\0';
+	}
+
+	g_data.m_cfg->GetBooleanConfig("binding reader", g_data.m_bBindingReader);
+
 
 	g_data.m_thrd_com = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_com) {
@@ -104,6 +125,8 @@ int  CBusiness::PrintStatus() {
 	DWORD  dwCfgLaunchPort = 0;
 	g_data.m_cfg->GetConfig("launch port", dwCfgLaunchPort, 0);
 	JTelSvrPrint("launch port = %lu", dwCfgLaunchPort);
+	JTelSvrPrint("server addr = %s", g_data.m_szServerAddr);	
+	JTelSvrPrint("binding reader = %s", g_data.m_bBindingReader ? "true" : "false" );
 	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close"  );
 	
 	return 0;
@@ -120,12 +143,14 @@ int  CBusiness::GetStationDataAsyn(DWORD  dwDelay /*= 0*/) {
 }
 
 int  CBusiness::GetStationData() {
+	m_launch.GetData();
+	GetStationDataAsyn();
 	return 0;
 }
 
 void  CBusiness::OnLaunchStatus(CLmnSerialPort::PortStatus s) {
 	if ( s == CLmnSerialPort::OPEN ) {
-
+		GetStationDataAsyn();
 	}
 }
 

@@ -12,6 +12,7 @@
 #define   GLOBAL_LOCK_NAME        "LUHE"
 #define   LOG_FILE_NAME           "station.log"
 #define   CONFIG_FILE_NAME        "station.cfg"
+#define   UPDATE_FILE_NAME        "update.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame_STATION"
 #define   SKIN_FILE               "mainframe_luhe.xml"
 #define   SKIN_FOLDER             "proj_luhe_res"
@@ -25,13 +26,28 @@
 #define   MSG_GET_STATION_DATA    3
 
 #define   RECONNECT_LAUNCH_TIME_INTERVAL       10000
+#define   READER_ID_LENGTH                     8
+#define   TAG_ID_LENGTH                        8
+#define   NURSE_ID_LENGTH                      8
 
+typedef struct tagTempItem {
+	BYTE    pbReaderId[READER_ID_LENGTH];
+	BYTE    pbTagId[TAG_ID_LENGTH];
+	BYTE    pbNurseId[NURSE_ID_LENGTH];
+	DWORD   dwTemp;
+	time_t  tTime;
+}TempItem;
 
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
+	IConfig *                 m_update_cfg;
 	LmnToolkits::Thread *     m_thrd_com;                // 读串口的线程
+
+
+	char                      m_szServerAddr[64];
+	BOOL                      m_bBindingReader;
 
 public:
 	CGlobalData() {
