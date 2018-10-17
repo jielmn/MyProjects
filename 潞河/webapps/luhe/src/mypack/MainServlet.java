@@ -60,22 +60,6 @@ public class MainServlet extends HttpServlet {
 		
 		PrintWriter out = rsp.getWriter();		
 		
-		/*
-		out.print("hello");
-		Connection con = null;
-		try{
-			con = getConnection();
-		} catch(Exception e) {
-			out.print(e.getMessage());
-		}
-		
-		if ( con == null ) {
-			out.print("null");
-		} else { 
-			out.print("ok");
-		}
-		*/
-		
 			
 		if ( type.length() == 0 ) {
 			
@@ -168,15 +152,13 @@ public class MainServlet extends HttpServlet {
 		}
 		
 		try {
-			//Class.forName("com.mysql.jdbc.Driver");
-			//DriverManager.registerDriver( new com.mysql.jdbc.Driver() );			
-			//Connection con = java.sql.DriverManager.getConnection(dbUrl,dbUser,dbPwd);
 			
 			Connection con = null;
 			try{
 				con = getConnection();
 			}
 			catch(Exception e ) {
+				setContentError(out,-1);
 				out.print(e.getMessage());
 				return;
 			}

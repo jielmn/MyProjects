@@ -85,10 +85,15 @@ int  CLaunch::GetData() {
 		m_recv_buf.Read( buf, dwItemLen );
 		DWORD  dwTemp = (buf[0] - '0') * 1000 + (buf[1] - '0') * 100 + (buf[2] - '0') * 10 + (buf[3] - '0') ;
 
+		int * pArg = new int[2];
+
 		TempItem * pItem = new TempItem;
 		memset(pItem, 0, sizeof(TempItem));
 		pItem->dwTemp = dwTemp;
 		pItem->tTime = time(0);
+
+		pArg[0] = (int)TYPE_UPLOAD_TEMP;
+		pArg[1] = (int)pItem;
 
 		// 如果有服务器地址
 		if (g_data.m_szServerAddr[0] != '\0') {
@@ -100,7 +105,7 @@ int  CLaunch::GetData() {
 			strUrl += "&bind=";
 			strUrl += strText.Format("%d", g_data.m_bBindingReader) ;
 
-			CHttp::GetInstance()->Get(strUrl, (void *)pItem);
+			CHttp::GetInstance()->Get(strUrl, (void *)pArg);
 		}
 		else {
 			JTelSvrPrint("server address is empty.");

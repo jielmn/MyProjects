@@ -13,7 +13,7 @@ create table PATIENTINFO
   gender        CHAR(1) not null,
   bedid         VARCHAR(16),
   age           tinyint not null
-);
+) DEFAULT CHARSET=utf8;
 
 create table TEMPERMONITOR
 (
@@ -26,7 +26,7 @@ create table TEMPERMONITOR
   bodyindex  tinyint not null default 0,
   islast     tinyint not null default 0,
   isbind     tinyint not null default 0
-);
+)DEFAULT CHARSET=utf8;
 
 create table PATIENTRELTAG
 (
@@ -35,13 +35,21 @@ create table PATIENTRELTAG
   tagid      VARCHAR(8) not null,
   reltime    timestamp,
   unique( patientid, tagid )
-);
+)DEFAULT CHARSET=utf8;
 
 create table NURSEINFO
 (
   nurseid    varchar(16) not null primary key,
   name       varchar(16) not null
-);
+)DEFAULT CHARSET=utf8;
+
+create table STATION
+(
+	ip       varchar(16) not null primary key,
+	name     varchar(32) not null,
+	atime    timestamp not null
+)DEFAULT CHARSET=utf8;
+
 
 
 

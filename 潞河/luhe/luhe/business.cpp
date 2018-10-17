@@ -71,7 +71,14 @@ int CBusiness::Init() {
 
 	g_data.m_cfg->GetBooleanConfig("binding reader", g_data.m_bBindingReader);
 
-
+	char szName[256];
+	g_data.m_cfg->GetConfig("name", szName, sizeof(szName), "");
+	if ( szName[0] == '\0' ) {
+		STRNCPY(szName, "unknonw", sizeof(szName));
+	}
+	//Utf8ToAnsi(g_data.m_szName, sizeof(g_data.m_szName), szName);
+	STRNCPY(g_data.m_szName, szName, sizeof(g_data.m_szName));
+		
 	g_data.m_thrd_com = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_com) {
 		return -1;
@@ -124,11 +131,15 @@ int  CBusiness::PrintStatusAsyn(DWORD  dwDelay /*= 0*/) {
 int  CBusiness::PrintStatus() {
 	DWORD  dwCfgLaunchPort = 0;
 	g_data.m_cfg->GetConfig("launch port", dwCfgLaunchPort, 0);
+
+	char szName[256] = { 0 };
+	Utf8ToAnsi(szName, sizeof(szName), g_data.m_szName);
 	JTelSvrPrint("launch port = %lu", dwCfgLaunchPort);
 	JTelSvrPrint("server addr = %s", g_data.m_szServerAddr);	
 	JTelSvrPrint("binding reader = %s", g_data.m_bBindingReader ? "true" : "false" );
 	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close"  );
-	
+	JTelSvrPrint("name = %s", szName);
+
 	return 0;
 }
 

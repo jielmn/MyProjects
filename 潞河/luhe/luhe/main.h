@@ -39,6 +39,7 @@ public:
 
 	void    AddTray(HICON hIcon);
 	void    OnTrayMsg(WPARAM wParam, LPARAM  lParam);
+	void    OnMyTimer(WPARAM wParam, LPARAM  lParam);
 
 private:
 	NOTIFYICONDATA  m_nid;

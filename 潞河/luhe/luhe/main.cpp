@@ -15,26 +15,57 @@
 
 void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	const char * szHeader, DWORD dwHeaderLen, void * context) {
-	TempItem * pItem = (TempItem *)context;
+	int * pArg = (int *)context;
+	int nType = pArg[0];
 
-	if (nError == 0) {
-		int n = 0;
-		char szMsg[64] = { 0 };
-		memcpy(szMsg, szData, min(dwDataLen, sizeof(szMsg) - 1));
-		sscanf(szMsg, "%d", &n);
+	if (nType == TYPE_UPLOAD_TEMP) {
+		TempItem * pItem = (TempItem *)pArg[1];
 
-		if ( n == 0) {
-			JTelSvrPrint("send temp to server OK.");
+		if (nError == 0) {
+			int n = 0;
+			char szMsg[8192] = { 0 };
+			char szDescription[8192] = { 0 };
+			char buf[8192] = { 0 };
+			memcpy(szMsg, szData, min(dwDataLen, sizeof(szMsg) - 1));
+			sscanf(szMsg, "%d%s", &n, buf);
+			Utf8ToAnsi(szDescription, sizeof(szDescription), buf);
+
+			if (n == 0) {
+				JTelSvrPrint("send temp to server OK.");
+			}
+			else {
+				JTelSvrPrint("send temp to server FAIL, error = %d, description = %s", n, szDescription);
+			}
 		}
 		else {
-			JTelSvrPrint("send temp to server FAIL, error = %d", n);
+			JTelSvrPrint("send temp to server FAIL.");
+		}
+
+		delete pItem;
+	}
+	else if (nType == TYPE_HEART_BEAT) {
+		if (nError == 0) {
+			int n = 0;
+			char szMsg[8192] = { 0 };
+			char szDescription[8192] = { 0 };
+			char buf[8192] = { 0 };
+			memcpy(szMsg, szData, min(dwDataLen, sizeof(szMsg) - 1));
+			sscanf(szMsg, "%d%s", &n, buf);
+			Utf8ToAnsi(szDescription, sizeof(szDescription), buf);
+
+			if (n == 0) {
+				JTelSvrPrint("heart beat OK.");
+			}
+			else {
+				JTelSvrPrint("heart beat FAIL, error = %d, description = %s", n, szDescription);
+			}
+		}
+		else {
+			JTelSvrPrint("heart beat FAIL.");
 		}
 	}
-	else {
-		JTelSvrPrint("send temp to server FAIL.");
-	}
-
-	delete pItem;
+	
+	delete[] pArg;
 }
 
 
@@ -51,6 +82,8 @@ void  CDuiFrameWnd::InitWindow() {
 	DWORD dwStyle = ::GetWindowLong(m_hWnd, GWL_EXSTYLE);
 	dwStyle = dwStyle | WS_EX_TOOLWINDOW;
 	::SetWindowLong( m_hWnd, GWL_EXSTYLE, dwStyle);
+
+	SetTimer(m_hWnd, TIMER_HEART_BEAT, TIMER_HEART_BEAT_INTERVAL, NULL);
 
 	WindowImplBase::InitWindow();
 }
@@ -71,6 +104,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if ( uMsg == UM_TRAY ) {
 		OnTrayMsg(wParam, lParam);
+	}
+	else if (uMsg == WM_TIMER) {
+		OnMyTimer(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -109,8 +145,8 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 		//生成托盘菜单
 		hMenu = CreatePopupMenu();
 		//添加菜单,关键在于设置的一个标识符  WM_ONCLOSE 点击后会用到		
-		AppendMenu(hMenu, MF_STRING, UM_OTHER,   _T("Show me"));
-		AppendMenu(hMenu, MF_STRING, UM_ONCLOSE, _T("Exit"));
+		//AppendMenu(hMenu, MF_STRING, UM_OTHER,   _T("Show me"));
+		AppendMenu(hMenu, MF_STRING, UM_ONCLOSE, _T("退出"));
 		//弹出菜单,并把用户所选菜单项的标识符返回
 		int cmd = TrackPopupMenu(hMenu, TPM_RETURNCMD, pt.x, pt.y, NULL, m_hWnd, NULL);
 		//如果标识符是WM_ONCLOSE则关闭
@@ -118,9 +154,9 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 		{			
 			this->PostMessage(WM_CLOSE);
 		}
-		else if (cmd == UM_OTHER) {
-			this->ShowWindow();
-		}
+		//else if (cmd == UM_OTHER) {
+		//	this->ShowWindow();
+		//}
 		DestroyMenu(hMenu);
 	}
 	break;
@@ -132,6 +168,18 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 	}
 	break;
 
+	}
+}
+
+void   CDuiFrameWnd::OnMyTimer(WPARAM wParam, LPARAM  lParam) {
+	if ( wParam == TIMER_HEART_BEAT ) {
+		int * pArg = new int[1];
+		pArg[0] = TYPE_HEART_BEAT;
+
+		std::string strUrl = g_data.m_szServerAddr;
+		strUrl += "/manage?type=heartbeat&name=";
+		strUrl += UrlEncode(g_data.m_szName);
+		CHttp::GetInstance()->Get(strUrl, (void *)pArg);
 	}
 }
 

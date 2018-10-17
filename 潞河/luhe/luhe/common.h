@@ -30,6 +30,12 @@
 #define   TAG_ID_LENGTH                        8
 #define   NURSE_ID_LENGTH                      8
 
+#define   TIMER_HEART_BEAT                     90
+#define   TIMER_HEART_BEAT_INTERVAL            60000
+
+#define   TYPE_UPLOAD_TEMP                     1
+#define   TYPE_HEART_BEAT                      2
+
 typedef struct tagTempItem {
 	BYTE    pbReaderId[READER_ID_LENGTH];
 	BYTE    pbTagId[TAG_ID_LENGTH];
@@ -48,6 +54,7 @@ public:
 
 	char                      m_szServerAddr[64];
 	BOOL                      m_bBindingReader;
+	char                      m_szName[64];
 
 public:
 	CGlobalData() {
@@ -60,6 +67,7 @@ public:
 extern CGlobalData  g_data;
 
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
+extern std::string UrlEncode(const std::string& str);
 
 
 // templates
