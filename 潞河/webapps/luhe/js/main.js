@@ -1,4 +1,5 @@
-var addr = "http://192.168.0.99/luhe/";
+//var addr = "http://192.168.0.99/luhe/";
+var addr = "";
 var content_len  = "30%";
 
 function onTabChange(index){
@@ -26,7 +27,7 @@ function getUrlParam(name) {
 function onMainLoad() {
 	//uid = getUrlParam('uid');
 	$("#iframeMine").attr('src','station.html'); 
-	$("#iframeGroup").attr('src','group.html'); 
+	$("#iframeGroup").attr('src','patient.html'); 
 	
 	$("#divMine").click(function(){
 	  onTabChange(0);
@@ -40,17 +41,21 @@ function onMainLoad() {
 // “我的”页面加载
 function onMineLoad() {
 	console.log("mine load")
-	//uid = getUrlParam('uid');
-	//alert("content:"+uid);
 	getStationList();
 }
 
 function getStationList() {
 	console.log("getStationList ......");
-	$.get(addr+"manage?type=station_list",function(data,status){
-		if ( "success" == status && 0 == data.error ) {
-			console.log("get station list success");
-			console.log(data);
+	jQuery.ajax({
+	type: "get",
+	url: addr+"manage?",
+	//data: "bid="+my_bid+"&name_cn="+name_cn+"&timeStamp=" + new Date().getTime(),
+	data: {'type':'station_list'},
+	dataType: 'json',
+	error: function (err) { console.log("get station list failed!"); },
+	success: function (data) {
+		console.log(data);
+		if ( 0 == data.error ) {
 			$("#divStationList").css('display','block');	
 			if ( data.stationlist.length == 0 ) {
 				$("#divNone").css('display','block');
@@ -64,10 +69,56 @@ function getStationList() {
 					var divIp = $('<div class="listitem" style="line-height:21px;" >' + data.stationlist[i].ip + '</div>');
 					item.append(divIp);
 				}
-			}			
+			}
+		}
+		else {
+			console.log("get station list failed!!!");
+		}
+	}});
+}
+
+
+// “数据”页面加载
+function onPatientLoad() {
+	console.log("patient load");
+	getPatientList();
+}
+
+function getPatientList() {
+	console.log("getPatientList ......");
+	jQuery.ajax({
+	type: "get",
+	url: addr+"manage?",
+	data: {'type':'patient_list'},
+	dataType: 'json',
+	error: function (err) { console.log("get patient list failed!"); },
+	success: function (data) {
+		console.log(data);
+		if ( 0 == data.error ) {
+			$("#divPatientList").css('display','block');	
+			if ( data.patientlist.length == 0 ) {
+				$("#divNone").css('display','block');
+			} else {
+				$("#divNone").css('display','none');
+				
+				for (var i = 0;i < data.patientlist.length;i++ ){
+					$("#divNone").before('<div class="row1"></div>');
+					var item = $("#divNone").prev();
+					var divId   = $('<div class="listitem" style="width:20%;line-height:21px;" >' + data.patientlist[i].id + '</div>');
+					var divName = $('<div class="listitem" style="width:20%;line-height:21px;" >' + data.patientlist[i].name + '</div>');
+					var divSex = $('<div class="listitem" style="width:20%;line-height:21px;" >' + (data.patientlist[i].sex == '1' ? '男' : '女')  + '</div>');
+					var divBed = $('<div class="listitem" style="width:20%;line-height:21px;" >' + data.patientlist[i].bed + '</div>');
+					var divAge = $('<div class="listitem" style="line-height:21px;" >' + data.patientlist[i].age + '</div>');
+					item.append(divId);
+					item.append(divName);
+					item.append(divSex);
+					item.append(divBed);
+					item.append(divAge);
+				}
+				
+			}
 		} else {
-			console.log("get station list fail");
-		}			
-	});
-	
+			console.log("get patient list failed!!!");
+		}
+	}});
 }

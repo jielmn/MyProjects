@@ -73,7 +73,16 @@ public class ManageServlet extends HttpServlet {
 				}
 				
 				heartbeat(out, name, req.getRemoteAddr() );
-			} else {
+			} 
+			else if (type.equals("station_list")) {
+				rsp.setContentType("application/json;charset=utf-8");				
+				station_list(out);
+			}
+			else if (type.equals("patient_list")) {
+				rsp.setContentType("application/json;charset=utf-8");				
+				patient_list(out);
+			}
+			else {
 				setContentError(out,-1);
 				out.print("invalid type");
 			}
@@ -133,6 +142,10 @@ public class ManageServlet extends HttpServlet {
 		out.print(errCode);
 	}
 	
+	public void setContentError_1(PrintWriter out, int errCode) {
+		out.print("{\"error\":"+errCode+"}");
+	}
+	
 	public void heartbeat( PrintWriter out, String name, String station_addr ) {				
 		
 		try {
@@ -165,6 +178,96 @@ public class ManageServlet extends HttpServlet {
 			setContentError(out,-1);
 			out.print(ex.getMessage());
         }		
+	}
+	
+	public void station_list ( PrintWriter out ) {
+		
+		try {
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select * from station;" );
+			
+			// 获取清单
+			JSONArray item_arr = new JSONArray();
+			while ( rs.next() ) {
+				String     ip          = rs.getString(1);
+				String     name        = rs.getString(2);
+				Timestamp  time        = rs.getTimestamp(3);
+				
+				JSONObject item_obj = new JSONObject();
+				item_obj.put("ip",           ip);
+				item_obj.put("name",         name);
+				item_obj.put("time",         time.getTime());
+				
+				item_arr.put(item_obj);
+			} 
+
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("stationlist", item_arr);
+			rsp_obj.put("error", 0);			
+			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void patient_list ( PrintWriter out ) {
+		
+		try {
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select * from patientinfo;" );
+			
+			// 获取清单
+			JSONArray item_arr = new JSONArray();
+			while ( rs.next() ) {
+				String     id          = rs.getString(2);
+				String     name        = rs.getString(3);
+				String     sex         = rs.getString(4);
+				String     bed         = rs.getString(5);
+				int        age         = rs.getInt(6);
+				
+				JSONObject item_obj = new JSONObject();
+				item_obj.put("id",           id);
+				item_obj.put("name",         name);
+				item_obj.put("sex",          sex);
+				item_obj.put("bed",          bed);
+				item_obj.put("age",          age);
+				
+				item_arr.put(item_obj);
+			} 
+
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("patientlist", item_arr);
+			rsp_obj.put("error", 0);			
+			out.print(rsp_obj.toString());
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
 	}
 }
 

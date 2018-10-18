@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-3.3.1.min.js" ></script>
+<script src="js/main.js" ></script>
+
+<script type="text/javascript">
+	$(document).ready(onPatientLoad);
+</script>
+
+</head>
+
+<body class="margin-none" style="display:block;" >
+  <div id="divClearPatient"  class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onClearPatients();" >清除病人信息</div>
+  <div id="divImportPatient" class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onClearPatients();" >导入病人信息</div>
+  <div style="line-heigh:50px;display:block;" >&nbsp;</div>  
+  
+  <div id="divPatientList" style="display:block" >
+	<div class="row" >病人列表</div>
+	
+	<div class="row1">
+		<div class="listitem" style="width:20%;line-height:21px;" >ID</div>
+		<div class="listitem" style="width:19%;line-height:21px;" >姓名</div>
+		<div class="listitem" style="width:20%;line-height:21px;" >性别</div>
+		<div class="listitem" style="width:19%;line-height:21px;" >床号</div>
+		<div class="listitem" style="line-height:21px;" >年龄</div>
+	</div>
+	
+    <div id="divTopLine" class="split-line" ></div>	
+	
+	<div id="divNone" style="display:block">
+		<div class="row" >(无)</div>
+		<div class="split-line" ></div>
+	</div>	
+	
+	<div></div>
+  </div>
+
+  
+
+</body>
+</html>
+
+
+
+
+  

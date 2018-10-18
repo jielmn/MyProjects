@@ -164,7 +164,7 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			Statement stmt = con.createStatement();      
-			stmt.executeUpdate( "insert into tempermonitor values( null, 'reader', 'tag', " + temp + ", '" + transForDate1(d) + "', 'nurse', 0, 0, " + bind + " );" );
+			stmt.executeUpdate( "insert into tempermonitor values( null, 'reader', 'tag', " + temp + ", '" + transForDate1(d) + "', 'nurse', 0, 1, " + bind + " );" );
 			setContentError(out,0);
 			
 			stmt.close();
