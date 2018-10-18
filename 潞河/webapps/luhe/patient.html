@@ -15,8 +15,22 @@
 </head>
 
 <body class="margin-none" style="display:block;" >
-  <div id="divClearPatient"  class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onClearPatients();" >清除病人信息</div>
-  <div id="divImportPatient" class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onClearPatients();" >导入病人信息</div>
+  <!--<div id="divClearPatient"  class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onClearPatients();" >清除病人信息</div>-->
+  <div style="line-height:42px;display:block;margin:10px;">
+	<form action="" method="post" enctype="multipart/form-data">
+		<input type="button" value="清除病人信息" onclick="onClearPatients();" />
+	</form>
+  </div>
+  
+  
+  <!--<div id="divImportPatient" class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onImportPatients();" >导入病人信息</div>-->
+  <div style="line-height:42px;display:block;margin:10px;">
+	<form action="" method="post" enctype="multipart/form-data" id="uploadForm" >
+		<input type="button" value="导入病人信息" onclick="onImportPatients();"  />
+		<input type="file" id="fileUpload1" name="fileUpload1" accept=".xls,.xlsx" />		
+	</form>
+  </div>
+  
   <div style="line-heigh:50px;display:block;" >&nbsp;</div>  
   
   <div id="divPatientList" style="display:block" >

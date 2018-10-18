@@ -82,6 +82,10 @@ public class ManageServlet extends HttpServlet {
 				rsp.setContentType("application/json;charset=utf-8");				
 				patient_list(out);
 			}
+			else if (type.equals("clear_patient")) {
+				rsp.setContentType("application/json;charset=utf-8");				
+				clear_patient(out);
+			}
 			else {
 				setContentError(out,-1);
 				out.print("invalid type");
@@ -268,6 +272,124 @@ public class ManageServlet extends HttpServlet {
         } catch (Exception ex ) {
            out.print(ex.getMessage());
         }
+	}
+	
+	public void clear_patient ( PrintWriter out ) {
+		
+		try {
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate( "delete from patientreltag;" );
+			stmt.executeUpdate( "delete from patientinfo;" );
+			setContentError_1(out,0);
+			
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	
+	
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		
+		response.setContentType("application/json;charset=utf-8");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+		
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		
+		PrintWriter out = response.getWriter();		
+		JSONArray item_arr = new JSONArray();		
+		int nError = 0;
+		String description = new String();
+		
+		try {
+			List items = upload.parseRequest(request);
+			Iterator itr = items.iterator();
+			while (itr.hasNext()) {				
+				FileItem item = (FileItem) itr.next();
+				if (item.isFormField()) {
+					//out.print("<p>from param name:" + item.getFieldName() + "，value:" + item.getString("UTF-8") + "</p>");
+				} else {
+					if (item.getName() != null && !item.getName().equals("")) {		
+						//description =  new String(item.getName().getBytes("gbk"),"UTF-8");
+						//description = item.getName();
+						
+						String post_fix = new String();
+						String s = item.getName();
+						String tmp  = s.substring( s.length() - 3 );
+						if ( tmp.equals("xls") ) {
+							post_fix = ".xls";
+						} else if (tmp.equals("lsx")) {
+							post_fix = ".xlsx";
+						} else {
+							post_fix = "";
+						}
+						
+						/*
+						int pos = item.getName().lastIndexOf(".");  
+						String post_fix = new String();
+						if ( pos > -1 ) {
+							post_fix = item.getName().substring( pos );
+						}
+						*/
+						
+						Date d = new Date();
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");						
+						String newRelativeName = "tmp/" + sdf.format(d) + post_fix;
+						String newFileName = this.getServletContext().getRealPath("/") + newRelativeName;
+						
+						//out.print("<p>new file:" + newFileName + "</p>" );										
+						File file = new File(newFileName);
+						item.write(file);
+						//out.print("<p>upload success!</p>");
+						
+						JSONObject item_obj = new JSONObject();
+						item_obj.put("filename",  newRelativeName);
+						item_arr.put(item_obj);
+						
+					} else {
+						//out.print("<p>no file!</p>");
+					}
+				}
+			}
+		} catch (FileUploadException e) {
+			e.printStackTrace();
+			nError = -1;
+			description = e.getMessage();
+		} catch (Exception e) {
+			e.printStackTrace();
+			//out.print("<p>failed to upload file!</p>");
+			nError = -2;
+			description = e.getMessage();
+		}
+		
+		if ( nError == 0 ) {			
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("upload_files", item_arr);
+			rsp_obj.put("error", 0);
+			//rsp_obj.put("description", description);
+			out.print(rsp_obj.toString());
+			//setContentError(out,0);
+		} else {
+			JSONObject rsp_obj = new JSONObject();
+			rsp_obj.put("error", nError);
+			rsp_obj.put("description", description);
+			out.print(rsp_obj.toString());
+		}
+		
+		out.close();
 	}
 }
 

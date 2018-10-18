@@ -102,7 +102,7 @@ function getPatientList() {
 				$("#divNone").css('display','none');
 				
 				for (var i = 0;i < data.patientlist.length;i++ ){
-					$("#divNone").before('<div class="row1"></div>');
+					$("#divNone").before('<div class="row2"></div>');
 					var item = $("#divNone").prev();
 					var divId   = $('<div class="listitem" style="width:20%;line-height:21px;" >' + data.patientlist[i].id + '</div>');
 					var divName = $('<div class="listitem" style="width:20%;line-height:21px;" >' + data.patientlist[i].name + '</div>');
@@ -121,4 +121,89 @@ function getPatientList() {
 			console.log("get patient list failed!!!");
 		}
 	}});
+}
+
+
+function onClearPatients() {
+	var msg = "您真的确定要清空病人信息吗？"; 
+	if (confirm(msg)==true){ 
+		console.log("clear patients ......");
+		jQuery.ajax({
+			type: "get",
+			url: addr+"manage?",
+			data: {'type':'clear_patient'},
+			dataType: 'json',
+			error: function (err) { console.log("clear patient failed!"); },
+			success: function (data) {
+				console.log(data);
+				if ( 0 == data.error ) {
+					$("#divPatientList").find(".row2").filter( function( index ) {
+						// console.log(index);
+						$( this ).remove();
+					});
+					$("#divNone").css('display','block');
+				} else {
+					console.log("clear patient failed!!!");
+				}
+		}});
+	}
+}
+
+function getType(file){
+	var filename=file;
+	var index1=filename.lastIndexOf(".");
+	var index2=filename.length;
+	var type=filename.substring(index1,index2);
+	return type;
+}
+
+function  onImportPatients() {
+	//console.log( $("#fileUpload1")[0].value );
+	var filename = $("#fileUpload1")[0].value;
+	if ( filename == "" ) {
+		alert("请选择文件");
+		return;
+	}
+	
+	var ext = getType(filename);
+	if ( ext != ".xls" && ext != ".xlsx" ) {
+		alert("请选择excel文件");
+		return;
+	}
+
+	var fd = new FormData();
+	//fd.append("paragram", 12345);
+	//console.log($("#fileUpload1").get(0).files[0]);
+	fd.append("upfile", $("#fileUpload1").get(0).files[0] );
+	
+	$.ajax({
+		 url: addr+"manage",
+		 type: "POST",
+		 processData: false,
+		 contentType: false,
+		 data: fd,
+		 success: function(data) {
+			console.log(data);
+		 }
+	})
+
+	
+	/*
+	jQuery.ajax({
+		type: "post",
+		url: addr+"manage",
+		enctype: 'multipart/form-data',
+		data: {
+			file: filename
+		},
+		error: function (err) { console.log("upload excel file failed!"); },
+		success: function (data) {
+			console.log(data);
+			if ( 0 == data.error ) {
+				console.log("upload excel file success!");
+			} else {
+				console.log("upload excel file failed!!!");
+			}
+	}});
+	*/
 }
