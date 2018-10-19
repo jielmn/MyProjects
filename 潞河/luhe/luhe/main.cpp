@@ -12,7 +12,6 @@
 #include "LmnTelSvr.h"
 #include "httpstack.h"
 
-
 void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	const char * szHeader, DWORD dwHeaderLen, void * context) {
 	int * pArg = (int *)context;
@@ -83,6 +82,13 @@ void  CDuiFrameWnd::InitWindow() {
 	dwStyle = dwStyle | WS_EX_TOOLWINDOW;
 	::SetWindowLong( m_hWnd, GWL_EXSTYLE, dwStyle);
 
+	m_edName = static_cast<CEditUI*>(m_PaintManager.FindControl("edtName"));
+	
+	char szName[256] = { 0 };
+	Utf8ToAnsi(szName, sizeof(szName), g_data.m_szName);
+	m_edName->SetText(szName);
+
+	OnMyTimer(TIMER_HEART_BEAT, 0);
 	SetTimer(m_hWnd, TIMER_HEART_BEAT, TIMER_HEART_BEAT_INTERVAL, NULL);
 
 	WindowImplBase::InitWindow();
@@ -96,6 +102,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if ( msg.sType == "click" ) {
 		if (msg.pSender->GetName() == "myclosebtn") {
 			ShowWindow(false);
+		}
+		else if (msg.pSender->GetName() == "btnOK") {
+			OnMyOk();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -145,7 +154,7 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 		//生成托盘菜单
 		hMenu = CreatePopupMenu();
 		//添加菜单,关键在于设置的一个标识符  WM_ONCLOSE 点击后会用到		
-		//AppendMenu(hMenu, MF_STRING, UM_OTHER,   _T("Show me"));
+		AppendMenu(hMenu, MF_STRING, UM_MODIFY_NAME,   _T("修改名称"));
 		AppendMenu(hMenu, MF_STRING, UM_ONCLOSE, _T("退出"));
 		//弹出菜单,并把用户所选菜单项的标识符返回
 		int cmd = TrackPopupMenu(hMenu, TPM_RETURNCMD, pt.x, pt.y, NULL, m_hWnd, NULL);
@@ -154,10 +163,10 @@ void  CDuiFrameWnd::OnTrayMsg(WPARAM wParam, LPARAM  lParam) {
 		{			
 			this->PostMessage(WM_CLOSE);
 		}
-		//else if (cmd == UM_OTHER) {
-		//	this->ShowWindow();
-		//}
-		DestroyMenu(hMenu);
+		else if (cmd == UM_MODIFY_NAME) {
+			this->ShowWindow();
+		}
+		DestroyMenu(hMenu);   
 	}
 	break;
 
@@ -183,9 +192,24 @@ void   CDuiFrameWnd::OnMyTimer(WPARAM wParam, LPARAM  lParam) {
 	}
 }
 
+void    CDuiFrameWnd::OnMyOk() {
+	CDuiString strName = m_edName->GetText();
+	if ( strName.GetLength() == 0 ) {
+		::MessageBox(GetHWND(), "请输入名称", "修改名称", 0);
+		return;
+	}
+
+	char szName[256] = { 0 };
+	AnsiToUtf8(g_data.m_szName, sizeof(g_data.m_szName), strName);
+	g_data.m_cfg->SetConfig("name", g_data.m_szName, "");
+	g_data.m_cfg->Save();
+
+	OnMyTimer(TIMER_HEART_BEAT, 0);
+}
 
 
 
+   
 // integer, text arguments
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();

@@ -40,7 +40,10 @@ public:
 	void    AddTray(HICON hIcon);
 	void    OnTrayMsg(WPARAM wParam, LPARAM  lParam);
 	void    OnMyTimer(WPARAM wParam, LPARAM  lParam);
+	
+	void    OnMyOk();
 
 private:
 	NOTIFYICONDATA  m_nid;
+	DuiLib::CEditUI *              m_edName;
 };

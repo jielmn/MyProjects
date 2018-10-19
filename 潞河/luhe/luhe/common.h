@@ -20,6 +20,7 @@
 #define   UM_TRAY                 (WM_USER+1)
 #define   UM_ONCLOSE              (WM_USER+2)
 #define   UM_OTHER                (WM_USER+3)
+#define   UM_MODIFY_NAME          (WM_USER+4)
 
 #define   MSG_RECONNECT_LAUNCH    1
 #define   MSG_PRINT_STATUS        2
@@ -31,7 +32,7 @@
 #define   NURSE_ID_LENGTH                      8
 
 #define   TIMER_HEART_BEAT                     90
-#define   TIMER_HEART_BEAT_INTERVAL            60000
+#define   TIMER_HEART_BEAT_INTERVAL            55000
 
 #define   TYPE_UPLOAD_TEMP                     1
 #define   TYPE_HEART_BEAT                      2
@@ -55,6 +56,7 @@ public:
 	char                      m_szServerAddr[64];
 	BOOL                      m_bBindingReader;
 	char                      m_szName[64];
+	BOOL                      m_bUtf8;
 
 public:
 	CGlobalData() {

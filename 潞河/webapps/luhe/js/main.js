@@ -45,12 +45,16 @@ function onMineLoad() {
 	getStationList();
 }
 
-function getStationList() {
-	console.log("getStationList ......");
+function clearStatioin() {
 	$("#divStationList").find(".row2").filter( function( index ) {
 		$( this ).remove();
 	});
 	$("#divNone").css('display','block');
+}
+
+function getStationList() {
+	console.log("getStationList ......");
+	
 	
 	jQuery.ajax({
 	type: "get",
@@ -58,13 +62,15 @@ function getStationList() {
 	//data: "bid="+my_bid+"&name_cn="+name_cn+"&timeStamp=" + new Date().getTime(),
 	data: {'type':'station_list','c':new Date().getTime()},
 	dataType: 'json',
-	error: function (err) { console.log("get station list failed!");setTimeout(getStationList,60000); },
+	error: function (err) { console.log("get station list failed!");clearStatioin();setTimeout(getStationList,60000); },
 	success: function (data) {
 		console.log(data);
+		clearStatioin();
+		
 		if ( 0 == data.error ) {
 			$("#divStationList").css('display','block');	
 			if ( data.stationlist.length == 0 ) {
-				$("#divNone").css('display','block');
+				//clearStatioin();
 			} else {
 				$("#divNone").css('display','none');
 				for (var i = 0;i < data.stationlist.length;i++ ){

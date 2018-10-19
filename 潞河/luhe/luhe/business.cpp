@@ -70,14 +70,20 @@ int CBusiness::Init() {
 	}
 
 	g_data.m_cfg->GetBooleanConfig("binding reader", g_data.m_bBindingReader);
-
+	g_data.m_cfg->GetBooleanConfig("utf8", g_data.m_bUtf8, TRUE);
+	
 	char szName[256];
 	g_data.m_cfg->GetConfig("name", szName, sizeof(szName), "");
 	if ( szName[0] == '\0' ) {
 		STRNCPY(szName, "unknonw", sizeof(szName));
 	}
+	if (g_data.m_bUtf8) {
+		STRNCPY(g_data.m_szName, szName, sizeof(g_data.m_szName));
+	}
+	else {
+		AnsiToUtf8(g_data.m_szName, sizeof(g_data.m_szName), szName);
+	}
 	//Utf8ToAnsi(g_data.m_szName, sizeof(g_data.m_szName), szName);
-	STRNCPY(g_data.m_szName, szName, sizeof(g_data.m_szName));
 		
 	g_data.m_thrd_com = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_com) {
