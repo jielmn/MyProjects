@@ -46,6 +46,15 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import java.io.File;
+import java.io.IOException;
+
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+
 public class ManageServlet extends HttpServlet {
 	    
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
@@ -85,6 +94,10 @@ public class ManageServlet extends HttpServlet {
 			else if (type.equals("clear_patient")) {
 				rsp.setContentType("application/json;charset=utf-8");				
 				clear_patient(out);
+			}
+			else if (type.equals("test")) {
+				rsp.setContentType("application/json;charset=utf-8");				
+				test(out);
 			}
 			else {
 				setContentError(out,-1);
@@ -197,7 +210,7 @@ public class ManageServlet extends HttpServlet {
 			}
 			
 			Statement stmt = con.createStatement();      
-			ResultSet rs = stmt.executeQuery("select * from station;" );
+			ResultSet rs = stmt.executeQuery("select * from station where unix_timestamp(now()) - unix_timestamp(atime) <= 60 ;" );			
 			
 			// 获取清单
 			JSONArray item_arr = new JSONArray();
@@ -303,7 +316,7 @@ public class ManageServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		
-		response.setContentType("application/json;charset=utf-8");
+		response.setContentType("text/html;charset=utf-8");
         response.setHeader("Access-Control-Allow-Origin", "*");
 		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -331,8 +344,6 @@ public class ManageServlet extends HttpServlet {
 						String tmp  = s.substring( s.length() - 3 );
 						if ( tmp.equals("xls") ) {
 							post_fix = ".xls";
-						} else if (tmp.equals("lsx")) {
-							post_fix = ".xlsx";
 						} else {
 							post_fix = "";
 						}
@@ -355,9 +366,34 @@ public class ManageServlet extends HttpServlet {
 						item.write(file);
 						//out.print("<p>upload success!</p>");
 						
+						Connection con = getConnection();
+						Statement stmt = con.createStatement();      
+						
+						File xlsFile = new File(newFileName);
+						Workbook workbook = Workbook.getWorkbook(xlsFile);
+						Sheet[] sheets = workbook.getSheets();
+						if (sheets != null)
+						{
+							Sheet sheet = sheets[0];
+							int rows = sheet.getRows();
+							int cols = sheet.getColumns();
+							if ( cols != 5 ) {
+								throw new Exception("excel columns not equal 5");
+							}
+							
+							for (int row = 0; row < rows; row++)
+							{
+								stmt.executeUpdate( "insert into patientinfo (patientid, patientname, gender, bedid, age ) values('" + sheet.getCell(0, row).getContents() + "', '" + sheet.getCell(1, row).getContents() + "','" 
+								                    + (sheet.getCell(2, row).getContents().equals("Ů") ? 0 : 1) + "', '" + sheet.getCell(3, row).getContents() + "', " + sheet.getCell(4, row).getContents() + "); " );							   
+							}
+						}
+						workbook.close();
+						
 						JSONObject item_obj = new JSONObject();
 						item_obj.put("filename",  newRelativeName);
 						item_arr.put(item_obj);
+						
+						break;
 						
 					} else {
 						//out.print("<p>no file!</p>");
@@ -391,6 +427,36 @@ public class ManageServlet extends HttpServlet {
 		
 		out.close();
 	}
+	
+	
+   public void test(PrintWriter out)
+   {
+	  try{
+		  String newFileName = this.getServletContext().getRealPath("/") + "tmp/a.xls";
+		  File xlsFile = new File(newFileName);
+		  Workbook workbook = Workbook.getWorkbook(xlsFile);
+		  Sheet[] sheets = workbook.getSheets();
+		  if (sheets != null)
+		  {
+			Sheet sheet = sheets[0];
+			int rows = sheet.getRows();
+			int cols = sheet.getColumns();
+			for (int row = 0; row < rows; row++)
+			{
+			   for (int col = 0; col < cols; col++)
+			   {
+				  out.print( "<div>" + sheet.getCell(col, row).getContents() + "</div>" );
+			   }
+			}
+		  }
+		  workbook.close();
+	  }
+	  catch (Exception e ) {
+		  out.print(e.getMessage());
+	  }
+      
+   }
+
 }
 
 

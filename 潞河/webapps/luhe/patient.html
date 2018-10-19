@@ -7,6 +7,7 @@
 <link href="css/style.css" rel="stylesheet" type="text/css" />
 <script src="js/jquery-3.3.1.min.js" ></script>
 <script src="js/main.js" ></script>
+<script src="js/jquery-form.js" ></script>
 
 <script type="text/javascript">
 	$(document).ready(onPatientLoad);
@@ -25,7 +26,7 @@
   
   <!--<div id="divImportPatient" class="listitem my-del hand" style="line-height:42px;width:120px;text-align:center;display:inline-block;margin:10px;" onclick="onImportPatients();" >导入病人信息</div>-->
   <div style="line-height:42px;display:block;margin:10px;">
-	<form action="" method="post" enctype="multipart/form-data" id="uploadForm" >
+	<form action="/luhe/manage" method="post" id="form1" enctype="multipart/form-data" id="uploadForm" >
 		<input type="button" value="导入病人信息" onclick="onImportPatients();"  />
 		<input type="file" id="fileUpload1" name="fileUpload1" accept=".xls,.xlsx" />		
 	</form>

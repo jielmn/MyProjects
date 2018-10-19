@@ -41,18 +41,24 @@ function onMainLoad() {
 // “我的”页面加载
 function onMineLoad() {
 	console.log("mine load")
+	//setInterval( getStationList, 60000 );
 	getStationList();
 }
 
 function getStationList() {
 	console.log("getStationList ......");
+	$("#divStationList").find(".row2").filter( function( index ) {
+		$( this ).remove();
+	});
+	$("#divNone").css('display','block');
+	
 	jQuery.ajax({
 	type: "get",
 	url: addr+"manage?",
 	//data: "bid="+my_bid+"&name_cn="+name_cn+"&timeStamp=" + new Date().getTime(),
-	data: {'type':'station_list'},
+	data: {'type':'station_list','c':new Date().getTime()},
 	dataType: 'json',
-	error: function (err) { console.log("get station list failed!"); },
+	error: function (err) { console.log("get station list failed!");setTimeout(getStationList,60000); },
 	success: function (data) {
 		console.log(data);
 		if ( 0 == data.error ) {
@@ -62,7 +68,7 @@ function getStationList() {
 			} else {
 				$("#divNone").css('display','none');
 				for (var i = 0;i < data.stationlist.length;i++ ){
-					$("#divNone").before('<div class="row1"></div>');
+					$("#divNone").before('<div class="row2"></div>');
 					var item = $("#divNone").prev();
 					var divName = $('<div class="listitem" style="width:' + content_len + ';line-height:21px;" >' + data.stationlist[i].name + '</div>');
 					item.append(divName);
@@ -74,7 +80,8 @@ function getStationList() {
 		else {
 			console.log("get station list failed!!!");
 		}
-	}});
+		setTimeout(getStationList,60000);
+	}});	
 }
 
 
@@ -89,7 +96,7 @@ function getPatientList() {
 	jQuery.ajax({
 	type: "get",
 	url: addr+"manage?",
-	data: {'type':'patient_list'},
+	data: {'type':'patient_list', 'c':new Date().getTime()},
 	dataType: 'json',
 	error: function (err) { console.log("get patient list failed!"); },
 	success: function (data) {
@@ -157,6 +164,15 @@ function getType(file){
 	return type;
 }
 
+function writeObj(obj){ 
+	var description = ""; 
+		for(var i in obj){ 
+		var property=obj[i]; 
+		description+=i+" = "+property+"\n"; 
+	} 
+	console.log(description); 
+} 
+
 function  onImportPatients() {
 	//console.log( $("#fileUpload1")[0].value );
 	var filename = $("#fileUpload1")[0].value;
@@ -166,14 +182,35 @@ function  onImportPatients() {
 	}
 	
 	var ext = getType(filename);
-	if ( ext != ".xls" && ext != ".xlsx" ) {
-		alert("请选择excel文件");
+	if ( ext != ".xls" ) {
+		alert("请选择excel(.xls)文件");
 		return;
 	}
+	
+	$("#form1").ajaxSubmit({
+		error: function (err) { console.log("upload excel file failed!"); alert("upload excel file failed!"); },
+		success: function(data1) {
+			$("#form1").resetForm();
+			data = JSON.parse(data1);
+			//console.log(data);
+			if ( data.error == "0" ) {
+				$("#divPatientList").find(".row2").filter( function( index ) {
+					// console.log(index);
+					$( this ).remove();
+				});
+				$("#divNone").css('display','block');
+				$("#fileUpload1")[0].value = "";
+				getPatientList();
+			} else {
+				console.log("upload excel file failed!");
+				console.log(data);
+				alert("upload excel file failed!!! description:" + data.description);
+			}
+		}
+	})
 
+	/*
 	var fd = new FormData();
-	//fd.append("paragram", 12345);
-	//console.log($("#fileUpload1").get(0).files[0]);
 	fd.append("upfile", $("#fileUpload1").get(0).files[0] );
 	
 	$.ajax({
@@ -182,10 +219,23 @@ function  onImportPatients() {
 		 processData: false,
 		 contentType: false,
 		 data: fd,
+		 error: function (err) { console.log("upload excel file failed!"); },
 		 success: function(data) {
-			console.log(data);
+			if ( data.error == "0" ) {
+				$("#divPatientList").find(".row2").filter( function( index ) {
+					// console.log(index);
+					$( this ).remove();
+				});
+				$("#divNone").css('display','block');
+				$("#fileUpload1")[0].value = "";
+				getPatientList();
+			} else {
+				console.log("upload excel file failed!");
+				console.log(data);
+			}
 		 }
 	})
+	*/
 
 	
 	/*
