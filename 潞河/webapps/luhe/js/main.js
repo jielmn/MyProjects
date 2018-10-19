@@ -6,15 +6,28 @@ function onTabChange(index){
 	if ( 0 == index ) {
 		$("#imgMine").attr('src','images/mine.png'); 
 		$("#imgGroup").attr('src','images/group_blur.png'); 
+		$("#imgUpgrade").attr('src','images/upgrade_blur.png'); 
 		
 		$("#iframeMine").css('display','block'); 
 		$("#iframeGroup").css('display','none'); 
-	} else {
+		$("#iframeUpgrade").css('display','none'); 
+	} else if ( 1 == index ) {
 		$("#imgMine").attr('src','images/mine_blur.png'); 
 		$("#imgGroup").attr('src','images/group.png'); 
+		$("#imgUpgrade").attr('src','images/upgrade_blur.png'); 
 		
 		$("#iframeMine").css('display','none'); 
 		$("#iframeGroup").css('display','block'); 
+		$("#iframeUpgrade").css('display','none'); 
+	}
+	else {
+		$("#imgMine").attr('src','images/mine_blur.png'); 
+		$("#imgGroup").attr('src','images/group_blur.png'); 
+		$("#imgUpgrade").attr('src','images/upgrade.png'); 
+		
+		$("#iframeMine").css('display','none'); 
+		$("#iframeGroup").css('display','none'); 
+		$("#iframeUpgrade").css('display','block'); 
 	}
 }
 
@@ -28,6 +41,7 @@ function onMainLoad() {
 	//uid = getUrlParam('uid');
 	$("#iframeMine").attr('src','station.html'); 
 	$("#iframeGroup").attr('src','patient.html'); 
+	$("#iframeUpgrade").attr('src','upgrade.html'); 
 	
 	$("#divMine").click(function(){
 	  onTabChange(0);
@@ -35,6 +49,10 @@ function onMainLoad() {
 	
 	$("#divGroup").click(function(){
 	  onTabChange(1);
+	});
+	
+	$("#divUpgrade").click(function(){
+	  onTabChange(2);
 	});
 }
 
@@ -262,4 +280,39 @@ function  onImportPatients() {
 			}
 	}});
 	*/
+}
+
+
+function onUpgradeLoad() {
+	console.log("upgrade page load");
+}
+
+function onUpgrade() {
+	var filename = $("#fileUpload1")[0].value;
+	if ( filename == "" ) {
+		alert("请选择文件");
+		return;
+	}
+	
+	var ext = getType(filename);
+	if ( ext != ".exe" ) {
+		alert("请选择可执行文件(*.exe)");
+		return;
+	}
+	
+	$("#form1").ajaxSubmit({
+		error: function (err) { console.log("upload exe file failed!"); alert("upload exe file failed!"); },
+		success: function(data1) {
+			$("#form1").resetForm();
+			data = JSON.parse(data1);
+			//console.log(data);
+			if ( data.error == "0" ) {
+				
+			} else {
+				console.log("upload exe file failed!");
+				console.log(data);
+				alert("upload exe file failed!!! description:" + data.description);
+			}
+		}
+	})
 }

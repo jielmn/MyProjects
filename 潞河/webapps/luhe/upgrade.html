@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link href="css/style.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-3.3.1.min.js" ></script>
+<script src="js/main.js" ></script>
+<script src="js/jquery-form.js" ></script>
+
+<script type="text/javascript">
+	$(document).ready(onUpgradeLoad);
+</script>
+
+</head>
+
+<body class="margin-none" style="display:block;" >  
+  
+  <div style="line-height:42px;display:block;margin:10px;">
+	<form action="/luhe/upgrade" method="post" id="form1" enctype="multipart/form-data" id="uploadForm" >
+		<div>版本号：</div>
+		<input type="text" name="version" placeholder="版本号">
+		<div>升级文件：</div>
+		<input type="button" value="上传433升级文件" onclick="onUpgrade();"  />
+		<input type="file" id="fileUpload1" name="fileUpload1" accept=".exe" />		
+	</form>
+  </div>  
+
+</body>
+</html>
+
+
+
+
+  

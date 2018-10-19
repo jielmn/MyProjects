@@ -12,6 +12,11 @@
   <servlet-name>manage</servlet-name>
   <servlet-class>mypack.ManageServlet</servlet-class>
  </servlet>
+ 
+ <servlet>
+  <servlet-name>upgrade</servlet-name>
+  <servlet-class>mypack.UpgradeServlet</servlet-class>
+ </servlet>
 
   <servlet-mapping>
     <servlet-name>main</servlet-name>
@@ -21,6 +26,11 @@
   <servlet-mapping>
     <servlet-name>manage</servlet-name>
     <url-pattern>/manage</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>upgrade</servlet-name>
+    <url-pattern>/upgrade</url-pattern>
   </servlet-mapping>
 
   <welcome-file-list>
