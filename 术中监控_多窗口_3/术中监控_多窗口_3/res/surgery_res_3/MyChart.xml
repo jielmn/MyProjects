@@ -41,8 +41,8 @@
 		
 		
 		<!-- 2 -->
-		<HorizontalLayout name="lay_2" bkcolor="#FF192431" inset="0,0,0,0" visible="false" >			
-			<VerticalLayout width="370" bkcolor="#FF192431" bkcolor2="#FF293441" inset="0,10,0,10" >
+		<HorizontalLayout name="lay_2" bkcolor="#FF192431" inset="1,1,1,1" visible="false" bordercolor="#FF768D9B" bordersize="1" >			
+			<VerticalLayout name="lay_21" width="370" bkcolor="#FF192431" bkcolor2="#FF293441" inset="0,10,0,10" >
 				
 				<HorizontalLayout height="30" inset="10,0,10,0" >
 					<Label text="窗格信息"   textcolor="#FFFFFFFF" width="200" font="2" />
@@ -83,7 +83,7 @@
 			
 			<VerticalLayout inset="10,0,10,10" >
 				<HorizontalLayout height="40">
-					<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
+					<Label text="温度曲线" name="lblTempTitle"   textcolor="#FFFFFFFF" width="150" font="1" />
 				</HorizontalLayout>
 			
 				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >

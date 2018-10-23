@@ -49,9 +49,14 @@ using namespace DuiLib;
 #define   LABEL_NAME_TITLE_GRID    "lblNameTitle_1"
 #define   LABEL_CUR_TITLE_GRID     "lblCurTitle_1"
 #define   MYIMAGE_NAME             "my_image_1"
+#define   MYIMAGE_NAME_MAXIUM      "my_image_2"
 #define   OPT_GRID_SWITCH_GRID     "opn_grid_switch_1"
 #define   ALARM_NAME               "alarm_1"
 #define   OPT_GRID_SWITCH_MAX      "opn_grid_switch_2"
+#define   BUTTON_BED_NAME_MAX      "btnBed_2"
+#define   EDIT_BED_NAME_MAX        "edtBed_2"
+#define   BUTTON_NAME_NAME_MAX     "btnName_2"
+#define   EDIT_NAME_NAME_MAX       "edtName_2"
 #define   LAYOUT_READERS           "layReaders"
 #define   CTL_INDICATOR_NAME       "indicator"
 #define   LAY_READER_NAME          "layReader"
@@ -178,6 +183,7 @@ extern std::vector<TArea *>  g_vArea;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
+extern DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 
 // templates
 template <class T>

@@ -46,8 +46,15 @@ private:
 	CMyImageUI *                       m_MyImage_grid[MAX_GRID_COUNT];
 	COptionUI *                        m_OptGridSwitch_grid[MAX_GRID_COUNT];
 	CAlarmImageUI *                    m_MyAlarm_grid[MAX_GRID_COUNT];
+	CButtonUI *                        m_BtnBed_max[MAX_GRID_COUNT];
+	CEditUI *                          m_EdtBed_max[MAX_GRID_COUNT];
+	CButtonUI *                        m_BtnName_max[MAX_GRID_COUNT];
+	CEditUI *                          m_EdtName_max[MAX_GRID_COUNT];
+	CMyImageUI *                       m_MyImage_max[MAX_GRID_COUNT];
 	COptionUI *                        m_OptGridSwitch_max[MAX_GRID_COUNT];
 	DuiLib::CVerticalLayoutUI *        m_layReaders[MAX_GRID_COUNT];
+	DuiLib::CLabelUI *                 m_lblTempTitle[MAX_GRID_COUNT];
+	DuiLib::CVerticalLayoutUI *        m_lay21[MAX_GRID_COUNT];
 	CControlUI *                       m_UiReaders[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	COptionUI *                        m_UiReaderSwitch[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CAlarmImageUI *                    m_UiAlarms[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
@@ -77,5 +84,11 @@ private:
 	void   OnEdtBedKillFocus_grid(TNotifyUI& msg);
 	void   OnBtnName_grid(TNotifyUI& msg);
 	void   OnEdtNameKillFocus_grid(TNotifyUI& msg);
+	void   OnGridSwitch(TNotifyUI& msg);
+	void   OnBtnBed_max(TNotifyUI& msg);
+	void   OnBtnName_max(TNotifyUI& msg);
+	void   OnEdtBedKillFocus_max(TNotifyUI& msg);
+	void   OnEdtNameKillFocus_max(TNotifyUI& msg);
+	void   OnReaderSwitch(TNotifyUI& msg);
 
 };

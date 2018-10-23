@@ -24,6 +24,8 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 		{
 		case LAYOUT_MAIN_BK:
 			return 0xFF192431;
+		case LAYOUT_MAIN_BK_1:
+			return 0xFF293441;
 		case LABEL_STATUS_BK:
 			return 0xFF3A4F67;
 		case GRID_BORDER:
@@ -41,6 +43,8 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 		{
 		case LAYOUT_MAIN_BK:
 			return 0xFFFFFFFF;
+		case LAYOUT_MAIN_BK_1:
+			return 0xFFDDDDDD;
 		case LABEL_STATUS_BK:
 			return 0xFF007ACC;
 		case GRID_BORDER:

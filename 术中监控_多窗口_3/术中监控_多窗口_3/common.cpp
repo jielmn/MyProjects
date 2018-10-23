@@ -31,6 +31,20 @@ DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl,
 	return 0;
 }
 
+DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData) {
+	if ( 0 == strcmp( pSubControl->GetClass(),DUI_CTR_LABEL )) {
+		((CLabelUI *)pSubControl)->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	}
+	else if (0 == strcmp(pSubControl->GetClass(), DUI_CTR_BUTTON)) {
+		((CButtonUI *)pSubControl)->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	}
+	else if (0 == strcmp(pSubControl->GetClass(), DUI_CTR_OPTION)) {
+		((COptionUI *)pSubControl)->SetSelectedImage(g_data.m_skin.GetImageName(CMySkin::OPT_SELECTED));
+		((COptionUI *)pSubControl)->SetNormalImage(g_data.m_skin.GetImageName(CMySkin::OPT_NOT_SELECTED));
+	}
+	return 0;
+}
+
 
 LRESULT CDuiMenu::OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
