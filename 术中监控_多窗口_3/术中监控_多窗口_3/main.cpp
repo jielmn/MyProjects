@@ -616,15 +616,15 @@ void   CDuiFrameWnd::OnEdtNameKillFocus_max(TNotifyUI& msg) {
 
 void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 	DWORD dwTag = msg.pSender->GetTag();
-	DWORD dwIndex = HIWORD(dwTag);
-	DWORD dwSubIndex = LOWORD(dwTag);
+	DWORD dwIndex = LOWORD(dwTag);
+	DWORD dwSubIndex = HIWORD(dwTag);
 
 	COptionUI * p = (COptionUI*)msg.pSender;
 	g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch = !p->IsSelected();
-	//CDuiString  strText;
-	//strText.Format("%s %lu", CFG_GRID_SWITCH, nIndex + 1);
-	//g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_bSwitch, DEFAULT_READER_SWITCH);
-	//g_data.m_cfg->Save();
+	CDuiString  strText;
+	strText.Format("%s %lu %lu", CFG_READER_SWITCH, dwIndex + 1, dwSubIndex + 1);
+	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch, DEFAULT_READER_SWITCH);
+	g_data.m_cfg->Save();
 }
 
 
