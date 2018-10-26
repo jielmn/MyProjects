@@ -13,6 +13,18 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#ifdef   _DEBUG
+#define  TEST_FLAG                1
+#endif
+
+#if TEST_FLAG
+#define  TIMER_TEST_ID            1
+#define  TIMER_TEST_INTERVAL      5000
+
+#define  TIMER_TEST_ID_1          2
+#define  TIMER_TEST_INTERVAL_1    7000
+#endif
+
 #define   LOG_FILE_NAME           "surgery3.log"
 #define   CONFIG_FILE_NAME        "surgery3.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
@@ -35,6 +47,7 @@ using namespace DuiLib;
 #define   MYCHART_XML_FILE         "MyChart.xml"
 #define   LAYOUT_STATUS_NAME       "layStatus"
 #define   MYIMAGE_CLASS_NAME       "MyImage"
+#define   MYIMAGE_CLASS_NAME1      "MyImage1"
 #define   ALARM_IMAGE_CLASS_NAME   "AlarmImage"
 #define   LAYOUT_GRID_NAME         "lay_1"
 #define   LAYOUT_MAXIUM_NAME       "lay_2"
@@ -101,12 +114,21 @@ using namespace DuiLib;
 #define   MAX_TEMPERATURE                42
 #define   MIN_MYIMAGE_VMARGIN            30              // 图像的上、下至少留出的空白
 #define   MYIMAGE_LEFT_BLANK             50
+#define   MYIMAGE_RIGHT_BLANK            50
 #define   MIN_TEMP_V_INTERVAL            30
 #define   MAX_REMARK_LENGTH              28
 #define   DEFAULT_POINT_RADIUS           6
 #define   EDT_REMARK_WIDTH               200
 #define   EDT_REMARK_HEIGHT              30
 #define   EDT_REMARK_Y_OFFSET            -50
+#define   DEFAULT_COLLECT_INTERVAL       50
+#define   RADIUS_SIZE_IN_GRID            3  
+#define   RADIUS_SIZE_IN_MAXIUM          6
+
+// message
+#define MSG_UPDATE_SCROLL                1001
+
+#define UM_UPDATE_SCROLL                 (WM_USER+1)
 
 // 类
 typedef struct tagTempData {
@@ -206,9 +228,16 @@ public:
 	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
 };
 
+class CUpdateScrollParam : public LmnToolkits::MessageData {
+public:
+	CUpdateScrollParam(int nIndex) : m_nIndex(nIndex) { }
+	int     m_nIndex;
+};
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
+extern LmnToolkits::Thread *  g_thrd_work;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);

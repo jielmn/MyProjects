@@ -1,22 +1,30 @@
 #pragma once
 
 #include "common.h"
+#include "sigslot.h"
 class CDuiFrameWnd;
 
 class CMyImageUI : public DuiLib::CControlUI
 {
 public:
-	CMyImageUI();
+	enum E_TYPE {
+		TYPE_GRID = 0,
+		TYPE_MAX,
+	};
+	CMyImageUI(E_TYPE e);
 	~CMyImageUI();
 
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	void  OnChangeSkin();
+	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
 
 private:
 	time_t  GetFirstTime();
 	time_t  GetLastTime();
 	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
+	void    MyInvalidate();
+	int     CalcMinWidth();
 
 private:
 	HPEN                         m_hCommonThreadPen;
@@ -32,5 +40,11 @@ private:
 private:
 	vector<TempData *>           m_vTempData[MAX_READERS_PER_GRID];
 	DWORD                        m_dwSelectedReaderIndex;
+	DWORD                        m_dwNextTempIndex;
+	BOOL                         m_bSetParentScrollPos;
+	E_TYPE                       m_type;
+
+public:
+	sigslot::signal1<DWORD>      m_sigUpdateScroll;
 };
 

@@ -79,6 +79,7 @@ private:
 	void   OnBtnMenu(TNotifyUI& msg);
 	void   OnSetting();
 	void   OnAbout();
+	void   OnTestTimer(DWORD  dwTimer);
 
 	void   OnBtnBed_grid(TNotifyUI& msg);
 	void   OnEdtBedKillFocus_grid(TNotifyUI& msg);
@@ -90,5 +91,6 @@ private:
 	void   OnEdtBedKillFocus_max(TNotifyUI& msg);
 	void   OnEdtNameKillFocus_max(TNotifyUI& msg);
 	void   OnReaderSwitch(TNotifyUI& msg);
-
+	void   OnUpdateGridScroll(WPARAM wParam, LPARAM lParam);
+	void   UpdateLayout();
 };

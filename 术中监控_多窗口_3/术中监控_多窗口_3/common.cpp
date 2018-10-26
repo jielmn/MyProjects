@@ -7,6 +7,7 @@ CGlobalData  g_data;
 std::vector<TArea *>  g_vArea;
 ARGB g_default_argb[MAX_READERS_PER_GRID] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0xFF51786C, 0xFFFFFF00, 0xFFCA5100, 0xFFFF00FF,
 0xFFA5A852,0xFFCCCCCC };
+LmnToolkits::Thread *  g_thrd_work = 0;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
@@ -18,7 +19,10 @@ char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 
 CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, MYIMAGE_CLASS_NAME)) {
-		return new CMyImageUI();
+		return new CMyImageUI( CMyImageUI::TYPE_GRID );
+	}
+	else if (0 == strcmp(pstrClass, MYIMAGE_CLASS_NAME1)) {
+		return new CMyImageUI( CMyImageUI::TYPE_MAX );
 	}
 	else if (0 == strcmp(pstrClass, ALARM_IMAGE_CLASS_NAME)) {
 		return new CAlarmImageUI();

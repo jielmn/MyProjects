@@ -166,26 +166,65 @@ int CBusiness::Init() {
 	}
 	// END OF 区号
 
-	g_data.m_dwCollectIntervalWidth = 10;
+	g_data.m_dwCollectIntervalWidth = DEFAULT_COLLECT_INTERVAL;
 	memcpy(g_data.m_argb, g_default_argb, sizeof(ARGB) * MAX_READERS_PER_GRID);
+
+	// 线程
+	g_thrd_work = new LmnToolkits::PriorityThread();
+	if (0 == g_thrd_work) {
+		return -1;
+	}
+	g_thrd_work->Start();
+
 	return 0;
 }
 
 int CBusiness::DeInit() {
 
-	//if (g_thrd_db) {
-	//	g_thrd_db->Stop();
-	//	delete g_thrd_db;
-	//	g_thrd_db = 0;
-	//}
+	if (g_thrd_work) {
+		g_thrd_work->Stop();
+		delete g_thrd_work;
+		g_thrd_work = 0;
+	}
 
 	Clear();
 	return 0;
+}
+
+// 调整滑动条
+int  CBusiness::UpdateScrollAsyn(int nIndex, DWORD dwDelay /*= 0*/) {
+	if (0 == dwDelay) {
+		g_thrd_work->PostMessage(this, MSG_UPDATE_SCROLL, new CUpdateScrollParam(nIndex));
+	}
+	else {
+		g_thrd_work->PostDelayMessage(dwDelay, this, MSG_UPDATE_SCROLL, new CUpdateScrollParam(nIndex));
+	}
+	return 0;
+}
+
+int  CBusiness::UpdateScroll(const CUpdateScrollParam * pParam) {
+	::PostMessage(g_data.m_hWnd, UM_UPDATE_SCROLL, pParam->m_nIndex, 0 );
+	return 0;
+}
+
+void   CBusiness::OnUpdateScroll(DWORD dwIndex) {
+	UpdateScrollAsyn(dwIndex);
 }
 
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch ( dwMessageId )
+	{
+	case MSG_UPDATE_SCROLL:
+	{
+		CUpdateScrollParam * pParam = (CUpdateScrollParam *)pMessageData;
+		UpdateScroll(pParam);
+	}
+	break;
 
+	default:
+		break;
+	}
 }

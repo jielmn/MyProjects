@@ -15,6 +15,11 @@ public:
 	int Init();
 	int DeInit();
 
+	// 调整滑动条
+	int    UpdateScrollAsyn(int nIndex, DWORD dwDelay = 0);
+	int    UpdateScroll(const CUpdateScrollParam * pParam);
+	void   OnUpdateScroll(DWORD dwIndex);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

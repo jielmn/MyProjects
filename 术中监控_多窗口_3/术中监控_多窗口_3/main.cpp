@@ -187,6 +187,11 @@ void  CDuiFrameWnd::InitWindow() {
 
 	OnChangeSkin();
 
+#if TEST_FLAG
+	SetTimer(m_hWnd, TIMER_TEST_ID, TIMER_TEST_INTERVAL, NULL);
+	SetTimer(m_hWnd, TIMER_TEST_ID_1, TIMER_TEST_INTERVAL_1, NULL);
+#endif
+
 	WindowImplBase::InitWindow();
 }
 
@@ -256,6 +261,16 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_LBUTTONDBLCLK) {
 		OnDbClick();
+	}
+	else if (uMsg == WM_TIMER) {
+#if TEST_FLAG
+		if ( wParam == TIMER_TEST_ID || wParam == TIMER_TEST_ID_1 ) {
+			OnTestTimer(wParam);
+		}
+#endif		
+	}
+	else if (uMsg == UM_UPDATE_SCROLL) {
+		OnUpdateGridScroll(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -470,6 +485,7 @@ void   CDuiFrameWnd::OnSetting() {
 				strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
 				bValue = DEFAULT_READER_SWITCH;
 				g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, &bValue);
+				m_UiReaderSwitch[i][j]->Selected(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch ? true : false);
 
 				strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
 				dwValue = 3500;
@@ -492,8 +508,46 @@ void   CDuiFrameWnd::OnSetting() {
 			g_data.m_skin.SetSkin((CMySkin::ENUM_SKIN)g_data.m_CfgData.m_dwSkinIndex);
 			OnChangeSkin();
 		}
+
+		if (oldData.m_dwLayoutColumns != g_data.m_CfgData.m_dwLayoutColumns || oldData.m_dwLayoutRows != g_data.m_CfgData.m_dwLayoutRows) {
+			UpdateLayout();
+		}
+		
 	}
 	delete pSettingDlg;
+}
+
+// 重新布局(在设置更改之后)
+void   CDuiFrameWnd::UpdateLayout() {
+	DWORD dwInvisibleIndex = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		if (i < dwInvisibleIndex) {
+			m_pGrids[i]->SetVisible(true);
+		}
+		else {
+			m_pGrids[i]->SetVisible(false);
+		}
+	}
+
+	if (m_eGridStatus == GRID_STATUS_GRIDS) {
+		m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
+		ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+	}
+	else {
+		assert(m_eGridStatus == GRID_STATUS_MAXIUM);
+		// 如果当前格子超出范围
+		if (m_dwInflateGridIndex >= (int)(g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows)) {
+			m_layMain->Remove(m_pGrids[m_dwInflateGridIndex], true);
+			for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+				m_layMain->AddAt(m_pGrids[i], i);
+			}
+			m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
+			m_eGridStatus = GRID_STATUS_GRIDS;
+			m_dwInflateGridIndex = -1;
+			ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
+		}
+	}
+
 }
 
 void   CDuiFrameWnd::OnAbout() {
@@ -625,6 +679,29 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 	strText.Format("%s %lu %lu", CFG_READER_SWITCH, dwIndex + 1, dwSubIndex + 1);
 	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch, DEFAULT_READER_SWITCH);
 	g_data.m_cfg->Save();
+}
+
+void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
+	if (dwTimer == TIMER_TEST_ID ) {
+		DWORD dwTmp = GetRand(3600, 3800);
+		m_MyImage_grid[0]->AddTemp(0, dwTmp);
+		m_MyImage_max[0]->AddTemp(0, dwTmp);
+	}
+	else if (dwTimer == TIMER_TEST_ID_1) {
+		DWORD dwTmp = GetRand(3400, 3600);
+		m_MyImage_grid[0]->AddTemp(1, dwTmp);
+		m_MyImage_max[0]->AddTemp(1, dwTmp);
+	}	
+}
+
+void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
+	DWORD  dwIndex = wParam;
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_MyImage_max[dwIndex]->GetParent();
+	SIZE tParentScrollPos = pParent->GetScrollPos();
+	SIZE tParentScrollRange = pParent->GetScrollRange();
+	if (tParentScrollPos.cx != tParentScrollRange.cx) {
+		pParent->SetScrollPos(tParentScrollRange);
+	}
 }
 
 

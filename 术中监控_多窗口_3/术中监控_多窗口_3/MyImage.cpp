@@ -1,8 +1,9 @@
 #include <time.h>
 #include "MyImage.h"
 #include "skin.h"
+#include "business.h"
 
-CMyImageUI::CMyImageUI() :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
+CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 							m_remark_brush(Gdiplus::Color(0x803D5E49)) {
 	m_hCommonThreadPen = ::CreatePen( PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::COMMON_PEN) );
 	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
@@ -16,216 +17,11 @@ CMyImageUI::CMyImageUI() :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	}
 
 	m_dwSelectedReaderIndex = 0;
+	m_dwNextTempIndex = 0;
+	m_type = e;
 
-#if 1
-	TempData * pData = 0;
-	int nIndex = 0;
-
-	/* 1 */
-	nIndex = 0;
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3357;
-	pData->tTime = DateTime2String("2018-08-24 15:00:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3407;
-	pData->tTime = DateTime2String("2018-08-24 15:01:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3435;
-	pData->tTime = DateTime2String("2018-08-24 15:02:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3461;
-	pData->tTime = DateTime2String("2018-08-24 15:03:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3478;
-	pData->tTime = DateTime2String("2018-08-24 15:04:00");
-	STRNCPY(pData->szRemark, "测试", sizeof(pData->szRemark));
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3497;
-	pData->tTime = DateTime2String("2018-08-24 15:05:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3509;
-	pData->tTime = DateTime2String("2018-08-24 15:06:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3521;
-	pData->tTime = DateTime2String("2018-08-24 15:07:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3547;
-	pData->tTime = DateTime2String("2018-08-24 15:08:00");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3559;
-	pData->tTime = DateTime2String("2018-08-24 15:09:00");
-	m_vTempData[nIndex].push_back(pData);
-
-
-	/* 2 */
-	nIndex = 1;
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3516;
-	pData->tTime = DateTime2String("2018-08-24 15:00:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3530;
-	pData->tTime = DateTime2String("2018-08-24 15:01:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3540;
-	pData->tTime = DateTime2String("2018-08-24 15:02:02");
-	STRNCPY(pData->szRemark, "测试2.0", sizeof(pData->szRemark));
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3554;
-	pData->tTime = DateTime2String("2018-08-24 15:03:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3561;
-	pData->tTime = DateTime2String("2018-08-24 15:04:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	/* 3 */
-	nIndex = 2;
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3195;
-	pData->tTime = DateTime2String("2018-08-24 15:01:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3214;
-	pData->tTime = DateTime2String("2018-08-24 15:02:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3228;
-	pData->tTime = DateTime2String("2018-08-24 15:03:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3242;
-	pData->tTime = DateTime2String("2018-08-24 15:04:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3259;
-	pData->tTime = DateTime2String("2018-08-24 15:05:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3276;
-	pData->tTime = DateTime2String("2018-08-24 15:06:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3290;
-	pData->tTime = DateTime2String("2018-08-24 15:07:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3335;
-	pData->tTime = DateTime2String("2018-08-24 15:08:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3366;
-	pData->tTime = DateTime2String("2018-08-24 15:09:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	/* 4 */
-	nIndex = 3;
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3421;
-	pData->tTime = DateTime2String("2018-08-24 15:02:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3442;
-	pData->tTime = DateTime2String("2018-08-24 15:03:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3461;
-	pData->tTime = DateTime2String("2018-08-24 15:04:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3478;
-	pData->tTime = DateTime2String("2018-08-24 15:05:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3492;
-	pData->tTime = DateTime2String("2018-08-24 15:06:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3504;
-	pData->tTime = DateTime2String("2018-08-24 15:07:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3533;
-	pData->tTime = DateTime2String("2018-08-24 15:08:02");
-	m_vTempData[nIndex].push_back(pData);
-
-	pData = new TempData;
-	memset(pData, 0, sizeof(TempData));
-	pData->dwTemperature = 3545;
-	pData->tTime = DateTime2String("2018-08-24 15:09:02");
-	m_vTempData[nIndex].push_back(pData);
-#endif
+	CBusiness * pBusiness = CBusiness::GetInstance();	
+	m_sigUpdateScroll.connect(pBusiness, &CBusiness::OnUpdateScroll);
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -255,6 +51,28 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int  width  = pParent->GetWidth();
 	int  height = rect.bottom - rect.top;
 	DWORD  dwIndex = this->GetTag();
+
+	// 只有最大化状态下才调整scroll
+	if (m_type == TYPE_MAX) {
+		if (tParentScrollPos.cx != tParentScrollRange.cx) {
+			if (m_bSetParentScrollPos)
+			{
+				m_sigUpdateScroll.emit(dwIndex);
+				m_bSetParentScrollPos = FALSE;
+			}
+		}
+	}
+
+	int nRadius = RADIUS_SIZE_IN_MAXIUM;
+	// 如果是多格子模式，模拟父窗口的滚动条已打开
+	if (m_type == TYPE_GRID) {
+		int nMinWidth = GetMinWidth();
+		if (nMinWidth > width) {
+			tParentScrollPos.cx = nMinWidth - width;
+			rect.left -= tParentScrollPos.cx;
+		}
+		nRadius = RADIUS_SIZE_IN_GRID;
+	}
 
 	/* 开始作图 */
 	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
@@ -320,7 +138,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 				        * g_data.m_dwCollectIntervalWidth );
 			int nY    = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
-			DrawTempPoint(i, graphics, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, hDC, 6);
+			DrawTempPoint(i, graphics, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, hDC, nRadius );
 
 			if (it == vTempData.begin()) {
 				::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
@@ -546,4 +364,58 @@ time_t  CMyImageUI::GetLastTime() {
 
 void  CMyImageUI::DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS /*= DEFAULT_POINT_RADIUS*/) {
 	g.FillEllipse(m_temperature_brush[nIndex], x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS);
+}
+
+void  CMyImageUI::AddTemp(DWORD dwIndex, DWORD dwTemp) {
+	time_t now = time(0);
+
+	TempData * pTemp = new TempData;
+	pTemp->dwTemperature = dwTemp;
+	pTemp->tTime = now;
+	pTemp->dwIndex = m_dwNextTempIndex;	
+	m_dwNextTempIndex++;
+	// skip -1 index
+	if (m_dwNextTempIndex == -1) {
+		m_dwNextTempIndex = 0;
+	}
+	pTemp->szRemark[0] = '\0';
+	//STRNCPY(pTemp->szRemark, "123", sizeof(pTemp->szRemark));
+
+	if (m_vTempData[dwIndex].size() >= 1500) {
+		vector<TempData *>::iterator it = m_vTempData[dwIndex].begin();
+		TempData * pData = *it;
+		m_vTempData[dwIndex].erase(it);
+		delete pData;
+	}
+	m_vTempData[dwIndex].push_back(pTemp);
+
+	// 重绘
+	MyInvalidate();
+}
+
+void  CMyImageUI::MyInvalidate() {
+	int nMinWidth = CalcMinWidth();
+	this->SetMinWidth(nMinWidth);
+	Invalidate();
+	m_bSetParentScrollPos = TRUE;
+}
+
+// 计算图像需要的宽度
+int   CMyImageUI::CalcMinWidth() {
+	time_t  tFirstTime = GetFirstTime();
+	if (tFirstTime < 0) {
+		return 0;
+	}
+
+	time_t  tLastTime = GetLastTime();
+	assert(tLastTime >= 0);
+
+	DWORD  dwIndex = GetTag();
+	//DWORD  dwInterval = g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval;
+	DWORD  dwInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
+	DWORD  dwUnitWidth = g_data.m_dwCollectIntervalWidth;
+	DWORD  dwLeftColumnWidth = MYIMAGE_LEFT_BLANK;
+
+	int nWidth = (int)((double)(tLastTime - tFirstTime) / dwInterval * dwUnitWidth);
+	return nWidth + dwLeftColumnWidth + MYIMAGE_RIGHT_BLANK;
 }
