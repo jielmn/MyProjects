@@ -98,8 +98,24 @@ using namespace DuiLib;
 #define   CFG_PATIENT_NAME              "patient name"
 
 // 其他
+#define   MAX_TEMPERATURE                42
+#define   MIN_MYIMAGE_VMARGIN            30              // 图像的上、下至少留出的空白
+#define   MYIMAGE_LEFT_BLANK             50
+#define   MIN_TEMP_V_INTERVAL            30
+#define   MAX_REMARK_LENGTH              28
+#define   DEFAULT_POINT_RADIUS           6
+#define   EDT_REMARK_WIDTH               200
+#define   EDT_REMARK_HEIGHT              30
+#define   EDT_REMARK_Y_OFFSET            -50
 
 // 类
+typedef struct tagTempData {
+	DWORD    dwIndex;
+	DWORD    dwTemperature;
+	time_t   tTime;
+	char     szRemark[MAX_REMARK_LENGTH];
+}TempData;
+
 class CDuiFrameWnd;
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
@@ -140,6 +156,7 @@ typedef struct tagReaderCfg
 	DWORD     m_dwLowTempAlarm;
 	DWORD     m_dwHighTempAlarm;
 	DWORD     m_dwBed;
+	char      m_szName[32];
 }ReaderCfg;
 
 typedef struct tagGridCfg
@@ -169,6 +186,8 @@ public:
 	CMySkin   m_skin;
 
 	CfgData   m_CfgData;
+	DWORD     m_dwCollectIntervalWidth;
+	ARGB      m_argb[MAX_READERS_PER_GRID];
 };
 
 #define  MAX_AREA_NAME_LENGTH   64
@@ -177,13 +196,26 @@ typedef struct tagArea {
 	DWORD  dwAreaNo;
 }TArea;
 
+class CGraphicsRoundRectPath : public GraphicsPath
+{
+
+public:
+	CGraphicsRoundRectPath();
+
+public:
+	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
+};
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
-
+extern ARGB g_default_argb[MAX_READERS_PER_GRID];
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
+extern DWORD   GetMinTemp(DWORD  dwIndex);
+extern DWORD   GetCollectInterval(DWORD dwIndex);
+extern time_t  DateTime2String(const char * szDatetime);
 
 // templates
 template <class T>

@@ -166,6 +166,8 @@ int CBusiness::Init() {
 	}
 	// END OF ÇøºÅ
 
+	g_data.m_dwCollectIntervalWidth = 10;
+	memcpy(g_data.m_argb, g_default_argb, sizeof(ARGB) * MAX_READERS_PER_GRID);
 	return 0;
 }
 

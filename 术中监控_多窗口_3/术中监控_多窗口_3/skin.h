@@ -23,6 +23,12 @@ public:
 		OPT_NOT_SELECTED,
 	};
 
+	enum ENUM_GDI {
+		COMMON_PEN = 0,
+		COMMON_TEXT_COLOR,
+		BRIGHT_PEN,
+	};
+
 	CMySkin();
 	~CMySkin();
 
@@ -31,6 +37,7 @@ public:
 	DWORD  operator [] (ENUM_UI eUI) const;
 	const char * GetImageName(ENUM_IMG_NAME e) const;
 	DWORD  GetReaderIndicator( DWORD dwReaderIndex ) const;
+	COLORREF   GetRgb(ENUM_GDI e) const;
 
 private:
 	ENUM_SKIN     m_skin;

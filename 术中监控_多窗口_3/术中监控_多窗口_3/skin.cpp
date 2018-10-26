@@ -141,3 +141,34 @@ DWORD  CMySkin::GetReaderIndicator(DWORD dwReaderIndex) const {
 	}
 	return 0;
 }
+
+COLORREF   CMySkin::GetRgb(CMySkin::ENUM_GDI e) const {
+	if (m_skin == SKIN_BLACK) {
+		switch (e)
+		{
+		case CMySkin::COMMON_PEN:
+			return RGB(0x66, 0x66, 0x66);
+		case COMMON_TEXT_COLOR:
+			return RGB(255, 255, 255);
+		case BRIGHT_PEN:
+			return RGB(0x99, 0x99, 0x99);
+		default:
+			break;
+		}
+	}
+	else {
+		switch (e)
+		{
+		case CMySkin::COMMON_PEN:
+			return RGB(0x66, 0x66, 0x66);
+		case COMMON_TEXT_COLOR:
+			return RGB(255, 255, 255);
+		case BRIGHT_PEN:
+			return RGB(0x99, 0x99, 0x99);
+		default:
+			break;
+		}
+	}
+	
+	return RGB(255, 255, 255);
+}

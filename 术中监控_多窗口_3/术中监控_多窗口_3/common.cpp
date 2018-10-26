@@ -5,6 +5,8 @@
 
 CGlobalData  g_data;
 std::vector<TArea *>  g_vArea;
+ARGB g_default_argb[MAX_READERS_PER_GRID] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0xFF51786C, 0xFFFFFF00, 0xFFCA5100, 0xFFFF00FF,
+0xFFA5A852,0xFFCCCCCC };
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
@@ -74,4 +76,94 @@ void  CDuiMenu::Notify(DuiLib::TNotifyUI& msg) {
 LRESULT CDuiMenu::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return __super::HandleMessage(uMsg, wParam, lParam);
+}
+
+DWORD   GetMinTemp(DWORD  dwIndex) {
+	switch (dwIndex)
+	{
+	case 0:
+		return 20;
+	case 1:
+		return 24;
+	case 2:
+		return 28;
+	case 3:
+		return 32;
+	default:
+		break;
+	}
+	return 20;
+}
+
+DWORD   GetCollectInterval(DWORD dwIndex) {
+	switch (dwIndex)
+	{
+	case 0:
+		return 10;
+	case 1:
+		return 60;
+	case 2:
+		return 300;
+	case 3:
+		return 900;
+	case 4:
+		return 1800;
+	case 5:
+		return 3600;
+	default:
+		break;
+	}
+	return 10;
+}
+
+time_t  DateTime2String(const char * szDatetime) {
+	struct tm  tmp;
+	if (6 != sscanf_s(szDatetime, "%d-%d-%d %d:%d:%d", &tmp.tm_year, &tmp.tm_mon, &tmp.tm_mday, &tmp.tm_hour, &tmp.tm_min, &tmp.tm_sec)) {
+		return 0;
+	}
+
+	tmp.tm_year -= 1900;
+	tmp.tm_mon--;
+	return mktime(&tmp);
+}
+
+CGraphicsRoundRectPath::CGraphicsRoundRectPath(void)
+	:Gdiplus::GraphicsPath()
+{
+
+}
+
+void CGraphicsRoundRectPath::AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY)
+{
+	INT elWid = 2 * cornerX;
+	INT elHei = 2 * cornerY;
+
+	AddArc(x, y, elWid, elHei, 180, 90); // ◊Û…œΩ«‘≤ª°
+	AddLine(x + cornerX, y, x + width - cornerX, y); // …œ±ﬂ
+
+	AddArc(x + width - elWid, y, elWid, elHei, 270, 90); // ”“…œΩ«‘≤ª°
+	AddLine(x + width, y + cornerY, x + width, y + height - cornerY);// ”“±ﬂ
+
+	AddArc(x + width - elWid, y + height - elHei, elWid, elHei, 0, 90); // ”“œ¬Ω«‘≤ª°
+																		//AddLine(x + width - cornerX, y + height, x + cornerX, y + height); // œ¬±ﬂ
+
+	int x1 = x + width - cornerX;
+	int y1 = y + height;
+	int x2 = x + width / 2 + 10;
+	int y2 = y1;
+	AddLine(x1, y1, x2, y2);
+	x1 = x2;
+	y1 = y2;
+	x2 = x + width / 2;
+	y2 = y1 + 10;
+	AddLine(x1, y1, x2, y2);
+	x1 = x2;
+	y1 = y2;
+	x2 = x + width / 2 - 10;
+	y2 = y + height;
+	AddLine(x1, y1, x2, y2);
+
+
+	AddArc(x, y + height - elHei, elWid, elHei, 90, 90);
+	AddLine(x, y + cornerY, x, y + height - cornerY);
 }
