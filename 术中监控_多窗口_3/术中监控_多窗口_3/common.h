@@ -109,6 +109,7 @@ using namespace DuiLib;
 #define   DEFAULT_MIN_TEMP_INDEX        2
 #define   CFG_BED_NAME                  "bed name"
 #define   CFG_PATIENT_NAME              "patient name"
+#define   CFG_READER_NAME               "reader name"
 
 // ÆäËû
 #define   MAX_TEMPERATURE                42

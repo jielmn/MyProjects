@@ -109,6 +109,10 @@ int CBusiness::Init() {
 
 			strText.Format("%s %lu %lu", CFG_BED_NO, i + 1, j + 1);
 			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, 0);
+
+			strText.Format("%s %lu %lu", CFG_READER_NAME, i + 1, j + 1);
+			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName, 
+				     sizeof(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName), "--");
 		}
 	}
 

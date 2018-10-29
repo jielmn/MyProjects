@@ -93,4 +93,6 @@ private:
 	void   OnReaderSwitch(TNotifyUI& msg);
 	void   OnUpdateGridScroll(WPARAM wParam, LPARAM lParam);
 	void   UpdateLayout();
+	void   OnReaderName(TNotifyUI& msg);
+	void   OnEdtReaderNameKillFocus(TNotifyUI& msg);
 };

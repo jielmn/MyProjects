@@ -155,17 +155,17 @@ void  CDuiFrameWnd::InitWindow() {
 			m_UiReaderTemp[i][j]->SetTag(j);
 
 			m_UiBtnReaderNames[i][j] = static_cast<CButtonUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, BTN_READER_NAME, 0));
-			m_UiBtnReaderNames[i][j]->SetTag(j);
+			m_UiBtnReaderNames[i][j]->SetTag( MAKELONG(i, j) );
 
 			m_UiEdtReaderNames[i][j] = static_cast<CEditUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, EDT_READER_NAME, 0));
-			m_UiEdtReaderNames[i][j]->SetTag(j);
+			m_UiEdtReaderNames[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiAlarms[i][j] = static_cast<CAlarmImageUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
 			m_UiAlarms[i][j]->SetTag(j);
 
 			m_UiIndicator[i][j]->SetBkColor( g_data.m_skin.GetReaderIndicator(j) );
 			m_UiReaderTemp[i][j]->SetText("--");
-			m_UiBtnReaderNames[i][j]->SetText("--");
+			m_UiBtnReaderNames[i][j]->SetText(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName);
 			m_UiReaderSwitch[i][j]->Selected(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch ? true : false);
 
 			m_layReaders[i]->Add(m_UiReaders[i][j]);
@@ -231,6 +231,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == READER_SWITCH_NAME) {
 			OnReaderSwitch(msg);
 		}
+		else if (name == BTN_READER_NAME) {
+			OnReaderName(msg);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -250,6 +253,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == EDIT_NAME_NAME_MAX) {
 			OnEdtNameKillFocus_max(msg);
+		}
+		else if ( name == EDT_READER_NAME ) {
+			OnEdtReaderNameKillFocus(msg);
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -350,7 +356,6 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_MyImage_grid[i]->OnChangeSkin();
 		m_OptGridSwitch_grid[i]->SetSelectedImage(g_data.m_skin.GetImageName(CMySkin::OPT_SELECTED));
 		m_OptGridSwitch_grid[i]->SetNormalImage(g_data.m_skin.GetImageName(CMySkin::OPT_NOT_SELECTED));
-
 		m_layMaxium[i]->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_MAIN_BK]);
 		m_lblTempTitle[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_lay21[i]->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_MAIN_BK]);
@@ -358,6 +363,13 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_lay21[i]->FindControl(CS_FINDCONTROLPROC, 0, 0);	
 		m_MyImage_max[i]->SetBkColor(g_data.m_skin[CMySkin::MYIMAGE_BK]);
 		m_MyImage_max[i]->OnChangeSkin(); 
+
+		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+			m_UiBtnReaderNames[i][j]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+			m_UiEdtReaderNames[i][j]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
+			m_UiEdtReaderNames[i][j]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+			m_UiEdtReaderNames[i][j]->SetNativeEditBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		}
 	} 
 }
 
@@ -715,6 +727,35 @@ void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
 	if (tParentScrollPos.cx != tParentScrollRange.cx) {
 		pParent->SetScrollPos(tParentScrollRange);
 	}
+}
+
+void  CDuiFrameWnd::OnReaderName(TNotifyUI& msg) {
+	DWORD  dwTag      = msg.pSender->GetTag();
+	DWORD  dwIndex    = LOWORD(dwTag);
+	DWORD  dwSubIndex = HIWORD(dwTag);
+	msg.pSender->SetVisible(false);
+	m_UiEdtReaderNames[dwIndex][dwSubIndex]->SetText(msg.pSender->GetText());
+	m_UiEdtReaderNames[dwIndex][dwSubIndex]->SetVisible(true);
+	m_UiEdtReaderNames[dwIndex][dwSubIndex]->SetFocus();
+}
+
+void   CDuiFrameWnd::OnEdtReaderNameKillFocus(TNotifyUI& msg) {
+	DWORD  dwTag      = msg.pSender->GetTag();
+	DWORD  dwIndex    = LOWORD(dwTag);
+	DWORD  dwSubIndex = HIWORD(dwTag);
+
+	STRNCPY( g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName, 
+		     msg.pSender->GetText(), 
+		     sizeof(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName));
+
+	CDuiString  strText;
+	strText.Format(CFG_READER_NAME " %lu %lu", dwIndex + 1, dwSubIndex + 1);
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName, "");
+	g_data.m_cfg->Save();
+
+	msg.pSender->SetVisible(false);
+	m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetText(msg.pSender->GetText());
+	m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetVisible(true);
 }
 
 
