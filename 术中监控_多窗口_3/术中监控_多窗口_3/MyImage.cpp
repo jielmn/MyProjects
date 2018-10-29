@@ -5,11 +5,11 @@
 
 CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 							m_remark_brush(Gdiplus::Color(0x803D5E49)) {
-	m_hCommonThreadPen = ::CreatePen( PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::COMMON_PEN) );
-	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
-	m_hCommonBrush = ::CreateSolidBrush(RGB(0x19, 0x24, 0x31));
-	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0x02, 0xA5, 0xF1));
-	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0xFC, 0x23, 0x5C));
+	m_hCommonThreadPen   = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::COMMON_PEN) );
+	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
+	m_hCommonBrush       = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
+	m_hLowTempAlarmPen   = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::LOW_ALARM_PEN));
+	m_hHighTempAlarmPen  = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::HIGH_ALARM_PEN));
 	
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_temperature_pen[i] = new Pen(Gdiplus::Color(g_data.m_argb[i]), 3.0);
@@ -22,6 +22,7 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 
 	CBusiness * pBusiness = CBusiness::GetInstance();	
 	m_sigUpdateScroll.connect(pBusiness, &CBusiness::OnUpdateScroll);
+	m_sigAlarm.connect(pBusiness, &CBusiness::OnAlarm);
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -311,7 +312,17 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void  CMyImageUI::OnChangeSkin() {
+	DeleteObject(m_hCommonThreadPen);
+	DeleteObject(m_hBrighterThreadPen);
+	DeleteObject(m_hCommonBrush);
+	DeleteObject(m_hLowTempAlarmPen);
+	DeleteObject(m_hHighTempAlarmPen);
 
+	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::COMMON_PEN));
+	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
+	m_hCommonBrush = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
+	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::LOW_ALARM_PEN));
+	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::HIGH_ALARM_PEN));
 }
 
 time_t  CMyImageUI::GetFirstTime() {
@@ -380,6 +391,15 @@ void  CMyImageUI::AddTemp(DWORD dwIndex, DWORD dwTemp) {
 	}
 	pTemp->szRemark[0] = '\0';
 	//STRNCPY(pTemp->szRemark, "123", sizeof(pTemp->szRemark));
+
+	DWORD dwGridIndex = GetTag();
+	// 如果报警开关打开
+	if ( !g_data.m_CfgData.m_bAlarmVoiceOff ) {
+		if (   dwTemp < g_data.m_CfgData.m_GridCfg[dwGridIndex].m_ReaderCfg[dwIndex].m_dwLowTempAlarm 
+			|| dwTemp > g_data.m_CfgData.m_GridCfg[dwGridIndex].m_ReaderCfg[dwIndex].m_dwHighTempAlarm ) {
+			m_sigAlarm.emit();
+		}
+	}
 
 	if (m_vTempData[dwIndex].size() >= 1500) {
 		vector<TempData *>::iterator it = m_vTempData[dwIndex].begin();

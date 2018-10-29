@@ -169,6 +169,8 @@ int CBusiness::Init() {
 	g_data.m_dwCollectIntervalWidth = DEFAULT_COLLECT_INTERVAL;
 	memcpy(g_data.m_argb, g_default_argb, sizeof(ARGB) * MAX_READERS_PER_GRID);
 
+	GetDefaultAlarmFile(m_szAlarmFile, sizeof(m_szAlarmFile));
+
 	// 线程
 	g_thrd_work = new LmnToolkits::PriorityThread();
 	if (0 == g_thrd_work) {
@@ -211,6 +213,38 @@ void   CBusiness::OnUpdateScroll(DWORD dwIndex) {
 	UpdateScrollAsyn(dwIndex);
 }
 
+int   CBusiness::AlarmAsyn() {
+	g_thrd_work->PostMessage( this, MSG_ALARM );
+	return 0;
+}
+
+int   CBusiness::Alarm() {
+	DuiLib::CDuiString strText;
+
+	// 如果关闭报警开关
+	if (g_data.m_CfgData.m_bAlarmVoiceOff) {
+		return 0;
+	}
+
+	if ( m_szAlarmFile[0] != '\0' ) {
+		// stop
+		strText.Format("close %s", m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+
+		// open
+		strText.Format("open %s", m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+
+		// play
+		strText.Format("play %s", m_szAlarmFile);
+		mciSendString(strText, NULL, 0, 0);
+	}
+	return 0;
+}
+
+void  CBusiness::OnAlarm() {
+	AlarmAsyn();
+}
 
 
 // 消息处理
@@ -221,6 +255,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CUpdateScrollParam * pParam = (CUpdateScrollParam *)pMessageData;
 		UpdateScroll(pParam);
+	}
+	break;
+
+	case MSG_ALARM:
+	{
+		Alarm();
 	}
 	break;
 

@@ -124,9 +124,11 @@ using namespace DuiLib;
 #define   DEFAULT_COLLECT_INTERVAL       50
 #define   RADIUS_SIZE_IN_GRID            3  
 #define   RADIUS_SIZE_IN_MAXIUM          6
+#define   DEFAULT_ALARM_FILE_PATH        "\\res\\surgery_res_3\\1.wav"
 
 // message
 #define MSG_UPDATE_SCROLL                1001
+#define MSG_ALARM                        1002
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 
@@ -245,6 +247,7 @@ extern DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubC
 extern DWORD   GetMinTemp(DWORD  dwIndex);
 extern DWORD   GetCollectInterval(DWORD dwIndex);
 extern time_t  DateTime2String(const char * szDatetime);
+extern char *  GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 
 // templates
 template <class T>

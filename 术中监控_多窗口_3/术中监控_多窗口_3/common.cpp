@@ -171,3 +171,16 @@ void CGraphicsRoundRectPath::AddRoundRect(INT x, INT y, INT width, INT height, I
 	AddArc(x, y + height - elHei, elWid, elHei, 90, 90);
 	AddLine(x, y + cornerY, x, y + height - cornerY);
 }
+
+char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize) {
+	char buf[8192];
+
+	GetModuleFileName(0, buf, sizeof(buf));
+	const char * pStr = strrchr(buf, '\\');
+	assert(pStr);
+	DWORD  dwTemp = pStr - buf;
+	buf[dwTemp] = '\0';
+
+	SNPRINTF(szDefaultFile, dwSize, "%s%s", buf, DEFAULT_ALARM_FILE_PATH);
+	return szDefaultFile;
+}

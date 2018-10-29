@@ -327,9 +327,21 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_LblIndex_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_LblIndex_maxium[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_BtnBed_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-		m_EdtBed_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+		m_EdtBed_grid[i]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
+		m_EdtBed_grid[i]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		m_EdtBed_grid[i]->SetNativeEditBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
 		m_BtnName_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-		m_EdtName_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+		m_EdtName_grid[i]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
+		m_EdtName_grid[i]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		m_EdtName_grid[i]->SetNativeEditBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		m_BtnBed_max[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+		m_EdtBed_max[i]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
+		m_EdtBed_max[i]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		m_EdtBed_max[i]->SetNativeEditBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		m_BtnName_max[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+		m_EdtName_max[i]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
+		m_EdtName_max[i]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+		m_EdtName_max[i]->SetNativeEditBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
 		m_LblCurTemp_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_LblBedTitle_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_LblNameTitle_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
@@ -513,6 +525,7 @@ void   CDuiFrameWnd::OnSetting() {
 			UpdateLayout();
 		}
 		
+		::InvalidateRect(this->GetHWND(), 0, TRUE);
 	}
 	delete pSettingDlg;
 }

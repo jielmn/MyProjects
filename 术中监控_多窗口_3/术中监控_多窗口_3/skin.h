@@ -16,6 +16,8 @@ public:
 		GRID_BORDER,
 		COMMON_TEXT,
 		MYIMAGE_BK,
+		EDIT_BK,
+		EDIT_TEXT,
 	};
 
 	enum ENUM_IMG_NAME {
@@ -27,6 +29,9 @@ public:
 		COMMON_PEN = 0,
 		COMMON_TEXT_COLOR,
 		BRIGHT_PEN,
+		COMMON_BRUSH,
+		LOW_ALARM_PEN,
+		HIGH_ALARM_PEN,
 	};
 
 	CMySkin();

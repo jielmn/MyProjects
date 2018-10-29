@@ -20,6 +20,11 @@ public:
 	int    UpdateScroll(const CUpdateScrollParam * pParam);
 	void   OnUpdateScroll(DWORD dwIndex);
 
+	// 报警
+	int   AlarmAsyn();
+	int   Alarm();
+	void  OnAlarm();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -27,6 +32,9 @@ private:
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
 	BOOL CanBeFreed() { return false; }
+
+private:
+	char     m_szAlarmFile[256];
 };
 
 

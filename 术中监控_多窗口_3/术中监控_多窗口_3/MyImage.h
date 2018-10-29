@@ -46,5 +46,6 @@ private:
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;
+	sigslot::signal0<>           m_sigAlarm;
 };
 

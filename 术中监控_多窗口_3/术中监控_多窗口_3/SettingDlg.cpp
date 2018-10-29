@@ -105,7 +105,7 @@ void  CSettingDlg::InitCommonCfg() {
 
 	// 报警声音开关 
 	pCheckBox = new CCheckBoxUI;
-	pCheckBox->Selected(g_data.m_CfgData.m_bAlarmVoiceOff ? true : false);
+	pCheckBox->Selected(g_data.m_CfgData.m_bAlarmVoiceOff ? false : true);
 	m_tree->AddNode("报警声音开关", pTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382 );
 }
 
@@ -263,7 +263,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 
 	// 报警声
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	m_data.m_bAlarmVoiceOff = cfgValue.m_bCheckbox;
+	m_data.m_bAlarmVoiceOff = !cfgValue.m_bCheckbox;
 
 	return TRUE;
 }

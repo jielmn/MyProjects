@@ -34,6 +34,10 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 			return 0xFFFFFFFF;
 		case MYIMAGE_BK:
 			return 0xFF192431;
+		case EDIT_BK:
+			return 0xFFFFFFFF;
+		case EDIT_TEXT:
+			return 0xFF000000;
 		default:
 			break;
 		}
@@ -53,6 +57,10 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 			return 0xFF555555;
 		case MYIMAGE_BK:
 			return 0xFFDDDDDD;
+		case EDIT_BK:
+			return 0xFFAAAAAA;
+		case EDIT_TEXT:
+			return 0xFFFFFFFF;
 		default:
 			break;
 		}
@@ -146,12 +154,18 @@ COLORREF   CMySkin::GetRgb(CMySkin::ENUM_GDI e) const {
 	if (m_skin == SKIN_BLACK) {
 		switch (e)
 		{
-		case CMySkin::COMMON_PEN:
+		case COMMON_PEN:
 			return RGB(0x66, 0x66, 0x66);
 		case COMMON_TEXT_COLOR:
 			return RGB(255, 255, 255);
 		case BRIGHT_PEN:
 			return RGB(0x99, 0x99, 0x99);
+		case COMMON_BRUSH:
+			return RGB(0x19, 0x24, 0x31);
+		case LOW_ALARM_PEN:
+			return RGB(0x02, 0xA5, 0xF1);
+		case HIGH_ALARM_PEN:
+			return RGB(0xFC, 0x23, 0x5C);
 		default:
 			break;
 		}
@@ -159,12 +173,18 @@ COLORREF   CMySkin::GetRgb(CMySkin::ENUM_GDI e) const {
 	else {
 		switch (e)
 		{
-		case CMySkin::COMMON_PEN:
-			return RGB(0x66, 0x66, 0x66);
-		case COMMON_TEXT_COLOR:
-			return RGB(255, 255, 255);
-		case BRIGHT_PEN:
+		case COMMON_PEN:
 			return RGB(0x99, 0x99, 0x99);
+		case COMMON_TEXT_COLOR:
+			return RGB(0x55, 0x55, 0x55);
+		case BRIGHT_PEN:
+			return RGB(0x33, 0x33, 0x33);
+		case COMMON_BRUSH:
+			return RGB(0xDD, 0xDD, 0xDD);
+		case LOW_ALARM_PEN:
+			return RGB(0x02, 0xA5, 0xF1);
+		case HIGH_ALARM_PEN:
+			return RGB(0xFC, 0x23, 0x5C);
 		default:
 			break;
 		}
