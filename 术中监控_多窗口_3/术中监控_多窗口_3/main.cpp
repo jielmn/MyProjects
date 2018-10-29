@@ -140,19 +140,19 @@ void  CDuiFrameWnd::InitWindow() {
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			CDialogBuilder builder_child;
 			m_UiReaders[i][j] = builder_child.Create(READER_FILE_NAME, (UINT)0, &m_callback, &m_PaintManager);
-			m_UiReaders[i][j]->SetTag(j);
+			m_UiReaders[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiIndicator[i][j] = static_cast<CHorizontalLayoutUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, CTL_INDICATOR_NAME, 0));
-			m_UiIndicator[i][j]->SetTag(j);
+			m_UiIndicator[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiLayReader[i][j] = static_cast<CHorizontalLayoutUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, LAY_READER_NAME, 0));
-			m_UiLayReader[i][j]->SetTag(j);
+			m_UiLayReader[i][j]->SetTag( MAKELONG(i, j) );
 
 			m_UiReaderSwitch[i][j] = static_cast<COptionUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, READER_SWITCH_NAME, 0));
 			m_UiReaderSwitch[i][j]->SetTag( MAKELONG(i,j) );
 			
 			m_UiReaderTemp[i][j] = static_cast<CLabelUI *>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, READER_TEMP_NAME, 0));
-			m_UiReaderTemp[i][j]->SetTag(j);
+			m_UiReaderTemp[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiBtnReaderNames[i][j] = static_cast<CButtonUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, BTN_READER_NAME, 0));
 			m_UiBtnReaderNames[i][j]->SetTag( MAKELONG(i, j) );
@@ -161,7 +161,7 @@ void  CDuiFrameWnd::InitWindow() {
 			m_UiEdtReaderNames[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiAlarms[i][j] = static_cast<CAlarmImageUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
-			m_UiAlarms[i][j]->SetTag(j);
+			m_UiAlarms[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiIndicator[i][j]->SetBkColor( g_data.m_skin.GetReaderIndicator(j) );
 			m_UiReaderTemp[i][j]->SetText("--");
@@ -278,6 +278,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_UPDATE_SCROLL) {
 		OnUpdateGridScroll(wParam, lParam);
 	}
+	else if (uMsg == WM_LBUTTONDOWN) {
+		OnMyLButtonDown(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -369,6 +372,14 @@ void   CDuiFrameWnd::OnChangeSkin() {
 			m_UiEdtReaderNames[i][j]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
 			m_UiEdtReaderNames[i][j]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
 			m_UiEdtReaderNames[i][j]->SetNativeEditBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
+
+			if (j == m_MyImage_max[i]->m_dwSelectedReaderIndex) {
+				m_UiLayReader[i][j]->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_READER_BK]);
+			}
+			else {
+				m_UiLayReader[i][j]->SetBkColor(0);
+			}
+			
 		}
 	} 
 }
@@ -709,13 +720,11 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
 	if (dwTimer == TIMER_TEST_ID ) {
 		DWORD dwTmp = GetRand(3600, 3800);
-		m_MyImage_grid[0]->AddTemp(0, dwTmp);
-		m_MyImage_max[0]->AddTemp(0, dwTmp);
+		OnTemp(0, 0, dwTmp);
 	}
 	else if (dwTimer == TIMER_TEST_ID_1) {
 		DWORD dwTmp = GetRand(3400, 3600);
-		m_MyImage_grid[0]->AddTemp(1, dwTmp);
-		m_MyImage_max[0]->AddTemp(1, dwTmp);
+		OnTemp(0, 1, dwTmp);
 	}	
 }
 
@@ -756,6 +765,78 @@ void   CDuiFrameWnd::OnEdtReaderNameKillFocus(TNotifyUI& msg) {
 	msg.pSender->SetVisible(false);
 	m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetText(msg.pSender->GetText());
 	m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetVisible(true);
+}
+
+void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
+	POINT pt;
+	pt.x = LOWORD(lParam);
+	pt.y = HIWORD(lParam);
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(0, pt);
+	if (0 == pCtl) {
+		return;
+	}
+
+	while (pCtl) {
+		if (pCtl->GetName() == LAY_READER_NAME) {
+			DWORD  dwTag = pCtl->GetTag();
+			OnLayReaderSelected( LOWORD(dwTag), HIWORD(dwTag) );
+			break;
+		}
+		pCtl = pCtl->GetParent();
+	}
+}
+
+void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
+	assert(dwIndex < MAX_READERS_PER_GRID);
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		if (i == dwSubIndex) {
+			m_UiLayReader[dwIndex][i]->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_READER_BK]);
+		}
+		else {
+			m_UiLayReader[dwIndex][i]->SetBkColor(0);
+		}
+	}
+	m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
+	m_MyImage_grid[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
+	m_MyImage_max[dwIndex]->MyInvalidate();
+	m_MyImage_grid[dwIndex]->MyInvalidate();
+}
+
+void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
+	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
+	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
+
+	CAlarmImageUI::ENUM_ALARM e = CAlarmImageUI::ALARM_OK;
+	if ( dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm ) {
+		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::HIGH_TEMP);
+		e = CAlarmImageUI::HIGH_TEMP;
+	}
+	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm ) {
+		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::LOW_TEMP);
+		e = CAlarmImageUI::LOW_TEMP;
+	}
+	else {
+		m_UiAlarms[dwIndex][dwSubIndex]->StopAlarm();
+	}
+
+	int nAvailableReaderCnt = 0;
+	for ( int i = 0; i < MAX_READERS_PER_GRID; i++) {
+		if ( g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ) {
+			nAvailableReaderCnt++;
+		}
+	}
+
+	if ( 1 == nAvailableReaderCnt ) {
+		m_MyAlarm_grid[dwIndex]->StartAlarm(e);
+	}
+	else if ( nAvailableReaderCnt > 1 ) {
+		//if ( e != CAlarmImageUI::ALARM_OK ) {
+		//	m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::CHILD_ALARM);
+		//}
+		//else {
+		//	m_MyAlarm_grid[dwIndex]->StopAlarm();
+		//}
+	}
 }
 
 

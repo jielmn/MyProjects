@@ -18,6 +18,7 @@ public:
 		MYIMAGE_BK,
 		EDIT_BK,
 		EDIT_TEXT,
+		LAYOUT_READER_BK,
 	};
 
 	enum ENUM_IMG_NAME {

@@ -38,6 +38,8 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 			return 0xFFFFFFFF;
 		case EDIT_TEXT:
 			return 0xFF000000;
+		case LAYOUT_READER_BK:
+			return 0xFF444444;
 		default:
 			break;
 		}
@@ -61,6 +63,8 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 			return 0xFFAAAAAA;
 		case EDIT_TEXT:
 			return 0xFFFFFFFF;
+		case LAYOUT_READER_BK:
+			return 0xFFDDDDDD;
 		default:
 			break;
 		}

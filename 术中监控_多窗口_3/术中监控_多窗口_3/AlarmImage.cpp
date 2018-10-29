@@ -48,10 +48,14 @@ void CAlarmImageUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void  CAlarmImageUI::StartAlarm(CAlarmImageUI::ENUM_ALARM e) {
-	assert(e != ALARM_OK);
-
+	//assert(e != ALARM_OK);
 	// 如果和当前Alarm值相等，不用处理
 	if (e == m_alarm) {
+		return;
+	}
+
+	if (e == ALARM_OK) {
+		StopAlarm();
 		return;
 	}
 

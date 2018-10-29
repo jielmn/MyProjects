@@ -95,4 +95,7 @@ private:
 	void   UpdateLayout();
 	void   OnReaderName(TNotifyUI& msg);
 	void   OnEdtReaderNameKillFocus(TNotifyUI& msg);
+	void   OnMyLButtonDown(WPARAM wParam, LPARAM lParam);
+	void   OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex);
+	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
 };

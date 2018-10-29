@@ -18,12 +18,12 @@ public:
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	void  OnChangeSkin();
 	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
+	void  MyInvalidate();
 
 private:
 	time_t  GetFirstTime();
 	time_t  GetLastTime();
-	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
-	void    MyInvalidate();
+	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);	
 	int     CalcMinWidth();
 
 private:
@@ -38,8 +38,7 @@ private:
 	SolidBrush                   m_remark_brush;
 
 private:
-	vector<TempData *>           m_vTempData[MAX_READERS_PER_GRID];
-	DWORD                        m_dwSelectedReaderIndex;
+	vector<TempData *>           m_vTempData[MAX_READERS_PER_GRID];	
 	DWORD                        m_dwNextTempIndex;
 	BOOL                         m_bSetParentScrollPos;
 	E_TYPE                       m_type;
@@ -47,5 +46,6 @@ private:
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;
 	sigslot::signal0<>           m_sigAlarm;
+	DWORD                        m_dwSelectedReaderIndex;
 };
 
