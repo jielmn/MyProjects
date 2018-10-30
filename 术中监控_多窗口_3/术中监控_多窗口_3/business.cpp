@@ -10,7 +10,8 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() {
-
+	m_launch.m_sigReconnect.connect(this, &CBusiness::OnReconnect);
+	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 }
 
 CBusiness::~CBusiness() {
@@ -182,6 +183,15 @@ int CBusiness::Init() {
 	}
 	g_thrd_work->Start();
 
+	g_thrd_launch = new LmnToolkits::PriorityThread();
+	if (0 == g_thrd_launch) {
+		return -1;
+	}
+	g_thrd_launch->Start();
+
+
+	ReconnectLaunchAsyn(200);
+
 	return 0;
 }
 
@@ -191,6 +201,12 @@ int CBusiness::DeInit() {
 		g_thrd_work->Stop();
 		delete g_thrd_work;
 		g_thrd_work = 0;
+	}
+
+	if (g_thrd_launch) {
+		g_thrd_launch->Stop();
+		delete g_thrd_launch;
+		g_thrd_launch = 0;
 	}
 
 	Clear();
@@ -250,6 +266,31 @@ void  CBusiness::OnAlarm() {
 	AlarmAsyn();
 }
 
+int   CBusiness::ReconnectLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+	g_thrd_launch->DeleteMessages();
+
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_RECONNECT_LAUNCH);
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_RECONNECT_LAUNCH);
+	}
+	return 0;
+}
+
+int   CBusiness::ReconnectLaunch() {
+	m_launch.Reconnect();
+	return 0;
+}
+
+void   CBusiness::OnReconnect(DWORD dwDelay) {
+	ReconnectLaunchAsyn(dwDelay);
+}
+
+void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -265,6 +306,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_ALARM:
 	{
 		Alarm();
+	}
+	break;
+
+	case MSG_RECONNECT_LAUNCH:
+	{
+		ReconnectLaunch();
 	}
 	break;
 

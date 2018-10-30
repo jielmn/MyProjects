@@ -25,6 +25,7 @@ using namespace DuiLib;
 #define  TIMER_TEST_INTERVAL_1    7000
 #endif
 
+#define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
 #define   LOG_FILE_NAME           "surgery3.log"
 #define   CONFIG_FILE_NAME        "surgery3.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
@@ -126,10 +127,12 @@ using namespace DuiLib;
 #define   RADIUS_SIZE_IN_GRID            3  
 #define   RADIUS_SIZE_IN_MAXIUM          6
 #define   DEFAULT_ALARM_FILE_PATH        "\\res\\surgery_res_3\\1.wav"
+#define   RECONNECT_LAUNCH_TIME_INTERVAL 10000
 
 // message
 #define MSG_UPDATE_SCROLL                1001
 #define MSG_ALARM                        1002
+#define MSG_RECONNECT_LAUNCH             1003
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 
@@ -241,6 +244,7 @@ extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
 extern LmnToolkits::Thread *  g_thrd_work;
+extern LmnToolkits::Thread *  g_thrd_launch;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
@@ -249,6 +253,8 @@ extern DWORD   GetMinTemp(DWORD  dwIndex);
 extern DWORD   GetCollectInterval(DWORD dwIndex);
 extern time_t  DateTime2String(const char * szDatetime);
 extern char *  GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
+extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
+extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 
 // templates
 template <class T>

@@ -830,6 +830,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	HANDLE handle = ::CreateMutex(NULL, FALSE, GLOBAL_LOCK_NAME);//handle为声明的HANDLE类型的全局变量 
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		::MessageBox(0, "程序已经打开或没有关闭完全，请先关闭或等待完全关闭!", "错误", 0);
+		return 0;
+	}
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");

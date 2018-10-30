@@ -4,6 +4,7 @@
 #include "LmnThread.h"
 #include "common.h"
 #include "sigslot.h"
+#include "Launch.h"
 
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
@@ -25,6 +26,12 @@ public:
 	int   Alarm();
 	void  OnAlarm();
 
+	// ÷ÿ¡¨∑¢…‰∆˜
+	int   ReconnectLaunchAsyn(DWORD dwDelayTime = 0);
+	int   ReconnectLaunch();
+	void  OnReconnect(DWORD dwDelay);
+	void  OnStatus(CLmnSerialPort::PortStatus e);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -35,6 +42,7 @@ private:
 
 private:
 	char     m_szAlarmFile[256];
+	CLaunch  m_launch;
 };
 
 
