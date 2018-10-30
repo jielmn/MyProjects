@@ -798,6 +798,7 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	}
 	m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
 	m_MyImage_grid[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
+	m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
 	m_MyImage_max[dwIndex]->MyInvalidate();
 	m_MyImage_grid[dwIndex]->MyInvalidate();
 }
@@ -806,36 +807,18 @@ void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
 	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 
-	CAlarmImageUI::ENUM_ALARM e = CAlarmImageUI::ALARM_OK;
 	if ( dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm ) {
 		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::HIGH_TEMP);
-		e = CAlarmImageUI::HIGH_TEMP;
 	}
 	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm ) {
 		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::LOW_TEMP);
-		e = CAlarmImageUI::LOW_TEMP;
 	}
 	else {
 		m_UiAlarms[dwIndex][dwSubIndex]->StopAlarm();
 	}
 
-	int nAvailableReaderCnt = 0;
-	for ( int i = 0; i < MAX_READERS_PER_GRID; i++) {
-		if ( g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ) {
-			nAvailableReaderCnt++;
-		}
-	}
-
-	if ( 1 == nAvailableReaderCnt ) {
-		m_MyAlarm_grid[dwIndex]->StartAlarm(e);
-	}
-	else if ( nAvailableReaderCnt > 1 ) {
-		//if ( e != CAlarmImageUI::ALARM_OK ) {
-		//	m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::CHILD_ALARM);
-		//}
-		//else {
-		//	m_MyAlarm_grid[dwIndex]->StopAlarm();
-		//}
+	if ( dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex ) {
+		m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
 	}
 }
 

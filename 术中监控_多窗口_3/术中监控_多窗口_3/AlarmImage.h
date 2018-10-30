@@ -23,7 +23,9 @@ public:
 	void  StartAlarm(ENUM_ALARM e);
 	void  StopAlarm();
 
-private:
+public:
 	ENUM_ALARM     m_alarm;
+
+private:
 	BOOL           m_bSetBkImage;                     // Í¼Æ¬½»Ìæ
 };
