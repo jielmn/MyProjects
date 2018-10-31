@@ -203,7 +203,7 @@ int CBusiness::Init() {
 	}
 	g_thrd_work->Start();
 
-	g_thrd_launch = new LmnToolkits::PriorityThread();
+	g_thrd_launch = new LmnToolkits::SimThread();
 	if (0 == g_thrd_launch) {
 		return -1;
 	}
