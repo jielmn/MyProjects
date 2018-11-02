@@ -47,5 +47,8 @@ public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;
 	sigslot::signal0<>           m_sigAlarm;
 	DWORD                        m_dwSelectedReaderIndex;
+
+public:
+	void                         OnReaderSelected(DWORD  dwSelectedIndex);
 };
 

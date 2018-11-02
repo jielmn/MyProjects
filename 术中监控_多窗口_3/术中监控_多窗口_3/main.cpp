@@ -11,6 +11,7 @@
 #include "resource.h"
 #include <assert.h>
 #include "SettingDlg.h"
+#include "LmnTelSvr.h"
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_eGridStatus = GRID_STATUS_GRIDS;
@@ -28,6 +29,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_layMain = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(LAYOUT_MAIN_NAME));
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
+	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_STATUS_NAME));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -280,6 +282,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_LBUTTONDOWN) {
 		OnMyLButtonDown(wParam, lParam);
+	}
+	else if ( uMsg == UM_LAUNCH_STATUS ) {
+		OnLaunchStatus(wParam, lParam);
+	}
+	else if (uMsg == UM_READER_TEMP) {
+		OnReaderTemp(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -546,6 +554,7 @@ void   CDuiFrameWnd::OnSetting() {
 
 		if (oldData.m_dwLayoutColumns != g_data.m_CfgData.m_dwLayoutColumns || oldData.m_dwLayoutRows != g_data.m_CfgData.m_dwLayoutRows) {
 			UpdateLayout();
+			CBusiness::GetInstance()->ReconnectLaunchAsyn();
 		}
 		
 		::InvalidateRect(this->GetHWND(), 0, TRUE);
@@ -718,6 +727,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 }
 
 void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
+#if TEST_FLAG
 	if (dwTimer == TIMER_TEST_ID ) {
 		DWORD dwTmp = GetRand(3600, 3800);
 		OnTemp(0, 0, dwTmp);
@@ -726,6 +736,7 @@ void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
 		DWORD dwTmp = GetRand(3400, 3600);
 		OnTemp(0, 1, dwTmp);
 	}	
+#endif
 }
 
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
@@ -796,8 +807,11 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 			m_UiLayReader[dwIndex][i]->SetBkColor(0);
 		}
 	}
-	m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
-	m_MyImage_grid[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
+	//m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
+	//m_MyImage_grid[dwIndex]->m_dwSelectedReaderIndex = dwSubIndex;
+	m_MyImage_max[dwIndex]->OnReaderSelected(dwSubIndex);
+	m_MyImage_grid[dwIndex]->OnReaderSelected(dwSubIndex);
+
 	m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
 	m_MyImage_max[dwIndex]->MyInvalidate();
 	m_MyImage_grid[dwIndex]->MyInvalidate();
@@ -819,11 +833,41 @@ void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
 
 	if ( dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex ) {
 		m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
+
+		DuiLib::CDuiString  strText;
+		strText.Format("%.2f", dwTemp / 100.0);
+		m_LblCurTemp_grid[dwIndex]->SetText(strText);
 	}
+}
+
+void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
+	CLmnSerialPort::PortStatus eStatus = (CLmnSerialPort::PortStatus)wParam;
+
+	if (eStatus == CLmnSerialPort::OPEN) {
+		m_lblLaunchStatus->SetText("发射器连接OK");
+	}
+	else {
+		m_lblLaunchStatus->SetText("发射器连接断开");
+	}
+}
+
+void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
+	DWORD  dwIndex = LOWORD(wParam);
+	DWORD  dwSubIndex = HIWORD(wParam);
+	OnTemp(dwIndex, dwSubIndex, lParam);
+
+	DuiLib::CDuiString  strText;
+	strText.Format("%.2f", lParam / 100.0);
+	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
 }
 
 
 
+
+
+void PrintStatus(int nCnt, void * args[]) {
+	CBusiness::GetInstance()->PrintStatusAsyn();
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -836,9 +880,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		return 0;
 	}
 
+	JTelSvrRegCommand("status", "print status", PrintStatus, 0);
+
+	DWORD  dwPort = 2018;
+	JTelSvrStart((unsigned short)dwPort, 10);
+	
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
+
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));

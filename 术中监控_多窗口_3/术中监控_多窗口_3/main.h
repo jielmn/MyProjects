@@ -30,6 +30,7 @@ private:
 	CDialogBuilderCallbackEx           m_callback;
 	DuiLib::CTileLayoutUI *            m_layMain;
 	DuiLib::CHorizontalLayoutUI *      m_layStatus;
+	CLabelUI *                         m_lblLaunchStatus;
 	CControlUI *                       m_pGrids[MAX_GRID_COUNT];
 	DuiLib::CVerticalLayoutUI *        m_layGrid[MAX_GRID_COUNT];
 	DuiLib::CHorizontalLayoutUI *      m_layMaxium[MAX_GRID_COUNT];
@@ -98,4 +99,6 @@ private:
 	void   OnMyLButtonDown(WPARAM wParam, LPARAM lParam);
 	void   OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex);
 	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
+	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
+	void   OnReaderTemp(WPARAM wParam, LPARAM  lParam);
 };

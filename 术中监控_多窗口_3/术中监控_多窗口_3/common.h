@@ -14,7 +14,8 @@
 using namespace DuiLib;
 
 #ifdef   _DEBUG
-#define  TEST_FLAG                1
+#define  TEST_FLAG                0
+#define  TEST_FLAG_1              1
 #endif
 
 #if TEST_FLAG
@@ -47,6 +48,7 @@ using namespace DuiLib;
 #define   GRID_NAME                "MyGrid"
 #define   MYCHART_XML_FILE         "MyChart.xml"
 #define   LAYOUT_STATUS_NAME       "layStatus"
+#define   LABEL_STATUS_NAME        "lblLaunchStatus"
 #define   MYIMAGE_CLASS_NAME       "MyImage"
 #define   MYIMAGE_CLASS_NAME1      "MyImage1"
 #define   ALARM_IMAGE_CLASS_NAME   "AlarmImage"
@@ -124,17 +126,27 @@ using namespace DuiLib;
 #define   EDT_REMARK_HEIGHT              30
 #define   EDT_REMARK_Y_OFFSET            -50
 #define   DEFAULT_COLLECT_INTERVAL       50
-#define   RADIUS_SIZE_IN_GRID            3  
-#define   RADIUS_SIZE_IN_MAXIUM          6
+#define   RADIUS_SIZE_IN_GRID            4
+#define   RADIUS_SIZE_IN_MAXIUM          8
 #define   DEFAULT_ALARM_FILE_PATH        "\\res\\surgery_res_3\\1.wav"
 #define   RECONNECT_LAUNCH_TIME_INTERVAL 10000
+#define   READER_STATUS_CLOSE            0
+#define   READER_STATUS_OPEN             1
+#define   WRITE_SLEEP_TIME               2000
+#define   READ_INTERVAL_TIME             1000
 
 // message
 #define MSG_UPDATE_SCROLL                1001
 #define MSG_ALARM                        1002
 #define MSG_RECONNECT_LAUNCH             1003
+#define MSG_PRINT_STATUS                 1004
+#define MSG_GET_TEMPERATURE              1005
+#define MSG_READ_LAUNCH                  1006
+#define MSG_GET_GRID_TEMP                1007
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
+#define UM_LAUNCH_STATUS                 (WM_USER+2)
+#define UM_READER_TEMP                   (WM_USER+3)
 
 // ¿‡
 typedef struct tagTempData {
@@ -240,6 +252,27 @@ public:
 	int     m_nIndex;
 };
 
+class CTemperatureParam : public LmnToolkits::MessageData {
+public:
+	CTemperatureParam(DWORD dwIndex, DWORD dwSubIndex) : m_dwIndex(dwIndex), m_dwSubIndex(dwSubIndex) { }
+	DWORD     m_dwIndex;
+	DWORD     m_dwSubIndex;
+};
+
+class CGridTempParam : public LmnToolkits::MessageData {
+public:
+	CGridTempParam(DWORD dwIndex) : m_dwIndex(dwIndex) { }
+	DWORD     m_dwIndex;
+};
+
+typedef struct tagReaderStatus {
+	BOOL     m_bConnected;
+	DWORD    m_dwTryCnt;
+	DWORD    m_dwLastQueryTick;
+	DWORD    m_dwLastTemp;
+	BOOL     m_bChecked;
+}ReaderStatus;
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
@@ -255,6 +288,7 @@ extern time_t  DateTime2String(const char * szDatetime);
 extern char *  GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
+extern DWORD  FindReaderIndexByBed(DWORD dwBedNo);
 
 // templates
 template <class T>

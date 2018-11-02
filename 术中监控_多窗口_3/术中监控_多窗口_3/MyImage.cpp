@@ -4,7 +4,7 @@
 #include "business.h"
 
 CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
-							m_remark_brush(Gdiplus::Color(0x803D5E49)) {
+							m_remark_brush(Gdiplus::Color(0x803D5E49)), m_type(e) {
 	m_hCommonThreadPen   = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::COMMON_PEN) );
 	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
 	m_hCommonBrush       = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
@@ -16,9 +16,10 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 		m_temperature_brush[i] = new SolidBrush(Gdiplus::Color(g_data.m_argb[i]));
 	}
 
-	m_dwSelectedReaderIndex = 0;
+	//m_dwSelectedReaderIndex = 0;
+	OnReaderSelected(0);
+
 	m_dwNextTempIndex = 0;
-	m_type = e;
 
 	CBusiness * pBusiness = CBusiness::GetInstance();	
 	m_sigUpdateScroll.connect(pBusiness, &CBusiness::OnUpdateScroll);
@@ -438,4 +439,23 @@ int   CMyImageUI::CalcMinWidth() {
 
 	int nWidth = (int)((double)(tLastTime - tFirstTime) / dwInterval * dwUnitWidth);
 	return nWidth + dwLeftColumnWidth + MYIMAGE_RIGHT_BLANK;
+}
+
+void  CMyImageUI::OnReaderSelected(DWORD  dwSelectedIndex) {
+	m_dwSelectedReaderIndex = dwSelectedIndex;
+
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		if (i == m_dwSelectedReaderIndex) {
+			if ( m_type == TYPE_MAX)
+				m_temperature_pen[i]->SetWidth(8.0);
+			else 
+				m_temperature_pen[i]->SetWidth(4.0);
+		}
+		else {
+			if (m_type == TYPE_MAX)
+				m_temperature_pen[i]->SetWidth(5.0);
+			else
+				m_temperature_pen[i]->SetWidth(2.0);
+		}
+	}
 }

@@ -12,6 +12,14 @@ public:
 	// 重连
 	int  Reconnect();
 
+	// 获取温度
+	int  QueryTemperature(DWORD dwArea, DWORD dwBedID);
+
+	// 读取串口数据并处理数据
+	int  ReadComData();
+
+	BOOL WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen);
+
 private:
 	void   CloseLaunch();
 
@@ -19,6 +27,9 @@ private:
 	CDataBuf   m_recv_buf;
 
 public:
-	sigslot::signal1<PortStatus>        m_sigStatus;
-	sigslot::signal1<DWORD>             m_sigReconnect;
+	sigslot::signal1<PortStatus>          m_sigStatus;
+	sigslot::signal1<DWORD>               m_sigReconnect;
+	sigslot::signal3<DWORD, DWORD, DWORD> m_sigReaderStatus;
+	sigslot::signal3<DWORD, DWORD, DWORD> m_sigReaderTemp;
+	sigslot::signal0<>                    m_sigCheck;
 };

@@ -1,4 +1,5 @@
 #include "business.h"
+#include "LmnTelSvr.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -12,6 +13,11 @@ CBusiness *  CBusiness::GetInstance() {
 CBusiness::CBusiness() {
 	m_launch.m_sigReconnect.connect(this, &CBusiness::OnReconnect);
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
+	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
+	m_launch.m_sigCheck.connect(this, &CBusiness::OnCheckReader);
+
+	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
+	memset(m_reader_status, 0, sizeof(m_reader_status));
 }
 
 CBusiness::~CBusiness() {
@@ -183,7 +189,7 @@ int CBusiness::Init() {
 	}
 	g_thrd_work->Start();
 
-	g_thrd_launch = new LmnToolkits::PriorityThread();
+	g_thrd_launch = new LmnToolkits::SimThread();
 	if (0 == g_thrd_launch) {
 		return -1;
 	}
@@ -288,7 +294,175 @@ void   CBusiness::OnReconnect(DWORD dwDelay) {
 }
 
 void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
+	::PostMessage( g_data.m_hWnd, UM_LAUNCH_STATUS, (WPARAM)e, 0 );
+	if ( e == CLmnSerialPort::OPEN ) {
+		DWORD  dwCount = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+		DWORD  dwDelay = 200;
+		for ( DWORD i = 0; i < dwCount; i++ ) {
+			GetGridTemperatureAsyn(i,dwDelay);
+			dwDelay += 2000;
+		}		
+		ReadLaunchAsyn(1000);
+	}
+}
 
+// 打印状态
+int   CBusiness::PrintStatusAsyn() {
+	g_thrd_work->PostMessage( this, MSG_PRINT_STATUS );
+	return 0;
+}
+
+int   CBusiness::PrintStatus() {
+	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+	JTelSvrPrint("launch messages count: %lu", g_thrd_launch->GetMessagesCount());
+	return 0;
+}
+
+// 获取温度
+int   CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
+	if (0 == dwDelay) {
+		g_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP, new CGridTempParam(dwIndex));
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP, new CGridTempParam(dwIndex));
+	}
+	return 0;
+}
+
+int   CBusiness::GetGridTemperature(const CGridTempParam * pParam) {
+	DWORD  dwIndex = pParam->m_dwIndex;
+	for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++ ) {
+		m_reader_status[dwIndex][j].m_bChecked = FALSE;
+		m_reader_status[dwIndex][j].m_dwLastQueryTick = 0;
+		m_reader_status[dwIndex][j].m_dwTryCnt = 0;
+
+		CTemperatureParam a(dwIndex, j);
+		GetTemperature(&a);
+	}	
+	return 0;
+}
+
+int   CBusiness::GetTemperatureAsyn(DWORD  dwIndex, DWORD dwSubIndex, DWORD dwDelay /*= 0*/) {
+	if (0 == dwDelay) {
+		g_thrd_launch->PostMessage(this, MSG_GET_TEMPERATURE, new CTemperatureParam(dwIndex, dwSubIndex));
+	}
+	else {
+		g_thrd_launch->PostDelayMessage( dwDelay, this, MSG_GET_TEMPERATURE, new CTemperatureParam(dwIndex, dwSubIndex));
+	}
+	
+	return 0;
+}
+
+int   CBusiness::GetTemperature(CTemperatureParam * pParam) {
+	DWORD  dwIndex    = pParam->m_dwIndex;
+	DWORD  dwSubIndex = pParam->m_dwSubIndex;
+
+	//JTelSvrPrint("GetTemperature[%lu,%lu]:", dwIndex, dwSubIndex);
+
+	// 如果总开关没有打开
+	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {	
+		m_reader_status[dwIndex][dwSubIndex].m_bChecked = TRUE;
+		CheckGrid(dwIndex);
+		return 0;
+	}
+
+	// 如果本Reader开关没有打开或者床号为0
+	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch 
+		|| 0 == g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwBed ) {
+		m_reader_status[dwIndex][dwSubIndex].m_bChecked = TRUE;
+		CheckGrid(dwIndex);
+		return 0;
+	}
+	
+	// 如果本Reader开关打开
+	m_reader_status[dwIndex][dwSubIndex].m_dwLastQueryTick = LmnGetTickCount();
+	m_launch.QueryTemperature( g_data.m_CfgData.m_dwAreaNo, 
+		                       g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwBed );
+	return 0;
+}
+
+// launch 读串口数据
+int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_thrd_launch->PostMessage(this, MSG_READ_LAUNCH);
+	}
+	else {
+		g_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READ_LAUNCH);
+	}
+	return 0;
+}
+
+int   CBusiness::ReadLaunch() {
+	m_launch.ReadComData();
+	ReadLaunchAsyn(READ_INTERVAL_TIME);
+	return 0;
+}
+
+void  CBusiness::OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp) {
+	if ( !m_reader_status[dwIndex][dwSubIndex].m_bConnected ) {
+		m_reader_status[dwIndex][dwSubIndex].m_bConnected = TRUE;
+	}
+
+	// 通知UI温度
+	::PostMessage(g_data.m_hWnd, UM_READER_TEMP, MAKELONG(dwIndex, dwSubIndex), dwTemp );
+
+	m_reader_status[dwIndex][dwSubIndex].m_dwLastQueryTick = 0;
+	m_reader_status[dwIndex][dwSubIndex].m_dwTryCnt = 0;
+	m_reader_status[dwIndex][dwSubIndex].m_dwLastTemp = dwTemp;
+	m_reader_status[dwIndex][dwSubIndex].m_bChecked = TRUE;
+	
+	CheckGrid(dwIndex);
+}
+
+void  CBusiness::CheckGrid(DWORD dwIndex) {
+	// 查看是否最后一个
+	BOOL  bAllChecked = TRUE;
+	for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+		if (!m_reader_status[dwIndex][j].m_bChecked) {
+			bAllChecked = FALSE;
+			break;
+		}
+	}
+
+	// 如果格子里的Reader都获取了温度
+	if (bAllChecked) {
+		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+			m_reader_status[dwIndex][j].m_dwLastQueryTick = 0;
+			m_reader_status[dwIndex][j].m_dwTryCnt = 0;
+			m_reader_status[dwIndex][j].m_bChecked = FALSE;
+		}
+		DWORD dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
+		GetGridTemperatureAsyn(dwIndex, dwCollectInterval * 1000);
+	}
+}
+
+void  CBusiness::OnCheckReader() {
+	DWORD  dwCnt = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	DWORD  dwCurTick = LmnGetTickCount();
+	for ( DWORD i = 0; i < dwCnt; i++ ) {
+		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+			if ( m_reader_status[i][j].m_dwLastQueryTick > 0 ) {
+				// 如果超时
+				if ( dwCurTick - m_reader_status[i][j].m_dwLastQueryTick >= 3000 ) {
+					// 如果超时不超过3次，重新请求
+					if ( m_reader_status[i][j].m_dwTryCnt < 3 ) {
+						m_reader_status[i][j].m_dwLastQueryTick = 0;
+						m_reader_status[i][j].m_dwTryCnt++;
+						GetTemperatureAsyn(i, j, 100);
+					}
+					// 认为失败
+					else {
+						// 通知界面, Reader disconnected
+
+						assert(!m_reader_status[i][j].m_bChecked);
+						m_reader_status[i][j].m_bChecked = TRUE;
+						CheckGrid(i);
+					}
+				}
+			}
+					
+		}
+	}
 }
 
 
@@ -312,6 +486,32 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_RECONNECT_LAUNCH:
 	{
 		ReconnectLaunch();
+	}
+	break;
+
+	case MSG_PRINT_STATUS:
+	{
+		PrintStatus();
+	}
+	break;
+
+	case MSG_GET_TEMPERATURE:
+	{
+		CTemperatureParam * pParam = (CTemperatureParam *)pMessageData;
+		GetTemperature(pParam);
+	}
+	break;
+
+	case MSG_READ_LAUNCH:
+	{
+		ReadLaunch();
+	}
+	break;
+
+	case MSG_GET_GRID_TEMP:
+	{
+		CGridTempParam * pParam = (CGridTempParam *)pMessageData;
+		GetGridTemperature(pParam);
 	}
 	break;
 

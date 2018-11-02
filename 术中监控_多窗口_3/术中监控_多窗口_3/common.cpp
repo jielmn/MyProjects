@@ -332,3 +332,22 @@ int  GetCh340Count(char * szComPort, DWORD dwComPortLen) {
 	}
 	return nFindCount;
 }
+
+DWORD  FindReaderIndexByBed(DWORD dwBedNo) {
+	if ( 0 == dwBedNo ) {
+		return -1;
+	}
+
+	DWORD  dwCnt = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	DWORD  dwIndex = 0;
+	for (dwIndex = 0; dwIndex < dwCnt; dwIndex++) {
+		for (DWORD dwSubIndex = 0; dwSubIndex < MAX_READERS_PER_GRID; dwSubIndex++) {
+			// ÕÒµ½´²Î»ºÅ
+			if ( g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwBed == dwBedNo ) {
+				return MAKELONG( dwIndex, dwSubIndex );
+			}
+		}		
+	}
+
+	return -1;
+}
