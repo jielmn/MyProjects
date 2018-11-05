@@ -443,7 +443,7 @@ void  CBusiness::OnCheckReader() {
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			if ( m_reader_status[i][j].m_dwLastQueryTick > 0 ) {
 				// 如果超时
-				if ( dwCurTick - m_reader_status[i][j].m_dwLastQueryTick >= 3000 ) {
+				if ( dwCurTick - m_reader_status[i][j].m_dwLastQueryTick >= 5000 ) {
 					// 如果超时不超过3次，重新请求
 					if ( m_reader_status[i][j].m_dwTryCnt < 3 ) {
 						m_reader_status[i][j].m_dwLastQueryTick = 0;
@@ -453,9 +453,12 @@ void  CBusiness::OnCheckReader() {
 					// 认为失败
 					else {
 						// 通知界面, Reader disconnected
+						::PostMessage(g_data.m_hWnd, UM_READER_DISCONNECTED, MAKELONG(i, j), 0);
 
 						assert(!m_reader_status[i][j].m_bChecked);
 						m_reader_status[i][j].m_bChecked = TRUE;
+						m_reader_status[i][j].m_dwLastQueryTick = 0;
+						m_reader_status[i][j].m_dwTryCnt = 0;
 						CheckGrid(i);
 					}
 				}

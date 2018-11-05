@@ -147,6 +147,7 @@ using namespace DuiLib;
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
 #define UM_READER_TEMP                   (WM_USER+3)
+#define UM_READER_DISCONNECTED           (WM_USER+4)
 
 // ¿‡
 typedef struct tagTempData {

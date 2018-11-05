@@ -289,6 +289,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_READER_TEMP) {
 		OnReaderTemp(wParam, lParam);
 	}
+	else if (uMsg == UM_READER_DISCONNECTED) {
+		OnReaderDisconnected(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -859,6 +862,17 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
 	strText.Format("%.2f", lParam / 100.0);
 	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
+}
+
+void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
+	DWORD  dwIndex = LOWORD(wParam);
+	DWORD  dwSubIndex = HIWORD(wParam);
+	m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
+
+	if (dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex) {
+		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
+		m_LblCurTemp_grid[dwIndex]->SetText("--");
+	}
 }
 
 

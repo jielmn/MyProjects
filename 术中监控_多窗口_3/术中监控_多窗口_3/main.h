@@ -101,4 +101,5 @@ private:
 	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
 	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
 	void   OnReaderTemp(WPARAM wParam, LPARAM  lParam);
+	void   OnReaderDisconnected(WPARAM wParam, LPARAM  lParam);
 };
