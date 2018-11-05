@@ -68,6 +68,8 @@ public class MainServlet extends HttpServlet {
 				String  temp   = new String();
 				String  time   = new String();
 				String  bind   = new String();
+				String  readerid = new String();
+				String  tagid  = new String();
 				
 				if ( null != req.getParameter("temp") ) {
 					temp = req.getParameter("temp");
@@ -79,9 +81,17 @@ public class MainServlet extends HttpServlet {
 
 				if ( null != req.getParameter("bind") ) {
 					bind = req.getParameter("bind");
-				}				
+				}		
+
+				if ( null != req.getParameter("readerid") ) {
+					readerid = req.getParameter("readerid");
+				}
+
+				if ( null != req.getParameter("tagid") ) {
+					tagid = req.getParameter("tagid");
+				}
 				
-				addtemp(out, Integer.parseInt(temp), Integer.parseInt(time), Integer.parseInt(bind)  );
+				addtemp(out, Integer.parseInt(temp), Integer.parseInt(time), Integer.parseInt(bind), readerid, tagid  );
 			}
 		}		
 		
@@ -139,7 +149,7 @@ public class MainServlet extends HttpServlet {
 		out.print(errCode);
 	}
 	
-	public void addtemp(PrintWriter out, int temp, int d, int bind ) {		
+	public void addtemp(PrintWriter out, int temp, int d, int bind, String readerid,  String tagid ) {		
 		
 		if ( temp == 0 ) {
 			setContentError(out,1);
@@ -163,8 +173,9 @@ public class MainServlet extends HttpServlet {
 				return;
 			}
 			
-			Statement stmt = con.createStatement();      
-			stmt.executeUpdate( "insert into tempermonitor values( null, 'reader', 'tag', " + temp + ", '" + transForDate1(d) + "', 'nurse', 0, 1, " + bind + " );" );
+			Statement stmt = con.createStatement();      			
+			stmt.executeUpdate( "update tempermonitor set islast = 0 where tagid='" + tagid + "' and TIMESTAMPDIFF(SECOND,mtime,now()) < 300;" );			
+			stmt.executeUpdate( "insert into tempermonitor values( null, '" + readerid + "', '" + tagid + "', " + temp + ", '" + transForDate1(d) + "', 'nurse', 0, 1, " + bind + " );" );
 			setContentError(out,0);
 			
 			stmt.close();
