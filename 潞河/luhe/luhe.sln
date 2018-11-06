@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luhe", "luhe\luhe.vcxproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "update", "update\update.vcxproj", "{6A46FA24-B982-493D-8758-9F06A9EA2CBE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "setting", "setting\setting.vcxproj", "{56730612-2B50-49DA-B1E9-CA021F168BCE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{6A46FA24-B982-493D-8758-9F06A9EA2CBE}.Release|x64.Build.0 = Release|x64
 		{6A46FA24-B982-493D-8758-9F06A9EA2CBE}.Release|x86.ActiveCfg = Release|Win32
 		{6A46FA24-B982-493D-8758-9F06A9EA2CBE}.Release|x86.Build.0 = Release|Win32
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Debug|x64.ActiveCfg = Debug|x64
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Debug|x64.Build.0 = Debug|x64
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Debug|x86.ActiveCfg = Debug|Win32
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Debug|x86.Build.0 = Debug|Win32
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Release|x64.ActiveCfg = Release|x64
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Release|x64.Build.0 = Release|x64
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Release|x86.ActiveCfg = Release|Win32
+		{56730612-2B50-49DA-B1E9-CA021F168BCE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

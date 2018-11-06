@@ -4,8 +4,12 @@
 #include <locale.h>
 #include <assert.h>
 #include "common.h"
+#include "UIlib.h"
+using namespace DuiLib;
 
 CGlobalData  g_data;
+std::vector<TArea *>  g_vArea;
+IConfig * g_cfg_area = 0;
 
 BOOL EnumPortsWdm(std::vector<std::string> & v)
 {
@@ -151,89 +155,54 @@ int  GetCh340Count(char * szComPort, DWORD dwComPortLen) {
 	return nFindCount;
 }
 
-BOOL  CheckComPortExist(int nCheckComPort) {
-	std::vector<std::string> vComPorts;
-	EnumPortsWdm(vComPorts);
+static DWORD  FindMaxAreaId(const std::vector<TArea *> & v) {
+	DWORD  dwMax = 0;
+	std::vector<TArea *>::const_iterator  it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TArea * pArea = *it;
+		if (pArea->dwAreaNo > dwMax) {
+			dwMax = pArea->dwAreaNo;
+		}
+	}
+	return dwMax + 1;
+}
 
-	char buf[8192];
-	std::vector<std::string>::iterator it;
-	for (it = vComPorts.begin(); it != vComPorts.end(); it++) {
-		std::string & s = *it;
-		Str2Lower(s.c_str(), buf, sizeof(buf));
+DWORD  FindNewAreaId(const std::vector<TArea *> & v) {
+	DWORD dwMaxId = FindMaxAreaId(v);
+	if (dwMaxId <= 100) {
+		return dwMaxId;
+	}
 
-		int nComPort = 0;
-		const char * pFind = strstr(buf, "com");
-		while (pFind) {
-			if (1 == sscanf(pFind + 3, "%d", &nComPort)) {
+	for (DWORD i = 1; i <= 100; i++) {
+		std::vector<TArea *>::const_iterator  it;
+		for (it = v.begin(); it != v.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == i) {
 				break;
 			}
-			pFind = strstr(pFind + 3, "com");
 		}
-		assert(nComPort > 0);
-
-		if (nCheckComPort == nComPort) {
-			return TRUE;
+		// 如果没有找到相同的id，就用这个id
+		if (it == v.end()) {
+			return i;
 		}
 	}
-
-	return FALSE;
+	return -1;
 }
 
+void  SaveAreas() {
+	g_cfg_area->ClearConfig();
 
-unsigned char ToHex(unsigned char x)
-{
-	return  x > 9 ? x + 55 : x + 48;
-}
+	std::vector<TArea *>::iterator it;
+	int i = 0;
+	DuiLib::CDuiString strText;
 
-unsigned char FromHex(unsigned char x)
-{
-	unsigned char y;
-	if (x >= 'A' && x <= 'Z') y = x - 'A' + 10;
-	else if (x >= 'a' && x <= 'z') y = x - 'a' + 10;
-	else if (x >= '0' && x <= '9') y = x - '0';
-	else assert(0);
-	return y;
-}
-
-std::string UrlEncode(const std::string& str)
-{
-	std::string strTemp = "";
-	size_t length = str.length();
-	for (size_t i = 0; i < length; i++)
-	{
-		if (isalnum((unsigned char)str[i]) ||
-			(str[i] == '-') ||
-			(str[i] == '_') ||
-			(str[i] == '.') ||
-			(str[i] == '~'))
-			strTemp += str[i];
-		else if (str[i] == ' ')
-			strTemp += "+";
-		else
-		{
-			strTemp += '%';
-			strTemp += ToHex((unsigned char)str[i] >> 4);
-			strTemp += ToHex((unsigned char)str[i] % 16);
-		}
+	for (it = g_vArea.begin(); it != g_vArea.end(); it++, i++) {
+		TArea * pArea = *it;
+		strText.Format("area no %d", i + 1);
+		g_cfg_area->SetConfig(strText, pArea->dwAreaNo);
+		strText.Format("area name %d", i + 1);
+		g_cfg_area->SetConfig(strText, pArea->szAreaName);
 	}
-	return strTemp;
-}
 
-std::string UrlDecode(const std::string& str)
-{
-	std::string strTemp = "";
-	size_t length = str.length();
-	for (size_t i = 0; i < length; i++)
-	{
-		if (str[i] == '+') strTemp += ' ';
-		else if (str[i] == '%')
-		{
-			assert(i + 2 < length);
-			unsigned char high = FromHex((unsigned char)str[++i]);
-			unsigned char low = FromHex((unsigned char)str[++i]);
-			strTemp += high * 16 + low;
-		}
-		else strTemp += str[i];
-	}
-	return strTemp;
+	g_cfg_area->Save();
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1" bkcolor="#FFD1E8F5"  >				
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout height="40" inset="10,5,10,5">
+			<Label text="Reader对应串口" width="150" font="3" textcolor="#FF386382" />
+			<Combo name="cmbReaderComPort" width="400" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382"  >
+			</Combo>
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="40" />
+		
+		<HorizontalLayout height="40" inset="10,5,10,5">
+			<Label text="Reader信道" width="150" font="3" textcolor="#FF386382" />		
+			<Combo name="cmbArea1" width="300" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382"  >
+			</Combo>			
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="40" inset="10,5,10,5">
+			<Label text="Reader地址" width="150" font="3" textcolor="#FF386382" />
+			<Edit name="edtBedNo" font="3" textcolor="#FF386382" width="200" text="1" />
+			<Control width="10" />
+			<Label text="范围(1~200)" width="100" font="3" textcolor="#FF386382" />
+			<Control width="140" />
+			<Button name="btnSetting_1" text="设置" font="3" textcolor="#FF386382" width="150" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="40" />
+		
+		<HorizontalLayout height="40" inset="10,5,10,5">
+			<Label text="Reader SN码" width="150" font="3" textcolor="#FF386382" />
+			<Edit name="edtSnNo" font="3" textcolor="#FF386382" width="200" text="1" />
+			<Control width="10" />
+			<Label text="范围(1~10000000)" width="140" font="3" textcolor="#FF386382" />
+			<Control width="100" />
+			<Button name="btnSetting_2" text="设置" font="3" textcolor="#FF386382" width="150" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+		</HorizontalLayout>
+		
+	</VerticalLayout>
+</Window>
