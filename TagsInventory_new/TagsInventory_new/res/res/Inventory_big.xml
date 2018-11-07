@@ -19,7 +19,7 @@
 				
 				<HorizontalLayout height="20" />
 				
-				<VerticalLayout height="342" width="540" bordercolor="#FFCCCCCC" bordersize="1" inset="10,1,10,1" >
+				<VerticalLayout height="332" width="540" bordercolor="#FFCCCCCC" bordersize="1" inset="10,1,10,1" >
 					<HorizontalLayout height="20" />
 					<HorizontalLayout height="200">
 						<Label text="盘点内容：" width="120" height="30" font="1" textcolor="#FF386382" />
@@ -39,7 +39,7 @@
 						<Button name="btnAddSmallBarcode" text="添加" textcolor="#FF386382" font="1" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' "  disabledimage="file='win7_button_disabled.png' corner='5,5,5,5' hole='false' " />
 					</HorizontalLayout>	
 					
-					<HorizontalLayout height="20" />
+					<HorizontalLayout height="10" />
 					<HorizontalLayout >
 						<Label text="盘点总数：" width="120" height="40" font="1" textcolor="#FF386382" /><Label name="lblCountBig" text="0" width="300" height="40" font="3" textcolor="#FF386382" />
 					</HorizontalLayout>
@@ -47,12 +47,12 @@
 				
 							
 				
-				<HorizontalLayout height="20" />
+				<HorizontalLayout height="10" />
 				<HorizontalLayout height="40">
 					<Label text="生成包装号：" width="120" height="40" font="1" textcolor="#FF386382" /><Edit name="big_package_id" text="包装号" height="40" width="400" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" font="3" textcolor="#FF386382" />
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="60" />
+				<HorizontalLayout height="10" />
 				<HorizontalLayout height="40">
 					<Label text="保存结果" width="520" height="40" font="4" textcolor="#FF386382" name="lblInvBigSaveRet" />
 				</HorizontalLayout>
