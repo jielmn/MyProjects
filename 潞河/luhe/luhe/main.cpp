@@ -235,7 +235,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	JTelSvrRegCommand("status", "check status", PrintStatus, 0);
 
 	DWORD  dwPort = 0;
-	g_data.m_cfg->GetConfig("telnet port", dwPort, 1207);
+	g_data.m_cfg->GetConfig("telnet port", dwPort, 4108);
 	JTelSvrStart((unsigned short)dwPort, 10);
 
 

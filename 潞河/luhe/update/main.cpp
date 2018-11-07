@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include "httpstack.h"
+#include "LmnTelSvr.h"
 
 void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen, 
 	          const char * szHeader, DWORD dwHeaderLen, void * context ) {
@@ -17,7 +18,7 @@ void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	// 如果是获取更新版本
 	if ( nCmd == FETCH_STATION ) {
 		// 获取更新版本成功
-		if ( nError == 0 ) {
+		if ( nError == 0 && dwCode == 200 ) {
 			// 把原433程序改名
 			DeleteFile("old.exe");
 			MoveFile(STATION_EXE_NAME, "old.exe");
@@ -41,7 +42,7 @@ void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	}
 	else if (nCmd == FETCH_VERSION) {
 		// 获取版本号成功
-		if (nError == 0) {
+		if (nError == 0 && dwCode == 200) {
 			char * pVersion = new char[dwDataLen + 1];
 			memcpy(pVersion, szData, dwDataLen);
 			pVersion[dwDataLen] = '\0';
@@ -59,8 +60,7 @@ void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_nState = STATE_OK;
-	memset(m_szRemoteVersion, 0, sizeof(m_szRemoteVersion));
-	InitHttpStack(OnHttp);
+	memset(m_szRemoteVersion, 0, sizeof(m_szRemoteVersion));	
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -181,12 +181,12 @@ void   CDuiFrameWnd::OnUpdateCheck() {
 
 	// 获取服务器版本号
 	std::string strUrl = g_data.m_szServerAddr;
-	strUrl += "/update/version.txt";
+	strUrl += "/upgrade/version.txt";
 	CHttp::GetInstance()->Get(strUrl, (void *)FETCH_VERSION);
 	m_nState = STATE_GET_VERSION;
 }
 
-void   CDuiFrameWnd::LaunchStation() {
+BOOL   CDuiFrameWnd::LaunchStation() {
 	TCHAR szCommandLine[MAX_PATH];
 	memset(szCommandLine, 0, sizeof(szCommandLine));
 	lstrcpy(szCommandLine, _T(STATION_EXE_NAME));//要启动的进程
@@ -206,19 +206,35 @@ void   CDuiFrameWnd::LaunchStation() {
 	if (!bRet)
 	{
 		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to launch %s \n", STATION_EXE_NAME);
-		this->PostMessage(WM_CLOSE);
+		JTelSvrPrint("failed to launch %s", STATION_EXE_NAME);
+		//this->PostMessage(WM_CLOSE);
 	}
+	return bRet;
 }
 
 void   CDuiFrameWnd::OnUpdateRet(WPARAM wParam, LPARAM lParam) {
 	int nRet = wParam;
 	if ( 0 == nRet ) {
-		g_data.m_cfg->SetConfig("station version", m_szRemoteVersion);
-		g_data.m_cfg->Save();
-		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "update OK \n");
+		BOOL bRet = LaunchStation();
+		if (!bRet) {
+			DeleteFile(STATION_EXE_NAME);
+			MoveFile("old.exe", STATION_EXE_NAME);
+			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "update ok, but launch fail \n");
+			JTelSvrPrint("update ok, but launch fail");
+			LaunchStation();
+		}
+		else {
+			g_data.m_cfg->SetConfig("station version", m_szRemoteVersion);
+			g_data.m_cfg->Save();
+			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "update OK \n");
+			JTelSvrPrint("update OK");
+		}		
 	}
-
-	LaunchStation();
+	else {
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "update fail \n");
+		JTelSvrPrint("update fail");
+		LaunchStation();
+	}
 
 	m_nState = STATE_OK;
 }
@@ -240,6 +256,7 @@ void  CDuiFrameWnd::OnVersionRet(WPARAM wParam, LPARAM lParam) {
 		// 版本号不同
 		else {
 			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "remote version is different from local. start updating \n");
+			JTelSvrPrint("remote version is different from local. start updating");
 			STRNCPY(m_szRemoteVersion, pVersion, sizeof(m_szRemoteVersion));
 
 			// 1. 查看433进程是否存在，如果存在，则关闭进程	
@@ -257,7 +274,7 @@ void  CDuiFrameWnd::OnVersionRet(WPARAM wParam, LPARAM lParam) {
 
 			// 2. 从服务器上下载最新版本
 			std::string strUrl = g_data.m_szServerAddr;
-			strUrl += "/update/";
+			strUrl += "/upgrade/";
 			strUrl += STATION_EXE_NAME;
 			CHttp::GetInstance()->Get(strUrl, (void *)FETCH_STATION);
 			m_nState = STATE_FETCH;
@@ -266,6 +283,7 @@ void  CDuiFrameWnd::OnVersionRet(WPARAM wParam, LPARAM lParam) {
 	// 获取版本号失败
 	else {
 		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "failed to get remote version \n");
+		JTelSvrPrint("failed to get remote version");
 		m_nState = STATE_OK;
 	}
 
@@ -297,9 +315,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		SetCurrentDirectory(szCurDir);
 	}
 	
+	InitHttpStack(OnHttp);
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
+
+	DWORD  dwPort = 0;
+	g_data.m_cfg->GetConfig("telnet port", dwPort, 8737);
+	JTelSvrStart((unsigned short)dwPort, 10);
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
@@ -317,12 +340,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	duiFrame->ShowModal(false);
 	delete duiFrame;
 
+	// 查看433进程是否存在，如果存在，则关闭进程	
+	HWND hWnd = ::FindWindow(STATION_CLASS_WINDOW_NAME, 0);
+	if (0 != hWnd) {
+		::PostMessage(hWnd, WM_CLOSE, 0, 0);
+	}
+
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main close.\n");
 
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();
-
+	DeinitHttpStack();
 	return 0;
 }
 

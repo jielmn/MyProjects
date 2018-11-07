@@ -23,7 +23,7 @@
 #define   UM_VERSION_RET          (WM_USER+5)
 
 #define  TIMER_UPDATE_CHECK_ID        100
-#define  TIMER_UPDATE_CHECK_INTERVAL  5000
+#define  TIMER_UPDATE_CHECK_INTERVAL  60000
 
 #define  FETCH_STATION               1
 #define  FETCH_VERSION               2

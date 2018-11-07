@@ -47,7 +47,7 @@ private:
 
 private:
 	void   OnUpdateCheck();
-	void   LaunchStation();
+	BOOL   LaunchStation();
 	void   OnUpdateRet(WPARAM wParam, LPARAM lParam);
 	void   OnVersionRet(WPARAM wParam, LPARAM lParam);
 };
