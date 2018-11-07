@@ -1,6 +1,7 @@
 #include "business.h"
 #include "UIlib.h"
 using namespace DuiLib;
+#include "LmnSerialPort.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -107,9 +108,160 @@ int CBusiness::DeInit() {
 	return 0;
 }
 
+int  CBusiness::SettingGwAsyn(int nAreaNo, int nComPort) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SETTING_GW, new CSettingGwParam(nAreaNo, nComPort));
+	return 0;
+}
+
+int  CBusiness::SettingGw(const CSettingGwParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	char  write_data[256];
+	DWORD dwWriteLen = 7;
+	int ret = -1;
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nComPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		::PostMessage(g_hWnd, UM_SETTTING_GW_RET, -1, 0);
+		return 0;
+	}
+
+	memcpy(write_data, "\xC0\x00\x01\x1A\x04\xDD\xAA", dwWriteLen);
+	write_data[4] = pParam->m_nAreaNo;
+	serial_port.Write(write_data, dwWriteLen);
+
+	LmnSleep(2000);
+
+	BYTE buf[256];
+	DWORD  dwRecvLen = sizeof(buf);
+	serial_port.Read(buf, dwRecvLen);
+	if (dwRecvLen == 3) {
+		if ( buf[0] == 0x55 && buf[1] == (BYTE)pParam->m_nAreaNo && buf[2] == 0xFF ) {
+			ret = 0;
+		}
+	}
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_hWnd, UM_SETTTING_GW_RET, ret, 0);
+	return 0;
+}
+
+int  CBusiness::SettingReaderAsyn(int nAreaNo, int nBedNo, int nComPort) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SETTING_READER, new CSettingReaderParam(nAreaNo, nBedNo, nComPort));
+	return 0;
+}
+
+int  CBusiness::SettingReader(const CSettingReaderParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	BYTE  write_data[256];
+	DWORD dwWriteLen = 6;
+	int ret = -1;
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nComPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		::PostMessage(g_hWnd, UM_SETTTING_READER_RET, -1, 0);
+		return 0;
+	}
+
+	memcpy(write_data, "\xC0\x00\x01\x04\xDD\xAA", dwWriteLen);
+	write_data[2] = pParam->m_nBedNo & 0xFF;
+	write_data[3] = pParam->m_nAreaNo;
+	serial_port.Write(write_data, dwWriteLen);
+
+	LmnSleep(2000);
+
+	BYTE buf[256];
+	DWORD  dwRecvLen = sizeof(buf);
+	serial_port.Read(buf, dwRecvLen);
+	if (dwRecvLen == 4) {
+		if (buf[0] == 0 && buf[1] == (pParam->m_nBedNo & 0xFF) && buf[2] == pParam->m_nAreaNo && buf[3] == 0xFF ) {
+			ret = 0;
+		}
+	}
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_hWnd, UM_SETTTING_READER_RET, ret, 0);
+	return 0;
+}
+
+int  CBusiness::SettingSnAsyn(int nSn, int nComPort) {
+	g_data.m_thrd_db->PostMessage( this, MSG_SETTING_SN, new CSettingSnParam(nSn, nComPort) );
+	return 0;
+}
+
+int  CBusiness::SettingSn(const CSettingSnParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	BYTE  write_data[256];
+	DWORD dwWriteLen = 9;
+	int ret = -1;
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nComPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		::PostMessage(g_hWnd, UM_SETTTING_SN_RET, -1, 0);
+		return 0;
+	}
+	
+	memcpy(write_data, "\x66\x00\x00\x00\x00\x00\x01\xDD\xAA", dwWriteLen);
+	long n = htonl(pParam->m_nSn);
+	memcpy(write_data + 3, &n, 4);
+	serial_port.Write(write_data, dwWriteLen);
+
+	LmnSleep(2000);
+
+	BYTE buf[256];
+	DWORD  dwRecvLen = sizeof(buf);
+	serial_port.Read(buf, dwRecvLen);
+	if (dwRecvLen == 13) {
+		if ( buf[0] == 0x55 && buf[1] == 0x45 && buf[2] == 0x52 && buf[3] == 0x00 && buf[4] == 0x00 && buf[5] == 0x04
+			&& buf[6] == 0x00 && buf[7] == 0x00 ) {
+			DWORD  d = buf[11] + buf[10] * 256 + buf[9] * 256 * 256 + buf[8] * 256 * 256 * 256;
+			if ( d == pParam->m_nSn &&  buf[12] == 0xFF ) {
+				ret = 0;
+			}
+		}
+	}
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_hWnd, UM_SETTTING_SN_RET, ret, 0);
+	return 0;
+}
+
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_SETTING_GW:
+	{
+		CSettingGwParam * pParam = (CSettingGwParam *)pMessageData;
+		SettingGw(pParam);
+	}
+	break;
 
+	case MSG_SETTING_READER:
+	{
+		CSettingReaderParam * pParam = (CSettingReaderParam *)pMessageData;
+		SettingReader(pParam);
+	}
+	break;
+
+	case MSG_SETTING_SN:
+	{
+		CSettingSnParam * pParam = (CSettingSnParam *)pMessageData;
+		SettingSn(pParam);
+	}
+	break;
+
+	default:
+		break;
+	}
 }

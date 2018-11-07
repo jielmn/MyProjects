@@ -61,7 +61,7 @@ public:
 
 
 CDuiFrameWnd::CDuiFrameWnd() {
-
+	m_bBusy = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -69,6 +69,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	g_hWnd = m_hWnd;
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 	m_tabs             = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
@@ -78,8 +79,30 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lstArea          = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstArea"));
 	m_cmbArea1         = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbArea1"));
 	m_cmbArea2         = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbArea2"));
+	m_btnSetting1      = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_1"));
+	m_btnSetting2      = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_2"));
+	m_btnSetting3      = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_3"));
+	m_edtBedNo         = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtBedNo"));
+	m_edtSn            = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtSnNo"));
+	m_progress         = (CMyProgress *)m_PaintManager.FindControl("progress");
 
 	OnDeviceChanged(0, 0);
+
+	DuiLib::CDuiString  strText;
+	std::vector<TArea *>::iterator it;
+	for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+		TArea * pArea = *it;
+
+		CListTextElementUI* pItem = new CListTextElementUI;
+		m_lstArea->Add(pItem);
+
+		strText.Format("%lu", pArea->dwAreaNo);
+		pItem->SetText(0, strText);
+		pItem->SetText(1, pArea->szAreaName);
+		pItem->SetTag(pArea->dwAreaNo);
+	}
+	OnAreasChanged();
+
 	WindowImplBase::InitWindow();
 }
 
@@ -136,12 +159,32 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_delete_area") {
 		OnDeleteArea();
 	}
+	else if (msg.sType == "click") {
+		if ( name == "btnSetting_3" ) {
+			OnSettingGw();
+		}
+		else if (name == "btnSetting_1") {
+			OnSettingReader1();
+		}
+		else if (name == "btnSetting_2") {
+			OnSettingReader2();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_DEVICECHANGE) {
 		OnDeviceChanged(wParam, lParam);
+	}
+	else if (uMsg == UM_SETTTING_GW_RET) {
+		OnSettingGwRet(wParam, lParam);
+	}
+	else if (uMsg == UM_SETTTING_READER_RET) {
+		OnSettingReaderRet1(wParam, lParam);
+	}
+	else if (uMsg == UM_SETTTING_SN_RET) {
+		OnSettingSnRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -289,11 +332,55 @@ void  CDuiFrameWnd::OnAddArea() {
 }
 
 void  CDuiFrameWnd::OnModifyArea() {
+	int nSel = m_lstArea->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中要修改的信道", "错误", 0);
+		return;
+	}
 
+	CListTextElementUI* pItem = (CListTextElementUI*)m_lstArea->GetItemAt(nSel);
+
+	CAreaWnd * pAreaDlg = new CAreaWnd(FALSE);
+	STRNCPY(pAreaDlg->m_tArea.szAreaName, pItem->GetText(1), sizeof(pAreaDlg->m_tArea.szAreaName));
+	sscanf(pItem->GetText(0), "%lu", &pAreaDlg->m_tArea.dwAreaNo);
+	pAreaDlg->Create(this->m_hWnd, _T("修改信道"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAreaDlg->CenterWindow();
+
+	// 如果是确定按钮后关闭
+	if (0 == pAreaDlg->ShowModal()) {
+		pItem->SetText(1, pAreaDlg->m_tArea.szAreaName);
+
+		OnAreasChanged();
+	}
+
+	delete pAreaDlg;
 }
 
 void  CDuiFrameWnd::OnDeleteArea() {
+	int nSel = m_lstArea->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中要删除的信道", "错误", 0);
+		return;
+	}
 
+	CListTextElementUI* pItem = (CListTextElementUI*)m_lstArea->GetItemAt(nSel);
+	DWORD dwAreaId = pItem->GetTag();
+
+	if (IDYES == MessageBox(GetHWND(), "确定要删除吗？", "删除", MB_YESNO | MB_DEFBUTTON2)) {
+		std::vector<TArea *>::iterator it;
+		for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == dwAreaId) {
+				g_vArea.erase(it);
+				delete pArea;
+				break;
+			}
+		}
+		SaveAreas();
+		m_lstArea->RemoveAt(nSel);
+
+		OnAreasChanged();
+	}
 }
 
 void  CDuiFrameWnd::OnAreasChanged() {
@@ -327,6 +414,176 @@ void  CDuiFrameWnd::OnAreasChanged() {
 	}
 }
 
+void  CDuiFrameWnd::OnSettingGw() {
+	if (m_bBusy) {
+		MessageBox(GetHWND(), "正忙着配置或查询，请稍候", "忙碌", 0);
+		return;
+	}
+
+	int nAreaNo = 0;
+	int nPort = 0;
+	DuiLib::CDuiString  strText;
+
+	if (m_gw_com_ports->GetCurSel() < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	nPort = m_gw_com_ports->GetItemAt(m_gw_com_ports->GetCurSel())->GetTag();
+
+	int nSel = m_cmbArea2->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有信道号。请先编辑信道", "错误", 0);
+		return;
+	}
+
+	nAreaNo = m_cmbArea2->GetItemAt(nSel)->GetTag();
+
+	CBusiness::GetInstance()->SettingGwAsyn(nAreaNo, nPort);
+	SetBusy(TRUE);
+}
+
+void  CDuiFrameWnd::SetBusy(BOOL bBusy) {
+	if (bBusy) {
+		m_progress->SetVisible(true);
+		m_progress->Start();
+		m_bBusy = TRUE;
+
+		m_btnSetting3->SetEnabled(false);
+		m_btnSetting2->SetEnabled(false);
+		m_btnSetting1->SetEnabled(false);
+	}
+	else {
+		m_progress->Stop();
+		m_progress->SetVisible(false);
+		m_bBusy = FALSE;
+
+		m_btnSetting3->SetEnabled(true);
+		m_btnSetting2->SetEnabled(true);
+		m_btnSetting1->SetEnabled(true);
+	}
+}
+
+void  CDuiFrameWnd::OnSettingGwRet(WPARAM wParm, LPARAM  lParam) {
+	int ret = (int)wParm;
+	SetBusy(FALSE);
+
+	if (ret != 0) {
+		MessageBox(GetHWND(), "设置基站的过程中出错!", "错误", 0);
+		return;
+	}
+	else {
+		MessageBox(GetHWND(), "设置基站成功", "成功", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSettingReader1() {
+	if (m_bBusy) {
+		MessageBox(GetHWND(), "正忙着配置或查询，请稍候", "忙碌", 0);
+		return;
+	}
+
+	int nAreaNo = 0;
+	int nBedNo = 0;
+	int nPort = 0;
+	DuiLib::CDuiString  strText;
+
+	if (m_reader_com_ports->GetCurSel() < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	nPort = m_reader_com_ports->GetItemAt(m_reader_com_ports->GetCurSel())->GetTag();
+
+	int nSel = m_cmbArea1->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中信道。请先编辑信道", "错误", 0);
+		return;
+	}
+
+	nAreaNo = m_cmbArea1->GetItemAt(nSel)->GetTag();
+
+	strText = m_edtBedNo->GetText();
+	if (1 != sscanf(strText, "%d", &nBedNo)) {
+		MessageBox(GetHWND(), "请输入地址", "错误", 0);
+		return;
+	}
+
+	if (nBedNo <= 0) {
+		MessageBox(GetHWND(), "地址必须是正整数", "错误", 0);
+		return;
+	}
+
+	if (nBedNo > 200) {
+		MessageBox(GetHWND(), "地址的范围是1到200", "错误", 0);
+		return;
+	}
+
+	CBusiness::GetInstance()->SettingReaderAsyn(nAreaNo, nBedNo, nPort);
+
+	SetBusy(TRUE);
+}
+
+void  CDuiFrameWnd::OnSettingReader2() {
+	if (m_bBusy) {
+		MessageBox(GetHWND(), "正忙着配置或查询，请稍候", "忙碌", 0);
+		return;
+	}
+
+	int nSn = 0;
+	int nPort = 0;
+	DuiLib::CDuiString  strText;
+
+	if (m_reader_com_ports->GetCurSel() < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	nPort = m_reader_com_ports->GetItemAt(m_reader_com_ports->GetCurSel())->GetTag();
+
+	strText = m_edtSn->GetText();
+	if (1 != sscanf(strText, "%d", &nSn)) {
+		MessageBox(GetHWND(), "请输入SN码", "错误", 0);
+		return;
+	}
+
+	if (nSn <= 0) {
+		MessageBox(GetHWND(), "SN码必须是正整数", "错误", 0);
+		return;
+	}
+
+	if (nSn > 10000000) {
+		MessageBox(GetHWND(), "SN码的范围是1到10000000", "错误", 0);
+		return;
+	}
+
+	CBusiness::GetInstance()->SettingSnAsyn(nSn, nPort);
+
+	SetBusy(TRUE);
+}
+
+void  CDuiFrameWnd::OnSettingReaderRet1(WPARAM wParm, LPARAM  lParam) {
+	int ret = (int)wParm;
+	SetBusy(FALSE);
+
+	if (ret != 0) {
+		MessageBox(GetHWND(), "设置Reader的过程中出错!", "错误", 0);
+		return;
+	}
+	else {
+		MessageBox(GetHWND(), "设置Reader成功", "成功", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSettingSnRet(WPARAM wParm, LPARAM  lParam) {
+	int ret = (int)wParm;
+	SetBusy(FALSE);
+
+	if (ret != 0) {
+		MessageBox(GetHWND(), "设置Reader SN码的过程中出错!", "错误", 0);
+		return;
+	}
+	else {
+		MessageBox(GetHWND(), "设置Reader SN码成功", "成功", 0);
+	}
+}
 
  
                                

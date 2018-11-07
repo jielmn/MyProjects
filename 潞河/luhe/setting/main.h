@@ -6,6 +6,7 @@
 using namespace DuiLib;
 
 #include "resource.h"
+#include "MyProgress.h"
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -45,6 +46,13 @@ private:
 	DuiLib::CListUI *                   m_lstArea;
 	DuiLib::CComboUI *                  m_cmbArea1;
 	DuiLib::CComboUI *                  m_cmbArea2;
+	DuiLib::CButtonUI *                 m_btnSetting1;
+	DuiLib::CButtonUI *                 m_btnSetting2;
+	DuiLib::CButtonUI *                 m_btnSetting3;
+	CMyProgress *                       m_progress;
+	DuiLib::CEditUI *                   m_edtBedNo;
+	DuiLib::CEditUI *                   m_edtSn;
+	BOOL                                m_bBusy;
 
 private:
 	void  OnFreshComPort_Reader();
@@ -55,4 +63,11 @@ private:
 	void  OnModifyArea();
 	void  OnDeleteArea();
 	void  OnAreasChanged();
+	void  OnSettingGw();
+	void  SetBusy(BOOL bBusy);
+	void  OnSettingGwRet(WPARAM wParm, LPARAM  lParam);
+	void  OnSettingReader1();
+	void  OnSettingReader2();
+	void  OnSettingReaderRet1(WPARAM wParm, LPARAM  lParam);
+	void  OnSettingSnRet(WPARAM wParm, LPARAM  lParam);
 };

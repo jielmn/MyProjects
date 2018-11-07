@@ -10,6 +10,7 @@ using namespace DuiLib;
 CGlobalData  g_data;
 std::vector<TArea *>  g_vArea;
 IConfig * g_cfg_area = 0;
+HWND    g_hWnd = 0;
 
 BOOL EnumPortsWdm(std::vector<std::string> & v)
 {

@@ -15,6 +15,15 @@ public:
 	int Init();
 	int DeInit();
 
+	int  SettingGwAsyn(int nAreaNo, int nComPort);
+	int  SettingGw(const CSettingGwParam * pParam);
+
+	int  SettingReaderAsyn(int nAreaNo, int nBedNo, int nComPort);
+	int  SettingReader(const CSettingReaderParam * pParam);
+
+	int  SettingSnAsyn(int nSn, int nComPort);
+	int  SettingSn(const CSettingSnParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
