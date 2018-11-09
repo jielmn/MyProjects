@@ -1,0 +1,7 @@
+1.复制jdk6到任意目录下
+2.复制依赖的lib到jdk的lib目录下
+3.安装tomcat6，指定jdk目录
+4.修改luhe依赖的mysql数据库地址
+5.复制luhe到webapp目录下
+6.修改tomcat/conf/server.xml。修改Connector的URI编码：URIEncoding="UTF-8"
+7.重启tomcat6

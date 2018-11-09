@@ -2,10 +2,11 @@ use mysql;
 update user set host = '%' where user = 'root';
 flush privileges;
 
-drop database if exists luhe_temp;
-create database  luhe_temp;
-use luhe_temp;
+drop database if exists luhe_temp_1;
+create database  luhe_temp_1;
+use luhe_temp_1;
 
+/*
 create table PATIENTINFO
 (
   patientid     VARCHAR(16) not null primary key,
@@ -49,7 +50,7 @@ create table STATION
 	name     varchar(32) not null,
 	atime    timestamp not null
 )DEFAULT CHARSET=utf8;
-
+*/
 
 
 
