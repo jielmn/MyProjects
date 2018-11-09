@@ -142,9 +142,14 @@ int  CBusiness::PrintStatus() {
 	Utf8ToAnsi(szName, sizeof(szName), g_data.m_szName);
 	JTelSvrPrint("launch port = %lu", dwCfgLaunchPort);
 	JTelSvrPrint("server addr = %s", g_data.m_szServerAddr);	
-	JTelSvrPrint("binding reader = %s", g_data.m_bBindingReader ? "true" : "false" );
-	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close"  );
+	JTelSvrPrint("binding reader = %s", g_data.m_bBindingReader ? "true" : "false" );	
+	JTelSvrPrint("utf8 = %s", g_data.m_bUtf8 ? "true" : "false");
 	JTelSvrPrint("name = %s", szName);
+	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+	if (m_launch.GetStatus() == CLmnSerialPort::OPEN) {
+		JTelSvrPrint("launch connected port: %d", m_launch.GetPort());
+	}
+	
 
 	return 0;
 }
