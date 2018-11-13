@@ -448,7 +448,7 @@ void  CDuiFrameWnd::OnTimerMsg(DWORD dwTimerId) {
 	}
 }
 
-int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
+int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode_1) {
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received chars:%s\n", m_strInvBigBuf);
 
 	// 检查格式(15位)
@@ -456,6 +456,9 @@ int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode) {
 
 	char buf[8192];
 	char  szProductId[64] = { 'E', 'T' };
+
+	StrTrim( (const char*)strBarCode_1, buf, sizeof(buf) );
+	DuiLib::CDuiString strBarCode = buf;
 
 	DWORD  dwFactoryLen = 2;
 	DWORD  dwProductLen = 2;
