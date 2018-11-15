@@ -128,6 +128,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	SetTimer(m_hWnd, TIMER_MAIN_CHECK_ID, TIMER_MAIN_CHECK_INTERVAL, NULL);
 
+	CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
 	WindowImplBase::InitWindow();    
 }
 

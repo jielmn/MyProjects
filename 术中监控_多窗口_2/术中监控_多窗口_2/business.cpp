@@ -209,7 +209,7 @@ int CBusiness::Init() {
 	}
 	g_thrd_launch->Start();
 	
-	ReconnectLaunchAsyn(200);
+	//ReconnectLaunchAsyn(200);
 
 	return 0;
 }

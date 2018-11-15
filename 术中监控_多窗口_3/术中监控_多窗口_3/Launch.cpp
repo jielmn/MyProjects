@@ -103,6 +103,12 @@ int  CLaunch::ReadComData() {
 			m_recv_buf.Append(buf, dwBufLen);
 		}
 	}
+	else {
+		CloseLaunch();
+		m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
+		m_sigCheck.emit();
+		return 0;
+	}
 
 	// 处理数据
 	//

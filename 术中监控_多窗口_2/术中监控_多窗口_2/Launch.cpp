@@ -198,6 +198,11 @@ int  CLaunch::ReadComData() {
 			m_recv_buf.Append(buf, dwBufLen);
 		}
 	}
+	else {
+		CloseLaunch();
+		CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+		return 0;
+	}
 
 	// 处理数据
 	//

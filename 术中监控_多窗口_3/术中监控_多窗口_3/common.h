@@ -15,7 +15,7 @@ using namespace DuiLib;
 
 #ifdef   _DEBUG
 #define  TEST_FLAG                0
-#define  TEST_FLAG_1              1
+#define  TEST_FLAG_1              0
 #endif
 
 #if TEST_FLAG
