@@ -355,6 +355,7 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_pLblBedTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblNameTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblCurTempTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		m_pLblTemp[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 
 		m_pMyImage[nIndex]->SetBkColor(g_skin[MYIMAGE_BK_COLOR_INDEX]);
 		m_pMyImage[nIndex]->OnChangeSkin();
