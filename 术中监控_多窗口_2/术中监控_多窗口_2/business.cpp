@@ -184,6 +184,9 @@ int CBusiness::Init() {
 	g_cfg->GetConfig(CFG_LAUNCH_COM_PORT, g_szLaunchComPort, sizeof(g_szLaunchComPort), "");
 
 	g_cfg->GetConfig(CFG_LAUNCH_WRITE_INTERVAL, g_dwLaunchWriteInterval, DEFAULT_LAUNCH_WRITE_INTERVAL);
+
+	g_cfg->GetConfig("temperature font", g_dwTemperatureFont, 16);    
+	
 	
 
 	if ( g_dwLayoutRows * g_dwLayoutColumns > MAX_GRID_COUNT ) {

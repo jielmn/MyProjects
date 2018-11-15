@@ -95,6 +95,8 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 			return 0xFFFC235C;
 		case LOW_TEMP_ALARM_TEXT_COLOR_INDEX:
 			return 0xFF02A5F1;
+		case NORMAL_TEMP_TEXT_COLOR_INDEX:
+			return 0xFF00FF00;
 		default:
 			break;
 		}
@@ -128,6 +130,8 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 			return 0xFFFC235C;
 		case LOW_TEMP_ALARM_TEXT_COLOR_INDEX:
 			return 0xFF02A5F1;
+		case NORMAL_TEMP_TEXT_COLOR_INDEX:
+			return 0xFF00FF00;
 		default:
 			break;
 		}

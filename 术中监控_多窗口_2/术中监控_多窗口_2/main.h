@@ -91,6 +91,13 @@ private:
 	CLabelUI *                         m_pLblNameTitle_small[MAX_GRID_COUNT];
 	CLabelUI *                         m_pLblCurTempTitle_small[MAX_GRID_COUNT];
 	CMyImageUI *                       m_pMyImage[MAX_GRID_COUNT];
+	CVerticalLayoutUI *                m_pMyImageParent[MAX_GRID_COUNT]; 
+	CHorizontalLayoutUI *              m_pTempLayout[MAX_GRID_COUNT];
+	CLabelUI *                         m_pLblTemp[MAX_GRID_COUNT];
+	CHorizontalLayoutUI *              m_pLay1[MAX_GRID_COUNT];
+	CHorizontalLayoutUI *              m_pLay2[MAX_GRID_COUNT];
+	CVerticalLayoutUI *                m_pLay3[MAX_GRID_COUNT];
+	CVerticalLayoutUI *                m_pLay4[MAX_GRID_COUNT];
 	COptionUI *                        m_pOptGridReaderSwitch[MAX_GRID_COUNT];
 
 	DuiLib::CButtonUI *                m_btnMenu;    // ²Ëµ¥°´Å¥	

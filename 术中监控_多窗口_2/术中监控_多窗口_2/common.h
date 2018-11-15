@@ -140,6 +140,7 @@ using namespace DuiLib;
 #define   EDIT_TEXT_COLOR_INDEX            10
 #define   HIGH_TEMP_ALARM_TEXT_COLOR_INDEX            11
 #define   LOW_TEMP_ALARM_TEXT_COLOR_INDEX             12
+#define   NORMAL_TEMP_TEXT_COLOR_INDEX                13
 
 #define   COMMON_PEN_INDEX              0
 #define   COMMON_BRUSH_INDEX            1
@@ -227,7 +228,7 @@ using namespace DuiLib;
 #define MAX_BED_NAME_LENGTH               16
 #define MAX_PATIENT_NAME_LENGTH           16
 
-#define FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM    64
+#define FLEX_LAYOUT_HEIGHT_IN_STATE_MAXIUM    164
 #define INDEX_FONT_IN_STATE_MAXIUM            4
 #define TITLE_WIDTH_IN_STATE_MAXIUM           80
 #define TITLE_FONT_IN_STATE_MAXIUM            3
@@ -384,6 +385,7 @@ extern char      g_szLastPatientName[MAX_GRID_COUNT][MAX_PATIENT_NAME_LENGTH];
 extern std::vector<TArea *>  g_vArea;
 extern char      g_szLaunchComPort[MAX_COM_PORT_LENGTH];
 extern DWORD     g_dwLaunchWriteInterval;
+extern DWORD     g_dwTemperatureFont;
 
 extern int       g_nGridReaderStatus[MAX_GRID_COUNT];   // 对应的Reader是否在线
 //extern BOOL      g_bQueryTemp[MAX_GRID_COUNT];          // 是否请求了温度数据
