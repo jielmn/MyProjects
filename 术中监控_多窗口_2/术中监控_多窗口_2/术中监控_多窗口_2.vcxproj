@@ -182,6 +182,9 @@
   <ItemGroup>
     <Image Include="res\main.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\res.zip" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

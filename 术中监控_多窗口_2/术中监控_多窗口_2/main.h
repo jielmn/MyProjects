@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "MyImage.h"
+#include "resource.h"
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -9,7 +10,22 @@ public:
 	CDuiFrameWnd();
 	virtual LPCTSTR    GetWindowClassName() const { return _T(MAIN_FRAME_NAME); }
 	virtual CDuiString GetSkinFile() { return _T(MAIN_XML_FILE); }
+
+#ifndef _DEBUG
+	virtual CDuiString GetSkinFolder() { return _T(""); }
+#else
 	virtual CDuiString GetSkinFolder() { return _T(SKIN_FOLDER); }
+#endif
+
+#ifndef _DEBUG
+	virtual UILIB_RESOURCETYPE GetResourceType() const {
+		return UILIB_ZIPRESOURCE;
+	}
+
+	virtual LPCTSTR GetResourceID() const {
+		return MAKEINTRESOURCE(IDR_ZIPRES1);
+	}
+#endif
 
 	virtual void    Notify(TNotifyUI& msg);
 	virtual void    InitWindow();
