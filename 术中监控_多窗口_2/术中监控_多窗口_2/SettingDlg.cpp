@@ -5,7 +5,7 @@
 #define GRID_SETTING_ITEMS_COUNT  7
 
 CSettingDlg::CSettingDlg() {
-
+	m_dwTempFont = 0;
 }
 
 
@@ -129,6 +129,16 @@ void  CSettingDlg::InitCommonCfg() {
 
 	SetComboStyle(pCombo);
 	m_tree->AddNode(ALARM_VOICE_SWITCH_TEXT, pTitleNode, 0, pCombo);
+
+	// 温度字体大小
+	pCombo = new CComboUI;
+	for (DWORD i = 0; i < 8; i++) {
+		strText.Format("%lu", i+1);
+		AddComboItem(pCombo, strText);
+	}
+	pCombo->SelectItem(g_dwTemperatureFont - 10);
+	SetComboStyle(pCombo);
+	m_tree->AddNode("温度字体大小", pTitleNode, 0, pCombo);
 }
 
 void   CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
@@ -310,6 +320,7 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	g_dwSkinIndex = m_dwSkinIndex;
 	g_bAlarmVoiceOff = m_bAlarmVoiceOff;
 	g_dwAreaNo = m_dwAreaNo;
+	g_dwTemperatureFont = m_dwTempFont + 10;
 
 	memcpy(g_dwLowTempAlarm, m_dwLowTempAlarm, sizeof(DWORD) * MAX_GRID_COUNT);
 	memcpy(g_dwHighTempAlarm, m_dwHighTempAlarm, sizeof(DWORD) * MAX_GRID_COUNT);
@@ -411,6 +422,9 @@ BOOL  CSettingDlg::GetCommonConfig() {
 		bAlarmVoiceOff = TRUE;
 	}
 
+	bGetCfg = m_tree->GetConfigValue(6, cfgValue);
+	m_dwTempFont = cfgValue.m_nComboSel;
+
 	m_dwLayoutColumns = nCols;
 	m_dwLayoutRows = nRows;
 	m_dwSkinIndex = nSkin;
@@ -429,7 +443,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	int    nBedNo = 0;
 	bool   bGetCfg = false;
 
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 1, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(8 + nIndex * GRID_SETTING_ITEMS_COUNT + 1, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -445,7 +459,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 
 	dwInterval = 10;
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 2, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 8 + nIndex * GRID_SETTING_ITEMS_COUNT + 2, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -490,7 +504,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 
 
 	dwMinTemp = 20;
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 3, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(8 + nIndex * GRID_SETTING_ITEMS_COUNT + 3, cfgValue);
 	switch (cfgValue.m_nComboSel)
 	{
 	case 0:
@@ -522,7 +536,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 
 
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 4, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 8 + nIndex * GRID_SETTING_ITEMS_COUNT + 4, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("窗口%d配置，低温报警请输入数字", nIndex + 1);
@@ -537,7 +551,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 	dwLowAlarm = (DWORD)(dbTemp * 100);
 
-	bGetCfg = m_tree->GetConfigValue( 7 + nIndex * GRID_SETTING_ITEMS_COUNT + 5, cfgValue);
+	bGetCfg = m_tree->GetConfigValue( 8 + nIndex * GRID_SETTING_ITEMS_COUNT + 5, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%lf", &dbTemp)) {
 		strText.Format("窗口%d配置，高温报警请输入数字", nIndex + 1);
@@ -557,7 +571,7 @@ BOOL  CSettingDlg::GetConfig(int nIndex, DWORD & dwInterval, DWORD & dwLowAlarm,
 	}
 	dwHighAlarm = (DWORD)(dbTemp * 100);
 
-	bGetCfg = m_tree->GetConfigValue(7 + nIndex * GRID_SETTING_ITEMS_COUNT + 6, cfgValue);
+	bGetCfg = m_tree->GetConfigValue(8 + nIndex * GRID_SETTING_ITEMS_COUNT + 6, cfgValue);
 	strText = cfgValue.m_strEdit;
 	if (1 != sscanf_s(strText, "%d", &nBedNo)) {
 		strText.Format("窗口%d配置，Reader相关床位号请输入数字", nIndex + 1);

@@ -42,6 +42,7 @@ private:
 	DWORD     m_dwSkinIndex;
 	DWORD     m_bAlarmVoiceOff;
 	DWORD     m_dwAreaNo;
+	DWORD     m_dwTempFont;
 
 	DWORD     m_dwLowTempAlarm[MAX_GRID_COUNT];
 	DWORD     m_dwHighTempAlarm[MAX_GRID_COUNT];

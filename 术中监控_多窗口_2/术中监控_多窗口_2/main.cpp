@@ -351,11 +351,15 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_pEdtName_small[nIndex]->SetBkColor(g_skin[EDIT_BK_COLOR_INDEX]);
 		m_pEdtName_small[nIndex]->SetNativeEditBkColor(g_skin[EDIT_BK_COLOR_INDEX]);
 
-		m_pLblCurTemp_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		//m_pLblCurTemp_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblBedTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblNameTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
 		m_pLblCurTempTitle_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
-		m_pLblTemp[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		//m_pLblTemp[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		if ( m_pLblCurTemp_small[nIndex]->GetText() == "--" ) {
+			m_pLblCurTemp_small[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+			m_pLblTemp[nIndex]->SetTextColor(g_skin[COMMON_TEXT_COLOR_INDEX]);
+		}
 
 		m_pMyImage[nIndex]->SetBkColor(g_skin[MYIMAGE_BK_COLOR_INDEX]);
 		m_pMyImage[nIndex]->OnChangeSkin();
@@ -550,6 +554,7 @@ void   CDuiFrameWnd::OnSetting() {
 	DWORD  dwOldRows = g_dwLayoutRows;
 	DWORD  dwOldCols = g_dwLayoutColumns;
 	DWORD  dwOldAreaNo = g_dwAreaNo;
+	DWORD  dwOldFont = g_dwTemperatureFont;
 	
 	DWORD  dwOldBedNo[MAX_GRID_COUNT];
 	memcpy(dwOldBedNo, g_dwBedNo, sizeof(dwOldBedNo));
@@ -583,6 +588,9 @@ void   CDuiFrameWnd::OnSetting() {
 		dwValue = 0;
 		g_cfg->SetConfig(CFG_AREA_ID_NAME, g_dwAreaNo, &dwValue);
 
+		dwValue = 16;
+		g_cfg->SetConfig("temperature font", g_dwTemperatureFont, &dwValue);
+
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
 			strText.Format(CFG_LOW_ALARM " %d", i + 1);
 			dwValue = DEFAULT_LOW_ALARM;
@@ -615,6 +623,12 @@ void   CDuiFrameWnd::OnSetting() {
 		OnChangeSkin();
 		UpdateLayout();
 		//::InvalidateRect(GetHWND(), 0, TRUE);
+		if (dwOldFont != g_dwTemperatureFont) {
+			for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+				m_pLblTemp[i]->SetFont(g_dwTemperatureFont); 
+				m_pLblCurTemp_small[i]->SetFont(g_dwTemperatureFont);
+			}
+		}		
 
 		DWORD dwOldCount = dwOldCols * dwOldRows;
 		DWORD dwNewCount = g_dwLayoutColumns * g_dwLayoutRows;
