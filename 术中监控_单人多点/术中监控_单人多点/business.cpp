@@ -167,7 +167,8 @@ int CBusiness::Init() {
 	}
 
 	g_data.m_bAutoScroll = TRUE;
-	memset(g_data.m_szLaunchComPort, 0, sizeof(g_data.m_szLaunchComPort));
+	//memset(g_data.m_szLaunchComPort, 0, sizeof(g_data.m_szLaunchComPort));
+	g_cfg->GetConfig("launch com port", g_data.m_szLaunchComPort, sizeof(g_data.m_szLaunchComPort), "");
 	memset(g_data.m_nReaderStatus, 0, sizeof(g_data.m_nReaderStatus));
 	memset(g_data.m_nQueryTempRetryTime, 0, sizeof(g_data.m_nQueryTempRetryTime));
 	memset(g_data.m_dwLastQueryTick, 0, sizeof(g_data.m_dwLastQueryTick));

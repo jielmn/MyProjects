@@ -393,7 +393,8 @@ void   CDuiFrameWnd::OnNewTempData(int nRederIndex, DWORD dwTemp) {
 		m_pUiAlarms[nRederIndex]->LowTempAlarm();
 	}
 	else {
-		m_pUiReaderTemp[nRederIndex]->SetTextColor(0xFFFFFFFF);
+		//m_pUiReaderTemp[nRederIndex]->SetTextColor(0xFFFFFFFF);
+		m_pUiReaderTemp[nRederIndex]->SetTextColor(0xFF00FF00);
 		m_pUiAlarms[nRederIndex]->StopAlarm();
 	}
 

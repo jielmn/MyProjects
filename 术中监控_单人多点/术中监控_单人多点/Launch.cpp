@@ -76,6 +76,9 @@ int  CLaunch::CheckStatus() {
 		if ( 1 == nFindCount ) {
 			CBusiness::GetInstance()->ReconnectLaunchAsyn();
 		}
+		else if (g_data.m_szLaunchComPort[0] != 0) {
+			CBusiness::GetInstance()->ReconnectLaunchAsyn();
+		}
 	}
 	// ´ò¿ª×´Ì¬
 	else {
