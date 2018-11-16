@@ -29,7 +29,7 @@ using namespace DuiLib;
 #define   CONFIG_FILE_NAME        "single_patient_multi_points.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               "main.xml"
-#define   SKIN_FOLDER             "res\\single_patient_multi_points_res"
+#define   SKIN_FOLDER             "single_patient_multi_points_res"
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   SETTING_FILE            "Setting.xml"
 #define   AREA_CFG_FILE_NAME      "area.cfg"

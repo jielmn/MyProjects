@@ -180,6 +180,9 @@
   <ItemGroup>
     <Image Include="res\doctor.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\single_patient_multi_points_res.zip" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

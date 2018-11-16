@@ -79,4 +79,7 @@
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\single_patient_multi_points_res.zip" />
+  </ItemGroup>
 </Project>
