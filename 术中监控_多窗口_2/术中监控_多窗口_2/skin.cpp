@@ -71,6 +71,7 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 		{
 		case LAYOUT_MAIN_BK_COLOR_INDEX:
 			return 0xFF192431;
+			//return 0xFF434248;
 		case LABEL_STATUS_BK_COLOR_INDEX:
 			return 0xFF3A4F67;
 		case GRID_BORDER_COLOR_INDEX:

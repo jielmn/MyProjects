@@ -54,8 +54,10 @@
 				<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
 			</HorizontalLayout>
 			-->
-			<HorizontalLayout inset="10,0,0,0" name="layout_101" >
-				<Label   name="lblCur_2"   text="35.64"    textcolor="#FF000000" font="16" />
+			<HorizontalLayout inset="0,0,0,0" name="layout_101" >
+				<Control />
+				<Label   name="lblCur_2"   text="35.64"    textcolor="#FF000000" font="16" width="500" />
+				<Control />
 			</HorizontalLayout>
 				
 			<VerticalLayout name="layout_100" inset="0,0,0,0" hscrollbar="false" vscrollbar="false" sepheight="4" >

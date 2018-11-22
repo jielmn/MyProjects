@@ -408,9 +408,10 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 		m_pOptGridReaderSwitch[nIndex]->SetFixedWidth(64 - 2 * 2);
 	}
 	else { 
-		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS);
-		m_pLblIndexes_small[nIndex]->SetFont(INDEX_FONT_IN_STATE_GRIDS);
-		m_pLblIndexes_small[nIndex]->SetFixedWidth(40);
+		m_pLayFlex[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS);        
+		//m_pLblIndexes_small[nIndex]->SetFont(INDEX_FONT_IN_STATE_GRIDS);
+		m_pLblIndexes_small[nIndex]->SetFont(7);
+		m_pLblIndexes_small[nIndex]->SetFixedWidth(100); 
 
 		m_pLblBedTitle_small[nIndex]->SetFixedWidth(TITLE_WIDTH_IN_STATE_GRIDS);
 		m_pLblBedTitle_small[nIndex]->SetFont(TITLE_FONT_IN_STATE_GRIDS);
@@ -435,13 +436,13 @@ void   CDuiFrameWnd::OnChangeState(int nIndex) {
 		m_pMyImageParent[nIndex]->SetVisible(false);
 		m_pTempLayout[nIndex]->SetVisible(true);   
 		m_pLay1[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);
-		m_pLay2[nIndex]->SetFixedHeight(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);  
-		m_pLay3[nIndex]->SetFixedWidth(260);
+		m_pLay2[nIndex]->SetFixedHeight(34 - 2 * 2);  
+		m_pLay3[nIndex]->SetFixedWidth(320);
 		m_pLay4[nIndex]->SetFixedWidth(80);
 
-		m_pAlarmUI[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);
+		m_pAlarmUI[nIndex]->SetFixedWidth(34 - 2 * 2);
 
-		m_pOptGridReaderSwitch[nIndex]->SetFixedWidth(FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS - 2 * 2);
+		m_pOptGridReaderSwitch[nIndex]->SetFixedWidth(34 - 2 * 2);  
 	}
 	m_pMyImage[nIndex]->SetState(m_nState);
 	m_pAlarmUI[nIndex]->SetState(m_nState);

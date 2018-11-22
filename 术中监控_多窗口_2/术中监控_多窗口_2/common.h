@@ -235,7 +235,7 @@ using namespace DuiLib;
 #define BUTTON_WIDTH_IN_STATE_MAXIUM          160
 #define BUTTON_FONT_IN_STATE_MAXIUM           3
 
-#define FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS     34
+#define FLEX_LAYOUT_HEIGHT_IN_STATE_GRIDS     70
 #define INDEX_FONT_IN_STATE_GRIDS             3
 #define TITLE_WIDTH_IN_STATE_GRIDS            40
 #define TITLE_FONT_IN_STATE_GRIDS             1
