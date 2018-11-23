@@ -51,6 +51,7 @@ private:
 	void   OnGridMenu(TNotifyUI& msg);
 	void   OnGridExpandOrRestore(DWORD nIndex);
 	void   OnGridSaveExcel(TNotifyUI& msg);
+	void   OnGridPrintExcel(TNotifyUI& msg);
 	// 重新布局
 	void   ReLayout(DWORD dwWidth, DWORD dwHeight);
 	// 重新布局(在设置更改之后)

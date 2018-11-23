@@ -54,7 +54,7 @@
 				<Label text="温度曲线"   textcolor="#FFFFFFFF" width="150" font="1" />
 			</HorizontalLayout>
 			-->
-			<HorizontalLayout inset="0,0,0,0" name="layout_101" >
+			<HorizontalLayout inset="0,0,0,0" name="layout_101" menu="true" >
 				<Label   name="lblCur_2"   text="35.64"    textcolor="#FF000000" font="16" align="center" />
 			</HorizontalLayout>
 				

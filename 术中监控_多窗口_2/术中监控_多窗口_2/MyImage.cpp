@@ -543,6 +543,66 @@ void  CMyImageUI::SaveExcel(const char * szBed, const char * szPatientName) {
 	}
 }
 
+void  CMyImageUI::PrintExcel(const char * szBed, const char * szPatientName) {
+	CDuiString strText;
+
+	if (!CExcel::IfExcelInstalled()) {
+		::MessageBox(m_pMainWnd->GetHWND(), "没有检测到系统安装了excel", "打印excel", 0);
+		return;
+	}
+
+	if (m_vTempData.size() == 0) {
+		strText.Format("第%d个窗格没有温度数据，放弃打印excel", m_nIndex + 1);
+		::MessageBox(m_pMainWnd->GetHWND(), strText, "打印excel", 0);
+		return;
+	}
+
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+	char szTime[256];
+	time_t now = time(0);
+	Date2String(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s %s", szPatientName, szTime);
+
+	CExcelEx  excel;
+	vector<TempData *>::iterator it;
+	DWORD i = 0;
+	char buf[8192] = { 0 };
+	DWORD  dwMin = 3400;
+	for (it = m_vTempData.begin(), i = 0; it != m_vTempData.end(); it++,i++) {
+		TempData * pItem = *it;
+
+		Time2String(szTime, sizeof(szTime), &pItem->tTime);
+		excel.WriteGrid( i, 0, szTime );
+
+		SNPRINTF(buf, sizeof(buf), "%.2f", pItem->dwTemperature / 100.0);
+		excel.WriteGrid(i, 1, buf);
+
+		if ( pItem->dwTemperature < dwMin ) {
+			dwMin = pItem->dwTemperature;
+		}
+	}
+
+	assert(i > 0);
+	double dMin = 0.0;
+	if (dwMin >= 3400) {
+		dMin = 34.0;
+	}
+	else if (dwMin >= 3000) {
+		dMin = 30.0;
+	}
+	else if (dwMin >= 2600) {
+		dMin = 26.0;
+	}
+	else if (dwMin >= 2200) {
+		dMin = 22.0;
+	}
+	else if (dwMin >= 1800) {
+		dMin = 18.0;
+	}
+	excel.PrintChartWithTwoColumns(0, 0, i-1, strFilename,0,0,TRUE, &dMin);
+	excel.Quit();
+}
+
 
 
 

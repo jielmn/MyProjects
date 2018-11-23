@@ -66,6 +66,14 @@ char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t) {
 	return szDest;
 }
 
+char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04dÄê%02dÔÂ%02dÈÕ", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday);
+	return szDest;
+}
+
 DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData) {
 	if (pSubControl->GetName() == (const char *)lpData) {
 		return pSubControl;

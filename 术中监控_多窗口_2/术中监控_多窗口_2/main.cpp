@@ -196,6 +196,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_save_excel") {
 		OnGridSaveExcel(msg);
 	}
+	else if (msg.sType == "menu_print_excel" ) {
+		OnGridPrintExcel(msg);
+	}
 	else if (msg.sType == "killfocus") {
 		if (name == EDIT_REMARK_NAME ) {
 			OnEdtRemarkKillFocus();
@@ -208,8 +211,8 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 	}
 	else if (msg.sType == "menu") {
-		if (name == MYIMAGE_NAME) {
-			OnGridMenu(msg);
+		if (name == MYIMAGE_NAME||name == "layout_101") {
+			OnGridMenu(msg); 
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -742,6 +745,13 @@ void  CDuiFrameWnd::OnGridSaveExcel(TNotifyUI& msg) {
 	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
 
 	m_pMyImage[nIndex]->SaveExcel( m_pBtnBedName_small[nIndex]->GetText(), m_pBtnName_small[nIndex]->GetText() );
+}
+
+void   CDuiFrameWnd::OnGridPrintExcel(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	assert(nIndex >= 0 && nIndex < MAX_GRID_COUNT);
+
+	m_pMyImage[nIndex]->PrintExcel(m_pBtnBedName_small[nIndex]->GetText(), m_pBtnName_small[nIndex]->GetText());
 }
 
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {

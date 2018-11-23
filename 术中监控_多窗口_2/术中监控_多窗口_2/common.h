@@ -395,6 +395,7 @@ extern DWORD     g_dwLastQueryTick[MAX_GRID_COUNT];     // 上一次请求心跳/温度的
 /* 函数 */
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern char * GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern BOOL GetAllSerialPortName(std::vector<std::string> & vCom);
