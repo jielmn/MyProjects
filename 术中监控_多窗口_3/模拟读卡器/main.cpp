@@ -77,7 +77,7 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 					byData[3] = byBed;
 					byData[4] = byArea;
 					dwWriteLen = 29;
-					DWORD dwTemp = GetRand(3500, 4150);
+					DWORD dwTemp = GetRand(3200, 4080);
 					byData[24] = (BYTE)(dwTemp / 1000);
 					byData[25] = (BYTE)(( dwTemp / 100 ) % 10);
 					byData[26] = (BYTE)(( dwTemp / 10) % 10);
