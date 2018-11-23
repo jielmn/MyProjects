@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout >
+	<VerticalLayout>
 		
 		<HorizontalLayout height="34" name="layFlex" >
 			<VerticalLayout>			
@@ -55,9 +55,7 @@
 			</HorizontalLayout>
 			-->
 			<HorizontalLayout inset="0,0,0,0" name="layout_101" >
-				<Control />
-				<Label   name="lblCur_2"   text="35.64"    textcolor="#FF000000" font="16" width="500" />
-				<Control />
+				<Label   name="lblCur_2"   text="35.64"    textcolor="#FF000000" font="16" align="center" />
 			</HorizontalLayout>
 				
 			<VerticalLayout name="layout_100" inset="0,0,0,0" hscrollbar="false" vscrollbar="false" sepheight="4" >

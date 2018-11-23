@@ -50,7 +50,7 @@ void  CDuiFrameWnd::InitWindow() {
 		CDialogBuilder builder;
 		int nIndex = i;
 		m_pGrids[nIndex] = builder.Create(MYCHART_XML_FILE, (UINT)0, &m_callback, &m_PaintManager);
-		m_pGrids[nIndex]->SetBorderSize(1);
+		m_pGrids[nIndex]->SetBorderSize(4);  
 		m_pGrids[nIndex]->SetName(GRID_NAME);
 		m_pGrids[nIndex]->SetTag(nIndex);
 

@@ -47,7 +47,8 @@ void CMySkin::SetSkin(DWORD dwSkinIndex) {
 
 	if (m_dwSkinIndex == SKIN_BLACK) {
 		m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
-		m_hCommonBrush     = ::CreateSolidBrush(RGB(0x19, 0x24, 0x31));
+		//m_hCommonBrush     = ::CreateSolidBrush(RGB(0x19, 0x24, 0x31));
+		m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
 		m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
 		m_hLowTempAlarmPen   = ::CreatePen(PS_DASH, 1, RGB(0x02, 0xA5, 0xF1));
 		m_hHighTempAlarmPen  = ::CreatePen(PS_DASH, 1, RGB(0xFC, 0x23, 0x5C));
@@ -69,17 +70,20 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 	if ( m_dwSkinIndex == SKIN_BLACK ) {
 		switch (dwPartIndex)
 		{
-		case LAYOUT_MAIN_BK_COLOR_INDEX:
-			return 0xFF192431;
-			//return 0xFF434248;
+		case LAYOUT_MAIN_BK_COLOR_INDEX:  
+			//return 0xFF192431;
+			return 0xFF434248;
 		case LABEL_STATUS_BK_COLOR_INDEX:
 			return 0xFF3A4F67;
 		case GRID_BORDER_COLOR_INDEX:
-			return 0xFFFFFFFF;
+			//return 0xFFFFFFFF;
+			return 0xFF4F4F4F;
 		case COMMON_TEXT_COLOR_INDEX:
 			return 0xFFFFFFFF;
+			//return 0xFFEEEEEE;
 		case MYIMAGE_BK_COLOR_INDEX:
-			return 0xFF192431;
+			//return 0xFF192431;
+			return 0xFF434248;
 		case MYIMAGE_TEMP_THREAD_COLOR_INDEX:
 			return 0xFF00FF00;
 		case MYIMAGE_TEMP_DOT_COLOR_INDEX:
@@ -93,11 +97,14 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 		case EDIT_TEXT_COLOR_INDEX:
 			return 0xFF000000;
 		case HIGH_TEMP_ALARM_TEXT_COLOR_INDEX:
-			return 0xFFFC235C;
+			//return 0xFFFC235C;
+			return 0xDF455F;
 		case LOW_TEMP_ALARM_TEXT_COLOR_INDEX:
-			return 0xFF02A5F1;
+			//return 0xFF02A5F1;
+			return 0x01AFC3;
 		case NORMAL_TEMP_TEXT_COLOR_INDEX:
-			return 0xFF00FF00;
+			//return 0xFF00FF00;
+			return 0x4E8B20;
 		default:
 			break;
 		}
@@ -106,7 +113,8 @@ DWORD CMySkin::operator [] (DWORD dwPartIndex) const {
 		switch (dwPartIndex)
 		{
 		case LAYOUT_MAIN_BK_COLOR_INDEX:
-			return 0xFFFFFFFF;
+			//return 0xFFFFFFFF;
+			return 0xFFF5F5F5;
 		case LABEL_STATUS_BK_COLOR_INDEX:
 			return 0xFF007ACC;  
 		case GRID_BORDER_COLOR_INDEX:

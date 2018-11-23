@@ -80,8 +80,8 @@ using namespace DuiLib;
 #define   DEFALUT_MYIMAGE_LEFT_BLANK    40
 #define   DEFALUT_MYIMAGE_RIGHT_BLANK   40
 #define   DEFAULT_ALARM_FILE_PATH       "\\res\\1.wav"
-#define   DEFAULT_LOW_ALARM             3500
-#define   DEFAULT_HI_ALARM              4000
+#define   DEFAULT_LOW_ALARM             3550
+#define   DEFAULT_HI_ALARM              3850
 #define   DEFAULT_COLLECT_INTERVAL      10          // 采集间隔时间，单位秒
 #define   DEFAULT_MIN_TEMP              28
 #define   DEFAULT_MYIMAGE_TIME_TEXT_OFFSET_X   1

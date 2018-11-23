@@ -185,7 +185,7 @@ int CBusiness::Init() {
 
 	g_cfg->GetConfig(CFG_LAUNCH_WRITE_INTERVAL, g_dwLaunchWriteInterval, DEFAULT_LAUNCH_WRITE_INTERVAL);
 
-	g_cfg->GetConfig("temperature font", g_dwTemperatureFont, 16);    
+	g_cfg->GetConfig("temperature font", g_dwTemperatureFont, 14);    
 	
 	
 
