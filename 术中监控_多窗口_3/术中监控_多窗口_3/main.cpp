@@ -183,6 +183,15 @@ void  CDuiFrameWnd::InitWindow() {
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			m_UiAlarms[i][j]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		}
+
+		int nSelectedIndex = 0;
+		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
+			if (g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[k].m_bSwitch) {
+				m_MyImage_max[i]->OnReaderSelected(k);
+				m_MyImage_grid[i]->OnReaderSelected(k);
+				break;                               
+			}
+		}
 	} 
 
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
@@ -543,7 +552,7 @@ void   CDuiFrameWnd::OnSetting() {
 				g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
 
 				strText.Format("%s %lu %lu", CFG_BED_NO, i + 1, j + 1);
-				dwValue = 0;
+				dwValue = i * MAX_READERS_PER_GRID + j + 1;
 				g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, &dwValue);
 			}
 		}
@@ -802,7 +811,7 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 }
 
 void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
-	assert(dwIndex < MAX_READERS_PER_GRID);
+	assert(dwSubIndex < MAX_READERS_PER_GRID);
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		if (i == dwSubIndex) {
 			m_UiLayReader[dwIndex][i]->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_READER_BK]);

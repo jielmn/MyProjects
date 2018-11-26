@@ -15,7 +15,7 @@ using namespace DuiLib;
 
 #ifdef   _DEBUG
 #define  TEST_FLAG                0
-#define  TEST_FLAG_1              0
+#define  TEST_FLAG_1              1
 #endif
 
 #if TEST_FLAG
@@ -32,8 +32,8 @@ using namespace DuiLib;
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               "mainframe.xml"
 #define   SKIN_FOLDER             "res\\surgery_res_3"
-#define   MAX_GRID_COUNT          50
-#define   MAX_READERS_PER_GRID    9
+#define   MAX_GRID_COUNT          30
+#define   MAX_READERS_PER_GRID    6
 #define   READER_FILE_NAME        "reader.xml"
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   SETTING_FILE            "Setting.xml"

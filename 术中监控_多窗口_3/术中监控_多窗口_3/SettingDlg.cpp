@@ -174,10 +174,23 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 		m_tree->AddNode("∏ﬂŒ¬±®æØ", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
 		// ¥≤∫≈
-		pEdit = new CEditUI;
-		strText.Format("%lu", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwBed);
-		pEdit->SetText(strText);
-		m_tree->AddNode("Readerœ‡πÿ¥≤∫≈", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
+		//pEdit = new CEditUI;
+		//strText.Format("%lu", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwBed);
+		//pEdit->SetText(strText);
+		//m_tree->AddNode("Reader±‡∫≈", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
+
+		pCombo = new CComboUI;
+		AddComboItem(pCombo, "ø’", 0);
+
+		for ( DWORD j = 0; j < MAX_GRID_COUNT; j++ ) {
+			for ( char k = 'A'; k <= 'F'; k++ ) {
+				strText.Format("%lu%c", j + 1, k);
+				AddComboItem(pCombo, strText, 6 * j + (k - 'A') + 1);
+			}
+		}
+		pCombo->SelectItem(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwBed);
+		m_tree->AddNode("Reader±‡∫≈", pSubTitleNode_2, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
+
 
 		if ( i > 0 ) {
 			m_tree->ExpandNode(pSubTitleNode_2, false);
@@ -189,6 +202,7 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 
 void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	m_data = g_data.m_CfgData;
+	CDuiString  strText;
 
 	if (!GetCommonConfig()) {
 		return;
@@ -197,6 +211,28 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		if ( !GetGridConfig(i) ) {
 			return;
+		}
+	}
+
+	// ºÏ≤ÈReader±‡∫≈ «∑Ò÷ÿ∏¥
+	for ( int i = 0; i < MAX_GRID_COUNT; i++ ) {
+		for ( int j = 0; j < MAX_READERS_PER_GRID; j++ ) {
+			if ( m_data.m_GridCfg[i].m_ReaderCfg[j].m_dwBed > 0 ) {
+
+				for (int m = i; m < MAX_GRID_COUNT; m++) {
+					for (int n = 0; n < MAX_READERS_PER_GRID; n++) {
+						if ( m == i && n <= j ) {
+							continue;
+						}
+
+						if (m_data.m_GridCfg[i].m_ReaderCfg[j].m_dwBed == m_data.m_GridCfg[m].m_ReaderCfg[n].m_dwBed) {
+							strText.Format("¥∞ø⁄%d∂¡ø®∆˜%dµƒ±‡∫≈∫Õ¥∞ø⁄%d∂¡ø®∆˜%dµƒ±‡∫≈÷ÿ∏¥", i + 1, j + 1, m + 1, n + 1);
+							::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
+							return;
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -272,7 +308,7 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 7 + 50 * nIndex + 2 - 1;
+	int  nCfgRowIndex = 7 + ((5 * MAX_READERS_PER_GRID)+5) * nIndex + 2 - 1;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 
@@ -333,13 +369,14 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 		}
 
 		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 5 * i + 5, cfgValue);
-		strText = cfgValue.m_strEdit;
-		if (1 != sscanf_s(strText, "%d", &nNumber)) {
-			strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨¥≤∫≈«Î ‰»Î ˝◊÷", nIndex + 1, i + 1);
-			::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
-			return FALSE;
-		}
-		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwBed = nNumber;
+		//strText = cfgValue.m_strEdit;
+		//if (1 != sscanf_s(strText, "%d", &nNumber)) {
+		//	strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨¥≤∫≈«Î ‰»Î ˝◊÷", nIndex + 1, i + 1);
+		//	::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
+		//	return FALSE;
+		//}
+		//m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwBed = nNumber;
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwBed = cfgValue.m_tag;
 	}
 
 	return TRUE;

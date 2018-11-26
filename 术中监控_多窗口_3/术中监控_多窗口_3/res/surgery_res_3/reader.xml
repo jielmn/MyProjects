@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<HorizontalLayout height="50" inset="30,10,0,10" name="layReader" >	
+	<HorizontalLayout height="100" inset="30,10,0,10" name="layReader" >	
 		<VerticalLayout width="30">
 			<Control />
 			<Control name="indicator" width="20" height="12" bkcolor="#FFFF0000" />
 			<Control />
+		</VerticalLayout>
+		
+		<VerticalLayout>
+			<Control />
+			<Option width="30" height="30" name="opn_reader_switch" normalimage="not_checked_0.png" selectedimage="checked_0.png" selected="true" />
+			<Control />
+		</VerticalLayout>
+		
+		<Control width="10" />
+		
+		<VerticalLayout width="105">
+			<Control />
+			<HorizontalLayout height="30">
+				<Edit name="edtReaderName" text="--"    textcolor="#FF000000" width="105" font="1" visible="false" />		
+				<Button name="btnReaderName" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="105" font="1" />
+			</HorizontalLayout>
+			<Control />
 		</VerticalLayout>		
-		<Option width="30" name="opn_reader_switch" normalimage="not_checked_0.png" selectedimage="checked_0.png" selected="true" />
+		
 		<Control width="10" />
-		<Edit name="edtReaderName" text="--"    textcolor="#FF000000" width="105" font="1" visible="false" />		
-		<Button name="btnReaderName" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="105" font="1" />
-		<Control width="10" />
-		<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="1" width="90" />
-		<AlarmImage name="alarm_image" width="30" />
+		<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
+		
+		<VerticalLayout>
+			<Control />
+			<AlarmImage name="alarm_image" width="30" height="30" />
+			<Control />
+		</VerticalLayout>		
+		
 	</HorizontalLayout>
 </Window>

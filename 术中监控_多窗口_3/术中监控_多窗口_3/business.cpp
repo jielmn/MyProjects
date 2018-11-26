@@ -115,11 +115,34 @@ int CBusiness::Init() {
 			}
 
 			strText.Format("%s %lu %lu", CFG_BED_NO, i + 1, j + 1);
-			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, 0);
+			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, -1);
 
 			strText.Format("%s %lu %lu", CFG_READER_NAME, i + 1, j + 1);
 			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName, 
 				     sizeof(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName), "--");
+		}
+	}
+
+	// ¸øÄ¬ÈÏµÄ´²ºÅ1, 2, 3
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
+			if ( g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed == -1 ) {
+
+				BOOL bFind = FALSE;
+				for (int m = 0; m < MAX_GRID_COUNT; m++) {
+					for ( int n = 0; n < MAX_READERS_PER_GRID; n++ ) {
+						if (g_data.m_CfgData.m_GridCfg[m].m_ReaderCfg[n].m_dwBed == i * MAX_READERS_PER_GRID  + j + 1) {
+							bFind = TRUE;
+							break;
+						}
+					}					
+				}
+
+				if (!bFind) {
+					g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed = i * MAX_READERS_PER_GRID + j + 1;
+				}
+
+			}
 		}
 	}
 

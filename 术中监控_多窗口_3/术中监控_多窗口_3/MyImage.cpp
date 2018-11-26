@@ -16,7 +16,7 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 		m_temperature_brush[i] = new SolidBrush(Gdiplus::Color(g_data.m_argb[i]));
 	}
 
-	//m_dwSelectedReaderIndex = 0;
+	//m_dwSelectedReaderIndex = 0;	
 	OnReaderSelected(0);
 
 	m_dwNextTempIndex = 0;
