@@ -165,6 +165,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_export_excel") {
 		OnExportExcel();
 	}
+	else if (msg.sType == "menu_print_excel") {
+		OnPrintExcel();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -451,6 +454,20 @@ void   CDuiFrameWnd::OnExportExcel() {
 
 void   CDuiFrameWnd::OnMyImageClick(const POINT * pPoint) {
 	m_pUiMyImage->OnMyClick(pPoint);
+}
+
+void   CDuiFrameWnd::OnPrintExcel() {
+	char szReaderName[MAX_READERS_COUNT][64] = {0};
+	for ( DWORD i = 0; i < MAX_READERS_COUNT; i++ ) {
+		STRNCPY(szReaderName[i], m_pUiBtnReaderNames[i]->GetText(), 64);
+		if ( szReaderName[i][0] == '\0' ) {
+			SNPRINTF(szReaderName[i], 64, "No.%lu", i + 1);
+		}
+		else if (0 == strcmp(szReaderName[i], "--")) {
+			SNPRINTF(szReaderName[i], 64, "No.%lu", i + 1);
+		}
+	}
+	m_pUiMyImage->PrintExcel(szReaderName, m_pUiBtnPatientName->GetText());
 }
 
 // launch status

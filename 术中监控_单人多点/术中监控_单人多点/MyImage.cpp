@@ -858,3 +858,83 @@ void  CMyImageUI::ExportExcel(const char * szPatientName) {
 		::MessageBox(g_hWnd, strText, "保存excel", 0);
 	}
 }
+
+void  CMyImageUI::PrintExcel(char szReaderName[MAX_READERS_COUNT][64], const char * szPatientName) {
+	CDuiString strText;
+
+	if (!CExcelEx::IfExcelInstalled()) {
+		::MessageBox(g_hWnd, "没有检测到系统安装了excel", "保存excel", 0);
+		return;
+	}
+
+	DWORD  dwDataCnt = 0;
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		dwDataCnt += m_vTempData[i].size();
+	}
+	if (dwDataCnt == 0) {
+		strText.Format("没有温度数据，放弃打印excel图表");
+		::MessageBox(g_hWnd, strText, "打印excel图表", 0);
+		return;
+	}
+
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+	char szTime[256];
+	time_t now = time(0);
+	Date2String(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s_%s", szPatientName, szTime);
+
+	CExcelEx  excel;
+	vector<TempData *>::iterator it;
+	CExcelEx::Series s[MAX_READERS_COUNT] = {0};
+	DWORD  dwMin = 3500;
+
+	for (DWORD i = 0; i < MAX_READERS_COUNT; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+		if ( vTempData.size() == 0 ) {
+			s[i].bEmpty = TRUE;
+			continue;
+		}
+
+		s[i].bEmpty = FALSE;
+		s[i].dwStartRowIndex = 0;
+		s[i].dwStartColIndex = i * 2;
+		s[i].dwEndRowIndex = vTempData.size() - 1;
+		STRNCPY(s[i].szName, szReaderName[i], sizeof(s[i].szName));
+
+		if ( vTempData.size() > g_dwPrintExcelMaxPointsCnt) {
+			s[i].dwStartRowIndex = vTempData.size() - g_dwPrintExcelMaxPointsCnt;
+		}
+
+		DWORD j = 0;
+		for (it = vTempData.begin(), j = 0; it != vTempData.end(); it++, j++) {
+			TempData * pItem = *it;
+
+			Time2String(szTime, sizeof(szTime), &pItem->tTime);
+			excel.WriteGrid(j, i * 2, szTime);
+
+			char szTemperature[8];
+			SNPRINTF(szTemperature, 8, "%.2f", pItem->dwTemperature / 100.0);
+			excel.WriteGrid(j, i * 2 + 1, szTemperature);
+
+			if ( pItem->dwTemperature < dwMin) {
+				dwMin = pItem->dwTemperature;
+			}
+		}
+	}
+
+	double dMin = 0.0;
+	if (dwMin >= 3500) {
+		dMin = 34.0;
+	}
+	else if (dwMin > 3000) {
+		dMin = 30.0;
+	}
+	else if (dwMin > 2600) {
+		dMin = 26.0;
+	}
+	else if (dwMin > 2200) {
+		dMin = 22.0;
+	}
+	excel.PrintChartWithMultiSeries(s, MAX_READERS_COUNT, strFilename, 0, 0, TRUE, &dMin);
+	excel.Quit();
+}

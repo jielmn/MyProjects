@@ -98,6 +98,11 @@ int CBusiness::Init() {
 	g_cfg->GetConfig(CFG_ALARM_VOICE_SWITCH, dwCfgValue, DEFAULT_ALARM_VOICE_SWITCH);
 	g_data.m_bAlarmVoiceOff = dwCfgValue;
 
+	g_cfg->GetConfig("max printing points", g_dwPrintExcelMaxPointsCnt, PRINT_EXCEL_MAX_POINTS_COUNT);
+	if ( g_dwPrintExcelMaxPointsCnt <= PRINT_EXCEL_MAX_POINTS_COUNT ) {
+		g_dwPrintExcelMaxPointsCnt = PRINT_EXCEL_MAX_POINTS_COUNT;
+	}
+
 	// ¸øÄ¬ÈÏµÄ´²ºÅ1, 2, 3
 	for (int i = 0; i < MAX_READERS_COUNT; i++) {
 		if ( g_data.m_dwBedNo[i] == -1 ) {

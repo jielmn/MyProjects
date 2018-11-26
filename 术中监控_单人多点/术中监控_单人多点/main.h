@@ -65,6 +65,8 @@ private:
 	//
 	void   OnExportExcel();
 	//
+	void   OnPrintExcel();
+	//
 	void   OnMyImageClick(const POINT * pPoint);
 	// launch status
 	void   OnLaunchStatus(WPARAM wParam, LPARAM lParam);
