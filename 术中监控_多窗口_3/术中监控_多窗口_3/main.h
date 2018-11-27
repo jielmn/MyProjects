@@ -41,6 +41,7 @@ private:
 	CButtonUI *                        m_BtnName_grid[MAX_GRID_COUNT];
 	CEditUI *                          m_EdtName_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblCurTemp_grid[MAX_GRID_COUNT];
+	CLabelUI *                         m_LblCurTemp_grid1[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblBedTitle_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblNameTitle_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblCurTempTitle_grid[MAX_GRID_COUNT];
@@ -102,4 +103,6 @@ private:
 	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
 	void   OnReaderTemp(WPARAM wParam, LPARAM  lParam);
 	void   OnReaderDisconnected(WPARAM wParam, LPARAM  lParam);
+	//  Û¬÷
+	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 };

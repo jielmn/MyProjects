@@ -15,7 +15,7 @@ using namespace DuiLib;
 
 #ifdef   _DEBUG
 #define  TEST_FLAG                0
-#define  TEST_FLAG_1              1
+#define  TEST_FLAG_1              0
 #endif
 
 #if TEST_FLAG
@@ -61,6 +61,7 @@ using namespace DuiLib;
 #define   BUTTON_NAME_NAME_GRID    "btnName_1"
 #define   EDIT_NAME_NAME_GRID      "edtName_1"
 #define   LABEL_CUR_TEMP_GRID      "lblCur_1"
+#define   LABEL_CUR_TEMP_GRID1     "lblCur_2"
 #define   LABEL_BED_TITLE_GRID     "lblBedTitle_1"
 #define   LABEL_NAME_TITLE_GRID    "lblNameTitle_1"
 #define   LABEL_CUR_TITLE_GRID     "lblCurTitle_1"
@@ -113,6 +114,8 @@ using namespace DuiLib;
 #define   CFG_BED_NAME                  "bed name"
 #define   CFG_PATIENT_NAME              "patient name"
 #define   CFG_READER_NAME               "reader name"
+#define   CFG_TEMP_FONT                 "temperature font"
+#define   DEFAULT_TEMP_FONT             14 
 
 // ÆäËû
 #define   MAX_TEMPERATURE                42
@@ -216,6 +219,7 @@ typedef struct tagCfgData {
 	DWORD     m_dwLayoutRows;
 	DWORD     m_dwSkinIndex;
 	BOOL      m_bAlarmVoiceOff;
+	DWORD     m_dwTempFont;
 	GridCfg   m_GridCfg[MAX_GRID_COUNT];
 }CfgData;
 
@@ -229,6 +233,7 @@ public:
 	CfgData   m_CfgData;
 	DWORD     m_dwCollectIntervalWidth;
 	ARGB      m_argb[MAX_READERS_PER_GRID];
+	char      m_szLaunchPort[64];
 };
 
 #define  MAX_AREA_NAME_LENGTH   64

@@ -107,6 +107,15 @@ void  CSettingDlg::InitCommonCfg() {
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->Selected(g_data.m_CfgData.m_bAlarmVoiceOff ? false : true);
 	m_tree->AddNode("报警声音开关", pTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382 );
+
+	// 字体
+	pCombo = new CComboUI;
+	for ( DWORD i = 0; i < 8; i++ ) {
+		strText.Format("%lu", i + 1);
+		AddComboItem(pCombo, strText, i+10);
+	}
+	pCombo->SelectItem(g_data.m_CfgData.m_dwTempFont - 10);
+	m_tree->AddNode("温度字体大小", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
 }
 
 void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
@@ -300,6 +309,12 @@ BOOL  CSettingDlg::GetCommonConfig() {
 	// 报警声
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
 	m_data.m_bAlarmVoiceOff = !cfgValue.m_bCheckbox;
+	nCfgRowIndex++;
+
+	// 字体
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_dwTempFont = cfgValue.m_tag;
+	nCfgRowIndex++;
 
 	return TRUE;
 }
@@ -308,7 +323,7 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 7 + ((5 * MAX_READERS_PER_GRID)+5) * nIndex + 2 - 1;
+	int  nCfgRowIndex = 8 + ((5 * MAX_READERS_PER_GRID)+5) * nIndex + 2 - 1;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 

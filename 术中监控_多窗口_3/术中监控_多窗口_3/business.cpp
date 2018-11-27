@@ -71,7 +71,13 @@ int CBusiness::Init() {
 	}
 	g_data.m_skin.SetSkin( (CMySkin::ENUM_SKIN)g_data.m_CfgData.m_dwSkinIndex );
 	// end of 皮肤
-	
+
+	// 发射器端口
+	g_data.m_cfg->GetConfig("launch com port", g_data.m_szLaunchPort, sizeof(g_data.m_szLaunchPort), "");
+
+	// 温度字体大小
+	g_data.m_cfg->GetConfig(CFG_TEMP_FONT, g_data.m_CfgData.m_dwTempFont, DEFAULT_TEMP_FONT );
+		
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
 		g_data.m_cfg->GetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_bSwitch, DEFAULT_READER_SWITCH);

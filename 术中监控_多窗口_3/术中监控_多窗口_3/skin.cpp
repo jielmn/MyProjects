@@ -23,23 +23,32 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 		switch (eUI)
 		{
 		case LAYOUT_MAIN_BK:
-			return 0xFF192431;
+			//return 0xFF192431;
+			return 0xFF434248;
 		case LAYOUT_MAIN_BK_1:
 			return 0xFF293441;
 		case LABEL_STATUS_BK:
 			return 0xFF3A4F67;
 		case GRID_BORDER:
-			return 0xFFFFFFFF;
+			//return 0xFFFFFFFF;
+			return 0xFF4F4F4F;
 		case COMMON_TEXT:
 			return 0xFFFFFFFF;
 		case MYIMAGE_BK:
-			return 0xFF192431;
+			//return 0xFF192431;
+			return 0xFF434248;
 		case EDIT_BK:
 			return 0xFFFFFFFF;
 		case EDIT_TEXT:
 			return 0xFF000000;
 		case LAYOUT_READER_BK:
 			return 0xFF444444;
+		case HIGH_TEMP_ALARM_TEXT_COLOR:
+			return 0xFFDF455F;
+		case LOW_TEMP_ALARM_TEXT_COLOR:
+			return 0xFF01AFC3;
+		case NORMAL_TEMP_TEXT_COLOR:
+			return 0xFF4E8B20;
 		default:
 			break;
 		}
@@ -65,6 +74,12 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 			return 0xFFFFFFFF;
 		case LAYOUT_READER_BK:
 			return 0xFFDDDDDD;
+		case HIGH_TEMP_ALARM_TEXT_COLOR:
+			return 0xFFDF455F;
+		case LOW_TEMP_ALARM_TEXT_COLOR:
+			return 0xFF01AFC3;
+		case NORMAL_TEMP_TEXT_COLOR:
+			return 0xFF4E8B20;
 		default:
 			break;
 		}
@@ -165,11 +180,12 @@ COLORREF   CMySkin::GetRgb(CMySkin::ENUM_GDI e) const {
 		case BRIGHT_PEN:
 			return RGB(0x99, 0x99, 0x99);
 		case COMMON_BRUSH:
-			return RGB(0x19, 0x24, 0x31);
+			//return RGB(0x19, 0x24, 0x31);
+			return RGB(0x43, 0x42, 0x48);
 		case LOW_ALARM_PEN:
 			return RGB(0x02, 0xA5, 0xF1);
 		case HIGH_ALARM_PEN:
-			return RGB(0xFC, 0x23, 0x5C);
+			return RGB(0xFC, 0x23, 0x5C);		
 		default:
 			break;
 		}

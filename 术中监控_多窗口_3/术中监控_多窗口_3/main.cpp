@@ -35,7 +35,7 @@ void  CDuiFrameWnd::InitWindow() {
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 		CDialogBuilder builder;
 		m_pGrids[i] = builder.Create(MYCHART_XML_FILE, (UINT)0, &m_callback, &m_PaintManager);
-		m_pGrids[i]->SetBorderSize(1);
+		m_pGrids[i]->SetBorderSize(4);           
 		m_pGrids[i]->SetName(GRID_NAME);
 		m_pGrids[i]->SetTag(i);
 
@@ -92,6 +92,11 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblCurTemp_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID, 0));
 		m_LblCurTemp_grid[i]->SetTag(i);
 		m_LblCurTemp_grid[i]->SetText("--");
+
+		m_LblCurTemp_grid1[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID1, 0));
+		m_LblCurTemp_grid1[i]->SetTag(i);
+		m_LblCurTemp_grid1[i]->SetText("--");
+		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);
 
 		m_LblBedTitle_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_BED_TITLE_GRID, 0));
 		m_LblBedTitle_grid[i]->SetTag(i);
@@ -302,6 +307,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_READER_DISCONNECTED) {
 		OnReaderDisconnected(wParam, lParam);
 	}
+	else if (uMsg == WM_MOUSEWHEEL) {
+		OnMyMouseWheel(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -434,7 +442,7 @@ void   CDuiFrameWnd::OnDbClick() {
 }
 
 // 窗格扩大或缩小
-void  CDuiFrameWnd::OnGridInflate(DWORD dwIndex) {
+void  CDuiFrameWnd::OnGridInflate(DWORD dwIndex) { 
 	if ( m_eGridStatus == GRID_STATUS_GRIDS ) {
 		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 			if (i != dwIndex) {
@@ -519,6 +527,9 @@ void   CDuiFrameWnd::OnSetting() {
 		bValue = FALSE;
 		g_data.m_cfg->SetBooleanConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_CfgData.m_bAlarmVoiceOff, &bValue);
 
+		dwValue = DEFAULT_TEMP_FONT;
+		g_data.m_cfg->SetConfig(CFG_TEMP_FONT, g_data.m_CfgData.m_dwTempFont, &dwValue);
+
 		dwValue = DEFAULT_SKIN;
 		g_data.m_cfg->SetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, &dwValue);
 
@@ -569,8 +580,14 @@ void   CDuiFrameWnd::OnSetting() {
 			UpdateLayout();
 			CBusiness::GetInstance()->ReconnectLaunchAsyn();
 		}
+
+		if ( oldData.m_dwTempFont != g_data.m_CfgData.m_dwTempFont ) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);
+			}			
+		}
 		
-		::InvalidateRect(this->GetHWND(), 0, TRUE);
+		::InvalidateRect(this->GetHWND(), 0, TRUE);   
 	}
 	delete pSettingDlg;
 }
@@ -623,6 +640,9 @@ void   CDuiFrameWnd::OnBtnBed_grid(TNotifyUI& msg) {
 void   CDuiFrameWnd::OnEdtBedKillFocus_grid(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	STRNCPY( g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, msg.pSender->GetText(), MAX_BED_LENGTH);
+	if (0 == strcmp(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "--")) {
+		g_data.m_CfgData.m_GridCfg[nIndex].m_szBed[0] = '\0';
+	}
 
 	CDuiString  strText;
 	strText.Format(CFG_BED_NAME " %d", nIndex + 1);
@@ -647,6 +667,9 @@ void  CDuiFrameWnd::OnBtnName_grid(TNotifyUI& msg) {
 void    CDuiFrameWnd::OnEdtNameKillFocus_grid(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	STRNCPY(g_data.m_CfgData.m_GridCfg[nIndex].m_szName, msg.pSender->GetText(), MAX_NAME_LENGTH);
+	if (0 == strcmp(g_data.m_CfgData.m_GridCfg[nIndex].m_szName, "--")) {
+		g_data.m_CfgData.m_GridCfg[nIndex].m_szName[0] = '\0';
+	}
 
 	CDuiString  strText;
 	strText.Format(CFG_PATIENT_NAME " %d", nIndex + 1);
@@ -697,6 +720,9 @@ void   CDuiFrameWnd::OnBtnName_max(TNotifyUI& msg) {
 void   CDuiFrameWnd::OnEdtBedKillFocus_max(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	STRNCPY(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, msg.pSender->GetText(), MAX_BED_LENGTH);
+	if (0 == strcmp(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "--")) {
+		g_data.m_CfgData.m_GridCfg[nIndex].m_szBed[0] = '\0';
+	}
 
 	CDuiString  strText;
 	strText.Format(CFG_BED_NAME " %d", nIndex + 1);
@@ -713,6 +739,9 @@ void   CDuiFrameWnd::OnEdtBedKillFocus_max(TNotifyUI& msg) {
 void   CDuiFrameWnd::OnEdtNameKillFocus_max(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	STRNCPY(g_data.m_CfgData.m_GridCfg[nIndex].m_szName, msg.pSender->GetText(), MAX_NAME_LENGTH);
+	if (0 == strcmp(g_data.m_CfgData.m_GridCfg[nIndex].m_szName, "--")) {
+		g_data.m_CfgData.m_GridCfg[nIndex].m_szName[0] = '\0';
+	}
 
 	CDuiString  strText;
 	strText.Format(CFG_PATIENT_NAME " %d", nIndex + 1);
@@ -825,9 +854,26 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_MyImage_max[dwIndex]->OnReaderSelected(dwSubIndex);
 	m_MyImage_grid[dwIndex]->OnReaderSelected(dwSubIndex);
 
+	m_LblCurTemp_grid1[dwIndex]->SetText(m_UiReaderTemp[dwIndex][dwSubIndex]->GetText());
+	if ( m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
+		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
+		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::ALARM_OK) {
+		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+	}
+	else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::DISCONNECTED) {
+		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	}
+	else {
+		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	}
+
 	m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
 	m_MyImage_max[dwIndex]->MyInvalidate();
-	m_MyImage_grid[dwIndex]->MyInvalidate();
+	m_MyImage_grid[dwIndex]->MyInvalidate();  
 }
 
 void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
@@ -835,21 +881,33 @@ void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 
 	if ( dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm ) {
-		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::HIGH_TEMP);
+		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::HIGH_TEMP);		
 	}
 	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm ) {
-		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::LOW_TEMP);
+		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::LOW_TEMP);		
 	}
 	else {
-		m_UiAlarms[dwIndex][dwSubIndex]->StopAlarm();
+		m_UiAlarms[dwIndex][dwSubIndex]->StopAlarm();		
 	}
+	//m_LblCurTemp_grid1[dwIndex]->SetTextColor(0xFF4E8B20);
 
 	if ( dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex ) {
 		m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
 
+		if ( m_MyAlarm_grid[dwIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
+			m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+		}
+		else if (m_MyAlarm_grid[dwIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
+			m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+		}
+		else {
+			m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+		}
+
 		DuiLib::CDuiString  strText;
 		strText.Format("%.2f", dwTemp / 100.0);
 		m_LblCurTemp_grid[dwIndex]->SetText(strText);
+		m_LblCurTemp_grid1[dwIndex]->SetText(strText);
 	}
 }
 
@@ -869,6 +927,17 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	DWORD  dwSubIndex = HIWORD(wParam);
 	OnTemp(dwIndex, dwSubIndex, lParam);
 
+	DWORD  dwTemp = lParam;
+	if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+	}
+
 	DuiLib::CDuiString  strText;
 	strText.Format("%.2f", lParam / 100.0);
 	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
@@ -878,10 +947,39 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	DWORD  dwIndex = LOWORD(wParam);
 	DWORD  dwSubIndex = HIWORD(wParam);
 	m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
+	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText("--");
+	m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 
 	if (dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex) {
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		m_LblCurTemp_grid[dwIndex]->SetText("--");
+		m_LblCurTemp_grid1[dwIndex]->SetText("--");
+		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	}
+}
+
+void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
+	int nDirectory = (int)wParam;
+	BOOL bChanged = FALSE;
+	if (nDirectory > 0)
+	{
+		if (g_data.m_dwCollectIntervalWidth >= 20) {
+			g_data.m_dwCollectIntervalWidth -= 5;
+			bChanged = TRUE;
+		}
+	}
+	else
+	{
+		if (g_data.m_dwCollectIntervalWidth < 100) {
+			g_data.m_dwCollectIntervalWidth += 5;
+			bChanged = TRUE;
+		}
+	}
+
+	if (bChanged) {
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			m_MyImage_max[i]->MyInvalidate();
+		}
 	}
 }
 

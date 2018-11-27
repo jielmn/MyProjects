@@ -24,22 +24,22 @@ int  CLaunch::Reconnect() {
 	}
 
 	char  szComPort[16] = { 0 };
-#if TEST_FLAG_1
-	int nFindCount = 1;
-	STRNCPY(szComPort, "com2", sizeof(szComPort));
-#else
-	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
-#endif
 
-	// 太多的ch340
-	if (nFindCount > 1) {
-		m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
-		return 0;
+	if ( g_data.m_szLaunchPort[0] != 0 ) {
+		STRNCPY(szComPort, g_data.m_szLaunchPort, sizeof(szComPort));
 	}
-	// 没有找到ch340
-	else if (nFindCount == 0) {
-		m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
-		return 0;
+	else {
+		int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+		// 太多的ch340
+		if (nFindCount > 1) {
+			m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
+			return 0;
+		}
+		// 没有找到ch340
+		else if (nFindCount <= 0) {
+			m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
+			return 0;
+		}
 	}
 
 	BOOL bRet = OpenUartPort(szComPort);
