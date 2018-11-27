@@ -351,3 +351,31 @@ DWORD  FindReaderIndexByBed(DWORD dwBedNo) {
 
 	return -1;
 }
+
+BOOL  CheckComPortExist(int nCheckComPort) {
+	std::vector<std::string> vComPorts;
+	EnumPortsWdm(vComPorts);
+
+	char buf[8192];
+	std::vector<std::string>::iterator it;
+	for (it = vComPorts.begin(); it != vComPorts.end(); it++) {
+		std::string & s = *it;
+		Str2Lower(s.c_str(), buf, sizeof(buf));
+
+		int nComPort = 0;
+		const char * pFind = strstr(buf, "com");
+		while (pFind) {
+			if (1 == sscanf(pFind + 3, "%d", &nComPort)) {
+				break;
+			}
+			pFind = strstr(pFind + 3, "com");
+		}
+		assert(nComPort > 0);
+
+		if (nCheckComPort == nComPort) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}

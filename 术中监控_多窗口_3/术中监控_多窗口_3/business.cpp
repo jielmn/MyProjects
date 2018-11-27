@@ -497,6 +497,16 @@ void  CBusiness::OnCheckReader() {
 	}
 }
 
+int   CBusiness::CheckLaunchStatusAsyn() {
+	g_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
+	return 0;
+}
+
+int   CBusiness::CheckLaunchStatus() {
+	m_launch.CheckStatus();
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -544,6 +554,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CGridTempParam * pParam = (CGridTempParam *)pMessageData;
 		GetGridTemperature(pParam);
+	}
+	break;
+
+	case MSG_CHECK_LAUNCH_STATUS:
+	{
+		CheckLaunchStatus();
 	}
 	break;
 

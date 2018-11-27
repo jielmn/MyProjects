@@ -31,6 +31,7 @@ private:
 	DuiLib::CTileLayoutUI *            m_layMain;
 	DuiLib::CHorizontalLayoutUI *      m_layStatus;
 	CLabelUI *                         m_lblLaunchStatus;
+	CLabelUI *                         m_lblBarTips;
 	CControlUI *                       m_pGrids[MAX_GRID_COUNT];
 	DuiLib::CVerticalLayoutUI *        m_layGrid[MAX_GRID_COUNT];
 	DuiLib::CHorizontalLayoutUI *      m_layMaxium[MAX_GRID_COUNT];
@@ -105,4 +106,6 @@ private:
 	void   OnReaderDisconnected(WPARAM wParam, LPARAM  lParam);
 	//  Û¬÷
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
+	// 
+	void   OnMyDeviceChanged();
 };

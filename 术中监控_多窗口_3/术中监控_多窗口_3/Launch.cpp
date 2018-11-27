@@ -229,3 +229,30 @@ BOOL  CLaunch::WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen) {
 	LmnSleep(WRITE_SLEEP_TIME);
 	return bRet;
 }
+
+int  CLaunch::CheckStatus() {
+	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "check status \n");
+
+	// 关闭状态
+	if (GetStatus() == CLmnSerialPort::CLOSE) {
+		char szComPort[16];
+		int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+		// 如果找到1个ch340串口，立即连接发射器
+		if (1 == nFindCount) {
+			m_sigReconnect.emit(0);
+		}
+		else if (g_data.m_szLaunchPort[0] != 0) {
+			m_sigReconnect.emit(0);
+		}
+	}
+	// 打开状态
+	else {
+		// 如果串口已经不在
+		if (!CheckComPortExist(this->GetPort())) {
+			CloseLaunch();
+			m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
+		}
+	}
+
+	return 0;
+}

@@ -48,6 +48,10 @@ public:
 	void  OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
 	void  OnCheckReader();
 
+	// 硬件改动，检查状态
+	int   CheckLaunchStatusAsyn();
+	int   CheckLaunchStatus();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

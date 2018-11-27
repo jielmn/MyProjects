@@ -132,7 +132,7 @@ using namespace DuiLib;
 #define   RADIUS_SIZE_IN_GRID            4
 #define   RADIUS_SIZE_IN_MAXIUM          8
 #define   DEFAULT_ALARM_FILE_PATH        "\\res\\surgery_res_3\\1.wav"
-#define   RECONNECT_LAUNCH_TIME_INTERVAL 10000
+#define   RECONNECT_LAUNCH_TIME_INTERVAL 30000
 #define   READER_STATUS_CLOSE            0
 #define   READER_STATUS_OPEN             1
 #define   WRITE_SLEEP_TIME               2000
@@ -146,6 +146,7 @@ using namespace DuiLib;
 #define MSG_GET_TEMPERATURE              1005
 #define MSG_READ_LAUNCH                  1006
 #define MSG_GET_GRID_TEMP                1007
+#define MSG_CHECK_LAUNCH_STATUS          1008
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -295,6 +296,7 @@ extern char *  GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern DWORD  FindReaderIndexByBed(DWORD dwBedNo);
+extern BOOL  CheckComPortExist(int nCheckComPort);
 
 // templates
 template <class T>

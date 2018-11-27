@@ -20,6 +20,9 @@ public:
 
 	BOOL WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen);
 
+	// 硬件改动，检查状态
+	int  CheckStatus();
+
 private:
 	void   CloseLaunch();
 

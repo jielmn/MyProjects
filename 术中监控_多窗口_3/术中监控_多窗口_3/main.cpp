@@ -30,6 +30,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layMain = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(LAYOUT_MAIN_NAME));
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
 	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_STATUS_NAME));
+	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblBarTips"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -208,7 +209,8 @@ void  CDuiFrameWnd::InitWindow() {
 	SetTimer(m_hWnd, TIMER_TEST_ID_1, TIMER_TEST_INTERVAL_1, NULL);
 #endif
 
-	CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
+	OnMyDeviceChanged();
+	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
 	WindowImplBase::InitWindow();
 }
 
@@ -309,6 +311,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_MOUSEWHEEL) {
 		OnMyMouseWheel(wParam, lParam);
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		OnMyDeviceChanged();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -919,6 +924,12 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
 	}
 	else {
 		m_lblLaunchStatus->SetText("发射器连接断开");
+
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
+				OnReaderDisconnected( MAKELONG(i,j), 0 );
+			}			
+		}
 	}
 }
 
@@ -981,6 +992,23 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 			m_MyImage_max[i]->MyInvalidate();
 		}
 	}
+}
+
+// 
+void   CDuiFrameWnd::OnMyDeviceChanged() {
+	char szComPort[16];
+	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+	if (nFindCount > 1) {
+		m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+	}
+	else if (0 == nFindCount) {
+		m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+	}
+	else {
+		m_lblBarTips->SetText("");
+	}
+
+	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
 }
 
 
