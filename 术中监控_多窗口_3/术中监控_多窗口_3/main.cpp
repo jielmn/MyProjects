@@ -31,6 +31,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));
 	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_STATUS_NAME));
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblBarTips"));
+	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -253,6 +254,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == BTN_READER_NAME) {
 			OnReaderName(msg);
 		}
+		else if (name == MYIMAGE_NAME_MAXIUM) {
+			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+			OnMyImageClick(msg.pSender->GetTag(),&pt);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -275,6 +280,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if ( name == EDT_READER_NAME ) {
 			OnEdtReaderNameKillFocus(msg);
+		}
+		else if ( name == "edRemark" ) {
+			OnEdtRemarkKillFocus();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -470,12 +478,14 @@ void  CDuiFrameWnd::OnGridInflate(DWORD dwIndex) {
 			}
 		}
 
+		OnEdtRemarkKillFocus();
+
 		m_layMain->SetFixedColumns( g_data.m_CfgData.m_dwLayoutColumns );
 		m_eGridStatus = GRID_STATUS_GRIDS;
 		m_dwInflateGridIndex = -1;
 		OnGridInflateSub(dwIndex);
 		ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
-		OnEdtRemarkKillFocus();
+		
 	}
 }
 
@@ -493,7 +503,8 @@ void   CDuiFrameWnd::OnGridInflateSub( DWORD dwIndex ) {
 }
    
 void   CDuiFrameWnd::OnEdtRemarkKillFocus() {
-
+	assert(GRID_STATUS_MAXIUM == m_eGridStatus);
+	OnEdtRemarkKillFocus_g(m_MyImage_max[m_dwInflateGridIndex]);
 }      
 
 void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
@@ -1009,6 +1020,11 @@ void   CDuiFrameWnd::OnMyDeviceChanged() {
 	}
 
 	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
+}
+
+//
+void  CDuiFrameWnd::OnMyImageClick(DWORD dwIndex,const POINT * pPoint) {
+	m_MyImage_max[dwIndex]->OnMyClick(pPoint);
 }
 
 

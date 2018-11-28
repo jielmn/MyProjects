@@ -235,6 +235,7 @@ public:
 	DWORD     m_dwCollectIntervalWidth;
 	ARGB      m_argb[MAX_READERS_PER_GRID];
 	char      m_szLaunchPort[64];
+	BOOL      m_bAutoScroll;                           // 自动更新滑动条
 };
 
 #define  MAX_AREA_NAME_LENGTH   64
@@ -285,6 +286,7 @@ extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
 extern LmnToolkits::Thread *  g_thrd_work;
 extern LmnToolkits::Thread *  g_thrd_launch;
+extern DuiLib::CEditUI * g_edRemark;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
@@ -297,6 +299,7 @@ extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern DWORD  FindReaderIndexByBed(DWORD dwBedNo);
 extern BOOL  CheckComPortExist(int nCheckComPort);
+extern void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage);
 
 // templates
 template <class T>

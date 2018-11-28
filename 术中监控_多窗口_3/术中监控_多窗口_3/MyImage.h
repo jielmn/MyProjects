@@ -42,6 +42,7 @@ private:
 	DWORD                        m_dwNextTempIndex;
 	BOOL                         m_bSetParentScrollPos;
 	E_TYPE                       m_type;
+	DWORD                        m_dwCurTempIndex;
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;
@@ -49,6 +50,8 @@ public:
 	DWORD                        m_dwSelectedReaderIndex;
 
 public:
-	void                         OnReaderSelected(DWORD  dwSelectedIndex);
+	void   OnReaderSelected(DWORD  dwSelectedIndex);
+	void   OnMyClick(const POINT * pPoint);
+	void   SetRemark(DuiLib::CDuiString & strRemark);
 };
 

@@ -12,6 +12,7 @@ std::vector<TArea *>  g_vArea;
 ARGB g_default_argb[MAX_READERS_PER_GRID] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0xFF51786C, 0xFFFFFF00, 0xFFCA5100 };
 LmnToolkits::Thread *  g_thrd_work = 0;
 LmnToolkits::Thread *  g_thrd_launch = 0;
+DuiLib::CEditUI * g_edRemark = 0;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
@@ -378,4 +379,14 @@ BOOL  CheckComPortExist(int nCheckComPort) {
 	}
 
 	return FALSE;
+}
+
+void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage) {
+	DuiLib::CDuiString  strRemark = g_edRemark->GetText();
+	g_edRemark->SetText("");
+	g_edRemark->SetVisible(false);
+	g_data.m_bAutoScroll = TRUE;
+
+	CMyImageUI * pImage = (CMyImageUI *)pUiImage;
+	pImage->SetRemark(strRemark);
 }

@@ -108,4 +108,6 @@ private:
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 	// 
 	void   OnMyDeviceChanged();
+	//
+	void   OnMyImageClick(DWORD dwIndex, const POINT * pPoint);
 };

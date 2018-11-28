@@ -24,6 +24,8 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	CBusiness * pBusiness = CBusiness::GetInstance();	
 	m_sigUpdateScroll.connect(pBusiness, &CBusiness::OnUpdateScroll);
 	m_sigAlarm.connect(pBusiness, &CBusiness::OnAlarm);
+
+	m_dwCurTempIndex = -1;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -309,6 +311,12 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 }
 
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN)
+	{
+		//告诉UIManager这个消息需要处理
+		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+		return;
+	}
 	DuiLib::CControlUI::DoEvent(event);
 }
 
@@ -456,6 +464,94 @@ void  CMyImageUI::OnReaderSelected(DWORD  dwSelectedIndex) {
 				m_temperature_pen[i]->SetWidth(5.0);
 			else
 				m_temperature_pen[i]->SetWidth(2.0);
+		}
+	}
+}
+
+void   CMyImageUI::OnMyClick(const POINT * pPoint) {
+	DWORD  dwIndex = this->GetTag();
+
+	// 找到点击了哪个点
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
+	int nGridCount = MAX_TEMPERATURE - nMinTemp;
+	int nMiddleTemp = (MAX_TEMPERATURE + nMinTemp) / 2;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	time_t  tFirstTime = GetFirstTime();
+	time_t  tLastTime = GetLastTime();
+
+	int middle = height / 2;
+	int nRadius = 6;
+	vector<TempData *>::iterator it;
+	DWORD  dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
+
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+
+			int nDiff = (int)(pItem->tTime - tFirstTime);
+			int nX = (int)(((double)nDiff / dwCollectInterval ) *  g_data.m_dwCollectIntervalWidth);
+			int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+			int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
+			int nY1 = nY + middle + rect.top;
+
+			if (pPoint->x >= nX1 - 6 && pPoint->x <= nX1 + 6
+				&& pPoint->y >= nY1 - 6 && pPoint->y <= nY1 + 6) {
+				//JTelSvrPrint("you clicked the point!");
+
+				// 如果之前在编辑状态
+				if (g_edRemark->IsVisible()) {
+					OnEdtRemarkKillFocus_g(this);
+				}
+
+				m_dwCurTempIndex = pItem->dwIndex;
+				RECT rectRemark;
+				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2 + 1;
+				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET + 3;
+				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH - 2;
+				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT - 6;
+				g_edRemark->SetPos(rectRemark);
+				g_edRemark->SetText(pItem->szRemark);
+				g_edRemark->SetVisible(true);
+				g_edRemark->SetFocus();
+
+				g_data.m_bAutoScroll = FALSE;
+				break;
+			}
+		}
+	}
+}
+
+void   CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
+	// assert(m_dwCurTempIndex != -1);
+	if (m_dwCurTempIndex == -1) {
+		return;
+	}
+
+	vector<TempData *>::iterator it;
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+			if (pItem->dwIndex == m_dwCurTempIndex) {
+				STRNCPY(pItem->szRemark, strRemark, sizeof(pItem->szRemark));
+				return;
+			}
 		}
 	}
 }
