@@ -285,6 +285,17 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnEdtRemarkKillFocus();
 		}
 	}
+	else if (msg.sType == "menu") {
+		if (name == MYIMAGE_NAME_MAXIUM) {
+			OnMyImageMenu(msg);
+		}
+	}
+	else if (msg.sType == "menu_export_excel") {
+		OnExportExcel();
+	}
+	else if (msg.sType == "menu_print_excel") {
+		OnPrintExcel();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -798,6 +809,11 @@ void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
 }
 
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
+	// 如果正在编辑Remark,停止自动更新滚动条
+	if ( !g_data.m_bAutoScroll ) {
+		return;
+	}
+
 	DWORD  dwIndex = wParam;
 	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)m_MyImage_max[dwIndex]->GetParent();
 	SIZE tParentScrollPos = pParent->GetScrollPos();
@@ -1025,6 +1041,44 @@ void   CDuiFrameWnd::OnMyDeviceChanged() {
 //
 void  CDuiFrameWnd::OnMyImageClick(DWORD dwIndex,const POINT * pPoint) {
 	m_MyImage_max[dwIndex]->OnMyClick(pPoint);
+}
+
+//
+void   CDuiFrameWnd::OnMyImageMenu(TNotifyUI& msg) {
+	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_image.xml"), msg.pSender);
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
+}
+
+//
+void   CDuiFrameWnd::OnExportExcel() {
+	assert(m_eGridStatus == GRID_STATUS_MAXIUM);
+	if (m_eGridStatus != GRID_STATUS_MAXIUM) {
+		return;
+	}
+
+	m_MyImage_max[m_dwInflateGridIndex]->ExportExcel( g_data.m_CfgData.m_GridCfg[m_dwInflateGridIndex].m_szName );
+}
+
+//
+void   CDuiFrameWnd::OnPrintExcel() {
+	assert(m_eGridStatus == GRID_STATUS_MAXIUM);
+	if (m_eGridStatus != GRID_STATUS_MAXIUM) {
+		return;
+	}
+
+	char szReaderName[MAX_READERS_PER_GRID][64] = { 0 };
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		STRNCPY( szReaderName[i], g_data.m_CfgData.m_GridCfg[m_dwInflateGridIndex].m_ReaderCfg[i].m_szName, 64 );
+		if (szReaderName[i][0] == '\0') {
+			SNPRINTF(szReaderName[i], 64, "No.%lu", i + 1);
+		}
+		else if (0 == strcmp(szReaderName[i], "--")) {
+			SNPRINTF(szReaderName[i], 64, "No.%lu", i + 1);
+		}
+	}
+	m_MyImage_max[m_dwInflateGridIndex]->PrintExcel(szReaderName, g_data.m_CfgData.m_GridCfg[m_dwInflateGridIndex].m_szName );
 }
 
 

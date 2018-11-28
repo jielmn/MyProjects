@@ -110,4 +110,10 @@ private:
 	void   OnMyDeviceChanged();
 	//
 	void   OnMyImageClick(DWORD dwIndex, const POINT * pPoint);
+	//
+	void   OnMyImageMenu(TNotifyUI& msg);
+	//
+	void   OnExportExcel();
+	//
+	void   OnPrintExcel();
 };

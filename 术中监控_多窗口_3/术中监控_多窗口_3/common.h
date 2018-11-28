@@ -153,6 +153,8 @@ using namespace DuiLib;
 #define UM_READER_TEMP                   (WM_USER+3)
 #define UM_READER_DISCONNECTED           (WM_USER+4)
 
+#define PRINT_EXCEL_MAX_POINTS_COUNT      100
+
 // ¿‡
 typedef struct tagTempData {
 	DWORD    dwIndex;
@@ -287,6 +289,7 @@ extern ARGB g_default_argb[MAX_READERS_PER_GRID];
 extern LmnToolkits::Thread *  g_thrd_work;
 extern LmnToolkits::Thread *  g_thrd_launch;
 extern DuiLib::CEditUI * g_edRemark;
+extern DWORD g_dwPrintExcelMaxPointsCnt;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
@@ -300,6 +303,8 @@ extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern DWORD  FindReaderIndexByBed(DWORD dwBedNo);
 extern BOOL  CheckComPortExist(int nCheckComPort);
 extern void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage);
+extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>

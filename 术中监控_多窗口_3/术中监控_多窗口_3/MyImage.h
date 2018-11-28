@@ -53,5 +53,8 @@ public:
 	void   OnReaderSelected(DWORD  dwSelectedIndex);
 	void   OnMyClick(const POINT * pPoint);
 	void   SetRemark(DuiLib::CDuiString & strRemark);
+
+	void  ExportExcel(const char * szPatientName);
+	void  PrintExcel(char szReaderName[MAX_READERS_PER_GRID][64], const char * szPatientName);
 };
 

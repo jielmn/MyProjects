@@ -77,6 +77,11 @@ int CBusiness::Init() {
 
 	// 温度字体大小
 	g_data.m_cfg->GetConfig(CFG_TEMP_FONT, g_data.m_CfgData.m_dwTempFont, DEFAULT_TEMP_FONT );
+
+	g_data.m_cfg->GetConfig("max printing points", g_dwPrintExcelMaxPointsCnt, PRINT_EXCEL_MAX_POINTS_COUNT);
+	if (g_dwPrintExcelMaxPointsCnt <= PRINT_EXCEL_MAX_POINTS_COUNT) {
+		g_dwPrintExcelMaxPointsCnt = PRINT_EXCEL_MAX_POINTS_COUNT;
+	}
 		
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
@@ -205,6 +210,7 @@ int CBusiness::Init() {
 		}
 	}
 	// END OF 区号
+	g_data.m_bAutoScroll = TRUE;
 
 	g_data.m_dwCollectIntervalWidth = DEFAULT_COLLECT_INTERVAL;
 	memcpy(g_data.m_argb, g_default_argb, sizeof(ARGB) * MAX_READERS_PER_GRID);

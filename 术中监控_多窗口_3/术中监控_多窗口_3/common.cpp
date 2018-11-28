@@ -13,6 +13,7 @@ ARGB g_default_argb[MAX_READERS_PER_GRID] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0
 LmnToolkits::Thread *  g_thrd_work = 0;
 LmnToolkits::Thread *  g_thrd_launch = 0;
 DuiLib::CEditUI * g_edRemark = 0;
+DWORD g_dwPrintExcelMaxPointsCnt = 0;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
@@ -383,10 +384,33 @@ BOOL  CheckComPortExist(int nCheckComPort) {
 
 void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage) {
 	DuiLib::CDuiString  strRemark = g_edRemark->GetText();
+	bool bVisible = g_edRemark->IsVisible();
+
+	// 如果是由于g_edRemark->SetVisible(false);导致的又一次堆栈调用，则跳过
+	if (!bVisible) {
+		return;
+	}
+
 	g_edRemark->SetText("");
 	g_edRemark->SetVisible(false);
 	g_data.m_bAutoScroll = TRUE;
 
 	CMyImageUI * pImage = (CMyImageUI *)pUiImage;
 	pImage->SetRemark(strRemark);
+}
+
+char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d年%02d月%02d日%02d时%02d分%02d秒", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
+	return szDest;
+}
+
+char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d年%02d月%02d日", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday);
+	return szDest;
 }
