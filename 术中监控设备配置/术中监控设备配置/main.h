@@ -71,6 +71,11 @@ private:
 	DuiLib::CEditUI *                   m_edtQuery2Ret;
 	DuiLib::CListUI *                   m_lstArea;
 
+	DuiLib::CHorizontalLayoutUI *       m_lay1;
+	DuiLib::CHorizontalLayoutUI *       m_lay2;
+	DuiLib::CComboUI *                  m_cmbBedNo1;
+	DuiLib::CComboUI *                  m_cmbBedNo2;
+
 	BOOL                                m_bBusy;
 
 };

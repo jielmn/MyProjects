@@ -12,6 +12,9 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+// 是否多人多点的Reader配置
+#define   MULTI_FLAG              1
+
 #define   LOG_FILE_NAME           "surgery_setting.log"
 #define   CONFIG_FILE_NAME        "surgery_setting.cfg"
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"

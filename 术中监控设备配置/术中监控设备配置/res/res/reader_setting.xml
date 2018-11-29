@@ -26,11 +26,23 @@
 			</Combo>			
 		</HorizontalLayout>
 		
-		<HorizontalLayout height="40" inset="10,5,10,5">
+		<HorizontalLayout height="40" inset="10,5,10,5">		
 			<Label text="Reader相关床号" width="150" font="3" textcolor="#FF386382" />
-			<Edit name="edtBedNo" font="3" textcolor="#FF386382" width="200" text="1" />
-			<Control width="10" />
-			<Label text="范围(1~200)" width="100" font="3" textcolor="#FF386382" />
+			
+			<HorizontalLayout name="lay1">
+				<Edit name="edtBedNo" font="3" textcolor="#FF386382" width="200" text="1" />
+				<Control width="10" />
+				<Label text="范围(1~200)" width="100" font="3" textcolor="#FF386382" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout name="lay2">
+				<Combo name="cmbBedNo1" width="100" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382"  >
+				</Combo>
+				<Control width="10" />
+				<Combo name="cmbBedNo2" width="100" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382"  >
+				</Combo>
+			</HorizontalLayout>
+			
 		</HorizontalLayout>
 		
 		<HorizontalLayout height="20" />

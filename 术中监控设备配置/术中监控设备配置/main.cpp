@@ -67,6 +67,8 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	DuiLib::CDuiString  strText;
+
 	g_hWnd = GetHWND();
 	this->PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
@@ -86,10 +88,39 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edtQuery2Ret = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtAreaNo_Ret2"));
 	m_lstArea = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstArea"));
 
+	m_lay1 = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("lay1"));
+	m_lay2 = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("lay2"));
+	m_cmbBedNo1 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbBedNo1"));
+	m_cmbBedNo2 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbBedNo2"));
+
+	for (int i = 0; i < 30; i++) {
+		DuiLib::CListLabelElementUI * pElement = new CListLabelElementUI;
+		strText.Format("%lu", i + 1);
+		pElement->SetText(strText);
+		m_cmbBedNo1->Add(pElement);
+	}
+	m_cmbBedNo1->SelectItem(0);
+
+	for (int i = 'A'; i <= 'F'; i++) {
+		DuiLib::CListLabelElementUI * pElement = new CListLabelElementUI;
+		strText.Format("%c", (char)i);
+		pElement->SetText(strText);
+		m_cmbBedNo2->Add(pElement);
+	}
+	m_cmbBedNo2->SelectItem(0);
+
+#if MULTI_FLAG
+	m_lay1->SetVisible(false);
+	m_lay2->SetVisible(true);
+#else
+	m_lay1->SetVisible(true);
+	m_lay2->SetVisible(false);
+#endif
+
 	OnFreshComPort_Reader();
 	OnFreshComPort_Gw();    
 
-	DuiLib::CDuiString  strText;
+	
 	std::vector<TArea *>::iterator it;
 	for (it = g_vArea.begin(); it != g_vArea.end(); ++it) {
 		TArea * pArea = *it;
@@ -322,6 +353,17 @@ void  CDuiFrameWnd::OnSettingReader() {
 
 	nAreaNo = m_cmbArea1->GetItemAt(nSel)->GetTag();
 
+#if MULTI_FLAG
+	int nSel_1 = m_cmbBedNo1->GetCurSel();
+	int nSel_2 = m_cmbBedNo2->GetCurSel();
+
+	if ( nSel_1 < 0 || nSel_2 < 0 ) {
+		MessageBox(GetHWND(), "ÇëÑ¡Ôñ´²Î»ºÅ£¬ÀýÈç2A, 3CµÈ", "´íÎó", 0);
+		return;
+	}
+
+	nBedNo = nSel_1 * 6 + nSel_2 + 1;
+#else
 	strText = m_edtBedNo->GetText();
 	if (1 != sscanf(strText, "%d", &nBedNo)) {
 		MessageBox(GetHWND(), "ÇëÊäÈë´²Î»ºÅ", "´íÎó", 0);
@@ -337,6 +379,7 @@ void  CDuiFrameWnd::OnSettingReader() {
 		MessageBox(GetHWND(), "´²ºÅµÄ·¶Î§ÊÇ1µ½200", "´íÎó", 0);
 		return;
 	}
+#endif
 
 	CBusiness::GetInstance()->SettingReaderAsyn(nAreaNo, nBedNo, nPort);
 
