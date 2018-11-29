@@ -557,8 +557,13 @@ void   CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 	}
 }
 
-void  CMyImageUI::ExportExcel(const char * szPatientName) {
+void  CMyImageUI::ExportExcel(const char * szOrgPatientName) {
 	CDuiString strText;
+
+	char szPatientName[256] = {0};
+	if ( 0 != szOrgPatientName && 0 != strcmp(szOrgPatientName, "--") ) {
+		STRNCPY(szPatientName, szOrgPatientName, sizeof(szPatientName));
+	}
 
 	if (!CExcel::IfExcelInstalled()) {
 		::MessageBox(g_data.m_hWnd, "没有检测到系统安装了excel", "保存excel", 0);
@@ -670,12 +675,17 @@ void  CMyImageUI::ExportExcel(const char * szPatientName) {
 	}
 }
 
-void  CMyImageUI::PrintExcel(char szReaderName[MAX_READERS_PER_GRID][64], const char * szPatientName) {
+void  CMyImageUI::PrintExcel(char szReaderName[MAX_READERS_PER_GRID][64], const char * szOrgPatientName) {
 	CDuiString strText;
 
 	if (!CExcelEx::IfExcelInstalled()) {
 		::MessageBox( g_data.m_hWnd, "没有检测到系统安装了excel", "保存excel", 0);
 		return;
+	}
+
+	char szPatientName[256] = { 0 };
+	if (0 != szOrgPatientName && 0 != strcmp(szOrgPatientName, "--")) {
+		STRNCPY(szPatientName, szOrgPatientName, sizeof(szPatientName));
 	}
 
 	DWORD  dwDataCnt = 0;
@@ -692,7 +702,7 @@ void  CMyImageUI::PrintExcel(char szReaderName[MAX_READERS_PER_GRID][64], const 
 	char szTime[256];
 	time_t now = time(0);
 	Date2String(szTime, sizeof(szTime), &now);
-	SNPRINTF(strFilename, sizeof(strFilename), "%s_%s", szPatientName, szTime);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s %s", szPatientName, szTime);
 
 	CExcelEx  excel;
 	vector<TempData *>::iterator it;
