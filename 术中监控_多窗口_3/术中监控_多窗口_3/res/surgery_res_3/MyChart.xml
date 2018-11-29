@@ -41,15 +41,18 @@
 			</HorizontalLayout>
 			
 			<VerticalLayout inset="10,0,10,0" >		
-				<VerticalLayout inset="0,0,0,0" hscrollbar="false" vscrollbar="false" sepheight="4" visible="false" >
+				<VerticalLayout inset="0,0,0,0" hscrollbar="false" vscrollbar="false" sepheight="4" visible="false" height="0" >
 					<MyImage name="my_image_1" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" menu="true" visible="false" />					
 				</VerticalLayout>
 				
 				<VerticalLayout>
-					<Control />
-					<Label   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center" height="170" />
-					<Control />
+					<Label   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
 				</VerticalLayout>
+				
+				<HorizontalLayout height="40">
+					<Control />
+					<Button  name="btnEmpty"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="清空" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="60" height="30" font="1" />
+				</HorizontalLayout>
 			</VerticalLayout>		
 		</VerticalLayout>
 		

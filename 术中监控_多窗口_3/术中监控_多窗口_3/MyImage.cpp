@@ -759,3 +759,9 @@ void  CMyImageUI::PrintExcel(char szReaderName[MAX_READERS_PER_GRID][64], const 
 	excel.PrintChartWithMultiSeries(s, MAX_READERS_PER_GRID, strFilename, 0, 0, TRUE, &dMin);
 	excel.Quit();
 }
+
+void  CMyImageUI::EmptyData() {
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		ClearVector(m_vTempData[i]);
+	}
+}

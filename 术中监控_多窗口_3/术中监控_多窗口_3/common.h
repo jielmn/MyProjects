@@ -115,7 +115,7 @@ using namespace DuiLib;
 #define   CFG_PATIENT_NAME              "patient name"
 #define   CFG_READER_NAME               "reader name"
 #define   CFG_TEMP_FONT                 "temperature font"
-#define   DEFAULT_TEMP_FONT             14 
+#define   DEFAULT_TEMP_FONT             13
 
 // ÆäËû
 #define   MAX_TEMPERATURE                42

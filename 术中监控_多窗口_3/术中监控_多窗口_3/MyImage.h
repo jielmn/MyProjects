@@ -56,5 +56,7 @@ public:
 
 	void  ExportExcel(const char * szPatientName);
 	void  PrintExcel(char szReaderName[MAX_READERS_PER_GRID][64], const char * szPatientName);
+
+	void  EmptyData();
 };
 

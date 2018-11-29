@@ -54,6 +54,7 @@ private:
 	DuiLib::CHorizontalLayoutUI *      m_layMaxium[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblIndex_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblIndex_maxium[MAX_GRID_COUNT];
+	CButtonUI *                        m_BtnEmpty[MAX_GRID_COUNT];
 	CButtonUI *                        m_BtnBed_grid[MAX_GRID_COUNT];
 	CEditUI *                          m_EdtBed_grid[MAX_GRID_COUNT];
 	CButtonUI *                        m_BtnName_grid[MAX_GRID_COUNT];
@@ -133,4 +134,6 @@ private:
 	void   OnExportExcel();
 	//
 	void   OnPrintExcel();
+	// Çå¿ÕÊý¾Ý
+	void   OnEmpty(TNotifyUI& msg);
 };

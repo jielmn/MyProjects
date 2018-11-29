@@ -50,7 +50,10 @@ void  CDuiFrameWnd::InitWindow() {
 		strText.Format("%lu", i + 1);
 		m_LblIndex_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_INDEX_NAME_GRID, 0));
 		m_LblIndex_grid[i]->SetTag(i);
-		m_LblIndex_grid[i]->SetText(strText);		
+		m_LblIndex_grid[i]->SetText(strText);	
+
+		m_BtnEmpty[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, "btnEmpty", 0));
+		m_BtnEmpty[i]->SetTag(i);
 
 		m_BtnBed_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_BED_NAME_GRID, 0));
 		m_BtnBed_grid[i]->SetTag(i);
@@ -259,6 +262,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
 			OnMyImageClick(msg.pSender->GetTag(),&pt);
 		}
+		else if (name == "btnEmpty") {
+			OnEmpty(msg);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -389,6 +395,7 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_pGrids[i]->SetBorderColor(g_data.m_skin[CMySkin::GRID_BORDER]);
 		m_LblIndex_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_LblIndex_maxium[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+		m_BtnEmpty[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_BtnBed_grid[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		m_EdtBed_grid[i]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
 		m_EdtBed_grid[i]->SetBkColor(g_data.m_skin[CMySkin::EDIT_BK]);
@@ -1091,6 +1098,20 @@ void   CDuiFrameWnd::OnPrintExcel() {
 		}
 	}
 	m_MyImage_max[m_dwInflateGridIndex]->PrintExcel(szReaderName, g_data.m_CfgData.m_GridCfg[m_dwInflateGridIndex].m_szName );
+}
+
+// 清空数据
+void   CDuiFrameWnd::OnEmpty(TNotifyUI& msg) {
+	if ( IDNO == ::MessageBox(this->GetHWND(), "确定要清空数据吗？", "清空数据", MB_YESNO | MB_DEFBUTTON2 )) {
+		return;
+	}
+
+	DWORD dwIndex = msg.pSender->GetTag();
+	m_MyImage_max[dwIndex]->EmptyData();
+
+	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+		OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
+	}	
 }
 
 
