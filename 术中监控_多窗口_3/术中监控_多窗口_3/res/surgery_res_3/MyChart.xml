@@ -51,7 +51,7 @@
 				
 				<HorizontalLayout height="40">
 					<Control />
-					<Button  name="btnEmpty"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="清空" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="60" height="30" font="1" />
+					<Button  name="btnEmpty"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" foreimage="file='trash2.png' dest='10,3,30,25'" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="40" height="30" font="1" />
 				</HorizontalLayout>
 			</VerticalLayout>		
 		</VerticalLayout>

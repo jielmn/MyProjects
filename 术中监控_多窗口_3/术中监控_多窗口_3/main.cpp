@@ -428,6 +428,27 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_MyImage_max[i]->SetBkColor(g_data.m_skin[CMySkin::MYIMAGE_BK]);
 		m_MyImage_max[i]->OnChangeSkin(); 
 
+		if ( m_eGridStatus == GRID_STATUS_GRIDS ) {
+			DWORD dwIndex = m_MyImage_max[i]->m_dwSelectedReaderIndex;
+			if (m_UiAlarms[i][dwIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP) {
+				m_LblCurTemp_grid1[i]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+			}
+			else if (m_UiAlarms[i][dwIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
+				m_LblCurTemp_grid1[i]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+			}
+			else if (m_UiAlarms[i][dwIndex]->m_alarm == CAlarmImageUI::DISCONNECTED) {
+				m_LblCurTemp_grid1[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+			}
+			else {
+				m_LblCurTemp_grid1[i]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+			}
+		}
+		
+		if (g_data.m_skin.GetSkin() == CMySkin::SKIN_WHITE)
+			m_BtnEmpty[i]->SetForeImage("file='trash1.png' dest='10,3,30,25'");
+		else if (g_data.m_skin.GetSkin() == CMySkin::SKIN_BLACK)
+			m_BtnEmpty[i]->SetForeImage("file='trash2.png' dest='10,3,30,25'");
+
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			m_UiBtnReaderNames[i][j]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 			m_UiEdtReaderNames[i][j]->SetTextColor(g_data.m_skin[CMySkin::EDIT_TEXT]);
