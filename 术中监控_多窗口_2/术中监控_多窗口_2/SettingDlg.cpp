@@ -301,7 +301,7 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 	}
 
 	DuiLib::CDuiString  strText;
-	DWORD dwCount = m_dwLayoutRows * m_dwLayoutColumns;
+	DWORD dwCount = MAX_GRID_COUNT;
 	for ( DWORD i = 0; i < dwCount; ++i ) {
 		if (m_dwBedNo[i] > 0) {
 			for (DWORD j = i + 1; j < dwCount; ++j) {
