@@ -442,7 +442,7 @@ void   CDuiFrameWnd::OnChangeSkin() {
 			else {
 				m_LblCurTemp_grid1[i]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
 			}
-		}
+		}                       
 		
 		if (g_data.m_skin.GetSkin() == CMySkin::SKIN_WHITE)
 			m_BtnEmpty[i]->SetForeImage("file='trash1.png' dest='10,3,30,25'");
@@ -1106,7 +1106,7 @@ void   CDuiFrameWnd::OnPrintExcel() {
 	assert(m_eGridStatus == GRID_STATUS_MAXIUM);
 	if (m_eGridStatus != GRID_STATUS_MAXIUM) {
 		return;
-	}
+	}              
 
 	char szReaderName[MAX_READERS_PER_GRID][64] = { 0 };
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {

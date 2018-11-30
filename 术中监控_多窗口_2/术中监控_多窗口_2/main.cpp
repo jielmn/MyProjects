@@ -677,7 +677,7 @@ void   CDuiFrameWnd::OnAbout() {
 
 	}
 
-	delete pAboutDlg;
+	delete pAboutDlg; 
 }
 
 void   CDuiFrameWnd::OnDbClick() {
