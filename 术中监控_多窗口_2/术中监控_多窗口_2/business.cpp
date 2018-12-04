@@ -1,4 +1,5 @@
 #include "business.h"
+#include "resource.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -270,6 +271,7 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 		return 0;
 	}
 
+#if 0
 	if (m_szAlarmFile[0] == '\0') {
 		// open
 		strText.Format("open %s", pParam->m_szAlarmFile);
@@ -294,6 +296,9 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 
 	}
 	strncpy_s(m_szAlarmFile, pParam->m_szAlarmFile, sizeof(m_szAlarmFile)); 
+#endif
+
+	PlaySound((LPCTSTR)IDR_WAVE1, GetModuleHandle(0), SND_RESOURCE | SND_ASYNC);
 	return 0;
 }
 

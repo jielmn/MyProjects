@@ -132,7 +132,8 @@
       <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\res ..\Release\res /dseiy</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -184,6 +185,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\res.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\res\1.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

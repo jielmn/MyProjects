@@ -36,7 +36,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager,this) {
 }
 
 void  CDuiFrameWnd::InitWindow() {
-	CDuiString strText;
+	CDuiString strText;	
 
 	g_hWnd = GetHWND();
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
