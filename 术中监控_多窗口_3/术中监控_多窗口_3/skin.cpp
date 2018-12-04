@@ -33,7 +33,7 @@ DWORD  CMySkin::operator [] (ENUM_UI eUI) const {
 			//return 0xFFFFFFFF;
 			return 0xFF4F4F4F;
 		case COMMON_TEXT:
-			return 0xFFFFFFFF;
+			return 0xFFCCCCCC;
 		case MYIMAGE_BK:
 			//return 0xFF192431;
 			return 0xFF434248;

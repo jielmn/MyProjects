@@ -22,7 +22,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
-
+       
 void  CDuiFrameWnd::InitWindow() {
 	CDuiString strText;
 	g_data.m_hWnd = GetHWND();
@@ -445,9 +445,9 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		}                       
 		
 		if (g_data.m_skin.GetSkin() == CMySkin::SKIN_WHITE)
-			m_BtnEmpty[i]->SetForeImage("file='trash1.png' dest='10,3,30,25'");
+			m_BtnEmpty[i]->SetForeImage("file='trash1.png' dest='10,5,30,25'");              
 		else if (g_data.m_skin.GetSkin() == CMySkin::SKIN_BLACK)
-			m_BtnEmpty[i]->SetForeImage("file='trash2.png' dest='10,3,30,25'");
+			m_BtnEmpty[i]->SetForeImage("file='trash2.png' dest='10,5,30,25'");
 
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			m_UiBtnReaderNames[i][j]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
@@ -705,16 +705,19 @@ void   CDuiFrameWnd::OnBtnBed_grid(TNotifyUI& msg) {
 }
 
 void   CDuiFrameWnd::OnEdtBedKillFocus_grid(TNotifyUI& msg) {
+	DuiLib::CDuiString  strDefault;	
 	int nIndex = msg.pSender->GetTag();
+	strDefault.Format("%02d", nIndex + 1);
+
 	STRNCPY( g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, msg.pSender->GetText(), MAX_BED_LENGTH);
-	if (0 == strcmp(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "--")) {
-		g_data.m_CfgData.m_GridCfg[nIndex].m_szBed[0] = '\0';
-	}
+	//if (0 == strcmp(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "--")) {
+	//	g_data.m_CfgData.m_GridCfg[nIndex].m_szBed[0] = '\0';
+	//}  
 
 	CDuiString  strText;
 	strText.Format(CFG_BED_NAME " %d", nIndex + 1);
-	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "");
-	g_data.m_cfg->Save();
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, strDefault);
+	g_data.m_cfg->Save();                      
 
 	msg.pSender->SetVisible(false);
 	m_BtnBed_grid[nIndex]->SetText(msg.pSender->GetText());

@@ -42,6 +42,7 @@ void CBusiness::Clear() {
 
 int CBusiness::Init() {
 	DuiLib::CDuiString  strText;
+	DuiLib::CDuiString  strDefault;
 
 	g_data.m_log = new FileLog();
 	if (0 == g_data.m_log) {
@@ -100,7 +101,8 @@ int CBusiness::Init() {
 		}
 
 		strText.Format("%s %lu", CFG_BED_NAME, i + 1);
-		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szBed, MAX_BED_LENGTH, "--" );
+		strDefault.Format("%02lu", i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szBed, MAX_BED_LENGTH, strDefault);
 
 		strText.Format("%s %lu", CFG_PATIENT_NAME, i + 1);
 		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szName, MAX_NAME_LENGTH, "--");
@@ -129,8 +131,9 @@ int CBusiness::Init() {
 			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, -1);
 
 			strText.Format("%s %lu %lu", CFG_READER_NAME, i + 1, j + 1);
+			strDefault.Format("¶Á¿¨Æ÷%02lu-%lu", i+1, j + 1);
 			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName, 
-				     sizeof(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName), "--");
+				     sizeof(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName), strDefault);
 		}
 	}
 
