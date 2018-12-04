@@ -1,5 +1,6 @@
 #include "business.h"
 #include "LmnTelSvr.h"
+#include "resource.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -184,7 +185,7 @@ int CBusiness::Init() {
 	}
 	g_thrd_work->Start();
 
-	g_thrd_launch = new LmnToolkits::PriorityThread();
+	g_thrd_launch = new LmnToolkits::SimThread();
 	if (0 == g_thrd_launch) {
 		return -1;
 	}
@@ -243,6 +244,7 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 		return 0;
 	}
 
+#if 0
 	if (m_szAlarmFile[0] == '\0') {
 		// open
 		strText.Format("open %s", pParam->m_szAlarmFile);
@@ -267,6 +269,9 @@ int   CBusiness::Alarm(const CAlarmParam * pParam) {
 
 	}
 	strncpy_s(m_szAlarmFile, pParam->m_szAlarmFile, sizeof(m_szAlarmFile));
+#endif
+
+	PlaySound((LPCTSTR)IDR_WAVE1, GetModuleHandle(0), SND_RESOURCE | SND_ASYNC);
 	return 0;
 }
 

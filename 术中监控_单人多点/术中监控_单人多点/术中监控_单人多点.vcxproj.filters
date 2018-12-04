@@ -82,4 +82,9 @@
   <ItemGroup>
     <None Include="res\single_patient_multi_points_res.zip" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\single_patient_multi_points_res\1.wav">
+      <Filter>资源文件</Filter>
+    </Media>
+  </ItemGroup>
 </Project>

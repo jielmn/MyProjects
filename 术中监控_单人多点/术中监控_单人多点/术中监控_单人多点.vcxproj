@@ -132,7 +132,8 @@
       <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib;Ws2_32.lib;Ole32.lib;OleAut32.lib;setupapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\single_patient_multi_points_res ..\Release\res\single_patient_multi_points_res /dseiy</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -182,6 +183,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\single_patient_multi_points_res.zip" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="res\single_patient_multi_points_res\1.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

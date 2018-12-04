@@ -87,7 +87,7 @@ using namespace DuiLib;
 #define   DEFAULT_LOWEST_TEMP            28
 #define   DEFAULT_MYIMAGE_LEFT_BLANK     50
 #define   DEFAULT_MYIMAGE_RIGHT_BLANK    100
-#define   DEFAULT_COLLECT_INTERVAL       60
+#define   DEFAULT_COLLECT_INTERVAL       10
 #define   DEFAULT_COLLECT_INTERVAL_WIDTH 100
 #define   DEFAULT_LOW_TEMP_ALARM         3500
 #define   DEFAULT_HIGH_TEMP_ALARM        4000
@@ -123,7 +123,7 @@ using namespace DuiLib;
 #define   READER_STATUS_CLOSE            0
 #define   READER_STATUS_OPEN             1
 #define   READ_LAUNCH_INTERVAL           1000
-#define   NEXT_HEART_BEAT_TIME           30000
+#define   NEXT_HEART_BEAT_TIME           10000
 
 #define MSG_UPDATE_SCROLL                 1001
 #define MSG_ALARM                         1002
