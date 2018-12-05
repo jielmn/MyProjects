@@ -54,18 +54,38 @@ void  CAlarmImageUI::StartAlarm(CAlarmImageUI::ENUM_ALARM e) {
 		return;
 	}
 
-	if (e == ALARM_OK) {
+	m_alarm = e;
+
+	if (m_alarm == ALARM_OK) {
 		StopAlarm();
 		return;
 	}
 
-	m_alarm = e;
-	m_bSetBkImage = TRUE;
-	m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
+	if (HIGH_TEMP == m_alarm) {
+		this->SetBkImage("");
+	}
+	else if (LOW_TEMP == m_alarm) {
+		this->SetBkImage("");
+	}
+	else if (DISCONNECTED == m_alarm) {
+		this->SetBkImage("alarm_fail_2.png");
+	}
+	else if (CHILD_ALARM == m_alarm) {
+		assert(0);
+		this->SetBkImage("alarm_fail_2.png");
+	}
+	else {
+		assert(0);
+		this->SetBkImage("");
+	}
+
+	//m_bSetBkImage = TRUE;
+	//m_pManager->SetTimer(this, MYIMAGE_TIMER_ID, 500);
 }
 
 void  CAlarmImageUI::StopAlarm() {
 	m_alarm = ALARM_OK;
 	this->SetBkImage("");
-	m_pManager->KillTimer(this, MYIMAGE_TIMER_ID);
+
+	//m_pManager->KillTimer(this, MYIMAGE_TIMER_ID);
 }
