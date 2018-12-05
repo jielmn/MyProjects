@@ -55,6 +55,10 @@ void  CDuiFrameWnd::InitWindow() {
 		m_BtnEmpty[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, "btnEmpty", 0));
 		m_BtnEmpty[i]->SetTag(i);
 
+		m_LblBodyPart[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, "lblBodyPart", 0));
+		m_LblBodyPart[i]->SetTag(i);
+		m_LblBodyPart[i]->SetText("A");
+
 		m_BtnBed_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_BED_NAME_GRID, 0));
 		m_BtnBed_grid[i]->SetTag(i);
 		m_BtnBed_grid[i]->SetVisible(true);
@@ -102,7 +106,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblCurTemp_grid1[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID1, 0));
 		m_LblCurTemp_grid1[i]->SetTag(i);
 		m_LblCurTemp_grid1[i]->SetText("--");
-		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);
+		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);		
 
 		m_LblBedTitle_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_BED_TITLE_GRID, 0));
 		m_LblBedTitle_grid[i]->SetTag(i);
@@ -166,6 +170,10 @@ void  CDuiFrameWnd::InitWindow() {
 			
 			m_UiReaderTemp[i][j] = static_cast<CLabelUI *>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, READER_TEMP_NAME, 0));
 			m_UiReaderTemp[i][j]->SetTag(MAKELONG(i, j));
+			if (g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch)
+				m_UiReaderTemp[i][j]->SetText("--");
+			else
+				m_UiReaderTemp[i][j]->SetText("");
 
 			m_UiBtnReaderNames[i][j] = static_cast<CButtonUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, BTN_READER_NAME, 0));
 			m_UiBtnReaderNames[i][j]->SetTag( MAKELONG(i, j) );
@@ -177,7 +185,6 @@ void  CDuiFrameWnd::InitWindow() {
 			m_UiAlarms[i][j]->SetTag(MAKELONG(i, j));
 
 			m_UiIndicator[i][j]->SetBkColor( g_data.m_skin.GetReaderIndicator(j) );
-			m_UiReaderTemp[i][j]->SetText("--");
 			m_UiBtnReaderNames[i][j]->SetText(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName);
 			m_UiReaderSwitch[i][j]->Selected(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch ? true : false);
 
@@ -198,9 +205,29 @@ void  CDuiFrameWnd::InitWindow() {
 		int nSelectedIndex = 0;
 		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
 			if (g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[k].m_bSwitch) {
+				nSelectedIndex = k;
 				m_MyImage_max[i]->OnReaderSelected(k);
-				m_MyImage_grid[i]->OnReaderSelected(k);
+				m_MyImage_grid[i]->OnReaderSelected(k);				
+				strText.Format("%c", 'A' + k);
+				m_LblBodyPart[i]->SetText(strText);
 				break;                               
+			}
+		}
+
+		if (!g_data.m_CfgData.m_GridCfg[i].m_bSwitch) {
+			m_LblCurTemp_grid1[i]->SetVisible(false);
+		}
+		else {
+			if ( nSelectedIndex >= MAX_READERS_PER_GRID ) {
+				m_LblCurTemp_grid1[i]->SetVisible(false);
+			}
+			else {
+				if (g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[nSelectedIndex].m_bSwitch) {
+					m_LblCurTemp_grid1[i]->SetVisible(true);
+				}
+				else {
+					m_LblCurTemp_grid1[i]->SetVisible(false);
+				}
 			}
 		}
 	} 
@@ -387,7 +414,7 @@ void   CDuiFrameWnd::ReLayout(DWORD dwWidth, DWORD dwHeight) {
 	}
 }
 
-void   CDuiFrameWnd::OnChangeSkin() {
+void   CDuiFrameWnd::OnChangeSkin() {    
 	m_layMain->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_MAIN_BK]);
 	m_layStatus->SetBkColor(g_data.m_skin[CMySkin::LABEL_STATUS_BK]);
 
@@ -762,6 +789,42 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_bSwitch, DEFAULT_READER_SWITCH);
 	g_data.m_cfg->Save();
 
+	DWORD  dwIndex         = nIndex;
+	DWORD  dwSelectedIndex = m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex;
+
+	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
+		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
+			m_UiReaderTemp[dwIndex][k]->SetVisible(false);
+		}
+	}
+	else {
+		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
+			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[k].m_bSwitch)
+			{
+				m_UiReaderTemp[dwIndex][k]->SetVisible(true);
+				m_UiReaderTemp[dwIndex][k]->SetText("--");
+			}
+			else
+			{
+				m_UiReaderTemp[dwIndex][k]->SetVisible(false);
+			}
+		}
+
+		if (dwSelectedIndex >= MAX_READERS_PER_GRID) {
+			m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		}
+		else {
+			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSelectedIndex].m_bSwitch) {
+				m_LblCurTemp_grid1[dwIndex]->SetVisible(true);
+				m_LblCurTemp_grid1[dwIndex]->SetText("--");
+			}
+			else {
+				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+			}
+		}
+	}
+
 	CDuiString name = msg.pSender->GetName();
 	if (name == OPT_GRID_SWITCH_GRID) {
 		m_OptGridSwitch_max[nIndex]->Selected(g_data.m_CfgData.m_GridCfg[nIndex].m_bSwitch ? true : false);
@@ -836,6 +899,35 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 	strText.Format("%s %lu %lu", CFG_READER_SWITCH, dwIndex + 1, dwSubIndex + 1);
 	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch, DEFAULT_READER_SWITCH);
 	g_data.m_cfg->Save();
+
+	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+	}
+	else {
+		if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch)
+		{
+			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(true);
+			m_UiReaderTemp[dwIndex][dwSubIndex]->SetText("--");
+		}
+		else
+		{
+			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+		}
+
+		DWORD  dwSelectedIndex = m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex;
+		if (dwSelectedIndex == dwSubIndex) {
+			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch)
+			{
+				m_LblCurTemp_grid1[dwIndex]->SetVisible(true);
+				m_LblCurTemp_grid1[dwIndex]->SetText("--");
+			}
+			else
+			{
+				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+			}
+		}
+	}
 }
 
 void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
@@ -929,6 +1021,7 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_MyImage_max[dwIndex]->OnReaderSelected(dwSubIndex);
 	m_MyImage_grid[dwIndex]->OnReaderSelected(dwSubIndex);
 
+	m_LblCurTemp_grid1[dwIndex]->SetVisible(m_UiReaderTemp[dwIndex][dwSubIndex]->IsVisible());
 	m_LblCurTemp_grid1[dwIndex]->SetText(m_UiReaderTemp[dwIndex][dwSubIndex]->GetText());
 	if ( m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
 		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
@@ -946,6 +1039,9 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 	}
 
+	CDuiString strText;
+	strText.Format("%c", 'A' + dwSubIndex);
+	m_LblBodyPart[dwIndex]->SetText(strText);
 	m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
 	m_MyImage_max[dwIndex]->MyInvalidate();
 	m_MyImage_grid[dwIndex]->MyInvalidate();  
@@ -1126,7 +1222,7 @@ void   CDuiFrameWnd::OnPrintExcel() {
 
 // 清空数据
 void   CDuiFrameWnd::OnEmpty(TNotifyUI& msg) {
-	if ( IDNO == ::MessageBox(this->GetHWND(), "确定要清空数据吗？", "清空数据", MB_YESNO | MB_DEFBUTTON2 )) {
+	if ( IDNO == ::MessageBox(this->GetHWND(), "确定要重置数据吗？", "重置数据", MB_YESNO | MB_DEFBUTTON2 )) {
 		return;
 	}
 

@@ -13,7 +13,7 @@
 			<Control />
 		</VerticalLayout>
 		
-		<Control width="10" />
+		<Control width="1" />
 		
 		<VerticalLayout width="105">
 			<Control />
@@ -25,7 +25,9 @@
 		</VerticalLayout>		
 		
 		<Control width="10" />
-		<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
+		<VerticalLayout width="250">
+			<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
+		</VerticalLayout>
 		
 		<VerticalLayout>
 			<Control />
