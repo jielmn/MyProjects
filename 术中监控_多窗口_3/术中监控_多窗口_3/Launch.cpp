@@ -183,7 +183,7 @@ int  CLaunch::ReadComData() {
 						g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "´íÎóµÄÊý¾ÝÎ²£º\n%s\n", debug_buf);
 
 						CloseLaunch();
-						CBusiness::GetInstance()->ReconnectLaunchAsyn(RECONNECT_LAUNCH_TIME_INTERVAL);
+						m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
 					}
 					else {
 						DWORD  dwBedNo = buf[2] * 256 + buf[3];

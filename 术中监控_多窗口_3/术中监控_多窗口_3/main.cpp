@@ -244,7 +244,7 @@ void  CDuiFrameWnd::InitWindow() {
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
 	WindowImplBase::InitWindow();
-}
+}  
 
 LRESULT CDuiFrameWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return WindowImplBase::OnCreate(uMsg, wParam, lParam, bHandled);
@@ -803,6 +803,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[k].m_bSwitch)
 			{
 				m_UiReaderTemp[dwIndex][k]->SetVisible(true);
+				m_UiReaderTemp[dwIndex][k]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 				m_UiReaderTemp[dwIndex][k]->SetText("--");
 			}
 			else
@@ -817,6 +818,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 		else {
 			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSelectedIndex].m_bSwitch) {
 				m_LblCurTemp_grid1[dwIndex]->SetVisible(true);
+				m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 				m_LblCurTemp_grid1[dwIndex]->SetText("--");
 			}
 			else {
@@ -909,6 +911,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 		{
 			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(true);
 			m_UiReaderTemp[dwIndex][dwSubIndex]->SetText("--");
+			m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		}
 		else
 		{
@@ -921,6 +924,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 			{
 				m_LblCurTemp_grid1[dwIndex]->SetVisible(true);
 				m_LblCurTemp_grid1[dwIndex]->SetText("--");
+				m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 			}
 			else
 			{
@@ -1021,23 +1025,24 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_MyImage_max[dwIndex]->OnReaderSelected(dwSubIndex);
 	m_MyImage_grid[dwIndex]->OnReaderSelected(dwSubIndex);
 
+	m_LblCurTemp_grid1[dwIndex]->SetTextColor(m_UiReaderTemp[dwIndex][dwSubIndex]->GetTextColor());
 	m_LblCurTemp_grid1[dwIndex]->SetVisible(m_UiReaderTemp[dwIndex][dwSubIndex]->IsVisible());
 	m_LblCurTemp_grid1[dwIndex]->SetText(m_UiReaderTemp[dwIndex][dwSubIndex]->GetText());
-	if ( m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
-		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
-	}
-	else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
-		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
-	}
-	else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::ALARM_OK) {
-		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
-	}
-	else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::DISCONNECTED) {
-		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-	}
-	else {
-		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-	}
+	//if ( m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
+	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+	//}
+	//else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
+	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	//}
+	//else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::ALARM_OK) {
+	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+	//}
+	//else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::DISCONNECTED) {
+	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	//}
+	//else {
+	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+	//}
 
 	CDuiString strText;
 	strText.Format("%c", 'A' + dwSubIndex);

@@ -135,7 +135,7 @@ using namespace DuiLib;
 #define   RECONNECT_LAUNCH_TIME_INTERVAL 30000
 #define   READER_STATUS_CLOSE            0
 #define   READER_STATUS_OPEN             1
-#define   WRITE_SLEEP_TIME               2000
+#define   WRITE_SLEEP_TIME               1100
 #define   READ_INTERVAL_TIME             1000
 
 // message
@@ -154,6 +154,7 @@ using namespace DuiLib;
 #define UM_READER_DISCONNECTED           (WM_USER+4)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
+#define GET_TEMPERATURE_TIMEOUT           10000
 
 // ¿‡
 typedef struct tagTempData {

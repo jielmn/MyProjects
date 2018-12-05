@@ -7,7 +7,7 @@
 			<Control />
 		</VerticalLayout>
 		
-		<VerticalLayout>
+		<VerticalLayout width="30">
 			<Control />
 			<Option width="30" height="30" name="opn_reader_switch" normalimage="not_checked_0.png" selectedimage="checked_0.png" selected="true" />
 			<Control />
@@ -25,15 +25,15 @@
 		</VerticalLayout>		
 		
 		<Control width="10" />
-		<VerticalLayout width="250">
-			<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
-		</VerticalLayout>
+		<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
+		<Control />
 		
-		<VerticalLayout>
+		<VerticalLayout width="30">
 			<Control />
 			<AlarmImage name="alarm_image" width="30" height="30" />
 			<Control />
 		</VerticalLayout>		
 		
+		<Control width="20" />
 	</HorizontalLayout>
 </Window>

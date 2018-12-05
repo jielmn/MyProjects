@@ -481,7 +481,7 @@ void  CBusiness::OnCheckReader() {
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			if ( m_reader_status[i][j].m_dwLastQueryTick > 0 ) {
 				// 如果超时
-				if ( dwCurTick - m_reader_status[i][j].m_dwLastQueryTick >= 5000 ) {
+				if ( dwCurTick - m_reader_status[i][j].m_dwLastQueryTick >= GET_TEMPERATURE_TIMEOUT) {
 					// 如果超时不超过3次，重新请求
 					if ( m_reader_status[i][j].m_dwTryCnt < 3 ) {
 						m_reader_status[i][j].m_dwLastQueryTick = 0;
