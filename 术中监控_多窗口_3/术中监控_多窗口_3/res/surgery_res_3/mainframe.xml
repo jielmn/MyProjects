@@ -61,7 +61,7 @@
 			<Label name="lblBarTips"  text=""  font="1" textcolor="#FFCAF100" width="450"  />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="20" />
-			<Label name="lblProcessTips"  text=""  font="1" textcolor="#FFCAF100"  />
+			<Label name="lblProcessTips"  text=""  font="1" textcolor="#FFFFFFFF"  />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="10" />
 		</HorizontalLayout>

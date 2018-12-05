@@ -33,6 +33,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_STATUS_NAME));
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblBarTips"));
 	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
+	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -367,6 +368,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		OnMyDeviceChanged();
+	}
+	else if (uMsg == UM_READER_PROCESSING) {
+		OnReaderProcessing(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -1095,6 +1099,7 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
 	}
 	else {
 		m_lblLaunchStatus->SetText("发射器连接断开");
+		m_lblProcTips->SetText("");
 
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
 			for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
@@ -1123,6 +1128,8 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
 	strText.Format("%.2f", lParam / 100.0);
 	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
+
+	m_lblProcTips->SetText("");
 }
 
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
@@ -1138,6 +1145,8 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 		m_LblCurTemp_grid1[dwIndex]->SetText("--");
 		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 	}
+
+	m_lblProcTips->SetText("");
 }
 
 void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
@@ -1237,6 +1246,15 @@ void   CDuiFrameWnd::OnEmpty(TNotifyUI& msg) {
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
 		OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
 	}	
+}
+
+void   CDuiFrameWnd::OnReaderProcessing(WPARAM wParam, LPARAM  lParam) {
+	WORD  dwIndex = LOWORD(wParam);
+	DWORD  dwSubIndex = HIWORD(wParam);
+	DuiLib::CDuiString  strText;
+
+	strText.Format("\"%s%c\"读卡器正在测温......", g_data.m_CfgData.m_GridCfg[dwIndex].m_szBed, dwSubIndex + 'A');
+	m_lblProcTips->SetText(strText);
 }
 
 

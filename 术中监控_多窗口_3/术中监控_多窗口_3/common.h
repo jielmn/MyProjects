@@ -152,9 +152,10 @@ using namespace DuiLib;
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
 #define UM_READER_TEMP                   (WM_USER+3)
 #define UM_READER_DISCONNECTED           (WM_USER+4)
+#define UM_READER_PROCESSING             (WM_USER+5)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
-#define GET_TEMPERATURE_TIMEOUT           10000
+#define GET_TEMPERATURE_TIMEOUT           2000
 
 // ¿‡
 typedef struct tagTempData {

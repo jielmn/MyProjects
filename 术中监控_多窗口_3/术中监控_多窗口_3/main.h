@@ -49,6 +49,7 @@ private:
 	DuiLib::CHorizontalLayoutUI *      m_layStatus;
 	CLabelUI *                         m_lblLaunchStatus;
 	CLabelUI *                         m_lblBarTips;
+	CLabelUI *                         m_lblProcTips;
 	CControlUI *                       m_pGrids[MAX_GRID_COUNT];
 	DuiLib::CVerticalLayoutUI *        m_layGrid[MAX_GRID_COUNT];
 	DuiLib::CHorizontalLayoutUI *      m_layMaxium[MAX_GRID_COUNT];
@@ -137,4 +138,6 @@ private:
 	void   OnPrintExcel();
 	// Çå¿ÕÊý¾Ý
 	void   OnEmpty(TNotifyUI& msg);
+	//
+	void   OnReaderProcessing(WPARAM wParam, LPARAM  lParam);
 };

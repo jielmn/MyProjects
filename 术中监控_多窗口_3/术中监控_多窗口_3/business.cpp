@@ -412,10 +412,31 @@ int   CBusiness::GetTemperature(CTemperatureParam * pParam) {
 		return 0;
 	}
 	
+	// 通知界面, Reader disconnected
+	::PostMessage(g_data.m_hWnd, UM_READER_PROCESSING, MAKELONG(dwIndex, dwSubIndex), 0);
+
 	// 如果本Reader开关打开
 	m_reader_status[dwIndex][dwSubIndex].m_dwLastQueryTick = LmnGetTickCount();
 	m_launch.QueryTemperature( g_data.m_CfgData.m_dwAreaNo, 
 		                       g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwBed );
+
+	while ( m_launch.GetStatus() == CLmnSerialPort::OPEN ) {
+		m_launch.ReadComData();
+
+		if ( !m_reader_status[dwIndex][dwSubIndex].m_bChecked ) {
+			// 一次测量超时结束
+			if (m_reader_status[dwIndex][dwSubIndex].m_dwLastQueryTick == 0) {
+				m_reader_status[dwIndex][dwSubIndex].m_dwLastQueryTick = LmnGetTickCount();
+				m_launch.QueryTemperature(g_data.m_CfgData.m_dwAreaNo,
+					g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwBed);
+			}
+		}
+		else {
+			break;
+		}		
+		LmnSleep(200);
+	}
+	
 	return 0;
 }
 
@@ -431,7 +452,7 @@ int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 }
 
 int   CBusiness::ReadLaunch() {
-	m_launch.ReadComData();
+	// m_launch.ReadComData();
 	ReadLaunchAsyn(READ_INTERVAL_TIME);
 	return 0;
 }
@@ -486,7 +507,7 @@ void  CBusiness::OnCheckReader() {
 					if ( m_reader_status[i][j].m_dwTryCnt < 3 ) {
 						m_reader_status[i][j].m_dwLastQueryTick = 0;
 						m_reader_status[i][j].m_dwTryCnt++;
-						GetTemperatureAsyn(i, j, 100);
+						// GetTemperatureAsyn(i, j, 100);
 					}
 					// 认为失败
 					else {
