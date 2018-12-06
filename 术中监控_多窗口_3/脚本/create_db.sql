@@ -1,0 +1,27 @@
+use mysql;
+update user set host = '%' where user = 'root';
+flush privileges;
+
+drop database if exists surgery;
+create database  surgery;
+use surgery;
+
+create table bindings
+(
+	tag_id         varchar(16) not null primary key,
+	patient_name   VARCHAR(16) not null,
+	tag_name       varchar(16) not null
+) DEFAULT CHARSET=utf8;
+
+create table  temperature (
+	id            int NOT NULL primary key AUTO_INCREMENT,
+	tag_id        varchar(16) not null,
+	reader_id     varchar(20) not null,
+	collect_time  timestamp not null,
+	temperature   int not null
+) DEFAULT CHARSET=utf8;
+
+
+
+
+
