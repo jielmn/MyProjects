@@ -14,7 +14,8 @@ create table bindings
 (
 	tag_id         varchar(16) not null primary key,
 	patient_name   VARCHAR(16) not null,
-	tag_name       varchar(16) not null
+	tag_name       varchar(16) not null,
+	grid_index     int not null
 ) DEFAULT CHARSET=utf8;
 
 create table  temperature (
