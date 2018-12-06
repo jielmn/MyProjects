@@ -55,13 +55,16 @@
 	
 		<!-- 状态栏 -->
 		<HorizontalLayout name="layStatus" height="30" bkcolor="#FF3A4F67" inset="10,3,10,3">
-			<Label name="lblLaunchStatus"  text="发射器连接断开"  font="1" textcolor="#FFFFFFFF" width="300" />
+			<Label name="lblLaunchStatus"  text="发射器连接断开"  font="1" textcolor="#FFFFFFFF" width="130" />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="20" />
-			<Label name="lblBarTips"  text=""  font="1" textcolor="#FFCAF100" width="450"  />
+			<Label name="lblBarTips"  text=""  font="1" textcolor="#FFF8992F" width="450"  />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="20" />
-			<Label name="lblProcessTips"  text=""  font="1" textcolor="#FFFFFFFF"  />
+			<Label name="lblDbTips"  text="数据库连接断开"  font="1" textcolor="#FFFFFFFF" width="150"  />			
+			<Control width="1" bkimage="sep.png" />
+			<Control width="20" />
+			<Label name="lblProcessTips"  text=""  font="1" textcolor="#FFCAF100"  />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="10" />
 		</HorizontalLayout>

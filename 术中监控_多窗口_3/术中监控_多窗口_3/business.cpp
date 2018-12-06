@@ -421,6 +421,11 @@ int   CBusiness::GetTemperature(CTemperatureParam * pParam) {
 		                       g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwBed );
 
 	while ( m_launch.GetStatus() == CLmnSerialPort::OPEN ) {
+		DWORD  dwCnt = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+		if ( dwIndex >= dwCnt ) {
+			break;
+		}
+
 		m_launch.ReadComData();
 
 		if ( !m_reader_status[dwIndex][dwSubIndex].m_bChecked ) {

@@ -1059,6 +1059,15 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 }
 
 void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
+	// 如果开关没有打开
+	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
+		return;
+	}
+
+	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch ) {
+		return;
+	}
+
 	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 
@@ -1191,7 +1200,7 @@ void   CDuiFrameWnd::OnMyDeviceChanged() {
 	}
 
 	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
-}
+}    
 
 //
 void  CDuiFrameWnd::OnMyImageClick(DWORD dwIndex,const POINT * pPoint) {

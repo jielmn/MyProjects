@@ -47,6 +47,8 @@
 							<HorizontalLayout />
 						</VerticalLayout>
 						
+						<VerticalLayout />
+						
 						<VerticalLayout width="30" >
 							<HorizontalLayout />
 							<HorizontalLayout height="30">																
