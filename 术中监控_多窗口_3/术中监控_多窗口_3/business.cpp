@@ -131,7 +131,7 @@ int CBusiness::Init() {
 			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwBed, -1);
 
 			strText.Format("%s %lu %lu", CFG_READER_NAME, i + 1, j + 1);
-			strDefault.Format("¶Á¿¨Æ÷%02lu-%lu", i+1, j + 1);
+			strDefault.Format("¶Á¿¨Æ÷%02lu%c", i+1, j + 'A');
 			g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName, 
 				     sizeof(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName), strDefault);
 		}
@@ -338,7 +338,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 		DWORD  dwDelay = 200;
 		for ( DWORD i = 0; i < dwCount; i++ ) {
 			GetGridTemperatureAsyn(i,dwDelay);
-			dwDelay += 2000;
+			dwDelay += 200;
 		}		
 		ReadLaunchAsyn(1000);
 	}

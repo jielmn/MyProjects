@@ -986,8 +986,10 @@ void   CDuiFrameWnd::OnEdtReaderNameKillFocus(TNotifyUI& msg) {
 		     sizeof(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName));
 
 	CDuiString  strText;
-	strText.Format(CFG_READER_NAME " %lu %lu", dwIndex + 1, dwSubIndex + 1);
-	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName, "");
+	CDuiString  strDefault;
+	strText.Format(CFG_READER_NAME " %lu %lu", dwIndex + 1, dwSubIndex + 1);    
+	strDefault.Format("¶Á¿¨Æ÷%02lu%c", dwIndex + 1, dwSubIndex + 'A');
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName, strDefault);
 	g_data.m_cfg->Save();
 
 	msg.pSender->SetVisible(false);
