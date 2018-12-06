@@ -1,5 +1,9 @@
 use mysql;
-update user set host = '%' where user = 'root';
+
+set @cnt = 0;
+select count(*) into @cnt from user where user = 'root' and host = '%';
+update user set host = '%' where user = 'root' and @cnt = 0;
+
 flush privileges;
 
 drop database if exists surgery;
