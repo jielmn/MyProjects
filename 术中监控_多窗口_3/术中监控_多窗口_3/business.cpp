@@ -1,5 +1,6 @@
 #include "business.h"
 #include "LmnTelSvr.h"
+#include "resource.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -290,6 +291,7 @@ int   CBusiness::Alarm() {
 		return 0;
 	}
 
+#if 0
 	if ( m_szAlarmFile[0] != '\0' ) {
 		// stop
 		strText.Format("close %s", m_szAlarmFile);
@@ -303,6 +305,9 @@ int   CBusiness::Alarm() {
 		strText.Format("play %s", m_szAlarmFile);
 		mciSendString(strText, NULL, 0, 0);
 	}
+#endif
+
+	PlaySound((LPCTSTR)IDR_WAVE1, GetModuleHandle(0), SND_RESOURCE | SND_ASYNC);
 	return 0;
 }
 
