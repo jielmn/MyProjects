@@ -17,6 +17,7 @@
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_eGridStatus = GRID_STATUS_GRIDS;
 	m_dwInflateGridIndex = -1;
+	memset(m_dwLastTemp, 0, sizeof(m_dwLastTemp));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -801,6 +802,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
 			m_UiReaderTemp[dwIndex][k]->SetVisible(false);
+			m_dwLastTemp[dwIndex][k] = 0;
 		}
 	}
 	else {
@@ -814,6 +816,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 			else
 			{
 				m_UiReaderTemp[dwIndex][k]->SetVisible(false);
+				m_dwLastTemp[dwIndex][k] = 0;
 			}
 		}
 
@@ -911,6 +914,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 
 	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
 		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+		m_dwLastTemp[dwIndex][dwSubIndex] = 0;
 		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 	}
@@ -924,6 +928,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 		else
 		{
 			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+			m_dwLastTemp[dwIndex][dwSubIndex] = 0;
 		}
 
 		DWORD  dwSelectedIndex = m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex;
@@ -955,7 +960,7 @@ void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
 	}	
 #endif
 }
-
+    
 void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
 	// 如果正在编辑Remark,停止自动更新滚动条
 	if ( !g_data.m_bAutoScroll ) {
@@ -1073,6 +1078,8 @@ void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
 		return;
 	}
 
+	m_dwLastTemp[dwIndex][dwSubIndex] = dwTemp;
+
 	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 
@@ -1149,17 +1156,55 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 }
 
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
+	DuiLib::CDuiString  strText;
+
 	DWORD  dwIndex = LOWORD(wParam);
 	DWORD  dwSubIndex = HIWORD(wParam);
 	m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
-	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText("--");
-	m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+
+	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+	}
+	else {
+		if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
+			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(true);
+			if (m_dwLastTemp[dwIndex][dwSubIndex] == 0) {
+				m_UiReaderTemp[dwIndex][dwSubIndex]->SetText("--");
+				m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);				
+			}
+			else {
+				strText.Format("--/%.2f", m_dwLastTemp[dwIndex][dwSubIndex] / 100.0);
+				m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
+			}
+		}
+		else {
+			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+		}
+	}
 
 	if (dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex) {
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
-		m_LblCurTemp_grid[dwIndex]->SetText("--");
-		m_LblCurTemp_grid1[dwIndex]->SetText("--");
-		m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+		m_LblCurTemp_grid[dwIndex]->SetText("--");		
+
+		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
+			m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		}
+		else {
+			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
+				m_LblCurTemp_grid1[dwIndex]->SetVisible(true);
+				if (m_dwLastTemp[dwIndex][dwSubIndex] == 0) {
+					m_LblCurTemp_grid1[dwIndex]->SetText("--");
+					m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
+				}
+				else {
+					strText.Format("--/%.2f", m_dwLastTemp[dwIndex][dwSubIndex] / 100.0);
+					m_LblCurTemp_grid1[dwIndex]->SetText(strText);
+				}
+			}
+			else {
+				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+			}
+		}
 	}
 
 	m_lblProcTips->SetText("");

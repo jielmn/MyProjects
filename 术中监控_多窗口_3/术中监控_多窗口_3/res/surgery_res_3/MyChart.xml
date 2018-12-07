@@ -4,7 +4,7 @@
 	
 		<!-- 1 -->
 		<VerticalLayout name="lay_1" visible="true">
-			<HorizontalLayout height="74" name="layFlex" >
+			<HorizontalLayout height="54" name="layFlex" >
 				<VerticalLayout>			
 					<HorizontalLayout inset="5,2,5,2"  >						
 						<Label   name="lblIndex_1" text="1"    textcolor="#FFFFFFFF" width="100" font="7" visible="false" />	

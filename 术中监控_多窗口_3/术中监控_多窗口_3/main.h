@@ -89,6 +89,7 @@ private:
 	DuiLib::CButtonUI *                m_btnMenu;    // ²Ëµ¥°´Å¥	
 	ENUM_GRID_STATUS                   m_eGridStatus;
 	DWORD                              m_dwInflateGridIndex;
+	DWORD                              m_dwLastTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
