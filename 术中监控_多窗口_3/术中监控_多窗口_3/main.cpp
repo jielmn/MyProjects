@@ -1305,6 +1305,7 @@ void   CDuiFrameWnd::OnEmpty(TNotifyUI& msg) {
 	m_MyImage_max[dwIndex]->EmptyData();
 
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+		m_dwLastTemp[dwIndex][i] = 0;
 		OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
 	}	
 }
