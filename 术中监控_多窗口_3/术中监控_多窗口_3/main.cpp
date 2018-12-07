@@ -798,6 +798,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 
 	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
 		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
 			m_UiReaderTemp[dwIndex][k]->SetVisible(false);
 		}
@@ -818,6 +819,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 
 		if (dwSelectedIndex >= MAX_READERS_PER_GRID) {
 			m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+			m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		}
 		else {
 			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSelectedIndex].m_bSwitch) {
@@ -827,6 +829,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 			}
 			else {
 				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+				m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 			}
 		}
 	}
@@ -909,6 +912,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
 		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
 		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 	}
 	else {
 		if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch)
@@ -933,6 +937,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 			else
 			{
 				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+				m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 			}
 		}
 	}
