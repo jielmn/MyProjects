@@ -151,12 +151,14 @@ using namespace DuiLib;
 #define MSG_READ_LAUNCH                  1006
 #define MSG_GET_GRID_TEMP                1007
 #define MSG_CHECK_LAUNCH_STATUS          1008
+#define MSG_RECONNECT_DB                 1009
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
 #define UM_READER_TEMP                   (WM_USER+3)
 #define UM_READER_DISCONNECTED           (WM_USER+4)
 #define UM_READER_PROCESSING             (WM_USER+5)
+#define UM_DB_STATUS                     (WM_USER+6)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
@@ -302,9 +304,9 @@ extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
 extern LmnToolkits::Thread *  g_thrd_work;
 extern LmnToolkits::Thread *  g_thrd_launch;
+extern LmnToolkits::Thread *  g_thrd_db;
 extern DuiLib::CEditUI * g_edRemark;
 extern DWORD g_dwPrintExcelMaxPointsCnt;
-extern MYSQL g_mysql;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);

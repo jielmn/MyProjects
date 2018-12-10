@@ -19,6 +19,8 @@ CBusiness::CBusiness() {
 
 	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
 	memset(m_reader_status, 0, sizeof(m_reader_status));
+
+	m_db.m_sigStatus.connect(this, &CBusiness::OnDbStatus);
 }
 
 CBusiness::~CBusiness() {
@@ -220,25 +222,14 @@ int CBusiness::Init() {
 	g_data.m_dwCollectIntervalWidth = DEFAULT_COLLECT_INTERVAL;
 	memcpy(g_data.m_argb, g_default_argb, sizeof(ARGB) * MAX_READERS_PER_GRID);
 
-	GetDefaultAlarmFile(m_szAlarmFile, sizeof(m_szAlarmFile));
+	GetDefaultAlarmFile(m_szAlarmFile, sizeof(m_szAlarmFile));	
 
-	//初始化mysql结构
-	mysql_init(&g_mysql);
-
-	g_data.m_cfg->GetConfig("mysql host", g_data.m_szDbHost, sizeof(g_data.m_szDbHost), "localhost");
-	g_data.m_cfg->GetConfig("mysql user", g_data.m_szDbUser, sizeof(g_data.m_szDbUser), "root");
-	g_data.m_cfg->GetConfig("mysql pwd",  buf,  sizeof(buf),  "" );
+	g_data.m_cfg->GetConfig("mysql host",      g_data.m_szDbHost, sizeof(g_data.m_szDbHost), "localhost");
+	g_data.m_cfg->GetConfig("mysql user",      g_data.m_szDbUser, sizeof(g_data.m_szDbUser), "root");
+	g_data.m_cfg->GetConfig("mysql password",  buf,  sizeof(buf),  "" );
 
 	DWORD  dwPwdLen = sizeof(g_data.m_szDbPwd);
-	MyDecrypt( buf, g_data.m_szDbPwd, dwPwdLen );
-
-	/*	my_bool reconnect = 0;
-		mysql_options(&g_mysql, MYSQL_OPT_RECONNECT, &reconnect);
-
-		if ( !mysql_real_connect(&g_mysql, g_data.m_szDbHost, g_data.m_szDbUser, g_data.m_szDbPwd, "surgery", 3306, NULL, 0) )
-		{
-			g_data.m_log->Output( ILog::LOG_SEVERITY_ERROR, "连接数据库失败\n" );
-		}*/
+	MyDecrypt( buf, g_data.m_szDbPwd, dwPwdLen );	
 
 	// 线程
 	g_thrd_work = new LmnToolkits::PriorityThread();
@@ -253,6 +244,11 @@ int CBusiness::Init() {
 	}
 	g_thrd_launch->Start();
 
+	g_thrd_db = new LmnToolkits::Thread();
+	if (0 == g_thrd_db) {
+		return -1;
+	}
+	g_thrd_db->Start();
 
 	//ReconnectLaunchAsyn(200);
 
@@ -273,10 +269,13 @@ int CBusiness::DeInit() {
 		g_thrd_launch = 0;
 	}
 
-	Clear();
+	if (g_thrd_db) {
+		g_thrd_db->Stop();
+		delete g_thrd_db;
+		g_thrd_db = 0;
+	}
 
-	//释放数据库
-	mysql_close(&g_mysql); 
+	Clear();	
 	return 0;
 }
 
@@ -569,6 +568,27 @@ int   CBusiness::CheckLaunchStatus() {
 	return 0;
 }
 
+// 连接数据库
+int   CBusiness::ReconnectDbAsyn(DWORD dwDelay /*= 0*/) {
+	g_thrd_db->DeleteMessages();
+	if (0 == dwDelay) {
+		g_thrd_db->PostMessage( this, MSG_RECONNECT_DB );
+	}
+	else {
+		g_thrd_db->PostDelayMessage( dwDelay, this, MSG_RECONNECT_DB);
+	}
+	return 0;
+}
+
+int   CBusiness::ReconnectDb() {
+	m_db.Reconnect();
+	return 0;
+}
+
+void   CBusiness::OnDbStatus(int nDbStatus) {
+	::PostMessage(g_data.m_hWnd, UM_DB_STATUS, (WPARAM)nDbStatus, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -625,7 +645,42 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_RECONNECT_DB: 
+	{
+		ReconnectDb();
+	}
+	break;
+
 	default:
 		break;
 	}
+}
+
+CMyDb::CMyDb() {
+	//初始化mysql结构
+	mysql_init(&m_mysql);
+	m_nStatus = 0;
+}
+
+CMyDb::~CMyDb() {
+	//释放数据库
+	mysql_close(&m_mysql);
+}
+
+int CMyDb::Reconnect() {
+
+	if (!mysql_real_connect(&m_mysql, g_data.m_szDbHost, g_data.m_szDbUser, g_data.m_szDbPwd, "surgery", 3306, NULL, 0))
+	{
+		m_nStatus = 0;
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "连接数据库失败\n");
+	}
+	else {
+		m_nStatus = 1;
+		char reconnect = 1;
+		mysql_options( &m_mysql, MYSQL_OPT_RECONNECT, (char *)&reconnect );
+	}
+
+	m_sigStatus.emit(m_nStatus);
+
+	return 0;
 }

@@ -12,9 +12,9 @@ std::vector<TArea *>  g_vArea;
 ARGB g_default_argb[MAX_READERS_PER_GRID] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0xFF51786C, 0xFFFFFF00, 0xFFCA5100 };
 LmnToolkits::Thread *  g_thrd_work = 0;
 LmnToolkits::Thread *  g_thrd_launch = 0;
+LmnToolkits::Thread *  g_thrd_db = 0;
 DuiLib::CEditUI * g_edRemark = 0;
 DWORD g_dwPrintExcelMaxPointsCnt = 0;
-MYSQL g_mysql;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;

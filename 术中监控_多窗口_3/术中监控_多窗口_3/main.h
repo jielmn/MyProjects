@@ -92,6 +92,8 @@ private:
 	DWORD                              m_dwInflateGridIndex;
 	LastTemp                           m_tLastTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
+	CLabelUI *                         m_LblDbStatus;
+
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
 	// 重新布局
@@ -143,4 +145,6 @@ private:
 	void   OnEmpty(TNotifyUI& msg);
 	//
 	void   OnReaderProcessing(WPARAM wParam, LPARAM  lParam);
+	//
+	void   OnDbStatus(int nStatus);
 };

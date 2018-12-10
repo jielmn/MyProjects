@@ -36,6 +36,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblBarTips"));
 	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
 	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
+	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -252,6 +253,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
+
+	CBusiness::GetInstance()->ReconnectDbAsyn();
 	WindowImplBase::InitWindow();
 }  
 
@@ -382,6 +385,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_READER_PROCESSING) {
 		OnReaderProcessing(wParam, lParam);
+	}
+	else if (uMsg == UM_DB_STATUS) {
+		OnDbStatus(wParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -1349,6 +1355,16 @@ void   CDuiFrameWnd::OnUpdateTimeDescTimer( ) {
 				m_LblCurTempTime[i]->SetText( buf );
 			}
 		}
+	}
+}
+
+//
+void   CDuiFrameWnd::OnDbStatus(int nStatus) {
+	if (0 == nStatus) {
+		m_LblDbStatus->SetText("数据库连接断开");
+	}
+	else {
+		m_LblDbStatus->SetText("数据库连接OK");
 	}
 }
 

@@ -6,6 +6,20 @@
 #include "sigslot.h"
 #include "Launch.h"
 
+class  CMyDb {
+public:
+	CMyDb();
+	~CMyDb();
+
+	int Reconnect();
+
+	sigslot::signal1<int>     m_sigStatus;
+
+private:
+	MYSQL   m_mysql;
+	int     m_nStatus;    //0: 关闭;    1: 打开
+};
+
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
 public:
@@ -52,6 +66,12 @@ public:
 	int   CheckLaunchStatusAsyn();
 	int   CheckLaunchStatus();
 
+	// 连接数据库
+	int   ReconnectDbAsyn(DWORD dwDelay = 0);
+	int   ReconnectDb();
+	// 0: 关闭;  1: 打开
+	void  OnDbStatus(int nDbStatus);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -65,6 +85,7 @@ private:
 	char              m_szAlarmFile[256];
 	CLaunch           m_launch;
 	ReaderStatus      m_reader_status[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CMyDb             m_db;
 };
 
 
