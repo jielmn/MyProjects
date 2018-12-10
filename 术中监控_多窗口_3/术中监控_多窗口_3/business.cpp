@@ -44,6 +44,7 @@ void CBusiness::Clear() {
 int CBusiness::Init() {
 	DuiLib::CDuiString  strText;
 	DuiLib::CDuiString  strDefault;
+	char buf[8192];
 
 	g_data.m_log = new FileLog();
 	if (0 == g_data.m_log) {
@@ -221,6 +222,24 @@ int CBusiness::Init() {
 
 	GetDefaultAlarmFile(m_szAlarmFile, sizeof(m_szAlarmFile));
 
+	//初始化mysql结构
+	mysql_init(&g_mysql);
+
+	g_data.m_cfg->GetConfig("mysql host", g_data.m_szDbHost, sizeof(g_data.m_szDbHost), "localhost");
+	g_data.m_cfg->GetConfig("mysql user", g_data.m_szDbUser, sizeof(g_data.m_szDbUser), "root");
+	g_data.m_cfg->GetConfig("mysql pwd",  buf,  sizeof(buf),  "" );
+
+	DWORD  dwPwdLen = sizeof(g_data.m_szDbPwd);
+	MyDecrypt( buf, g_data.m_szDbPwd, dwPwdLen );
+
+	/*	my_bool reconnect = 0;
+		mysql_options(&g_mysql, MYSQL_OPT_RECONNECT, &reconnect);
+
+		if ( !mysql_real_connect(&g_mysql, g_data.m_szDbHost, g_data.m_szDbUser, g_data.m_szDbPwd, "surgery", 3306, NULL, 0) )
+		{
+			g_data.m_log->Output( ILog::LOG_SEVERITY_ERROR, "连接数据库失败\n" );
+		}*/
+
 	// 线程
 	g_thrd_work = new LmnToolkits::PriorityThread();
 	if (0 == g_thrd_work) {
@@ -255,6 +274,9 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+
+	//释放数据库
+	mysql_close(&g_mysql); 
 	return 0;
 }
 

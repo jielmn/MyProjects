@@ -24,6 +24,9 @@ static LmnToolkits::Thread *  g_thrd = 0;
 static  CLmnSerialPort    g_com;
 static  CDataBuf          g_buf;
 
+static  BYTE  g_ReaderId[180][11] = { 0 };
+static  BYTE  g_TagId[180][8] = { 0 };
+
 void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData) {
 	if ( dwMessageId == MSG_CONNECT ) {
 		if ( g_com.GetStatus() == CLmnSerialPort::OPEN ) {
@@ -82,6 +85,13 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 					byData[25] = (BYTE)(( dwTemp / 100 ) % 10);
 					byData[26] = (BYTE)(( dwTemp / 10) % 10);
 					byData[27] = (BYTE)(dwTemp  % 10);
+
+					if ( byBed <= 180 && byBed > 0 ) {
+						memcpy(byData + 5,  g_ReaderId[byBed], 11);
+						memcpy(byData + 16, g_TagId[byBed], 8);
+					}
+
+
 					g_com.Write(byData, dwWriteLen);
 				}
 			}
@@ -140,6 +150,14 @@ DWORD SelectChoice (ConsoleMenuHandle hMenu, const void * pArg, const char * szC
 int main() {
 	LmnToolkits::ThreadManager::GetInstance();
 	InitRand(TRUE,1);
+
+	for ( int i = 0; i < 180; i++ ) {
+		memcpy(g_ReaderId[i], "\x45\x52\x00\x00\x04\x00\x00\x00\x00\x00\x01", 11);
+		g_ReaderId[i][10] = (BYTE)(i + 1);
+
+		memcpy(g_TagId[i], "\xe0\x29\x00\x00\x00\x00\x00\x00", 8);
+		g_TagId[i][7] = (BYTE)(i + 1);
+	}
 
 	TConsoleMenuItem  item[3];
 	STRNCPY(item[0].szName, "1.¿ªÊ¼Ä£Äâ", sizeof(item[0].szName));
