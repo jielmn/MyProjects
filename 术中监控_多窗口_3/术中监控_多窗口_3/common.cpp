@@ -414,3 +414,30 @@ char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d年%02d月%02d日", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday);
 	return szDest;
 }
+
+char * GetElapsedTimeDesc(char * buf, DWORD dwBufSize, time_t  tTimeDiff) {
+	if ( 0 == buf || dwBufSize == 0 ) {
+		return 0;
+	}
+
+	assert( tTimeDiff >= 0 );
+	if ( tTimeDiff < 0 ) {
+		buf[0] = '\0';
+		return buf;
+	}
+
+	if (tTimeDiff < 30) {
+		SNPRINTF(buf, dwBufSize, "刚刚");
+	}
+	else if ( tTimeDiff < 60 ) {
+		SNPRINTF(buf, dwBufSize, "半分钟前");
+	}
+	else if (tTimeDiff >= 3600 ) {
+		SNPRINTF(buf, dwBufSize, "%lu小时前", (DWORD)(( tTimeDiff - 3600 ) / 3600 + 1) );
+	}
+	else {
+		SNPRINTF(buf, dwBufSize, "%lu分钟前", (DWORD)((tTimeDiff - 60) / 60 + 1) );
+	}
+	
+	return buf;
+}

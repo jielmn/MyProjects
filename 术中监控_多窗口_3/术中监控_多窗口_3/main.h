@@ -63,6 +63,7 @@ private:
 	CEditUI *                          m_EdtName_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblCurTemp_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblCurTemp_grid1[MAX_GRID_COUNT];
+	CLabelUI *                         m_LblCurTempTime[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblBedTitle_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblNameTitle_grid[MAX_GRID_COUNT];
 	CLabelUI *                         m_LblCurTempTitle_grid[MAX_GRID_COUNT];
@@ -89,7 +90,7 @@ private:
 	DuiLib::CButtonUI *                m_btnMenu;    // ²Ëµ¥°´Å¥	
 	ENUM_GRID_STATUS                   m_eGridStatus;
 	DWORD                              m_dwInflateGridIndex;
-	DWORD                              m_dwLastTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	LastTemp                           m_tLastTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -104,6 +105,7 @@ private:
 	void   OnSetting();
 	void   OnAbout();
 	void   OnTestTimer(DWORD  dwTimer);
+	void   OnUpdateTimeDescTimer();
 
 	void   OnBtnBed_grid(TNotifyUI& msg);
 	void   OnEdtBedKillFocus_grid(TNotifyUI& msg);

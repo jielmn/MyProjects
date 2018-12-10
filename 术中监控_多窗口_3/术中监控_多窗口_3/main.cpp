@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include <assert.h>
+#include <time.h>
 #include "SettingDlg.h"
 #include "LmnTelSvr.h"
 #include "AboutDlg.h"
@@ -17,7 +18,7 @@
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_eGridStatus = GRID_STATUS_GRIDS;
 	m_dwInflateGridIndex = -1;
-	memset(m_dwLastTemp, 0, sizeof(m_dwLastTemp));
+	memset(m_tLastTemp, 0, sizeof(m_tLastTemp));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -108,7 +109,11 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblCurTemp_grid1[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID1, 0));
 		m_LblCurTemp_grid1[i]->SetTag(i);
 		m_LblCurTemp_grid1[i]->SetText("--");
-		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);		
+		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);	
+
+		m_LblCurTempTime[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, "lblCurTime_2", 0));
+		m_LblCurTempTime[i]->SetTag(i);
+		m_LblCurTempTime[i]->SetText("");
 
 		m_LblBedTitle_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_BED_TITLE_GRID, 0));
 		m_LblBedTitle_grid[i]->SetTag(i);
@@ -243,6 +248,8 @@ void  CDuiFrameWnd::InitWindow() {
 	SetTimer(m_hWnd, TIMER_TEST_ID_1, TIMER_TEST_INTERVAL_1, NULL);
 #endif
 
+	SetTimer(m_hWnd, TIMER_UPDATE_TIME_DESC, TIMER_UPDATE_TIME_DESC_INTERVAL, NULL);
+
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
 	WindowImplBase::InitWindow();
@@ -348,6 +355,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			OnTestTimer(wParam);
 		}
 #endif		
+		if (wParam == TIMER_UPDATE_TIME_DESC) {
+			OnUpdateTimeDescTimer();
+		}
 	}
 	else if (uMsg == UM_UPDATE_SCROLL) {
 		OnUpdateGridScroll(wParam, lParam);
@@ -460,6 +470,7 @@ void   CDuiFrameWnd::OnChangeSkin() {
 		m_MyImage_max[i]->SetBkColor(g_data.m_skin[CMySkin::MYIMAGE_BK]);
 		m_MyImage_max[i]->OnChangeSkin(); 
 
+		m_LblCurTempTime[i]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 		if ( m_eGridStatus == GRID_STATUS_GRIDS ) {
 			DWORD dwIndex = m_MyImage_max[i]->m_dwSelectedReaderIndex;
 			if (m_UiAlarms[i][dwIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP) {
@@ -802,7 +813,8 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
 			m_UiReaderTemp[dwIndex][k]->SetVisible(false);
-			m_dwLastTemp[dwIndex][k] = 0;
+			m_tLastTemp[dwIndex][k].m_dwTemp = 0;
+			m_tLastTemp[dwIndex][k].m_Time = 0;
 		}
 	}
 	else {
@@ -816,7 +828,8 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 			else
 			{
 				m_UiReaderTemp[dwIndex][k]->SetVisible(false);
-				m_dwLastTemp[dwIndex][k] = 0;
+				m_tLastTemp[dwIndex][k].m_dwTemp = 0;
+				m_tLastTemp[dwIndex][k].m_Time = 0;
 			}
 		}
 
@@ -914,7 +927,8 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 
 	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
 		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
-		m_dwLastTemp[dwIndex][dwSubIndex] = 0;
+		m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = 0;
+		m_tLastTemp[dwIndex][dwSubIndex].m_Time = 0;
 		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 	}
@@ -928,7 +942,8 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 		else
 		{
 			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
-			m_dwLastTemp[dwIndex][dwSubIndex] = 0;
+			m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = 0;
+			m_tLastTemp[dwIndex][dwSubIndex].m_Time = 0;
 		}
 
 		DWORD  dwSelectedIndex = m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex;
@@ -1078,7 +1093,8 @@ void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
 		return;
 	}
 
-	m_dwLastTemp[dwIndex][dwSubIndex] = dwTemp;
+	m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = dwTemp;
+	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
 
 	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
@@ -1111,6 +1127,7 @@ void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
 		strText.Format("%.2f", dwTemp / 100.0);
 		m_LblCurTemp_grid[dwIndex]->SetText(strText);
 		m_LblCurTemp_grid1[dwIndex]->SetText(strText);
+		m_LblCurTempTime[dwIndex]->SetText("¸Õ¸Õ");
 	}
 }
 
@@ -1168,12 +1185,12 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	else {
 		if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
 			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(true);
-			if (m_dwLastTemp[dwIndex][dwSubIndex] == 0) {
+			if (m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp == 0) {
 				m_UiReaderTemp[dwIndex][dwSubIndex]->SetText("--");
 				m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);				
 			}
 			else {
-				strText.Format("--/%.2f", m_dwLastTemp[dwIndex][dwSubIndex] / 100.0);
+				strText.Format("--/%.2f", m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp / 100.0);
 				m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
 			}
 		}
@@ -1192,12 +1209,12 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 		else {
 			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
 				m_LblCurTemp_grid1[dwIndex]->SetVisible(true);
-				if (m_dwLastTemp[dwIndex][dwSubIndex] == 0) {
+				if (m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp == 0) {
 					m_LblCurTemp_grid1[dwIndex]->SetText("--");
 					m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 				}
 				else {
-					strText.Format("--/%.2f", m_dwLastTemp[dwIndex][dwSubIndex] / 100.0);
+					strText.Format("--/%.2f", m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp / 100.0);
 					m_LblCurTemp_grid1[dwIndex]->SetText(strText);
 				}
 			}
@@ -1305,11 +1322,12 @@ void   CDuiFrameWnd::OnEmpty(TNotifyUI& msg) {
 	m_MyImage_max[dwIndex]->EmptyData();
 
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
-		m_dwLastTemp[dwIndex][i] = 0;
+		m_tLastTemp[dwIndex][i].m_dwTemp = 0;
+		m_tLastTemp[dwIndex][i].m_Time = 0;
 		OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
 	}	
 }
-
+         
 void   CDuiFrameWnd::OnReaderProcessing(WPARAM wParam, LPARAM  lParam) {
 	WORD  dwIndex = LOWORD(wParam);
 	DWORD  dwSubIndex = HIWORD(wParam);
@@ -1317,6 +1335,21 @@ void   CDuiFrameWnd::OnReaderProcessing(WPARAM wParam, LPARAM  lParam) {
 
 	strText.Format("\"%s%c\"¶Á¿¨Æ÷ÕýÔÚ²âÎÂ......", g_data.m_CfgData.m_GridCfg[dwIndex].m_szBed, dwSubIndex + 'A');
 	m_lblProcTips->SetText(strText);
+}
+
+void   CDuiFrameWnd::OnUpdateTimeDescTimer( ) {
+	time_t  now = time(0);
+	char buf[8192];
+	for ( int i = 0; i < MAX_GRID_COUNT; i++ ) {
+		DWORD  dwSelectIndex = m_MyImage_max[i]->m_dwSelectedReaderIndex;
+		if ( dwSelectIndex < MAX_READERS_PER_GRID ) {
+			if ( m_tLastTemp[i][dwSelectIndex].m_Time != 0 ) {
+				// ÏÔÊ¾Ê±¼ä
+				GetElapsedTimeDesc(buf, sizeof(buf), now - m_tLastTemp[i][dwSelectIndex].m_Time);
+				m_LblCurTempTime[i]->SetText( buf );
+			}
+		}
+	}
 }
 
 

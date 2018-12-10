@@ -68,9 +68,16 @@
 					<MyImage name="my_image_1" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" menu="true" visible="false" />					
 				</VerticalLayout>
 				
-				<VerticalLayout>
-					<Label   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
-				</VerticalLayout>
+				<HorizontalLayout>
+					<VerticalLayout>
+						<Label   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
+					</VerticalLayout>					
+					
+					<VerticalLayout width="70">
+						<HorizontalLayout />
+						<Label   name="lblCurTime_2"  height="30"  text="24小时前"    textcolor="#FFFFFFFF" font="1" align="center"  />
+					</VerticalLayout>					
+				</HorizontalLayout>
 				
 				<!--
 				<HorizontalLayout height="40">

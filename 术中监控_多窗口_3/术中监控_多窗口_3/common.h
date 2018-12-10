@@ -9,6 +9,7 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 #include "skin.h"
+#include "mysql.h"
 
 #include "UIlib.h"
 using namespace DuiLib;
@@ -25,6 +26,9 @@ using namespace DuiLib;
 #define  TIMER_TEST_ID_1          2
 #define  TIMER_TEST_INTERVAL_1    7000
 #endif
+
+#define  TIMER_UPDATE_TIME_DESC             100
+#define  TIMER_UPDATE_TIME_DESC_INTERVAL    10000
 
 #define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
 #define   LOG_FILE_NAME           "surgery3.log"
@@ -285,6 +289,11 @@ typedef struct tagReaderStatus {
 	BOOL     m_bChecked;
 }ReaderStatus;
 
+typedef struct  tagLastTemp {
+	DWORD   m_dwTemp;
+	time_t  m_Time;
+}LastTemp;
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
@@ -292,6 +301,7 @@ extern LmnToolkits::Thread *  g_thrd_work;
 extern LmnToolkits::Thread *  g_thrd_launch;
 extern DuiLib::CEditUI * g_edRemark;
 extern DWORD g_dwPrintExcelMaxPointsCnt;
+extern MYSQL g_mysql;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
@@ -307,6 +317,7 @@ extern BOOL  CheckComPortExist(int nCheckComPort);
 extern void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage);
 extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * GetElapsedTimeDesc(char * buf, DWORD dwBufSize, time_t  tTimeDiff);
 
 // templates
 template <class T>
