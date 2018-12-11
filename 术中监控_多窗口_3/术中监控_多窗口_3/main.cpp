@@ -76,12 +76,18 @@ void  CDuiFrameWnd::InitWindow() {
 		m_BtnName_grid[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_NAME_NAME_GRID, 0));
 		m_BtnName_grid[i]->SetTag(i);
 		m_BtnName_grid[i]->SetVisible(true);
+#if DB_FLAG
+		m_BtnName_grid[i]->SetText("--");
+#else
 		m_BtnName_grid[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szName);
+#endif
 
 		m_EdtName_grid[i] = static_cast<CEditUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, EDIT_NAME_NAME_GRID, 0));
 		m_EdtName_grid[i]->SetTag(i);
 		m_EdtName_grid[i]->SetVisible(false);
+#if !DB_FLAG
 		m_EdtName_grid[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szName);
+#endif
 
 		m_BtnBed_max[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_BED_NAME_MAX, 0));
 		m_BtnBed_max[i]->SetTag(i);
@@ -96,12 +102,18 @@ void  CDuiFrameWnd::InitWindow() {
 		m_BtnName_max[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, BUTTON_NAME_NAME_MAX, 0));
 		m_BtnName_max[i]->SetTag(i);
 		m_BtnName_max[i]->SetVisible(true);
+#if DB_FLAG
+		m_BtnName_max[i]->SetText("--");
+#else
 		m_BtnName_max[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szName);
+#endif
 
 		m_EdtName_max[i] = static_cast<CEditUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, EDIT_NAME_NAME_MAX, 0));
 		m_EdtName_max[i]->SetTag(i);
 		m_EdtName_max[i]->SetVisible(false);
+#if !DB_FLAG
 		m_EdtName_max[i]->SetText(g_data.m_CfgData.m_GridCfg[i].m_szName);
+#endif
 
 		m_LblCurTemp_grid[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID, 0));
 		m_LblCurTemp_grid[i]->SetTag(i);
@@ -889,7 +901,7 @@ void   CDuiFrameWnd::OnBtnName_max(TNotifyUI& msg) {
 	m_EdtName_max[nIndex]->SetFocus();
 #endif
 }
- 
+      
 void   CDuiFrameWnd::OnEdtBedKillFocus_max(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	STRNCPY(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, msg.pSender->GetText(), MAX_BED_LENGTH);

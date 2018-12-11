@@ -296,9 +296,12 @@ typedef struct tagReaderStatus {
 	BOOL     m_bChecked;
 }ReaderStatus;
 
+// 上一次读取的温度
 typedef struct  tagLastTemp {
-	DWORD   m_dwTemp;
-	time_t  m_Time;
+	DWORD   m_dwTemp;                      // 温度
+	time_t  m_Time;                        // 时间
+	char    m_szTagId[20];                 // tag id
+	char    m_szReaderId[20];              // Reader id
 }LastTemp;
 
 extern CGlobalData  g_data;
