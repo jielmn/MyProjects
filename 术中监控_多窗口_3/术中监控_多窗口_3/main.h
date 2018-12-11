@@ -93,6 +93,7 @@ private:
 	LastTemp                           m_tLastTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
 	CLabelUI *                         m_LblDbStatus;
+	CButtonUI *                        m_btnBinding[MAX_GRID_COUNT];
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);

@@ -33,6 +33,6 @@ public:
 	sigslot::signal1<PortStatus>          m_sigStatus;
 	sigslot::signal1<DWORD>               m_sigReconnect;
 	sigslot::signal3<DWORD, DWORD, DWORD> m_sigReaderStatus;
-	sigslot::signal3<DWORD, DWORD, DWORD> m_sigReaderTemp;
+	sigslot::signal3<DWORD, DWORD, const LastTemp &> m_sigReaderTemp;
 	sigslot::signal0<>                    m_sigCheck;
 };

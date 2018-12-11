@@ -22,7 +22,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
-
+	
 }
        
 void  CDuiFrameWnd::InitWindow() {
@@ -173,6 +173,11 @@ void  CDuiFrameWnd::InitWindow() {
 
 		m_layReaders[i] = static_cast<CVerticalLayoutUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LAYOUT_READERS, 0));
 		m_layReaders[i]->SetTag(i);
+
+		m_btnBinding[i] = static_cast<CButtonUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, "btnBinding", 0));
+		m_btnBinding[i]->SetTag(i);
+		m_btnBinding[i]->SetVisible(false);
+
 
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 			CDialogBuilder builder_child;
@@ -1086,21 +1091,17 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_LblCurTemp_grid1[dwIndex]->SetTextColor(m_UiReaderTemp[dwIndex][dwSubIndex]->GetTextColor());
 	m_LblCurTemp_grid1[dwIndex]->SetVisible(m_UiReaderTemp[dwIndex][dwSubIndex]->IsVisible());
 	m_LblCurTemp_grid1[dwIndex]->SetText(m_UiReaderTemp[dwIndex][dwSubIndex]->GetText());
-	//if ( m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
-	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
-	//}
-	//else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
-	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
-	//}
-	//else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::ALARM_OK) {
-	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
-	//}
-	//else if (m_UiAlarms[dwIndex][dwSubIndex]->m_alarm == CAlarmImageUI::DISCONNECTED) {
-	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-	//}
-	//else {
-	//	m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
-	//}
+	
+	time_t  now = time(0);
+	char buf[8192];
+	if (m_tLastTemp[dwIndex][dwSubIndex].m_Time != 0) {
+		// ÏÔÊ¾Ê±¼ä
+		GetElapsedTimeDesc(buf, sizeof(buf), now - m_tLastTemp[dwIndex][dwSubIndex].m_Time);
+		m_LblCurTempTime[dwIndex]->SetText(buf);
+	}
+	else {
+		m_LblCurTempTime[dwIndex]->SetText("");
+	}
 
 	CDuiString strText;
 	strText.Format("%c", 'A' + dwSubIndex);
@@ -1179,9 +1180,11 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
 void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	DWORD  dwIndex = LOWORD(wParam);
 	DWORD  dwSubIndex = HIWORD(wParam);
-	OnTemp(dwIndex, dwSubIndex, lParam);
+	LastTemp * pTemp = (LastTemp*)lParam;
 
-	DWORD  dwTemp = lParam;
+	DWORD  dwTemp = pTemp->m_dwTemp;
+	OnTemp(dwIndex, dwSubIndex, dwTemp);
+
 	if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
 		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
 	}
@@ -1193,10 +1196,12 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	}
 
 	DuiLib::CDuiString  strText;
-	strText.Format("%.2f", lParam / 100.0);
+	strText.Format("%.2f", dwTemp / 100.0);
 	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
 
 	m_lblProcTips->SetText("");
+
+	delete pTemp;
 }
 
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {

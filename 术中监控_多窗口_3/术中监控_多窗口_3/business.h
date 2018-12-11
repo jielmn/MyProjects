@@ -59,7 +59,7 @@ public:
 	// launch 读串口数据
 	int   ReadLaunchAsyn(DWORD dwDelayTime = 0);
 	int   ReadLaunch();
-	void  OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
+	void  OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, const LastTemp & t);
 	void  OnCheckReader();
 
 	// 硬件改动，检查状态

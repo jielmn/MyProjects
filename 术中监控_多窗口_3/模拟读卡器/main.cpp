@@ -153,10 +153,14 @@ int main() {
 
 	for ( int i = 0; i < 180; i++ ) {
 		memcpy(g_ReaderId[i], "\x45\x52\x00\x00\x04\x00\x00\x00\x00\x00\x01", 11);
-		g_ReaderId[i][10] = (BYTE)(i + 1);
 
-		memcpy(g_TagId[i], "\xe0\x29\x00\x00\x00\x00\x00\x00", 8);
-		g_TagId[i][7] = (BYTE)(i + 1);
+		g_ReaderId[i][8]  = (i + 1) / 100;
+		g_ReaderId[i][9]  = ((i + 1) % 100) / 10;
+		g_ReaderId[i][10] = (i + 1) % 10;
+
+		//memcpy(g_TagId[i], "\xe0\x29\x00\x00\x00\x00\x00\x00", 8);
+		memcpy(g_TagId[i], "\x00\x00\x00\x00\x00\x00\x29\xe0", 8);
+		g_TagId[i][0] = (BYTE)(i + 1);
 	}
 
 	TConsoleMenuItem  item[3];

@@ -330,6 +330,8 @@ extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * GetElapsedTimeDesc(char * buf, DWORD dwBufSize, time_t  tTimeDiff);
 extern char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD dwDestSize);
 extern int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
+extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, BYTE * pData, DWORD dwDataLen);
+extern char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD dwDataLen);
 
 // templates
 template <class T>

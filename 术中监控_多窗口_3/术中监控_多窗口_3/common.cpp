@@ -512,3 +512,54 @@ int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize) {
 	delete[] pTmp;
 	return 0;
 }
+
+char *  GetTagId( char * szTagId, DWORD dwTagIdLen, BYTE * pData, DWORD dwDataLen ) {
+	if (0 == szTagId || 0 == dwTagIdLen) {
+		return 0;
+	}
+
+	if (dwDataLen != 8 ) {
+		szTagId[0] = '\0';
+		return szTagId;
+	}
+
+	if (dwTagIdLen < 16) {
+		szTagId[0] = '\0';
+		return szTagId;
+	}
+
+	for ( DWORD i = 0; i < dwDataLen; i++ ) {
+		SNPRINTF( szTagId + 2 * i, 3, "%02x", pData[dwDataLen-i-1]);
+	}
+
+	return szTagId;
+}
+
+char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD dwDataLen) {
+	if (0 == szReaderId || 0 == dwReaderIdLen ) {
+		return 0;
+	}
+
+	if (dwDataLen != 11) {
+		szReaderId[0] = '\0';
+		return szReaderId;
+	}
+
+	if (dwReaderIdLen < 12) {
+		szReaderId[0] = '\0';
+		return szReaderId;
+	}
+
+	szReaderId[0] = pData[0];
+	szReaderId[1] = pData[1];
+	szReaderId[2] = pData[2] + '0';
+	szReaderId[3] = pData[3] + '0';
+	szReaderId[4] = pData[4] + '0';
+	szReaderId[5] = '0';
+
+	for (int i = 0; i < 6; i++) {
+		szReaderId[i + 6] = pData[i + 5] + '0';
+	}
+
+	return szReaderId;
+}

@@ -490,17 +490,20 @@ int   CBusiness::ReadLaunch() {
 	return 0;
 }
 
-void  CBusiness::OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp) {
+void  CBusiness::OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, const LastTemp & t ) {
 	if ( !m_reader_status[dwIndex][dwSubIndex].m_bConnected ) {
 		m_reader_status[dwIndex][dwSubIndex].m_bConnected = TRUE;
 	}
 
+	LastTemp * pTemp = new LastTemp;
+	memcpy(pTemp, &t, sizeof(LastTemp));
+
 	// Í¨ÖªUIÎÂ¶È
-	::PostMessage(g_data.m_hWnd, UM_READER_TEMP, MAKELONG(dwIndex, dwSubIndex), dwTemp );
+	::PostMessage(g_data.m_hWnd, UM_READER_TEMP, MAKELONG(dwIndex, dwSubIndex), (LPARAM)pTemp );
 
 	m_reader_status[dwIndex][dwSubIndex].m_dwLastQueryTick = 0;
 	m_reader_status[dwIndex][dwSubIndex].m_dwTryCnt = 0;
-	m_reader_status[dwIndex][dwSubIndex].m_dwLastTemp = dwTemp;
+	m_reader_status[dwIndex][dwSubIndex].m_dwLastTemp = t.m_dwTemp;
 	m_reader_status[dwIndex][dwSubIndex].m_bChecked = TRUE;
 	
 	CheckGrid(dwIndex);

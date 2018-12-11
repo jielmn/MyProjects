@@ -204,7 +204,12 @@ int  CLaunch::ReadComData() {
 
 							// ’“µΩ
 							if (dwRet != -1) {
-								m_sigReaderTemp.emit( LOWORD(dwRet), HIWORD(dwRet), dwTemp );
+								LastTemp t;
+								memset(&t, 0, sizeof(t));
+								t.m_dwTemp = dwTemp;
+								GetTagId(t.m_szTagId, sizeof(t.m_szTagId), buf + 16, 8);
+								GetReaderId(t.m_szReaderId, sizeof(t.m_szReaderId), buf + 5, 11 );
+								m_sigReaderTemp.emit( LOWORD(dwRet), HIWORD(dwRet), t );
 							}
 							else {
 								DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
