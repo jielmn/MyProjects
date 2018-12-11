@@ -87,8 +87,8 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 					byData[27] = (BYTE)(dwTemp  % 10);
 
 					if ( byBed <= 180 && byBed > 0 ) {
-						memcpy(byData + 5,  g_ReaderId[byBed], 11);
-						memcpy(byData + 16, g_TagId[byBed], 8);
+						memcpy(byData + 5,  g_ReaderId[byBed-1], 11);
+						memcpy(byData + 16, g_TagId[byBed-1], 8);
 					}
 
 
