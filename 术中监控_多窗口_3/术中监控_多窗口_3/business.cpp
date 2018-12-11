@@ -594,6 +594,21 @@ void   CBusiness::OnDbStatus(int nDbStatus) {
 	::PostMessage(g_data.m_hWnd, UM_DB_STATUS, (WPARAM)nDbStatus, 0);
 }
 
+int   CBusiness::GetDbStatus() {
+	return m_db.GetStatus();
+}
+
+// 查询绑定关系
+int   CBusiness::QueryBindingAsyn(DWORD dwIndex, DWORD dwSubIndex, const char * szTagId) {
+	g_thrd_db->PostMessage(this, MSG_QUERY_BINDING, 
+		new CQueryBindingParam(dwIndex, dwSubIndex, szTagId) );
+	return 0;
+}
+
+int   CBusiness::QueryBinding(const CQueryBindingParam * pParam) {
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -656,6 +671,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_QUERY_BINDING:
+	{
+		CQueryBindingParam * pParam = (CQueryBindingParam *)pMessageData;
+		QueryBinding(pParam);
+	}
+	break;
+
 	default:
 		break;
 	}
@@ -686,6 +708,19 @@ int CMyDb::Reconnect() {
 	}
 
 	m_sigStatus.emit(m_nStatus);
+
+	return 0;
+}
+
+int CMyDb::GetStatus() {
+	return m_nStatus;
+}
+
+int  CMyDb::QueryBinding(const CQueryBindingParam * pParam) {
+	// 数据库没有连上
+	if (0 == m_nStatus) {
+		return -1;
+	}
 
 	return 0;
 }

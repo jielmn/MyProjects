@@ -19,6 +19,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_eGridStatus = GRID_STATUS_GRIDS;
 	m_dwInflateGridIndex = -1;
 	memset(m_tLastTemp, 0, sizeof(m_tLastTemp));
+	memset(m_tTagBinding, 0, sizeof(m_tTagBinding));	
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -1111,18 +1112,7 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_MyImage_grid[dwIndex]->MyInvalidate();  
 }
 
-void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {
-	// 如果开关没有打开
-	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
-		return;
-	}
-
-	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch ) {
-		return;
-	}
-
-	m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = dwTemp;
-	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
+void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {	
 
 	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
@@ -1182,7 +1172,31 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	DWORD  dwSubIndex = HIWORD(wParam);
 	LastTemp * pTemp = (LastTemp*)lParam;
 
+	// 如果开关没有打开
+	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
+		delete pTemp;
+		return;
+	}
+
+	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
+		delete pTemp;
+		return;
+	}
+
 	DWORD  dwTemp = pTemp->m_dwTemp;
+
+#if DB_FLAG
+	// 查询tag绑定关系
+	if ( 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId ) ) {
+		memset(&m_tTagBinding[dwIndex][dwSubIndex], 0, sizeof(m_tTagBinding[dwIndex][dwSubIndex]));
+		CBusiness::GetInstance()->QueryBindingAsyn(dwIndex, dwSubIndex,pTemp->m_szTagId);
+		m_btnBinding[dwIndex]->SetVisible(false);
+	}
+#endif
+
+	memcpy(&m_tLastTemp[dwIndex][dwSubIndex], pTemp, sizeof(LastTemp));
+	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
+	
 	OnTemp(dwIndex, dwSubIndex, dwTemp);
 
 	if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
@@ -1198,7 +1212,6 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
 	strText.Format("%.2f", dwTemp / 100.0);
 	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
-
 	m_lblProcTips->SetText("");
 
 	delete pTemp;

@@ -91,6 +91,7 @@ private:
 	ENUM_GRID_STATUS                   m_eGridStatus;
 	DWORD                              m_dwInflateGridIndex;
 	LastTemp                           m_tLastTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	TagBinding                         m_tTagBinding[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
 	CLabelUI *                         m_LblDbStatus;
 	CButtonUI *                        m_btnBinding[MAX_GRID_COUNT];

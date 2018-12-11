@@ -11,7 +11,9 @@ public:
 	CMyDb();
 	~CMyDb();
 
-	int Reconnect();
+	int  Reconnect();
+	int  GetStatus();
+	int  QueryBinding(const CQueryBindingParam * pParam);
 
 	sigslot::signal1<int>     m_sigStatus;
 
@@ -71,6 +73,11 @@ public:
 	int   ReconnectDb();
 	// 0: 关闭;  1: 打开
 	void  OnDbStatus(int nDbStatus);
+	int   GetDbStatus();
+
+	// 查询绑定关系
+	int   QueryBindingAsyn(DWORD dwIndex, DWORD dwSubIndex, const char * szTagId);
+	int   QueryBinding(const CQueryBindingParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

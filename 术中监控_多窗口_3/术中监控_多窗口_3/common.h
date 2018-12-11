@@ -154,6 +154,7 @@ using namespace DuiLib;
 #define MSG_GET_GRID_TEMP                1007
 #define MSG_CHECK_LAUNCH_STATUS          1008
 #define MSG_RECONNECT_DB                 1009
+#define MSG_QUERY_BINDING                1010
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -288,6 +289,17 @@ public:
 	DWORD     m_dwIndex;
 };
 
+class CQueryBindingParam : public LmnToolkits::MessageData {
+public:
+	CQueryBindingParam(DWORD dwIndex, DWORD dwSubIndex, 
+		const char * szTagId) : m_dwIndex(dwIndex), m_dwSubIndex(dwSubIndex) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId) );
+	}
+	DWORD     m_dwIndex;
+	DWORD     m_dwSubIndex;
+	char      m_szTagId[20];
+};
+
 typedef struct tagReaderStatus {
 	BOOL     m_bConnected;
 	DWORD    m_dwTryCnt;
@@ -303,6 +315,12 @@ typedef struct  tagLastTemp {
 	char    m_szTagId[20];                 // tag id
 	char    m_szReaderId[20];              // Reader id
 }LastTemp;
+
+typedef struct tagTagBinding {
+	BOOL     m_bGetBindingRet;             // 有无查询到绑定结果
+	DWORD    m_dwPatientId;                // 0表示还没有绑定病人
+	char     m_szPatientName[32];
+}TagBinding;
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
