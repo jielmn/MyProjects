@@ -254,7 +254,12 @@ void  CDuiFrameWnd::InitWindow() {
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
 
+#if DB_FLAG
 	CBusiness::GetInstance()->ReconnectDbAsyn();
+#else
+	m_LblDbStatus->SetText("");
+#endif
+
 	WindowImplBase::InitWindow();
 }  
 
@@ -776,11 +781,13 @@ void   CDuiFrameWnd::OnEdtBedKillFocus_grid(TNotifyUI& msg) {
 }
 
 void  CDuiFrameWnd::OnBtnName_grid(TNotifyUI& msg) {
+#if !(DB_FLAG)
 	int nIndex = msg.pSender->GetTag();
 	msg.pSender->SetVisible(false);
 	m_EdtName_grid[nIndex]->SetText(msg.pSender->GetText());
 	m_EdtName_grid[nIndex]->SetVisible(true);
 	m_EdtName_grid[nIndex]->SetFocus();
+#endif
 }
 
 void    CDuiFrameWnd::OnEdtNameKillFocus_grid(TNotifyUI& msg) {
@@ -874,13 +881,15 @@ void   CDuiFrameWnd::OnBtnBed_max(TNotifyUI& msg) {
 }
 
 void   CDuiFrameWnd::OnBtnName_max(TNotifyUI& msg) {
+#if !(DB_FLAG)
 	int nIndex = msg.pSender->GetTag();
 	msg.pSender->SetVisible(false);
 	m_EdtName_max[nIndex]->SetText(msg.pSender->GetText());
 	m_EdtName_max[nIndex]->SetVisible(true);
 	m_EdtName_max[nIndex]->SetFocus();
+#endif
 }
-
+ 
 void   CDuiFrameWnd::OnEdtBedKillFocus_max(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	STRNCPY(g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, msg.pSender->GetText(), MAX_BED_LENGTH);

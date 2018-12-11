@@ -38,7 +38,7 @@
 							<HorizontalLayout height="30">								
 								
 								<Label   name="lblNameTitle_1"  text="" bkimage="file='user_1.png' dest='0,2,30,27'"    textcolor="#FFFFFFFF" width="30" font="1" tooltip="病人姓名" />
-								<Edit    name="edtName_1"  text="--"    textcolor="#FF000000" width="100" font="70" visible="true" />
+								<Edit    name="edtName_1"  text="--"    textcolor="#FF000000" width="70" font="100" visible="true" />
 								<Button  name="btnName_1"  textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="70" font="100" tooltip="病人姓名" />
 								
 								<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" visible="false" />
