@@ -424,6 +424,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_DB_STATUS) {
 		OnDbStatus(wParam);
 	}
+	else if (uMsg == UM_QUERY_TAG_BINDING_RET) {
+		OnQueryBindingRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1429,6 +1432,46 @@ void   CDuiFrameWnd::OnDbStatus(int nStatus) {
 	else {
 		m_LblDbStatus->SetText("数据库连接OK");
 	}
+}
+
+//
+void    CDuiFrameWnd::OnQueryBindingRet(WPARAM wParam, LPARAM  lParam) {
+	WORD  dwIndex = LOWORD(wParam);
+	DWORD  dwSubIndex = HIWORD(wParam);
+	TagBinding * pRet = (TagBinding *)lParam;
+
+	// 如果tag id不等
+	if ( 0 != strcmp(pRet->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
+		delete pRet;
+		return;
+	}
+
+	memcpy(&m_tTagBinding[dwIndex][dwSubIndex], pRet, sizeof(TagBinding));
+	m_tTagBinding[dwIndex][dwSubIndex].m_bGetBindingRet = TRUE;
+
+	BOOL  bAllGetRet = TRUE;
+	// 检查一个窗格的所有tag都是否取到结果
+	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+		if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch ) {
+			continue;
+		}
+
+		if (!m_tTagBinding[dwIndex][i].m_bGetBindingRet) {
+			bAllGetRet = FALSE;
+			break;
+		}
+	}
+
+	// 不是所有的tag都查询到结果
+	if (!bAllGetRet) {
+		delete pRet;
+		return;
+	}
+
+	// 检查是否所有tag绑定到同一个人
+	// 检查是否有tag没有绑定
+
+	delete pRet;
 }
 
 

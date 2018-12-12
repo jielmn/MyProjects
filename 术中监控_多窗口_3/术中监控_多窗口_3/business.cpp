@@ -610,11 +610,11 @@ int   CBusiness::QueryBinding(const CQueryBindingParam * pParam) {
 	int nRet = m_db.QueryBinding(pParam, &tResult);
 	// 数据库OK，查询到绑定结果
 	if (0 == nRet) {
-		//TagBinding * pNewRet = new TagBinding;
-		//memcpy(pNewRet, &tResult, sizeof(TagBinding));
-		//STRNCPY(pNewRet->m_szTagId, pParam->m_szTagId, sizeof(pNewRet->m_szTagId));
-		//::PostMessage(g_data.m_hWnd, UM_QUERY_TAG_BINDING_RET,
-		//	MAKELONG(pParam->m_dwIndex, pParam->m_dwSubIndex), (LPARAM)pNewRet);
+		TagBinding * pNewRet = new TagBinding;
+		memcpy(pNewRet, &tResult, sizeof(TagBinding));
+		STRNCPY(pNewRet->m_szTagId, pParam->m_szTagId, sizeof(pNewRet->m_szTagId));
+		::PostMessage(g_data.m_hWnd, UM_QUERY_TAG_BINDING_RET,
+			MAKELONG(pParam->m_dwIndex, pParam->m_dwSubIndex), (LPARAM)pNewRet);
 	}
 	return 0;
 }
@@ -735,7 +735,10 @@ int  CMyDb::QueryBinding(const CQueryBindingParam * pParam, TagBinding * pRet ) 
 	assert(pRet);
 
 	char  szSql[8192] = { 0 };
-	SNPRINTF(szSql, sizeof(szSql), "select * from bindings where tag_id='%s'", pParam->m_szTagId);
+	SNPRINTF(szSql, sizeof(szSql), 
+		"select a.tagid, a.patientid, a.patientpart, b.patientname"
+		" from tagbands a inner join patientinfo b on a.patientid = b.id"
+		" where a.tagid='%s'", pParam->m_szTagId);
 
 	MYSQL_RES *res = 0;
 	MYSQL_ROW row;
@@ -757,8 +760,18 @@ int  CMyDb::QueryBinding(const CQueryBindingParam * pParam, TagBinding * pRet ) 
 		return 0;
 	}
 	
-	STRNCPY(pRet->m_szTagName, row[1], sizeof(pRet->m_szTagName));
-	sscanf( row[2], "%lu", &pRet->m_dwPatientId );
+	if (row[2]) {
+		STRNCPY(pRet->m_szTagName, row[1], sizeof(pRet->m_szTagName));
+	}
+
+	if (row[1]) {
+		sscanf(row[1], "%lu", &pRet->m_dwPatientId);
+	}
+
+	if (row[3]) {
+		STRNCPY(pRet->m_szPatientName, row[3], sizeof(pRet->m_szPatientName));
+	}
+	
 
 	mysql_free_result(res);
 	return 0;

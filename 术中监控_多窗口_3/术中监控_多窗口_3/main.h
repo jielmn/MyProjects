@@ -152,4 +152,6 @@ private:
 	void   OnReaderProcessing(WPARAM wParam, LPARAM  lParam);
 	//
 	void   OnDbStatus(int nStatus);
+	//
+	void    OnQueryBindingRet(WPARAM wParam, LPARAM  lParam);
 };
