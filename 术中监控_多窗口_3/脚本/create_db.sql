@@ -13,6 +13,7 @@ use surgery;
 create table bindings
 (
 	tag_id         varchar(16) not null primary key,
+	tag_name       varchar(16) not null,
 	patient_id     int not null
 ) DEFAULT CHARSET=utf8;
 
@@ -22,7 +23,6 @@ create table  temperature (
 	reader_id     varchar(20) not null,
 	collect_time  timestamp not null,
 	temperature   int not null,
-	tag_name      varchar(16) not null,
 	grid_index    int not null
 ) DEFAULT CHARSET=utf8;
 
