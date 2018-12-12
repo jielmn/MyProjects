@@ -85,7 +85,7 @@ private:
 	CLabelUI *                         m_UiReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CButtonUI *                        m_UiBtnReaderNames[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CEditUI *                          m_UiEdtReaderNames[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
-	CHorizontalLayoutUI *              m_UiLayReader[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CVerticalLayoutUI *                m_UiLayReader[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CControlUI *                       m_UiIndicator[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	DuiLib::CButtonUI *                m_btnMenu;    // ²Ëµ¥°´Å¥	
 	ENUM_GRID_STATUS                   m_eGridStatus;
@@ -95,6 +95,9 @@ private:
 
 	CLabelUI *                         m_LblDbStatus;
 	CButtonUI *                        m_btnBinding[MAX_GRID_COUNT];
+	CLabelUI *                         m_LblReaderId[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CLabelUI *                         m_LblTagId[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CLabelUI *                         m_LblTagBinding[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);

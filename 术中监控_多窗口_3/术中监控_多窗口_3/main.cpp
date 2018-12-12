@@ -188,7 +188,7 @@ void  CDuiFrameWnd::InitWindow() {
 			m_UiIndicator[i][j] = static_cast<CHorizontalLayoutUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, CTL_INDICATOR_NAME, 0));
 			m_UiIndicator[i][j]->SetTag(MAKELONG(i, j));
 
-			m_UiLayReader[i][j] = static_cast<CHorizontalLayoutUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, LAY_READER_NAME, 0));
+			m_UiLayReader[i][j] = static_cast<CVerticalLayoutUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, LAY_READER_NAME, 0));
 			m_UiLayReader[i][j]->SetTag( MAKELONG(i, j) );
 
 			m_UiReaderSwitch[i][j] = static_cast<COptionUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, READER_SWITCH_NAME, 0));
@@ -209,6 +209,18 @@ void  CDuiFrameWnd::InitWindow() {
 
 			m_UiAlarms[i][j] = static_cast<CAlarmImageUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, ALARM_IMAGE_NAME, 0));
 			m_UiAlarms[i][j]->SetTag(MAKELONG(i, j));
+
+			m_LblReaderId[i][j] = static_cast<CLabelUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, "lblReaderId", 0));
+			m_LblReaderId[i][j]->SetTag(MAKELONG(i, j));
+			m_LblReaderId[i][j]->SetText("");
+
+			m_LblTagId[i][j] = static_cast<CLabelUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, "lblTagId", 0));
+			m_LblTagId[i][j]->SetTag(MAKELONG(i, j));
+			m_LblTagId[i][j]->SetText("");
+
+			m_LblTagBinding[i][j] = static_cast<CLabelUI*>(m_UiReaders[i][j]->FindControl(MY_FINDCONTROLPROC, "lblTagBindingStatus", 0));
+			m_LblTagBinding[i][j]->SetTag(MAKELONG(i, j));
+			m_LblTagBinding[i][j]->SetText("");
 
 			m_UiIndicator[i][j]->SetBkColor( g_data.m_skin.GetReaderIndicator(j) );
 			m_UiBtnReaderNames[i][j]->SetText(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szName);
@@ -280,7 +292,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	WindowImplBase::InitWindow();
 }  
-
+                 
 LRESULT CDuiFrameWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return WindowImplBase::OnCreate(uMsg, wParam, lParam, bHandled);
 }
@@ -1023,8 +1035,9 @@ void   CDuiFrameWnd::OnUpdateGridScroll(WPARAM wParam, LPARAM lParam) {
 		pParent->SetScrollPos(tParentScrollRange);
 	}
 }
-
+        
 void  CDuiFrameWnd::OnReaderName(TNotifyUI& msg) {
+#if !DB_FLAG
 	DWORD  dwTag      = msg.pSender->GetTag();
 	DWORD  dwIndex    = LOWORD(dwTag);
 	DWORD  dwSubIndex = HIWORD(dwTag);
@@ -1032,6 +1045,7 @@ void  CDuiFrameWnd::OnReaderName(TNotifyUI& msg) {
 	m_UiEdtReaderNames[dwIndex][dwSubIndex]->SetText(msg.pSender->GetText());
 	m_UiEdtReaderNames[dwIndex][dwSubIndex]->SetVisible(true);
 	m_UiEdtReaderNames[dwIndex][dwSubIndex]->SetFocus();
+#endif
 }
 
 void   CDuiFrameWnd::OnEdtReaderNameKillFocus(TNotifyUI& msg) {
@@ -1191,6 +1205,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		memset(&m_tTagBinding[dwIndex][dwSubIndex], 0, sizeof(m_tTagBinding[dwIndex][dwSubIndex]));
 		CBusiness::GetInstance()->QueryBindingAsyn(dwIndex, dwSubIndex,pTemp->m_szTagId);
 		m_btnBinding[dwIndex]->SetVisible(false);
+		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("");
 	}
 #endif
 
@@ -1214,9 +1229,12 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
 	m_lblProcTips->SetText("");
 
-	delete pTemp;
-}
+	m_LblReaderId[dwIndex][dwSubIndex]->SetText(pTemp->m_szReaderId);
+	m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
 
+	delete pTemp;
+}   
+ 
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
 
