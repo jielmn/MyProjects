@@ -781,11 +781,13 @@ void   CDuiFrameWnd::OnAbout() {
 }
 
 void   CDuiFrameWnd::OnBtnBed_grid(TNotifyUI& msg) {
+#if !DB_FLAG
 	int nIndex = msg.pSender->GetTag();
 	msg.pSender->SetVisible(false);
 	m_EdtBed_grid[nIndex]->SetText(msg.pSender->GetText());
 	m_EdtBed_grid[nIndex]->SetVisible(true);
 	m_EdtBed_grid[nIndex]->SetFocus();
+#endif
 }
 
 void   CDuiFrameWnd::OnEdtBedKillFocus_grid(TNotifyUI& msg) {
@@ -903,11 +905,13 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 } 
 
 void   CDuiFrameWnd::OnBtnBed_max(TNotifyUI& msg) {
+#if !DB_FLAG
 	int nIndex = msg.pSender->GetTag();
 	msg.pSender->SetVisible(false);
 	m_EdtBed_max[nIndex]->SetText(msg.pSender->GetText());
 	m_EdtBed_max[nIndex]->SetVisible(true);
 	m_EdtBed_max[nIndex]->SetFocus();
+#endif
 }
 
 void   CDuiFrameWnd::OnBtnName_max(TNotifyUI& msg) {
@@ -928,8 +932,10 @@ void   CDuiFrameWnd::OnEdtBedKillFocus_max(TNotifyUI& msg) {
 	}
 
 	CDuiString  strText;
+	CDuiString  strDefault;
 	strText.Format(CFG_BED_NAME " %d", nIndex + 1);
-	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, "");
+	strDefault.Format("%02lu", nIndex + 1);
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[nIndex].m_szBed, (const char *)strDefault);
 	g_data.m_cfg->Save();
 
 	msg.pSender->SetVisible(false);
