@@ -13,7 +13,7 @@ public:
 
 	int  Reconnect();
 	int  GetStatus();
-	int  QueryBinding(const CQueryBindingParam * pParam);
+	int  QueryBinding(const CQueryBindingParam * pParam, TagBinding * tRet);
 
 	sigslot::signal1<int>     m_sigStatus;
 

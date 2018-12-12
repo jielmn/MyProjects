@@ -606,6 +606,16 @@ int   CBusiness::QueryBindingAsyn(DWORD dwIndex, DWORD dwSubIndex, const char * 
 }
 
 int   CBusiness::QueryBinding(const CQueryBindingParam * pParam) {
+	TagBinding tResult;
+	int nRet = m_db.QueryBinding(pParam, &tResult);
+	// 数据库OK，查询到绑定结果
+	if (0 == nRet) {
+		//TagBinding * pNewRet = new TagBinding;
+		//memcpy(pNewRet, &tResult, sizeof(TagBinding));
+		//STRNCPY(pNewRet->m_szTagId, pParam->m_szTagId, sizeof(pNewRet->m_szTagId));
+		//::PostMessage(g_data.m_hWnd, UM_QUERY_TAG_BINDING_RET,
+		//	MAKELONG(pParam->m_dwIndex, pParam->m_dwSubIndex), (LPARAM)pNewRet);
+	}
 	return 0;
 }
 
@@ -716,11 +726,40 @@ int CMyDb::GetStatus() {
 	return m_nStatus;
 }
 
-int  CMyDb::QueryBinding(const CQueryBindingParam * pParam) {
+int  CMyDb::QueryBinding(const CQueryBindingParam * pParam, TagBinding * pRet ) {
 	// 数据库没有连上
 	if (0 == m_nStatus) {
 		return -1;
 	}
 
+	assert(pRet);
+
+	char  szSql[8192] = { 0 };
+	SNPRINTF(szSql, sizeof(szSql), "select * from bindings where tag_id='%s'", pParam->m_szTagId);
+
+	MYSQL_RES *res = 0;
+	MYSQL_ROW row;
+
+	if ( 0 != mysql_query(&m_mysql, szSql) ) {
+		return -1;
+	}
+
+	res = mysql_store_result(&m_mysql);
+	if ( 0 == res ) {
+		return -1;
+	}
+
+	memset(pRet, 0, sizeof(TagBinding));
+
+	row = mysql_fetch_row(res);
+	if ( 0 == row ) {
+		mysql_free_result(res);
+		return 0;
+	}
+	
+	STRNCPY(pRet->m_szTagName, row[1], sizeof(pRet->m_szTagName));
+	sscanf( row[2], "%lu", &pRet->m_dwPatientId );
+
+	mysql_free_result(res);
 	return 0;
 }

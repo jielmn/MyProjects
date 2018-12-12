@@ -162,6 +162,7 @@ using namespace DuiLib;
 #define UM_READER_DISCONNECTED           (WM_USER+4)
 #define UM_READER_PROCESSING             (WM_USER+5)
 #define UM_DB_STATUS                     (WM_USER+6)
+#define UM_QUERY_TAG_BINDING_RET         (WM_USER+7)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
@@ -320,6 +321,8 @@ typedef struct tagTagBinding {
 	BOOL     m_bGetBindingRet;             // 有无查询到绑定结果
 	DWORD    m_dwPatientId;                // 0表示还没有绑定病人
 	char     m_szPatientName[32];
+	char     m_szTagName[32];
+	char     m_szTagId[20];
 }TagBinding;
 
 extern CGlobalData  g_data;
