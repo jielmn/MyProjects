@@ -1,10 +1,14 @@
 #include <time.h>
 #include <stdio.h>   
 #include <windows.h>  
+#include <dbghelp.h>
 #include <setupapi.h>
 #include "common.h"
 #include "MyImage.h"
 #include "AlarmImage.h"
+
+ 
+#pragma comment(lib, "dbghelp.lib")
 
 CGlobalData  g_data;
 std::vector<TArea *>  g_vArea;
@@ -562,4 +566,55 @@ char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD 
 	}
 
 	return szReaderId;
+}
+
+
+LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
+{
+	if (IsDebuggerPresent())
+	{
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+
+	typedef BOOL(WINAPI* MiniDumpWriteDumpT)(
+		HANDLE,
+		DWORD,
+		HANDLE,
+		MINIDUMP_TYPE,
+		PMINIDUMP_EXCEPTION_INFORMATION,
+		PMINIDUMP_USER_STREAM_INFORMATION,
+		PMINIDUMP_CALLBACK_INFORMATION);
+
+	HMODULE hDbgHelp = LoadLibrary("dbghelp.dll");
+	if (NULL == hDbgHelp)
+	{
+		return EXCEPTION_CONTINUE_EXECUTION;
+	}
+
+	SYSTEMTIME stSysTime;
+	memset(&stSysTime, 0, sizeof(SYSTEMTIME));
+	GetLocalTime(&stSysTime);
+
+	TCHAR szFile[MAX_PATH] = { 0 };		//根据字符集，有时候可能为WCHAR
+	wsprintf(szFile, "%0.4d-%0.2d-%0.2d-%0.2d-%0.2d-%0.2d-%0.3d.dmp", \
+		stSysTime.wYear, stSysTime.wMonth, stSysTime.wDay, stSysTime.wHour, \
+		stSysTime.wMinute, stSysTime.wSecond, stSysTime.wMilliseconds);
+
+	HANDLE hFile = CreateFile(szFile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, \
+		0, CREATE_ALWAYS, 0, 0);
+	if (INVALID_HANDLE_VALUE != hFile)
+	{
+		MINIDUMP_EXCEPTION_INFORMATION objExInfo;
+		objExInfo.ThreadId = ::GetCurrentThreadId();
+		objExInfo.ExceptionPointers = pExceptionInfo;
+		objExInfo.ClientPointers = NULL;
+
+		BOOL bOk = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, \
+			MiniDumpWithDataSegs, (pExceptionInfo ? &objExInfo : NULL), NULL, NULL);
+		CloseHandle(hFile);
+	}
+
+	FreeLibrary(hDbgHelp);
+
+	return EXCEPTION_EXECUTE_HANDLER;
 }
