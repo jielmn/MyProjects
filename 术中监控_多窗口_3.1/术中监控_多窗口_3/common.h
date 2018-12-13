@@ -51,6 +51,8 @@ using namespace DuiLib;
 #define   MAX_AREA_ID             100
 #define   MAX_BED_LENGTH          16
 #define   MAX_NAME_LENGTH         16
+#define   BINDING_FRAME_NAME      "DUIBindingFrame"
+#define   BINDING_FILE            "Binding.xml"
 
 // ¿Ø¼þÏà¹Ø
 #define   LAYOUT_MAIN_NAME         "layMain"

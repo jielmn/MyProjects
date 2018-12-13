@@ -156,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AlarmImage.cpp" />
+    <ClCompile Include="BindingDlg.cpp" />
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="Launch.cpp" />
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AlarmImage.h" />
+    <ClInclude Include="BindingDlg.h" />
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="Launch.h" />

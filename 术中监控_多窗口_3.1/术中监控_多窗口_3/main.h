@@ -159,4 +159,6 @@ private:
 	void   OnCheckGridBinding(DWORD dwIndex);
 	//
 	void   OnCheckConflictTagTimer();
+	//
+	void   OnBinding();
 };

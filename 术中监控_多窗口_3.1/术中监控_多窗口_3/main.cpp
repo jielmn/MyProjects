@@ -14,6 +14,7 @@
 #include "SettingDlg.h"
 #include "LmnTelSvr.h"
 #include "AboutDlg.h"
+#include "BindingDlg.h"
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_eGridStatus = GRID_STATUS_GRIDS;
@@ -340,6 +341,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnEmpty") {
 			OnEmpty(msg);
+		}
+		else if (name == "btnBinding") {
+			OnBinding();
 		}
 	}
 	else if (msg.sType == "menu_setting") {
@@ -1636,6 +1640,17 @@ void   CDuiFrameWnd::OnCheckConflictTagTimer() {
 	m_LblConflictTips->SetText(strTips);
 }
 
+//
+void   CDuiFrameWnd::OnBinding() {
+	CBindingDlg * pDlg = new CBindingDlg;
+	pDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+	// 如果是click ok
+	if (0 == ret) {
+	}
+	delete pDlg;
+}
 
 
 
