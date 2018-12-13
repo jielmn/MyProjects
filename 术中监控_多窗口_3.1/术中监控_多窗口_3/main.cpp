@@ -1444,15 +1444,62 @@ void    CDuiFrameWnd::OnQueryBindingRet(WPARAM wParam, LPARAM  lParam) {
 	if ( 0 != strcmp(pRet->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
 		delete pRet;
 		return;
-	}
+	}    
 
 	memcpy(&m_tTagBinding[dwIndex][dwSubIndex], pRet, sizeof(TagBinding));
 	m_tTagBinding[dwIndex][dwSubIndex].m_bGetBindingRet = TRUE;
+	if (pRet->m_dwPatientId > 0) {
+		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("已绑定");
+	}
+	else {
+		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("未绑定");
+	}  
 
-	BOOL  bAllGetRet = TRUE;
+	BOOL    bAllGetRet;
+	DWORD   dwPatientId;
+	BOOL    bValidate;
+	BOOL    bTotalBinding;
+	CheckGridBinding(dwIndex, bAllGetRet, dwPatientId, bValidate, bTotalBinding);
+
+	// 如果不是所有的tag查询到绑定结果
+	if ( !bAllGetRet ) {
+		delete pRet;
+		return;
+	}
+
+	// 如果所有绑定的tag的绑定者是同一人
+	if ( bValidate ) {
+		// 所有的tag均没有绑定
+		if (dwPatientId == 0) {
+			m_btnBinding[dwIndex]->SetVisible(true);
+		}
+		else {
+			// 所有的tag中，只有部分绑定
+			if ( !bTotalBinding ) {
+				m_btnBinding[dwIndex]->SetVisible(true);
+			}
+			// 所有的tag中，都已经绑定
+			else {
+
+			}
+		}
+	}
+	// 如果所有绑定的tag的绑定者不是同一人
+	else {
+
+	}
+
+	delete pRet;
+}
+
+// 
+int   CDuiFrameWnd::CheckGridBinding(DWORD dwIndex, BOOL & bAllGetRet,
+	         DWORD & dwPatientId, BOOL & bValidate, BOOL & bTotalBinding ) {
+
+	bAllGetRet = TRUE;
 	// 检查一个窗格的所有tag都是否取到结果
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
-		if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch ) {
+		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
 			continue;
 		}
 
@@ -1464,16 +1511,43 @@ void    CDuiFrameWnd::OnQueryBindingRet(WPARAM wParam, LPARAM  lParam) {
 
 	// 不是所有的tag都查询到结果
 	if (!bAllGetRet) {
-		delete pRet;
-		return;
+		return 0;
 	}
 
 	// 检查是否所有tag绑定到同一个人
 	// 检查是否有tag没有绑定
+	dwPatientId = 0;
+	bValidate = TRUE;
+	bTotalBinding = TRUE;
+	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
+			continue;
+		}
 
-	delete pRet;
+		if (0 == dwPatientId) {
+			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {
+				dwPatientId = m_tTagBinding[dwIndex][i].m_dwPatientId;
+			}
+			else {
+				bTotalBinding = FALSE;
+			}
+		}
+		else {
+			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {
+				// 两个Tag绑定到不同的病人，有问题
+				if (m_tTagBinding[dwIndex][i].m_dwPatientId != dwPatientId) {
+					bValidate = FALSE;
+					break;
+				}
+			}
+			else {
+				bTotalBinding = FALSE;
+			}
+		}
+	}
+
+	return 0;
 }
-
 
 
 

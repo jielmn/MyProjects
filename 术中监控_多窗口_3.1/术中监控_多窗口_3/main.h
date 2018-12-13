@@ -153,5 +153,8 @@ private:
 	//
 	void   OnDbStatus(int nStatus);
 	//
-	void    OnQueryBindingRet(WPARAM wParam, LPARAM  lParam);
+	void   OnQueryBindingRet(WPARAM wParam, LPARAM  lParam);
+	// 
+	int   CheckGridBinding(DWORD dwIndex, BOOL & bAllGetRet,
+		    DWORD & dwPatientId, BOOL & bValidate, BOOL & bTotalBinding);
 };

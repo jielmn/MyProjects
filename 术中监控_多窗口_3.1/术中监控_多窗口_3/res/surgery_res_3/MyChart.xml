@@ -74,9 +74,9 @@
 					</VerticalLayout>					
 					
 					<VerticalLayout width="70">
-						<Button name="btnBinding" text="绑定" textpadding="4,0,4,0" textcolor="#FFF8992F" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="50" height="30" font="1" />
+						<Button name="btnBinding" text="绑定" textpadding="4,0,4,0" textcolor="#FFF8992F" hotimage="file='btn_hot.png' corner='2,8,2,2'" height="30" font="1" />
 						<HorizontalLayout />
-						<Label   name="lblCurTime_2"  height="30"  text="24小时前"    textcolor="#FFFFFFFF" font="1" align="center"  />
+						<Label   name="lblCurTime_2"  height="30"  text="24小时前"  textcolor="#FFFFFFFF" font="1" align="center"   />
 					</VerticalLayout>					
 				</HorizontalLayout>
 				

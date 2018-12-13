@@ -30,7 +30,7 @@ using namespace DuiLib;
 #define  TIMER_UPDATE_TIME_DESC             100
 #define  TIMER_UPDATE_TIME_DESC_INTERVAL    10000
 
-#define  DB_FLAG 0
+#define  DB_FLAG 1
 
 #define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
 #define   LOG_FILE_NAME           "surgery3.log"
