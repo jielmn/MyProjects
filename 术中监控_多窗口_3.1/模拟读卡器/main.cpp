@@ -12,6 +12,8 @@
 #define   MSG_CONNECT                 1            // 打开串口
 #define   MSG_READ_COM                2            // 读串口数据并处理
 
+// 制造1A和16A的tag冲突 
+#define   TAG_CONFLICT      1
 
 class MyMessageHandler : public LmnToolkits::MessageHandler {
 public:
@@ -158,9 +160,20 @@ int main() {
 		g_ReaderId[i][9]  = ((i + 1) % 100) / 10;
 		g_ReaderId[i][10] = (i + 1) % 10;
 
-		//memcpy(g_TagId[i], "\xe0\x29\x00\x00\x00\x00\x00\x00", 8);
 		memcpy(g_TagId[i], "\x00\x00\x00\x00\x00\x00\x29\xe0", 8);
+#if TAG_CONFLICT
+		if (i == 90) {
+			g_TagId[i][0] = (BYTE)(0 + 1);
+		}
+		else if (i == 84) {
+			g_TagId[i][0] = (BYTE)(6 + 1);
+		}
+		else {
+			g_TagId[i][0] = (BYTE)(i + 1);
+		}
+#else
 		g_TagId[i][0] = (BYTE)(i + 1);
+#endif
 	}
 
 	TConsoleMenuItem  item[3];

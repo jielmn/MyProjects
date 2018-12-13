@@ -38,6 +38,7 @@ void  CDuiFrameWnd::InitWindow() {
 	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
 	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
 	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
+	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -280,6 +281,7 @@ void  CDuiFrameWnd::InitWindow() {
 #endif
 
 	SetTimer(m_hWnd, TIMER_UPDATE_TIME_DESC, TIMER_UPDATE_TIME_DESC_INTERVAL, NULL);
+	SetTimer(m_hWnd, TIMER_CHECK_CONFLICT,   TIMER_CHECK_CONFLICT_INTERVAL, NULL);
 
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
@@ -395,6 +397,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 #endif		
 		if (wParam == TIMER_UPDATE_TIME_DESC) {
 			OnUpdateTimeDescTimer();
+		}
+		else if (wParam == TIMER_CHECK_CONFLICT) {
+			OnCheckConflictTagTimer();
 		}
 	}
 	else if (uMsg == UM_UPDATE_SCROLL) {
@@ -1015,6 +1020,10 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 			}
 		}
 	}
+
+#if DB_FLAG
+	OnCheckGridBinding(dwIndex);
+#endif
 }
 
 void   CDuiFrameWnd::OnTestTimer(DWORD  dwTimer) {
@@ -1455,47 +1464,20 @@ void    CDuiFrameWnd::OnQueryBindingRet(WPARAM wParam, LPARAM  lParam) {
 		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("未绑定");
 	}  
 
-	BOOL    bAllGetRet;
-	DWORD   dwPatientId;
-	BOOL    bValidate;
-	BOOL    bTotalBinding;
-	CheckGridBinding(dwIndex, bAllGetRet, dwPatientId, bValidate, bTotalBinding);
-
-	// 如果不是所有的tag查询到绑定结果
-	if ( !bAllGetRet ) {
-		delete pRet;
-		return;
-	}
-
-	// 如果所有绑定的tag的绑定者是同一人
-	if ( bValidate ) {
-		// 所有的tag均没有绑定
-		if (dwPatientId == 0) {
-			m_btnBinding[dwIndex]->SetVisible(true);
-		}
-		else {
-			// 所有的tag中，只有部分绑定
-			if ( !bTotalBinding ) {
-				m_btnBinding[dwIndex]->SetVisible(true);
-			}
-			// 所有的tag中，都已经绑定
-			else {
-
-			}
-		}
-	}
-	// 如果所有绑定的tag的绑定者不是同一人
-	else {
-
-	}
-
+	OnCheckGridBinding(dwIndex);
+	
 	delete pRet;
 }
 
 // 
-int   CDuiFrameWnd::CheckGridBinding(DWORD dwIndex, BOOL & bAllGetRet,
-	         DWORD & dwPatientId, BOOL & bValidate, BOOL & bTotalBinding ) {
+void   CDuiFrameWnd::OnCheckGridBinding(DWORD dwIndex ) {
 
+	BOOL    bAllGetRet;
+	DWORD   dwPatientId;
+	BOOL    bValidate;
+	BOOL    bTotalBinding;
+
+	int nSwitchOnCnt = 0;
 	bAllGetRet = TRUE;
 	// 检查一个窗格的所有tag都是否取到结果
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
@@ -1503,15 +1485,23 @@ int   CDuiFrameWnd::CheckGridBinding(DWORD dwIndex, BOOL & bAllGetRet,
 			continue;
 		}
 
+		nSwitchOnCnt++;
 		if (!m_tTagBinding[dwIndex][i].m_bGetBindingRet) {
 			bAllGetRet = FALSE;
 			break;
 		}
 	}
 
+	// 没有一个Reader打开开关
+	if (nSwitchOnCnt <= 0) {
+		m_btnBinding[dwIndex]->SetVisible(false);
+		return;
+	}
+
 	// 不是所有的tag都查询到结果
 	if (!bAllGetRet) {
-		return 0;
+		m_btnBinding[dwIndex]->SetVisible(false);
+		return;
 	}
 
 	// 检查是否所有tag绑定到同一个人
@@ -1546,7 +1536,104 @@ int   CDuiFrameWnd::CheckGridBinding(DWORD dwIndex, BOOL & bAllGetRet,
 		}
 	}
 
-	return 0;
+	// 如果所有绑定的tag的绑定者是同一人
+	if (bValidate) {
+		// 所有的tag均没有绑定
+		if (dwPatientId == 0) {
+			m_btnBinding[dwIndex]->SetVisible(true);
+		}
+		else {
+			// 所有的tag中，只有部分绑定
+			if (!bTotalBinding) {
+				m_btnBinding[dwIndex]->SetVisible(true);
+			}
+			// 所有的tag中，都已经绑定
+			else {
+				m_btnBinding[dwIndex]->SetVisible(false);
+			}
+		}
+	}
+	// 如果所有绑定的tag的绑定者不是同一人
+	else {
+		m_btnBinding[dwIndex]->SetVisible(false);
+	}
+}
+ 
+void   CDuiFrameWnd::OnCheckConflictTagTimer() {
+	// DWORD  a = LmnGetTickCount();
+
+	DWORD   dwGridsCnt = MAX_GRID_COUNT;
+	DWORD   dwReaderCnt = MAX_READERS_PER_GRID * dwGridsCnt;
+
+	std::vector<DWORD>  vConfilcts;
+	for (DWORD i = 0; i < dwReaderCnt; i++) {
+		DWORD  m = i / 6;
+		DWORD  n = i % 6;
+
+		if ( m_tLastTemp[m][n].m_szTagId[0] == '\0' ) {
+			continue;
+		}
+
+		for (DWORD j = i + 1; j < dwReaderCnt; j++) {
+			DWORD  x = j / 6;
+			DWORD  y = j % 6;
+
+			if (m_tLastTemp[x][y].m_szTagId[0] == '\0') {
+				continue;
+			}
+
+			// 如果有冲突
+			if (0 == strcmp(m_tLastTemp[m][n].m_szTagId, m_tLastTemp[x][y].m_szTagId)) {
+				DWORD  time_diff = 0;
+				if ( m_tLastTemp[m][n].m_Time >= m_tLastTemp[x][y].m_Time ) {
+					time_diff = (DWORD)(m_tLastTemp[m][n].m_Time - m_tLastTemp[x][y].m_Time);
+				}
+				else {
+					time_diff = (DWORD)(m_tLastTemp[x][y].m_Time - m_tLastTemp[m][n].m_Time);
+				}
+				// 如果间隔小于10分钟
+				if ( time_diff <= 600 ) {
+					vConfilcts.push_back(MAKELONG(i, j));
+				}				
+			}
+		}
+	}
+
+	std::vector<DWORD>::iterator  it;
+	DuiLib::CDuiString  strText;
+	DuiLib::CDuiString  strTips;
+	DWORD  k = 0;
+	for (it = vConfilcts.begin(), k = 0; it != vConfilcts.end(); it++, k++) {
+		DWORD  i = LOWORD( *it );
+		DWORD  j = HIWORD( *it );
+
+		DWORD  m = i / 6;
+		DWORD  n = i % 6;
+
+		DWORD  x = j / 6;
+		DWORD  y = j % 6;
+
+		strText.Format("\"%s%c\"和\"%s%c\"", 
+			g_data.m_CfgData.m_GridCfg[m].m_szBed, n + 'A', 
+			g_data.m_CfgData.m_GridCfg[x].m_szBed, y + 'A');
+		if ( 0 == k ) {
+			strTips += strText;
+		}
+		else {
+			strTips += ",";
+			strTips += strText;
+		}
+	}
+
+	if (vConfilcts.size() > 0) {
+		strTips += "读取的tag冲突";
+	}
+
+	//DWORD  b = LmnGetTickCount();
+	//strText.Format("elapsed: %.3f秒", (b - a) / 1000.0);
+	//strTips += strText;
+
+	m_LblConflictTips->SetText(strTips);
 }
 
 

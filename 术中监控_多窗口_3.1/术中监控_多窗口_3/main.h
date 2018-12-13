@@ -98,6 +98,7 @@ private:
 	CLabelUI *                         m_LblReaderId[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CLabelUI *                         m_LblTagId[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	CLabelUI *                         m_LblTagBinding[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	CLabelUI *                         m_LblConflictTips;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -155,6 +156,7 @@ private:
 	//
 	void   OnQueryBindingRet(WPARAM wParam, LPARAM  lParam);
 	// 
-	int   CheckGridBinding(DWORD dwIndex, BOOL & bAllGetRet,
-		    DWORD & dwPatientId, BOOL & bValidate, BOOL & bTotalBinding);
+	void   OnCheckGridBinding(DWORD dwIndex);
+	//
+	void   OnCheckConflictTagTimer();
 };
