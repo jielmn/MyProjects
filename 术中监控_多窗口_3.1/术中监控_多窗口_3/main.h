@@ -160,5 +160,5 @@ private:
 	//
 	void   OnCheckConflictTagTimer();
 	//
-	void   OnBinding();
+	void   OnBinding(DWORD dwIndex);
 };

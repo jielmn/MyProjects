@@ -344,7 +344,6 @@ public:
 	LastTemp  m_tTemp;
 };
 
-
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];

@@ -343,7 +343,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnEmpty(msg);
 		}
 		else if (name == "btnBinding") {
-			OnBinding();
+			OnBinding(msg.pSender->GetTag());
 		}
 	}
 	else if (msg.sType == "menu_setting") {
@@ -1663,13 +1663,108 @@ void   CDuiFrameWnd::OnCheckConflictTagTimer() {
 }
 
 //
-void   CDuiFrameWnd::OnBinding() {
+void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
+	BOOL    bAllGetRet;
+	DWORD   dwPatientId;
+	BOOL    bValidate;
+	BOOL    bTotalBinding;
+
+	int nSwitchOnCnt = 0;
+	bAllGetRet = TRUE;
+	// 检查一个窗格的所有tag都是否取到结果
+	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
+			continue;
+		}
+
+		nSwitchOnCnt++;
+		if (!m_tTagBinding[dwIndex][i].m_bGetBindingRet) {
+			bAllGetRet = FALSE;
+			break;
+		}
+	}
+
+	// 没有一个Reader打开开关
+	if (nSwitchOnCnt <= 0) {
+		return;
+	}
+
+	// 不是所有的tag都查询到结果
+	if (!bAllGetRet) {
+		return;
+	}
+
+	// 检查是否所有tag绑定到同一个人
+	// 检查是否有tag没有绑定
+	dwPatientId = 0;
+	bValidate = TRUE;
+	bTotalBinding = TRUE;
 	CBindingDlg * pDlg = new CBindingDlg;
+
+	pDlg->m_dwIndex = dwIndex;
+	pDlg->m_dwTagItemCnt = nSwitchOnCnt;
+	for (int i = 0,k = 0; i < MAX_READERS_PER_GRID; i++) {
+		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
+			continue;
+		}
+
+		pDlg->m_tTagItem[k].m_dwSubIndex = i;
+		STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
+			sizeof(pDlg->m_tTagItem[k].m_szTagId));
+
+		if (0 == dwPatientId) {
+			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {
+				dwPatientId = m_tTagBinding[dwIndex][i].m_dwPatientId;
+			}
+			else {
+				bTotalBinding = FALSE;
+			}
+		}
+		else {
+			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {
+				// 两个Tag绑定到不同的病人，有问题
+				if (m_tTagBinding[dwIndex][i].m_dwPatientId != dwPatientId) {
+					bValidate = FALSE;
+					break;
+				}
+			}
+			else {
+				bTotalBinding = FALSE;
+			}
+		}
+	}
+
+	pDlg->m_dwPatientId = dwPatientId;
+	// 如果所有绑定的tag的绑定者是同一人
+	if (bValidate) {
+		// 所有的tag均没有绑定
+		if (dwPatientId == 0) {
+			
+		}
+		else {
+			// 所有的tag中，只有部分绑定
+			if (!bTotalBinding) {
+				
+			}
+			// 所有的tag中，都已经绑定
+			else {
+				delete pDlg;
+				return;
+			}
+		}
+	}
+	// 如果所有绑定的tag的绑定者不是同一人
+	else {
+		delete pDlg;
+		return;
+	}
+
 	pDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pDlg->CenterWindow();
 	int ret = pDlg->ShowModal();
 	// 如果是click ok
 	if (0 == ret) {
+
 	}
 	delete pDlg;
 }

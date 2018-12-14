@@ -40,14 +40,16 @@
 			
 			<HorizontalLayout height="20" />
 			
-			<VerticalLayout vscrollbar="true" sepheight="4">
-				<List name="lstTags" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" bordercolor="#FF768D9B" bordersize="1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
-					<ListHeader height="24" menu="true" bordercolor="#FF768D9B" bordersize="1" >
-						<ListHeaderItem text="Tag 位置"      font="1" width="150"   textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
-						<ListHeaderItem text="Tag ID"  font="1" width="160"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
-						<ListHeaderItem text="绑定部位"    font="1" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+			<VerticalLayout vscrollbar="true" sepheight="4" >
+				<List name="lstTags" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" bordercolor="#FF768D9B" bordersize="1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" height="24" enabled="false" >
+					<ListHeader height="24" menu="false" bordercolor="#FF768D9B" bordersize="1" enabled="false" >
+						<ListHeaderItem text="Tag 位置"      font="1" width="150"   textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1" enabled="false" />
+						<ListHeaderItem text="Tag ID"  font="1" width="160"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1" enabled="false" />
+						<ListHeaderItem text="绑定部位"    font="1" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1" enabled="false" />
 					</ListHeader>
-				</List> 
+				</List>
+
+				<VerticalLayout inset="0,0,0,0" name="layTags" />
 			</VerticalLayout>
 			
 			

@@ -8,6 +8,16 @@
 class CBindingDlg : public DuiLib::WindowImplBase
 {
 public:
+	typedef  struct tagTagItem{
+		char    m_szTagId[20];
+		DWORD   m_dwSubIndex;
+	}TagItem;
+
+	TagItem      m_tTagItem[MAX_READERS_PER_GRID];
+	DWORD        m_dwTagItemCnt;
+	DWORD        m_dwPatientId;
+	DWORD        m_dwIndex;
+
 	CBindingDlg();
 
 	virtual LPCTSTR    GetWindowClassName() const { return _T(BINDING_FRAME_NAME); }
@@ -18,5 +28,9 @@ public:
 	virtual void   InitWindow();
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
+private:
+
+	DuiLib::CListUI *               m_lstTags;
 };
 
