@@ -27,7 +27,7 @@ void   CSettingDlg::InitWindow() {
 
 	DuiLib::CDuiString  strText;
 	CMyTreeCfgUI::Node* pTitleNode = NULL;
-	strText.Format("窗格");
+	strText.Format("床位");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666 );
 
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -122,7 +122,7 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	DuiLib::CDuiString  strText;
 
 	CMyTreeCfgUI::Node* pSubTitleNode = NULL;
-	strText.Format("窗格%lu参数设置", dwIndex + 1);
+	strText.Format("床位%lu参数设置", dwIndex + 1);
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666 );
 
 	CComboUI * pCombo = 0;
@@ -163,7 +163,7 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	for ( DWORD i = 0; i < MAX_READERS_PER_GRID; i++ ) {
 
 		CMyTreeCfgUI::Node* pSubTitleNode_2 = NULL;
-		strText.Format("读卡器%lu", i+1);
+		strText.Format("读卡器%c", i+'A');
 		pSubTitleNode_2 = m_tree->AddNode(strText, pSubTitleNode_1, 0, 0, 3, 0xFF666666);
 
 		pCheckBox = new CCheckBoxUI;

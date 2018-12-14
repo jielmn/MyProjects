@@ -1259,7 +1259,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
 
 	delete pTemp;
-}   
+}         
  
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
