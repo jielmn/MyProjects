@@ -1225,14 +1225,18 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	// 查询tag绑定关系
 	if ( 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId ) ) {
 		memset(&m_tTagBinding[dwIndex][dwSubIndex], 0, sizeof(m_tTagBinding[dwIndex][dwSubIndex]));
-		CBusiness::GetInstance()->QueryBindingAsyn(dwIndex, dwSubIndex,pTemp->m_szTagId);
 		m_btnBinding[dwIndex]->SetVisible(false);
 		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("");
-	}
+		CBusiness::GetInstance()->QueryBindingAsyn(dwIndex, dwSubIndex, pTemp->m_szTagId);
+	}	
 #endif
 
 	memcpy(&m_tLastTemp[dwIndex][dwSubIndex], pTemp, sizeof(LastTemp));
 	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
+
+#if DB_FLAG
+	CBusiness::GetInstance()->SaveTempAsyn(dwIndex, dwSubIndex, &m_tLastTemp[dwIndex][dwSubIndex]);
+#endif
 	
 	OnTemp(dwIndex, dwSubIndex, dwTemp);
 
@@ -1444,6 +1448,24 @@ void   CDuiFrameWnd::OnDbStatus(int nStatus) {
 	}
 	else {
 		m_LblDbStatus->SetText("数据库连接OK");
+
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
+				if ( !g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch ) {
+					continue;
+				}
+
+				if (m_tLastTemp[i][j].m_szTagId[0] == '\0') {
+					continue;
+				}
+
+				if (m_tTagBinding[i][j].m_bGetBindingRet) {
+					continue;
+				}
+
+				CBusiness::GetInstance()->QueryBindingAsyn(i, j, m_tLastTemp[i][j].m_szTagId);
+			}
+		}
 	}
 }
 

@@ -159,7 +159,10 @@ using namespace DuiLib;
 #define MSG_GET_GRID_TEMP                1007
 #define MSG_CHECK_LAUNCH_STATUS          1008
 #define MSG_RECONNECT_DB                 1009
-#define MSG_QUERY_BINDING                1010
+#define MSG_QUERY_BINDING                2000
+#define MSG_QUERY_BINDING_MAX            2999
+#define MSG_DB_HEARTBEAT                 3000
+#define MSG_SAVE_TEMP                    3001
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -330,6 +333,18 @@ typedef struct tagTagBinding {
 	char     m_szTagId[20];
 }TagBinding;
 
+class CSaveTempParam : public LmnToolkits::MessageData {
+public:
+	CSaveTempParam(DWORD dwIndex, DWORD dwSubIndex, const LastTemp * pTemp)
+		: m_dwIndex(dwIndex), m_dwSubIndex(dwSubIndex) {
+		memcpy(&m_tTemp, pTemp, sizeof(LastTemp));
+	}
+	DWORD     m_dwIndex;
+	DWORD     m_dwSubIndex;
+	LastTemp  m_tTemp;
+};
+
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
@@ -353,12 +368,14 @@ extern BOOL  CheckComPortExist(int nCheckComPort);
 extern void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage);
 extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Date2String_2(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * GetElapsedTimeDesc(char * buf, DWORD dwBufSize, time_t  tTimeDiff);
 extern char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD dwDestSize);
 extern int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, BYTE * pData, DWORD dwDataLen);
 extern char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD dwDataLen);
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
+
 
 // templates
 template <class T>

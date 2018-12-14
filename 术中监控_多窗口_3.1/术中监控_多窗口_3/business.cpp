@@ -592,6 +592,13 @@ int   CBusiness::ReconnectDb() {
 
 void   CBusiness::OnDbStatus(int nDbStatus) {
 	::PostMessage(g_data.m_hWnd, UM_DB_STATUS, (WPARAM)nDbStatus, 0);
+	// 如果连接失败，重新连接
+	if ( 0 == nDbStatus ) {
+		ReconnectDbAsyn(15000);
+	}
+	else {
+		DbHeartBeatAsyn();
+	}
 }
 
 int   CBusiness::GetDbStatus() {
@@ -600,8 +607,8 @@ int   CBusiness::GetDbStatus() {
 
 // 查询绑定关系
 int   CBusiness::QueryBindingAsyn(DWORD dwIndex, DWORD dwSubIndex, const char * szTagId) {
-	g_thrd_db->PostMessage(this, MSG_QUERY_BINDING, 
-		new CQueryBindingParam(dwIndex, dwSubIndex, szTagId) );
+	g_thrd_db->PostMessage(this, MSG_QUERY_BINDING + dwIndex * MAX_READERS_PER_GRID + dwSubIndex, 
+		new CQueryBindingParam(dwIndex, dwSubIndex, szTagId), TRUE );
 	return 0;
 }
 
@@ -616,6 +623,33 @@ int   CBusiness::QueryBinding(const CQueryBindingParam * pParam) {
 		::PostMessage(g_data.m_hWnd, UM_QUERY_TAG_BINDING_RET,
 			MAKELONG(pParam->m_dwIndex, pParam->m_dwSubIndex), (LPARAM)pNewRet);
 	}
+	return 0;
+}
+
+int   CBusiness::DbHeartBeatAsyn(DWORD dwDelay /*= 0*/) {
+	if (0 == dwDelay) {
+		g_thrd_db->PostMessage(this, MSG_DB_HEARTBEAT);
+	}
+	else {
+		g_thrd_db->PostDelayMessage(dwDelay, this, MSG_DB_HEARTBEAT);
+	}
+	return 0;
+}
+
+int   CBusiness::DbHeartBeat() {
+	m_db.DbHeartBeat();
+	DbHeartBeatAsyn(15000);
+	return 0;
+}
+
+int   CBusiness::SaveTempAsyn(DWORD dwIndex, DWORD dwSubIndex, const LastTemp * pTemp) {
+	g_thrd_db->PostMessage(this, MSG_SAVE_TEMP, 
+		new CSaveTempParam(dwIndex, dwSubIndex, pTemp) );
+	return 0;
+}
+
+int   CBusiness::SaveTemp(const CSaveTempParam * pParam ) {
+	m_db.SaveTemp(pParam);
 	return 0;
 }
 
@@ -681,31 +715,46 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
-	case MSG_QUERY_BINDING:
+	case MSG_DB_HEARTBEAT:
 	{
-		CQueryBindingParam * pParam = (CQueryBindingParam *)pMessageData;
-		QueryBinding(pParam);
+		DbHeartBeat();
+	}
+	break;
+
+	case MSG_SAVE_TEMP:
+	{
+		CSaveTempParam * pParam = (CSaveTempParam *)pMessageData;
+		SaveTemp(pParam);
 	}
 	break;
 
 	default:
-		break;
+	{
+		if ( dwMessageId >= MSG_QUERY_BINDING && dwMessageId <= MSG_QUERY_BINDING_MAX ) {
+			CQueryBindingParam * pParam = (CQueryBindingParam *)pMessageData;
+			QueryBinding(pParam);
+		}
+	}
+	break;
+
 	}
 }
 
 CMyDb::CMyDb() {
 	//初始化mysql结构
-	mysql_init(&m_mysql);
+	//mysql_init(&m_mysql);
 	m_nStatus = 0;
 }
 
 CMyDb::~CMyDb() {
+	ClearVector(m_vTemps);
+
 	//释放数据库
 	mysql_close(&m_mysql);
 }
 
 int CMyDb::Reconnect() {
-
+	mysql_init(&m_mysql);	
 	if (!mysql_real_connect(&m_mysql, g_data.m_szDbHost, g_data.m_szDbUser, g_data.m_szDbPwd, "surgery", 3306, NULL, 0))
 	{
 		m_nStatus = 0;
@@ -713,8 +762,22 @@ int CMyDb::Reconnect() {
 	}
 	else {
 		m_nStatus = 1;
-		char reconnect = 1;
-		mysql_options( &m_mysql, MYSQL_OPT_RECONNECT, (char *)&reconnect );
+
+		// 处理没有保存的温度数据
+		int ret = 0;
+		std::vector<TempItem *>::iterator it;
+		for (it = m_vTemps.begin(); it != m_vTemps.end(); ) {
+			TempItem * pItem = *it;
+			ret = SaveTemp(pItem);
+			// 保存温度失败
+			if (0 != ret) {
+				break;
+			}
+			else {
+				delete pItem;
+				it = m_vTemps.erase(it);
+			}
+		}
 	}
 
 	m_sigStatus.emit(m_nStatus);
@@ -774,5 +837,87 @@ int  CMyDb::QueryBinding(const CQueryBindingParam * pParam, TagBinding * pRet ) 
 	
 
 	mysql_free_result(res);
+	return 0;
+}
+
+int  CMyDb::DbHeartBeat() {
+	if ( m_nStatus == 0 ) {
+		return -1;
+	}
+
+	int ret = mysql_ping(&m_mysql);
+	if ( 0 != ret ) {
+		m_nStatus = 0;
+		m_sigStatus.emit(m_nStatus);
+	}
+	
+	return 0;
+}
+
+void  CMyDb::BuffTemp(const CSaveTempParam * pParam) {
+	if (m_vTemps.size() >= 270000) {
+		std::vector<TempItem *>::iterator it = m_vTemps.begin();
+		TempItem * pData = *it;
+		m_vTemps.erase(it);
+		delete pData;
+	}
+
+	TempItem * pItem = new TempItem;
+	pItem->m_dwIndex = pParam->m_dwIndex;
+	pItem->m_dwSubIndex = pParam->m_dwSubIndex;
+	pItem->m_dwTemp = pParam->m_tTemp.m_dwTemp;
+	pItem->m_Time = pParam->m_tTemp.m_Time;
+	STRNCPY(pItem->m_szTagId, pParam->m_tTemp.m_szTagId, sizeof(pItem->m_szTagId));
+	m_vTemps.push_back(pItem);
+}
+
+int  CMyDb::SaveTemp(const CSaveTempParam * pParam) {
+	if (m_nStatus == 0) {
+		BuffTemp(pParam);
+		return -1;
+	}
+
+	char  szSql[8192];
+	char  szTime[256];
+	SNPRINTF(szSql, sizeof(szSql), 
+		"insert into temperature values (null, '%s', '%s', %lu, %lu) ", 
+		pParam->m_tTemp.m_szTagId, 
+		Date2String_2(szTime, sizeof(szTime), &pParam->m_tTemp.m_Time ), 
+		pParam->m_tTemp.m_dwTemp, 
+		pParam->m_dwIndex * MAX_READERS_PER_GRID + pParam->m_dwSubIndex );
+
+	int ret = mysql_query(&m_mysql, szSql);
+	if ( 0 != ret ) {
+		DWORD dwError = mysql_errno(&m_mysql);
+		if (2013 == dwError || 2006 == dwError) {
+			m_nStatus = 0;
+			m_sigStatus.emit(m_nStatus);
+		}
+
+		BuffTemp(pParam);
+		return -2;
+	}
+	return 0;
+}
+
+int  CMyDb::SaveTemp(const TempItem * pTemp) {
+	char  szSql[8192];
+	char  szTime[256];
+	SNPRINTF(szSql, sizeof(szSql),
+		"insert into temperature values (null, '%s', '%s', %lu, %lu) ",
+		pTemp->m_szTagId,
+		Date2String_2(szTime, sizeof(szTime), &pTemp->m_Time),
+		pTemp->m_dwTemp,
+		pTemp->m_dwIndex * MAX_READERS_PER_GRID + pTemp->m_dwSubIndex);
+
+	int ret = mysql_query(&m_mysql, szSql);
+	if (0 != ret) {
+		DWORD dwError = mysql_errno(&m_mysql);
+		if (2013 == dwError || 2006 == dwError) {
+			m_nStatus = 0;
+			m_sigStatus.emit(m_nStatus);
+		}
+		return -1;
+	}
 	return 0;
 }

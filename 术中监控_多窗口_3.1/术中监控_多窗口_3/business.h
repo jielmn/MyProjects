@@ -14,12 +14,26 @@ public:
 	int  Reconnect();
 	int  GetStatus();
 	int  QueryBinding(const CQueryBindingParam * pParam, TagBinding * tRet);
+	int  DbHeartBeat();
+	int  SaveTemp(const CSaveTempParam * pParam);
 
 	sigslot::signal1<int>     m_sigStatus;
 
 private:
+	typedef struct tagTempItem {
+		DWORD   m_dwTemp;                      // 温度
+		time_t  m_Time;                        // 时间
+		char    m_szTagId[20];                 // tag id
+		DWORD   m_dwIndex;
+		DWORD   m_dwSubIndex;
+	}TempItem;
+
 	MYSQL   m_mysql;
 	int     m_nStatus;    //0: 关闭;    1: 打开
+	std::vector<TempItem *>   m_vTemps;
+
+	int SaveTemp(const TempItem * pTemp);
+	void BuffTemp(const CSaveTempParam * pParam);
 };
 
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
@@ -75,9 +89,17 @@ public:
 	void  OnDbStatus(int nDbStatus);
 	int   GetDbStatus();
 
+	// 检查数据数连接状态
+	int   DbHeartBeatAsyn(DWORD dwDelay = 0);
+	int   DbHeartBeat();
+
 	// 查询绑定关系
 	int   QueryBindingAsyn(DWORD dwIndex, DWORD dwSubIndex, const char * szTagId);
 	int   QueryBinding(const CQueryBindingParam * pParam);
+
+	// 保存温度数据到数据库
+	int   SaveTempAsyn(DWORD dwIndex, DWORD dwSubIndex, const LastTemp * pTemp );
+	int   SaveTemp(const CSaveTempParam * pParam);
 
 private:
 	static CBusiness *  pInstance;
