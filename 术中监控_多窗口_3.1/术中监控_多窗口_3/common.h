@@ -261,6 +261,7 @@ public:
 	char      m_szDbHost[64];                          // mysql host
 	char      m_szDbUser[64];
 	char      m_szDbPwd[64];
+	BOOL      m_bUtf8;                                 // ÊÇ·ñutf8±àÂë
 };
 
 #define  MAX_AREA_NAME_LENGTH   64
@@ -344,6 +345,10 @@ public:
 	LastTemp  m_tTemp;
 };
 
+typedef  struct  tagBodyPart {
+	char      m_szName[20];
+}BodyPart;
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
@@ -374,7 +379,7 @@ extern int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, BYTE * pData, DWORD dwDataLen);
 extern char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD dwDataLen);
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
-
+extern std::vector<BodyPart *>    g_vBodyParts;
 
 // templates
 template <class T>

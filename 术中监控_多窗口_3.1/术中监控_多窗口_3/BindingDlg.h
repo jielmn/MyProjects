@@ -32,5 +32,13 @@ public:
 private:
 
 	DuiLib::CListUI *               m_lstTags;
+	DuiLib::CTileLayoutUI *         m_layTags;
+	CControlUI *                    m_pTags[MAX_READERS_PER_GRID];
+	CLabelUI *                      m_lblTagPos[MAX_READERS_PER_GRID];
+	CLabelUI *                      m_lblTagId[MAX_READERS_PER_GRID];
+	CComboUI *                      m_cmbTagName[MAX_READERS_PER_GRID];
+
+private:
+	void   OnSize(WPARAM wParam, LPARAM lParam);
 };
 

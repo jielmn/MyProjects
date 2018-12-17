@@ -21,6 +21,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_dwInflateGridIndex = -1;
 	memset(m_tLastTemp, 0, sizeof(m_tLastTemp));
 	memset(m_tTagBinding, 0, sizeof(m_tTagBinding));	
+	m_layMain = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -295,7 +296,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	WindowImplBase::InitWindow();
 }  
-                 
+                
 LRESULT CDuiFrameWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	return WindowImplBase::OnCreate(uMsg, wParam, lParam, bHandled);
 }
@@ -1711,6 +1712,7 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 		pDlg->m_tTagItem[k].m_dwSubIndex = i;
 		STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
 			sizeof(pDlg->m_tTagItem[k].m_szTagId));
+		k++;
 
 		if (0 == dwPatientId) {
 			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {

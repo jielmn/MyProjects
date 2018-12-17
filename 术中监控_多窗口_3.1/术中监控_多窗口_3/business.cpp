@@ -41,6 +41,7 @@ void CBusiness::Clear() {
 	}
 
 	ClearVector(g_vArea);
+	ClearVector(g_vBodyParts);
 }
 
 int CBusiness::Init() {
@@ -68,6 +69,7 @@ int CBusiness::Init() {
 	g_data.m_cfg->GetConfig(CFG_MAIN_LAYOUT_ROWS, g_data.m_CfgData.m_dwLayoutRows, DEFAULT_MAIN_LAYOUT_ROWS);
 	g_data.m_cfg->GetConfig(CFG_AREA_ID_NAME, g_data.m_CfgData.m_dwAreaNo, 0);
 	g_data.m_cfg->GetBooleanConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_CfgData.m_bAlarmVoiceOff, DEFAULT_ALARM_VOICE_SWITCH);
+	g_data.m_cfg->GetBooleanConfig("utf8", g_data.m_bUtf8, TRUE);
 
 	// 皮肤
 	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, DEFAULT_SKIN);
@@ -219,6 +221,24 @@ int CBusiness::Init() {
 		}
 	}
 	// END OF 区号
+
+	// 身体部位( tag name )
+	for (int i = 0; i < 20; i++) {
+		BodyPart item;
+		strText.Format("body part %d", i + 1);
+		g_data.m_cfg->GetConfig(strText, item.m_szName, sizeof(item.m_szName), "");
+		if (item.m_szName[0] == '\0') {
+			break;
+		}		
+
+		BodyPart * pNewItem = new BodyPart;
+		memcpy(pNewItem, &item, sizeof(BodyPart));
+		if (g_data.m_bUtf8) {
+			Utf8ToAnsi(pNewItem->m_szName, sizeof(pNewItem->m_szName), item.m_szName);
+		}
+		g_vBodyParts.push_back(pNewItem);
+	}
+
 	g_data.m_bAutoScroll = TRUE;
 
 	g_data.m_dwCollectIntervalWidth = DEFAULT_COLLECT_INTERVAL;

@@ -19,6 +19,7 @@ LmnToolkits::Thread *  g_thrd_launch = 0;
 LmnToolkits::Thread *  g_thrd_db = 0;
 DuiLib::CEditUI * g_edRemark = 0;
 DWORD g_dwPrintExcelMaxPointsCnt = 0;
+std::vector<BodyPart *>    g_vBodyParts;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;

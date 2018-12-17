@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="800,600" mininfo="400,400" caption="0,0,0,32" sizebox="0,0,0,0" roundcorner="5,5"> <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
 	<Font id="0" name="宋体" size="12" bold="true" />
-	<Font id="1" name="宋体" size="13" bold="false" />
+	<Font id="1" name="宋体" size="15" bold="false" />
 	<Font id="2" name="宋体" size="15" bold="false" />
 	<Font id="3" name="宋体" size="15" bold="true" />
 	<Font id="4" name="宋体" size="22" bold="true" italic="true"/>
@@ -40,7 +40,7 @@
 			
 			<HorizontalLayout height="20" />
 			
-			<VerticalLayout vscrollbar="true" sepheight="4" >
+			<VerticalLayout vscrollbar="true" sepheight="4" height="24" >
 				<List name="lstTags" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="false" bordercolor="#FF768D9B" bordersize="1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" height="24" enabled="false" >
 					<ListHeader height="24" menu="false" bordercolor="#FF768D9B" bordersize="1" enabled="false" >
 						<ListHeaderItem text="Tag 位置"      font="1" width="150"   textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1" enabled="false" />
@@ -52,7 +52,17 @@
 				<VerticalLayout inset="0,0,0,0" name="layTags" />
 			</VerticalLayout>
 			
-			
+			<VerticalLayout>
+				<HorizontalLayout>			
+					<VerticalLayout width="1" bkcolor="#FF768D9B" />
+					<!-- 待绑定的tag -->		
+					<TileLayout inset="0,0,0,0" name="layTags" columns="1" bordercolor="#FF768D9B" >
+					</TileLayout>
+					<VerticalLayout width="1" bkcolor="#FF768D9B" />
+				</HorizontalLayout>	
+				<HorizontalLayout height="1" bkcolor="#FF768D9B" />
+			</VerticalLayout>
+						
 			<HorizontalLayout  height="40" inset="0,5,0,5" >
 				<Control />
 				<Button name="btnOK" text="确定" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
