@@ -1709,17 +1709,17 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 			continue;
 		}
 
-		pDlg->m_tTagItem[k].m_dwSubIndex = i;
-		STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
-			sizeof(pDlg->m_tTagItem[k].m_szTagId));
-		k++;
-
 		if (0 == dwPatientId) {
 			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {
 				dwPatientId = m_tTagBinding[dwIndex][i].m_dwPatientId;
 			}
 			else {
 				bTotalBinding = FALSE;
+
+				pDlg->m_tTagItem[k].m_dwSubIndex = i;
+				STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
+					sizeof(pDlg->m_tTagItem[k].m_szTagId));
+				k++;
 			}
 		}
 		else {
@@ -1732,6 +1732,11 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 			}
 			else {
 				bTotalBinding = FALSE;
+
+				pDlg->m_tTagItem[k].m_dwSubIndex = i;
+				STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
+					sizeof(pDlg->m_tTagItem[k].m_szTagId));
+				k++;
 			}
 		}
 	}
@@ -1764,9 +1769,11 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 	pDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pDlg->CenterWindow();
 	int ret = pDlg->ShowModal();
-	// 如果是click ok
+	// 如果是click ok(绑定成功)
 	if (0 == ret) {
-
+		//for ( DWORD i = 0; i < pDlg->m_dwTagItemCnt; i++ ) {
+		//	m_tTagBinding[dwIndex][pDlg->m_tTagItem[i].m_dwSubIndex].m_dwPatientId;
+		//}
 	}
 	delete pDlg;
 }

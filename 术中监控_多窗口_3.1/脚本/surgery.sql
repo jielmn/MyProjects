@@ -10,8 +10,25 @@ Target Server Type    : MYSQL
 Target Server Version : 50560
 File Encoding         : 65001
 
-Date: 2018-12-12 17:32:02
+Date: 2018-12-17 15:26:12
 */
+
+/* mine */
+use mysql;
+
+set @cnt = 0;
+select count(*) into @cnt from user where user = 'root' and host = '%';
+update user set host = '%' where user = 'root' and @cnt = 0;
+
+flush privileges;
+
+drop database if exists surgery;
+create database  surgery;
+use surgery;
+/* end of mine */
+
+
+
 
 SET FOREIGN_KEY_CHECKS=0;
 
@@ -36,7 +53,7 @@ CREATE TABLE `logininfo` (
   `loginip` varchar(255) DEFAULT NULL,
   `loginpart` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=580 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=589 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for patientinfo
@@ -50,7 +67,7 @@ CREATE TABLE `patientinfo` (
   `bedid` varchar(16) DEFAULT NULL,
   `age` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4077 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2308 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for staff
@@ -75,12 +92,11 @@ CREATE TABLE `staff` (
 -- ----------------------------
 DROP TABLE IF EXISTS `tagbands`;
 CREATE TABLE `tagbands` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `tagid` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
-  `patientid` varchar(255) CHARACTER SET utf8 DEFAULT '',
+  `patientid` int(11) DEFAULT NULL,
   `patientpart` varchar(255) CHARACTER SET utf8 DEFAULT '',
-  PRIMARY KEY (`id`,`tagid`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`tagid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- ----------------------------
 -- Table structure for temperature
@@ -93,7 +109,7 @@ CREATE TABLE `temperature` (
   `temperature` int(11) NOT NULL,
   `grid_index` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for users

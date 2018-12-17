@@ -163,6 +163,8 @@ using namespace DuiLib;
 #define MSG_QUERY_BINDING_MAX            2999
 #define MSG_DB_HEARTBEAT                 3000
 #define MSG_SAVE_TEMP                    3001
+#define MSG_GET_ALL_PATIENTS             3002
+#define MSG_BIND_TAGS                    3003
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -171,6 +173,8 @@ using namespace DuiLib;
 #define UM_READER_PROCESSING             (WM_USER+5)
 #define UM_DB_STATUS                     (WM_USER+6)
 #define UM_QUERY_TAG_BINDING_RET         (WM_USER+7)
+#define UM_GET_ALL_PATIENTS_RET          (WM_USER+8)
+#define UM_BIND_TAGS_RET                 (WM_USER+9)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
@@ -348,6 +352,42 @@ public:
 typedef  struct  tagBodyPart {
 	char      m_szName[20];
 }BodyPart;
+
+class CGetPatientsParam : public LmnToolkits::MessageData {
+public:
+	CGetPatientsParam(HWND hWnd, DWORD dwPatientId)
+		: m_hWnd(hWnd), m_dwPatientId(dwPatientId) {}
+	HWND   m_hWnd;
+	DWORD  m_dwPatientId;
+};
+
+typedef struct  tagPatient {
+	char    m_szId[20];
+	DWORD   m_dwPatientId;
+	char    m_szName[20];
+	BOOL    m_bMale;
+	DWORD   m_dwAge;
+}Patient;
+
+typedef struct tagTagBinding_1 {
+	char     m_szTagName[32];
+	char     m_szTagId[20];
+}TagBinding_1;
+
+class CBindTagsParam : public LmnToolkits::MessageData {
+public:
+	CBindTagsParam( HWND hWnd, DWORD dwPatientId, const TagBinding_1 * items, 
+		DWORD dwTagsCnt) : m_hWnd(hWnd),  m_dwPatientId(dwPatientId), 
+		m_dwItemsCnt(dwTagsCnt) {
+		assert(dwTagsCnt <= MAX_READERS_PER_GRID);
+		memcpy(m_items, items, sizeof(TagBinding_1) * dwTagsCnt);
+	}
+
+	HWND           m_hWnd;
+	DWORD          m_dwPatientId;
+	TagBinding_1   m_items[MAX_READERS_PER_GRID];
+	DWORD          m_dwItemsCnt;
+};
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

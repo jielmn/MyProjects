@@ -673,6 +673,35 @@ int   CBusiness::SaveTemp(const CSaveTempParam * pParam ) {
 	return 0;
 }
 
+// 查询所有病人信息
+int   CBusiness::GetAllPatientsAsyn(HWND  hWnd, DWORD  dwPatientId /*= 0*/) {
+	g_thrd_db->PostMessage(this, MSG_GET_ALL_PATIENTS,
+		          new CGetPatientsParam(hWnd, dwPatientId));
+	return 0;
+}
+
+int   CBusiness::GetAllPatients(const CGetPatientsParam * pParam) {
+	std::vector<Patient *> * pvRet = new std::vector<Patient *>;
+	int nRet = m_db.GetAllPatients(*pvRet, pParam->m_dwPatientId);
+
+	::PostMessage(pParam->m_hWnd, UM_GET_ALL_PATIENTS_RET, (WPARAM)pvRet, 0 );
+	return 0;
+}
+
+// 绑定tag
+int   CBusiness::SetBindingAsyn( HWND hWnd, DWORD dwPatientId, 
+	const TagBinding_1 * pTags, DWORD dwTagsCnt ) {
+	g_thrd_db->PostMessage(this, MSG_BIND_TAGS,
+		new CBindTagsParam( hWnd, dwPatientId, pTags, dwTagsCnt));
+	return 0;
+}
+
+int   CBusiness::SetBinding(const CBindTagsParam * pParam) {
+	int nRet = m_db.SetBinding(pParam);
+	::PostMessage(pParam->m_hWnd, UM_BIND_TAGS_RET, (WPARAM)nRet, 0);
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -748,6 +777,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_GET_ALL_PATIENTS:
+	{
+		CGetPatientsParam * pParam = (CGetPatientsParam *)pMessageData;
+		GetAllPatients(pParam);
+	}
+	break;
+	
+	case MSG_BIND_TAGS:
+	{
+		CBindTagsParam * pParam = (CBindTagsParam *)pMessageData;
+		SetBinding(pParam);
+	}
+	break;
+
 	default:
 	{
 		if ( dwMessageId >= MSG_QUERY_BINDING && dwMessageId <= MSG_QUERY_BINDING_MAX ) {
@@ -782,6 +825,7 @@ int CMyDb::Reconnect() {
 	}
 	else {
 		m_nStatus = 1;
+		mysql_set_character_set(&m_mysql, "gbk");
 
 		// 处理没有保存的温度数据
 		int ret = 0;
@@ -941,4 +985,73 @@ int  CMyDb::SaveTemp(const TempItem * pTemp) {
 	}
 	return 0;
 }
- 
+
+int  CMyDb::GetAllPatients(std::vector<Patient *> & vRet, DWORD dwPatiendId /*= 0*/) {
+	if (m_nStatus == 0) {
+		return -1;
+	}
+
+	char  szSql[8192];
+	if ( 0 == dwPatiendId )
+		SNPRINTF(szSql, sizeof(szSql),"select * from patientinfo");
+	else
+		SNPRINTF(szSql, sizeof(szSql), "select * from patientinfo where id = %lu", dwPatiendId );
+
+	MYSQL_RES *res = 0;
+	MYSQL_ROW row;
+
+	if (0 != mysql_query(&m_mysql, szSql)) {
+		return -1;
+	}
+
+	res = mysql_store_result(&m_mysql);
+	if (0 == res) {
+		return -1;
+	}
+
+	while ( row = mysql_fetch_row(res) ) {
+		Patient * pItem = new Patient;
+		memset(pItem, 0, sizeof(Patient));
+		pItem->m_bMale = TRUE;
+
+		sscanf(row[0], "%lu", &pItem->m_dwPatientId);
+		if ( row[1] ) {
+			STRNCPY(pItem->m_szId, row[1], sizeof(pItem->m_szId));
+		}
+		if (row[2]) {
+			STRNCPY(pItem->m_szName, row[2], sizeof(pItem->m_szName));
+		}
+		if (row[3]) {
+			char ch;
+			sscanf(row[3], "%c", &ch);
+			if ( ch == '0' ) {
+				pItem->m_bMale = FALSE;
+			}
+		}
+		if (row[5]) {
+			sscanf(row[5], "%lu", &pItem->m_dwAge);
+		}
+		vRet.push_back(pItem);
+	}
+
+	mysql_free_result(res);
+	return 0;
+}
+
+int  CMyDb::SetBinding(const CBindTagsParam * pParam) {
+	if (m_nStatus == 0) {
+		return -1;
+	}
+
+	char  szSql[8192];
+	for (DWORD i = 0; i < pParam->m_dwItemsCnt; i++) {
+		SNPRINTF(szSql, sizeof(szSql), "insert into tagbands values('%s', %lu, '%s' ) ",
+			pParam->m_items[i].m_szTagId, pParam->m_dwPatientId, pParam->m_items[i].m_szTagName );
+
+		if (0 != mysql_query(&m_mysql, szSql)) {
+			return -1;
+		}
+	}
+	
+	return 0;
+}

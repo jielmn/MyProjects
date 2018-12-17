@@ -16,6 +16,8 @@ public:
 	int  QueryBinding(const CQueryBindingParam * pParam, TagBinding * tRet);
 	int  DbHeartBeat();
 	int  SaveTemp(const CSaveTempParam * pParam);
+	int  GetAllPatients( std::vector<Patient *> & vRet, DWORD dwPatiendId = 0 );
+	int  SetBinding(const CBindTagsParam * pParam);
 
 	sigslot::signal1<int>     m_sigStatus;
 
@@ -100,6 +102,15 @@ public:
 	// 保存温度数据到数据库
 	int   SaveTempAsyn(DWORD dwIndex, DWORD dwSubIndex, const LastTemp * pTemp );
 	int   SaveTemp(const CSaveTempParam * pParam);
+
+	// 查询所有病人信息
+	int   GetAllPatientsAsyn(HWND  hWnd, DWORD  dwPatientId = 0);
+	int   GetAllPatients(const CGetPatientsParam * pParam);
+
+	// 绑定tag
+	int   SetBindingAsyn(HWND hWnd, DWORD dwPatientId, 
+		                const TagBinding_1 * pTags, DWORD dwTagsCnt );
+	int   SetBinding(const CBindTagsParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

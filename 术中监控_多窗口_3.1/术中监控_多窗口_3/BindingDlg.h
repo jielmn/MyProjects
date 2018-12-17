@@ -18,6 +18,9 @@ public:
 	DWORD        m_dwPatientId;
 	DWORD        m_dwIndex;
 
+	DWORD        m_dwBindingPatientId;
+	char         m_szBindingPatientName[20];
+
 	CBindingDlg();
 
 	virtual LPCTSTR    GetWindowClassName() const { return _T(BINDING_FRAME_NAME); }
@@ -37,8 +40,12 @@ private:
 	CLabelUI *                      m_lblTagPos[MAX_READERS_PER_GRID];
 	CLabelUI *                      m_lblTagId[MAX_READERS_PER_GRID];
 	CComboUI *                      m_cmbTagName[MAX_READERS_PER_GRID];
+	DuiLib::CListUI *               m_lstPatients;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
+	void   OnAllPatientsRet(WPARAM wParam, LPARAM lParam);
+	void   OnBtnOk();
+	void   OnBindTagsRet(WPARAM wParam, LPARAM lParam);
 };
 
