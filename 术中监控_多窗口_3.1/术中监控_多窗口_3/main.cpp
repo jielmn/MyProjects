@@ -1228,6 +1228,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		memset(&m_tTagBinding[dwIndex][dwSubIndex], 0, sizeof(m_tTagBinding[dwIndex][dwSubIndex]));
 		m_btnBinding[dwIndex]->SetVisible(false);
 		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("");
+		m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName);
 		CBusiness::GetInstance()->QueryBindingAsyn(dwIndex, dwSubIndex, pTemp->m_szTagId);
 	}	
 #endif
@@ -1486,6 +1487,7 @@ void    CDuiFrameWnd::OnQueryBindingRet(WPARAM wParam, LPARAM  lParam) {
 	m_tTagBinding[dwIndex][dwSubIndex].m_bGetBindingRet = TRUE;
 	if (pRet->m_dwPatientId > 0) {
 		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("已绑定");
+		m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetText(m_tTagBinding[dwIndex][dwSubIndex].m_szTagName);
 	}
 	else {
 		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("未绑定");
@@ -1536,6 +1538,7 @@ void   CDuiFrameWnd::OnCheckGridBinding(DWORD dwIndex ) {
 	dwPatientId = 0;
 	bValidate = TRUE;
 	bTotalBinding = TRUE;
+	CDuiString  strPatientName="--";
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
 		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
 			continue;
@@ -1544,6 +1547,7 @@ void   CDuiFrameWnd::OnCheckGridBinding(DWORD dwIndex ) {
 		if (0 == dwPatientId) {
 			if (m_tTagBinding[dwIndex][i].m_dwPatientId > 0) {
 				dwPatientId = m_tTagBinding[dwIndex][i].m_dwPatientId;
+				strPatientName = m_tTagBinding[dwIndex][i].m_szPatientName;
 			}
 			else {
 				bTotalBinding = FALSE;
@@ -1577,8 +1581,10 @@ void   CDuiFrameWnd::OnCheckGridBinding(DWORD dwIndex ) {
 			// 所有的tag中，都已经绑定
 			else {
 				m_btnBinding[dwIndex]->SetVisible(false);
-			}
+			}			
 		}
+		m_BtnName_grid[dwIndex]->SetText(strPatientName);
+		m_BtnName_max[dwIndex]->SetText(strPatientName);
 	}
 	// 如果所有绑定的tag的绑定者不是同一人
 	else {
@@ -1702,8 +1708,8 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 	bTotalBinding = TRUE;
 	CBindingDlg * pDlg = new CBindingDlg;
 
-	pDlg->m_dwIndex = dwIndex;
-	pDlg->m_dwTagItemCnt = nSwitchOnCnt;
+	pDlg->m_dwIndex = dwIndex;	
+	int nItemCnt = 0;
 	for (int i = 0,k = 0; i < MAX_READERS_PER_GRID; i++) {
 		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
 			continue;
@@ -1716,6 +1722,7 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 			else {
 				bTotalBinding = FALSE;
 
+				nItemCnt++;
 				pDlg->m_tTagItem[k].m_dwSubIndex = i;
 				STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
 					sizeof(pDlg->m_tTagItem[k].m_szTagId));
@@ -1733,6 +1740,7 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 			else {
 				bTotalBinding = FALSE;
 
+				nItemCnt++;
 				pDlg->m_tTagItem[k].m_dwSubIndex = i;
 				STRNCPY(pDlg->m_tTagItem[k].m_szTagId, m_tTagBinding[dwIndex][i].m_szTagId,
 					sizeof(pDlg->m_tTagItem[k].m_szTagId));
@@ -1741,6 +1749,7 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 		}
 	}
 
+	pDlg->m_dwTagItemCnt = nItemCnt;
 	pDlg->m_dwPatientId = dwPatientId;
 	// 如果所有绑定的tag的绑定者是同一人
 	if (bValidate) {
@@ -1771,9 +1780,20 @@ void   CDuiFrameWnd::OnBinding(DWORD dwIndex) {
 	int ret = pDlg->ShowModal();
 	// 如果是click ok(绑定成功)
 	if (0 == ret) {
-		//for ( DWORD i = 0; i < pDlg->m_dwTagItemCnt; i++ ) {
-		//	m_tTagBinding[dwIndex][pDlg->m_tTagItem[i].m_dwSubIndex].m_dwPatientId;
-		//}
+		for (DWORD i = 0; i < pDlg->m_dwTagItemCnt; i++) {
+			DWORD  dwSubIndex = pDlg->m_tTagItem[i].m_dwSubIndex;
+			if (m_tTagBinding[dwIndex][dwSubIndex].m_bGetBindingRet && 0 == strcmp(m_tTagBinding[dwIndex][dwSubIndex].m_szTagId, pDlg->m_tTagItem[i].m_szTagId)) {
+				m_tTagBinding[dwIndex][dwSubIndex].m_dwPatientId = pDlg->m_dwBindingPatientId;
+				STRNCPY(m_tTagBinding[dwIndex][dwSubIndex].m_szPatientName,
+					pDlg->m_szBindingPatientName, sizeof(m_tTagBinding[dwIndex][dwSubIndex].m_szPatientName));
+				STRNCPY(m_tTagBinding[dwIndex][dwSubIndex].m_szTagName,
+					pDlg->m_szTagName[i], sizeof(m_tTagBinding[dwIndex][dwSubIndex].m_szTagName));
+
+				m_LblTagBinding[dwIndex][dwSubIndex]->SetText("已绑定");
+				m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetText(m_tTagBinding[dwIndex][dwSubIndex].m_szTagName);
+			}	
+		}
+		OnCheckGridBinding(dwIndex);
 	}
 	delete pDlg;
 }

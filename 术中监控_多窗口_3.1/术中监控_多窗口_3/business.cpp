@@ -888,7 +888,7 @@ int  CMyDb::QueryBinding(const CQueryBindingParam * pParam, TagBinding * pRet ) 
 	}
 	
 	if (row[2]) {
-		STRNCPY(pRet->m_szTagName, row[1], sizeof(pRet->m_szTagName));
+		STRNCPY(pRet->m_szTagName, row[2], sizeof(pRet->m_szTagName));
 	}
 
 	if (row[1]) {

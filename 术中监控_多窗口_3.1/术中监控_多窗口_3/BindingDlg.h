@@ -20,6 +20,7 @@ public:
 
 	DWORD        m_dwBindingPatientId;
 	char         m_szBindingPatientName[20];
+	char         m_szTagName[MAX_READERS_PER_GRID][20];
 
 	CBindingDlg();
 

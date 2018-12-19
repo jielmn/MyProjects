@@ -9,6 +9,7 @@ CBindingDlg::CBindingDlg() {
 
 	m_dwBindingPatientId = 0;
 	memset( m_szBindingPatientName, 0, sizeof(m_szBindingPatientName) );
+	memset( m_szTagName, 0, sizeof(m_szTagName) );
 }
 
 void   CBindingDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -145,9 +146,11 @@ void   CBindingDlg::OnBtnOk() {
 		STRNCPY(items[i].m_szTagId, m_tTagItem[i].m_szTagId, sizeof(items[i].m_szTagId));
 		if ( m_cmbTagName[i]->GetCurSel() < 0 ) {
 			items[i].m_szTagName[0] = '\0';
+			m_szTagName[i][0] = '\0';
 		}
 		else {
 			STRNCPY(items[i].m_szTagName, m_cmbTagName[i]->GetText(), sizeof(items[i].m_szTagName));
+			STRNCPY(m_szTagName[i], m_cmbTagName[i]->GetText(), sizeof(m_szTagName[i]));
 		}
 	}
 
