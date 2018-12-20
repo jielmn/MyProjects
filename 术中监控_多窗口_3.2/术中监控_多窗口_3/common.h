@@ -160,7 +160,6 @@ using namespace DuiLib;
 #define MSG_PRINT_STATUS                 1004
 #define MSG_GET_TEMPERATURE              1005
 #define MSG_READ_LAUNCH                  1006
-#define MSG_GET_GRID_TEMP                1007
 #define MSG_CHECK_LAUNCH_STATUS          1008
 #define MSG_RECONNECT_DB                 1009
 #define MSG_QUERY_BINDING                2000
@@ -169,6 +168,8 @@ using namespace DuiLib;
 #define MSG_SAVE_TEMP                    3001
 #define MSG_GET_ALL_PATIENTS             3002
 #define MSG_BIND_TAGS                    3003
+#define MSG_GET_GRID_TEMP                3004
+#define MSG_GET_GRID_TEMP_MAX            3999
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)

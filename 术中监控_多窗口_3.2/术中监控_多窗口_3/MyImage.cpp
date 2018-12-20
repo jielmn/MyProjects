@@ -135,7 +135,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		vector<TempData *> & vTempData = m_vTempData[i];
 
-		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		Gdiplus::Point * points = new Gdiplus::Point[vTempData.size()];
+		int j = 0;
+		for (it = vTempData.begin(),j = 0; it != vTempData.end(); it++, j++) {
 			TempData * pItem = *it;
 
 			int nDiff = (int)(pItem->tTime - tFirstTime);
@@ -143,19 +145,24 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 				        * g_data.m_dwCollectIntervalWidth );
 			int nY    = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
+			points[j].X = nX + MYIMAGE_LEFT_BLANK + rect.left;
+			points[j].Y = nY + middle + rect.top;
 			DrawTempPoint(i, graphics, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, hDC, nRadius );
 
-			if (it == vTempData.begin()) {
-				::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
-			}
-			else {
-				POINT pt;
-				::GetCurrentPositionEx(hDC, &pt);
-				graphics.DrawLine(m_temperature_pen[i], pt.x, pt.y, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top);
-				::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
-			}
+			//if (it == vTempData.begin()) {
+			//	::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
+			//}
+			//else {
+			//	POINT pt;
+			//	::GetCurrentPositionEx(hDC, &pt);
+			//	graphics.DrawLine(m_temperature_pen[i], pt.x, pt.y, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top);
+			//	::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
+			//}
 
 		}
+
+		graphics.DrawCurve(m_temperature_pen[i], points, vTempData.size());
+		delete[] points;
 	}
 	
 	// 从第一个10秒整数，画时间

@@ -424,10 +424,10 @@ int   CBusiness::PrintStatus() {
 // »ñÈ¡ÎÂ¶È
 int   CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
 	if (0 == dwDelay) {
-		g_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP, new CGridTempParam(dwIndex));
+		g_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP + dwIndex, new CGridTempParam(dwIndex), TRUE );
 	}
 	else {
-		g_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP, new CGridTempParam(dwIndex));
+		g_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP + dwIndex, new CGridTempParam(dwIndex), TRUE );
 	}
 	return 0;
 }
@@ -924,13 +924,6 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
-	case MSG_GET_GRID_TEMP:
-	{
-		CGridTempParam * pParam = (CGridTempParam *)pMessageData;
-		GetGridTemperature(pParam);
-	}
-	break;
-
 	case MSG_CHECK_LAUNCH_STATUS:
 	{
 		CheckLaunchStatus();
@@ -975,6 +968,10 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 		if ( dwMessageId >= MSG_QUERY_BINDING && dwMessageId <= MSG_QUERY_BINDING_MAX ) {
 			CQueryBindingParam * pParam = (CQueryBindingParam *)pMessageData;
 			QueryBinding(pParam);
+		}
+		else if (dwMessageId >= MSG_GET_GRID_TEMP && dwMessageId <= MSG_GET_GRID_TEMP_MAX) {
+			CGridTempParam * pParam = (CGridTempParam *)pMessageData;
+			GetGridTemperature(pParam);
 		}
 	}
 	break;
