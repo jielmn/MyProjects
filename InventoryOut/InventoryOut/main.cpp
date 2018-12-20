@@ -1036,6 +1036,11 @@ void  CDuiFrameWnd::OnSelectTarget_1() {
 }
 
 void  CDuiFrameWnd::OnExportExcel_1() {
+	if ( !CExcelEx::IfExcelInstalled() ) {
+		MessageBox(this->GetHWND(), "没有找到excel。请先安装excel", "导出", 0);
+		return;
+	}
+
 	CExcelEx   excel;
 	int nCnt = m_lstQueryByTime->GetCount();
 
