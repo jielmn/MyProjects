@@ -125,6 +125,7 @@ private:
 	/*查询*/
 	void OnQueryByTime();
 	void OnSelectTarget_1();
+	void OnExportExcel_1();
 
 	// 根据大包装查询
 	void OnQueryByBigPkg();

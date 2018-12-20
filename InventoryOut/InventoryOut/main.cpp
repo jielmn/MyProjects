@@ -10,7 +10,7 @@
 #include "AgencyDlg.h"
 #include "TargetDlg.h"
 #include "MyProgress.h"
-
+#include "LmnExcel.h"
 
 // menu
 class CDuiMenu : public DuiLib::WindowImplBase
@@ -214,6 +214,9 @@ void  CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnQuery_1") {
 			OnQueryByTime();
+		}
+		else if (name == "btnQuery_101") {
+			OnExportExcel_1();
 		}
 		else if (name == "btnTarget_1") {
 			OnSelectTarget_1();
@@ -447,7 +450,7 @@ void  CDuiFrameWnd::OnTimerMsg(DWORD dwTimerId) {
 		m_strInvOutBuf = "";
 	}
 }
-
+ 
 int CDuiFrameWnd::OnInvOutBarCode(const DuiLib::CDuiString & strBarCode_1) {
 	// g_log->Output(ILog::LOG_SEVERITY_INFO, "received chars:%s\n", m_strInvBigBuf);
 
@@ -1030,6 +1033,41 @@ void  CDuiFrameWnd::OnSelectTarget_1() {
 	}
 
 	delete pDlg;
+}
+
+void  CDuiFrameWnd::OnExportExcel_1() {
+	CExcelEx   excel;
+	int nCnt = m_lstQueryByTime->GetCount();
+
+	excel.WriteGrid(0, 0, "序号");
+	excel.WriteGrid(0, 1, "包装类型");
+	excel.WriteGrid(0, 2, "包装ID");
+	excel.WriteGrid(0, 3, "出库目标类型");
+	excel.WriteGrid(0, 4, "出库目标名称");
+	excel.WriteGrid(0, 5, "操作人员");
+	excel.WriteGrid(0, 6, "出库时间");
+
+	for (int i = 0; i < nCnt; i++) {
+		DuiLib::CListTextElementUI* pListElement = (DuiLib::CListTextElementUI*)m_lstQueryByTime->GetItemAt(i);
+		for (int j = 0; j < 7; j++) {
+			excel.WriteGrid(i + 1, j, pListElement->GetText(j) );
+		}
+	}
+
+	try
+	{
+		excel.Save();		
+	}
+	catch (...) {
+
+	}
+
+	try {
+		excel.Quit();
+	}
+	catch (...) {
+
+	}
 }
 
 void CDuiFrameWnd::OnQueryByBigPkg() {
