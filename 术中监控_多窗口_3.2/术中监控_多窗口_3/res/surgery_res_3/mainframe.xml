@@ -33,7 +33,7 @@
 			<HorizontalLayout height="32" bkcolor="#00000000" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
 				<HorizontalLayout inset="10,1,10,1" >
 					<Container width="61" height="27" bkimage="file='logo.png'" />
-					<Text name="txtTitle" text="易温体温中央监控" pos="75, 8, 250, 24" float="true" textcolor="#FF447AA1" font="0" mouse="false" />
+					<Text name="txtTitle" text="易温体温中央监控T" pos="75, 8, 250, 24" float="true" textcolor="#FF447AA1" font="0" mouse="false" />
 				</HorizontalLayout>
 				<VerticalLayout /> <!-- 占空位，占据左边所有的空位-->
 				<VerticalLayout width="126"> <!-- 右边三个控件所占的宽度-->
