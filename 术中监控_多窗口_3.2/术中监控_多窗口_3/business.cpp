@@ -2,6 +2,7 @@
 #include "LmnTelSvr.h"
 #include "resource.h"
 #include <time.h>
+#include "LmnFile.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -742,13 +743,18 @@ int    CBusiness::SaveExcelAsyn() {
 	DWORD  dwTemp = pStr - szPath;
 	szPath[dwTemp] = '\0';
 
+	const char * szFolder = "auto_save_excel";
+	char buf[256];
+	SNPRINTF(buf, sizeof(buf), "%s\\%s", szPath, szFolder );
+	LmnCreateFolder( buf );
+
 	time_t t = time(0);
 	struct tm  tmp;
 	localtime_s(&tmp, &t);
 
 	char szFileName[256];
-	SNPRINTF(szFileName, sizeof(szFileName), "%s\\autosave%04d%02d%02d%02d%02d%02d.xlsx",
-		szPath, tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
+	SNPRINTF(szFileName, sizeof(szFileName), "%s\\%04d%02d%02d%02d%02d%02d.xlsx",
+		buf, tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
 	m_excel->SaveAs(szFileName);
 	m_excel->Quit();
 	delete m_excel;
