@@ -230,6 +230,7 @@ void CDuiFrameWnd::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == PRINT_BIG_BUTTON_ID) {
 			PrintInventoryBig();
+			PrintInventoryBig();
 		}
 		else if ( name == MANUAL_SMALL_PKG_ID_BUTTON_ID ) {
 			OnManualAddBarcode();
