@@ -463,13 +463,13 @@ void  CMyImageUI::OnReaderSelected(DWORD  dwSelectedIndex) {
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		if (i == m_dwSelectedReaderIndex) {
 			if ( m_type == TYPE_MAX)
-				m_temperature_pen[i]->SetWidth(8.0);
+				m_temperature_pen[i]->SetWidth(3.0);
 			else 
-				m_temperature_pen[i]->SetWidth(4.0);
+				m_temperature_pen[i]->SetWidth(2.0);
 		}
 		else {
 			if (m_type == TYPE_MAX)
-				m_temperature_pen[i]->SetWidth(5.0);
+				m_temperature_pen[i]->SetWidth(2.0);
 			else
 				m_temperature_pen[i]->SetWidth(2.0);
 		}

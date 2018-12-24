@@ -36,7 +36,7 @@ using namespace DuiLib;
 #define  TIMER_CHECK_AUTO_SAVE              102
 #define  TIMER_CHECK_AUTO_SAVE_INTERVAL     60000
 
-#define  DB_FLAG  0
+#define  DB_FLAG  1
 #define  DBG_FLAG 0
 
 #define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
@@ -145,7 +145,7 @@ using namespace DuiLib;
 #define   EDT_REMARK_Y_OFFSET            -50
 #define   DEFAULT_COLLECT_INTERVAL       50
 #define   RADIUS_SIZE_IN_GRID            4
-#define   RADIUS_SIZE_IN_MAXIUM          8
+#define   RADIUS_SIZE_IN_MAXIUM          4
 #define   DEFAULT_ALARM_FILE_PATH        "\\res\\surgery_res_3\\1.wav"
 #define   RECONNECT_LAUNCH_TIME_INTERVAL 30000
 #define   READER_STATUS_CLOSE            0
