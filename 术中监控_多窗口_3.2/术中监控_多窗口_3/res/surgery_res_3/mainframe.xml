@@ -12,6 +12,7 @@
 	<Font id="9" name="微软雅黑" size="40"  bold="true" />
 	<Font id="100" name="宋体" size="20"  bold="true" />
 	<Font id="101" name="宋体" size="18"  bold="true" />
+	<Font id="102" name="微软雅黑" size="40"  bold="true" />
 	
 	<Font id="10" name="微软雅黑" size="30"  bold="true" />
 	<Font id="11" name="微软雅黑" size="50"  bold="true" />

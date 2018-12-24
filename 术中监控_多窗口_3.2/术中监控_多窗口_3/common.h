@@ -36,7 +36,7 @@ using namespace DuiLib;
 #define  TIMER_CHECK_AUTO_SAVE              102
 #define  TIMER_CHECK_AUTO_SAVE_INTERVAL     60000
 
-#define  DB_FLAG  1
+#define  DB_FLAG  0
 #define  DBG_FLAG 0
 
 #define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
