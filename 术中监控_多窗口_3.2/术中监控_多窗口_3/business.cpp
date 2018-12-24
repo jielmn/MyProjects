@@ -111,8 +111,14 @@ int CBusiness::Init() {
 
 		strText.Format("%s %lu", CFG_MIN_TEMP, i + 1);
 		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, DEFAULT_MIN_TEMP_INDEX);
-		if (g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp > 4) {
+		if (g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp > 5) {
 			g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp = 0;
+		}
+
+		strText.Format("%s %lu", CFG_MAX_TEMP, i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, DEFAULT_MAX_TEMP_INDEX);
+		if (g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp > 4) {
+			g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp = 0;
 		}
 
 		strText.Format("%s %lu", CFG_BED_NAME, i + 1);

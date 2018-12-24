@@ -164,6 +164,14 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	m_tree->AddNode("显示的最低温度", pSubTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 显示最高温度
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "42℃", 0);
+	AddComboItem(pCombo, "40℃", 1);
+	AddComboItem(pCombo, "38℃", 2);
+	AddComboItem(pCombo, "34℃", 3);
+	AddComboItem(pCombo, "30℃", 4);
+	pCombo->SelectItem(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	m_tree->AddNode("显示的最高温度", pSubTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
 
 	CMyTreeCfgUI::Node* pSubTitleNode_1 = NULL;
 	strText.Format("读卡器");
@@ -340,7 +348,7 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 9 + ((5 * MAX_READERS_PER_GRID)+5) * nIndex + 2 - 1;
+	int  nCfgRowIndex = 9 + ((5 * MAX_READERS_PER_GRID)+6) * nIndex + 2 - 1;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 
@@ -358,6 +366,19 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
 	m_data.m_GridCfg[nIndex].m_dwMinTemp = cfgValue.m_tag;
 	nCfgRowIndex++;
+
+	// 最高显示可读
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_GridCfg[nIndex].m_dwMaxTemp = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	if (GetMaxTemp(m_data.m_GridCfg[nIndex].m_dwMaxTemp) <=
+		GetMinTemp(m_data.m_GridCfg[nIndex].m_dwMinTemp)) {
+
+		strText.Format("窗口%d，最高显示温度必须大于最低显示温度", nIndex + 1 );
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
 
 	// 获取Reader配置
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {

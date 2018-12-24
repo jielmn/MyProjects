@@ -709,6 +709,10 @@ void   CDuiFrameWnd::OnSetting() {
 			dwValue = DEFAULT_MIN_TEMP_INDEX;
 			g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, &dwValue);
 
+			strText.Format("%s %lu", CFG_MAX_TEMP, i + 1);
+			dwValue = DEFAULT_MAX_TEMP_INDEX;
+			g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, &dwValue);
+
 			for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
 				strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
 				bValue = DEFAULT_READER_SWITCH;

@@ -122,6 +122,25 @@ DWORD   GetMinTemp(DWORD  dwIndex) {
 	return 20;
 }
 
+DWORD   GetMaxTemp(DWORD  dwIndex) {
+	switch (dwIndex)
+	{
+	case 0:
+		return 42;
+	case 1:
+		return 40;
+	case 2:
+		return 38;
+	case 3:
+		return 34;
+	case 4:
+		return 30;
+	default:
+		break;
+	}
+	return 42;
+}
+
 DWORD   GetCollectInterval(DWORD dwIndex) {
 	switch (dwIndex)
 	{

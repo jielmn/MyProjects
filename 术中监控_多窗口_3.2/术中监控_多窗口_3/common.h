@@ -121,11 +121,13 @@ using namespace DuiLib;
 #define   DEFAULT_READER_SWITCH         FALSE
 #define   CFG_COLLECT_INTERVAL          "collect interval"
 #define   CFG_MIN_TEMP                  "min temperature"
+#define   CFG_MAX_TEMP                  "max temperature"
 #define   CFG_READER_SWITCH             "reader switch"
 #define   CFG_LOW_TEMP_ALARM            "low temperature alarm"
 #define   CFG_HIGH_TEMP_ALARM           "high temperature alarm"
 #define   CFG_BED_NO                    "bed no"
 #define   DEFAULT_MIN_TEMP_INDEX        2
+#define   DEFAULT_MAX_TEMP_INDEX        1
 #define   CFG_BED_NAME                  "bed name"
 #define   CFG_PATIENT_NAME              "patient name"
 #define   CFG_READER_NAME               "reader name"
@@ -240,6 +242,7 @@ typedef struct tagGridCfg
 	BOOL        m_bSwitch;
 	DWORD       m_dwCollectInterval;
 	DWORD       m_dwMinTemp;
+	DWORD       m_dwMaxTemp;
 	char        m_szBed[MAX_BED_LENGTH];
 	char        m_szName[MAX_NAME_LENGTH];
 	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];
@@ -409,6 +412,7 @@ extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
 extern DWORD   GetMinTemp(DWORD  dwIndex);
+extern DWORD   GetMaxTemp(DWORD  dwIndex);
 extern DWORD   GetCollectInterval(DWORD dwIndex);
 extern time_t  DateTime2String(const char * szDatetime);
 extern char *  GetDefaultAlarmFile(char * szDefaultFile, DWORD dwSize);

@@ -81,7 +81,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	/* 开始作图 */
 	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
-	int nGridCount = MAX_TEMPERATURE - nMinTemp;
+	//int nGridCount = MAX_TEMPERATURE - nMinTemp;
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
 
 	int nGridHeight = height / nGridCount;
 	int nReminder = height % nGridCount;
@@ -105,7 +107,8 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rectLeft.bottom = rect.bottom;
 
 	int nFirstTop = middle - nGridHeight * (nGridCount / 2);
-	int nFistTemperature = MAX_TEMPERATURE;
+	//int nFistTemperature = MAX_TEMPERATURE;
+	int nFistTemperature = nMaxTemp;
 	DWORD  dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
 
 	// 画出刻度线(水平横线)
@@ -129,7 +132,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	/* 画温度曲线 */
 	time_t  tFirstTime = GetFirstTime();
 	time_t  tLastTime = GetLastTime();
-	int nMiddleTemp = (MAX_TEMPERATURE + nMinTemp) / 2;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
 
 	vector<TempData *>::iterator it;
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
@@ -486,8 +489,9 @@ void   CMyImageUI::OnMyClick(const POINT * pPoint) {
 	int  height = rect.bottom - rect.top;
 
 	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
-	int nGridCount = MAX_TEMPERATURE - nMinTemp;
-	int nMiddleTemp = (MAX_TEMPERATURE + nMinTemp) / 2;
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
 
 	int nGridHeight = height / nGridCount;
 	int nReminder = height % nGridCount;
