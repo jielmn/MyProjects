@@ -158,8 +158,12 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	AddComboItem(pCombo, "24℃", 1);
 	AddComboItem(pCombo, "28℃", 2);
 	AddComboItem(pCombo, "32℃", 3);
+	AddComboItem(pCombo, "34℃", 4);
+	AddComboItem(pCombo, "36℃", 5);
 	pCombo->SelectItem(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
 	m_tree->AddNode("显示的最低温度", pSubTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
+
+	// 显示最高温度
 
 	CMyTreeCfgUI::Node* pSubTitleNode_1 = NULL;
 	strText.Format("读卡器");

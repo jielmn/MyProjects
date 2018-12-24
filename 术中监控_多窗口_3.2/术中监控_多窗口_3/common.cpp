@@ -112,6 +112,10 @@ DWORD   GetMinTemp(DWORD  dwIndex) {
 		return 28;
 	case 3:
 		return 32;
+	case 4:
+		return 34;
+	case 5:
+		return 36;
 	default:
 		break;
 	}
