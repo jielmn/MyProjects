@@ -79,6 +79,10 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		nRadius = RADIUS_SIZE_IN_GRID;
 	}
 
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point );
+
 	/* 开始作图 */
 	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
 	//int nGridCount = MAX_TEMPERATURE - nMinTemp;
@@ -318,6 +322,22 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		}
 	}
 
+	// 画十字线
+	RECT rCross;
+	rCross.left = rectLeft.right;
+	rCross.right = rectLeft.left + width - 1;
+	rCross.top = rectLeft.top;
+	rCross.bottom = rectLeft.bottom;
+
+	if ( ::PtInRect( &rCross, cursor_point ) ) {
+		::SelectObject(hDC, m_hCommonThreadPen);
+		::MoveToEx(hDC, cursor_point.x, rectLeft.top, 0);
+		::LineTo(hDC, cursor_point.x, rectLeft.bottom);
+		::MoveToEx(hDC, rectLeft.right, cursor_point.y, 0);
+		::LineTo(hDC, rectLeft.left + width - 1, cursor_point.y);
+	}
+	
+
 	return true;
 }
 
@@ -327,6 +347,9 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 		//告诉UIManager这个消息需要处理
 		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
 		return;
+	}
+	else if (event.Type == UIEVENT_MOUSEMOVE) {
+		this->Invalidate();
 	}
 	DuiLib::CControlUI::DoEvent(event);
 }
