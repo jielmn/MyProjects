@@ -256,6 +256,7 @@ typedef struct tagCfgData {
 	BOOL      m_bAlarmVoiceOff;
 	DWORD     m_dwTempFont;
 	BOOL      m_bAutoSaveExcel;
+	BOOL      m_bCrossAnchor;         // Ê®×ÖÃª
 	GridCfg   m_GridCfg[MAX_GRID_COUNT];
 }CfgData;
 

@@ -694,6 +694,9 @@ void   CDuiFrameWnd::OnSetting() {
 		bValue = FALSE;
 		g_data.m_cfg->SetBooleanConfig("auto save excel", g_data.m_CfgData.m_bAutoSaveExcel, &bValue);
 
+		bValue = FALSE;
+		g_data.m_cfg->SetBooleanConfig("cross anchor", g_data.m_CfgData.m_bCrossAnchor, &bValue);
+
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
 			strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
 			bValue = FALSE;

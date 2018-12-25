@@ -121,6 +121,11 @@ void  CSettingDlg::InitCommonCfg() {
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->Selected(g_data.m_CfgData.m_bAutoSaveExcel ? true : false);
 	m_tree->AddNode("自动保存excel", pTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
+
+	// 十字定位锚 
+	pCheckBox = new CCheckBoxUI;
+	pCheckBox->Selected(g_data.m_CfgData.m_bCrossAnchor ? true : false);
+	m_tree->AddNode("温度曲线十字定位", pTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
 }
 
 void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
@@ -341,6 +346,11 @@ BOOL  CSettingDlg::GetCommonConfig() {
 	m_data.m_bAutoSaveExcel = cfgValue.m_bCheckbox;
 	nCfgRowIndex++;
 
+	// 十字定位
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_bCrossAnchor = cfgValue.m_bCheckbox;
+	nCfgRowIndex++;
+
 	return TRUE;
 }
 
@@ -348,7 +358,7 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 9 + ((5 * MAX_READERS_PER_GRID)+6) * nIndex + 2 - 1;
+	int  nCfgRowIndex = 10 + ((5 * MAX_READERS_PER_GRID)+6) * nIndex + 2 - 1;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 

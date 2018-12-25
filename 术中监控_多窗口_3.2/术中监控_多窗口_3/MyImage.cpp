@@ -329,12 +329,25 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rCross.top = rectLeft.top;
 	rCross.bottom = rectLeft.bottom;
 
-	if ( ::PtInRect( &rCross, cursor_point ) ) {
+	// 如果有点
+	if ( g_data.m_CfgData.m_bCrossAnchor && (tFirstTime > 0) 
+		&& ::PtInRect( &rCross, cursor_point ) ) {
 		::SelectObject(hDC, m_hCommonThreadPen);
 		::MoveToEx(hDC, cursor_point.x, rectLeft.top, 0);
 		::LineTo(hDC, cursor_point.x, rectLeft.bottom);
 		::MoveToEx(hDC, rectLeft.right, cursor_point.y, 0);
 		::LineTo(hDC, rectLeft.left + width - 1, cursor_point.y);
+
+		float  fTempCursor = nFistTemperature - (float)(cursor_point.y - rect.top - nFirstTop) / nGridHeight;
+		float f1 = (cursor_point.x - rect.left - MYIMAGE_LEFT_BLANK)* dwCollectInterval / (float)g_data.m_dwCollectIntervalWidth;
+		time_t tCursor = (time_t)f1 + tFirstTime;
+
+		struct tm tTmTime;
+		localtime_s(&tTmTime, &tCursor);
+
+		strText.Format("%.2f℃,%02d:%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec );
+		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+		::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
 	}
 	
 
@@ -349,7 +362,8 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 		return;
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
-		this->Invalidate();
+		if (g_data.m_CfgData.m_bCrossAnchor)
+			this->Invalidate();
 	}
 	DuiLib::CControlUI::DoEvent(event);
 }

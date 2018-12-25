@@ -79,6 +79,7 @@ int CBusiness::Init() {
 	g_data.m_cfg->GetBooleanConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_CfgData.m_bAlarmVoiceOff, DEFAULT_ALARM_VOICE_SWITCH);
 	g_data.m_cfg->GetBooleanConfig("utf8", g_data.m_bUtf8, TRUE);
 	g_data.m_cfg->GetBooleanConfig("auto save excel", g_data.m_CfgData.m_bAutoSaveExcel, FALSE);	
+	g_data.m_cfg->GetBooleanConfig("cross anchor", g_data.m_CfgData.m_bCrossAnchor, FALSE);
 
 	// Æ¤·ô
 	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, DEFAULT_SKIN);
