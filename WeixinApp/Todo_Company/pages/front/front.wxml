@@ -4,7 +4,7 @@
   <scroll-view  scroll-x  catchtap="OnIgnore">
     <view wx:if="{{item.self}}" style="width:1000rpx;">
       <image src="{{item.avatarUrl}}" class="person avatar" catchtap="OnIgnore"></image>
-      <view class="person" catchtap="OnIgnore">{{item.name}}</view>     
+      <view class="person" catchtap="OnIgnore">{{item.name}}</view>           
       <view class="todo-item menu rd" catchtap="OnDelete" data-id="{{item.id}}" >删除</view>      
     </view>
     <view wx:else>
@@ -13,6 +13,7 @@
     </view>    
   </scroll-view> 
   
+  <text class="pubtime">{{item.pubtime_text}}</text>
   <text class="weibo_item">{{item.content}}</text>
   
   <label wx:for="{{item.images}}" wx:key="id" wx:for-item="subitem" wx:for-index="subindex" >

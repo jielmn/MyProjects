@@ -179,3 +179,11 @@
     -webkit-box-orient: vertical;
     margin:10rpx;
 }
+
+.pubtime{
+    display: block;
+    font-size:30rpx;
+    color:#cccccc;
+    line-height: 30rpx;
+    margin:10rpx;
+}

@@ -71,8 +71,11 @@ Page({
           var weibo_items = that.data.weibo_items.concat(res.data.weibo_items);
           for (var i in weibo_items) {
             weibo_items[i].readers_text = weibo_items[i].readers.join('，');
+            var date = new Date(parseInt(weibo_items[i].pubtime));
+            weibo_items[i].pubtime_text = this.formatTime(date);
           }
           that.setData({ weibo_items: weibo_items });
+          //console.log(that.data.weibo_items);
         } else {
           console.log("get weibo result:")
           console.log(res);
@@ -163,6 +166,22 @@ Page({
         break;
       }
     }
+  },
+
+  formatTime: function (date) {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const second = date.getSeconds()
+
+    return [year, month, day].map(this.formatNumber).join('-') + ' ' + [hour, minute, second].map(this.formatNumber).join(':')
+  },
+
+  formatNumber: function (n) {
+    n = n.toString()
+    return n[1] ? n : '0' + n
   },
 
 }) //  END OF PAGE
