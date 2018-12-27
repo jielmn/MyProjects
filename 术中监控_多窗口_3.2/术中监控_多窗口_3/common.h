@@ -276,6 +276,7 @@ public:
 	char      m_szDbUser[64];
 	char      m_szDbPwd[64];
 	BOOL      m_bUtf8;                                 // 是否utf8编码	
+	BOOL      m_bCurve;                                // 线条是否曲线
 };
 
 #define  MAX_AREA_NAME_LENGTH   64

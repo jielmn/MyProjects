@@ -80,6 +80,7 @@ int CBusiness::Init() {
 	g_data.m_cfg->GetBooleanConfig("utf8", g_data.m_bUtf8, TRUE);
 	g_data.m_cfg->GetBooleanConfig("auto save excel", g_data.m_CfgData.m_bAutoSaveExcel, FALSE);	
 	g_data.m_cfg->GetBooleanConfig("cross anchor", g_data.m_CfgData.m_bCrossAnchor, FALSE);
+	g_data.m_cfg->GetBooleanConfig("curve thread", g_data.m_bCurve, FALSE);
 
 	// Æ¤·ô
 	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, DEFAULT_SKIN);

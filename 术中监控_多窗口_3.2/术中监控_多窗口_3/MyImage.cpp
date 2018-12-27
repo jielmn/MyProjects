@@ -142,7 +142,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		vector<TempData *> & vTempData = m_vTempData[i];
 
-		//Gdiplus::Point * points = new Gdiplus::Point[vTempData.size()];
+		Gdiplus::Point * points = 0;
+		// 如果画曲线
+		if ( g_data.m_bCurve ) {
+			points = new Gdiplus::Point[vTempData.size()];
+		}
 		int j = 0;
 		for (it = vTempData.begin(),j = 0; it != vTempData.end(); it++, j++) {
 			TempData * pItem = *it;
@@ -152,24 +156,29 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 				        * g_data.m_dwCollectIntervalWidth );
 			int nY    = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
-			//points[j].X = nX + MYIMAGE_LEFT_BLANK + rect.left;
-			//points[j].Y = nY + middle + rect.top;
+			if (g_data.m_bCurve) {
+				points[j].X = nX + MYIMAGE_LEFT_BLANK + rect.left;
+				points[j].Y = nY + middle + rect.top;
+			}
 			DrawTempPoint(i, graphics, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, hDC, nRadius );
 
-			if (it == vTempData.begin()) {
-				::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
-			}
-			else {
-				POINT pt;
-				::GetCurrentPositionEx(hDC, &pt);
-				graphics.DrawLine(m_temperature_pen[i], pt.x, pt.y, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top);
-				::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
-			}
-
+			if ( !g_data.m_bCurve ) {
+				if (it == vTempData.begin()) {
+					::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
+				}
+				else {
+					POINT pt;
+					::GetCurrentPositionEx(hDC, &pt);
+					graphics.DrawLine(m_temperature_pen[i], pt.x, pt.y, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top);
+					::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
+				}
+			}			
 		}
 
-		//graphics.DrawCurve(m_temperature_pen[i], points, vTempData.size());
-		//delete[] points;
+		if (g_data.m_bCurve) {
+			graphics.DrawCurve(m_temperature_pen[i], points, vTempData.size());
+			delete[] points;
+		}
 	}
 	
 	// 从第一个10秒整数，画时间
