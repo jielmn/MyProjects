@@ -1354,8 +1354,12 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 	BOOL bChanged = FALSE;
 	if (nDirectory > 0)
 	{
-		if (g_data.m_dwCollectIntervalWidth >= 20) {
+		if (g_data.m_dwCollectIntervalWidth >= 10) {
 			g_data.m_dwCollectIntervalWidth -= 5;
+			bChanged = TRUE;
+		}
+		else if (g_data.m_dwCollectIntervalWidth >= 6 )  {
+			g_data.m_dwCollectIntervalWidth = 5;
 			bChanged = TRUE;
 		}
 	}
