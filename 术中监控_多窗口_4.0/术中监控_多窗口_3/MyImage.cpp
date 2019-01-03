@@ -475,7 +475,7 @@ void  CMyImageUI::AddTemp(DWORD dwIndex, DWORD dwTemp) {
 		}
 	}
 
-	if (m_vTempData[dwIndex].size() >= 6000) {
+	if (m_vTempData[dwIndex].size() >= MAX_POINTS_COUNT ) {
 		vector<TempData *>::iterator it = m_vTempData[dwIndex].begin();
 		TempData * pData = *it;
 		m_vTempData[dwIndex].erase(it);

@@ -16,6 +16,10 @@ public:
 
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
+	virtual LPCTSTR GetClass() const {
+		return "MyImage";
+	}
+
 	void  OnChangeSkin();
 	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
 	void  MyInvalidate();

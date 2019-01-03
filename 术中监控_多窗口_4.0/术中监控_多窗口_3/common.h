@@ -39,6 +39,8 @@ using namespace DuiLib;
 #define  DB_FLAG  0
 #define  DBG_FLAG 1
 
+#define  MAX_POINTS_COUNT         60480
+
 #define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
 #define   LOG_FILE_NAME           "surgery3.log"
 #define   CONFIG_FILE_NAME        "surgery3.cfg"

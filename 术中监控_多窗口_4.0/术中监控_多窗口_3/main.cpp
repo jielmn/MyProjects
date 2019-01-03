@@ -576,11 +576,12 @@ void   CDuiFrameWnd::OnDbClick() {
 	::ScreenToClient(m_hWnd, &point);
 	CControlUI * pFindControl = m_PaintManager.FindSubControlByPoint(m_layMain, point);
 	if (pFindControl) {
+		DuiLib::CDuiString  clsName = pFindControl->GetClass();
 		// 如果双击按钮，返回
-		if (0 == strcmp(pFindControl->GetClass(), DUI_CTR_BUTTON)) {
+		if (0 == strcmp(clsName, DUI_CTR_BUTTON)) {
 			return;
 		}
-		else if (0 == strcmp(pFindControl->GetClass(), DUI_CTR_OPTION)) {
+		else if (0 == strcmp(clsName, DUI_CTR_OPTION)) {
 			return;
 		}
 	}
