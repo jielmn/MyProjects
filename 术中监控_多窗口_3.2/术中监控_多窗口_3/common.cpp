@@ -1,7 +1,11 @@
 #include <time.h>
 #include <stdio.h>   
 #include <windows.h>  
+
+#if DBG_FLAG
 #include <dbghelp.h>
+#endif
+
 #include <setupapi.h>
 #include "common.h"
 #include "MyImage.h"
