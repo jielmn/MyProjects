@@ -6,6 +6,7 @@
 #include "sigslot.h"
 #include "Launch.h"
 #include "LmnExcel.h"
+#include "MyDatabase.h"
 
 class  CMyDb {
 public:
@@ -140,6 +141,8 @@ private:
 	CExcelEx *        m_excel;
 	int               m_excel_row[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 	char              m_excel_tag_id[MAX_GRID_COUNT][MAX_READERS_PER_GRID][20];
+
+	CMySqliteDatabase   m_sqlite;
 };
 
 

@@ -271,6 +271,9 @@ int CBusiness::Init() {
 	DWORD  dwPwdLen = sizeof(g_data.m_szDbPwd);
 	MyDecrypt( buf, g_data.m_szDbPwd, dwPwdLen );	
 
+	// 初始化sqlite 数据库
+	m_sqlite.InitDb();
+
 	// 线程
 	g_thrd_work = new LmnToolkits::PriorityThread();
 	if (0 == g_thrd_work) {
@@ -316,6 +319,7 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+	m_sqlite.DeinitDb();
 
 	SaveExcelAsyn();
 	if (m_excel) {
