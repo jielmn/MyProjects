@@ -122,6 +122,15 @@ public:
 	//
 	int  ExcelPatientNameChangedAsyn(DWORD dwIndex);
 
+	//   保存温度数据到sqlite
+	int  SaveTemp2SqliteAsyn(const char * szTagId, DWORD dwTemp);
+	int  SaveTemp2Sqlite(const CSaveTempSqliteParam * pParam);
+
+	//  查询sqlite记录的某个tag的温度记录
+	int   QueryTempFromSqliteByTagAsyn(const char * szTagId, DWORD  dwIndex, DWORD  dwSubIndex);
+	int   QueryTempFromSqliteByTag(const CQueryTempSqliteParam * pParam);
+	
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

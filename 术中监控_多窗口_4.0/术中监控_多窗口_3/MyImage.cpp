@@ -835,3 +835,18 @@ void  CMyImageUI::EmptyData(DWORD  dwSubIndex) {
 	assert(dwSubIndex < MAX_READERS_PER_GRID);
 	ClearVector(m_vTempData[dwSubIndex]);
 }
+
+void  CMyImageUI::OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex) {
+	std::vector<TempData*>::iterator it;
+	for ( it = vRet.begin(); it != vRet.end(); it++ ) {
+		TempData*  pData = *it;
+
+		pData->dwIndex = m_dwNextTempIndex;
+		m_dwNextTempIndex++;
+		// skip -1 index
+		if (m_dwNextTempIndex == -1) {
+			m_dwNextTempIndex = 0;
+		}
+	}
+	m_vTempData[dwIndex].insert(m_vTempData[dwIndex].begin(), vRet.begin(), vRet.end());
+}

@@ -164,4 +164,6 @@ private:
 	void   OnBinding(DWORD dwIndex);
 	//
 	void   OnCheckAutoSaveTimer();
+	//
+	void   OnTempSqliteRet(WPARAM wParam, LPARAM  lParam);
 };

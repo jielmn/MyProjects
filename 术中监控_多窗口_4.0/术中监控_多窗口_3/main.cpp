@@ -429,6 +429,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_MOUSEWHEEL) {
 		OnMyMouseWheel(wParam, lParam);
+		return 0;
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		OnMyDeviceChanged();
@@ -441,6 +442,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_QUERY_TAG_BINDING_RET) {
 		OnQueryBindingRet(wParam, lParam);
+	}
+	else if (uMsg == UM_QUERY_TEMP_SQLITE_RET) {
+		OnTempSqliteRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -582,6 +586,9 @@ void   CDuiFrameWnd::OnDbClick() {
 			return;
 		}
 		else if (0 == strcmp(clsName, DUI_CTR_OPTION)) {
+			return;
+		}
+		else if (0 == strcmp(clsName, "MyImage")) {
 			return;
 		}
 	}
@@ -1247,22 +1254,23 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	DWORD  dwTemp = pTemp->m_dwTemp;
 
+	// 如果tag改变
+	if (0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
+		m_MyImage_max[dwIndex]->EmptyData(dwSubIndex);
+		m_MyImage_max[dwIndex]->Invalidate();
+
+		// 查询tag绑定关系
 #if DB_FLAG
-	// 查询tag绑定关系
-	if ( 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId ) ) {
 		memset(&m_tTagBinding[dwIndex][dwSubIndex], 0, sizeof(m_tTagBinding[dwIndex][dwSubIndex]));
 		m_btnBinding[dwIndex]->SetVisible(false);
 		m_LblTagBinding[dwIndex][dwSubIndex]->SetText("");
 		m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_szName);
 		CBusiness::GetInstance()->QueryBindingAsyn(dwIndex, dwSubIndex, pTemp->m_szTagId);
-	}	
-#else
-	// 如果tag改变
-	if ( 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId) )  {
-		m_MyImage_max[dwIndex]->EmptyData(dwSubIndex);
-		m_MyImage_max[dwIndex]->Invalidate();
-	}
 #endif
+
+		// 查询sqlite历史温度数据
+		CBusiness::GetInstance()->QueryTempFromSqliteByTagAsyn(pTemp->m_szTagId, dwIndex, dwSubIndex);
+	}
 
 	memcpy(&m_tLastTemp[dwIndex][dwSubIndex], pTemp, sizeof(LastTemp));
 	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
@@ -1292,6 +1300,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	m_LblReaderId[dwIndex][dwSubIndex]->SetText(pTemp->m_szReaderId);
 	m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
 
+	CBusiness::GetInstance()->SaveTemp2SqliteAsyn(pTemp->m_szTagId, dwTemp);
 	delete pTemp;
 }         
  
@@ -1850,6 +1859,18 @@ void   CDuiFrameWnd::OnCheckAutoSaveTimer() {
 			m_LastSaveExcelTime = time(0);
 		}		
 	}
+}
+
+void   CDuiFrameWnd::OnTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
+	std::vector<TempData*> * pvRet = (std::vector<TempData*> *)wParam;
+	DWORD  dwIndex = LOWORD(lParam);
+	DWORD  dwSubIndex = HIWORD(lParam);
+
+	m_MyImage_max[dwIndex]->OnTempSqliteRet(*pvRet, dwSubIndex);
+	m_MyImage_max[dwIndex]->MyInvalidate();
+
+	// ClearVector(*pvRet);
+	delete pvRet;
 }
 
 

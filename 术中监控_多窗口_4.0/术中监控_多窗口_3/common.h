@@ -39,7 +39,7 @@ using namespace DuiLib;
 #define  DB_FLAG  0
 #define  DBG_FLAG 1
 
-#define  MAX_POINTS_COUNT         60480
+#define  MAX_POINTS_COUNT         60481
 
 #define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
 #define   LOG_FILE_NAME           "surgery3.log"
@@ -174,6 +174,8 @@ using namespace DuiLib;
 #define MSG_BIND_TAGS                    3003
 #define MSG_GET_GRID_TEMP                3004
 #define MSG_GET_GRID_TEMP_MAX            3999
+#define MSG_SAVE_TEMP_SQLITE             4000
+#define MSG_QUERY_TEMP_SQLITE            4001
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -184,6 +186,7 @@ using namespace DuiLib;
 #define UM_QUERY_TAG_BINDING_RET         (WM_USER+7)
 #define UM_GET_ALL_PATIENTS_RET          (WM_USER+8)
 #define UM_BIND_TAGS_RET                 (WM_USER+9)
+#define UM_QUERY_TEMP_SQLITE_RET         (WM_USER+10)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
@@ -402,6 +405,32 @@ public:
 	DWORD          m_dwItemsCnt;
 };
 
+class CSaveTempSqliteParam : public LmnToolkits::MessageData {
+public:
+	CSaveTempSqliteParam(const char * szTagId, DWORD dwTemp, time_t t){
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		m_dwTemp = dwTemp;
+		m_time = t;
+	}
+
+	char           m_szTagId[20];
+	DWORD          m_dwTemp;
+	time_t         m_time;
+};
+
+class CQueryTempSqliteParam : public LmnToolkits::MessageData {
+public:
+	CQueryTempSqliteParam(const char * szTagId, DWORD dwIndex, DWORD  dwSubIndex) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		m_dwIndex = dwIndex;
+		m_dwSubIndex = dwSubIndex;
+	}
+
+	char           m_szTagId[20];
+	DWORD          m_dwIndex;
+	DWORD          m_dwSubIndex;
+};
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
@@ -409,6 +438,7 @@ extern ARGB g_default_argb[MAX_READERS_PER_GRID];
 extern LmnToolkits::Thread *  g_thrd_work;
 extern LmnToolkits::Thread *  g_thrd_launch;
 extern LmnToolkits::Thread *  g_thrd_db;
+extern LmnToolkits::Thread *  g_thrd_sqlite;
 extern DuiLib::CEditUI * g_edRemark;
 extern DWORD g_dwPrintExcelMaxPointsCnt;
 

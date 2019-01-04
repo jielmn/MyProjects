@@ -27,6 +27,7 @@ ARGB g_default_argb[MAX_READERS_PER_GRID] = { 0xFF00FF00,0xFF1b9375,0xFF00FFFF,0
 LmnToolkits::Thread *  g_thrd_work = 0;
 LmnToolkits::Thread *  g_thrd_launch = 0;
 LmnToolkits::Thread *  g_thrd_db = 0;
+LmnToolkits::Thread *  g_thrd_sqlite = 0;
 DuiLib::CEditUI * g_edRemark = 0;
 DWORD g_dwPrintExcelMaxPointsCnt = 0;
 std::vector<BodyPart *>    g_vBodyParts;

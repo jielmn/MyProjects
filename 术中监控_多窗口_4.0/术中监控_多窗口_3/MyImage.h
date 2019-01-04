@@ -23,6 +23,7 @@ public:
 	void  OnChangeSkin();
 	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
 	void  MyInvalidate();
+	void  OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex);
 
 private:
 	time_t  GetFirstTime();

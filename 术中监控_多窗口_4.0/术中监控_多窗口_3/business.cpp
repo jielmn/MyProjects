@@ -293,6 +293,12 @@ int CBusiness::Init() {
 	}
 	g_thrd_db->Start();
 
+	g_thrd_sqlite = new LmnToolkits::Thread();
+	if (0 == g_thrd_sqlite) {
+		return -1;
+	}
+	g_thrd_sqlite->Start();
+	
 	//ReconnectLaunchAsyn(200);
 
 	return 0;
@@ -316,6 +322,12 @@ int CBusiness::DeInit() {
 		g_thrd_db->Stop();
 		delete g_thrd_db;
 		g_thrd_db = 0;
+	}
+
+	if (g_thrd_sqlite) {
+		g_thrd_sqlite->Stop();
+		delete g_thrd_sqlite;
+		g_thrd_sqlite = 0;
 	}
 
 	Clear();
@@ -894,9 +906,35 @@ int  CBusiness::ExcelPatientNameChangedAsyn(DWORD dwIndex) {
 	return 0;
 }
 
+//   保存温度数据到sqlite
+int  CBusiness::SaveTemp2SqliteAsyn(const char * szTagId, DWORD dwTemp) {
+	time_t t = time(0);
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_TEMP_SQLITE, new CSaveTempSqliteParam(szTagId, dwTemp, t));
+	return 0;
+}
+
+int  CBusiness::SaveTemp2Sqlite(const CSaveTempSqliteParam * pParam) {
+	m_sqlite.SaveTemp(pParam);
+	return 0;
+}
+
+//  查询sqlite记录的某个tag的温度记录
+int   CBusiness::QueryTempFromSqliteByTagAsyn(const char * szTagId, DWORD  dwIndex, DWORD  dwSubIndex) {
+	g_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_SQLITE,
+		new CQueryTempSqliteParam(szTagId, dwIndex, dwSubIndex));
+	return 0;
+}
+
+int   CBusiness::QueryTempFromSqliteByTag(const CQueryTempSqliteParam * pParam) {
+	std::vector<TempData*> * pvRet = new std::vector<TempData*>;
+	m_sqlite.QueryTempByTag(pParam->m_szTagId, *pvRet);
+	::PostMessage( g_data.m_hWnd, UM_QUERY_TEMP_SQLITE_RET, (WPARAM)pvRet, 
+		MAKELONG(pParam->m_dwIndex, pParam->m_dwSubIndex) );
+	return 0;
+}
 
 // 消息处理
-void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch ( dwMessageId )
 	{
 	case MSG_UPDATE_SCROLL:
@@ -973,6 +1011,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CBindTagsParam * pParam = (CBindTagsParam *)pMessageData;
 		SetBinding(pParam);
+	}
+	break;
+
+	case MSG_SAVE_TEMP_SQLITE:
+	{
+		CSaveTempSqliteParam * pParam = (CSaveTempSqliteParam *)pMessageData;
+		SaveTemp2Sqlite(pParam);
+	}
+	break;
+
+	case MSG_QUERY_TEMP_SQLITE:
+	{
+		CQueryTempSqliteParam * pParam = (CQueryTempSqliteParam *)pMessageData;
+		QueryTempFromSqliteByTag(pParam);
 	}
 	break;
 
