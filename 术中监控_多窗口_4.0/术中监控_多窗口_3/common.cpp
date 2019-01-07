@@ -433,7 +433,7 @@ void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage) {
 
 	g_edRemark->SetText("");
 	g_edRemark->SetVisible(false);
-	g_data.m_bAutoScroll = TRUE;
+	// g_data.m_bAutoScroll = TRUE;
 
 	CMyImageUI * pImage = (CMyImageUI *)pUiImage;
 	pImage->SetRemark(strRemark);
