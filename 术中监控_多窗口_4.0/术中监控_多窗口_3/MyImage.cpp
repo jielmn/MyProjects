@@ -848,5 +848,7 @@ void  CMyImageUI::OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex)
 			m_dwNextTempIndex = 0;
 		}
 	}
+
+	EmptyData(dwIndex);
 	m_vTempData[dwIndex].insert(m_vTempData[dwIndex].begin(), vRet.begin(), vRet.end());
 }

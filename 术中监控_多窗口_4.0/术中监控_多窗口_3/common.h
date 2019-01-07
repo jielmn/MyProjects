@@ -147,7 +147,7 @@ using namespace DuiLib;
 #define   EDT_REMARK_WIDTH               200
 #define   EDT_REMARK_HEIGHT              30
 #define   EDT_REMARK_Y_OFFSET            -50
-#define   DEFAULT_COLLECT_INTERVAL       50
+#define   DEFAULT_COLLECT_INTERVAL       10
 #define   RADIUS_SIZE_IN_GRID            4
 #define   RADIUS_SIZE_IN_MAXIUM          4
 #define   DEFAULT_ALARM_FILE_PATH        "\\res\\surgery_res_3\\1.wav"

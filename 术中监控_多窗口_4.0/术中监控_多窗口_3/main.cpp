@@ -1257,6 +1257,9 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	DWORD  dwTemp = pTemp->m_dwTemp;
 
+	// 保存sqlite
+	CBusiness::GetInstance()->SaveTemp2SqliteAsyn(pTemp->m_szTagId, dwTemp);
+
 	// 如果tag改变
 	if (0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
 		m_MyImage_max[dwIndex]->EmptyData(dwSubIndex);
@@ -1302,8 +1305,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	m_LblReaderId[dwIndex][dwSubIndex]->SetText(pTemp->m_szReaderId);
 	m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
-
-	CBusiness::GetInstance()->SaveTemp2SqliteAsyn(pTemp->m_szTagId, dwTemp);
+	
 	delete pTemp;
 }         
  
@@ -1378,7 +1380,7 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 	}
 	else
 	{
-		if (g_data.m_dwCollectIntervalWidth < 100) {
+		if (g_data.m_dwCollectIntervalWidth <= 20) {
 			g_data.m_dwCollectIntervalWidth += 5;
 			bChanged = TRUE;
 		}
