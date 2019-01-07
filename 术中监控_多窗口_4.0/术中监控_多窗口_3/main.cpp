@@ -591,6 +591,9 @@ void   CDuiFrameWnd::OnDbClick() {
 		else if (0 == strcmp(clsName, "MyImage")) {
 			return;
 		}
+		else if ( 0 == strcmp(clsName, DUI_CTR_SCROLLBAR) ) {
+			return;
+		}
 	}
 
 	while (pFindControl) {
