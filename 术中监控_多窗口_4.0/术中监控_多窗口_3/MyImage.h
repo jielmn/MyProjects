@@ -26,6 +26,11 @@ public:
 	void  OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex);
 
 private:
+	enum   E_STATE {
+		STATE_7_DAYS = 0,
+		STATE_SINGLE_DAY
+	};
+
 	time_t  GetFirstTime();
 	time_t  GetLastTime();
 	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);	
@@ -48,6 +53,11 @@ private:
 	BOOL                         m_bSetParentScrollPos;
 	E_TYPE                       m_type;
 	DWORD                        m_dwCurTempIndex;
+	E_STATE                      m_state;
+	int                          m_nSingleDayIndex;
+
+private:
+	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;

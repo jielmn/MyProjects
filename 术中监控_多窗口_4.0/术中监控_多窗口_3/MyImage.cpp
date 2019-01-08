@@ -27,6 +27,11 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	m_sigAlarm.connect(pBusiness, &CBusiness::OnAlarm);
 
 	m_dwCurTempIndex = -1;
+
+	// 初始状态为显示7日曲线
+	// m_state = STATE_7_DAYS;
+	m_state = STATE_SINGLE_DAY;
+	m_nSingleDayIndex = -1;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -42,8 +47,7 @@ CMyImageUI::~CMyImageUI() {
 	}
 }
 
-bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
-	DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+void  CMyImageUI::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	DuiLib::CDuiString strText;
 
 	Graphics graphics(hDC);
@@ -52,8 +56,8 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
 	SIZE tParentScrollPos = pParent->GetScrollPos();
 	SIZE tParentScrollRange = pParent->GetScrollRange();
-	RECT rect   = this->GetPos();
-	int  width  = pParent->GetWidth();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
 	int  height = rect.bottom - rect.top;
 	DWORD  dwIndex = this->GetTag();
 
@@ -81,7 +85,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	POINT cursor_point;
 	GetCursorPos(&cursor_point);
-	::ScreenToClient(g_data.m_hWnd, &cursor_point );
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
 
 	/* 开始作图 */
 	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
@@ -144,25 +148,25 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 		Gdiplus::Point * points = 0;
 		// 如果画曲线
-		if ( g_data.m_bCurve ) {
+		if (g_data.m_bCurve) {
 			points = new Gdiplus::Point[vTempData.size()];
 		}
 		int j = 0;
-		for (it = vTempData.begin(),j = 0; it != vTempData.end(); it++, j++) {
+		for (it = vTempData.begin(), j = 0; it != vTempData.end(); it++, j++) {
 			TempData * pItem = *it;
 
 			int nDiff = (int)(pItem->tTime - tFirstTime);
-			int nX    = (int)(((double)nDiff / dwCollectInterval )
-				        * g_data.m_dwCollectIntervalWidth );
-			int nY    = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+			int nX = (int)(((double)nDiff / dwCollectInterval)
+				* g_data.m_dwCollectIntervalWidth);
+			int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
 			if (g_data.m_bCurve) {
 				points[j].X = nX + MYIMAGE_LEFT_BLANK + rect.left;
 				points[j].Y = nY + middle + rect.top;
 			}
-			DrawTempPoint(i, graphics, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, hDC, nRadius );
+			DrawTempPoint(i, graphics, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, hDC, nRadius);
 
-			if ( !g_data.m_bCurve ) {
+			if (!g_data.m_bCurve) {
 				if (it == vTempData.begin()) {
 					::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
 				}
@@ -172,7 +176,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 					graphics.DrawLine(m_temperature_pen[i], pt.x, pt.y, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top);
 					::MoveToEx(hDC, nX + MYIMAGE_LEFT_BLANK + rect.left, nY + middle + rect.top, 0);
 				}
-			}			
+			}
 		}
 
 		if (g_data.m_bCurve) {
@@ -180,7 +184,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 			delete[] points;
 		}
 	}
-	
+
 	// 从第一个10秒整数，画时间
 	if (tFirstTime >= 0) {
 		int  remainder = tFirstTime % 10;
@@ -191,9 +195,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 		int nLastX = -1;
 		time_t t = 0;
-		for (t = tFirstTime_1; t < tLastTime; t += dwCollectInterval ) {
+		for (t = tFirstTime_1; t < tLastTime; t += dwCollectInterval) {
 			int nDiff = (int)(t - tFirstTime);
-			int nX = (int)(((double)nDiff / dwCollectInterval ) * g_data.m_dwCollectIntervalWidth);
+			int nX = (int)(((double)nDiff / dwCollectInterval) * g_data.m_dwCollectIntervalWidth);
 
 			if (nLastX == -1 || nX - nLastX >= 300) {
 				int nTextX = MYIMAGE_LEFT_BLANK + rect.left + nX + 1;
@@ -201,7 +205,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 					struct tm tTmTime;
 					localtime_s(&tTmTime, &t);
 
-					strText.Format("  %02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);					
+					strText.Format("  %02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
 					::TextOut(hDC, nTextX,
 						middle + (nGridCount / 2) * nGridHeight + rect.top + 5,
 						strText, strText.GetLength());
@@ -217,14 +221,14 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 		t = tLastTime;
 		int nDiff = (int)(t - tFirstTime);
-		int nX = (int)(((double)nDiff / dwCollectInterval ) * g_data.m_dwCollectIntervalWidth);
+		int nX = (int)(((double)nDiff / dwCollectInterval) * g_data.m_dwCollectIntervalWidth);
 		if (nLastX == -1 || nX - nLastX >= 80) {
 			int nTextX = MYIMAGE_LEFT_BLANK + rect.left + nX;
 			if (nTextX > rectLeft.left) {
 				struct tm tTmTime;
 				localtime_s(&tTmTime, &t);
 
-				strText.Format("  %02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);				
+				strText.Format("  %02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
 				::TextOut(hDC, nTextX,
 					middle + (nGridCount / 2) * nGridHeight + rect.top + 5,
 					strText, strText.GetLength());
@@ -269,11 +273,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	// 画出报警线
 	::SelectObject(hDC, m_hLowTempAlarmPen);
-	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm ) / 100.0 * nGridHeight);
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm) / 100.0 * nGridHeight);
 	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
 	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
-	if ( g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName[0] == '\0'
-		 || 0 == strcmp(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName, "--")) {
+	if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName[0] == '\0'
+		|| 0 == strcmp(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName, "--")) {
 		strText.Format("No.%lu_低温报警", m_dwSelectedReaderIndex + 1);
 	}
 	else {
@@ -347,8 +351,8 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rCross.bottom = rectLeft.bottom;
 
 	// 如果有点
-	if ( g_data.m_CfgData.m_bCrossAnchor && (tFirstTime > 0) 
-		&& ::PtInRect( &rCross, cursor_point ) ) {
+	if (g_data.m_CfgData.m_bCrossAnchor && (tFirstTime > 0)
+		&& ::PtInRect(&rCross, cursor_point)) {
 		::SelectObject(hDC, m_hCommonThreadPen);
 		::MoveToEx(hDC, cursor_point.x, rectLeft.top, 0);
 		::LineTo(hDC, cursor_point.x, rectLeft.bottom);
@@ -362,12 +366,21 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		struct tm tTmTime;
 		localtime_s(&tTmTime, &tCursor);
 
-		strText.Format("%.2f℃,%02d:%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec );
+		strText.Format("%.2f℃,%02d:%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
 		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
 		::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
 	}
-	
+}
 
+bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);	
+
+	if (m_state == STATE_7_DAYS) {
+
+	}
+	else {
+		SubPaint_0(hDC, rcPaint, pStopControl);
+	}	
 	return true;
 }
 
@@ -488,10 +501,18 @@ void  CMyImageUI::AddTemp(DWORD dwIndex, DWORD dwTemp) {
 }
 
 void  CMyImageUI::MyInvalidate() {
-	int nMinWidth = CalcMinWidth();
-	this->SetMinWidth(nMinWidth);
-	Invalidate();
-	m_bSetParentScrollPos = TRUE;
+	// 重新计算宽度
+	if ( m_state == STATE_SINGLE_DAY ) {
+		int nMinWidth = CalcMinWidth();
+		this->SetMinWidth(nMinWidth);
+		m_bSetParentScrollPos = TRUE;
+	}
+	else {
+		DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+		int  width = pParent->GetWidth();
+		this->SetMinWidth(width);
+	}
+	Invalidate();	
 }
 
 // 计算图像需要的宽度
