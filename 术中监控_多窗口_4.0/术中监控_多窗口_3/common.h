@@ -441,6 +441,7 @@ extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_sqlite;
 extern DuiLib::CEditUI * g_edRemark;
 extern DWORD g_dwPrintExcelMaxPointsCnt;
+extern std::vector<BodyPart *>    g_vBodyParts;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);
@@ -466,7 +467,10 @@ extern char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData,
 #if DBG_FLAG
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 #endif
-extern std::vector<BodyPart *>    g_vBodyParts;
+extern time_t  GetTodayZeroTime();
+extern int  GetWeekDay(time_t t);
+extern const char * GetWeekDayName(int nWeekIndex);
+
 
 // templates
 template <class T>

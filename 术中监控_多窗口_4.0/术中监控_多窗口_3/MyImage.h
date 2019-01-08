@@ -35,6 +35,8 @@ private:
 	time_t  GetLastTime();
 	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);	
 	int     CalcMinWidth();
+	// 7日视图有几天数据
+	int     GetDayCounts();
 
 private:
 	HPEN                         m_hCommonThreadPen;
@@ -46,6 +48,7 @@ private:
 	SolidBrush *                 m_temperature_brush[MAX_READERS_PER_GRID];
 	Pen                          m_remark_pen;
 	SolidBrush                   m_remark_brush;
+	HPEN                         m_hDaySplitThreadPen;
 
 private:
 	vector<TempData *>           m_vTempData[MAX_READERS_PER_GRID];	
@@ -58,6 +61,7 @@ private:
 
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	void   SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;

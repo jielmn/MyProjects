@@ -11,6 +11,7 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	m_hCommonBrush       = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
 	m_hLowTempAlarmPen   = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::LOW_ALARM_PEN));
 	m_hHighTempAlarmPen  = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::HIGH_ALARM_PEN));
+	m_hDaySplitThreadPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
 	
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_temperature_pen[i] = new Pen(Gdiplus::Color(g_data.m_argb[i]), 3.0);
@@ -29,8 +30,8 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	m_dwCurTempIndex = -1;
 
 	// 初始状态为显示7日曲线
-	// m_state = STATE_7_DAYS;
-	m_state = STATE_SINGLE_DAY;
+	m_state = STATE_7_DAYS;
+	// m_state = STATE_SINGLE_DAY;
 	m_nSingleDayIndex = -1;
 }
 
@@ -40,10 +41,166 @@ CMyImageUI::~CMyImageUI() {
 	DeleteObject(m_hCommonBrush);
 	DeleteObject(m_hLowTempAlarmPen);
 	DeleteObject(m_hHighTempAlarmPen);
+	DeleteObject(m_hDaySplitThreadPen);
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		delete m_temperature_pen[i];
 		delete m_temperature_brush[i];
 		ClearVector(m_vTempData[i]);
+	}
+}
+
+void   CMyImageUI::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CDuiString strText;
+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+	DWORD  dwIndex = this->GetTag();
+
+
+	/* 开始作图 */
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
+	//int nGridCount = MAX_TEMPERATURE - nMinTemp;
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	// 中间温度的位置
+	int middle = height / 2;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	::SetTextColor(hDC, g_data.m_skin.GetRgb(CMySkin::COMMON_TEXT_COLOR));
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	RECT rectLeft;
+	rectLeft.left   = rect.left;
+	rectLeft.top    = rect.top;
+	rectLeft.right  = rectLeft.left + MYIMAGE_LEFT_BLANK;
+	rectLeft.bottom = rect.bottom;
+
+	int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+	int nFistTemperature = nMaxTemp;
+	DWORD  dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
+
+	// 画出刻度线(水平横线)
+	int nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			::SelectObject(hDC, m_hBrighterThreadPen);
+			nVInterval = nGridHeight;
+		}
+		else {
+			::SelectObject(hDC, m_hCommonThreadPen);
+			nVInterval += nGridHeight;
+		}
+		int  nTop = nFirstTop + i * nGridHeight;
+		int  nTemperature = nFistTemperature - i;
+		::MoveToEx(hDC, rectLeft.right, nTop + rect.top, 0);
+		::LineTo(hDC, rect.right, nTop + rect.top);
+	}
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	// 画边框
+	::SelectObject(hDC, m_hCommonThreadPen);
+	::FillRect(hDC, &rectLeft, m_hCommonBrush);
+	::Rectangle(hDC, rectLeft.left, rectLeft.top, rectLeft.right, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left + width - 1, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.top);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.bottom - 1, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom - 1);
+
+	// 画刻度值
+	nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			int  nTop = nFirstTop + i * nGridHeight;
+			int  nTemperature = nFistTemperature - i;
+			strText.Format("%d℃", nTemperature);
+			::TextOut(hDC, rectLeft.right + (-40),
+				nTop + rect.top + (-8),
+				strText, strText.GetLength());
+			nVInterval = nGridHeight;
+		}
+		else {
+			nVInterval += nGridHeight;
+		}
+	}
+
+	// 画出报警线
+	::SelectObject(hDC, m_hLowTempAlarmPen);
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm) / 100.0 * nGridHeight);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
+	if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName[0] == '\0'
+		|| 0 == strcmp(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName, "--")) {
+		strText.Format("No.%lu_低温报警", m_dwSelectedReaderIndex + 1);
+	}
+	else {
+		strText.Format("%s_低温报警", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName);
+	}
+	::TextOut(hDC, rectLeft.right + 5,
+		middle + nY + rect.top + 5,
+		strText, strText.GetLength());
+
+
+	::SelectObject(hDC, m_hHighTempAlarmPen);
+	nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwHighTempAlarm) / 100.0 * nGridHeight);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
+	if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName[0] == '\0'
+		|| 0 == strcmp(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName, "--")) {
+		strText.Format("No.%lu_高温报警", m_dwSelectedReaderIndex + 1);
+	}
+	else {
+		strText.Format("%s_高温报警", g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_szName);
+	}
+	::TextOut(hDC, rectLeft.right + 5,
+		middle + nY + rect.top + (-20),
+		strText, strText.GetLength());
+
+	// 计算温度曲线跨越几个日子
+	int  nDayCounts = GetDayCounts();
+	assert(nDayCounts > 0);
+	int  nDaySpare = (width - MYIMAGE_LEFT_BLANK) % nDayCounts;
+	int  nDayWidth = (width - MYIMAGE_LEFT_BLANK) / nDayCounts;
+
+	// 画日子的分割线
+	::SelectObject(hDC, m_hDaySplitThreadPen);
+	for ( int i = 0; i < nDayCounts - 1; i++ ) {
+		::MoveToEx(hDC, rectLeft.right + nDayWidth * (i+1), rect.top, 0);
+		::LineTo(hDC, rectLeft.right + nDayWidth * (i + 1), rect.bottom);
+	}
+
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	time_t   tFirstDayZeroTime = tTodayZeroTime - 3600 * 24 * (nDayCounts - 1);
+	int nWeekDayIndex = GetWeekDay(tFirstDayZeroTime);
+
+	RECT  tmpRect;
+	char  szDate[256];
+	for ( int i = 0; i < nDayCounts; i++ ) {
+		tmpRect.left   = rectLeft.right + nDayWidth * i;
+		tmpRect.right  = tmpRect.left + nDayWidth;
+		tmpRect.top    = rectLeft.top + nFirstTop + nGridHeight * nGridCount;
+		tmpRect.bottom = rect.bottom;
+
+		time_t  t = tFirstDayZeroTime + 3600 * 24 * i;
+		Date2String(szDate, sizeof(szDate), &t);
+		strText.Format("%s %s", szDate, GetWeekDayName((nWeekDayIndex + i) % 7) );
+		::DrawText(hDC, strText, strText.GetLength(), &tmpRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 	}
 }
 
@@ -376,7 +533,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	DuiLib::CControlUI::DoPaint(hDC, rcPaint, pStopControl);	
 
 	if (m_state == STATE_7_DAYS) {
-
+		SubPaint_1(hDC, rcPaint, pStopControl);
 	}
 	else {
 		SubPaint_0(hDC, rcPaint, pStopControl);
@@ -410,6 +567,7 @@ void  CMyImageUI::OnChangeSkin() {
 	m_hCommonBrush = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
 	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::LOW_ALARM_PEN));
 	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::HIGH_ALARM_PEN));
+	m_hDaySplitThreadPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
 }
 
 time_t  CMyImageUI::GetFirstTime() {
@@ -872,4 +1030,27 @@ void  CMyImageUI::OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex)
 
 	EmptyData(dwIndex);
 	m_vTempData[dwIndex].insert(m_vTempData[dwIndex].begin(), vRet.begin(), vRet.end());
+}
+
+// 7日视图有几天数据
+int  CMyImageUI::GetDayCounts( ) {	
+	time_t  first_time      = GetFirstTime();
+	if ( -1 == first_time ) {
+		return 1;
+	}
+
+	time_t  today_zero_time = GetTodayZeroTime();
+	if ( first_time >= today_zero_time ) {
+		return 1;
+	}
+
+	// 一周前的开始位置
+	time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	// 如果开始时间比一周前还早
+	if ( first_time <= tWeekBegin ) {
+		return 7;
+	}
+
+	return (int)(today_zero_time - first_time - 1) / (3600 * 24) + 1 + 1;
 }
