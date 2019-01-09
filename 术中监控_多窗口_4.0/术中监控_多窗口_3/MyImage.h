@@ -37,6 +37,8 @@ private:
 	int     CalcMinWidth();
 	// 7日视图有几天数据
 	int     GetDayCounts();
+	void    DrawPolyline( time_t tFirstDayZeroTime, float fSecondsPerPixel, 
+		int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics );
 
 private:
 	HPEN                         m_hCommonThreadPen;

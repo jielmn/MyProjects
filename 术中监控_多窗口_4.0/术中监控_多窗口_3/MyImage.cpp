@@ -11,7 +11,7 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	m_hCommonBrush       = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
 	m_hLowTempAlarmPen   = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::LOW_ALARM_PEN));
 	m_hHighTempAlarmPen  = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::HIGH_ALARM_PEN));
-	m_hDaySplitThreadPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
+	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
 	
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_temperature_pen[i] = new Pen(Gdiplus::Color(g_data.m_argb[i]), 3.0);
@@ -202,6 +202,16 @@ void   CMyImageUI::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopCon
 		strText.Format("%s %s", szDate, GetWeekDayName((nWeekDayIndex + i) % 7) );
 		::DrawText(hDC, strText, strText.GetLength(), &tmpRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 	}
+
+	// 画折线图
+	if ( nDayWidth > 0 ) {
+		float  fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		POINT  top_left;
+		top_left.x = rectLeft.right;
+		top_left.y = nFirstTop + rectLeft.top;
+		DrawPolyline( tFirstDayZeroTime, fSecondsPerPixel, nMaxTemp, nGridHeight, top_left, graphics );
+	}
+	
 }
 
 void  CMyImageUI::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -652,6 +662,17 @@ void  CMyImageUI::AddTemp(DWORD dwIndex, DWORD dwTemp) {
 		m_vTempData[dwIndex].erase(it);
 		delete pData;
 	}
+	else if (m_vTempData[dwIndex].size() > 0) {
+		TempData * pFirst = m_vTempData[dwIndex].at(0);
+		time_t  tTodayZeroTime = GetTodayZeroTime();
+		// 如果时间超过一周
+		if ( (tTodayZeroTime > pFirst->tTime) && (tTodayZeroTime - pFirst->tTime > 3600 * 24 * 6 ) ) {
+			vector<TempData *>::iterator it = m_vTempData[dwIndex].begin();
+			TempData * pData = *it;
+			m_vTempData[dwIndex].erase(it);
+			delete pData;
+		}
+	}
 	m_vTempData[dwIndex].push_back(pTemp);
 
 	// 重绘
@@ -1053,4 +1074,85 @@ int  CMyImageUI::GetDayCounts( ) {
 	}
 
 	return (int)(today_zero_time - first_time - 1) / (3600 * 24) + 1 + 1;
+}
+
+void  CMyImageUI::DrawPolyline(
+	time_t tFirstDayZeroTime, float fSecondsPerPixel,
+	int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics ) {
+
+	Gdiplus::Point * points = new Gdiplus::Point[MAX_POINTS_COUNT];
+	vector<TempData *>::iterator it;
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+		
+		// 找到第一个点
+		for ( it = vTempData.begin(); it != vTempData.end(); it++ ) {
+			TempData * pItem = *it;
+			if ( pItem->tTime >= tFirstDayZeroTime) {
+				break;
+			}
+		}
+
+		// 找到第一个点后，其他的点不在和起始时间点比较
+		// 临时存储相同x坐标的vector
+		vector<TempData *>  vTmp;
+		// 临时vector的item有共同的点，它们的x坐标相同
+		int nTmpX = 0;
+		// points数组的大小
+		int cnt = 0;
+
+		for ( ; it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+			int  nX = (int)((pItem->tTime - tFirstDayZeroTime) / fSecondsPerPixel);
+
+			if ( vTmp.size() == 0 ) {
+				vTmp.push_back(pItem);
+				nTmpX = nX;
+			}
+			else {
+				// 如果偏移量和上次的相同，放置在临时vector中
+				if (nX == nTmpX) {
+					vTmp.push_back(pItem);
+				}
+				else {
+					vector<TempData *>::iterator  it_tmp;
+					int  sum = 0;
+					for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+						TempData * pTmpItem = *it_tmp;
+						sum += pTmpItem->dwTemperature;
+					}
+					// 求平均值
+					int  ave = sum / vTmp.size();
+
+					points[cnt].X = nTmpX + tTopLeft.x;
+					points[cnt].Y = tTopLeft.y + (int)((nHighestTemp - ave / 100.0) * nPixelPerCelsius);
+					cnt++;
+
+					vTmp.clear();
+					vTmp.push_back(pItem);
+					nTmpX = nX;
+				}
+			}
+		}
+
+		if (vTmp.size() > 0) {
+			vector<TempData *>::iterator  it_tmp;
+			int  sum = 0;
+			for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+				TempData * pTmpItem = *it_tmp;
+				sum += pTmpItem->dwTemperature;
+			}
+			// 求平均值
+			int  ave = sum / vTmp.size();
+
+			points[cnt].X = nTmpX + tTopLeft.x;
+			points[cnt].Y = tTopLeft.y + (int)((nHighestTemp - ave / 100.0) * nPixelPerCelsius);
+			cnt++;
+
+			vTmp.clear();
+		}
+
+		graphics.DrawLines(m_temperature_pen[i], points, cnt);
+	}
+	delete[] points;
 }
