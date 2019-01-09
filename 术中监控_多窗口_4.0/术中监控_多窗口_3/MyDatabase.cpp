@@ -99,8 +99,8 @@ int  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempDat
 	// 一周前的开始位置
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
 
-	SNPRINTF(szSql, sizeof(szSql), "select * from temperature where time >= %lu order by time",
-		(DWORD)tWeekBegin);
+	SNPRINTF(szSql, sizeof(szSql), "select * from temperature where tag_id = '%s' and time >= %lu order by time",
+		szTagId, (DWORD)tWeekBegin );
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
