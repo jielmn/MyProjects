@@ -33,6 +33,7 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	m_state = STATE_7_DAYS;
 	// m_state = STATE_SINGLE_DAY;
 	m_nSingleDayIndex = -1;
+	m_fSecondsPerPixel = 1.0f;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -47,6 +48,10 @@ CMyImageUI::~CMyImageUI() {
 		delete m_temperature_brush[i];
 		ClearVector(m_vTempData[i]);
 	}
+}
+
+void   CMyImageUI::SubPaint_2(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+
 }
 
 void   CMyImageUI::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -720,15 +725,15 @@ void  CMyImageUI::OnReaderSelected(DWORD  dwSelectedIndex) {
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		if (i == m_dwSelectedReaderIndex) {
 			if ( m_type == TYPE_MAX)
-				m_temperature_pen[i]->SetWidth(3.0);
+				m_temperature_pen[i]->SetWidth(1.5);
 			else 
-				m_temperature_pen[i]->SetWidth(2.0);
+				m_temperature_pen[i]->SetWidth(1.0);
 		}
 		else {
 			if (m_type == TYPE_MAX)
-				m_temperature_pen[i]->SetWidth(2.0);
+				m_temperature_pen[i]->SetWidth(1.0);
 			else
-				m_temperature_pen[i]->SetWidth(2.0);
+				m_temperature_pen[i]->SetWidth(1.0);
 		}
 	}
 }
@@ -1111,7 +1116,7 @@ void  CMyImageUI::DrawPolyline(
 			}
 			else {
 				// 如果偏移量和上次的相同，放置在临时vector中
-				if (nX == nTmpX) {
+				if (nX <= nTmpX + 1) {
 					vTmp.push_back(pItem);
 				}
 				else {
@@ -1155,4 +1160,38 @@ void  CMyImageUI::DrawPolyline(
 		graphics.DrawLines(m_temperature_pen[i], points, cnt);
 	}
 	delete[] points;
+}
+
+void  CMyImageUI::OnDbClick() {
+	if ( m_state == STATE_7_DAYS ) {
+		POINT cursor_point;
+		GetCursorPos(&cursor_point);
+		::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+		DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+		RECT rect = this->GetPos();
+		int  width = pParent->GetWidth();
+
+		// 计算温度曲线跨越几个日子
+		int  nDayCounts = GetDayCounts();
+		assert(nDayCounts > 0);
+		int  nDaySpare = (width - MYIMAGE_LEFT_BLANK) % nDayCounts;
+		int  nDayWidth = (width - MYIMAGE_LEFT_BLANK) / nDayCounts;
+
+		int  nOffsetX = cursor_point.x - rect.left;
+
+		int i = 0;
+		for ( i = 0; i < 6; i++ ) {
+			if ( nOffsetX < MYIMAGE_LEFT_BLANK + nDayWidth * (i+1) ) {
+				break;
+			}
+		}
+		m_nSingleDayIndex = i;
+		m_state = STATE_SINGLE_DAY;
+	}
+	else {
+		m_state = STATE_7_DAYS;
+	}
+
+	MyInvalidate();
 }

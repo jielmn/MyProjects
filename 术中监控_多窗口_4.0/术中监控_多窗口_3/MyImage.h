@@ -24,6 +24,7 @@ public:
 	void  AddTemp(DWORD dwIndex, DWORD dwTemp);
 	void  MyInvalidate();
 	void  OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex);
+	void  OnDbClick();
 
 private:
 	enum   E_STATE {
@@ -60,10 +61,12 @@ private:
 	DWORD                        m_dwCurTempIndex;
 	E_STATE                      m_state;
 	int                          m_nSingleDayIndex;
+	float                        m_fSecondsPerPixel;    // 用于单天的记录每个像素代表的点
 
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void   SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	void   SubPaint_2(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;
