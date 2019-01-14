@@ -25,6 +25,7 @@ public:
 	void  MyInvalidate();
 	void  OnTempSqliteRet(std::vector<TempData*> & vRet, DWORD  dwIndex);
 	void  OnDbClick();
+	void  OnMouseWheel(BOOL bPositive);
 
 private:
 	enum   E_STATE {
@@ -38,8 +39,9 @@ private:
 	int     CalcMinWidth();
 	// 7日视图有几天数据
 	int     GetDayCounts();
-	void    DrawPolyline( time_t tFirstDayZeroTime, float fSecondsPerPixel, 
-		int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics );
+	void    DrawPolyline( time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel, 
+		int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics,
+		BOOL  bDrawPoints = FALSE );
 
 private:
 	HPEN                         m_hCommonThreadPen;
@@ -61,12 +63,14 @@ private:
 	DWORD                        m_dwCurTempIndex;
 	E_STATE                      m_state;
 	int                          m_nSingleDayIndex;
+	time_t                       m_SingleDayZeroTime;
 	float                        m_fSecondsPerPixel;    // 用于单天的记录每个像素代表的点
+	BOOL                         m_bSetSecondsPerPixel;
 
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void   SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
-	void   SubPaint_2(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	void   CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, BOOL & bFindMax);
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;

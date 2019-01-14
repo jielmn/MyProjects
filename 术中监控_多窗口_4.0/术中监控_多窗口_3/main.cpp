@@ -1371,26 +1371,14 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 	BOOL bChanged = FALSE;
 	if (nDirectory > 0)
 	{
-		if (g_data.m_dwCollectIntervalWidth >= 10) {
-			g_data.m_dwCollectIntervalWidth -= 5;
-			bChanged = TRUE;
-		}
-		else if (g_data.m_dwCollectIntervalWidth >= 6 )  {
-			g_data.m_dwCollectIntervalWidth = 5;
-			bChanged = TRUE;
+		if ( m_eGridStatus == GRID_STATUS_MAXIUM ) {
+			m_MyImage_max[m_dwInflateGridIndex]->OnMouseWheel(TRUE);
 		}
 	}
 	else
 	{
-		if (g_data.m_dwCollectIntervalWidth <= 20) {
-			g_data.m_dwCollectIntervalWidth += 5;
-			bChanged = TRUE;
-		}
-	}
-
-	if (bChanged) {
-		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
-			m_MyImage_max[i]->MyInvalidate();
+		if (m_eGridStatus == GRID_STATUS_MAXIUM) {
+			m_MyImage_max[m_dwInflateGridIndex]->OnMouseWheel(FALSE);
 		}
 	}
 }
