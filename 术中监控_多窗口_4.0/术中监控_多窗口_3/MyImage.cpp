@@ -485,7 +485,7 @@ void  CMyImageUI::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopCont
 
 		float  fTempCursor = nFistTemperature - (float)(cursor_point.y - rect.top - nFirstTop) / nGridHeight;
 		int n1 = cursor_point.x - rect.left - MYIMAGE_LEFT_BLANK;
-		time_t tCursor = (time_t)( (float)n1 * m_fSecondsPerPixel + tFirstTime );
+		time_t tCursor = (time_t)( (float)n1 * m_fSecondsPerPixel ) + tFirstTime ;
 
 		struct tm tTmTime;
 		localtime_s(&tTmTime, &tCursor);
