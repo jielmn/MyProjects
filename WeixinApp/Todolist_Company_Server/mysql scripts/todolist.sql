@@ -1,6 +1,6 @@
-drop database if exists todo_list_company;
-create database  todo_list_company;
-use todo_list_company;
+drop database if exists todolist_company;
+create database  todolist_company;
+use todolist_company;
 
 -- 是否开放注册
 create table config ( id int primary key not null auto_increment, register_enable int not null ) DEFAULT CHARSET=utf8;
