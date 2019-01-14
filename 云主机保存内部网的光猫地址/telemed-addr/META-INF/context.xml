@@ -1,3 +1,3 @@
 <Context reloadable='true'>
-  <Resource name="jdbc/global_db" auth="Container" type="javax.sql.DataSource" maxActive="100" maxIdle="30" maxWait="10000" username="root" password="" driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/global_db?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8" /> 
+  <Resource name="jdbc/global_db" auth="Container" type="javax.sql.DataSource" maxActive="100" maxIdle="30" maxWait="10000" username="root" password="telemed#87374108" driverClassName="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/global_db?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8" /> 
 </Context>
