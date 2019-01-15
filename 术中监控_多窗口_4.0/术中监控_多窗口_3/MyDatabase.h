@@ -11,6 +11,7 @@ public:
 
 	int  SaveTemp(const CSaveTempSqliteParam * pParam);
 	int  QueryTempByTag(const char * szTagId, std::vector<TempData*> & vRet);
+	int  SaveRemark(const CSetRemarkSqliteParam * pParam);
 
 private:
 	sqlite3 *           m_db;

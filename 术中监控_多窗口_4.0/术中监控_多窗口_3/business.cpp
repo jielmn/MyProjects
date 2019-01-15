@@ -933,6 +933,19 @@ int   CBusiness::QueryTempFromSqliteByTag(const CQueryTempSqliteParam * pParam) 
 	return 0;
 }
 
+// 保存注释
+int   CBusiness::SetRemarkAsyn(const char * szTagId, time_t tTime, const char * szRemark) {
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_REMARK_SQLITE,
+		new CSetRemarkSqliteParam(szTagId, tTime, szRemark));
+	return 0;
+}
+
+int   CBusiness::SetRemark(const CSetRemarkSqliteParam * pParam) {
+	m_sqlite.SaveRemark(pParam);
+	return 0;
+}
+
+
 // 消息处理
 void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch ( dwMessageId )
@@ -1025,6 +1038,13 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 	{
 		CQueryTempSqliteParam * pParam = (CQueryTempSqliteParam *)pMessageData;
 		QueryTempFromSqliteByTag(pParam);
+	}
+	break;
+
+	case MSG_SAVE_REMARK_SQLITE: 
+	{
+		CSetRemarkSqliteParam * pParam = (CSetRemarkSqliteParam*)pMessageData;
+		SetRemark(pParam);
 	}
 	break;
 

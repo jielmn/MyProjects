@@ -176,6 +176,7 @@ using namespace DuiLib;
 #define MSG_GET_GRID_TEMP_MAX            3999
 #define MSG_SAVE_TEMP_SQLITE             4000
 #define MSG_QUERY_TEMP_SQLITE            4001
+#define MSG_SAVE_REMARK_SQLITE           4002
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -429,6 +430,24 @@ public:
 	char           m_szTagId[20];
 	DWORD          m_dwIndex;
 	DWORD          m_dwSubIndex;
+};
+
+class CSetRemarkSqliteParam : public LmnToolkits::MessageData {
+public:
+	CSetRemarkSqliteParam(const char * szTagId, time_t tTime, const char * szRemark) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		m_tTime = tTime;
+		if (szRemark) {
+			STRNCPY(m_szRemark, szRemark, sizeof(m_szRemark));
+		}
+		else {
+			m_szRemark[0] = '\0';
+		}
+	}
+
+	char           m_szTagId[20];
+	time_t         m_tTime;
+	char           m_szRemark[MAX_REMARK_LENGTH];
 };
 
 extern CGlobalData  g_data;

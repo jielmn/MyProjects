@@ -57,6 +57,7 @@ private:
 
 private:
 	vector<TempData *>           m_vTempData[MAX_READERS_PER_GRID];	
+	std::string                  m_sTagId[MAX_READERS_PER_GRID];
 	DWORD                        m_dwNextTempIndex;
 	BOOL                         m_bSetParentScrollPos;
 	E_TYPE                       m_type;
@@ -87,5 +88,7 @@ public:
 
 	void  EmptyData();
 	void  EmptyData(DWORD  dwSubIndex);
+
+	void  SetTagId(DWORD  dwSubIndex, const char * szTagId);
 };
 

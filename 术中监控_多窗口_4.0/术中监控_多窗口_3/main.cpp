@@ -1264,6 +1264,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	// 如果tag改变
 	if (0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
+		m_MyImage_max[dwIndex]->SetTagId(dwSubIndex, pTemp->m_szTagId);
 		m_MyImage_max[dwIndex]->EmptyData(dwSubIndex);
 		m_MyImage_max[dwIndex]->Invalidate();
 

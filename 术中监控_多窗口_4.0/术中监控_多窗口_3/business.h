@@ -130,6 +130,9 @@ public:
 	int   QueryTempFromSqliteByTagAsyn(const char * szTagId, DWORD  dwIndex, DWORD  dwSubIndex);
 	int   QueryTempFromSqliteByTag(const CQueryTempSqliteParam * pParam);
 	
+	// ±£´æ×¢ÊÍ
+	int   SetRemarkAsyn(const char * szTagId, time_t tTime, const char * szRemark);
+	int   SetRemark(const CSetRemarkSqliteParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

@@ -122,3 +122,21 @@ int  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempDat
 
 	return 0;
 }
+
+int  CMySqliteDatabase::SaveRemark(const CSetRemarkSqliteParam * pParam) {
+
+	char sql[8192];
+	char *zErrMsg = 0;
+	int  ret = 0;
+
+	char szRemark[256];
+	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
+
+	SNPRINTF(sql, sizeof(sql), "update temperature set remark='%s' "
+		"where tag_id='%s' and time=%lu",
+		szRemark, pParam->m_szTagId, (DWORD)pParam->m_tTime);
+	/* Execute SQL statement */
+	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+
+	return 0;
+}

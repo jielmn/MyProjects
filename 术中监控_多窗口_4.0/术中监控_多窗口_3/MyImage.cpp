@@ -206,13 +206,55 @@ void   CMyImageUI::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopCon
 		::DrawText(hDC, strText, strText.GetLength(), &tmpRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 	}
 
+	float  fSecondsPerPixel = 0.0f;
 	// 画折线图
 	if ( nDayWidth > 0 ) {
-		float  fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
 		POINT  top_left;
 		top_left.x = rectLeft.right;
 		top_left.y = nFirstTop + rectLeft.top;
 		DrawPolyline( tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nGridHeight, top_left, graphics );
+	}
+
+	// 画出类似注释的框
+	::SetBkMode(hDC, TRANSPARENT);
+
+	time_t tFirstTime = tFirstDayZeroTime;
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		vector<TempData *> & vTempData = m_vTempData[i];
+		vector<TempData *>::iterator it;
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+
+			if (pItem->szRemark[0] != '\0') {
+				int nDiff = (int)(pItem->tTime - tFirstTime);
+				int nX = (int)((float)nDiff / fSecondsPerPixel);
+				int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+				int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
+				int nY1 = nY + middle + rect.top;
+
+				CGraphicsRoundRectPath  RoundRectPath;
+				RoundRectPath.AddRoundRect(nX1 - EDT_REMARK_WIDTH / 2, nY1 + EDT_REMARK_Y_OFFSET,
+					EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5);
+				graphics.DrawPath(&m_remark_pen, &RoundRectPath);
+				graphics.FillPath(&m_remark_brush, &RoundRectPath);
+
+				strText = pItem->szRemark;
+				RECT rectRemark;
+				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
+				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+				if (rectRemark.left < rectLeft.left) {
+					rectRemark.left = rectLeft.left;
+				}
+				if (rectRemark.right < rectRemark.left) {
+					rectRemark.right = rectRemark.left;
+				}
+				::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			}
+		}
 	}
 	
 }
@@ -714,6 +756,18 @@ void  CMyImageUI::OnReaderSelected(DWORD  dwSelectedIndex) {
 }
 
 void   CMyImageUI::OnMyClick(const POINT * pPoint) {
+	if ( m_state == STATE_7_DAYS ) {
+		return;
+	}
+
+	if ( !m_bSetSecondsPerPixel ) {
+		return;
+	}
+
+	if ( m_fSecondsPerPixel > 6.0f ) {
+		return;
+	}
+
 	DWORD  dwIndex = this->GetTag();
 
 	// 找到点击了哪个点
@@ -735,22 +789,26 @@ void   CMyImageUI::OnMyClick(const POINT * pPoint) {
 		nGridHeight -= nSpared;
 	}
 
-	time_t  tFirstTime = GetFirstTime();
-	time_t  tLastTime = GetLastTime();
+	time_t  tFirstTime, tLastTime;
+	BOOL bFindMin, bFindMax;
+	CalcSingleDay(tFirstTime, bFindMin, tLastTime, bFindMax);
 
 	int middle = height / 2;
 	int nRadius = 6;
 	vector<TempData *>::iterator it;
-	DWORD  dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
+	// DWORD  dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
 
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		vector<TempData *> & vTempData = m_vTempData[i];
 
 		for (it = vTempData.begin(); it != vTempData.end(); it++) {
 			TempData * pItem = *it;
+			if ( !(pItem->tTime >= tFirstTime && pItem->tTime < tLastTime) ) {
+				continue;
+			}
 
 			int nDiff = (int)(pItem->tTime - tFirstTime);
-			int nX = (int)(((double)nDiff / dwCollectInterval ) *  g_data.m_dwCollectIntervalWidth);
+			int nX = (int)( nDiff / m_fSecondsPerPixel );
 			int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
 
 			int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
@@ -776,7 +834,7 @@ void   CMyImageUI::OnMyClick(const POINT * pPoint) {
 				g_edRemark->SetVisible(true);
 				g_edRemark->SetFocus();
 
-				g_data.m_bAutoScroll = FALSE;
+				// g_data.m_bAutoScroll = FALSE;
 				break;
 			}
 		}
@@ -796,6 +854,7 @@ void   CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
 			TempData * pItem = *it;
 			if (pItem->dwIndex == m_dwCurTempIndex) {
 				STRNCPY(pItem->szRemark, strRemark, sizeof(pItem->szRemark));
+				CBusiness::GetInstance()->SetRemarkAsyn(m_sTagId[i].c_str(), pItem->tTime, strRemark);
 				return;
 			}
 		}
@@ -1260,4 +1319,12 @@ void   CMyImageUI::CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, 
 			}
 		}
 	}
+}
+
+void  CMyImageUI::SetTagId(DWORD  dwSubIndex, const char * szTagId) {
+	assert(dwSubIndex < MAX_READERS_PER_GRID);
+	if (szTagId)
+		m_sTagId[dwSubIndex] = szTagId;
+	else
+		m_sTagId[dwSubIndex] = "";
 }
