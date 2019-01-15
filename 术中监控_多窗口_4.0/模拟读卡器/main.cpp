@@ -32,6 +32,34 @@ static  CDataBuf          g_buf;
 static  BYTE  g_ReaderId[180][11] = { 0 };
 static  BYTE  g_TagId[180][8] = { 0 };
 
+// 上一次温度数据
+static  DWORD  g_Temp[180] = { 0 };
+
+DWORD  GetRandTemp(BYTE  byBed) {
+	int  delta     = GetRand(0, 30);
+	BOOL bPositive = (BOOL)GetRand(0, 1);
+
+	if ( g_Temp[byBed] == 0) {
+		g_Temp[byBed] = GetRand(3200, 4080);
+	}
+	
+	if (bPositive) {
+		g_Temp[byBed] += delta;
+	}
+	else {
+		g_Temp[byBed] -= delta;
+	}
+
+	if ((int)g_Temp[byBed] < 3200) {
+		g_Temp[byBed] = 3200;
+	}
+	else if ((int)g_Temp[byBed] > 4080) {
+		g_Temp[byBed] = 4080;
+	}
+
+	return g_Temp[byBed];
+}
+
 void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData) {
 	if ( dwMessageId == MSG_CONNECT ) {
 		if ( g_com.GetStatus() == CLmnSerialPort::OPEN ) {
@@ -79,13 +107,14 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 			}
 			// 温度
 			else if ( byData[5] == 0x02 ) {
-				DWORD r = GetRand(1, 2);
+				DWORD r = GetRand(1, 5);
 				if ( r > 1 ) {
 					memcpy(byData, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF", 29);
 					byData[3] = byBed;
 					byData[4] = byArea;
 					dwWriteLen = 29;
-					DWORD dwTemp = GetRand(3200, 4080);
+					//DWORD dwTemp = GetRand(3200, 4080);
+					DWORD dwTemp = GetRandTemp(byBed);
 					byData[24] = (BYTE)(dwTemp / 1000);
 					byData[25] = (BYTE)(( dwTemp / 100 ) % 10);
 					byData[26] = (BYTE)(( dwTemp / 10) % 10);
