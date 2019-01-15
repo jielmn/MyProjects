@@ -70,7 +70,7 @@
 				
 				<HorizontalLayout>
 					<VerticalLayout>
-						<Label   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
+						<MyLabel   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
 					</VerticalLayout>					
 					
 					<VerticalLayout width="80">

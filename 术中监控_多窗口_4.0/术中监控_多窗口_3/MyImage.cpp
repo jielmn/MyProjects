@@ -52,6 +52,103 @@ CMyImageUI::~CMyImageUI() {
 	}
 }
 
+void  CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect) {
+	DuiLib::CDuiString strText;
+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	DWORD  dwIndex = this->GetTag();
+
+	/* 开始作图 */
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
+	//int nGridCount = MAX_TEMPERATURE - nMinTemp;
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = 5;
+
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	// 中间温度的位置
+	int middle = height / 2;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	::SetTextColor(hDC, g_data.m_skin.GetRgb(CMySkin::COMMON_TEXT_COLOR));
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	RECT rectLeft;
+	rectLeft.left = rect.left;
+	rectLeft.top = rect.top;
+	rectLeft.right = rectLeft.left + 0;
+	rectLeft.bottom = rect.bottom;
+
+	int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+	int nFistTemperature = nMaxTemp;
+	DWORD  dwCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwCollectInterval);
+
+	// 画出刻度线(水平横线)
+	int nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			::SelectObject(hDC, m_hBrighterThreadPen);
+			nVInterval = nGridHeight;
+		}
+		else {
+			::SelectObject(hDC, m_hCommonThreadPen);
+			nVInterval += nGridHeight;
+		}
+		int  nTop = nFirstTop + i * nGridHeight;
+		int  nTemperature = nFistTemperature - i;
+		::MoveToEx(hDC, rectLeft.right, nTop + rect.top, 0);
+		::LineTo(hDC, rect.right, nTop + rect.top);
+	}
+	//::SelectObject(hDC, m_hCommonThreadPen);
+
+	// 画边框
+	//::SelectObject(hDC, m_hCommonThreadPen);
+	//::FillRect(hDC, &rectLeft, m_hCommonBrush);
+	//::Rectangle(hDC, rectLeft.left, rectLeft.top, rectLeft.right, rectLeft.bottom);
+	//::MoveToEx(hDC, rectLeft.left + width - 1, rectLeft.top, 0);
+	//::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom);
+	//::MoveToEx(hDC, rectLeft.left, rectLeft.top, 0);
+	//::LineTo(hDC, rectLeft.left + width - 1, rectLeft.top);
+	//::MoveToEx(hDC, rectLeft.left, rectLeft.bottom - 1, 0);
+	//::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom - 1);
+
+	// 计算温度曲线跨越几个日子
+	int  nDayCounts = GetDayCounts();
+	assert(nDayCounts > 0);
+	int  nDaySpare = (width - 0) % nDayCounts;
+	int  nDayWidth = (width - 0) / nDayCounts;
+
+	// 画日子的分割线
+	//::SelectObject(hDC, m_hDaySplitThreadPen);
+	//for (int i = 0; i < nDayCounts - 1; i++) {
+	//	::MoveToEx(hDC, rectLeft.right + nDayWidth * (i + 1), rect.top, 0);
+	//	::LineTo(hDC, rectLeft.right + nDayWidth * (i + 1), rect.bottom);
+	//}
+
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	time_t   tFirstDayZeroTime = tTodayZeroTime - 3600 * 24 * (nDayCounts - 1);
+	int nWeekDayIndex = GetWeekDay(tFirstDayZeroTime);
+
+	float  fSecondsPerPixel = 0.0f;
+	// 画折线图
+	if (nDayWidth > 0) {
+		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		POINT  top_left;
+		top_left.x = rectLeft.right;
+		top_left.y = nFirstTop + rectLeft.top;
+		DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nGridHeight, top_left, graphics);
+	}
+}
+
 void   CMyImageUI::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	DuiLib::CDuiString strText;
 
@@ -748,7 +845,7 @@ void  CMyImageUI::OnReaderSelected(DWORD  dwSelectedIndex) {
 		}
 		else {
 			if (m_type == TYPE_MAX)
-				m_temperature_pen[i]->SetWidth(1.0);
+				m_temperature_pen[i]->SetWidth(1.5);
 			else
 				m_temperature_pen[i]->SetWidth(1.0);
 		}
@@ -1327,4 +1424,36 @@ void  CMyImageUI::SetTagId(DWORD  dwSubIndex, const char * szTagId) {
 		m_sTagId[dwSubIndex] = szTagId;
 	else
 		m_sTagId[dwSubIndex] = "";
+}
+
+
+CMyLabelUI::CMyLabelUI() {
+	m_image = 0;
+}
+
+CMyLabelUI::~CMyLabelUI() {
+
+}
+
+bool CMyLabelUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	CLabelUI::DoPaint(hDC, rcPaint, pStopControl);
+
+	if ( 0 == m_image ) {
+		return true;
+	}
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	int width = pParent->GetWidth();
+	int height = pParent->GetHeight();
+	RECT r = this->GetPos();
+
+	SetBkMode(hDC, TRANSPARENT);
+
+	m_image->PaintForLabelUI(hDC, width, height, r);
+
+	return true;
+}
+
+void CMyLabelUI::DoEvent(DuiLib::TEventUI& event) {
+	CLabelUI::DoEvent(event);
 }

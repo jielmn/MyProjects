@@ -90,5 +90,30 @@ public:
 	void  EmptyData(DWORD  dwSubIndex);
 
 	void  SetTagId(DWORD  dwSubIndex, const char * szTagId);
+
+	//
+	void   PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect);
+};
+
+
+
+class CMyLabelUI : public DuiLib::CLabelUI
+{
+public:
+	CMyLabelUI();
+	~CMyLabelUI();
+
+	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	virtual void DoEvent(DuiLib::TEventUI& event);
+	virtual LPCTSTR GetClass() const {
+		return "MyLabel";
+	}
+
+	void  SetMyImage(CMyImageUI * img) {
+		m_image = img;
+	}
+
+private:
+	CMyImageUI  *   m_image;
 };
 

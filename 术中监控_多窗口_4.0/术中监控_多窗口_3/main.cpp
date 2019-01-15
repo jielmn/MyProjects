@@ -124,7 +124,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblCurTemp_grid[i]->SetTag(i);
 		m_LblCurTemp_grid[i]->SetText("--");
 
-		m_LblCurTemp_grid1[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID1, 0));
+		m_LblCurTemp_grid1[i] = static_cast<CMyLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LABEL_CUR_TEMP_GRID1, 0));
 		m_LblCurTemp_grid1[i]->SetTag(i);
 		m_LblCurTemp_grid1[i]->SetText("--");
 		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);	
@@ -175,6 +175,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 		m_MyImage_max[i] = static_cast<CMyImageUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, MYIMAGE_NAME_MAXIUM, 0));
 		m_MyImage_max[i]->SetTag(i);
+		m_LblCurTemp_grid1[i]->SetMyImage(m_MyImage_max[i]);
 
 		m_layReaders[i] = static_cast<CVerticalLayoutUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, LAYOUT_READERS, 0));
 		m_layReaders[i]->SetTag(i);
