@@ -381,7 +381,7 @@ public class ManageServlet extends HttpServlet {
 								throw new Exception("excel columns not equal 5");
 							}
 							
-							for (int row = 0; row < rows; row++)
+							for (int row = 1; row < rows; row++)
 							{
 								stmt.executeUpdate( "insert into patientinfo (patientid, patientname, gender, bedid, age ) values('" + sheet.getCell(0, row).getContents() + "', '" + sheet.getCell(1, row).getContents() + "','" 
 								                    + (sheet.getCell(2, row).getContents().equals("Ů") ? 0 : 1) + "', '" + sheet.getCell(3, row).getContents() + "', " + sheet.getCell(4, row).getContents() + "); " );							   
