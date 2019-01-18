@@ -48,7 +48,7 @@ int  CLaunch::Reconnect() {
 		}
 	}
 
-	BOOL bRet = OpenUartPort(szComPort);
+	BOOL bRet = OpenUartPort(szComPort,115200);
 	if (!bRet) {
 		m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
 		return 0;
@@ -80,24 +80,30 @@ int  CLaunch::GetData() {
 
 	// 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
 	// 55 18 00 02 04 45 52 00 00 04 00 00 00 00 00 01 38 37 11 37 D8 59 02 E0 16 40 FF 0D 0A
-	const DWORD  dwItemLen = 29;
+	// new
+	//       信道  地址      SN                                  温度
+	//       ____  ____  ___________                             _____
+	//  1  2  3      4    5  6  7  8    9 10 11 12 13 14 15 16   17 18   19 20 21 22 23
+	// 55 15 02     00   00 00 00 0B   8F 63 11 37 D8 59 02 E0   14 39   00 00 00 00 FF 
+	const DWORD  dwItemLen = 23;
 	CLmnString strText;
 
 	// 如果获取一条温度数据
 	if ( m_recv_buf.GetDataLength() >= dwItemLen ) {
 		m_recv_buf.Read( buf, dwItemLen );
 		//DWORD  dwTemp = (buf[0] - '0') * 1000 + (buf[1] - '0') * 100 + (buf[2] - '0') * 10 + (buf[3] - '0') ;
-		if (buf[0] == 0x55 && buf[1] == 0x18) {
-			DWORD  dwTemp = buf[24] * 100 + buf[25];
+		if (buf[0] == 0x55 && buf[1] == 0x15 ) {
+			DWORD  dwTemp = buf[16] * 100 + buf[17];
 			char   szReaderId[256] = {0};
 			char   szTagId[256] = { 0 };
-			DWORD  dwNum_1 = buf[8] * 256 + buf[9];
-			DWORD  dwNum_2 = buf[13] * 256 * 256 + buf[14] * 256 + buf[15];
-			SNPRINTF(szReaderId, sizeof(szReaderId), "ER%03lu%07lu", dwNum_1, dwNum_2);
-			SNPRINTF(szTagId, sizeof(szTagId), "%02x%02x%02x%02x%02x%02x%02x%02x", buf[23], buf[22], buf[21], buf[20], buf[19], buf[18], buf[17], buf[16]);			
+			DWORD  dwNum = buf[4] * 256 * 256 * 256 + buf[5] * 256 * 256 + buf[6] * 256 + buf[7];
+			SNPRINTF(szReaderId, sizeof(szReaderId), "ER003%06lu", dwNum );
+			SNPRINTF(szTagId,    sizeof(szTagId),    "%02x%02x%02x%02x%02x%02x%02x%02x", 
+				buf[15], buf[14], buf[13], buf[12], buf[11], buf[10], buf[9], buf[8]);			
 
 			// 如果有服务器地址
 			if (g_data.m_szServerAddr[0] != '\0') {
+				JTelSvrPrint("try to send a temp record to server!");
 
 				int * pArg = new int[2];
 				TempItem * pItem = new TempItem;
