@@ -61,7 +61,7 @@ public:
 		}
 
 		DWORD dwFontSize = 0;
-		g_cfg->GetConfig("font size", dwFontSize, 28);
+		g_cfg->GetConfig("font size 1", dwFontSize, 60);
 
 		m_font = CreateFont(
 			(int)dwFontSize,               // nHeight
@@ -80,7 +80,7 @@ public:
 			_T("ºÚÌå")
 		);
 
-		g_cfg->GetConfig("big inv font size", dwFontSize, 80);
+		g_cfg->GetConfig("big inv font size 1", dwFontSize, 110);
 		m_font1 = CreateFont(
 			(int)dwFontSize,               // nHeight
 			0,                             // nWidth
@@ -106,6 +106,11 @@ public:
 		dateValid->SetTime(&t);
 		SNPRINTF(buf, sizeof(buf), "%04d-%02d-%02d", t.wYear, t.wMonth, t.wDay);
 		dateValid->SetText(buf);
+
+#ifdef _DEBUG
+		m_PaintManager.FindControl(_T("edString"))->SetText("WHET20180901A003");
+#endif
+
 	}
 
 	virtual void    Notify(TNotifyUI& msg);

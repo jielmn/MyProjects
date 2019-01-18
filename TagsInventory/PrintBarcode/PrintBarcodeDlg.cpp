@@ -85,23 +85,23 @@ void CDuiFrameWnd::PrintInventoryBig() {
 	char buf[8192];
 
 	char  szFactoryId[64] = { 0 };
-	g_cfg->GetConfig(FACTORY_CODE, szFactoryId, sizeof(szFactoryId), "");
+	g_cfg->GetConfig(FACTORY_CODE, szFactoryId, sizeof(szFactoryId), "WH");
 
 	char  szProductId[64] = { 0 };
-	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId), "");
+	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId), "ET");
 
 	DWORD  dwFactoryLen = strlen(szFactoryId);
 	DWORD  dwProductLen = strlen(szProductId);
 
 	g_cfg->Reload();
-	g_cfg->GetConfig("big inv paper width", dwPaperWidth, 750);
-	g_cfg->GetConfig("big inv paper height", dwPaperLength, 520);
-	g_cfg->GetConfig("big inv print left", dwLeft, 50);
-	g_cfg->GetConfig("big inv print top", dwTop, 30);
-	g_cfg->GetConfig("big inv print barcode width", dwPrintWidth, dwPaperWidth);
-	g_cfg->GetConfig("big inv print barcode height", dwPrintHeight, dwPaperLength);
-	g_cfg->GetConfig("big inv bar code text height", dwTextHeight, 50);
-	g_cfg->GetConfig("big inv print vertical interval", dwInterval, 130);
+	g_cfg->GetConfig("big inv paper width 1", dwPaperWidth, 720);
+	g_cfg->GetConfig("big inv paper height 1", dwPaperLength, 1200);
+	g_cfg->GetConfig("big inv print left 1", dwLeft, 40);
+	g_cfg->GetConfig("big inv print top 1", dwTop, 120);
+	g_cfg->GetConfig("big inv print barcode width 1", dwPrintWidth, 600);
+	g_cfg->GetConfig("big inv print barcode height 1", dwPrintHeight, 130);
+	g_cfg->GetConfig("big inv bar code text height 1", dwTextHeight, 80);
+	g_cfg->GetConfig("big inv print vertical interval 1", dwInterval, 130);
 
 	DuiLib::CEditUI *  edtBigPackageId = (DuiLib::CEditUI *)m_PaintManager.FindControl(_T("edString"));
 	DuiLib::CDuiString strBigPackageId = GET_CONTROL_TEXT(edtBigPackageId);
@@ -143,7 +143,7 @@ void CDuiFrameWnd::PrintInventoryBig() {
 			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
 			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
 			lpDevMode->dmPaperLength = (short)dwPaperLength;
-			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+			lpDevMode->dmOrientation = DMORIENT_LANDSCAPE; // DMORIENT_PORTRAIT;
 		}
 		GlobalUnlock(printInfo.hDevMode);
 		ResetDC(printInfo.hDC, lpDevMode);
@@ -166,16 +166,42 @@ void CDuiFrameWnd::PrintInventoryBig() {
 		SYSTEMTIME t1 = dateProc->GetTime();
 		SYSTEMTIME t2 = dateValid->GetTime();
 
-		DuiLib::CDuiString  strText = szProductId;
-		strText += strBigBatchId;
+
+
+		DWORD  dwOffsetY = 0;
+		DuiLib::CDuiString  strText;
+		DuiLib::CDuiString  strFullBatchId = szProductId;
+		strFullBatchId += strBigBatchId;
 
 		::SelectObject(pDC->m_hDC, m_font1);
-		::TextOut(pDC->m_hDC, dwLeft, dwTop, (const char *)strText, strText.GetLength());
+
+		strText = "产品名称：无线电子体温计测温标签";
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		strText = "产品型号：EASYTEMP";
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		strText = "产品规格：200mm×75mm";
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		strText.Format("产品批号：%s", strFullBatchId);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
 		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t1.wYear, (DWORD)t1.wMonth, (DWORD)t1.wDay);
-		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval, buf, strlen(buf));
+		strText.Format("生产日期：%s", buf);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
 		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t2.wYear, (DWORD)t2.wMonth, (DWORD)t2.wDay);
-		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval * 2, buf, strlen(buf));
-		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwInterval * 3, dwPrintWidth, dwPrintHeight, (const char *)strBigPackageId, m_font, dwTextHeight, "S/N:");
+		strText.Format("有效期至：%s", buf);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, dwPrintWidth, dwPrintHeight, (const char *)strBigPackageId, m_font, dwTextHeight, "S/N:");
 
 
 		EndPage(printInfo.hDC);

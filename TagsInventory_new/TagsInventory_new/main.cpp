@@ -116,7 +116,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 
 	DWORD dwFontSize = 0;
-	g_cfg->GetConfig("font size", dwFontSize, 28);
+	g_cfg->GetConfig("font size 1", dwFontSize, 60);
 	m_font = CreateFont(
 		(int)dwFontSize,               // nHeight
 		0,                             // nWidth
@@ -134,7 +134,7 @@ void  CDuiFrameWnd::InitWindow() {
 		_T("黑体")
 	);
 
-	g_cfg->GetConfig("big inv font size", dwFontSize, 80);
+	g_cfg->GetConfig("big inv font size 1", dwFontSize, 110);
 	m_font1 = CreateFont(
 		(int)dwFontSize,               // nHeight
 		0,                             // nWidth
@@ -510,88 +510,12 @@ void  CDuiFrameWnd::OnTest() {
 	g_log->Output(ILog::LOG_SEVERITY_INFO, strText);
 #endif
 
-	DWORD   dwPaperWidth = 0;
-	DWORD   dwPaperLength = 0;
-	DWORD   dwLeft = 0;
-	DWORD   dwTop = 0;
-	DWORD   dwPrintWidth = 0;
-	DWORD   dwPrintHeight = 0;
-	DWORD   dwTextHeight = 0;
-	DWORD   dwInterval = 0;
+	DuiLib::CDuiString strBigPackageId = GET_CONTROL_TEXT(m_edtBigPackageId);
+	DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigBatchId);
 
-	g_cfg->Reload();
-	g_cfg->GetConfig("big inv paper width", dwPaperWidth, 750);
-	g_cfg->GetConfig("big inv paper height", dwPaperLength, 520);
-	g_cfg->GetConfig("big inv print left", dwLeft, 50);
-	g_cfg->GetConfig("big inv print top", dwTop, 30);
-	g_cfg->GetConfig("big inv print barcode width", dwPrintWidth, dwPaperWidth);
-	g_cfg->GetConfig("big inv print barcode height", dwPrintHeight, dwPaperLength);
-	g_cfg->GetConfig("big inv bar code text height", dwTextHeight, 50);
-	g_cfg->GetConfig("big inv print vertical interval", dwInterval, 130);
-
-	PRINTDLG printInfo;
-	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
-	printInfo.lStructSize = sizeof(printInfo);
-	printInfo.hwndOwner = 0;
-	printInfo.hDevMode = 0;
-	printInfo.hDevNames = 0;
-	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
-	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
-	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
-	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
-	printInfo.nCopies = 1;
-	printInfo.nFromPage = 0xFFFF;
-	printInfo.nToPage = 0xFFFF;
-	printInfo.nMinPage = 1;
-	printInfo.nMaxPage = 0xFFFF;
-
-	//调用API拿出默认打印机     
-	PrintDlg(&printInfo);
-	//if (PrintDlg(&printInfo)==TRUE) 
-	{
-		LPDEVMODE lpDevMode = (LPDEVMODE)::GlobalLock(printInfo.hDevMode);
-
-		if (lpDevMode) {
-			lpDevMode->dmPaperSize = DMPAPER_USER;
-			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
-			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
-			lpDevMode->dmPaperLength = (short)dwPaperLength;
-			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
-		}
-		GlobalUnlock(printInfo.hDevMode);
-		ResetDC(printInfo.hDC, lpDevMode);
-
-		DOCINFO di;
-		ZeroMemory(&di, sizeof(DOCINFO));
-		di.cbSize = sizeof(DOCINFO);
-		di.lpszDocName = _T("MyXPS");
-		StartDoc(printInfo.hDC, &di);
-		StartPage(printInfo.hDC);
-
-		CDC *pDC = CDC::FromHandle(printInfo.hDC);
-		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
-
-		CSize size = CSize(dwPaperWidth, dwPaperLength);
-		pDC->SetWindowExt(size);
-		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
-
-		DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigPackageId);
-
-		// 画条码
-		//DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBigBatchId, m_font, dwTextHeight, "S/N:");
-		::SelectObject(pDC->m_hDC, m_font1);
-		::TextOut(pDC->m_hDC, dwLeft, dwTop,                "ET20180301", 12);
-		::TextOut(pDC->m_hDC, dwLeft, dwTop+ dwInterval,    "2018年03月01日", 12);
-		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval*2, "2021年03月01日", 12);
-		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwInterval * 3, dwPrintWidth, dwPrintHeight, (const char *)"WHET20180301A001", m_font, dwTextHeight, "S/N:");
-
-
-		EndPage(printInfo.hDC);
-		EndDoc(printInfo.hDC);
-
-		// Delete DC when done.
-		DeleteDC(printInfo.hDC);
-	}
+	m_edtBigPackageId->SetText("WHET20180901A003");
+	m_edtBigBatchId->SetText("20180901");
+	PrintInventoryBig();
 
 }
 
@@ -829,9 +753,10 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 	DWORD   dwInterval = 0;
 	char buf[8192];
 	char  szProductId[64] = { 0 };
-	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId), "");
+	g_cfg->GetConfig(PRODUCT_CODE, szProductId, sizeof(szProductId), "ET");
 
 	g_cfg->Reload();
+	/*
 	g_cfg->GetConfig("big inv paper width", dwPaperWidth, 750);
 	g_cfg->GetConfig("big inv paper height", dwPaperLength, 520);
 	g_cfg->GetConfig("big inv print left", dwLeft, 50);
@@ -840,6 +765,16 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 	g_cfg->GetConfig("big inv print barcode height", dwPrintHeight, dwPaperLength);
 	g_cfg->GetConfig("big inv bar code text height", dwTextHeight, 50);
 	g_cfg->GetConfig("big inv print vertical interval", dwInterval, 130);
+	*/
+	g_cfg->GetConfig("big inv paper width 1", dwPaperWidth, 720);
+	g_cfg->GetConfig("big inv paper height 1", dwPaperLength, 1200);
+	g_cfg->GetConfig("big inv print left 1", dwLeft, 40);
+	g_cfg->GetConfig("big inv print top 1", dwTop, 120);
+	g_cfg->GetConfig("big inv print barcode width 1", dwPrintWidth, 600);
+	g_cfg->GetConfig("big inv print barcode height 1", dwPrintHeight, 130);
+	g_cfg->GetConfig("big inv bar code text height 1", dwTextHeight, 80);
+	g_cfg->GetConfig("big inv print vertical interval 1", dwInterval, 130);
+
 
 	PRINTDLG printInfo;
 	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
@@ -868,7 +803,7 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 			lpDevMode->dmFields = lpDevMode->dmFields | DM_PAPERSIZE | DM_PAPERLENGTH | DM_PAPERWIDTH;
 			lpDevMode->dmPaperWidth = (short)dwPaperWidth;
 			lpDevMode->dmPaperLength = (short)dwPaperLength;
-			lpDevMode->dmOrientation = DMORIENT_PORTRAIT;
+			lpDevMode->dmOrientation = DMORIENT_LANDSCAPE;
 		}
 		GlobalUnlock(printInfo.hDevMode);
 		ResetDC(printInfo.hDC, lpDevMode);
@@ -893,9 +828,9 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 		SYSTEMTIME t1 = m_dateProc->GetTime();
 		SYSTEMTIME t2 = m_dateValid->GetTime();
 
+		/*
 		DuiLib::CDuiString  strText = szProductId;
 		strText += strBigBatchId;
-
 		::SelectObject(pDC->m_hDC, m_font1);
 		::TextOut(pDC->m_hDC, dwLeft, dwTop, (const char *)strText, strText.GetLength() );
 		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t1.wYear, (DWORD)t1.wMonth, (DWORD)t1.wDay);
@@ -903,6 +838,43 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t2.wYear, (DWORD)t2.wMonth, (DWORD)t2.wDay);
 		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwInterval * 2, buf, strlen(buf));
 		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwInterval * 3, dwPrintWidth, dwPrintHeight, (const char *)strBigPackageId, m_font, dwTextHeight, "S/N:");
+		*/
+
+		DWORD  dwOffsetY = 0;
+		DuiLib::CDuiString  strText;
+		DuiLib::CDuiString  strFullBatchId = szProductId;
+		strFullBatchId += strBigBatchId;
+
+		::SelectObject(pDC->m_hDC, m_font1);
+
+		strText = "产品名称：无线电子体温计测温标签";
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		strText = "产品型号：EASYTEMP";
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		strText = "产品规格：200mm×75mm";
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		strText.Format("产品批号：%s", strFullBatchId);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t1.wYear, (DWORD)t1.wMonth, (DWORD)t1.wDay);
+		strText.Format("生产日期：%s", buf);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		SNPRINTF(buf, sizeof(buf), "%04lu年%02lu月%02lu日", (DWORD)t2.wYear, (DWORD)t2.wMonth, (DWORD)t2.wDay);
+		strText.Format("有效期至：%s", buf);
+		::TextOut(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, (const char *)strText, strText.GetLength());
+		dwOffsetY += dwInterval;
+
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop + dwOffsetY, dwPrintWidth, dwPrintHeight, (const char *)strBigPackageId, m_font, dwTextHeight, "S/N:");
+
 
 
 		EndPage(printInfo.hDC);
