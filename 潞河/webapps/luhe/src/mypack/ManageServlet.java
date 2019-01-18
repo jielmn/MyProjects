@@ -150,7 +150,7 @@ public class ManageServlet extends HttpServlet {
 	
 	public Connection getConnection() throws NamingException, SQLException  {
 		Context ctx = new InitialContext();
-		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/luhe_123");
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/luhe_1234");
 		Connection con = ds.getConnection();
 		return con;
 	}	

@@ -140,7 +140,7 @@ public class MainServlet extends HttpServlet {
 	
 	public Connection getConnection() throws NamingException, SQLException  {
 		Context ctx = new InitialContext();
-		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/luhe_123");
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/luhe_1234");
 		Connection con = ds.getConnection();
 		return con;
 	}	
@@ -175,7 +175,19 @@ public class MainServlet extends HttpServlet {
 			
 			Statement stmt = con.createStatement();      			
 			stmt.executeUpdate( "update tempermonitor set islast = 0 where tagid='" + tagid + "' and TIMESTAMPDIFF(SECOND,mtime,now()) < 300;" );			
-			stmt.executeUpdate( "insert into tempermonitor values( null, '" + readerid + "', '" + tagid + "', " + temp + ", '" + transForDate1(d) + "', 'nurse', 0, 1, " + bind + " );" );
+			
+			Date d1=new Date();
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String date1=sdf.format(d1);
+			
+			
+			ResultSet rs = stmt.executeQuery("select * from tempermonitor where readerid = '" + readerid + "' and tagid = '" + tagid + "' and mtime = '" + date1 + "' " );	
+			if ( rs.next() ) {
+				stmt.executeUpdate( "update tempermonitor set temper = " + temp + " where readerid = '" + readerid + "' and tagid = '" + tagid + "' and mtime = '" + date1 + "' " );
+			} else {
+				stmt.executeUpdate( "insert into tempermonitor values( null, '" + readerid + "', '" + tagid + "', " + temp + ", '" + date1 + "', 'nurse_01', 0, 1, " + bind + " );" );
+			}
+			
 			setContentError(out,0);
 			
 			stmt.close();
