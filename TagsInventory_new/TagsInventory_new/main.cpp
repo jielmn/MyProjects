@@ -152,6 +152,25 @@ void  CDuiFrameWnd::InitWindow() {
 		_T("ËÎÌå")
 	);
 
+	g_cfg->GetConfig("font size", dwFontSize, 28);
+	m_font_small = CreateFont(
+		(int)dwFontSize,               // nHeight
+		0,                             // nWidth
+		0,                             // nEscapement
+		0,                             // nOrientation
+		FW_BOLD,                       // nWeight
+		FALSE,                         // bItalic
+		FALSE,                         // bUnderline
+		0,                             // cStrikeOut
+		ANSI_CHARSET,                  // nCharSet
+		OUT_DEFAULT_PRECIS,            // nOutPrecision
+		CLIP_DEFAULT_PRECIS,           // nClipPrecision
+		DEFAULT_QUALITY,               // nQuality
+		DEFAULT_PITCH | FF_SWISS,      // nPitchAndFamily
+		_T("ºÚÌå")
+	);
+	
+
 	SYSTEMTIME t = m_dateValid->GetTime();
 	t.wYear += 3;
 	m_dateValid->SetTime(&t);
@@ -483,7 +502,7 @@ void  CDuiFrameWnd::PrintInventorySmall() {
 		DuiLib::CDuiString strBatchId = GET_CONTROL_TEXT(m_edtPackageId);
 
 		// »­ÌõÂë
-		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBatchId, m_font, dwTextHeight, "S/N:");
+		DrawBarcode128(pDC->m_hDC, dwLeft, dwTop, dwPrintWidth, dwPrintHeight, (const char *)strBatchId, m_font_small, dwTextHeight, "S/N:");
 
 		EndPage(printInfo.hDC);
 		EndDoc(printInfo.hDC);
@@ -510,12 +529,15 @@ void  CDuiFrameWnd::OnTest() {
 	g_log->Output(ILog::LOG_SEVERITY_INFO, strText);
 #endif
 
-	DuiLib::CDuiString strBigPackageId = GET_CONTROL_TEXT(m_edtBigPackageId);
-	DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigBatchId);
+	//DuiLib::CDuiString strBigPackageId = GET_CONTROL_TEXT(m_edtBigPackageId);
+	//DuiLib::CDuiString strBigBatchId = GET_CONTROL_TEXT(m_edtBigBatchId);
 
-	m_edtBigPackageId->SetText("WHET20180901A003");
-	m_edtBigBatchId->SetText("20180901");
-	PrintInventoryBig();
+	//m_edtBigPackageId->SetText("WHET20180901A003");
+	//m_edtBigBatchId->SetText("20180901");
+	//PrintInventoryBig();
+
+	m_edtPackageId->SetText("WHET201809012003");
+	PrintInventorySmall();
 
 }
 

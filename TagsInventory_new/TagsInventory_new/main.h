@@ -81,6 +81,7 @@ private:
 
 	HFONT                    m_font;
 	HFONT                    m_font1;
+	HFONT                    m_font_small;
 
 	// check
 	DuiLib::CLabelUI *       m_lblCheckTagId;
