@@ -51,5 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\common_controls_res.zip" />
+    <None Include="flash10a.tlh">
+      <Filter>头文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

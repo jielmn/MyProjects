@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Ole32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\common_controls_res  ..\Debug\res\common_controls_res /dseiy</Command>
@@ -168,6 +168,7 @@
     <Image Include="res\main.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="flash10a.tlh" />
     <None Include="res\common_controls_res.zip" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

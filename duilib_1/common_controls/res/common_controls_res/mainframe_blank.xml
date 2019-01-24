@@ -67,7 +67,7 @@
 					<Label text="4.animation layout" textcolor="#FF447AA1" font="1" />
 				</HorizontalLayout>
 				
-				<AnimationTabLayout name="stepTabLayout" width="502">
+				<AnimationTabLayout name="stepTabLayout" width="502" height="150">
 					<HorizontalLayout width="502" height="125">
 						<Button name="BtnOneClick" float="true" pos="177,15,0,0" width="153" height="47" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="oneclick.png" hotimage="file=&apos;oneclick.png&apos; fade=&apos;215&apos;" disabledimage="oneclick_dis.png" />						
 						
@@ -88,6 +88,15 @@
 						
 					</HorizontalLayout>
 				</AnimationTabLayout>
+				
+				<HorizontalLayout height="30">
+					<Label text="5.activeX - flash" textcolor="#FF447AA1" font="1" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout width="538" height="373" bkimage="water_bg.jpg" >
+					<ActiveX name="ani_flash" clsid="{D27CDB6E-AE6D-11CF-96B8-444553540000}" mouse="true"/>
+				</HorizontalLayout>
+				
 			</VerticalLayout>
 			
 			

@@ -9,6 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "flash10a.tlh"
  
 CDuiFrameWnd::CDuiFrameWnd() {
 
@@ -19,6 +20,8 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+	 
 	m_pStepTabLayout = static_cast<CAnimationTabLayoutUI*>(m_PaintManager.FindControl(_T("stepTabLayout")));
 	m_pInstallText = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("textProgress")));
 	m_pProgressBar = static_cast<CProgressUI*>(m_PaintManager.FindControl(_T("install")));
@@ -43,13 +46,31 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			m_pStepTabLayout->SelectItem(0);
 		}
 	}
+	else if (msg.sType == _T("showactivex"))
+	{
+		if (name.CompareNoCase(_T("ani_flash")) == 0) {
+			CActiveXUI* pActiveX = static_cast<CActiveXUI*>(m_PaintManager.FindControl(_T("ani_flash")));		
+			DuiLib::CDuiString path = CPaintManagerUI::GetInstancePath() + GetSkinFolder() + "\\waterdrop.swf";
+			IShockwaveFlash* pFlash = NULL;
+			pActiveX->GetControl(__uuidof(IShockwaveFlash), (void**)&pFlash);
+			if (pFlash != NULL) {
+				pFlash->put_WMode(_bstr_t(_T("Transparent"))); 
+				pFlash->put_Movie(_bstr_t(path));
+				pFlash->DisableLocalSecurity();
+				pFlash->put_AllowScriptAccess(L"always");         
+				BSTR response;
+				pFlash->CallFunction(L"<invoke name=\"setButtonText\" returntype=\"xml\"><arguments><string>Click me!</string></arguments></invoke>", &response);
+				pFlash->Release(); 
+			}
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_TIMER) {
 		if ( wParam == TIMER_ID_PROGRESS) {
-			OnMyTimer();  
+			OnMyTimer();   
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
@@ -98,6 +119,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	CoInitialize(NULL);
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
