@@ -5,6 +5,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#define TIMER_ID_PROGRESS (1000)
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -35,4 +37,14 @@ public:
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+private:
+	CAnimationTabLayoutUI *   m_pStepTabLayout;
+	CProgressUI	*             m_pProgressBar;
+	CLabelUI	*             m_pInstallText;
+	CButtonUI   *             m_pAgainBtn;
+
+private:
+	void    InstallStart();
+	void    OnMyTimer();
+	void    InstallFinished();
 };

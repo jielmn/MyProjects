@@ -9,7 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
-
+ 
 CDuiFrameWnd::CDuiFrameWnd() {
 
 }
@@ -19,7 +19,12 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
-	WindowImplBase::InitWindow();
+	m_pStepTabLayout = static_cast<CAnimationTabLayoutUI*>(m_PaintManager.FindControl(_T("stepTabLayout")));
+	m_pInstallText = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("textProgress")));
+	m_pProgressBar = static_cast<CProgressUI*>(m_PaintManager.FindControl(_T("install")));
+	m_pAgainBtn = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("btnAgain")));	           
+
+	WindowImplBase::InitWindow();   
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
@@ -27,14 +32,61 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	DuiLib::CDuiString  name = msg.pSender->GetName();
+
+	if (msg.sType == _T("click")) {
+		if (name == "BtnOneClick") {
+			InstallStart();
+			return;
+		}
+		else if (name == "btnAgain") {
+			m_pStepTabLayout->SelectItem(0);
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (uMsg == WM_TIMER) {
+		if ( wParam == TIMER_ID_PROGRESS) {
+			OnMyTimer();  
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
 
+void CDuiFrameWnd::InstallStart() {
+	m_pAgainBtn->SetVisible(false);
+	m_pProgressBar->SetValue(0);
+	m_pInstallText->SetText(_T("正在安装中，请稍候..."));
+
+	m_pStepTabLayout->SelectItem(1);	
+	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
+}
+
+void  CDuiFrameWnd::InstallFinished() {
+	m_pInstallText->SetText(_T("安装完成！"));
+	KillTimer(GetHWND(), TIMER_ID_PROGRESS);
+	m_pAgainBtn->SetVisible(true);
+}
+
+void CDuiFrameWnd::OnMyTimer() {
+	int nVal = m_pProgressBar->GetValue();
+	CDuiString strPercent;
+	strPercent.Format(_T("正在安装（%d%%）"), nVal);
+	m_pInstallText->SetText(strPercent);
+	if (nVal > 95)
+	{
+		m_pProgressBar->SetValue(100);
+		InstallFinished();
+	}
+	else
+	{
+		nVal += 5;
+		m_pProgressBar->SetValue(nVal);
+	}
+}
 
 
 
