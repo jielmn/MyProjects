@@ -64,7 +64,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 	}
 	WindowImplBase::Notify(msg);
-}                                 
+}                                           
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);

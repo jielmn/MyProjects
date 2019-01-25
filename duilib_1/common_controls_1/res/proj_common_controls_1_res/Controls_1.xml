@@ -25,5 +25,11 @@
 			<Edit name="edit2" password="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" width="100" />
 		</HorizontalLayout >
 		
+		<HorizontalLayout inset="10,20" height="50">
+			<Slider name="slider" enabled="true" width="124" height="19" value="50" min="0" max="100" bkimage="file='SliderBar_BK.bmp' mask='#ffff00ff'" thumbimage="file='SliderBar_Thumb.png' mask='0xffffffff'" thumbhotimage="file='SliderBar_Thumb.png' mask='0xffffffff'" thumbpushedimage="file='SliderBar_Thumb.png' mask='0xffffffff'" thumbsize="12,20" />
+		</HorizontalLayout >
+		
+		
+		
 	</VerticalLayout>
 </Window>
