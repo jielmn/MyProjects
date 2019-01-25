@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1"   >		
+		<HorizontalLayout inset="10,20" height="37">
+			<Option name="option1" text="" normalimage="file='cb_normal.png' dest='0,0,16.16'" hotimage="file='cb_hot.png' dest='0,0,16.16'" pushedimage="file='cb_pushed.png' dest='0,0,16.16'" selectedimage="file='cb_selected.png' dest='0,0,16,16'" width="16" />
+			<Control width="10" />
+			<Label text="复选框" width="40" />
+			
+			<Control width="50" />
+			<Option name="radio1"  group="radio" text="" textcolor="#FF000000" normalimage="file='radio_normal.png' source='0,0,17,17'" selectedimage="file='radio_selected.png' source='0,0,17,17'" width="17"  />
+			<Control width="10" />
+			<Label text="单选框1" width="40" />
+			
+			<Control width="10" />
+			<Option name="radio2"  group="radio" text="" textcolor="#FF000000" normalimage="file='radio_normal.png' source='0,0,17,17'" selectedimage="file='radio_selected.png' source='0,0,17,17'" width="17"  />
+			<Control width="10" />
+			<Label text="单选框1" width="40" />		
+		</HorizontalLayout >
+		
+		<HorizontalLayout inset="10,20" height="50">
+			<Label text="只输入数字：" width="80" />
+			<Edit name="edit1" numberonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" width="100" />
+			<Control width="50" />
+			<Label text="密码：" width="40" />
+			<Edit name="edit2" password="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" width="100" />
+		</HorizontalLayout >
+		
+	</VerticalLayout>
+</Window>
