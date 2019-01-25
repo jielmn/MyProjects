@@ -9,11 +9,12 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
-#define   LOG_FILE_NAME           "blank.log"
-#define   CONFIG_FILE_NAME        "blank.cfg"
+#define   PROJ_NAME               "blank"
+#define   LOG_FILE_NAME           (PROJ_NAME ".log")
+#define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
-#define   SKIN_FILE               "mainframe_blank.xml"
-#define   SKIN_FOLDER             "res\\proj_blank_res"
+#define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
+#define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
 
 class  CGlobalData {
