@@ -66,7 +66,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	WindowImplBase::Notify(msg);
 }
-
+          
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_TIMER) {
 		if ( wParam == TIMER_ID_PROGRESS) {

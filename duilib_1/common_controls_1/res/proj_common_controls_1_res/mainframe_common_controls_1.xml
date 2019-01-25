@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window size="1024,768" mininfo="800,600" caption="0,0,0,32" sizebox="4,4,4,4" roundcorner="0,0"> <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
 	<Font id="0" name="宋体" size="12" bold="true" />
-	<Font id="1" name="宋体" size="15" bold="true" />
-	<Font id="2" name="微软雅黑" size="12" bold="false" italic="false" />
-	
 	<Default name="VScrollBar" value="button1normalimage=&quot;file='scrollbar.bmp' source='0,90,16,106' mask='#FFFF00FF'&quot; button1hotimage=&quot;file='scrollbar.bmp' source='18,90,34,106' mask='#FFFF00FF'&quot; button1pushedimage=&quot;file='scrollbar.bmp' source='36,90,52,106' mask='#FFFF00FF'&quot; button1disabledimage=&quot;file='scrollbar.bmp' source='54,90,70,106' mask='#FFFF00FF'&quot; button2normalimage=&quot;file='scrollbar.bmp' source='0,108,16,124' mask='#FFFF00FF'&quot; button2hotimage=&quot;file='scrollbar.bmp' source='18,108,34,124' mask='#FFFF00FF'&quot; button2pushedimage=&quot;file='scrollbar.bmp' source='36,108,52,124' mask='#FFFF00FF'&quot; button2disabledimage=&quot;file='scrollbar.bmp' source='54,108,70,124' mask='#FFFF00FF'&quot; thumbnormalimage=&quot;file='scrollbar.bmp' source='0,126,16,142' corner='2,2,2,2' mask='#FFFF00FF'&quot; thumbhotimage=&quot;file='scrollbar.bmp' source='18,126,34,142' corner='2,2,2,2' mask='#FFFF00FF'&quot; thumbpushedimage=&quot;file='scrollbar.bmp' source='36,126,52,142' corner='2,2,2,2' mask='#FFFF00FF'&quot; thumbdisabledimage=&quot;file='scrollbar.bmp' source='54,126,70,142' corner='2,2,2,2' mask='#FFFF00FF'&quot; railnormalimage=&quot;file='scrollbar.bmp' source='0,144,16,160' corner='2,2,2,2' mask='#FFFF00FF'&quot; railhotimage=&quot;file='scrollbar.bmp' source='18,144,34,160' corner='2,2,2,2' mask='#FFFF00FF'&quot; railpushedimage=&quot;file='scrollbar.bmp' source='36,144,52,160' corner='2,2,2,2' mask='#FFFF00FF'&quot; raildisabledimage=&quot;file='scrollbar.bmp' source='54,144,70,160' corner='2,2,2,2' mask='#FFFF00FF'&quot; bknormalimage=&quot;file='scrollbar.bmp' source='0,162,16,178' corner='2,2,2,2' mask='#FFFF00FF'&quot; bkhotimage=&quot;file='scrollbar.bmp' source='18,162,34,178' corner='2,2,2,2' mask='#FFFF00FF'&quot; bkpushedimage=&quot;file='scrollbar.bmp' source='36,162,52,178' corner='2,2,2,2' mask='#FFFF00FF'&quot; bkdisabledimage=&quot;file='scrollbar.bmp' source='54,162,70,178' corner='2,2,2,2' mask='#FFFF00FF'&quot; " />
 	<Default name="HScrollBar" value="button1normalimage=&quot;file='scrollbar.bmp' source='0,0,16,16' mask='#FFFF00FF'&quot; button1hotimage=&quot;file='scrollbar.bmp' source='18,0,34,16' mask='#FFFF00FF'&quot; button1pushedimage=&quot;file='scrollbar.bmp' source='36,0,52,16' mask='#FFFF00FF'&quot; button1disabledimage=&quot;file='scrollbar.bmp' source='54,0,70,16' mask='#FFFF00FF'&quot; button2normalimage=&quot;file='scrollbar.bmp' source='0,18,16,34' mask='#FFFF00FF'&quot; button2hotimage=&quot;file='scrollbar.bmp' source='18,18,34,34' mask='#FFFF00FF'&quot; button2pushedimage=&quot;file='scrollbar.bmp' source='36,18,52,34' mask='#FFFF00FF'&quot; button2disabledimage=&quot;file='scrollbar.bmp' source='54,18,70,34' mask='#FFFF00FF'&quot; thumbnormalimage=&quot;file='scrollbar.bmp' source='0,36,16,52' corner='2,2,2,2' mask='#FFFF00FF'&quot; thumbhotimage=&quot;file='scrollbar.bmp' source='18,36,34,52' corner='2,2,2,2' mask='#FFFF00FF'&quot; thumbpushedimage=&quot;file='scrollbar.bmp' source='36,36,52,52' corner='2,2,2,2' mask='#FFFF00FF'&quot; thumbdisabledimage=&quot;file='scrollbar.bmp' source='54,36,70,52' corner='2,2,2,2' mask='#FFFF00FF'&quot; railnormalimage=&quot;file='scrollbar.bmp' source='0,54,16,70' corner='2,2,2,2' mask='#FFFF00FF'&quot; railhotimage=&quot;file='scrollbar.bmp' source='18,54,34,70' corner='2,2,2,2' mask='#FFFF00FF'&quot; railpushedimage=&quot;file='scrollbar.bmp' source='36,54,52,70' corner='2,2,2,2' mask='#FFFF00FF'&quot; raildisabledimage=&quot;file='scrollbar.bmp' source='54,54,70,70' corner='2,2,2,2' mask='#FFFF00FF'&quot; bknormalimage=&quot;file='scrollbar.bmp' source='0,72,16,88' corner='2,2,2,2' mask='#FFFF00FF'&quot; bkhotimage=&quot;file='scrollbar.bmp' source='18,72,34,88' corner='2,2,2,2' mask='#FFFF00FF'&quot; bkpushedimage=&quot;file='scrollbar.bmp' source='36,72,52,88' corner='2,2,2,2' mask='#FFFF00FF'&quot; bkdisabledimage=&quot;file='scrollbar.bmp' source='54,72,70,88' corner='2,2,2,2' mask='#FFFF00FF'&quot; " />
 	
@@ -29,88 +26,28 @@
 			</HorizontalLayout>
 			
 			<!-- 客户区 -->
-			<VerticalLayout inset="10,5,10,5" >
-				<HorizontalLayout height="30">
-					<Label text="1.gif动画" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
+			<HorizontalLayout name="main_tabbar" inset="0,10" childpadding="-20" height="42">
+				<Option name="option_1" selected="true" group="main_tabbar" width="150" height="32" text="组件-1" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
 				
-				<HorizontalLayout height="90" >
-					<GifAnim bkimage="bounding.gif" autoplay="true" visible="true" width="120" height="90" />
-					<Control width="20" />
-					<GifAnim bkimage="love.gif" autoplay="true" visible="true" width="120" height="90" />
-					<Control width="20" />
-					<GifAnim bkimage="loading.gif" autoplay="true" visible="true" width="90" height="90" />
-				</HorizontalLayout>		
+				<Option name="option_2" group="main_tabbar" width="150" height="32" text="组件-2" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
 				
-				<HorizontalLayout height="20" />
-
-				<HorizontalLayout height="30">
-					<Label text="2.checkbox" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
+				<Option name="option_3" group="main_tabbar" width="150" height="32" text="组件-2" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
 				
-				<HorizontalLayout height="16" >
-					<Option width="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" />
-					<Label text="选项1" width="40" />
-					<Control width="10" />
-					<Option width="15" height="15" normalimage="uncheck.png" selectedimage="check.png" selected="true" />
-					<Label text="选项2" width="40"  />
-				</HorizontalLayout>		
-				
-				<HorizontalLayout height="20" />
-
-				<HorizontalLayout height="30">
-					<Label text="3.button" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<HorizontalLayout height="30" >
-					<Button text="确定" font="1" textcolor="#FF386382"   width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
-					
-					<Control width="10" />
-					
-					<Button text="确定" textcolor="#FF386382"   width="100" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " />
-				</HorizontalLayout>	
-
-				
-				<HorizontalLayout height="20" />
-
-				<HorizontalLayout height="30">
-					<Label text="4.animation layout" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<AnimationTabLayout name="stepTabLayout" width="502" height="150">
-					<HorizontalLayout width="502" height="125">
-						<Button name="BtnOneClick" float="true" pos="177,15,0,0" width="153" height="47" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="oneclick.png" hotimage="file=&apos;oneclick.png&apos; fade=&apos;215&apos;" disabledimage="oneclick_dis.png" />						
-						
-						<Option name="OptAddToAuto" float="true" pos="12,82,0,0" width="16" height="16" selected="true" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="noselect.png" selectedimage="select.png" />
-						
-						<Option name="Optlicense" float="true" pos="12,102,0,0" width="16" height="16" selected="true" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="noselect.png" selectedimage="select.png" />
-						
-						<Label name="TextAuto" text="开机自启动" float="true" pos="36,82,0,0" width="100" height="18" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="2" />
-						<Label text="已阅读并同意" float="true" pos="36,102,0,0" width="85" height="18" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="2" />
-						<Button name="btnlicense" text="许可协议" float="true" pos="115,102,0,0" width="55" height="18" textcolor="#0050CEDD" disabledtextcolor="#FFA7A6AA" font="2" align="center" />
-					</HorizontalLayout>
-				    <HorizontalLayout width="502" height="125">
-						<Progress name="install" float="true" pos="41,68,0,0" width="422" height="10" bkimage="progressb.png" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" foreimage="progressf.png" min="0" max="100" value="50" hor="true" />
-						
-						<Label name="textProgress" float="true" pos="41,42,0,0" width="407" height="20" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="1" />
-						
-						<Button name="btnAgain" text="重来一遍" font="2" textcolor="#FF386382"   float="true" pos="230,82,0,0" width="60" height="30" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " visible="false" />
-						
-					</HorizontalLayout>
-				</AnimationTabLayout>
-				
-				<HorizontalLayout height="30">
-					<Label text="5.activeX - flash" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<HorizontalLayout width="538" height="373" bkimage="water_bg.jpg" >
-					<ActiveX name="ani_flash" clsid="{D27CDB6E-AE6D-11CF-96B8-444553540000}" mouse="true"/>
-				</HorizontalLayout>
-				
-			</VerticalLayout>
+				<Option name="option_4" group="main_tabbar" width="150" height="32" text="组件-2" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
+			</HorizontalLayout>
 			
+			<!--Tab区-->
+			<HorizontalLayout bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="0">
+				<TabLayout name="switch">
+					<HorizontalLayout>
+						<Controls_1 />
+					</HorizontalLayout>
+					<HorizontalLayout>
+						<Controls_2 />
+					</HorizontalLayout>
+				</TabLayout>				
+			</HorizontalLayout>			
 			
-			<!--Tab区-->		
 		</VerticalLayout>
 		
 		<!-- 状态栏 -->
