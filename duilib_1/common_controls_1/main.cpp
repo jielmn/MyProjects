@@ -14,6 +14,9 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp("IPAddressEx", pstrClass)) {
 		return new CIPAddressExUI;
 	}
+	else if (0 == strcmp("HotKey", pstrClass)) {
+		return new CHotKeyUI;
+	}
 	return 0; 
 }
 
@@ -29,6 +32,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
 	m_ip = static_cast<CIPAddressExUI*>(m_PaintManager.FindControl("ipaddr"));
 	m_edIpAddr = static_cast<CEditUI *>(m_PaintManager.FindControl("edIpAddr"));
+	m_hotkey = static_cast<CHotKeyUI*>(m_PaintManager.FindControl("hotkey"));
+	m_edHotKey = static_cast<CEditUI *>(m_PaintManager.FindControl("edHotKey"));
 
 	WindowImplBase::InitWindow();
 }
@@ -86,6 +91,15 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnShowIp") {
 			m_edIpAddr->SetText(m_ip->GetIP());  
+		}
+		else if (name == "btnShowHotKey") {
+			WORD  wVirtualKey;
+			WORD  wModifiers;
+			m_hotkey->GetHotKey(wVirtualKey, wModifiers);
+
+			strText.Format("%s,virtual key=0x%X, modifiers=0x%X",
+				(const char *)m_hotkey->GetText(), (DWORD)wVirtualKey, (DWORD)wModifiers);
+			m_edHotKey->SetText(strText); 
 		}
 	}               
 	WindowImplBase::Notify(msg);

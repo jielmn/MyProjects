@@ -6,6 +6,7 @@
 using namespace DuiLib;
 
 #include "UIIPAddressEx.h"
+#include "UIHotKey.h"
 
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
@@ -38,6 +39,8 @@ private:
 	CDialogBuilderCallbackEx m_callback;
 	CIPAddressExUI *         m_ip;
 	CEditUI *                m_edIpAddr;
+	CHotKeyUI *              m_hotkey;
+	CEditUI *                m_edHotKey;
 };
  
 
