@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout inset="1,1,1,1"   >		
-		<Label text="2" />
+	<VerticalLayout inset="1,1,1,1" bordersize="1" bordercolor="#FF333333" height="102"   >		
+		<TileLayout name="tilelayout" vscrollbar="true" itemsize="100,100" childpadding="10">
+			<Include source="tileitem.xml" count="15"/>
+		</TileLayout>
 	</VerticalLayout>
 </Window>

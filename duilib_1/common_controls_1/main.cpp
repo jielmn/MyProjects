@@ -30,7 +30,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
-    
+            
 void  CDuiFrameWnd::InitWindow() {
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
 	m_ip = static_cast<CIPAddressExUI*>(m_PaintManager.FindControl("ipaddr"));
