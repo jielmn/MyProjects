@@ -5,6 +5,19 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "UIIPAddressEx.h"
+
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+private:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -22,6 +35,9 @@ public:
 
 private:
 	DuiLib::CTabLayoutUI *   m_tabs;
+	CDialogBuilderCallbackEx m_callback;
+	CIPAddressExUI *         m_ip;
+	CEditUI *                m_edIpAddr;
 };
  
 

@@ -9,8 +9,15 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
-              
-CDuiFrameWnd::CDuiFrameWnd() {
+
+CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp("IPAddressEx", pstrClass)) {
+		return new CIPAddressExUI;
+	}
+	return 0; 
+}
+
+CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 }
 
@@ -20,6 +27,8 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 
 void  CDuiFrameWnd::InitWindow() {
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
+	m_ip = static_cast<CIPAddressExUI*>(m_PaintManager.FindControl("ipaddr"));
+	m_edIpAddr = static_cast<CEditUI *>(m_PaintManager.FindControl("edIpAddr"));
 
 	WindowImplBase::InitWindow();
 }
@@ -27,22 +36,22 @@ void  CDuiFrameWnd::InitWindow() {
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	DuiLib::CDialogBuilder builder;
 	if (0 == strcmp("Controls_1", pstrClass)) {		
-		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_1.xml"), (UINT)0, 0, &m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_1.xml"), (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
 	else if (0 == strcmp("Controls_2", pstrClass)) {
-		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_2.xml"), (UINT)0, 0, &m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_2.xml"), (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
 	else if (0 == strcmp("Controls_3", pstrClass)) {
-		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_3.xml"), (UINT)0, 0, &m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_3.xml"), (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
 	else if (0 == strcmp("Controls_4", pstrClass)) {
-		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_4.xml"), (UINT)0, 0, &m_PaintManager);
+		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_4.xml"), (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
-	return WindowImplBase::CreateControl(pstrClass);
+	return WindowImplBase::CreateControl(pstrClass); 
 }
     
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
@@ -75,7 +84,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			pModeWnd->CenterWindow();
 			pModeWnd->ShowModal();       
 		}
-	}
+		else if (name == "btnShowIp") {
+			m_edIpAddr->SetText(m_ip->GetIP());  
+		}
+	}               
 	WindowImplBase::Notify(msg);
 }                                           
 
