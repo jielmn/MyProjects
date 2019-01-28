@@ -9,7 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
-                           
+              
 CDuiFrameWnd::CDuiFrameWnd() {
 
 }
@@ -63,11 +63,24 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			m_tabs->SelectItem(3);
 		}
 	}
+	else if (msg.sType == "click") {
+		if (name == "btnNonMode") {
+			CDuiPopupWnd* pPopWnd = new CDuiPopupWnd();
+			pPopWnd->Create(m_hWnd, NULL, WS_POPUP | WS_VISIBLE, WS_EX_TOOLWINDOW, 0, 0, 800, 572);
+			pPopWnd->CenterWindow();       
+		}
+		else if (name == "btnMode") {
+			CDuiModeWnd * pModeWnd = new CDuiModeWnd();
+			pModeWnd->Create(m_hWnd, NULL, WS_POPUP | WS_VISIBLE, WS_EX_TOOLWINDOW, 0, 0, 800, 572);
+			pModeWnd->CenterWindow();
+			pModeWnd->ShowModal();       
+		}
+	}
 	WindowImplBase::Notify(msg);
 }                                           
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
+	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 
 }
 
 

@@ -15,6 +15,8 @@
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
+#define   SKIN_POPUP_FILE         "popup.xml"
+#define   SKIN_MODE_FILE          "mode.xml"
 
 
 class  CGlobalData {

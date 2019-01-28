@@ -23,3 +23,26 @@ public:
 private:
 	DuiLib::CTabLayoutUI *   m_tabs;
 };
+ 
+
+class CDuiPopupWnd : public WindowImplBase
+{
+public:
+	virtual LPCTSTR    GetWindowClassName() const { return _T("PopupWnd"); }
+	virtual CDuiString GetSkinFile() { return _T(SKIN_POPUP_FILE); }
+	virtual CDuiString GetSkinFolder() { return _T(SKIN_FOLDER); }
+	virtual void       OnFinalMessage(HWND hWnd) { 
+		delete this; 
+	}
+};
+
+class CDuiModeWnd : public WindowImplBase
+{
+public:
+	virtual LPCTSTR    GetWindowClassName() const { return _T("ModeWnd"); }
+	virtual CDuiString GetSkinFile() { return _T(SKIN_MODE_FILE); }
+	virtual CDuiString GetSkinFolder() { return _T(SKIN_FOLDER); }
+	virtual void       OnFinalMessage(HWND hWnd) {
+		delete this;
+	}
+};
