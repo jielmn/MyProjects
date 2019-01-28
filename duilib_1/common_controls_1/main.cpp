@@ -34,7 +34,12 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edIpAddr = static_cast<CEditUI *>(m_PaintManager.FindControl("edIpAddr"));
 	m_hotkey = static_cast<CHotKeyUI*>(m_PaintManager.FindControl("hotkey"));
 	m_edHotKey = static_cast<CEditUI *>(m_PaintManager.FindControl("edHotKey"));
+	m_progress = static_cast<CProgressUI *>(m_PaintManager.FindControl("ProgressDemo1"));
 
+	m_ip->SetIP("192.168.0.1");           
+	m_hotkey->SetHotKey(65, 2);
+
+	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
 	WindowImplBase::InitWindow();
 }
 
@@ -106,6 +111,22 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }                                           
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	DuiLib::CDuiString  strText;
+	if (uMsg == WM_TIMER) {
+		if (wParam == TIMER_ID_PROGRESS) {			
+			int v = m_progress->GetValue();
+			if (v < 100) {
+				strText.Format("%d%%", v+1);
+				m_progress->SetValue(v + 1);
+				m_progress->SetText(strText);
+			}				
+			else {
+				strText.Format("%d%%", 0); 
+				m_progress->SetValue(0);
+				m_progress->SetText(strText);
+			}
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 
 }
 

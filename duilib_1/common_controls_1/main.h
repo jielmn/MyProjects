@@ -8,6 +8,8 @@ using namespace DuiLib;
 #include "UIIPAddressEx.h"
 #include "UIHotKey.h"
 
+#define TIMER_ID_PROGRESS 200
+
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
 public:
@@ -41,6 +43,7 @@ private:
 	CEditUI *                m_edIpAddr;
 	CHotKeyUI *              m_hotkey;
 	CEditUI *                m_edHotKey;
+	CProgressUI *            m_progress;
 };
  
 

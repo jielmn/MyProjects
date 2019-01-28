@@ -97,14 +97,14 @@ void CDuiFrameWnd::OnMyTimer() {
 	CDuiString strPercent;
 	strPercent.Format(_T("正在安装（%d%%）"), nVal);
 	m_pInstallText->SetText(strPercent);
-	if (nVal > 95)
+	if (nVal >= 99)
 	{
 		m_pProgressBar->SetValue(100);
 		InstallFinished();
 	}
 	else
 	{
-		nVal += 5;
+		nVal += 1;
 		m_pProgressBar->SetValue(nVal);
 	}
 }
