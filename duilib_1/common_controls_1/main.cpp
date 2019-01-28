@@ -17,6 +17,9 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp("HotKey", pstrClass)) {
 		return new CHotKeyUI;
 	}
+	else if (0 == strcmp("Ring", pstrClass)) {
+		return new CRingUI; 
+	}
 	return 0; 
 }
 
@@ -27,7 +30,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
-
+    
 void  CDuiFrameWnd::InitWindow() {
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
 	m_ip = static_cast<CIPAddressExUI*>(m_PaintManager.FindControl("ipaddr"));
@@ -109,7 +112,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}               
 	WindowImplBase::Notify(msg);
 }                                           
-
+  
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	DuiLib::CDuiString  strText;
 	if (uMsg == WM_TIMER) {

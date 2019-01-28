@@ -59,7 +59,10 @@
 		
 		<HorizontalLayout inset="10,20" height="50">
 			<Progress name="ProgressDemo1" text="Progress" width="200" height="30" foreimage="progressf.png" bkimage="progressb.png" min="0" max="100" value="50" hor="true" align="center" valign="vcenter" />
+			
+			<Control width="10" />
+			<Ring name="ring" text="" textcolor="#FF333333" align="center" valign="vcenter" width="30" bkimage="ring.png"/>
 		</HorizontalLayout >
-		
+
 	</VerticalLayout>
 </Window>
