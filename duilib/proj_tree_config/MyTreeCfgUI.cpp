@@ -244,6 +244,12 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			pCheckBox->SetAttribute("normalimage", "file='checkbox_unchecked.png' dest='0,2,16,18'");
 			pCheckBox->SetAttribute("selectedimage", "file='checkbox_checked.png' dest='0,2,16,18'");
 		}
+		else if (0 == strcmp(pConfig->GetClass(), DUI_CTR_FILEBROWSE)) {
+			CFileBrowseUI * pFileBrowse = (CFileBrowseUI *)pConfig;
+			pFileBrowse->SetAttribute("normalimage", "file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+			pFileBrowse->SetAttribute("hotimage", "file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+			pFileBrowse->SetAttribute("pushedimage", "file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+		}
 		else {
 			assert(0);
 		}
@@ -487,6 +493,11 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_CHECKBOX) ) {
 		cfgValue.m_eConfigType = ConfigType_CHECKBOX;
 		cfgValue.m_bCheckbox = ((CCheckBoxUI*)pCtl)->IsSelected();
+		cfgValue.m_tag = pCtl->GetTag();
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_FILEBROWSE)) {
+		cfgValue.m_eConfigType = ConfigType_FileBrowse;
+		cfgValue.m_strEdit = ((CFileBrowseUI*)pCtl)->GetFileName();
 		cfgValue.m_tag = pCtl->GetTag();
 	}
 	else {

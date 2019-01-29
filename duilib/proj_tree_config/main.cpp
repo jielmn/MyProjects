@@ -85,7 +85,7 @@ void CDuiFrameWnd::InitWindow() {
 		strText.Format("配置选项 %d", i + 1);
 		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i + 1));
 
-		for (int j = 0; j < 3; j++) {
+		for (int j = 0; j < 4; j++) {
 			if (j == 0) {
 				strText.Format("SUB配置选项 %d-%d", i + 1, j + 1);
 			}
@@ -102,6 +102,10 @@ void CDuiFrameWnd::InitWindow() {
 			else if (j == 1) {
 				CCheckBoxUI * pCheckBox = new CCheckBoxUI;
 				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pCheckBox);
+			}
+			else if (j == 2) {
+				CFileBrowseUI * pFileBrowse = new CFileBrowseUI;
+				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pFileBrowse);
 			}
 			else {
 				CComboUI * pCombo = new CComboUI;
@@ -149,6 +153,9 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 				} 
 				else if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_CHECKBOX) {
 					strText.Format("UserData:%d,checkbox:%s", (int)node->data()._pUserData, cfgValue.m_bCheckbox?"checked":"unchecked" );
+				}
+				else if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_FileBrowse) {
+					strText.Format("UserData:%d,filebrowse:%s", (int)node->data()._pUserData, cfgValue.m_strEdit);
 				}
 				else {
 					assert(FALSE);

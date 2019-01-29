@@ -50,7 +50,8 @@ public:
 		ConfigType_NONE = 0,
 		ConfigType_EDIT,
 		ConfigType_COMBO,
-		ConfigType_CHECKBOX
+		ConfigType_CHECKBOX,
+		ConfigType_FileBrowse,
 	};
 
 	class ConfigValue {
