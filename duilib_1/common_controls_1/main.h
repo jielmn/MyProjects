@@ -58,6 +58,8 @@ private:
 	CHotKeyUI *              m_hotkey;
 	CEditUI *                m_edHotKey;
 	CProgressUI *            m_progress;
+	CEditUI *                m_edFileName;
+	CFileBrowseUI *          m_filebrowse;
 };
  
 

@@ -11,7 +11,7 @@
 #include "resource.h"
 
 CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
-	return 0; 
+	return 0;   
 }
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
@@ -29,9 +29,12 @@ void  CDuiFrameWnd::InitWindow() {
 	m_hotkey = static_cast<CHotKeyUI*>(m_PaintManager.FindControl("hotkey"));
 	m_edHotKey = static_cast<CEditUI *>(m_PaintManager.FindControl("edHotKey"));
 	m_progress = static_cast<CProgressUI *>(m_PaintManager.FindControl("ProgressDemo1"));
+	m_edFileName = static_cast<CEditUI *>(m_PaintManager.FindControl("edFileName"));
+	m_filebrowse = static_cast<CFileBrowseUI *>(m_PaintManager.FindControl("browse1"));
 
 	m_ip->SetIP("192.168.0.1");           
 	m_hotkey->SetHotKey(65, 2);
+	m_filebrowse->SetFileName("D:\\test.txt");
 
 	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
 	WindowImplBase::InitWindow();
@@ -100,9 +103,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 				(const char *)m_hotkey->GetText(), (DWORD)wVirtualKey, (DWORD)wModifiers);
 			m_edHotKey->SetText(strText); 
 		}
+		else if (name == "btnShowFileName") {
+			m_edFileName->SetText(m_filebrowse->GetFileName());
+		}
 	}               
 	WindowImplBase::Notify(msg);
-}                                           
+}                                            
   
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	DuiLib::CDuiString  strText;
