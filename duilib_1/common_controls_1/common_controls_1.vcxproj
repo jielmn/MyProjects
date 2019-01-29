@@ -156,18 +156,12 @@
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="UIHotKey.cpp" />
-    <ClCompile Include="UIIPAddressEx.cpp" />
-    <ClCompile Include="UIRing.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="UIHotKey.h" />
-    <ClInclude Include="UIIPAddressEx.h" />
-    <ClInclude Include="UIRing.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="common_controls_1.rc" />

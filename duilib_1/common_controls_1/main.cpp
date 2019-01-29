@@ -11,15 +11,6 @@
 #include "resource.h"
 
 CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
-	if (0 == strcmp("IPAddressEx", pstrClass)) {
-		return new CIPAddressExUI;
-	}
-	else if (0 == strcmp("HotKey", pstrClass)) {
-		return new CHotKeyUI;
-	}
-	else if (0 == strcmp("Ring", pstrClass)) {
-		return new CRingUI; 
-	}
 	return 0; 
 }
 

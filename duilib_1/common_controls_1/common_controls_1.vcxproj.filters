@@ -24,15 +24,6 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="UIIPAddressEx.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UIHotKey.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="UIRing.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -45,15 +36,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UIIPAddressEx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UIHotKey.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="UIRing.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

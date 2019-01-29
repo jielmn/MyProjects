@@ -5,9 +5,6 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
-#include "UIIPAddressEx.h"
-#include "UIHotKey.h"
-#include "UIRing.h"
 #include "resource.h"
 
 #define TIMER_ID_PROGRESS 200
