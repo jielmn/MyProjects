@@ -16,6 +16,20 @@
 			<Control width="10" />
 			<Edit name="edFileName" width="400" bordersize="1" bordercolor="#FF888888" />
 			
-		</HorizontalLayout>		
+		</HorizontalLayout>	
+
+		<VerticalLayout inset="10,20,10,10">
+			<VerticalLayout inset="0,0,0,4" sepimm="false" sepheight="4" height="100" minheight="100" maxheight="300" bkcolor="#FFCCCCCC">
+				<HorizontalLayout bkcolor="#FFF1F1F3" inset="5,5,5,5" >
+					<Label text="这是一个可以移动分割线的Layout" height="30" />
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			<VerticalLayout bkcolor="#FFF1F1F3" inset="5,5,5,5" >
+				<Label text="这是下面的Layout" />
+			</VerticalLayout>
+			
+		</VerticalLayout>
+		
 	</VerticalLayout>	
 </Window>

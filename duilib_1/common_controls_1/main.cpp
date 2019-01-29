@@ -39,7 +39,7 @@ void  CDuiFrameWnd::InitWindow() {
 	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
 	WindowImplBase::InitWindow();
 }
-
+                
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	DuiLib::CDialogBuilder builder;
 	if (0 == strcmp("Controls_1", pstrClass)) {		
