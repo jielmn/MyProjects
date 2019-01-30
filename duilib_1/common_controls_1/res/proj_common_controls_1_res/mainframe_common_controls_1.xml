@@ -34,9 +34,9 @@
 				
 				<Option name="option_2" group="main_tabbar" width="150" height="32" text="组件-2" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
 				
-				<Option name="option_3" group="main_tabbar" width="150" height="32" text="组件-2" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
+				<Option name="option_3" group="main_tabbar" width="150" height="32" text="组件-3" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
 				
-				<Option name="option_4" group="main_tabbar" width="150" height="32" text="组件-2" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
+				<Option name="option_4" group="main_tabbar" width="150" height="32" text="组件-4" textpadding="0,0,0,0" normalimage="file='main_wnd_tab_item.png' source='0,0,43,32' corner='20,0,20,0'" pushedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'" selectedimage="file='main_wnd_tab_item.png' source='86,0,129,32' corner='20,0,20,0'"/>
 			</HorizontalLayout>
 			
 			<!--Tab区-->
