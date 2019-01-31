@@ -31,6 +31,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_progress = static_cast<CProgressUI *>(m_PaintManager.FindControl("ProgressDemo1"));
 	m_edFileName = static_cast<CEditUI *>(m_PaintManager.FindControl("edFileName"));
 	m_filebrowse = static_cast<CFileBrowseUI *>(m_PaintManager.FindControl("browse1"));
+	m_layBrowser = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layBrowser"));
 
 	m_ip->SetIP("192.168.0.1");           
 	m_hotkey->SetHotKey(65, 2);
@@ -38,6 +39,47 @@ void  CDuiFrameWnd::InitWindow() {
 
 	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
 	WindowImplBase::InitWindow();
+}
+
+void CDuiFrameWnd::OnWndInit() {
+	RECT rect = m_layBrowser->GetPos();
+	
+	PROCESS_INFORMATION pi;
+	STARTUPINFO si = { sizeof(si) };
+	BOOL bRet = CreateProcess(
+		NULL,					// name of executable module
+		"D:\\新建文件夹\\cefsimple.exe",			// command line string
+		NULL,					// process attributes
+		NULL,					// thread attributes
+		FALSE,					// handle inheritance option
+		0, //CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE,//0,		UNICODE版本下				// creation flags
+		NULL,					// new environment block
+		NULL,					// current directory name
+		&si,					// startup information
+		&pi); 				    // process information
+	Sleep(1000);
+
+	// 如果创建成功
+	if (bRet) {
+		HWND hWndChild = GetProcessMainWnd(pi.dwProcessId);
+		DWORD dwSleep = 0;
+
+		while (0 == hWndChild) {
+			if (dwSleep >= 1500) {
+				break;
+			}
+			Sleep(100);
+			dwSleep += 100;
+			hWndChild = GetProcessMainWnd(pi.dwProcessId);
+		}
+		if (hWndChild) {
+			//移动A进程窗口位置
+			MoveWindow(hWndChild, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+			//A进程窗口嵌入B进程窗口中
+			SetParent(hWndChild, this->GetHWND());
+		}
+	}
+	
 }
                 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
@@ -106,10 +148,13 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnShowFileName") {
 			m_edFileName->SetText(m_filebrowse->GetFileName());
 		}
-	}               
+	}  
+	else if (msg.sType == "windowinit") {
+		OnWndInit();
+	}
 	WindowImplBase::Notify(msg);
 }                                            
-  
+         
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	DuiLib::CDuiString  strText;
 	if (uMsg == WM_TIMER) {
@@ -119,7 +164,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 				strText.Format("%d%%", v+1);
 				m_progress->SetValue(v + 1);
 				m_progress->SetText(strText);
-			}				
+			}				 
 			else {
 				strText.Format("%d%%", 0); 
 				m_progress->SetValue(0);

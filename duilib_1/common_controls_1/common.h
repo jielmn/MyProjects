@@ -18,6 +18,11 @@
 #define   SKIN_POPUP_FILE         "popup.xml"
 #define   SKIN_MODE_FILE          "mode.xml"
 
+typedef struct tagWNDINFO
+{
+	DWORD dwProcessId;
+	HWND hWnd;
+} WNDINFO, *LPWNDINFO;
 
 class  CGlobalData {
 public:
@@ -35,6 +40,7 @@ public:
 
 extern CGlobalData  g_data;
 
+extern HWND GetProcessMainWnd(DWORD dwProcessId);
 
 // templates
 template <class T>

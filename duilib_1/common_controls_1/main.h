@@ -51,6 +51,9 @@ public:
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
+	void OnWndInit();
+
+private:
 	DuiLib::CTabLayoutUI *   m_tabs;
 	CDialogBuilderCallbackEx m_callback;
 	CIPAddressExUI *         m_ip;
@@ -60,6 +63,7 @@ private:
 	CProgressUI *            m_progress;
 	CEditUI *                m_edFileName;
 	CFileBrowseUI *          m_filebrowse;
+	CVerticalLayoutUI *      m_layBrowser;
 };
  
 
