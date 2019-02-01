@@ -8,7 +8,8 @@ using namespace DuiLib;
 #include "resource.h"
 
 #define TIMER_ID_PROGRESS 200
-
+//#define TIMER_ID_REPAINT  201
+#define UM_REPAINT   (WM_USER+1)
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
 public:
@@ -52,6 +53,8 @@ public:
 
 private:
 	void OnWndInit();
+	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	void MoveBrowser();
 
 private:
 	DuiLib::CTabLayoutUI *   m_tabs;
@@ -64,6 +67,9 @@ private:
 	CEditUI *                m_edFileName;
 	CFileBrowseUI *          m_filebrowse;
 	CVerticalLayoutUI *      m_layBrowser;
+
+	HWND                     m_hWndBrowser;
+	BOOL                     m_bRePaint;
 };
  
 

@@ -15,7 +15,7 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 }
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
-
+	m_bRePaint = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -41,14 +41,18 @@ void  CDuiFrameWnd::InitWindow() {
 	WindowImplBase::InitWindow();
 }
 
-void CDuiFrameWnd::OnWndInit() {
+void CDuiFrameWnd::MoveBrowser() {
 	RECT rect = m_layBrowser->GetPos();
-	
+	MoveWindow(m_hWndBrowser, rect.left+1, rect.top+1, rect.right - rect.left-2, rect.bottom - rect.top-2, TRUE);
+	SetParent(m_hWndBrowser, this->GetHWND());
+}
+
+void CDuiFrameWnd::OnWndInit() {	
 	PROCESS_INFORMATION pi;
 	STARTUPINFO si = { sizeof(si) };
 	BOOL bRet = CreateProcess(
 		NULL,					// name of executable module
-		"D:\\新建文件夹\\cefsimple.exe",			// command line string
+		"D:\\Third-party\\cef_win32\\build\\tests\\cefclient\\Release\\cefclient.exe --hide-controls --hide-caption --url=www.baidu.com",			// command line string
 		NULL,					// process attributes
 		NULL,					// thread attributes
 		FALSE,					// handle inheritance option
@@ -57,29 +61,31 @@ void CDuiFrameWnd::OnWndInit() {
 		NULL,					// current directory name
 		&si,					// startup information
 		&pi); 				    // process information
-	Sleep(1000);
 
 	// 如果创建成功
 	if (bRet) {
-		HWND hWndChild = GetProcessMainWnd(pi.dwProcessId);
+		m_hWndBrowser = GetProcessMainWnd(pi.dwProcessId);
 		DWORD dwSleep = 0;
 
-		while (0 == hWndChild) {
-			if (dwSleep >= 1500) {
+		while (0 == m_hWndBrowser) {
+			if (dwSleep >= 10000) {
 				break;
 			}
 			Sleep(100);
 			dwSleep += 100;
-			hWndChild = GetProcessMainWnd(pi.dwProcessId);
+			m_hWndBrowser = GetProcessMainWnd(pi.dwProcessId);
 		}
-		if (hWndChild) {
-			//移动A进程窗口位置
-			MoveWindow(hWndChild, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
-			//A进程窗口嵌入B进程窗口中
-			SetParent(hWndChild, this->GetHWND());
+		if (m_hWndBrowser) {
+			MoveBrowser();
 		}
+	}	
+}
+
+LRESULT CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if ( m_hWndBrowser ) {
+		m_bRePaint = TRUE;
 	}
-	
+	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
 }
                 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
@@ -171,6 +177,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 				m_progress->SetText(strText);
 			}
 		}
+	}
+	else if (uMsg == WM_PAINT) {
+		if (m_bRePaint) {
+			this->PostMessage(UM_REPAINT);
+			m_bRePaint = FALSE;			
+		}
+	}
+	else if (uMsg == UM_REPAINT) {
+		MoveBrowser();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 
 }
