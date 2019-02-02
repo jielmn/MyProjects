@@ -48,6 +48,18 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
+	
+	g_data.m_cfg->GetConfig("browser directory", g_data.m_szBrowserDir, sizeof(g_data.m_szBrowserDir), "");
+	// 默认为当前目录下
+	if (g_data.m_szBrowserDir[0] == '\0') {
+		char buf[256];
+		GetModuleFileName(0, buf, sizeof(buf));
+		const char * pStr = strrchr(buf, '\\');
+		DWORD  dwTemp = pStr - buf;
+		buf[dwTemp] = '\0';
+
+		SNPRINTF(g_data.m_szBrowserDir, sizeof(g_data.m_szBrowserDir), "%s\\cef_browser", buf);
+	}
 
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {

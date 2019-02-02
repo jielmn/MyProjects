@@ -65,9 +65,12 @@ void CDuiFrameWnd::MoveBrowser() {
 void CDuiFrameWnd::OnWndInit() {	
 	PROCESS_INFORMATION pi;
 	STARTUPINFO si = { sizeof(si) };
+
+	char szCommandLine[300];
+	SNPRINTF(szCommandLine, sizeof(szCommandLine), "%s\\cefclient.exe --hide-controls --hide-caption --url=www.baidu.com", g_data.m_szBrowserDir);
 	BOOL bRet = CreateProcess(
 		NULL,					// name of executable module
-		"D:\\Third-party\\cef_win32\\build\\tests\\cefclient\\Release\\cefclient.exe --hide-controls --hide-caption --url=www.baidu.com",			// command line string
+		szCommandLine,			// command line string
 		NULL,					// process attributes
 		NULL,					// thread attributes
 		FALSE,					// handle inheritance option

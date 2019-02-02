@@ -29,12 +29,14 @@ public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
+	char                      m_szBrowserDir[256];
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
 		m_thrd_db = 0;
+		memset(m_szBrowserDir, 0, sizeof(m_szBrowserDir));
 	}
 };
 
