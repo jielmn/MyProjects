@@ -15,13 +15,19 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 }
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
-	m_bRePaint = FALSE;
 	m_dwBrowerProcId = 0;
 	m_hWndBrowser = 0;
+	memset(&m_BrowserRect, 0, sizeof(m_BrowserRect));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
 
+}
+
+void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
+	if (m_hWndBrowser) {
+		::PostMessage(m_hWndBrowser, WM_CLOSE, 0, 0);   
+	}
 }
             
 void  CDuiFrameWnd::InitWindow() {
@@ -45,15 +51,15 @@ void  CDuiFrameWnd::InitWindow() {
 
 void CDuiFrameWnd::MoveBrowser() {	
 	RECT rect = m_layBrowser->GetPos();	
-	BOOL bRet = MoveWindow(m_hWndBrowser, rect.left+1, rect.top+1, rect.right - rect.left-2, rect.bottom - rect.top-2, TRUE);
-
-	CDuiString  strText;
-	strText.Format("m_hWndBrowser=%p, rect=(%d,%d,%d,%d), move=%s \n", m_hWndBrowser, rect.left, rect.right, rect.top, rect.bottom, bRet ? "true" : "false");
-	OutputDebugString((const char *)strText);
-
-	SetParent(m_hWndBrowser, this->GetHWND());
-
-	//m_hWndBrowser = GetProcessMainWnd(m_dwBrowerProcId);
+	// 比较rect的变化
+	if (rect.left != m_BrowserRect.left || rect.right != m_BrowserRect.right || rect.top != m_BrowserRect.top || rect.bottom != m_BrowserRect.bottom) {
+		BOOL bRet = MoveWindow(m_hWndBrowser, rect.left + 1 + 4, rect.top + 1, rect.right - rect.left - 2 - 4, rect.bottom - rect.top - 2, TRUE);
+		CDuiString  strText;
+		strText.Format("m_hWndBrowser=%p, rect=(%d,%d,%d,%d), move=%s \n", m_hWndBrowser, rect.left, rect.right, rect.top, rect.bottom, bRet ? "true" : "false");
+		OutputDebugString((const char *)strText);
+		SetParent(m_hWndBrowser, this->GetHWND());
+		memcpy(&m_BrowserRect, &rect, sizeof(RECT)); 
+	}
 }
 
 void CDuiFrameWnd::OnWndInit() {	
@@ -92,9 +98,6 @@ void CDuiFrameWnd::OnWndInit() {
 }
 
 LRESULT CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
-	if ( m_hWndBrowser ) {
-		m_bRePaint = TRUE;
-	}
 	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
 }
                 
@@ -189,12 +192,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	else if (uMsg == WM_PAINT) {
-		if (m_bRePaint) {
-			this->PostMessage(UM_REPAINT);
-			m_bRePaint = FALSE;			
-		}
+		this->PostMessage(UM_AFTER_PAINT);
 	}
-	else if (uMsg == UM_REPAINT) {
+	else if (uMsg == UM_AFTER_PAINT) {
 		MoveBrowser();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 

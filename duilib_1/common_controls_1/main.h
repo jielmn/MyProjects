@@ -9,7 +9,7 @@ using namespace DuiLib;
 
 #define TIMER_ID_PROGRESS 200
 //#define TIMER_ID_REPAINT  201
-#define UM_REPAINT   (WM_USER+1)
+#define UM_AFTER_PAINT   (WM_USER+1)
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
 public:
@@ -29,6 +29,7 @@ public:
 
 	virtual LPCTSTR    GetWindowClassName() const { return _T(MAIN_CLASS_WINDOW_NAME); }
 	virtual CDuiString GetSkinFile() { return _T(SKIN_FILE); }
+	void OnFinalMessage(HWND hWnd);
 
 #ifndef _DEBUG
 	virtual CDuiString GetSkinFolder() { return _T(""); }
@@ -70,7 +71,7 @@ private:
 
 	HWND                     m_hWndBrowser;
 	DWORD                    m_dwBrowerProcId;
-	BOOL                     m_bRePaint;
+	RECT                     m_BrowserRect;
 };
  
 
