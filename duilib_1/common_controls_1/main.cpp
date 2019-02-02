@@ -16,6 +16,8 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_bRePaint = FALSE;
+	m_dwBrowerProcId = 0;
+	m_hWndBrowser = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -41,10 +43,17 @@ void  CDuiFrameWnd::InitWindow() {
 	WindowImplBase::InitWindow();
 }
 
-void CDuiFrameWnd::MoveBrowser() {
-	RECT rect = m_layBrowser->GetPos();
-	MoveWindow(m_hWndBrowser, rect.left+1, rect.top+1, rect.right - rect.left-2, rect.bottom - rect.top-2, TRUE);
+void CDuiFrameWnd::MoveBrowser() {	
+	RECT rect = m_layBrowser->GetPos();	
+	BOOL bRet = MoveWindow(m_hWndBrowser, rect.left+1, rect.top+1, rect.right - rect.left-2, rect.bottom - rect.top-2, TRUE);
+
+	CDuiString  strText;
+	strText.Format("m_hWndBrowser=%p, rect=(%d,%d,%d,%d), move=%s \n", m_hWndBrowser, rect.left, rect.right, rect.top, rect.bottom, bRet ? "true" : "false");
+	OutputDebugString((const char *)strText);
+
 	SetParent(m_hWndBrowser, this->GetHWND());
+
+	//m_hWndBrowser = GetProcessMainWnd(m_dwBrowerProcId);
 }
 
 void CDuiFrameWnd::OnWndInit() {	
@@ -64,6 +73,7 @@ void CDuiFrameWnd::OnWndInit() {
 
 	// 如果创建成功
 	if (bRet) {
+		m_dwBrowerProcId = pi.dwProcessId;
 		m_hWndBrowser = GetProcessMainWnd(pi.dwProcessId);
 		DWORD dwSleep = 0;
 

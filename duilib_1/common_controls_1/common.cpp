@@ -10,8 +10,13 @@ BOOL CALLBACK YourEnumProc(HWND hWnd, LPARAM lParam)
 	LPWNDINFO pInfo = (LPWNDINFO)lParam;
 	if (dwProcessId == pInfo->dwProcessId)
 	{
-		pInfo->hWnd = hWnd;
-		return FALSE;
+		char szClassName[256];
+		::GetClassName(hWnd, szClassName, sizeof(szClassName));
+
+		if ( 0 == StrICmp(szClassName, "CEFCLIENT") ) {
+			pInfo->hWnd = hWnd;
+			return FALSE;
+		}		
 	}
 	return TRUE;
 }

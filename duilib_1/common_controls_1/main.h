@@ -69,6 +69,7 @@ private:
 	CVerticalLayoutUI *      m_layBrowser;
 
 	HWND                     m_hWndBrowser;
+	DWORD                    m_dwBrowerProcId;
 	BOOL                     m_bRePaint;
 };
  
