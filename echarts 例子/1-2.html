@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>体温测试</title>
+    <!-- 引入 echarts.js -->
+    <script type="text/javascript" src="js/echarts.common.min.js"></script>
+	<script type="text/javascript" src="js/data.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+	<div style="text-align:center;font-size:30px;margin-bottom:30px;">A体温测试</div>
+    <div id="main_0"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div id="main_1"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div style="height:50px;" ></div>
+	<div id="main_2"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div id="main_3"   style="width:48%;height:800px;display:inline-block;opacity:0;"></div>
+	<div style="text-align:center;font-size:30px;margin-bottom:30px;">B体温测试</div>
+	<div id="main_4"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div id="main_5"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div style="height:50px;" ></div>
+	<div id="main_6"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div id="main_7"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div style="text-align:center;font-size:30px;margin-bottom:30px;">C体温测试</div>
+	<div id="main_8"   style="width:48%;height:800px;display:inline-block;"></div>
+	<div id="main_9"   style="width:48%;height:800px;display:inline-block;"></div>
+	
+    <script type="text/javascript">
+		var minTemp = 32.0;
+		var count = 10;
+		
+        // 基于准备好的dom，初始化echarts实例
+		var myCharts = new Array();
+		for ( var i = 0; i < count; i++ ) {
+			myCharts[i] = echarts.init(document.getElementById('main_' +i));
+		}
+		
+		var titles = [ '腋下和背部(心脏)','腋下和背部(肾)','腋下和背部3','腋下和背部4' ];
+		
+		var data = new Array();
+		for ( var i = 0; i < count; i++ ) {
+			data[i] = {};
+			data[i].yexia = new Array;
+			data[i].beibu = new Array;
+						
+			if ( temp_data[i] ) {
+				var yexia = temp_data[i].yexia;
+				var beibu = temp_data[i].beibu;
+				
+				if ( yexia ) {
+					for ( var j = 0; j < yexia.length; j++ ) {
+						var time = new Date(Date.parse( yexia[j].time )); 
+						data[i].yexia.push([ time, yexia[j].temp/100 ]);
+					}
+				}
+				
+				if ( beibu ) {
+					for ( var j = 0; j < beibu.length; j++ ) {
+						var time = new Date(Date.parse( beibu[j].time )); 
+						data[i].beibu.push([ time, beibu[j].temp/100 ]);
+					}
+				}
+			}
+			
+			console.log(data[i].yexia);
+			console.log(data[i].beibu);
+		}
+
+        // 指定图表的配置项和数据
+		var options = new Array();
+		for ( var i = 0; i < count; i++ ) {
+			options[i] = 
+			{
+				title: {text: titles[i%4] },
+				tooltip: {},
+				legend: {
+					data:['腋下','背部']
+				},
+				xAxis: {type:'time'},
+				yAxis: {min: minTemp},
+				series: [
+					{
+						name: '腋下',
+						type: 'line',
+						smooth: true,
+						data: data[i].yexia,
+					},
+					{
+						name: '背部',
+						type: 'line',
+						smooth: true,
+						data: data[i].beibu,
+					}
+				]
+			};
+		}
+
+        // 使用刚指定的配置项和数据显示图表。
+		for ( var i = 0; i < count; i++ ) {
+			myCharts[i].setOption(options[i]);
+		}
+    </script>
+</body>
+</html>
