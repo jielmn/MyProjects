@@ -62,7 +62,7 @@
 		function newUser(){
 			$('#dlg').dialog('open').dialog('center').dialog('setTitle','添加用户');
 			$('#fm').form('clear');
-			url = 'save_user.php';
+			url = 'user?type=add';
 		}
 		function editUser(){
 			var row = $('#dg').datagrid('getSelected');
@@ -79,6 +79,7 @@
 					return $(this).form('validate');
 				},
 				success: function(result){
+					console.log(result);
 					var result = eval('('+result+')');
 					if (result.errorMsg){
 						$.messager.show({

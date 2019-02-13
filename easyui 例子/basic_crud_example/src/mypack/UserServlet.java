@@ -58,12 +58,41 @@ import java.text.SimpleDateFormat;
 //      1,  invalidate  url params
 //      2,  failed to get a connection
 public class UserServlet extends HttpServlet {
+	static enum ColumnType {
+		STRING,INT
+	}
+	
+	// 只能用于有一个值为主键的表
+	static class ColumnInfo{
+		ColumnInfo( String n, ColumnType t ) {
+			m_name = n;
+			m_type = t;
+			m_primary_key = false;
+		}
+		ColumnInfo( String n, ColumnType t, boolean b ) {
+			m_name = n;
+			m_type = t;
+			m_primary_key = b;
+		}
+		public String     m_name;
+		public ColumnType m_type;
+		public String     m_value;
+		public boolean    m_primary_key;
+	}
 	
 	static private String POOL_NAME  = "test";
 	static private String TABLE_NAME = "users";
+	// 顺序不能乱
+	static private ColumnInfo[] COLUMNS={ new ColumnInfo("firstname",ColumnType.INT, true ),
+										  new ColumnInfo("firstname",ColumnType.STRING),
+                                          new ColumnInfo("lastname", ColumnType.STRING),
+										  new ColumnInfo("phone",    ColumnType.STRING),
+										  new ColumnInfo("email",    ColumnType.STRING) };
+	static private String PRIVATE_KEY="id";
 	
     public void doGet( HttpServletRequest req, HttpServletResponse rsp ) throws ServletException, IOException
-    {       
+    {
+		req.setCharacterEncoding("utf-8");
         rsp.setContentType("application/json;charset=utf-8");
 		
 		String type = getParameter(req, "type");		
@@ -78,6 +107,10 @@ public class UserServlet extends HttpServlet {
 		// 如果是获取某一页的列表
 		if ( type.equals("list") ) {							
 			list(req, out);
+		}
+		// 如果添加用户
+		else if ( type.equals("add") ) {							
+			add(req, out);
 		}		
 		
 		out.close();
@@ -122,6 +155,40 @@ public class UserServlet extends HttpServlet {
 		catch(Exception e ) {
 			setContentError(out, 3, e.getMessage());
 		}
+	}
+	
+	
+	public void add(HttpServletRequest req, PrintWriter out ) {	
+		int i = 0;
+		for ( i = 0; i < COLUMNS.length; i++ ) {
+			COLUMNS[i].m_value = getParameter( req, COLUMNS[i].m_name );
+		}
+		
+		Connection con = null;
+		try{
+			con = getConnection();
+		}
+		catch(Exception e ) {
+			setContentError(out, 2, e.getMessage());
+			return;
+		}
+		
+		/*
+		JSONObject result=new JSONObject();
+		if(StringUtil.isNotEmpty(id)){
+			saveNums=userDao.userModify(con, user);
+		}else{
+			saveNums=userDao.userAdd(con, user);
+		}
+		if(saveNums==1){
+			result.put("success", "true");
+		}else{
+			result.put("success", "true");
+			result.put("errorMsg", "保存失败");
+		}
+		result.put("data", user);
+		ResponseUtil.write(response, result);
+		*/
 	}
 	
 	
@@ -178,6 +245,47 @@ public class UserServlet extends HttpServlet {
 		rs.close();
 		pstmt.close();
 		return cnt;
+	}
+	
+	// 如果主键id为整型的，则认为是自动增量
+	private boolean userAdd(Connection con,ColumnInfo[] user)throws Exception{
+		if ( user.length <= 0 ) {
+			return false;
+		}
+		
+		String sql="insert into " + TABLE_NAME + " values(";
+		// 第一列必须为主键
+		int i = 0;
+		for ( i = 0; i < user.length; i++ ) {
+			if ( i == 0 ) {
+				if ( user[i].m_type == ColumnType.INT ) {
+					sql += "null";
+				} else {
+					sql += "?";
+				}
+			} else {
+				sql += ",?";
+			}
+		}
+		sql += ")";
+		
+		PreparedStatement pstmt=con.prepareStatement(sql);
+		for ( i = 0; i < user.length; i++ ) {
+			if ( i == 0 ) {
+				if ( user[i].m_type == ColumnType.STRING ) {
+					pstmt.setString(i+1, user[i].m_value);
+				} 
+			} else {
+				if ( user[i].m_type == ColumnType.INT ) {
+					pstmt.setInt(i+1, parseInt(user[i].m_value));
+				} else {
+					pstmt.setString(i+1, user[i].m_value);
+				}
+			}
+		}
+		
+		pstmt.executeUpdate();		
+		return true;
 	}
 	
 	private static int parseInt(String s) {
