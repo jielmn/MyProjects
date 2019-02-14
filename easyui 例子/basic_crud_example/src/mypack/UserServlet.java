@@ -83,7 +83,7 @@ public class UserServlet extends HttpServlet {
 	static private String POOL_NAME  = "test";
 	static private String TABLE_NAME = "users";
 	// 顺序不能乱
-	static private ColumnInfo[] COLUMNS={ new ColumnInfo("firstname",ColumnType.INT, true ),
+	static private ColumnInfo[] COLUMNS={ new ColumnInfo("id",       ColumnType.INT, true ),
 										  new ColumnInfo("firstname",ColumnType.STRING),
                                           new ColumnInfo("lastname", ColumnType.STRING),
 										  new ColumnInfo("phone",    ColumnType.STRING),
@@ -114,6 +114,11 @@ public class UserServlet extends HttpServlet {
 		else if ( type.equals("add") ) {
 			rsp.setContentType("text/html;charset=utf-8");
 			add(req, out);
+		}
+		// 如果修改用户
+		else if ( type.equals("modify") ) {
+			rsp.setContentType("text/html;charset=utf-8");
+			modify(req, out);
 		}		
 		
 		out.close();
@@ -178,6 +183,33 @@ public class UserServlet extends HttpServlet {
 		
 		try{
 			boolean bRet = userAdd(con, COLUMNS);
+			JSONObject result=new JSONObject();
+			result.put("success", "true");
+			out.print(result.toString());
+			con.close();
+			
+		}catch (Exception e){
+			setContentError(out, 3, e.getMessage());
+		}
+	}
+	
+	public void modify(HttpServletRequest req, PrintWriter out ) {	
+		int i = 0;
+		for ( i = 0; i < COLUMNS.length; i++ ) {
+			COLUMNS[i].m_value = getParameter( req, COLUMNS[i].m_name );
+		}
+		
+		Connection con = null;
+		try{
+			con = getConnection();
+		}
+		catch(Exception e ) {
+			setContentError(out, 2, e.getMessage());
+			return;
+		}
+		
+		try{
+			boolean bRet = userModify(con, COLUMNS);
 			JSONObject result=new JSONObject();
 			result.put("success", "true");
 			out.print(result.toString());
@@ -278,6 +310,43 @@ public class UserServlet extends HttpServlet {
 					pstmt.setString(i+1, user[i].m_value);
 				}
 			}
+		}
+		
+		pstmt.executeUpdate();		
+		return true;
+	}
+	
+	// 如果主键id为整型的，则认为是自动增量
+	private boolean userModify(Connection con,ColumnInfo[] user)throws Exception{
+		if ( user.length <= 0 ) {
+			return false;
+		}
+		
+		String sql="update " + TABLE_NAME + " set ";
+		// 第一列必须为主键
+		int i = 0;
+		for ( i = 1; i < user.length; i++ ) {
+			if ( i == 1 ) {
+				sql += user[i].m_name + "=?";
+			} else {
+				sql += "," + user[i].m_name + "=?";
+			}
+		}
+		sql += " where " + user[0].m_name + "=?";
+		
+		// 第一列必须为主键
+		PreparedStatement pstmt=con.prepareStatement(sql);
+		for ( i = 1; i < user.length; i++ ) {
+			if ( user[i].m_type == ColumnType.INT ) {
+				pstmt.setInt(i, parseInt(user[i].m_value));
+			} else {
+				pstmt.setString(i, user[i].m_value);
+			}
+		}
+		if ( user[0].m_type == ColumnType.INT ) {
+			pstmt.setInt(user.length, parseInt(user[0].m_value));
+		} else {
+			pstmt.setString(user.length, user[0].m_value);
 		}
 		
 		pstmt.executeUpdate();		
