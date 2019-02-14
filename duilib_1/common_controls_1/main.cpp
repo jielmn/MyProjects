@@ -41,6 +41,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_filebrowse = static_cast<CFileBrowseUI *>(m_PaintManager.FindControl("browse1"));
 	m_layBrowser = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layBrowser"));
 	m_List1 = static_cast<CListUI *>(m_PaintManager.FindControl("list_1"));
+	m_Combo1 = static_cast<CComboUI *>(m_PaintManager.FindControl("combo_1"));
 
 	m_ip->SetIP("192.168.0.1");           
 	m_hotkey->SetHotKey(65, 2);
@@ -67,6 +68,15 @@ void  CDuiFrameWnd::InitWindow() {
 	pItem->SetText(2, "92888112");
 	pItem->SetText(3, "Yulai@163.com");
 	
+	CDuiString  strText;
+	CListLabelElementUI * pComboItem;
+	for (int i = 0; i < 5; i++) {
+		pComboItem = new CListLabelElementUI;
+		strText.Format("%dÌì", i + 1);
+		pComboItem->SetText(strText);
+		m_Combo1->Add(pComboItem);
+	}
+	m_Combo1->SelectItem(0);
 
 	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
 	WindowImplBase::InitWindow();
