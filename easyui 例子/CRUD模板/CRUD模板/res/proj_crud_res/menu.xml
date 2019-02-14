@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window size="120,72">
+<VerticalLayout bkimage="file='menu_bk.png' corner='30,8,8,8' mask='#FFFF0000' " hole="false" bkcolor="#FFCCCCCC">
+    <List header="hidden" inset="1,1,1,1" itemhotimage="file='menu_hot_bk.png' corner='2,2,2,2'">
+        <ListContainerElement name="menu_add" height="22" inset="40,0,0,0">
+            <Label text="添加" mouse="false"/>
+        </ListContainerElement>
+        <ListContainerElement name="menu_modify" height="22" inset="40,0,0,0">
+            <Label text="修改" mouse="false"/>
+        </ListContainerElement>
+        <ListContainerElement name="menu_delete" height="22" inset="40,0,0,0">
+            <Label text="删除" mouse="false"/>
+        </ListContainerElement>
+    </List>
+</VerticalLayout>
+</Window>
