@@ -89,11 +89,12 @@ public class UserServlet extends HttpServlet {
 										  new ColumnInfo("phone",    ColumnType.STRING),
 										  new ColumnInfo("email",    ColumnType.STRING) };
 	static private String PRIVATE_KEY="id";
+	static private String ERROR_CODE="errCode";
+	static private String ERROR_MSG="errMsg";
 	
     public void doGet( HttpServletRequest req, HttpServletResponse rsp ) throws ServletException, IOException
     {
-		req.setCharacterEncoding("utf-8");
-        rsp.setContentType("application/json;charset=utf-8");
+		req.setCharacterEncoding("utf-8");        
 		
 		String type = getParameter(req, "type");		
 		PrintWriter out = rsp.getWriter();		
@@ -105,11 +106,13 @@ public class UserServlet extends HttpServlet {
 		}
 		
 		// 如果是获取某一页的列表
-		if ( type.equals("list") ) {							
+		if ( type.equals("list") ) {
+			rsp.setContentType("application/json;charset=utf-8");
 			list(req, out);
 		}
 		// 如果添加用户
-		else if ( type.equals("add") ) {							
+		else if ( type.equals("add") ) {
+			rsp.setContentType("text/html;charset=utf-8");
 			add(req, out);
 		}		
 		
@@ -148,7 +151,7 @@ public class UserServlet extends HttpServlet {
 			int total=userCount(con);
 			result.put("rows", jsonArray);
 			result.put("total", total);
-			result.put("error code", 0);
+			result.put(ERROR_CODE, 0);
 			out.print(result.toString());			
 			con.close();
 		}
@@ -173,29 +176,23 @@ public class UserServlet extends HttpServlet {
 			return;
 		}
 		
-		/*
-		JSONObject result=new JSONObject();
-		if(StringUtil.isNotEmpty(id)){
-			saveNums=userDao.userModify(con, user);
-		}else{
-			saveNums=userDao.userAdd(con, user);
-		}
-		if(saveNums==1){
+		try{
+			boolean bRet = userAdd(con, COLUMNS);
+			JSONObject result=new JSONObject();
 			result.put("success", "true");
-		}else{
-			result.put("success", "true");
-			result.put("errorMsg", "保存失败");
+			out.print(result.toString());
+			con.close();
+			
+		}catch (Exception e){
+			setContentError(out, 3, e.getMessage());
 		}
-		result.put("data", user);
-		ResponseUtil.write(response, result);
-		*/
 	}
 	
 	
 	private static void setContentError(PrintWriter out, int errCode, String errMsg) {
 		JSONObject rsp_obj = new JSONObject();
-		rsp_obj.put("error code", errCode);
-		rsp_obj.put("error message", errMsg);
+		rsp_obj.put(ERROR_CODE, errCode);
+		rsp_obj.put(ERROR_MSG,  errMsg);
 		out.print(rsp_obj.toString());
 	}
 	
@@ -258,23 +255,22 @@ public class UserServlet extends HttpServlet {
 		int i = 0;
 		for ( i = 0; i < user.length; i++ ) {
 			if ( i == 0 ) {
-				if ( user[i].m_type == ColumnType.INT ) {
-					sql += "null";
-				} else {
-					sql += "?";
-				}
+				sql += "?";
 			} else {
 				sql += ",?";
 			}
 		}
 		sql += ")";
 		
+		// 第一列必须为主键
 		PreparedStatement pstmt=con.prepareStatement(sql);
 		for ( i = 0; i < user.length; i++ ) {
 			if ( i == 0 ) {
-				if ( user[i].m_type == ColumnType.STRING ) {
+				if ( user[i].m_type == ColumnType.INT ) {
+					pstmt.setNull(i+1, Types.INTEGER);
+				} else if ( user[i].m_type == ColumnType.STRING ) {
 					pstmt.setString(i+1, user[i].m_value);
-				} 
+				}				
 			} else {
 				if ( user[i].m_type == ColumnType.INT ) {
 					pstmt.setInt(i+1, parseInt(user[i].m_value));
