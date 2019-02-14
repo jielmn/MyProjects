@@ -68,6 +68,7 @@ private:
 	CEditUI *                m_edFileName;
 	CFileBrowseUI *          m_filebrowse;
 	CVerticalLayoutUI *      m_layBrowser;
+	CListUI *                m_List1;
 
 	HWND                     m_hWndBrowser;
 	DWORD                    m_dwBrowerProcId;

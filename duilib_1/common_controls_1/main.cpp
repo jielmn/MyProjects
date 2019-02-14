@@ -40,10 +40,33 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edFileName = static_cast<CEditUI *>(m_PaintManager.FindControl("edFileName"));
 	m_filebrowse = static_cast<CFileBrowseUI *>(m_PaintManager.FindControl("browse1"));
 	m_layBrowser = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layBrowser"));
+	m_List1 = static_cast<CListUI *>(m_PaintManager.FindControl("list_1"));
 
 	m_ip->SetIP("192.168.0.1");           
 	m_hotkey->SetHotKey(65, 2);
 	m_filebrowse->SetFileName("D:\\test.txt");
+
+	CListTextElementUI* pItem = new CListTextElementUI;	
+	m_List1->Add(pItem);
+	pItem->SetText(0, "White");
+	pItem->SetText(1, "Smith");
+	pItem->SetText(2, "1092652");
+	pItem->SetText(3, "Smith@hotmail.com");	
+
+	pItem = new CListTextElementUI;
+	m_List1->Add(pItem);
+	pItem->SetText(0, "Black");
+	pItem->SetText(1, "Mike");
+	pItem->SetText(2, "43987721");
+	pItem->SetText(3, "Mike@hotmail.com");
+
+	pItem = new CListTextElementUI;
+	m_List1->Add(pItem);
+	pItem->SetText(0, "³Â");
+	pItem->SetText(1, "ÓêÀ´");
+	pItem->SetText(2, "92888112");
+	pItem->SetText(3, "Yulai@163.com");
+	
 
 	SetTimer(GetHWND(), TIMER_ID_PROGRESS, 100, NULL);
 	WindowImplBase::InitWindow();
