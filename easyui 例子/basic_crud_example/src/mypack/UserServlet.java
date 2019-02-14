@@ -119,6 +119,11 @@ public class UserServlet extends HttpServlet {
 		else if ( type.equals("modify") ) {
 			rsp.setContentType("text/html;charset=utf-8");
 			modify(req, out);
+		}
+		// 如果删除用户
+		else if ( type.equals("delete") ) {
+			rsp.setContentType("application/json;charset=utf-8");
+			delete(req, out);
 		}		
 		
 		out.close();
@@ -156,7 +161,6 @@ public class UserServlet extends HttpServlet {
 			int total=userCount(con);
 			result.put("rows", jsonArray);
 			result.put("total", total);
-			result.put(ERROR_CODE, 0);
 			out.print(result.toString());			
 			con.close();
 		}
@@ -210,6 +214,31 @@ public class UserServlet extends HttpServlet {
 		
 		try{
 			boolean bRet = userModify(con, COLUMNS);
+			JSONObject result=new JSONObject();
+			result.put("success", "true");
+			out.print(result.toString());
+			con.close();
+			
+		}catch (Exception e){
+			setContentError(out, 3, e.getMessage());
+		}
+	}
+	
+	public void delete(HttpServletRequest req, PrintWriter out ) {	
+		// 主键的值
+		COLUMNS[0].m_value = getParameter( req, COLUMNS[0].m_name );
+		
+		Connection con = null;
+		try{
+			con = getConnection();
+		}
+		catch(Exception e ) {
+			setContentError(out, 2, e.getMessage());
+			return;
+		}
+		
+		try{
+			boolean bRet = userDelete(con, COLUMNS[0]);
 			JSONObject result=new JSONObject();
 			result.put("success", "true");
 			out.print(result.toString());
@@ -312,7 +341,8 @@ public class UserServlet extends HttpServlet {
 			}
 		}
 		
-		pstmt.executeUpdate();		
+		pstmt.executeUpdate();	
+		pstmt.close();		
 		return true;
 	}
 	
@@ -349,7 +379,21 @@ public class UserServlet extends HttpServlet {
 			pstmt.setString(user.length, user[0].m_value);
 		}
 		
-		pstmt.executeUpdate();		
+		pstmt.executeUpdate();
+		pstmt.close();		
+		return true;
+	}
+	
+	private boolean userDelete(Connection con, ColumnInfo primaryKey)throws Exception{
+		String sql="delete from " + TABLE_NAME + " where " + primaryKey.m_name + "=?";
+		PreparedStatement pstmt=con.prepareStatement(sql);		
+		if ( primaryKey.m_type == ColumnType.INT ) {
+			pstmt.setInt(1, parseInt(primaryKey.m_value));
+		} else {
+			pstmt.setString(1, primaryKey.m_value );
+		}
+		pstmt.executeUpdate();
+		pstmt.close();
 		return true;
 	}
 	
