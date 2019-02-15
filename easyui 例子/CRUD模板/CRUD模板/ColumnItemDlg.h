@@ -20,6 +20,9 @@ public:
 	virtual void  Notify(TNotifyUI& msg);
 	virtual void   InitWindow();
 
+	static const char * ColumnType2String(ColumnType e);
+	static ColumnType String2ColumnType(const char * szType);
+
 private:
 	BOOL    m_bAdd;                    // 是添加还是修改
 	CEditUI *    m_name;

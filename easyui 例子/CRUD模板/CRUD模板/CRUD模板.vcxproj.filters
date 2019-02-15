@@ -57,5 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\proj_crud_res.zip" />
+    <None Include="res\UserServlet.java" />
   </ItemGroup>
 </Project>

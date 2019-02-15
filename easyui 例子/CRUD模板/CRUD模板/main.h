@@ -41,8 +41,14 @@ private:
 	void   OnAdd();
 	void   OnModify();
 	void   OnDelete();
+	void   OnGenerate();
 
 private:
 	CListUI *              m_list;
+	CEditUI *              m_edEntity;
+	CRichEditUI *          m_html;
+	CRichEditUI *          m_javascript;
+	CRichEditUI *          m_java;
+	CEditUI *              m_edPool;
 
 };
