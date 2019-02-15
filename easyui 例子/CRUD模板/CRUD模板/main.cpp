@@ -217,6 +217,7 @@ void   CDuiFrameWnd::OnGenerate() {
 	char szKey[256];
 	CListTextElementUI * pKeyItem = (CListTextElementUI *)m_list->GetItemAt(0);
 	STRNCPY(szKey, pKeyItem->GetText(0), sizeof(szKey));
+	CColumnItemWnd::ColumnType key_type = CColumnItemWnd::String2ColumnType(pKeyItem->GetText(1));
 
 	CDuiString  strLine;
 	CDuiString  strHtml;	
@@ -313,21 +314,46 @@ void   CDuiFrameWnd::OnGenerate() {
 	strLine.Format("var url%s;\r\n", szEntity1);
 	strJavascript += strLine;
 
-	strLine.Format( "function new%s(){ \r\n"
-					"\t$('#dlg%s').dialog('open').dialog('center').dialog('setTitle', 'add %s');\r\n"
-					"\t$('#fm%s').form('clear');\r\n"
-					"\turl%s='%s?type=add';\r\n"
-					"}\r\n", szEntity1, szEntity1, szEntity0, szEntity1, szEntity1, szEntity0);
+	if (key_type == CColumnItemWnd::INT) {
+		strLine.Format("function new%s(){ \r\n"
+			"\t$('#dlg%s').dialog('open').dialog('center').dialog('setTitle', 'add %s');\r\n"
+			"\t$('#fm%s').form('clear');\r\n"
+			"\turl%s='%s?type=add';\r\n"
+			"}\r\n", szEntity1, szEntity1, szEntity0, szEntity1, szEntity1, szEntity0);
+	}
+	else {
+		strLine.Format("function new%s(){ \r\n"
+			"\t$('#dlg%s').dialog('open').dialog('center').dialog('setTitle', 'add %s');\r\n"
+			"\t$('#fm%s').form('clear');\r\n"
+			"\turl%s='%s?type=add';\r\n"
+			"\t$('#fm%s').find('input').eq(1).removeAttr(\"disabled\");\r\n"
+			"}\r\n", szEntity1, szEntity1, szEntity0, szEntity1, szEntity1, szEntity0, szEntity1);
+	}
+	
 	strJavascript += strLine;
 
-	strLine.Format(	"function edit%s(){\r\n"
-					"\tvar row=$('#dg%s').datagrid('getSelected');\r\n"
-					"\tif (row) {\r\n"
-					"\t\t$('#dlg%s').dialog('open').dialog('center').dialog('setTitle', 'edit %s');\r\n"
-					"\t\t$('#fm%s').form('load', row);\r\n"
-					"\t\turl%s='%s?type=modify&%s='+row.%s;\r\n"
-					"\t}\r\n"
-					"}\r\n", szEntity1, szEntity1, szEntity1, szEntity0, szEntity1, szEntity1, szEntity0, szKey,szKey);
+	if (key_type == CColumnItemWnd::INT) {
+		strLine.Format("function edit%s(){\r\n"
+			"\tvar row=$('#dg%s').datagrid('getSelected');\r\n"
+			"\tif (row) {\r\n"
+			"\t\t$('#dlg%s').dialog('open').dialog('center').dialog('setTitle', 'edit %s');\r\n"
+			"\t\t$('#fm%s').form('load', row);\r\n"
+			"\t\turl%s='%s?type=modify&%s='+row.%s;\r\n"
+			"\t}\r\n"
+			"}\r\n", szEntity1, szEntity1, szEntity1, szEntity0, szEntity1, szEntity1, szEntity0, szKey, szKey);
+	}
+	else {
+		strLine.Format("function edit%s(){\r\n"
+			"\tvar row=$('#dg%s').datagrid('getSelected');\r\n"
+			"\tif (row) {\r\n"
+			"\t\t$('#dlg%s').dialog('open').dialog('center').dialog('setTitle', 'edit %s');\r\n"
+			"\t\t$('#fm%s').form('load', row);\r\n"
+			"\t\turl%s='%s?type=modify&%s='+row.%s;\r\n"
+			"\t\t$('#fm%s').find('input').eq(1).attr(\"disabled\",\"true\");\t\n"
+			"\t}\r\n"
+			"}\r\n", szEntity1, szEntity1, szEntity1, szEntity0, szEntity1, szEntity1, szEntity0, szKey, szKey, szEntity1);
+	}
+	
 	strJavascript += strLine;
 
 	strLine.Format(	"function save%s(){\r\n"
