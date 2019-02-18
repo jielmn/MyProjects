@@ -42,7 +42,7 @@
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="40" inset="10,10,0,0">
-					<Label text="数据库(第一列默认为主键)" font="10" textcolor="#FFCA5100" />
+					<Label text="数据库(第一列默认为主键，如果为整型，默认为自增)" font="10" textcolor="#FFCA5100" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout inset="30,0,10,0" height="150">

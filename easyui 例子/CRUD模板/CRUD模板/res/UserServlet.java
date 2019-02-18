@@ -84,8 +84,8 @@ public class <%entity1%>Servlet extends HttpServlet {
 	static private String TABLE_NAME = "<%entity%>s";
 	
 	static private ColumnInfo[] COLUMNS={ <%columns%> };
-	static private String ERROR_CODE="errCode";
-	static private String ERROR_MSG="errMsg";
+	static private String ERROR_CODE="errorCode";
+	static private String ERROR_MSG="errorMsg";
 	
     public void doGet( HttpServletRequest req, HttpServletResponse rsp ) throws ServletException, IOException
     {
