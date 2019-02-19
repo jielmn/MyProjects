@@ -140,6 +140,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (strName == "btnGenerate" ) {
 			OnGenerate();
 		}
+		else if (strName == "btnCopyHtml") {
+			m_html->SetSelAll();
+			m_html->Copy();
+		}
+		else if (strName == "btnCopyJavaScript") {
+			m_javascript->SetSelAll();
+			m_javascript->Copy();
+		}
+		else if (strName == "btnCopyJava") {
+			m_java->SetSelAll();
+			m_java->Copy();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }

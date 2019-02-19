@@ -55,7 +55,7 @@
 				</HorizontalLayout >
 				
 				<HorizontalLayout height="40" inset="10,10,0,0">
-					<Button text="生成" name="btnGenerate" font="2" textcolor="#FF386382" width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Button text="生成" name="btnGenerate" font="2" textcolor="#FF386382" width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />			
 				</HorizontalLayout >
 				
 				<HorizontalLayout height="60" inset="10,30,0,0">
@@ -64,26 +64,35 @@
 				
 				<HorizontalLayout height="30" inset="30,0,0,0">
 					<Label text="HTML代码" font="11" textcolor="#FFCA5100" />
+					<Control />
+					<Button text="复制" name="btnCopyHtml" font="2" textcolor="#FF386382" width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Control width="10" />
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="70" inset="30,0,10,0">
-					<RichEdit name="rhHtml" text="" font="11" textcolor="#FF447AA1" bordercolor="#FF768D9B" bordersize="1" vscrollbar="false" />
+				<HorizontalLayout height="270" inset="30,0,10,0">
+					<RichEdit name="rhHtml" text="" font="11" textcolor="#FF447AA1" bordercolor="#FF768D9B" bordersize="1" vscrollbar="true" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="40" inset="30,10,0,0">
 					<Label text="JavaScript代码" font="11" textcolor="#FFCA5100" />
+					<Control />
+					<Button text="复制" name="btnCopyJavaScript" font="2" textcolor="#FF386382" width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Control width="10" />
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="70" inset="30,0,10,0">
-					<RichEdit name="rhJavascript" text="" font="11" textcolor="#FF447AA1" bordercolor="#FF768D9B" bordersize="1" vscrollbar="false" />
+				<HorizontalLayout height="270" inset="30,0,10,0">
+					<RichEdit name="rhJavascript" text="" font="11" textcolor="#FF447AA1" bordercolor="#FF768D9B" bordersize="1" vscrollbar="true" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="40" inset="30,10,0,0">
 					<Label text="Java代码" font="11" textcolor="#FFCA5100" />
+					<Control />
+					<Button text="复制" name="btnCopyJava" font="2" textcolor="#FF386382" width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Control width="10" />
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="70" inset="30,0,10,0">
-					<RichEdit name="rhJava" text="" font="11" textcolor="#FF447AA1" bordercolor="#FF768D9B" bordersize="1" vscrollbar="false" />
+				<HorizontalLayout height="270" inset="30,0,10,0">
+					<RichEdit name="rhJava" text="" font="11" textcolor="#FF447AA1" bordercolor="#FF768D9B" bordersize="1" vscrollbar="true" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="5" />
