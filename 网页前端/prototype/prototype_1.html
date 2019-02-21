@@ -1,0 +1,23 @@
+<html>
+<head>
+<script>
+	function Person(name){
+		this.name = name;
+		this.showMe = function () {
+			console.log(this.name);
+		}
+	}
+	
+	var one = new Person("Javascript");
+	one.showMe();
+	
+	console.log( one.prototype );             // undefined。New出来的普通对象是没有原型的
+	
+	console.log( typeof Person.prototype );   // object
+	console.log( Person.prototype );          
+	
+	console.log( typeof Person.prototype.constructor );  // function
+	console.log( Person.prototype.constructor );         
+</script>
+</head>
+</html>

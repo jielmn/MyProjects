@@ -1,0 +1,36 @@
+<html>
+<head>
+<script>
+	function Person(name) {
+		this.name = name;
+		this.showMe = function () {
+			console.log(this.name);
+		}
+	}
+	
+	function Hero() {
+		this.name = "张无忌";
+		this.showMe = function () {
+			console.log("this is 张无忌");
+		}
+	}
+	
+	// 通过原型增加的属性或方法
+	Hero.prototype.name = "周芷若";
+	Hero.prototype.showMe = function() {
+		console.log("this is 周芷若");
+	}
+	
+	var hero = new Hero();
+	console.log( hero.name );
+	hero.showMe();
+	
+	delete hero.name;
+	console.log( hero.name );
+	
+	delete hero.showMe;
+	hero.showMe();
+	
+</script>
+</head>
+</html>
