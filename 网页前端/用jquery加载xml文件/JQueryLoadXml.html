@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <script type="text/javascript" src="js/jquery-3.3.1.min.js" ></script>
+    </head>
+    <body>
+        <input type="button" id="getXml" value="获取和解析xml"/>
+        <div id="load"></div>
+    </body>
+    
+    <script type="text/javascript">
+        $(function(){
+            $("#getXml").click(function(){
+                $.ajax({
+                    type:"get",
+                    url:"sample.xml",    //这里通过设置url属性来获取xml
+                    dataType:"xml",
+                    timeout:10000,     //设定超时
+                    cache:false,       //禁用缓存
+                    success:function(xml){//这里是解析xml
+                        console.log(xml.documentElement);
+                    }
+                });
+            })
+        })
+    </script>
+</html>
