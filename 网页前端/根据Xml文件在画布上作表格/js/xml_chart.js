@@ -15,6 +15,12 @@ function  SplitPen( splitNum, pen ) {
 	this.pen = pen;
 }
 
+function Thread ( id, size, color ) {
+	this.id = id;
+	this.size = size;
+	this.color = color;
+}
+
 function  Font ( name, size, bold, italic, id ) {
 	this.name = name;
 	this.size = size;
@@ -31,7 +37,61 @@ function  createNewFont( emt ) {
 	var bold=false;
 	var italic=false;
 	var id = 0;
+	var tmp;
 	
+	attr = attrs.getNamedItem("id");
+	if ( attr ) {
+		id  = parseInt(attr.value);
+	}
+	
+	attr = attrs.getNamedItem("bold");
+	if ( attr ) {
+		tmp = attr.value.toLowerCase();
+		bold  = ( tmp == "true" ? true : false );
+	}
+	
+	attr = attrs.getNamedItem("italic");
+	if ( attr ) {
+		tmp = attr.value.toLowerCase();
+		italic  = ( tmp == "true" ? true : false );
+	}
+	
+	attr = attrs.getNamedItem("height");
+	if ( attr ) {
+		size  = parseInt(attr.value);
+	}
+	
+	attr = attrs.getNamedItem("facename");
+	if ( attr ) {
+		name  = attr.value;
+	}
+	
+	return new Font( name, size, bold, italic, id );
+}
+
+function  createNewThread ( emt ) {
+	var attrs = emt.attributes;
+	var attr = null
+	var id = 0;
+	var size = 0;
+	var color = "#000000";
+	
+	attr = attrs.getNamedItem("id");
+	if ( attr ) {
+		id  = parseInt(attr.value);
+	}
+	
+	attr = attrs.getNamedItem("width");
+	if ( attr ) {
+		size  = parseInt(attr.value);
+	}
+	
+	attr = attrs.getNamedItem("color");
+	if ( attr ) {
+		color  = attr.value;
+	}
+	
+	return new Thread( id, size, color );
 }
 
 function  XmlChartUI( ) {
@@ -80,8 +140,10 @@ function LoadXmlChart( xmlFile, canvasId ) {
 			var height = 0;
 			var attr = null;
 			var findLayout = false;
-			var firstChild = null;
+			var child = null;
 			var fonts = new Array();
+			var threads = new Array();
+			var findFirstLayout = false;
 			
 			attr = attrs.getNamedItem("width");
 			if ( attr ) {
@@ -96,25 +158,68 @@ function LoadXmlChart( xmlFile, canvasId ) {
 			console.log("width:"+width+", height="+height);
 			
 			
-			firstChild = root.firstChild;
-			while ( firstChild ) {
-				if ( 1 != firstChild.nodeType ) {
-					firstChild = firstChild.nextSibling;
+			child = root.firstChild;
+			while ( child ) {
+				if ( 1 != child.nodeType ) {
+					child = child.nextSibling;
 					continue;
 				}
-				console.log( firstChild );
-				console.log( firstChild.nodeName );
+				//console.log( child );
+				//console.log( child.nodeName );
 				
-				if ( firstChild.nodeName == "Font" ) {
-					
-				} else if ( firstChild.nodeName == "Thread" ) {
-					
+				if ( child.nodeName == "Font" ) {
+					var font = createNewFont ( child );
+					var i = 0;
+					for ( i = 0; i < fonts.length; i++ ) {
+						if ( fonts[i].id == font.id ) {
+							break;
+						} 
+					}
+					if ( i >= fonts.length ) {
+						fonts.push( font );
+					}
+				} else if ( child.nodeName == "Thread" ) {
+					var thread = createNewThread ( child );
+					var i = 0;
+					for ( i = 0; i < threads.length; i++ ) {
+						if ( threads[i].id == thread.id ) {
+							break;
+						} 
+					}
+					if ( i >= threads.length ) {
+						threads.push( thread );
+					}
 				} else {
+					var bVertical = false;
+					if ( child.nodeName == "VerticalLayout" ) {
+						if (findFirstLayout) {
+							child = child.nextSibling;
+							continue;
+						}
+						findFirstLayout = true;
+						bVertical = true;
+					}
+					else if ( child.nodeName == "HorizontalLayout" ) {
+						if (findFirstLayout) {
+							child = child.nextSibling;
+							continue;
+						}
+						findFirstLayout = true;
+						bVertical = false;
+					}
+					else {
+						child = child.nextSibling;
+						continue;
+					}
+					
+					var chartUI = new XmlChartUI();
 					
 				}
-				firstChild = firstChild.nextSibling;								
+				child = child.nextSibling;								
 			}
 			
+			console.log( fonts );
+			console.log( threads );
 			/*
 			var cxt=canvas.getContext("2d");
 			cxt.moveTo(10,10);
