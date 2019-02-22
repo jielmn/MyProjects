@@ -1,0 +1,25 @@
+<html>
+<head>
+<script>
+	// 1.建立一个原型为null的对象
+	var o = Object.create(null, {
+		name: {
+			value: 'tom'
+		}
+	});
+	console.log(o.constructor); // => undefined
+	 
+	// 2.创建一个原型为Array的对象
+	var array = Object.create(Array.prototype, {});
+	console.log(array.constructor); // => function Array 构造函数
+	console.log(array.constructor.prototype); // => [] ：原型对象为数组
+	 
+	// 3.创建一个原型为自定义类的对象
+	function People() { }
+	var p = Object.create(People.prototype, {});
+	console.log(p.constructor); // => function People 构造函数
+	console.log(p.constructor.prototype); // => People{} ：原型对象People
+	
+</script>
+</head>
+</html>

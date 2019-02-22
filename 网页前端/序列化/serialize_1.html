@@ -1,0 +1,17 @@
+<html>
+<head>
+<script>
+	var o = {
+		x: 1,
+		y: 2
+	}
+	 
+	var s = JSON.stringify(o); // => {"x":1,"y":2}：返回一个字符串
+	console.log(s);
+	
+	var str = '{ "x":1,"y":2 }'; // 字符串的属性名要用引号框起来
+	var a = JSON.parse(str);
+	console.log(a.x); // => 1：输出对象属性x的值
+</script>
+</head>
+</html>

@@ -1,0 +1,21 @@
+<html>
+<head>
+<script>
+	function People(name) {
+		this.name = name;
+		this.sayName = function () {
+			console.log(this.name);
+		}
+	}
+	 
+	function Student(age) {
+		this.age = age;
+	}
+	Student.prototype = new People(); // 设定Student的原型对象为Prople实例对象
+	 
+	var st = new Student(22);
+	st.name = '张三';
+	st.sayName(); // => alert('张三') ：sayName成员继承自People类
+</script>
+</head>
+</html>

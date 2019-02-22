@@ -1,0 +1,19 @@
+<html>
+<head>
+<script>
+	function People(name) {
+		this.name = name;
+	}
+	// 给类添加一个静态成员hasName：判断People实例是否含有name属性
+	People.hasName = function (p) {
+		if (p.name && p.name.length > 0) {
+			return true;
+		}
+		return false;
+	}
+	 
+	var p = new People('tom');
+	console.log(People.hasName(p)); // => true
+</script>
+</head>
+</html>

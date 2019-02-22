@@ -1,0 +1,21 @@
+<html>
+<head>
+<script>
+	function People(name) {
+		this.name = name;
+	}
+	var p1 = new People('张三');
+	var p2 = new People('李四');
+	 
+	// p1.sayName(); // 报错，实例没有此成员
+	 
+	// 对原型对象添加成员， 类的所有实例都会添加此成员
+	People.prototype.sayName = function () {
+		console.log(this.name);
+	}
+	 
+	p1.sayName(); // 弹出name属性的值
+	p2.sayName(); // 弹出name属性的值
+</script>
+</head>
+</html>

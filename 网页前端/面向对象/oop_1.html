@@ -1,0 +1,18 @@
+<html>
+<head>
+<script>
+	// 1.在创建对象方式中，对this进行操作
+	function People(name) {
+		this.name = name;
+	}
+	var p = new People('tom');
+	console.log(p.name); // => tom ：读取实例属性name的值
+	 
+	// 2.在类的原型对象中进行扩展操作
+	People.prototype.sayHello = function () {
+		console.log('Hello:' + this.name);
+	}
+	p.sayHello(); // => 弹出 Hello:tom	
+</script>
+</head>
+</html>

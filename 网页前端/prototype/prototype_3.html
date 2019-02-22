@@ -1,0 +1,26 @@
+<html>
+<head>
+<script>
+	// 1.创建构造函数
+	function People(name) {
+		this.name;
+	}
+	 
+	var p = new People('Tom');
+	console.log(p.constructor.prototype); // => People{} ：原型为构造函数的prototype
+	console.log(p.constructor.prototype === People.prototype); // => true
+	 
+	// 2.自定义对象的多层继承 ：constructor返回最先调用的构造函数
+	function Student(age) {
+		this.age = age;
+	}
+	Student.prototype = new People(); // 设置Student的原型为People对象
+	 
+	var s = new Student(22); // 对象初始化时，先调用People()，再调用Student()
+	console.log(s.constructor); // => function People ：对象s返回的构造函数为People
+	console.log(s.constructor.prototype); // => People{} ：原型对象为People
+	console.log(s.constructor.prototype === People.prototype); // => true
+	
+</script>
+</head>
+</html>
