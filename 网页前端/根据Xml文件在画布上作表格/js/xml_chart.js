@@ -17,8 +17,7 @@ function  SplitPen( splitNum, pen ) {
 
 function Thread ( id, size, color ) {
 	this.id = id;
-	this.size = size;
-	this.color = color;
+	this.pen = new Pen(color, size);
 }
 
 function  Font ( name, size, bold, italic, id ) {
@@ -109,13 +108,13 @@ function  XmlChartUI( ) {
 	
 	this.borderPen = new Array(4);
 	for ( var i = 0; i < 4; i++ ) {
-		this.borderPen[i] = new Pen( 0, 1 );
+		this.borderPen[i] = new Pen( "#000000", 1 );
 	}
 	
 	this.HSplitLines = new Array();
 	this.VSplitLines = new Array();
 	
-	this.textColor = 0;
+	this.textColor = "#000000";
 	this.align = 0;
 	this.valign = 0;
 }
@@ -140,20 +139,109 @@ function  getIntAttr( emt, attrName ) {
 	}
 }
 
-function  parseSplitPen ( ui, str, bVertical ) {
+/* num='5',pen='6' */
+function  parseSplitPen ( ui, str, bVertical, threads ) {
 	
+	var arr = str.split(",", 2);
+	if ( arr.length != 2 ) 
+		return;
+	
+	var i = 0;
+	var index = 0;
+	var num = 0;
+	var threadIndex = 0;
+	
+	for ( i = 0; i < arr.length; i++ ) {
+		if ( arr[i].indexOf("num") >= 0 ) {
+			index = arr[i].indexOf("'");			
+			if ( index < 0 )
+				return;
+			num = parseInt( arr[i].slice(index+1) );
+		} else if ( arr[i].indexOf("pen") >= 0 ) {			
+			index = arr[i].indexOf("'");
+			if ( index < 0 )
+				return;
+			threadIndex = parseInt( arr[i].slice(index+1) );
+		}
+	}	
+	
+	if ( num <= 0 )
+		return;
+	
+	
+	var pen = null;
+	for ( i = 0; i < threads.length; i++ ) {
+		if ( threads[i].id == threadIndex ){
+			pen = threads[i].pen;
+			break;
+		}
+	}
+	if ( i >= threads.length ) {
+		return;
+	}
+	
+	var x;
+	if ( bVertical ) {
+		x = ui.VSplitLines;		
+	} else {
+		x = ui.HSplitLines;		
+	}
+	
+	x.push(new SplitPen(num, pen));
 }
 
-function  parseSplit ( emt, ui ) {
+function  parseSplit ( emt, ui, threads ) {
+	if ( threads.length == 0 )
+		return;
+	
 	var vsplitStr = getAttr( emt, "VSplit" );
 	var hsplitStr = getAttr( emt, "HSplit" );
 	
 	if ( vsplitStr.length > 0 )
-		parseSplitPen ( ui, vsplitStr, true );
+		parseSplitPen ( ui, vsplitStr, true, threads );
 	
 	if ( hsplitStr.length > 0 )	
-		parseSplitPen ( ui, hsplitStr, false );
+		parseSplitPen ( ui, hsplitStr, false, threads );
 }
+
+function parseBorder( emt, ui, threads ) {
+	if ( threads.length == 0 )
+		return;
+	
+	var border = getAttr( emt, "border" );
+	if ( border.length == 0 )
+		return;
+	
+	var arr = border.split(",",4);
+	var i = 0;
+	var index = 0;
+	var j = 0;
+	for ( i = 0; i < arr.length; i++ ) {
+		index = parseInt( arr[i] );
+		for ( j = 0; j < threads.length; j++ ) {
+			if ( threads[j].id == index ) {
+				//找到
+				ui.borderPen[i] = threads[j].pen;
+				break;
+			}
+		}
+	}
+}
+
+function parsePadding( emt, ui ) {
+	var padding = getAttr( emt, "padding" );
+	if ( padding.length == 0 )
+		return;
+	
+	var arr = padding.split(",",4);
+	var arr1 = new Array(0,0,0,0);
+	for ( var i = 0; i < arr.length; i++ ) {
+		arr1[i] = parseInt(arr[i]);
+	}
+	
+	ui.padding = new Rect( arr1[0],arr1[1],arr1[2],arr1[3] );
+}
+
 
 function LoadXmlChart( xmlFile, canvasId ) {
 	var canvas = document.getElementById(canvasId);
@@ -252,7 +340,9 @@ function LoadXmlChart( xmlFile, canvasId ) {
 					chartUI.name = getAttr(child, "name");
 					chartUI.rect = new Rect(0,0,getIntAttr(child,"width"),getIntAttr(child,"height"));
 					chartUI.layoutType = ( bVertical ? 1 : 0 );
-					parseSplit( child, chartUI );
+					parseSplit( child, chartUI, threads );
+					parseBorder( child, chartUI, threads );
+					parsePadding( child, chartUI );
 					
 					console.log(chartUI);
 					
