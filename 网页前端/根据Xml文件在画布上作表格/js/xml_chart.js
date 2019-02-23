@@ -120,6 +120,41 @@ function  XmlChartUI( ) {
 	this.valign = 0;
 }
 
+function  getAttr( emt, attrName ) {
+	var attrs = emt.attributes;	
+	var attr  = attrs.getNamedItem(attrName);
+	if ( attr ) {
+		return attr.value;
+	} else {
+		return "";
+	}
+}
+
+function  getIntAttr( emt, attrName ) {
+	var attrs = emt.attributes;	
+	var attr  = attrs.getNamedItem(attrName);
+	if ( attr ) {
+		return parseInt(attr.value);
+	} else {
+		return 0;
+	}
+}
+
+function  parseSplitPen ( ui, str, bVertical ) {
+	
+}
+
+function  parseSplit ( emt, ui ) {
+	var vsplitStr = getAttr( emt, "VSplit" );
+	var hsplitStr = getAttr( emt, "HSplit" );
+	
+	if ( vsplitStr.length > 0 )
+		parseSplitPen ( ui, vsplitStr, true );
+	
+	if ( hsplitStr.length > 0 )	
+		parseSplitPen ( ui, hsplitStr, false );
+}
+
 function LoadXmlChart( xmlFile, canvasId ) {
 	var canvas = document.getElementById(canvasId);
 	if ( canvas == null ) {
@@ -212,7 +247,14 @@ function LoadXmlChart( xmlFile, canvasId ) {
 						continue;
 					}
 					
+					// chart UI
 					var chartUI = new XmlChartUI();
+					chartUI.name = getAttr(child, "name");
+					chartUI.rect = new Rect(0,0,getIntAttr(child,"width"),getIntAttr(child,"height"));
+					chartUI.layoutType = ( bVertical ? 1 : 0 );
+					parseSplit( child, chartUI );
+					
+					console.log(chartUI);
 					
 				}
 				child = child.nextSibling;								
