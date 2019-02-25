@@ -123,13 +123,15 @@ int  CLaunch::ReadComData() {
 	// 55 0E 00 06 01 45 52 00 00 03 00 00 00 00 00 01 FF
 
 	char debug_buf[8192];
+	const int MIN_DATA_LENGTH = 19;
+	const int TEMP_DATA_LENGTH = 31;
 
-	if (m_recv_buf.GetDataLength() >= 17) {
-		m_recv_buf.Read(buf, 17);
+	if (m_recv_buf.GetDataLength() >= MIN_DATA_LENGTH) {
+		m_recv_buf.Read(buf, MIN_DATA_LENGTH);
 
 		// 数据头错误
 		if (buf[0] != (BYTE)'\x55') {
-			DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+			DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
 			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf);
 
 			CloseLaunch();
@@ -141,7 +143,7 @@ int  CLaunch::ReadComData() {
 				m_recv_buf.Reform();
 				// 如果错误的数据尾
 				if (buf[16] != (BYTE)'\xFF') {
-					DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+					DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
 					g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
 
 					CloseLaunch();
@@ -152,7 +154,7 @@ int  CLaunch::ReadComData() {
 					DWORD  dwAreaNo = buf[4];
 					// 如果病区号不同
 					if (dwAreaNo != g_data.m_CfgData.m_dwAreaNo) {
-						DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+						DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
 						g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
 					}
 					else {
@@ -162,7 +164,7 @@ int  CLaunch::ReadComData() {
 							m_sigReaderStatus.emit(LOWORD(dwRet), HIWORD(dwRet), READER_STATUS_OPEN);
 						}
 						else {
-							DebugStream(debug_buf, sizeof(debug_buf), buf, 17);
+							DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
 							g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子心跳：\n%s\n", debug_buf);
 						}
 					}
@@ -174,12 +176,12 @@ int  CLaunch::ReadComData() {
 				//g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "数据：\n%s\n", debug_buf);
 
 				// 如果得到足够数据
-				if (m_recv_buf.GetDataLength() >= 29 - 17) {
-					m_recv_buf.Read(buf + 17, 12);
+				if (m_recv_buf.GetDataLength() >= TEMP_DATA_LENGTH - MIN_DATA_LENGTH) {
+					m_recv_buf.Read(buf + MIN_DATA_LENGTH, TEMP_DATA_LENGTH - MIN_DATA_LENGTH);
 					m_recv_buf.Reform();
 
 					if (buf[28] != (BYTE)'\xFF') {
-						DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
+						DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH);
 						g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
 
 						CloseLaunch();
@@ -196,7 +198,7 @@ int  CLaunch::ReadComData() {
 
 						// 如果病区号不同
 						if (dwAreaNo != g_data.m_CfgData.m_dwAreaNo) {
-							DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
+							DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH);
 							g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
 						}
 						else {
@@ -212,7 +214,7 @@ int  CLaunch::ReadComData() {
 								m_sigReaderTemp.emit( LOWORD(dwRet), HIWORD(dwRet), t );
 							}
 							else {
-								DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
+								DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH);
 								g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子温度：\n%s\n", debug_buf);
 							}
 						}
