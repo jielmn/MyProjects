@@ -48,7 +48,7 @@ int  CLaunch::Reconnect() {
 		}
 	}
 
-	BOOL bRet = OpenUartPort(szComPort,115200);
+	BOOL bRet = OpenUartPort(szComPort,9600);
 	if (!bRet) {
 		m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
 		return 0;
