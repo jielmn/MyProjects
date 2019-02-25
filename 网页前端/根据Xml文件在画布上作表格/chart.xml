@@ -3,7 +3,7 @@
 	<Font   id="0" bold="true" italic="false" facename="宋体" height="24" />
 	<Font   id="1" bold="false" italic="false" facename="宋体" height="16" />
 	<Thread id="5" width="2" color="#000000" />
-	<Thread id="6" width="1" color="#000000" />
+	<Thread id="6" width="1" color="#FF0000" />
 	
 	<!-- <VerticalLayout VSplit="num='3',pen='5'" HSplit="num='3',pen='6'" > -->
 	<VerticalLayout border="6,6,6,6">
