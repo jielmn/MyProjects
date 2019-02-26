@@ -116,6 +116,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_TIMER) {
 		OnMyTimer(wParam, lParam);
+	} else if (uMsg == WM_DEVICECHANGE) {
+		OnMyDeviceChanged();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -205,6 +207,10 @@ void    CDuiFrameWnd::OnMyOk() {
 	g_data.m_cfg->Save();
 
 	OnMyTimer(TIMER_HEART_BEAT, 0);
+}
+
+void  CDuiFrameWnd::OnMyDeviceChanged() {
+	CBusiness::GetInstance()->CheckLaunchStatusAsyn();
 }
 
 

@@ -42,7 +42,7 @@ public:
 	void    OnMyTimer(WPARAM wParam, LPARAM  lParam);
 	
 	void    OnMyOk();
-
+	void    OnMyDeviceChanged();
 private:
 	NOTIFYICONDATA  m_nid;
 	DuiLib::CEditUI *              m_edName;

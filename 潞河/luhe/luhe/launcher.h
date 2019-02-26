@@ -15,6 +15,9 @@ public:
 	// 获取数据
 	int  GetData();
 
+	// 检查硬件
+	int  CheckStatus();
+
 public:
 	sigslot::signal1<CLmnSerialPort::PortStatus>             m_sigStatus;
 	sigslot::signal1<DWORD>                                  m_sigReconnect;

@@ -141,3 +141,38 @@ int  CLaunch::GetData() {
 
 	return 0;
 }
+
+int  CLaunch::CheckStatus() {
+
+	// 关闭状态
+	if (GetStatus() == CLmnSerialPort::CLOSE) {
+
+		DWORD  dwCfgLaunchPort = 0;
+		g_data.m_cfg->GetConfig("launch port", dwCfgLaunchPort, 0);
+
+		// 如果串口在
+		if ( dwCfgLaunchPort != 0 ) {
+			if ( CheckComPortExist((int)dwCfgLaunchPort) ) {
+				// m_sigReconnect.emit(0);
+				Reconnect();
+			}
+		}
+		else {
+			char szComPort[16];
+			int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+			// 如果找到1个ch340串口，立即连接发射器
+			if (1 == nFindCount) {
+				//m_sigReconnect.emit(0);
+				Reconnect();
+			}
+		}
+	}
+	// 打开状态
+	else {
+		// 如果串口已经不在
+		if (!CheckComPortExist(this->GetPort())) {
+			CloseLaunch();
+		}
+	}
+	return 0;
+}

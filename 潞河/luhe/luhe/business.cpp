@@ -91,7 +91,8 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_com->Start();
 
-	ReconnectLauncherAsyn();
+	// ReconnectLauncherAsyn();
+	CheckLaunchStatusAsyn();
 
 	return 0;
 }
@@ -181,6 +182,17 @@ void  CBusiness::OnReconnectLaunch(DWORD dwDelay) {
 }
 
 
+int   CBusiness::CheckLaunchStatusAsyn() {
+	g_data.m_thrd_com->PostMessage(this, MSG_CHECK_HARDWARE, 0, TRUE);
+	return 0;
+}
+
+int   CBusiness::CheckLaunchStatus() {
+	m_launch.CheckStatus();
+	return 0;
+}
+
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -201,6 +213,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_GET_STATION_DATA:
 	{
 		GetStationData();
+	}
+	break;
+
+	case MSG_CHECK_HARDWARE:
+	{
+		CheckLaunchStatus();
 	}
 	break;
 
