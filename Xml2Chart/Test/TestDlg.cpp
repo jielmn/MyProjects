@@ -50,6 +50,7 @@ BOOL CTestDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+#if 0
 	CFont a;
 	LOGFONT b;
 	a.CreateFontIndirect( &b );
@@ -163,8 +164,9 @@ BOOL CTestDlg::OnInitDialog()
 	splitPen.nSplitNum = 4;
 	pChild1->SetSplitLine(FALSE, splitPen);
 
+#endif
 
-	m_XmlChartFile.ReadXmlChartFile("d:\\体温表设计.xml");
+	m_XmlChartFile.ReadXmlChartFile("d:\\chart_1.xml");
 
 	
 	

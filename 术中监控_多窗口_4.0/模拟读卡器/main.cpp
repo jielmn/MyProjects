@@ -109,10 +109,10 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 			else if ( byData[5] == 0x02 ) {
 				DWORD r = GetRand(1, 5);
 				if ( r > 1 ) {
-					memcpy(byData, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF", 29);
+					memcpy(byData, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF\xDD\xAA", 31);
 					byData[3] = byBed;
 					byData[4] = byArea;
-					dwWriteLen = 29;
+					dwWriteLen = 31;
 					//DWORD dwTemp = GetRand(3200, 4080);
 					DWORD dwTemp = GetRandTemp(byBed);
 					byData[24] = (BYTE)(dwTemp / 1000);

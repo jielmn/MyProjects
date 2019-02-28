@@ -1212,8 +1212,10 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 			if (sAttr) {
 				sscanf_s(sAttr, "#%x", &color);
 			}
-
-			HGDIOBJ hPen = ::CreatePen(PS_SOLID, nPenWidth, color);
+			BYTE b[sizeof(color)];
+			memcpy(b, &color, sizeof(color));
+			DWORD rgb = RGB(b[2], b[1], b[0]);
+			HGDIOBJ hPen = ::CreatePen(PS_SOLID, nPenWidth, rgb);
 			m_mapPens.insert(std::make_pair(nThreadId, hPen));
 		}
 		// 如果是布局节点
