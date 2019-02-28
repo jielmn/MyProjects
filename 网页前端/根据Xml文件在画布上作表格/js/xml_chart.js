@@ -134,6 +134,14 @@ function  XmlChartUI( ) {
 	this.bFloat = false;
 	this.position = new Rect( 0, 0, 0, 0);
 	
+	this.getWidth = function () {
+		return this.rect.right - this.rect.left;
+	}
+	
+	this.getHeight = function() {
+		return this.rect.bottom - this.rect.top;
+	}
+	
 	this.addChild = function ( child ) {
 		if ( child == null ) {
 			return;
@@ -153,12 +161,13 @@ function  XmlChartUI( ) {
 		}
 		this.children.push(child);
 
-		this.recacluteLayout();	
+		this.recaculateLayout();	
 	}
 	
-	this.recacluteLayout = function () {
-		var  nWidth  = this.width;
-		var  nHeight = this.height;
+	this.recaculateLayout = function () {
+		
+		var  nWidth  = this.getWidth();
+		var  nHeight = this.getHeight();
 		var  nAccu         = 0;
 		var  nAutoChildCnt = 0;
 		var  nAve   = 0;                   // 自动计算的平均值
@@ -170,7 +179,9 @@ function  XmlChartUI( ) {
 		var  i = 0;
 		var  child = null;
 		
+		
 		var tmpPadding = new Rect( this.padding.left, this.padding.top, this.padding.right, this.padding.bottom );
+		
 		if (tmpPadding.left > nWidth) {
 			tmpPadding.left = nWidth;
 			tmpPadding.right = 0;
@@ -234,7 +245,7 @@ function  XmlChartUI( ) {
 					if ( child.position.bottom > nHeight ) {
 						child.rect.bottom = nHeight;
 					}
-					child.recacluteLayout();
+					child.recaculateLayout();
 				}
 				// 如果是固定的高度
 				else if (child.height != -1) {
@@ -261,7 +272,7 @@ function  XmlChartUI( ) {
 						nTop += child.height;
 						nLeft -= child.height;
 					}
-					child.recacluteLayout();
+					child.recaculateLayout();
 				}
 				// 如果是自动计算
 				else {
@@ -291,7 +302,7 @@ function  XmlChartUI( ) {
 							nLeft -= nAve;
 						}
 					}
-					child.recacluteLayout();
+					child.recaculateLayout();
 				}
 			}
 		}
@@ -342,7 +353,7 @@ function  XmlChartUI( ) {
 					if (child.position.bottom > nHeight) {
 						child.rect.bottom = nHeight;
 					}
-					child.recacluteLayout();
+					child.recaculateLayout();
 				}
 				// 如果是固定的宽度
 				else if (child.width != -1) {
@@ -369,7 +380,7 @@ function  XmlChartUI( ) {
 						iLeft += child.width;
 						nLeft -= child.width;
 					}
-					child.recacluteLayout();
+					child.recaculateLayout();
 				}
 				// 如果是自动计算
 				else {
@@ -399,7 +410,7 @@ function  XmlChartUI( ) {
 							nLeft -= nAve;
 						}
 					}
-					child.recacluteLayout();
+					child.recaculateLayout();
 				}
 			}
 		}
@@ -709,10 +720,27 @@ function LoadXmlChart( xmlFile, canvasId ) {
 						continue;
 					}
 					
+					var w = getAttr(child,"width");
+					var h = getAttr(child,"height");
+					var w1 = 0;
+					var h1 = 0;
+					
+					if ( w ) {
+						w1 = MIN( width, parseInt(w) );
+					} else {
+						w1 = width;
+					}
+					
+					if ( h ) {
+						h1 = MIN( width, parseInt(h) );
+					} else {
+						h1 = height;
+					}
+					
 					// chart UI
 					var chartUI = new XmlChartUI();
 					chartUI.name = getAttr(child, "name");
-					chartUI.rect = new Rect(0,0,getIntAttr(child,"width"),getIntAttr(child,"height"));
+					chartUI.rect = new Rect(0,0,w1,h1);
 					chartUI.layoutType = ( bVertical ? 1 : 0 );
 					parseSplit( child, chartUI, threads );
 					parseBorder( child, chartUI, threads );
@@ -722,7 +750,7 @@ function LoadXmlChart( xmlFile, canvasId ) {
 				child = child.nextSibling;								
 			}
 			
-			chartUI.recacluteLayout();
+			chartUI.recaculateLayout();
 			
 			console.log(chartUI);
 			console.log( fonts );
