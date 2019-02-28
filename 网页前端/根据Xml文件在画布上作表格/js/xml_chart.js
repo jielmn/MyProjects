@@ -121,7 +121,7 @@ function  XmlChartUI( ) {
 	
 	this.borderPen = new Array(4);
 	for ( var i = 0; i < 4; i++ ) {
-		this.borderPen[i] = new Pen( "#000000", 1 );
+		this.borderPen[i] = new Pen( "#000000", 0 );
 	}
 	
 	this.HSplitLines = new Array();
@@ -415,6 +415,68 @@ function  XmlChartUI( ) {
 			}
 		}
 	}
+	
+	this.getAbsoluteLeft = function () {
+		if ( this.parent ) {
+			return this.rect.left + this.parent.getAbsoluteLeft();
+		}
+		else {
+			return this.rect.left;
+		}
+	}
+	
+	this.getAbsoluteRight = function() {
+		if ( this.parent ) {
+			return this.rect.right + this.parent.getAbsoluteLeft();
+		}
+		else {
+			return this.rect.right;
+		}
+	}
+	
+	this.getAbsoluteTop = function() {
+		if ( this.parent ) {
+			return  this.rect.top + this.parent.getAbsoluteTop();
+		}
+		else {
+			return this.rect.top;
+		}
+	}
+	
+	this.getAbsoluteBottom = function () {
+		if ( this.parent ) {
+			return this.rect.bottom + this.parent.getAbsoluteTop();
+		}
+		else {
+			return this.rect.bottom;
+		}
+	}
+	
+	this.getSplitLineCount = function (bVertical) {
+		if (bVertical) {
+			return this.VSplitLines.length;
+		}
+		else {
+			return this.HSplitLines.length;
+		}
+	}
+	
+	this.getSplitLine = function ( bVertical, nIndex ) {
+		var pVec = 0;
+		if (bVertical) {
+			pVec = this.VSplitLines;
+		}
+		else {
+			pVec = this.HSplitLines;
+		}
+
+		if ( nIndex < pVec.length ) {
+			return pVec[nIndex];
+		}
+
+		return new SplitPen( 0, null );
+	}
+
 }
 
 function  getAttr( emt, attrName ) {
@@ -627,6 +689,109 @@ function parseChartFile( emt, ui, threads, fonts ) {
 	}
 }
 
+function strokeLine( ctx, pen, x1, y1, x2, y2  ) {
+	ctx.beginPath();
+	ctx.lineWidth=pen.size;
+	ctx.strokeStyle=pen.color;
+	ctx.moveTo(x1,y1);
+	ctx.lineTo(x2,y2);
+	ctx.stroke(); // 进行绘制
+}
+
+function drawXml2ChartUI( ctx, ui ) {
+	
+	var penLeft   = ui.borderPen[0];
+	var penRight  = ui.borderPen[2];
+	var penTop    = ui.borderPen[1];
+	var penBottom = ui.borderPen[3];
+
+	if ( penLeft.size > 0 ) {
+		strokeLine( ctx, penLeft, ui.getAbsoluteLeft(), ui.getAbsoluteTop(), ui.getAbsoluteLeft(), ui.getAbsoluteBottom() );
+	}
+
+	if ( penRight.size > 0 ) {
+		strokeLine( ctx, penRight, ui.getAbsoluteRight(), ui.getAbsoluteTop(), ui.getAbsoluteRight(), ui.getAbsoluteBottom() );
+	}
+
+	if ( penTop.size > 0 ) {
+		strokeLine( ctx, penTop, ui.getAbsoluteLeft(), ui.getAbsoluteTop(), ui.getAbsoluteRight(), ui.getAbsoluteTop() );
+	}
+
+	if ( penBottom.size > 0 ) {
+		strokeLine( ctx, penBottom, ui.getAbsoluteLeft(), ui.getAbsoluteBottom(), ui.getAbsoluteRight(), ui.getAbsoluteBottom() );
+	}
+	
+	var nCount = 0;
+	var nAve = 0;
+	var nMod = 0;
+	var i = 0;
+	var j = 0;
+	var splitPen = null;
+
+	nCount = ui.getSplitLineCount(true);
+	for ( i = 0; i < nCount; i++ ) {
+		splitPen = ui.getSplitLine( true, i );		
+		nAve = parseInt( ui.getWidth() / splitPen.splitNum );
+		nMod = ui.getWidth() % splitPen.splitNum;
+		
+		for ( j = 0; j < splitPen.splitNum - 1; j++) {
+			strokeLine( ctx, splitPen.pen, ui.getAbsoluteLeft() + (j + 1)*nAve, ui.getAbsoluteTop(), ui.getAbsoluteLeft() + (j + 1)*nAve, ui.getAbsoluteBottom() );
+		}
+	}
+
+	nCount = ui.getSplitLineCount(false);
+	for ( i = 0; i < nCount; i++ ) {
+		splitPen = ui.getSplitLine( false, i );
+		nAve = parseInt ( ui.getHeight() / splitPen.splitNum );
+		nMod = ui.getHeight() % splitPen.splitNum;
+
+		for ( j = 0; j < splitPen.splitNum - 1; j++) {
+			strokeLine( ctx, splitPen.pen, ui.getAbsoluteLeft(), ui.getAbsoluteTop() + (j+1)*nAve, ui.getAbsoluteRight(), ui.getAbsoluteTop() + (j+1)*nAve );
+		}
+	}
+	
+	var  strText   = ui.text;
+	var  measure   = ctx.measureText(strText);
+	var  nStrWidth = parseInt( measure.width );
+	var  nHeight   = ui.font.size;
+	var  nLeft = 0;
+	var  nTop  = 0;
+	
+	if ( ui.align == 1 ) {
+		nLeft = ( ui.getWidth() - nStrWidth ) / 2;
+	}
+	else if ( ui.align == 2 ) {
+		nLeft = ui.getWidth() - nStrWidth;
+	}
+
+	if ( ui.valign == 1 ) {
+		nTop = (ui.getHeight() - nHeight) / 2;
+	}
+	else if (ui.valign == 2) {
+		nTop = ui.getHeight() - nHeight;
+	}
+
+	ctx.font=""+ui.font.size+"px " + ui.font.name;
+	ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop());
+	
+	if ( ui.text.length > 0 ) {
+		console.log( ui.text );
+		console.log( measure );
+		var a = nLeft + ui.getAbsoluteLeft();
+		var b = nTop;
+		var c = ui.getAbsoluteTop();
+		var d = ui.getHeight();
+		var e = nHeight;
+		console.log("==="+a+","+b+","+c+","+d+","+e);
+	}
+	
+	var nChildrenCount = ui.children.length;
+	for (i = 0; i < nChildrenCount; i++) {
+		var child = ui.children[i];
+		drawXml2ChartUI(ctx, child);
+	}
+}
+
 
 function LoadXmlChart( xmlFile, canvasId ) {
 	var canvas = document.getElementById(canvasId);
@@ -754,20 +919,10 @@ function LoadXmlChart( xmlFile, canvasId ) {
 			
 			console.log(chartUI);
 			console.log( fonts );
-			console.log( threads );			
-			/*
+			console.log( threads );		
+
 			var cxt=canvas.getContext("2d");
-			cxt.moveTo(10,10);
-			cxt.lineTo(150,50);
-			cxt.lineTo(10,50);
-			cxt.stroke();
-			*/
-			
-			var ctx=canvas.getContext("2d");
-			ctx.font="40px Arial";
-			ctx.fillText("Hello World",10,50);			
-			ctx.font="20px Arial";
-			ctx.fillText("Hello World",100,100);
+			drawXml2ChartUI(cxt, chartUI);
 		},
 		error:function() {
 			console.log( "failed to load \"" + xmlFile + "\" file" );

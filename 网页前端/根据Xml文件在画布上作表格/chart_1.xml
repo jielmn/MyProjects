@@ -2,12 +2,15 @@
 <Window width="800" height="600" >
 	<Font   id="0" bold="true" italic="false" facename="宋体" height="24" />
 	<Font   id="1" bold="false" italic="false" facename="宋体" height="16" />
-	<Thread id="5" width="2" color="#FF0000" />
-	<Thread id="6" width="1" color="#CCCCCC" />
+	<Thread id="5" width="1" color="#FF0000" />
+	<Thread id="6" width="1" color="#0000FF" />
+	<Thread id="7" width="1" color="#00FF00" />
 	
 	<!-- <VerticalLayout VSplit="num='3',pen='5'" HSplit="num='3',pen='6'" > -->
-	<VerticalLayout border="6,6,6,6" VSplit="num='3',pen='5'" HSplit="num='4',pen='6'" padding="3,4,5,6" >
+	<VerticalLayout border="7,7,6,6" VSplit="num='3',pen='5'" HSplit="num='4',pen='6'" padding="3,4,5,6" >
 		<VerticalLayout height="85">	
+			<Item text="某某医院" align="center" valign="center" font="0"  />
+			<Item text="体温单" align="center" valign="center" font="1" />
 		</VerticalLayout>
 
 	</VerticalLayout>
