@@ -812,12 +812,7 @@ function drawXml2ChartUI( ctx, ui ) {
 }
 
 
-function LoadXmlChart( xmlFile, canvasId ) {
-	var canvas = document.getElementById(canvasId);
-	if ( canvas == null ) {
-		console.log("canvas not found!");
-		return;
-	}
+function LoadXmlChart( xmlFile, canvasId, onLoadOk ) {
 			
 	$.ajax({
 		type: "get",
@@ -939,9 +934,8 @@ function LoadXmlChart( xmlFile, canvasId ) {
 			console.log(chartUI);
 			console.log( fonts );
 			console.log( threads );		
-
-			var cxt=canvas.getContext("2d");
-			drawXml2ChartUI(cxt, chartUI);
+			
+			onLoadOk( chartUI );
 		},
 		error:function() {
 			console.log( "failed to load \"" + xmlFile + "\" file" );

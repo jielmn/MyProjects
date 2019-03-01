@@ -5,8 +5,20 @@
 <script type="text/javascript" src="js/xml_chart.js" ></script>
 
 <script type="text/javascript" charset="UTF-8" >	
+	function onXmlChartLoadOk( ui ) {
+		
+		var canvas = document.getElementById("myCanvas");
+		if ( canvas == null ) {
+			console.log("canvas not found!");
+			return;
+		}
+		
+		var cxt=canvas.getContext("2d");
+		drawXml2ChartUI(cxt, ui);
+	}
+	
 	window.onload = function () {
-		LoadXmlChart( "chart.xml", "myCanvas" );
+		LoadXmlChart( "chart.xml", "myCanvas", onXmlChartLoadOk );
 	}
 </script>
 </head>
