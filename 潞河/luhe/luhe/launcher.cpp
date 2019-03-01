@@ -96,7 +96,7 @@ int  CLaunch::GetData() {
 			DWORD  dwTemp = buf[16] * 100 + buf[17];
 			char   szReaderId[256] = {0};
 			char   szTagId[256] = { 0 };
-			DWORD  dwNum = buf[4] * 256 * 256 * 256 + buf[5] * 256 * 256 + buf[6] * 256 + buf[7];
+			DWORD  dwNum = ( (DWORD)(buf[4]<<24) | (DWORD)(buf[5]<<16) | (DWORD)(buf[6]<<8) | (DWORD)buf[7] );
 			SNPRINTF(szReaderId, sizeof(szReaderId), "ER003%06lu", dwNum );
 			SNPRINTF(szTagId,    sizeof(szTagId),    "%02x%02x%02x%02x%02x%02x%02x%02x", 
 				buf[15], buf[14], buf[13], buf[12], buf[11], buf[10], buf[9], buf[8]);			
@@ -124,6 +124,8 @@ int  CLaunch::GetData() {
 				strUrl += szReaderId;
 				strUrl += "&tagid=";
 				strUrl += szTagId;
+				strUrl += "&nurseid=";
+				strUrl += "1122334455667788";
 
 				CHttp::GetInstance()->Get(strUrl, (void *)pArg);
 			}
