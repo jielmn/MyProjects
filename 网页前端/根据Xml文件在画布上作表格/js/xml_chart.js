@@ -750,39 +750,35 @@ function drawXml2ChartUI( ctx, ui ) {
 		}
 	}
 	
-	var  strText   = ui.text;
-	var  measure   = ctx.measureText(strText);
-	var  nStrWidth = parseInt( measure.width );
-	var  nHeight   = ui.font.size;
-	var  nLeft = 0;
-	var  nTop  = 0;
-	
-	if ( ui.align == 1 ) {
-		nLeft = ( ui.getWidth() - nStrWidth ) / 2;
-	}
-	else if ( ui.align == 2 ) {
-		nLeft = ui.getWidth() - nStrWidth;
-	}
-
-	if ( ui.valign == 1 ) {
-		nTop = (ui.getHeight() - nHeight) / 2;
-	}
-	else if (ui.valign == 2) {
-		nTop = ui.getHeight() - nHeight;
-	}
-
-	ctx.font=""+ui.font.size+"px " + ui.font.name;
-	ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop());
-	
 	if ( ui.text.length > 0 ) {
-		console.log( ui.text );
-		console.log( measure );
-		var a = nLeft + ui.getAbsoluteLeft();
-		var b = nTop;
-		var c = ui.getAbsoluteTop();
-		var d = ui.getHeight();
-		var e = nHeight;
-		console.log("==="+a+","+b+","+c+","+d+","+e);
+		ctx.font=""+ui.font.size+"px " + ui.font.name;
+		
+		var  strText   = ui.text;
+		var  measure   = ctx.measureText(strText);
+		var  nStrWidth = parseInt( measure.width );
+		var  nHeight   = ui.font.size;
+		var  nLeft = 0;
+		var  nTop  = 0;
+		
+		// console.log("text="+ui.text+",align="+ui.align+",valign="+ui.valign+",font height="+nHeight);
+		
+		if ( ui.align == 1 ) {
+			nLeft = ( ui.getWidth() - nStrWidth ) / 2;
+		}
+		else if ( ui.align == 2 ) {
+			nLeft = ui.getWidth() - nStrWidth;
+		}
+
+		if ( ui.valign == 1 ) {
+			nTop = (ui.getHeight() - nHeight) / 2;
+		}
+		else if (ui.valign == 2) {
+			nTop = ui.getHeight() - nHeight;
+		}
+		
+		// console.log("nLeft="+nLeft+",nTop="+nTop+",ui.getAbsoluteTop()="+ui.getAbsoluteTop());
+
+		ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop() + nHeight);
 	}
 	
 	var nChildrenCount = ui.children.length;
