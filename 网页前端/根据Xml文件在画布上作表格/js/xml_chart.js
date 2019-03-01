@@ -128,8 +128,8 @@ function  XmlChartUI( ) {
 	this.VSplitLines = new Array();
 	
 	this.textColor = "#000000";
-	this.align = 0;
-	this.valign = 0;
+	this.align = 1;
+	this.valign = 1;
 	this.font = new Font("宋体", 15, false, false, -1);
 	this.bFloat = false;
 	this.position = new Rect( 0, 0, 0, 0);
@@ -604,19 +604,30 @@ function parsePadding( emt, ui ) {
 
 function getAlignValue(value) {
 	if ( value == null ) {
-		return 0;
-	} else if ( value == "center" ) {
 		return 1;
+	} else if ( value == "left" ) {
+		return 0;
 	} else if ( value == "right" ) {
 		return 2;
 	}
-	return 0;
+	return 1;
+}
+
+function getVAlignValue(value) {
+	if ( value == null ) {
+		return 1;
+	} else if ( value == "top" ) {
+		return 0;
+	} else if ( value == "bottom" ) {
+		return 2;
+	}
+	return 1;
 }
 
 function parseText( emt, ui, fonts ) {
 	ui.text = getAttr( emt, "text" );
 	ui.align = getAlignValue( getAttr( emt, "align" ) );
-	ui.valign = getAlignValue( getAttr( emt, "valign" ) );
+	ui.valign = getVAlignValue( getAttr( emt, "valign" ) );
 	
 	var font = getAttr( emt, "font" );
 	if ( font.length == 0 ) {
@@ -778,7 +789,7 @@ function drawXml2ChartUI( ctx, ui ) {
 		
 		// console.log("nLeft="+nLeft+",nTop="+nTop+",ui.getAbsoluteTop()="+ui.getAbsoluteTop());
 
-		ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop() + nHeight);
+		ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop() + nHeight - 3);
 	}
 	
 	var nChildrenCount = ui.children.length;

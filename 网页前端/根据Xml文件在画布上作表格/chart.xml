@@ -4,6 +4,7 @@
 	<Font   id="1" bold="false" italic="false" facename="宋体" height="16" />
 	<Thread id="5" width="2" color="#000000" />
 	<Thread id="6" width="1" color="#FF0000" />
+	<Thread id="7" width="1" color="#FFFF00" />
 	
 	<!-- <VerticalLayout VSplit="num='3',pen='5'" HSplit="num='3',pen='6'" > -->
 	<VerticalLayout border="6,6,6,6">
@@ -11,9 +12,11 @@
 			<Item text="某某医院" align="center" valign="center" font="0" name="hospital_name"  />
 			<Item text="体温单" align="center" valign="center" font="1" />
 			<HorizontalLayout border="6,6,6,6" padding="15,0,15,0">
-				<Item text="姓名：张三1" align="left" font="1" name="patient_name"  /><Item text="入院日期：2017-7-1" align="left" font="1" name="indate" />
-				<Item text="科室：外科" align="left" font="1" name="office" /><Item text="床号：901" align="left" font="1" name="bed_no" />
-				<Item text="住院号：A0098112" align="left" font="1" name="inno" />
+				<Item text="姓名：张三1" align="left" valign="center" font="1" name="patient_name"   />
+				<Item text="入院日期：2017-7-1" align="left" valign="center" font="1" name="indate" />
+				<Item text="科室：外科" align="left" valign="center" font="1" name="office" />
+				<Item text="床号：901" align="left" valign="center" font="1" name="bed_no" />
+				<Item text="住院号：A0098112" align="left" valign="center" font="1" name="inno" />
 			</HorizontalLayout>
 		</VerticalLayout>
 		
