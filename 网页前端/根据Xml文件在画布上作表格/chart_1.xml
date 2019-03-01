@@ -9,10 +9,8 @@
 	
 	<!-- <VerticalLayout VSplit="num='3',pen='5'" HSplit="num='3',pen='6'" > -->
 	<VerticalLayout border="7,7,6,6" VSplit="num='3',pen='5'" HSplit="num='4',pen='6'" padding="1,1,1,1" >
-		<VerticalLayout height="85" border="8,8,8,8" >	
-			<Item text="某某医院" align="center" valign="center" font="0"  />
-			<Item text="体温单" align="center" valign="center" font="1" />
-		</VerticalLayout>
+		<Item text="某某医院" align="center" valign="center" font="0" name="hospital_name" textcolor="#FF0000"  />
+		<Item text="体温单" align="center" valign="center" font="1" />
 
 	</VerticalLayout>
 	

@@ -624,8 +624,20 @@ function getVAlignValue(value) {
 	return 1;
 }
 
+function getTextColor(value) {
+	if ( value == null ) {
+		return "#000000";
+	} else {
+		if ( value.length > 0 )
+			return value;
+		else 
+			return "#000000";
+	}
+}
+
 function parseText( emt, ui, fonts ) {
 	ui.text = getAttr( emt, "text" );
+	ui.textColor = getTextColor( getAttr( emt, "textcolor" ) );
 	ui.align = getAlignValue( getAttr( emt, "align" ) );
 	ui.valign = getVAlignValue( getAttr( emt, "valign" ) );
 	
@@ -788,7 +800,7 @@ function drawXml2ChartUI( ctx, ui ) {
 		}
 		
 		// console.log("nLeft="+nLeft+",nTop="+nTop+",ui.getAbsoluteTop()="+ui.getAbsoluteTop());
-
+		ctx.strokeStyle = ui.textColor;
 		ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop() + nHeight - 3);
 	}
 	
