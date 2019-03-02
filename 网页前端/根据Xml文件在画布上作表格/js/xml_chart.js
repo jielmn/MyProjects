@@ -476,6 +476,25 @@ function  XmlChartUI( ) {
 
 		return new SplitPen( 0, null );
 	}
+	
+	
+	this.findChartUIByName = function(szName) {
+		var sName = this.name;
+		if ( sName === szName ) {
+			return this;
+		}
+
+		var nChildrenCount = this.children.length;
+		for (var i = 0; i < nChildrenCount; i++) {
+			var pChild = this.children[i];
+			var pFind  = pChild.findChartUIByName(szName);
+			if (null != pFind) {
+				return pFind;
+			}
+		}
+
+		return null;
+	}
 
 }
 

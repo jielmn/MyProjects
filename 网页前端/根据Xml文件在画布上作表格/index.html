@@ -15,6 +15,47 @@
 		
 		var ctx=canvas.getContext("2d");
 		drawXml2ChartUI(ctx, ui);
+		
+		// 第1天 36.5摄氏度
+		// 第2天 35.5摄氏度
+		// 第3天 34.9摄氏度
+		// 第4天 37.5摄氏度
+		// 第5天 38.5摄氏度
+		
+		var child = ui.findChartUIByName("MainBlock");
+		console.log("findChartUIByName:");
+		console.log(child);
+		
+		var w = child.getWidth() / 7;
+		var h = child.getHeight() / 8;
+		console.log( w );
+		console.log( h );
+		
+		var x1 = child.getAbsoluteLeft() + (w / 2);
+		var y1 = child.getAbsoluteBottom() -  (2.5 * h);
+		var x2 = child.getAbsoluteLeft() + (w / 2) + w;
+		var y2 = child.getAbsoluteBottom() -  (1.5 * h);
+		
+		var pen = new Pen( "#00ff00", 1 );
+		strokeLine( ctx, pen, x1, y1, x2, y2 );
+		
+		x1 = x2;
+		y1 = y2;
+		x2 = child.getAbsoluteLeft() + (w / 2) + w * 2;
+		y2 = child.getAbsoluteBottom() -  (0.9 * h);
+		strokeLine( ctx, pen, x1, y1, x2, y2 );
+		
+		x1 = x2;
+		y1 = y2;
+		x2 = child.getAbsoluteLeft() + (w / 2) + w * 3;
+		y2 = child.getAbsoluteBottom() -  (3.5 * h);
+		strokeLine( ctx, pen, x1, y1, x2, y2 );
+		
+		x1 = x2;
+		y1 = y2;
+		x2 = child.getAbsoluteLeft() + (w / 2) + w * 4;
+		y2 = child.getAbsoluteBottom() -  (4.5 * h);
+		strokeLine( ctx, pen, x1, y1, x2, y2 );
 	}
 	
 	window.onload = function () {
