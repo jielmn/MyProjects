@@ -713,12 +713,20 @@ function parseChartFile( emt, ui, threads, fonts ) {
 }
 
 function strokeLine( ctx, pen, x1, y1, x2, y2  ) {
+	var bOdd = ( 1 == (pen.size % 2) );
+	if ( bOdd )
+		ctx.translate(0.5,0.5);
+	
 	ctx.beginPath();
 	ctx.lineWidth=pen.size;
 	ctx.strokeStyle=pen.color;
 	ctx.moveTo(x1,y1);
 	ctx.lineTo(x2,y2);
 	ctx.stroke(); // 进行绘制
+	ctx.closePath();
+	
+	if ( bOdd )
+		ctx.translate(-0.5,-0.5);
 }
 
 function drawXml2ChartUI( ctx, ui ) {
@@ -801,6 +809,7 @@ function drawXml2ChartUI( ctx, ui ) {
 		
 		// console.log("nLeft="+nLeft+",nTop="+nTop+",ui.getAbsoluteTop()="+ui.getAbsoluteTop());
 		ctx.strokeStyle = ui.textColor;
+		ctx.lineWidth=1;
 		ctx.strokeText( ui.text, nLeft + ui.getAbsoluteLeft(),nTop + ui.getAbsoluteTop() + nHeight - 3);
 	}
 	
