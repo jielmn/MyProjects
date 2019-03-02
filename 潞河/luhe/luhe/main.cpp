@@ -10,7 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include "LmnTelSvr.h"
-#include "httpstack.h"
+#include "LmnHttp.h"
 
 void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	const char * szHeader, DWORD dwHeaderLen, void * context) {

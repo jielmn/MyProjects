@@ -27,15 +27,6 @@
     <ClCompile Include="launcher.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="httpstack.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="seli.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ssl_adapter.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -51,15 +42,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="launcher.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="httpstack.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="seli.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ssl_adapter.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

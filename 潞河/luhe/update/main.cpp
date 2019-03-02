@@ -9,7 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
-#include "httpstack.h"
+#include "LmnHttp.h"
 #include "LmnTelSvr.h"
 
 void OnHttp(  int nError, DWORD dwCode, const char * szData, DWORD dwDataLen, 
