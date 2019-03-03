@@ -34,10 +34,23 @@ void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 			}
 			else {
 				JTelSvrPrint("send temp to server FAIL, error = %d, description = %s", n, szDescription);
+				if (dwDataLen > 0) {
+					JTelSvrPrint("response data(%lu): %s", dwDataLen, szData);
+				}
+				if (dwHeaderLen > 0) {
+					JTelSvrPrint("response header: %s", szHeader);
+				}
+				
 			}
 		}
 		else {
 			JTelSvrPrint("send temp to server FAIL.");
+			if (dwDataLen > 0) {
+				JTelSvrPrint("response data(%lu): %s", dwDataLen, szData);
+			}
+			if (dwHeaderLen > 0) {
+				JTelSvrPrint("response header: %s", szHeader);
+			}
 		}
 
 		delete pItem;
