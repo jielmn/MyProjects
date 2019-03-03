@@ -83,23 +83,27 @@ int  CLaunch::GetData() {
 	// new
 	//       信道  地址      SN                                  温度
 	//       ____  ____  ___________                             _____
-	//  1  2  3      4    5  6  7  8    9 10 11 12 13 14 15 16   17 18   19 20 21 22 23
-	// 55 15 02     00   00 00 00 0B   8F 63 11 37 D8 59 02 E0   14 39   00 00 00 00 FF 
-	const DWORD  dwItemLen = 23;
+	//  1  2  3      4    5  6  7  8    9 10 11 12 13 14 15 16   17 18   19 20 21 22   23
+	// 55 15 02     00   00 00 00 0B   8F 63 11 37 D8 59 02 E0   14 39   00 00 00 00   FF 
+	// 55 1E 01     00   00 00 00 02   73 2B 8C 7E E3 59 02 E0   21 5F   00 00 00 00   33 CD 79 A4 00 01 04 E0   00   FF 
+	const DWORD  dwItemLen = 32;
 	CLmnString strText;
 
 	// 如果获取一条温度数据
 	if ( m_recv_buf.GetDataLength() >= dwItemLen ) {
 		m_recv_buf.Read( buf, dwItemLen );
 		//DWORD  dwTemp = (buf[0] - '0') * 1000 + (buf[1] - '0') * 100 + (buf[2] - '0') * 10 + (buf[3] - '0') ;
-		if (buf[0] == 0x55 && buf[1] == 0x15 ) {
+		if (buf[0] == 0x55 && buf[1] == 0x1E ) {
 			DWORD  dwTemp = buf[16] * 100 + buf[17];
 			char   szReaderId[256] = {0};
 			char   szTagId[256] = { 0 };
+			char   szNurseCardId[256] = { 0 };
 			DWORD  dwNum = ( (DWORD)(buf[4]<<24) | (DWORD)(buf[5]<<16) | (DWORD)(buf[6]<<8) | (DWORD)buf[7] );
 			SNPRINTF(szReaderId, sizeof(szReaderId), "ER003%06lu", dwNum );
 			SNPRINTF(szTagId,    sizeof(szTagId),    "%02x%02x%02x%02x%02x%02x%02x%02x", 
-				buf[15], buf[14], buf[13], buf[12], buf[11], buf[10], buf[9], buf[8]);			
+				buf[15], buf[14], buf[13], buf[12], buf[11], buf[10], buf[9], buf[8]);	
+			SNPRINTF(szNurseCardId, sizeof(szNurseCardId), "%02x%02x%02x%02x%02x%02x%02x%02x",
+				buf[29], buf[28], buf[27], buf[26], buf[25], buf[24], buf[23], buf[22]);
 
 			// 如果有服务器地址
 			if (g_data.m_szServerAddr[0] != '\0') {
@@ -114,18 +118,17 @@ int  CLaunch::GetData() {
 				pArg[1] = (int)pItem;
 
 				std::string strUrl = g_data.m_szServerAddr;
-				strUrl += "/main?type=upload&temp=";
+				//strUrl += "/main?type=upload&temp=";
+				strUrl += "?type=upload&temp=";
 				strUrl += strText.Format("%lu", pItem->dwTemp);
-				strUrl += "&time=";
-				strUrl += strText.Format("%lu", (DWORD)pItem->tTime);
 				strUrl += "&bind=";
 				strUrl += strText.Format("%d", g_data.m_bBindingReader);
 				strUrl += "&readerid=";
 				strUrl += szReaderId;
 				strUrl += "&tagid=";
 				strUrl += szTagId;
-				strUrl += "&nurseid=";
-				strUrl += "1122334455667788";
+				strUrl += "&nursecardid=";
+				strUrl += szNurseCardId;
 
 				CHttp::GetInstance()->Get(strUrl, (void *)pArg);
 			}

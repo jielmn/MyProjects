@@ -20,16 +20,16 @@ void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 	if (nType == TYPE_UPLOAD_TEMP) {
 		TempItem * pItem = (TempItem *)pArg[1];
 
-		if (nError == 0) {
-			int n = 0;
+		if (nError == 0 && 200 == dwCode) {
+			int n = -1;
 			char szMsg[8192] = { 0 };
 			char szDescription[8192] = { 0 };
 			char buf[8192] = { 0 };
 			memcpy(szMsg, szData, min(dwDataLen, sizeof(szMsg) - 1));
-			sscanf(szMsg, "%d%s", &n, buf);
+			int nScanCnt = sscanf(szMsg, "%d%s", &n, buf);
 			Utf8ToAnsi(szDescription, sizeof(szDescription), buf);
 
-			if (n == 0) {
+			if ( nScanCnt > 0 && n == 0 ) {
 				JTelSvrPrint("send temp to server OK.");
 			}
 			else {
