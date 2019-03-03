@@ -107,7 +107,7 @@ int  CLaunch::GetData() {
 
 			// 如果有服务器地址
 			if (g_data.m_szServerAddr[0] != '\0') {
-				JTelSvrPrint("try to send a temp record to server!");
+				JTelSvrPrint("try to send a temp record to server! tagid=%s,cardid=%s,raderid=%s,temperature=%lu",szTagId, szNurseCardId, szReaderId, dwTemp );
 
 				int * pArg = new int[2];
 				TempItem * pItem = new TempItem;
