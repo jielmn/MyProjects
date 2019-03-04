@@ -48,7 +48,7 @@ import java.text.SimpleDateFormat;
 // utility
 import mypack.Utility;
 
-public class MainServlet extends HttpServlet {
+public class MainServlet extends HttpServlet implements Utility.UploadFilesEvents {
 	    
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException {       
         rsp.setContentType("application/json;charset=utf-8");
@@ -69,12 +69,45 @@ public class MainServlet extends HttpServlet {
 		out.close();
     }   
 	
-	public void doPost(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException {       
-       doGet( req, rsp );
+	public void doPost(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException {  
+		rsp.setContentType("application/json;charset=utf-8");
+		PrintWriter out = rsp.getWriter();
+		Utility.handleUploadFiles( req, this, out );
+		out.close();
     } 
 	
 	private void test(PrintWriter out, HttpServletRequest req ) {		
 		Utility.setContentError(out,Utility.EnumErrCode.OK,"OK");
+	}
+	
+	public void OnUploadFiles(List<FileItem> lstResult,PrintWriter out) {	
+		JSONObject rsp_obj = new JSONObject();
+		JSONArray item_arr = new JSONArray();
+		for ( int i = 0; i < lstResult.size(); i++ ) {
+			FileItem item = lstResult.get(i);
+			
+			JSONObject item_obj = new JSONObject();
+			item_obj.put("field",  item.getFieldName());
+			item_obj.put("name",  item.getName());
+			//item_obj.put("value",  item.getString());
+			item_obj.put("isFormField",  item.isFormField());
+			item_arr.put(item_obj);
+			
+			if (!item.isFormField()) {
+				if (item.getName().length() > 0) {
+					String newFileName = this.getServletContext().getRealPath("/") + "temp/" + item.getName();	
+					try {					
+						File file = new File(  new String( newFileName.getBytes("gbk"), "utf-8" )  );
+						item.write(file);
+					} catch (Exception e ) {
+						
+					}
+				}
+			}
+			
+		}
+		rsp_obj.put("post", item_arr);
+		out.print(rsp_obj.toString());
 	}
 }
 

@@ -58,6 +58,10 @@ public class Utility {
 	static private String JDBC_NAME="jdbc_name";
 	static private String ERROR_CODE="errCode";
 	static private String ERROR_MSG="errMsg";
+	
+	public interface  UploadFilesEvents {
+		public void OnUploadFiles(List<FileItem> lstResult,PrintWriter out);
+	}
     
     public static Connection getConnection() throws NamingException, SQLException  {
 		Context ctx = new InitialContext();
@@ -79,6 +83,28 @@ public class Utility {
 		out.print(rsp_obj.toString());
 	}
 	
+	public static void handleUploadFiles( HttpServletRequest request, UploadFilesEvents cbObj, PrintWriter out ) {
+		if ( cbObj == null ) {
+			return;
+		}
+		
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		List<FileItem> lstResult = new ArrayList<FileItem>();
+		try {
+			List items = upload.parseRequest(request);
+			Iterator itr = items.iterator();
+			while (itr.hasNext()) {				
+				FileItem item = (FileItem) itr.next();
+				lstResult.add( item );
+			}
+		} catch (Exception e) {
+
+		}
+		
+		cbObj.OnUploadFiles(lstResult, out);
+	}
+	
 	// ignore null paramter
 	public static String GetParameter(HttpServletRequest req, String paraName) {
 		String ret = req.getParameter(paraName);
@@ -87,6 +113,7 @@ public class Utility {
 		}
 		return ret;
 	}
+	
 }
 
 
