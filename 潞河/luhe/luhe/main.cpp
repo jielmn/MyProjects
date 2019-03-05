@@ -45,6 +45,7 @@ void OnHttp(int nError, DWORD dwCode, const char * szData, DWORD dwDataLen,
 		}
 		else {
 			JTelSvrPrint("send temp to server FAIL.");
+			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "send temp to server FAIL.\r\n");
 			if (dwDataLen > 0) {
 				JTelSvrPrint("response data(%lu): %s", dwDataLen, szData);
 			}
