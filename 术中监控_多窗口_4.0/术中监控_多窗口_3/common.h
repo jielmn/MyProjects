@@ -14,6 +14,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#define  DDAA_FLAG                1
+
 #ifdef   _DEBUG
 #define  TEST_FLAG                0
 #define  TEST_FLAG_1              0

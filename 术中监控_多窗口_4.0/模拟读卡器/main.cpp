@@ -6,6 +6,8 @@
 #include "LmnThread.h"
 #include "LmnSerialPort.h"
 
+#define DDAA_FLAG 1
+
 #define   COM_PORT                    "com3"
 #define   RECONNECT_TIME              10000
 
@@ -109,10 +111,18 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 			else if ( byData[5] == 0x02 ) {
 				DWORD r = GetRand(1, 5);
 				if ( r > 1 ) {
+#if DDAA_FLAG
 					memcpy(byData, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF\xDD\xAA", 31);
+#else
+					memcpy(byData, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF\xDD\xAA", 29);
+#endif
 					byData[3] = byBed;
 					byData[4] = byArea;
+#if DDAA_FLAG
 					dwWriteLen = 31;
+#else
+					dwWriteLen = 29;
+#endif
 					//DWORD dwTemp = GetRand(3200, 4080);
 					DWORD dwTemp = GetRandTemp(byBed);
 					byData[24] = (BYTE)(dwTemp / 1000);
