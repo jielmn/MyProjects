@@ -47,10 +47,27 @@
 				</VerticalLayout>      
 			</HorizontalLayout>
 			
-			<!-- 客户区 -->		
+			<!-- 客户区 -->
+			<HorizontalLayout height="85" inset="8,5,0,0">
+				<Option width="100" height="80" name="opn_monitor" text="实时监控" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='monitor.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
+				<Option width="100" height="80" name="opn_reader"  text="移动查房" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+			</HorizontalLayout>
+			
 			<TileLayout bkcolor="#FF192431" inset="0,0,0,0" name="layMain" columns="2" >
 				
 			</TileLayout>
+			
+			<HorizontalLayout bkcolor="#FF43424C" inset="0,0,0,0" name="layMain_1" visible="false">
+				<VerticalLayout width="500">
+					<HorizontalLayout height="40" inset="10,0,10,0" >
+						<Control bkimage="file='tag.png' dest='0,15,35,26'" width="35" /><Control width="10" /><Label text="所有Tag信息"   textcolor="#FFFFFFFF" width="200" font="2" />
+					</HorizontalLayout>
+				</VerticalLayout>
+				
+				<VerticalLayout >
+					<MyImage_1 name="my_image_hand_reader" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
+				</VerticalLayout>
+			</HorizontalLayout>
 			
 			<Edit name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" visible="false" />
 		</VerticalLayout>

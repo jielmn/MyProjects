@@ -117,3 +117,55 @@ private:
 	CMyImageUI  *   m_image;
 };
 
+
+//////////////////////////////////////////////////////////////////////////
+// new image
+
+class CMyImageUI_1 : public DuiLib::CControlUI
+{
+public:
+	CMyImageUI_1();
+	~CMyImageUI_1();
+
+	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	virtual void DoEvent(DuiLib::TEventUI& event);
+	virtual LPCTSTR GetClass() const {
+		return "MyImage_1";
+	}
+
+	void  OnDbClick();
+	void  MyInvalidate();
+
+private:
+	enum   E_STATE {
+		STATE_7_DAYS = 0,
+		STATE_SINGLE_DAY
+	};
+
+	vector< vector<TempData *> * >               m_vData;
+	vector< string * >                           m_vTagId;
+	int                                          m_nCurIndex;
+	E_STATE                                      m_state;
+	int                                          m_nSingleDayIndex;
+	time_t                                       m_SingleDayZeroTime;
+	BOOL                                         m_bSetSecondsPerPixel;
+
+	HPEN                                         m_hCommonThreadPen;
+	HPEN                                         m_hBrighterThreadPen;
+	HBRUSH                                       m_hCommonBrush;
+	HPEN                                         m_hDaySplitThreadPen;
+	Pen   *                                      m_temperature_pen;
+	Pen                                          m_remark_pen;
+	SolidBrush                                   m_remark_brush;
+
+private:
+	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	void   SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	// 7日视图有几天数据
+	int     GetDayCounts();
+	time_t  GetFirstTime();
+	void    DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+		int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics,
+		BOOL  bDrawPoints = FALSE);
+	
+};

@@ -53,6 +53,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "MyLabel")) {
 		return new CMyLabelUI();
 	}
+	else if (0 == strcmp(pstrClass, "MyImage_1")) {
+		return new CMyImageUI_1();
+	}
 	return NULL;
 }
 

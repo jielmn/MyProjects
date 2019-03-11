@@ -1457,3 +1457,558 @@ bool CMyLabelUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 void CMyLabelUI::DoEvent(DuiLib::TEventUI& event) {
 	CLabelUI::DoEvent(event);
 }
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// new image
+CMyImageUI_1::CMyImageUI_1() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
+                               m_remark_brush(Gdiplus::Color(0x803D5E49)) {
+	m_nCurIndex = -1;
+	m_state = STATE_7_DAYS;
+	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::COMMON_PEN));
+	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
+	m_hCommonBrush = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
+	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
+	m_temperature_pen = new Pen(Gdiplus::Color(g_data.m_argb[0]), 1.0);
+
+	m_nSingleDayIndex = 0; // -6, -5, -4, ......, 0
+	m_SingleDayZeroTime = 0;
+	m_bSetSecondsPerPixel = FALSE;
+
+#if TEST_FLAG_2
+	DWORD  i = 0;
+	string * s = 0;
+	s = new string("e030000000000001");
+	m_vTagId.push_back(s);
+	s = new string("e030000000000002");
+	m_vTagId.push_back(s);
+
+	TempData * pItem = 0;
+	vector<TempData *> * p = 0;
+	p = new vector<TempData *>;
+	m_vData.push_back(p);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3720;
+	pItem->tTime = DateTime2String("2019-03-10 11:01:01");
+	STRNCPY(pItem->szRemark, "111", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3640;
+	pItem->tTime = DateTime2String("2019-03-10 13:02:11");
+	STRNCPY(pItem->szRemark, "222", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3690;
+	pItem->tTime = DateTime2String("2019-03-10 16:03:20");
+	STRNCPY(pItem->szRemark, "333", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3530;
+	pItem->tTime = DateTime2String("2019-03-11 11:00:01");
+	STRNCPY(pItem->szRemark, "444", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3580;
+	pItem->tTime = DateTime2String("2019-03-11 13:01:11");
+	STRNCPY(pItem->szRemark, "555", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3610;
+	pItem->tTime = DateTime2String("2019-03-11 16:02:20");
+	STRNCPY(pItem->szRemark, "666", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+
+
+	p = new vector<TempData *>;
+	m_vData.push_back(p);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3680;
+	pItem->tTime = DateTime2String("2019-03-11 16:03:05");
+	STRNCPY(pItem->szRemark, "777", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	m_nCurIndex = 0;
+#endif
+}
+
+CMyImageUI_1::~CMyImageUI_1() {
+	vector< vector<TempData *> * >::iterator it;
+	for (it = m_vData.begin(); it != m_vData.end(); it++) {
+		vector<TempData *> * p = *it;
+		ClearVector(*p);
+		delete p;
+	}
+	m_vData.clear();
+
+	ClearVector(m_vTagId);
+
+	DeleteObject(m_hCommonThreadPen);
+	DeleteObject(m_hBrighterThreadPen);
+	DeleteObject(m_hCommonBrush);
+	DeleteObject(m_hDaySplitThreadPen);
+	delete m_temperature_pen;
+}
+
+bool CMyImageUI_1::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+
+	if (m_state == STATE_7_DAYS) {
+		SubPaint_1(hDC, rcPaint, pStopControl);
+	}
+	else {
+		SubPaint_0(hDC, rcPaint, pStopControl);
+	}
+	return true;
+}
+
+void CMyImageUI_1::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN)
+	{
+		//告诉UIManager这个消息需要处理
+		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+		return;
+	}
+	else if (event.Type == UIEVENT_MOUSEMOVE) {
+		if (g_data.m_CfgData.m_bCrossAnchor)
+			this->Invalidate();
+	}
+	CControlUI::DoEvent(event);
+}
+
+void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	
+}
+
+void   CMyImageUI_1::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CDuiString strText;
+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+
+	/* 开始作图 */
+	int nMinTemp = 20;
+	int nMaxTemp = 42;
+	int nGridCount = nMaxTemp - nMinTemp;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	// 中间温度的位置
+	int middle = height / 2;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	::SetTextColor(hDC, g_data.m_skin.GetRgb(CMySkin::COMMON_TEXT_COLOR));
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	RECT rectLeft;
+	rectLeft.left = rect.left;
+	rectLeft.top = rect.top;
+	rectLeft.right = rectLeft.left + MYIMAGE_LEFT_BLANK;
+	rectLeft.bottom = rect.bottom;
+
+	int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+	int nFistTemperature = nMaxTemp;
+	DWORD  dwCollectInterval = 10;
+
+	// 画出刻度线(水平横线)
+	int nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			::SelectObject(hDC, m_hBrighterThreadPen);
+			nVInterval = nGridHeight;
+		}
+		else {
+			::SelectObject(hDC, m_hCommonThreadPen);
+			nVInterval += nGridHeight;
+		}
+		int  nTop = nFirstTop + i * nGridHeight;
+		int  nTemperature = nFistTemperature - i;
+		::MoveToEx(hDC, rectLeft.right, nTop + rect.top, 0);
+		::LineTo(hDC, rect.right, nTop + rect.top);
+	}
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	// 画边框
+	::SelectObject(hDC, m_hCommonThreadPen);
+	::FillRect(hDC, &rectLeft, m_hCommonBrush);
+	::Rectangle(hDC, rectLeft.left, rectLeft.top, rectLeft.right, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left + width - 1, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.top);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.bottom - 1, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom - 1);
+
+	// 画刻度值
+	nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			int  nTop = nFirstTop + i * nGridHeight;
+			int  nTemperature = nFistTemperature - i;
+			strText.Format("%d℃", nTemperature);
+			::TextOut(hDC, rectLeft.right + (-40),
+				nTop + rect.top + (-8),
+				strText, strText.GetLength());
+			nVInterval = nGridHeight;
+		}
+		else {
+			nVInterval += nGridHeight;
+		}
+	}
+
+	// 画出报警线
+
+	// 计算温度曲线跨越几个日子
+	int  nDayCounts = GetDayCounts();
+	assert(nDayCounts > 0);
+	int  nDaySpare = (width - MYIMAGE_LEFT_BLANK) % nDayCounts;
+	int  nDayWidth = (width - MYIMAGE_LEFT_BLANK) / nDayCounts;
+
+	// 画日子的分割线
+	::SelectObject(hDC, m_hDaySplitThreadPen);
+	for (int i = 0; i < nDayCounts - 1; i++) {
+		::MoveToEx(hDC, rectLeft.right + nDayWidth * (i + 1), rect.top, 0);
+		::LineTo(hDC, rectLeft.right + nDayWidth * (i + 1), rect.bottom);
+	}
+
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	time_t   tFirstDayZeroTime = tTodayZeroTime - 3600 * 24 * (nDayCounts - 1);
+	int nWeekDayIndex = GetWeekDay(tFirstDayZeroTime);
+
+	RECT  tmpRect;
+	char  szDate[256];
+	for (int i = 0; i < nDayCounts; i++) {
+		tmpRect.left = rectLeft.right + nDayWidth * i;
+		tmpRect.right = tmpRect.left + nDayWidth;
+		tmpRect.top = rectLeft.top + nFirstTop + nGridHeight * nGridCount;
+		tmpRect.bottom = rect.bottom;
+
+		time_t  t = tFirstDayZeroTime + 3600 * 24 * i;
+		Date2String(szDate, sizeof(szDate), &t);
+		strText.Format("%s %s", szDate, GetWeekDayName((nWeekDayIndex + i) % 7));
+		::DrawText(hDC, strText, strText.GetLength(), &tmpRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	}
+
+	float  fSecondsPerPixel = 0.0f;
+	// 画折线图
+	if (nDayWidth > 0) {
+		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		POINT  top_left;
+		top_left.x = rectLeft.right;
+		top_left.y = nFirstTop + rectLeft.top;
+		DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nGridHeight, top_left, graphics);
+	}
+
+	// 画出类似注释的框
+	::SetBkMode(hDC, TRANSPARENT);
+
+	time_t tFirstTime = tFirstDayZeroTime;
+	if ( m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size() ) {
+		return;
+	}
+	vector<TempData *> & vTempData = *m_vData[m_nCurIndex];
+	vector<TempData *>::iterator it;
+	for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		TempData * pItem = *it;
+
+		if (pItem->szRemark[0] != '\0') {
+			int nDiff = (int)(pItem->tTime - tFirstTime);
+			int nX = (int)((float)nDiff / fSecondsPerPixel);
+			int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+			int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
+			int nY1 = nY + middle + rect.top;
+
+			CGraphicsRoundRectPath  RoundRectPath;
+			RoundRectPath.AddRoundRect(nX1 - EDT_REMARK_WIDTH / 2, nY1 + EDT_REMARK_Y_OFFSET,
+				EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5);
+			graphics.DrawPath(&m_remark_pen, &RoundRectPath);
+			graphics.FillPath(&m_remark_brush, &RoundRectPath);
+
+			strText = pItem->szRemark;
+			RECT rectRemark;
+			rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+			rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
+			rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+			if (rectRemark.left < rectLeft.left) {
+				rectRemark.left = rectLeft.left;
+			}
+			if (rectRemark.right < rectRemark.left) {
+				rectRemark.right = rectRemark.left;
+			}
+			::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+		}
+	}
+	
+}
+
+// 7日视图有几天数据
+int   CMyImageUI_1::GetDayCounts() {
+	time_t  first_time = GetFirstTime();
+	if (-1 == first_time) {
+		return 1;
+	}
+
+	time_t  today_zero_time = GetTodayZeroTime();
+	if (first_time >= today_zero_time) {
+		return 1;
+	}
+
+	// 一周前的开始位置
+	time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	// 如果开始时间比一周前还早
+	if (first_time <= tWeekBegin) {
+		return 7;
+	}
+
+	return (int)(today_zero_time - first_time - 1) / (3600 * 24) + 1 + 1;
+}
+
+time_t  CMyImageUI_1::GetFirstTime() {
+	if ( m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size() ) {
+		return -1;
+	}
+
+	vector<TempData *> * p = m_vData[m_nCurIndex];
+	if ( p->size() == 0 ) {
+		return -1;
+	}
+
+	return p->at(0)->tTime;
+}
+
+void    CMyImageUI_1::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+	int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics,
+	BOOL  bDrawPoints /*= FALSE*/) {
+
+	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
+		return;
+	}
+
+	vector<TempData *> * p = m_vData[m_nCurIndex];
+	if (p->size() == 0) {
+		return;
+	}
+
+	Gdiplus::Point * points = new Gdiplus::Point[MAX_POINTS_COUNT];
+
+	vector<TempData *>::iterator it;
+	vector<TempData *> & vTempData = *p;
+
+	// 找到第一个点
+	for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		TempData * pItem = *it;
+		if (pItem->tTime >= tFirstTime) {
+			break;
+		}
+	}
+
+	// 找到第一个点后，其他的点不在和起始时间点比较
+	// 临时存储相同x坐标的vector
+	vector<TempData *>  vTmp;
+	// 临时vector的item有共同的点，它们的x坐标相同
+	int nTmpX = 0;
+	// points数组的大小
+	int cnt = 0;
+
+	for (; it != vTempData.end(); it++) {
+		TempData * pItem = *it;
+		// 如果最后时间有值
+		if (tLastTime > 0) {
+			// 如果超出范围
+			if (pItem->tTime >= tLastTime) {
+				break;
+			}
+		}
+
+		int  nX = (int)((pItem->tTime - tFirstTime) / fSecondsPerPixel);
+
+		if (vTmp.size() == 0) {
+			vTmp.push_back(pItem);
+			nTmpX = nX;
+		}
+		else {
+			// 如果偏移量和上次的相同，放置在临时vector中
+			if (nX <= nTmpX + 1) {
+				vTmp.push_back(pItem);
+			}
+			else {
+				vector<TempData *>::iterator  it_tmp;
+				int  sum = 0;
+				for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+					TempData * pTmpItem = *it_tmp;
+					sum += pTmpItem->dwTemperature;
+				}
+				// 求平均值
+				int  ave = sum / vTmp.size();
+
+				points[cnt].X = nTmpX + tTopLeft.x;
+				points[cnt].Y = tTopLeft.y + (int)((nHighestTemp - ave / 100.0) * nPixelPerCelsius);
+				cnt++;
+
+				vTmp.clear();
+				vTmp.push_back(pItem);
+				nTmpX = nX;
+			}
+		}
+	}
+
+	if (vTmp.size() > 0) {
+		vector<TempData *>::iterator  it_tmp;
+		int  sum = 0;
+		for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+			TempData * pTmpItem = *it_tmp;
+			sum += pTmpItem->dwTemperature;
+		}
+		// 求平均值
+		int  ave = sum / vTmp.size();
+
+		points[cnt].X = nTmpX + tTopLeft.x;
+		points[cnt].Y = tTopLeft.y + (int)((nHighestTemp - ave / 100.0) * nPixelPerCelsius);
+		cnt++;
+
+		vTmp.clear();
+	}
+
+	if (bDrawPoints && fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f) {
+		for (int m = 0; m < cnt; ++m) {
+			// DrawTempPoint(i, graphics, points[m].X, points[m].Y, 0, 3);
+		}
+	}
+
+	graphics.DrawLines(m_temperature_pen, points, cnt);
+	
+	delete[] points;
+
+}
+
+void  CMyImageUI_1::OnDbClick() {
+	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
+		return;
+	}
+
+	vector<TempData *> * p = m_vData[m_nCurIndex];
+	if (p->size() == 0) {
+		return;
+	}
+
+	int nPointsCnt = p->size();
+	// 如果没有数据就不重绘了 
+	if (0 == nPointsCnt) {
+		return;
+	}
+
+	if (m_state == STATE_7_DAYS) {
+		POINT cursor_point;
+		GetCursorPos(&cursor_point);
+		::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+		DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+		RECT rect = this->GetPos();
+		int  width = pParent->GetWidth();
+
+		// 计算温度曲线跨越几个日子
+		int  nDayCounts = GetDayCounts();
+		assert(nDayCounts > 0);
+		int  nDaySpare = (width - MYIMAGE_LEFT_BLANK) % nDayCounts;
+		int  nDayWidth = (width - MYIMAGE_LEFT_BLANK) / nDayCounts;
+
+		int  nOffsetX = cursor_point.x - rect.left;
+
+		int i = 0;
+		for (i = 0; i < nDayCounts; i++) {
+			if (nOffsetX < MYIMAGE_LEFT_BLANK + nDayWidth * (i + 1)) {
+				break;
+			}
+		}
+
+		m_nSingleDayIndex = i - (nDayCounts - 1);
+		assert(m_nSingleDayIndex >= -6 && m_nSingleDayIndex <= 0);
+		time_t tTodayZeroTime = GetTodayZeroTime();
+		m_SingleDayZeroTime = tTodayZeroTime - 3600 * 24 * (0 - m_nSingleDayIndex);
+		assert(m_SingleDayZeroTime >= 0);
+		m_state = STATE_SINGLE_DAY;
+		m_bSetSecondsPerPixel = FALSE;
+	}
+	else {
+		m_state = STATE_7_DAYS;
+	}
+
+	MyInvalidate();
+}
+
+void  CMyImageUI_1::MyInvalidate() {
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	int  width = pParent->GetWidth();
+
+	// 重新计算宽度
+	//if (m_state == STATE_SINGLE_DAY) {
+	//	time_t  tMin, tMax;
+	//	BOOL bFindMin, bFindMax;
+	//	CalcSingleDay(tMin, bFindMin, tMax, bFindMax);
+
+	//	if (bFindMin) {
+	//		assert(bFindMax);
+	//		// 如果没有设置每秒像素率，计算该率
+	//		if (!m_bSetSecondsPerPixel) {
+	//			if (width > MYIMAGE_LEFT_BLANK) {
+	//				if (tMax > tMin) {
+	//					m_fSecondsPerPixel = (float)(tMax - tMin) / (float)(width - MYIMAGE_LEFT_BLANK);
+	//					if (m_fSecondsPerPixel < 1.0f) {
+	//						m_fSecondsPerPixel = 1.0f;
+	//					}
+	//					m_bSetSecondsPerPixel = TRUE;
+	//				}
+	//			}
+	//		}
+	//		else {
+	//			width = (int)((tMax - tMin) / m_fSecondsPerPixel) + MYIMAGE_LEFT_BLANK;
+	//		}
+	//	}
+	//	this->SetMinWidth(width);
+	//}
+	//else {
+	//	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	//	int  width = pParent->GetWidth();
+	//	this->SetMinWidth(width);
+	//}
+	//Invalidate();
+}

@@ -42,8 +42,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
 	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
 	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
+	m_layMain_1 = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain_1"));
 
-	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
+	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);            
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 		CDialogBuilder builder;
 		m_pGrids[i] = builder.Create(MYCHART_XML_FILE, (UINT)0, &m_callback, &m_PaintManager);
@@ -305,6 +306,9 @@ LRESULT CDuiFrameWnd::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bH
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, "MyImage_1")) {
+		return new CMyImageUI_1(); 
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -387,7 +391,16 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_print_excel") {
 		OnPrintExcel();
 	}
-	WindowImplBase::Notify(msg);
+	else if (msg.sType == _T("selectchanged"))
+	{
+		if (name == _T("opn_monitor")) {
+			OnTabChanged(0);
+		}
+		else if (name == _T("opn_reader")) {
+			OnTabChanged(1);
+		}
+	}
+	WindowImplBase::Notify(msg);        
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -464,9 +477,9 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 void   CDuiFrameWnd::OnSize(WPARAM wParam, LPARAM lParam) {
 	DWORD dwWidth = LOWORD(lParam) - LAYOUT_WINDOW_HMARGIN * 2;           // layWindow的左右margin
 																		  // 30是底部status的大致高度, 1是layWindow的上下margin, 32是标题栏高度
-	DWORD dwHeight = HIWORD(lParam) - STATUS_PANE_HEIGHT - LAYOUT_WINDOW_VMARGIN * 2 - WINDOW_TITLE_HEIGHT;
+	DWORD dwHeight = HIWORD(lParam) - STATUS_PANE_HEIGHT - LAYOUT_WINDOW_VMARGIN * 2 - WINDOW_TITLE_HEIGHT - 85;
 	ReLayout(dwWidth, dwHeight);
-}
+}             
 
 // 重新布局
 void   CDuiFrameWnd::ReLayout(DWORD dwWidth, DWORD dwHeight) {
@@ -597,17 +610,29 @@ void   CDuiFrameWnd::OnDbClick() {
 		else if ( 0 == strcmp(clsName, DUI_CTR_SCROLLBAR) ) {
 			return;
 		}
+
+		while (pFindControl) {
+			strName = pFindControl->GetName();
+			if (0 == strcmp(strName, GRID_NAME)) {
+				DWORD nIndex = pFindControl->GetTag();
+				OnGridInflate(nIndex);
+				break;
+			}
+			pFindControl = pFindControl->GetParent();
+		}
+	}
+	else {
+		pFindControl = m_PaintManager.FindSubControlByPoint(m_layMain_1, point);
+
+		DuiLib::CDuiString  clsName = pFindControl->GetClass();
+		if (0 == strcmp(clsName, "MyImage_1")) {
+			CMyImageUI_1 * pMyImage = (CMyImageUI_1 *)pFindControl;
+			pMyImage->OnDbClick();
+			return;
+		}
 	}
 
-	while (pFindControl) {
-		strName = pFindControl->GetName();
-		if (0 == strcmp(strName, GRID_NAME)) {
-			DWORD nIndex = pFindControl->GetTag();
-			OnGridInflate(nIndex);
-			break;
-		}
-		pFindControl = pFindControl->GetParent();
-	}
+	
 }
 
 // 窗格扩大或缩小
@@ -1868,6 +1893,17 @@ void   CDuiFrameWnd::OnTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 
 	// ClearVector(*pvRet);
 	delete pvRet;
+}
+
+void   CDuiFrameWnd::OnTabChanged(DWORD  dwIndex) {
+	if ( 0 == dwIndex ) {
+		m_layMain->SetVisible(true);
+		m_layMain_1->SetVisible(false);
+	}
+	else if (1 == dwIndex) {
+		m_layMain->SetVisible(false);
+		m_layMain_1->SetVisible(true);
+	}
 }
 
 

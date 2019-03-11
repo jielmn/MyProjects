@@ -101,6 +101,8 @@ private:
 	CLabelUI *                         m_LblConflictTips;
 	time_t                             m_LastSaveExcelTime;
 
+	CHorizontalLayoutUI *                m_layMain_1;
+
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
 	// 重新布局
@@ -166,4 +168,6 @@ private:
 	void   OnCheckAutoSaveTimer();
 	//
 	void   OnTempSqliteRet(WPARAM wParam, LPARAM  lParam);
+	//
+	void   OnTabChanged(DWORD  dwIndex);
 };
