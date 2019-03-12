@@ -569,42 +569,48 @@ void  CMyImageUI::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopCont
 	// 画出类似注释的框
 	::SetBkMode(hDC, TRANSPARENT);
 
-	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		vector<TempData *> & vTempData = m_vTempData[i];
-		vector<TempData *>::iterator it;
-		for (it = vTempData.begin(); it != vTempData.end(); it++) {
-			TempData * pItem = *it;
-
-			if (pItem->szRemark[0] != '\0') {
-				int nDiff = (int)(pItem->tTime - tFirstTime);
-				int nX = (int)( (float)nDiff / m_fSecondsPerPixel );
-				int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
-
-				int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
-				int nY1 = nY + middle + rect.top;
-
-				CGraphicsRoundRectPath  RoundRectPath;
-				RoundRectPath.AddRoundRect(nX1 - EDT_REMARK_WIDTH / 2, nY1 + EDT_REMARK_Y_OFFSET,
-					EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5);
-				graphics.DrawPath(&m_remark_pen, &RoundRectPath);
-				graphics.FillPath(&m_remark_brush, &RoundRectPath);
-
-				strText = pItem->szRemark;
-				RECT rectRemark;
-				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
-				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
-				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
-				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
-				if (rectRemark.left < rectLeft.left) {
-					rectRemark.left = rectLeft.left;
+	if (bFindMin) {
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			vector<TempData *> & vTempData = m_vTempData[i];
+			vector<TempData *>::iterator it;
+			for (it = vTempData.begin(); it != vTempData.end(); it++) {
+				TempData * pItem = *it;
+				if ( !(pItem->tTime >= tFirstTime && pItem->tTime <= tLastTime) ) {
+					continue;
 				}
-				if (rectRemark.right < rectRemark.left) {
-					rectRemark.right = rectRemark.left;
+
+				if (pItem->szRemark[0] != '\0') {
+					int nDiff = (int)(pItem->tTime - tFirstTime);
+					int nX = (int)((float)nDiff / m_fSecondsPerPixel);
+					int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+					int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
+					int nY1 = nY + middle + rect.top;
+
+					CGraphicsRoundRectPath  RoundRectPath;
+					RoundRectPath.AddRoundRect(nX1 - EDT_REMARK_WIDTH / 2, nY1 + EDT_REMARK_Y_OFFSET,
+						EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5);
+					graphics.DrawPath(&m_remark_pen, &RoundRectPath);
+					graphics.FillPath(&m_remark_brush, &RoundRectPath);
+
+					strText = pItem->szRemark;
+					RECT rectRemark;
+					rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+					rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
+					rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+					rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+					if (rectRemark.left < rectLeft.left) {
+						rectRemark.left = rectLeft.left;
+					}
+					if (rectRemark.right < rectRemark.left) {
+						rectRemark.right = rectRemark.left;
+					}
+					::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 				}
-				::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 			}
 		}
 	}
+	
 
 	// 画十字线
 	RECT rCross;
@@ -1243,7 +1249,7 @@ void  CMyImageUI::DrawPolyline(
 			// 如果最后时间有值
 			if ( tLastTime > 0 ) {
 				// 如果超出范围
-				if ( pItem->tTime >= tLastTime ) {
+				if ( pItem->tTime > tLastTime ) {
 					break;
 				}
 			}
@@ -1472,10 +1478,12 @@ CMyImageUI_1::CMyImageUI_1() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	m_hCommonBrush = ::CreateSolidBrush(g_data.m_skin.GetRgb(CMySkin::COMMON_BRUSH));
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
 	m_temperature_pen = new Pen(Gdiplus::Color(g_data.m_argb[0]), 1.0);
+	m_temperature_brush = new SolidBrush(Gdiplus::Color(g_data.m_argb[0]));
 
 	m_nSingleDayIndex = 0; // -6, -5, -4, ......, 0
 	m_SingleDayZeroTime = 0;
 	m_bSetSecondsPerPixel = FALSE;
+	m_fSecondsPerPixel = 0.0f;
 
 #if TEST_FLAG_2
 	DWORD  i = 0;
@@ -1571,6 +1579,7 @@ CMyImageUI_1::~CMyImageUI_1() {
 	DeleteObject(m_hCommonBrush);
 	DeleteObject(m_hDaySplitThreadPen);
 	delete m_temperature_pen;
+	delete m_temperature_brush;
 }
 
 bool CMyImageUI_1::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -1600,7 +1609,257 @@ void CMyImageUI_1::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CDuiString strText;
+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	SIZE tParentScrollPos = pParent->GetScrollPos();
+	SIZE tParentScrollRange = pParent->GetScrollRange();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+	int nRadius = RADIUS_SIZE_IN_MAXIUM;
+
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	/* 开始作图 */
+	int nMinTemp = 20;
+	int nMaxTemp = 42;
+	int nGridCount = nMaxTemp - nMinTemp;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	// 中间温度的位置
+	int middle = height / 2;
+
+	::SetTextColor(hDC, g_data.m_skin.GetRgb(CMySkin::COMMON_TEXT_COLOR));
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	RECT rectLeft;
+	rectLeft.left = rect.left + tParentScrollPos.cx;
+	rectLeft.top = rect.top;
+	rectLeft.right = rectLeft.left + MYIMAGE_LEFT_BLANK;
+	rectLeft.bottom = rect.bottom;
+
+	int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+	int nFistTemperature = nMaxTemp;
+
+	// 画出刻度线(水平横线)
+	int nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			::SelectObject(hDC, m_hBrighterThreadPen);
+			nVInterval = nGridHeight;
+		}
+		else {
+			::SelectObject(hDC, m_hCommonThreadPen);
+			nVInterval += nGridHeight;
+		}
+		int  nTop = nFirstTop + i * nGridHeight;
+		int  nTemperature = nFistTemperature - i;
+		::MoveToEx(hDC, rectLeft.right, nTop + rect.top, 0);
+		::LineTo(hDC, rect.right, nTop + rect.top);
+	}
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	time_t  tFirstTime, tLastTime;
+	BOOL bFindMin, bFindMax;
+	CalcSingleDay(tFirstTime, bFindMin, tLastTime, bFindMax);
+
+	// 如果有点
+	if (bFindMin) {
+		assert(bFindMax);
+		// 如果有两个点以上，画温度曲线
+		if (tLastTime > tFirstTime) {
+			POINT  top_left;
+			top_left.x = rect.left + MYIMAGE_LEFT_BLANK; //rectLeft.right;
+			top_left.y = nFirstTop + rectLeft.top;
+			DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nGridHeight, top_left, graphics, TRUE);
+
+			// 画时间
+			// 从第一个10秒整数，画时间
+			if (tFirstTime >= 0) {
+				int  remainder = tFirstTime % 10;
+				time_t  tFirstTime_1 = tFirstTime;
+				if (remainder > 0) {
+					tFirstTime_1 += 10 - remainder;
+				}
+
+				int nLastX = -1;
+				time_t t = 0;
+				for (t = tFirstTime_1; t < tLastTime; t += 10) {
+					int nDiff = (int)(t - tFirstTime);
+					int nX = (int)((float)nDiff / m_fSecondsPerPixel);
+
+					if (nLastX == -1 || nX - nLastX >= 300) {
+						int nTextX = MYIMAGE_LEFT_BLANK + rect.left + nX + 1;
+						if (nTextX > rectLeft.left) {
+							struct tm tTmTime;
+							localtime_s(&tTmTime, &t);
+
+							strText.Format("  %02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
+							::TextOut(hDC, nTextX,
+								middle + (nGridCount / 2) * nGridHeight + rect.top + 5,
+								strText, strText.GetLength());
+							strText.Format("%02d-%02d-%02d", tTmTime.tm_year + 1900, tTmTime.tm_mon + 1, tTmTime.tm_mday);
+							::TextOut(hDC, nTextX,
+								middle + (nGridCount / 2) * nGridHeight + rect.top + 20,
+								strText, strText.GetLength());
+
+							nLastX = nX;
+						}
+					}
+				}
+
+				t = tLastTime;
+				int nDiff = (int)(t - tFirstTime);
+				int nX = (int)((float)nDiff / m_fSecondsPerPixel);
+				if (nLastX == -1 || nX - nLastX >= 80) {
+					int nTextX = MYIMAGE_LEFT_BLANK + rect.left + nX;
+					if (nTextX > rectLeft.left) {
+						struct tm tTmTime;
+						localtime_s(&tTmTime, &t);
+
+						strText.Format("  %02d:%02d:%02d", tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
+						::TextOut(hDC, nTextX,
+							middle + (nGridCount / 2) * nGridHeight + rect.top + 5,
+							strText, strText.GetLength());
+						strText.Format("%02d-%02d-%02d", tTmTime.tm_year + 1900, tTmTime.tm_mon + 1, tTmTime.tm_mday);
+						::TextOut(hDC, nTextX,
+							middle + (nGridCount / 2) * nGridHeight + rect.top + 20,
+							strText, strText.GetLength());
+
+						nLastX = nX;
+					}
+				}
+			}
+		}
+		// 只有一个点
+		else {
+
+		}
+	}
+
+
+	// 画边框
+	::SelectObject(hDC, m_hCommonThreadPen);
+	::FillRect(hDC, &rectLeft, m_hCommonBrush);
+	::Rectangle(hDC, rectLeft.left, rectLeft.top, rectLeft.right, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left + width - 1, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.top);
+	::MoveToEx(hDC, rectLeft.left, rectLeft.bottom - 1, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, rectLeft.bottom - 1);
+
+	// 画刻度值
+	nVInterval = MIN_TEMP_V_INTERVAL;
+	for (int i = 0; i < nGridCount + 1; i++) {
+		if (nVInterval >= MIN_TEMP_V_INTERVAL) {
+			int  nTop = nFirstTop + i * nGridHeight;
+			int  nTemperature = nFistTemperature - i;
+			strText.Format("%d℃", nTemperature);
+			::TextOut(hDC, rectLeft.right + (-40),
+				nTop + rect.top + (-8),
+				strText, strText.GetLength());
+			nVInterval = nGridHeight;
+		}
+		else {
+			nVInterval += nGridHeight;
+		}
+	}
+
+	// 画出报警线
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	// 画出类似注释的框
+	::SetBkMode(hDC, TRANSPARENT);
+
+	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
+		return;
+	}
+
+	if (bFindMin) {
+		vector<TempData *> & vTempData = *m_vData[m_nCurIndex];
+		vector<TempData *>::iterator it;
+		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+			TempData * pItem = *it;
+			if ( !(pItem->tTime >= tFirstTime && pItem->tTime <= tLastTime) ) {
+				continue;
+			}
+
+			if (pItem->szRemark[0] != '\0') {
+				int nDiff = (int)(pItem->tTime - tFirstTime);
+				int nX = (int)((float)nDiff / m_fSecondsPerPixel);
+				int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+				int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
+				int nY1 = nY + middle + rect.top;
+
+				CGraphicsRoundRectPath  RoundRectPath;
+				RoundRectPath.AddRoundRect(nX1 - EDT_REMARK_WIDTH / 2, nY1 + EDT_REMARK_Y_OFFSET,
+					EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5);
+				graphics.DrawPath(&m_remark_pen, &RoundRectPath);
+				graphics.FillPath(&m_remark_brush, &RoundRectPath);
+
+				strText = pItem->szRemark;
+				RECT rectRemark;
+				rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2;
+				rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET;
+				rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+				rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+				if (rectRemark.left < rectLeft.left) {
+					rectRemark.left = rectLeft.left;
+				}
+				if (rectRemark.right < rectRemark.left) {
+					rectRemark.right = rectRemark.left;
+				}
+				::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			}
+		}
+	}
 	
+	
+
+	// 画十字线
+	RECT rCross;
+	rCross.left = rectLeft.right;
+	rCross.right = rectLeft.left + width - 1;
+	rCross.top = rectLeft.top;
+	rCross.bottom = rectLeft.bottom;
+
+	// 如果有点
+	if (g_data.m_CfgData.m_bCrossAnchor && bFindMin
+		&& ::PtInRect(&rCross, cursor_point)) {
+		::SelectObject(hDC, m_hCommonThreadPen);
+		::MoveToEx(hDC, cursor_point.x, rectLeft.top, 0);
+		::LineTo(hDC, cursor_point.x, rectLeft.bottom);
+		::MoveToEx(hDC, rectLeft.right, cursor_point.y, 0);
+		::LineTo(hDC, rectLeft.left + width - 1, cursor_point.y);
+
+		float  fTempCursor = nFistTemperature - (float)(cursor_point.y - rect.top - nFirstTop) / nGridHeight;
+		int n1 = cursor_point.x - rect.left - MYIMAGE_LEFT_BLANK;
+		time_t tCursor = (time_t)((float)n1 * m_fSecondsPerPixel) + tFirstTime;
+
+		struct tm tTmTime;
+		localtime_s(&tTmTime, &tCursor);
+
+		strText.Format("%.2f℃,%02d:%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
+		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+		::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+	}
 }
 
 void   CMyImageUI_1::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -1854,7 +2113,7 @@ void    CMyImageUI_1::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fS
 		// 如果最后时间有值
 		if (tLastTime > 0) {
 			// 如果超出范围
-			if (pItem->tTime >= tLastTime) {
+			if (pItem->tTime > tLastTime) {
 				break;
 			}
 		}
@@ -1910,7 +2169,7 @@ void    CMyImageUI_1::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fS
 
 	if (bDrawPoints && fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f) {
 		for (int m = 0; m < cnt; ++m) {
-			// DrawTempPoint(i, graphics, points[m].X, points[m].Y, 0, 3);
+			DrawTempPoint(0, graphics, points[m].X, points[m].Y, 0, 3); 
 		}
 	}
 
@@ -1980,35 +2239,108 @@ void  CMyImageUI_1::MyInvalidate() {
 	int  width = pParent->GetWidth();
 
 	// 重新计算宽度
-	//if (m_state == STATE_SINGLE_DAY) {
-	//	time_t  tMin, tMax;
-	//	BOOL bFindMin, bFindMax;
-	//	CalcSingleDay(tMin, bFindMin, tMax, bFindMax);
+	if (m_state == STATE_SINGLE_DAY) {
+		time_t  tMin, tMax;
+		BOOL bFindMin, bFindMax;
+		CalcSingleDay(tMin, bFindMin, tMax, bFindMax);
 
-	//	if (bFindMin) {
-	//		assert(bFindMax);
-	//		// 如果没有设置每秒像素率，计算该率
-	//		if (!m_bSetSecondsPerPixel) {
-	//			if (width > MYIMAGE_LEFT_BLANK) {
-	//				if (tMax > tMin) {
-	//					m_fSecondsPerPixel = (float)(tMax - tMin) / (float)(width - MYIMAGE_LEFT_BLANK);
-	//					if (m_fSecondsPerPixel < 1.0f) {
-	//						m_fSecondsPerPixel = 1.0f;
-	//					}
-	//					m_bSetSecondsPerPixel = TRUE;
-	//				}
-	//			}
-	//		}
-	//		else {
-	//			width = (int)((tMax - tMin) / m_fSecondsPerPixel) + MYIMAGE_LEFT_BLANK;
-	//		}
-	//	}
-	//	this->SetMinWidth(width);
-	//}
-	//else {
-	//	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
-	//	int  width = pParent->GetWidth();
-	//	this->SetMinWidth(width);
-	//}
-	//Invalidate();
+		if (bFindMin) {
+			assert(bFindMax);
+			// 如果没有设置每秒像素率，计算该率
+			if (!m_bSetSecondsPerPixel) {
+				if (width > MYIMAGE_LEFT_BLANK) {
+					if (tMax > tMin) {
+						m_fSecondsPerPixel = (float)(tMax - tMin) / (float)(width - MYIMAGE_LEFT_BLANK);
+						if (m_fSecondsPerPixel < 1.0f) {
+							m_fSecondsPerPixel = 1.0f;
+						}
+						m_bSetSecondsPerPixel = TRUE;
+					}
+				}
+			}
+			else {
+				width = (int)((tMax - tMin) / m_fSecondsPerPixel) + MYIMAGE_LEFT_BLANK;
+			}
+		}
+		this->SetMinWidth(width);
+	}
+	else {
+		DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+		int  width = pParent->GetWidth();
+		this->SetMinWidth(width);
+	}
+	Invalidate();
+}
+
+void  CMyImageUI_1::OnMouseWheel(BOOL bPositive) {
+	if (m_bSetSecondsPerPixel) {
+		if (bPositive) {
+			if (m_fSecondsPerPixel < 200.0f) {
+				m_fSecondsPerPixel *= 1.2f;
+			}
+		}
+		else {
+			if (m_fSecondsPerPixel > 1.2f) {
+				m_fSecondsPerPixel /= 1.2f;
+			}
+		}
+	}
+
+	MyInvalidate();
+}
+
+
+void   CMyImageUI_1::CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, BOOL & bFindMax) {
+	tMin = time(0);
+	bFindMin = FALSE;
+
+	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
+		return;
+	}
+
+	vector<TempData *> * p = m_vData[m_nCurIndex];
+	if (p->size() == 0) {
+		return;
+	}
+
+	vector<TempData *> & v = *p;
+	vector<TempData *>::iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempData * pItem = *it;
+		if (pItem->tTime >= m_SingleDayZeroTime) {
+			if (pItem->tTime < m_SingleDayZeroTime + 3600 * 24) {
+				if (pItem->tTime < tMin) {
+					tMin = pItem->tTime;
+				}
+				bFindMin = TRUE;
+				break;
+			}
+			else {
+				break;
+			}
+		}
+	}
+	
+
+	tMax = 0;
+	bFindMax = FALSE;
+	for (int n = v.size(); n > 0; n--) {
+		TempData * pItem = v.at(n - 1);
+		if (pItem->tTime >= m_SingleDayZeroTime) {
+			if (pItem->tTime < m_SingleDayZeroTime + 3600 * 24) {
+				if (pItem->tTime > tMax) {
+					tMax = pItem->tTime;
+				}
+				bFindMax = TRUE;
+				break;
+			}
+		}
+		else {
+			break;
+		}
+	}
+}
+
+void    CMyImageUI_1::DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS /*= DEFAULT_POINT_RADIUS*/) {
+	g.FillEllipse(m_temperature_brush, x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS);
 }

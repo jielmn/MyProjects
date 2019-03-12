@@ -64,7 +64,7 @@
 					</HorizontalLayout>
 				</VerticalLayout>
 				
-				<VerticalLayout >
+				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4">
 					<MyImage_1 name="my_image_hand_reader" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" />
 				</VerticalLayout>
 			</HorizontalLayout>

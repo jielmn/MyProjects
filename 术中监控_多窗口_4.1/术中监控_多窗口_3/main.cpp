@@ -23,6 +23,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	memset(m_tTagBinding, 0, sizeof(m_tTagBinding));	
 	m_layMain = 0;
 	m_LastSaveExcelTime = 0;
+	m_nSelTabIndex = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -43,6 +44,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
 	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
 	m_layMain_1 = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain_1"));
+	m_MyImage_hand_reader = static_cast<CMyImageUI_1*>(m_PaintManager.FindControl("my_image_hand_reader"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);            
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -1398,14 +1400,24 @@ void   CDuiFrameWnd::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 	BOOL bChanged = FALSE;
 	if (nDirectory > 0)
 	{
-		if ( m_eGridStatus == GRID_STATUS_MAXIUM ) {
-			m_MyImage_max[m_dwInflateGridIndex]->OnMouseWheel(TRUE);
+		if (0 == m_nSelTabIndex) {
+			if (m_eGridStatus == GRID_STATUS_MAXIUM) {
+				m_MyImage_max[m_dwInflateGridIndex]->OnMouseWheel(TRUE);
+			}
+		}
+		else if (1 == m_nSelTabIndex) {
+			m_MyImage_hand_reader->OnMouseWheel(TRUE);
 		}
 	}
 	else
 	{
-		if (m_eGridStatus == GRID_STATUS_MAXIUM) {
-			m_MyImage_max[m_dwInflateGridIndex]->OnMouseWheel(FALSE);
+		if (0 == m_nSelTabIndex) {
+			if (m_eGridStatus == GRID_STATUS_MAXIUM) {
+				m_MyImage_max[m_dwInflateGridIndex]->OnMouseWheel(FALSE);
+			}
+		}
+		else if (1 == m_nSelTabIndex) {
+			m_MyImage_hand_reader->OnMouseWheel(FALSE);
 		}
 	}
 }
@@ -1899,10 +1911,12 @@ void   CDuiFrameWnd::OnTabChanged(DWORD  dwIndex) {
 	if ( 0 == dwIndex ) {
 		m_layMain->SetVisible(true);
 		m_layMain_1->SetVisible(false);
+		m_nSelTabIndex = 0;
 	}
 	else if (1 == dwIndex) {
 		m_layMain->SetVisible(false);
 		m_layMain_1->SetVisible(true);
+		m_nSelTabIndex = 1;
 	}
 }
 

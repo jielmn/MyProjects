@@ -135,6 +135,7 @@ public:
 
 	void  OnDbClick();
 	void  MyInvalidate();
+	void  OnMouseWheel(BOOL bPositive);
 
 private:
 	enum   E_STATE {
@@ -149,6 +150,7 @@ private:
 	int                                          m_nSingleDayIndex;
 	time_t                                       m_SingleDayZeroTime;
 	BOOL                                         m_bSetSecondsPerPixel;
+	float                                        m_fSecondsPerPixel;    // 用于单天的记录每个像素代表的点
 
 	HPEN                                         m_hCommonThreadPen;
 	HPEN                                         m_hBrighterThreadPen;
@@ -157,6 +159,7 @@ private:
 	Pen   *                                      m_temperature_pen;
 	Pen                                          m_remark_pen;
 	SolidBrush                                   m_remark_brush;
+	SolidBrush *                                 m_temperature_brush;
 
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -167,5 +170,6 @@ private:
 	void    DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
 		int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics,
 		BOOL  bDrawPoints = FALSE);
-	
+	void   CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, BOOL & bFindMax);
+	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
 };
