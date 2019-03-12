@@ -145,6 +145,7 @@ private:
 
 	vector< vector<TempData *> * >               m_vData;
 	vector< string * >                           m_vTagId;
+	vector< string * >                           m_vTagName;
 	int                                          m_nCurIndex;
 	E_STATE                                      m_state;
 	int                                          m_nSingleDayIndex;

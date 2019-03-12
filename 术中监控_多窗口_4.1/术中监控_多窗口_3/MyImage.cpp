@@ -1493,6 +1493,12 @@ CMyImageUI_1::CMyImageUI_1() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	s = new string("e030000000000002");
 	m_vTagId.push_back(s);
 
+	s = new string("张三");
+	m_vTagName.push_back(s);
+	s = new string("李四");
+	m_vTagName.push_back(s);
+	
+
 	TempData * pItem = 0;
 	vector<TempData *> * p = 0;
 	p = new vector<TempData *>;
@@ -1573,6 +1579,7 @@ CMyImageUI_1::~CMyImageUI_1() {
 	m_vData.clear();
 
 	ClearVector(m_vTagId);
+	ClearVector(m_vTagName);
 
 	DeleteObject(m_hCommonThreadPen);
 	DeleteObject(m_hBrighterThreadPen);

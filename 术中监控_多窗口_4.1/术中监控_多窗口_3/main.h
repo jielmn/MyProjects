@@ -172,4 +172,6 @@ private:
 	void   OnTempSqliteRet(WPARAM wParam, LPARAM  lParam);
 	//
 	void   OnTabChanged(DWORD  dwIndex);
+	//
+	void   OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam);
 };

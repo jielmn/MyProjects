@@ -3,6 +3,9 @@
 
 #define  DB_NAME                          "surgery3.db"
 #define  TEMP_TABLE_NAME                  "temperature"
+// 手持读卡器
+#define  TEMP_TABLE_NAME_1                "temperature_1"
+#define  TAG_NICKNAME                     "tagname_1"
 
 CMySqliteDatabase::CMySqliteDatabase() {
 	m_db = 0;
@@ -19,7 +22,7 @@ int CMySqliteDatabase::InitDb() {
 	char *zErrMsg = 0;            // 错误描述
 	const char * sql = 0;
 
-	// 查看Patients表是否存在，如果不存在，则创建
+	// 查看温度表是否存在，如果不存在，则创建
 	sql = "select name from sqlite_master where name = '" TEMP_TABLE_NAME "';";
 	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
 
@@ -41,6 +44,59 @@ int CMySqliteDatabase::InitDb() {
 	}
 	sqlite3_free_table(azResult);
 
+
+	nrow = 0;
+	ncolumn = 0;
+	azResult = 0;
+	zErrMsg = 0;
+	sql = "select name from sqlite_master where name = '" TAG_NICKNAME "';";
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+
+	// 表不存在，则创建表
+	if (0 == nrow) {
+		sql = "CREATE TABLE " TAG_NICKNAME "("  \
+			"tag_id         CHAR(16)    NOT NULL PRIMARY KEY," \
+			"name           VARCHAR(16) NOT NULL," \
+			"time           int         NOT NULL"  \
+			");";
+
+		ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+		if (ret != 0) {
+			sqlite3_free_table(azResult);
+			return -1;
+		}
+	}
+	sqlite3_free_table(azResult);
+
+
+	nrow = 0;
+	ncolumn = 0;
+	azResult = 0;
+	zErrMsg = 0;
+	// 查看手持读卡器温度表是否存在，如果不存在，则创建
+	sql = "select name from sqlite_master where name = '" TEMP_TABLE_NAME_1 "';";
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+
+	// 表不存在，则创建表
+	if (0 == nrow) {
+		sql = "CREATE TABLE " TEMP_TABLE_NAME_1 "("  \
+			"id             INTEGER PRIMARY KEY AUTOINCREMENT," \
+			"tag_id         CHAR(16)    NOT NULL," \
+			"temp           int         NOT NULL," \
+			"time           int         NOT NULL,"  \
+			"remark         varchar(28) NOT NULL," \
+			"card_id        CHAR(16)    NOT NULL" \
+			");";
+
+		ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+		if (ret != 0) {
+			sqlite3_free_table(azResult);
+			return -1;
+		}
+	}
+	sqlite3_free_table(azResult);
+
+
 	// 删除一周前的温度
 	char szSql[8192];
 	time_t now = time(0);
@@ -58,8 +114,19 @@ int CMySqliteDatabase::InitDb() {
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
 
 	// 删除一周前的温度数据
-	SNPRINTF(szSql, sizeof(szSql), "delete from temperature where time < %lu", 
+	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE_NAME, 
 		(DWORD)tWeekBegin );
+	sqlite3_exec(m_db, szSql, 0, 0, &zErrMsg);
+
+	// 删除一周前的手持温度数据
+	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE_NAME_1,
+		(DWORD)tWeekBegin);
+	sqlite3_exec(m_db, szSql, 0, 0, &zErrMsg);
+
+	// 删除三个月前的tag name
+	time_t tThreeMonthAgo = today_zero_time - 3600 * 24 * 89;
+	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TAG_NICKNAME,
+		(DWORD)tThreeMonthAgo);
 	sqlite3_exec(m_db, szSql, 0, 0, &zErrMsg);
 
 	return 0;
@@ -137,6 +204,12 @@ int  CMySqliteDatabase::SaveRemark(const CSetRemarkSqliteParam * pParam) {
 		szRemark, pParam->m_szTagId, (DWORD)pParam->m_tTime);
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+
+	return 0;
+}
+
+int  CMySqliteDatabase::QueryHandReaderTemp(vector< vector<TempData *> * > & vData,
+	                vector< string * >  & vTagId, vector< string * > & vTagName) {
 
 	return 0;
 }

@@ -134,6 +134,10 @@ public:
 	int   SetRemarkAsyn(const char * szTagId, time_t tTime, const char * szRemark);
 	int   SetRemark(const CSetRemarkSqliteParam * pParam);
 
+	// 请求手持Reader的历史温度数据
+	int   QueryHandReaderTempFromSqliteAsyn();
+	int   QueryHandReaderTempFromSqlite();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

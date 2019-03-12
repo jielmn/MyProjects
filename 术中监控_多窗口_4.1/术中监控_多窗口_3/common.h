@@ -178,6 +178,7 @@ using namespace DuiLib;
 #define MSG_SAVE_TEMP_SQLITE             4000
 #define MSG_QUERY_TEMP_SQLITE            4001
 #define MSG_SAVE_REMARK_SQLITE           4002
+#define MSG_QUERY_HAND_READER_TEMP_SQLITE   4003
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -189,6 +190,7 @@ using namespace DuiLib;
 #define UM_GET_ALL_PATIENTS_RET          (WM_USER+8)
 #define UM_BIND_TAGS_RET                 (WM_USER+9)
 #define UM_QUERY_TEMP_SQLITE_RET         (WM_USER+10)
+#define UM_QUERY_HAND_READER_TEMP_SQLITE_RET         (WM_USER+11)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000

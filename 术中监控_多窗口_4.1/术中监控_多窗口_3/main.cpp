@@ -293,6 +293,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
+	CBusiness::GetInstance()->QueryHandReaderTempFromSqliteAsyn(); 
 
 #if DB_FLAG
 	CBusiness::GetInstance()->ReconnectDbAsyn();
@@ -461,6 +462,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_QUERY_TEMP_SQLITE_RET) {
 		OnTempSqliteRet(wParam, lParam);
+	} 
+	else if (uMsg == UM_QUERY_HAND_READER_TEMP_SQLITE_RET) {
+		OnHandReaderTempSqliteRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -1918,6 +1922,42 @@ void   CDuiFrameWnd::OnTabChanged(DWORD  dwIndex) {
 		m_layMain_1->SetVisible(true);
 		m_nSelTabIndex = 1;
 	}
+}
+
+//
+void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
+	void ** pParam = (void**)wParam;
+	if (0 == pParam) {
+		return;
+	}
+
+	vector< vector<TempData *> * > * pvData = ( vector< vector<TempData *> * > * )pParam[0];
+	vector< string * >  * pvTagId = ( vector< string * > * )pParam[1];
+	vector< string * > * pvTagName = ( vector< string * > * ) pParam[2];
+
+
+	if (0 != pvData) {
+		vector< vector<TempData *> * >::iterator it;
+		for (it = pvData->begin(); it != pvData->end(); it++) {
+			vector<TempData *> * p = *it;
+			ClearVector(*p);
+			delete p;
+		}
+		pvData->clear();
+		delete pvData;
+	}
+
+	if (0 != pvTagId) {
+		ClearVector(*pvTagId);
+		delete pvTagId;
+	}
+
+	if (0 != pvTagName) {
+		ClearVector(*pvTagName);
+		delete pvTagName;
+	}
+
+	delete[] pParam;
 }
 
 

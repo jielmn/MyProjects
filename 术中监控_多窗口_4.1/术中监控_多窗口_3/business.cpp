@@ -945,6 +945,26 @@ int   CBusiness::SetRemark(const CSetRemarkSqliteParam * pParam) {
 	return 0;
 }
 
+int   CBusiness::QueryHandReaderTempFromSqliteAsyn() {
+	g_thrd_sqlite->PostMessage(this, MSG_QUERY_HAND_READER_TEMP_SQLITE);
+	return 0;
+}
+
+int   CBusiness::QueryHandReaderTempFromSqlite() {
+	vector< vector<TempData *> * > * pvData = new vector< vector<TempData *> * >;
+	vector< string * >  * pvTagId = new vector< string * >; 
+	vector< string * > * pvTagName = new vector< string * >;
+	m_sqlite.QueryHandReaderTemp( *pvData, *pvTagId, *pvTagName );
+
+	void ** pParam = new void*[3];
+	pParam[0] = pvData;
+	pParam[1] = pvTagId;
+	pParam[2] = pvTagName;
+
+	::PostMessage(g_data.m_hWnd, UM_QUERY_HAND_READER_TEMP_SQLITE_RET, (WPARAM)pParam,0 );
+	return 0;
+}
+
 
 // 消息处理
 void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1045,6 +1065,12 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 	{
 		CSetRemarkSqliteParam * pParam = (CSetRemarkSqliteParam*)pMessageData;
 		SetRemark(pParam);
+	}
+	break;
+
+	case MSG_QUERY_HAND_READER_TEMP_SQLITE:
+	{
+		QueryHandReaderTempFromSqlite();
 	}
 	break;
 
