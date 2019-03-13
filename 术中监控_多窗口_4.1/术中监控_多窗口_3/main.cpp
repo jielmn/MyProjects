@@ -45,6 +45,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
 	m_layMain_1 = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain_1"));
 	m_MyImage_hand_reader = static_cast<CMyImageUI_1*>(m_PaintManager.FindControl("my_image_hand_reader"));
+	m_layTags = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl("layTags"));
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);            
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -1956,11 +1957,19 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 	delete[] pParam;
 }
 
-//
+// 需要设置一个定时器，定时清除7天前的数据和tag栏
 void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	HandReaderTemp * pTemp = (HandReaderTemp*)wParam;
 	BOOL  bNewTag = FALSE;
 	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag);
+
+	if ( bNewTag ) {
+		CDialogBuilder builder_child;
+		CControlUI * pTagUI = builder_child.Create("HandTag.xml", (UINT)0, &m_callback, &m_PaintManager);
+		pTagUI->FindControl(CS_FINDCONTROLPROC, 0, 0);
+		m_layTags->AddAt(pTagUI,0);
+		m_vHandTagUIs.push_back(pTagUI); 
+	}
 	delete pTemp;
 }
 

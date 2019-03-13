@@ -99,7 +99,7 @@ void  CSettingDlg::InitCommonCfg() {
 	// ∆§∑Ù
 	pCombo = new CComboUI;
 	AddComboItem(pCombo, "∫⁄Í◊ Ø", 0);
-	AddComboItem(pCombo, "∞◊–˚÷Ω", 1);
+	//AddComboItem(pCombo, "∞◊–˚÷Ω", 1);
 	pCombo->SelectItem(g_data.m_CfgData.m_dwSkinIndex);
 	m_tree->AddNode("—°‘Ò∆§∑Ù", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 

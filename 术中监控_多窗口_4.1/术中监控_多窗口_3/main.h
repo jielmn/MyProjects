@@ -104,6 +104,8 @@ private:
 	CHorizontalLayoutUI *              m_layMain_1;
 	int                                m_nSelTabIndex;
 	CMyImageUI_1 *                     m_MyImage_hand_reader;
+	CVerticalLayoutUI *                m_layTags;
+	vector<CControlUI *>               m_vHandTagUIs;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
