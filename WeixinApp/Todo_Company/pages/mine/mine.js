@@ -101,8 +101,8 @@ Page({
 
     // 获取传递的参数personid
     var personid = null;
-    if ( options ) {
-      personid = options.personid
+    if (options && options.personid) {
+      personid = options.personid;
     }
     this.setData({ personid: personid })
 
