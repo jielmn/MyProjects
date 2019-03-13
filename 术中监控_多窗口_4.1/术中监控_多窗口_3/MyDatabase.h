@@ -17,4 +17,5 @@ public:
 
 private:
 	sqlite3 *           m_db;
+	int   QueryTagNameByTagId(const char * szTagId, string & sName);
 };

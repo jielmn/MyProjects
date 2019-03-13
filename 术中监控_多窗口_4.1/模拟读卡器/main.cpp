@@ -8,9 +8,14 @@
 
 #define   COM_PORT                    "com3"
 #define   RECONNECT_TIME              10000
+#define   DELAY_SEND_DATA_1           10000
+#define   DELAY_SEND_DATA_2           11000
 
 #define   MSG_CONNECT                 1            // 打开串口
 #define   MSG_READ_COM                2            // 读串口数据并处理
+#define   MSG_CONNECT_1               3 
+#define   MSG_SEND_DATA_1             4
+#define   MSG_SEND_DATA_2             5
 
 // 制造1A和16A的tag冲突 
 #define   TAG_CONFLICT      1
@@ -24,13 +29,24 @@ public:
 	BOOL CanBeFreed() { return false; }
 };
 
+class MyMessageHandler_1 : public LmnToolkits::MessageHandler {
+public:
+	void OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData);
+	BOOL CanBeFreed() { return false; }
+};
+
 static  MyMessageHandler  g_handler;
+static  MyMessageHandler_1  g_handler_1;
 static LmnToolkits::Thread *  g_thrd = 0;
+static LmnToolkits::Thread *  g_thrd_1 = 0;
 static  CLmnSerialPort    g_com;
 static  CDataBuf          g_buf;
 
 static  BYTE  g_ReaderId[180][11] = { 0 };
 static  BYTE  g_TagId[180][8] = { 0 };
+
+static  BYTE  g_TagId_1[2][8] = { 0 };
+static  BYTE  g_CardId_1[2][8] = { 0 };
 
 // 上一次温度数据
 static  DWORD  g_Temp[180] = { 0 };
@@ -63,17 +79,19 @@ DWORD  GetRandTemp(BYTE  byBed) {
 void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData) {
 	if ( dwMessageId == MSG_CONNECT ) {
 		if ( g_com.GetStatus() == CLmnSerialPort::OPEN ) {
-			g_com.CloseUartPort();
-		}
-
-		g_com.OpenUartPort(COM_PORT);
-		if ( g_com.GetStatus() == CLmnSerialPort::OPEN ) {
 			g_buf.Clear();
 			g_thrd->PostMessage(&g_handler, MSG_READ_COM);
 		}
 		else {
-			g_thrd->PostDelayMessage( RECONNECT_TIME, &g_handler, MSG_CONNECT );
-		}
+			g_com.OpenUartPort(COM_PORT);
+			if (g_com.GetStatus() == CLmnSerialPort::OPEN) {
+				g_buf.Clear();
+				g_thrd->PostMessage(&g_handler, MSG_READ_COM);
+			}
+			else {
+				g_thrd->PostDelayMessage(RECONNECT_TIME, &g_handler, MSG_CONNECT);
+			}
+		}		
 	}
 	else if ( dwMessageId == MSG_READ_COM ) {
 		BYTE   byData[128];
@@ -147,6 +165,50 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 	}
 }
 
+void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData) {
+	if (dwMessageId == MSG_CONNECT_1) {
+		if (g_com.GetStatus() == CLmnSerialPort::OPEN) {
+			g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1);
+			g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_2, &g_handler_1, MSG_SEND_DATA_2);
+		}
+		else {
+			g_com.OpenUartPort(COM_PORT);
+			if (g_com.GetStatus() == CLmnSerialPort::OPEN) {
+				g_thrd_1->PostDelayMessage( DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1 );
+				g_thrd_1->PostDelayMessage( DELAY_SEND_DATA_2, &g_handler_1, MSG_SEND_DATA_2);
+			}
+			else {
+				g_thrd_1->PostDelayMessage(RECONNECT_TIME, &g_handler_1, MSG_CONNECT_1);
+			}
+		}
+	}
+	// 定时发送数据
+	else if (dwMessageId == MSG_SEND_DATA_1) {
+		BYTE   byData[128];
+		DWORD  dwDataLen = 32;
+		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
+		memcpy(byData + 8,  g_TagId_1[0], 8);
+		memcpy(byData + 22, g_CardId_1[0], 8);
+		DWORD dwTemp = GetRand(3530, 3920);
+		byData[16] = (BYTE)(dwTemp / 100);
+		byData[17] = (BYTE)(dwTemp % 100);
+		g_com.Write(byData, dwDataLen);
+		g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1);
+	}
+	else if (dwMessageId == MSG_SEND_DATA_2) {
+		BYTE   byData[128];
+		DWORD  dwDataLen = 32;
+		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
+		memcpy(byData + 8, g_TagId_1[1], 8);
+		memcpy(byData + 22, g_CardId_1[1], 8);
+		DWORD dwTemp = GetRand(3590, 3730);
+		byData[16] = (BYTE)(dwTemp / 100);
+		byData[17] = (BYTE)(dwTemp % 100);
+		g_com.Write(byData, dwDataLen);
+		g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_2, &g_handler_1, MSG_SEND_DATA_2);
+	}
+}
+
 void HandleChoice(ConsoleMenuHandle hMenu, const void * pArg, DWORD dwIndex) {
 	if ( dwIndex == 0 ) {
 		if (0 == g_thrd) {
@@ -168,6 +230,27 @@ void HandleChoice(ConsoleMenuHandle hMenu, const void * pArg, DWORD dwIndex) {
 			printf("还没有启动模拟！\n");
 		}
 	}
+	// 模拟手持读卡器
+	else if (dwIndex == 2) {
+		if (0 == g_thrd_1) {
+			g_thrd_1 = new LmnToolkits::Thread;
+			g_thrd_1->Start();
+			g_thrd_1->PostMessage(&g_handler_1, MSG_CONNECT_1);
+		}
+		else {
+			printf("模拟手持已经启动！\n");
+		}
+	}
+	else if (dwIndex == 3) {
+		if (0 != g_thrd_1) {
+			g_thrd_1->Stop();
+			delete g_thrd_1;
+			g_thrd_1 = 0;
+		}
+		else {
+			printf("还没有启动模拟手持读卡器！\n");
+		}
+	}
 }
 
 DWORD SelectChoice (ConsoleMenuHandle hMenu, const void * pArg, const char * szChoice) {
@@ -177,13 +260,25 @@ DWORD SelectChoice (ConsoleMenuHandle hMenu, const void * pArg, const char * szC
 	else if (0 == strcmp(szChoice, "2")) {
 		return 1;
 	}
-	else if (0 == strcmp(szChoice, "3")) {
+	else if (0 == strcmp(szChoice, "5")) {
 		if (0 != g_thrd) {
 			g_thrd->Stop();
 			delete g_thrd;
 			g_thrd = 0;
 		}
+
+		if (0 != g_thrd_1) {
+			g_thrd_1->Stop();
+			delete g_thrd_1;
+			g_thrd_1 = 0;
+		}
 		return QUIT_CONSOLE_MENU;
+	}
+	else if (0 == strcmp(szChoice, "3")) {
+		return 2;
+	}
+	else if (0 == strcmp(szChoice, "4")) {
+		return 3;
 	}
 	return 100;
 }
@@ -218,19 +313,33 @@ int main() {
 #endif
 	}
 
-	TConsoleMenuItem  item[3];
+	for (int i = 0; i < 2; i++) {
+		memcpy(g_TagId_1[i], "\x00\x00\x00\x00\x00\x00\x30\xe0", 8);
+		g_TagId_1[i][0] = (BYTE)(i + 1);
+
+		memcpy(g_CardId_1[i], "\x00\x00\x00\x00\x00\x00\x55\xe0", 8);
+		g_CardId_1[i][0] = (BYTE)(i + 1);
+	}
+
+	TConsoleMenuItem  item[5];
 	STRNCPY(item[0].szName, "1.开始模拟", sizeof(item[0].szName));
 	item[0].hMenu = 0;
 	STRNCPY(item[1].szName, "2.停止模拟", sizeof(item[1].szName));
 	item[1].hMenu = 0;
-	STRNCPY(item[2].szName, "3.退出", sizeof(item[2].szName));
+	STRNCPY(item[2].szName, "3.开始模拟手持读卡器", sizeof(item[2].szName));
 	item[2].hMenu = 0;
+	STRNCPY(item[3].szName, "4.停止模拟手持读卡器", sizeof(item[3].szName));
+	item[3].hMenu = 0;
+	STRNCPY(item[4].szName, "5.退出", sizeof(item[4].szName));
+	item[4].hMenu = 0;
 	
 	InitConsole(SelectChoice, HandleChoice);
 	ConsoleMenuHandle h = CreateConsoleMenu("模拟读卡器");
 	int ret = AddConsoleMenuItem(h, &item[0]);
 	ret = AddConsoleMenuItem(h, &item[1]);
 	ret = AddConsoleMenuItem(h, &item[2]);
+	ret = AddConsoleMenuItem(h, &item[3]);
+	ret = AddConsoleMenuItem(h, &item[4]);
 	DisplayConsoleMenu(h);
 	DeinitConsole();
 

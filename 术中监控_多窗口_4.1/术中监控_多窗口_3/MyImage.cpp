@@ -1309,7 +1309,10 @@ void  CMyImageUI::DrawPolyline(
 			}
 		}	
 
-		graphics.DrawLines(m_temperature_pen[i], points, cnt);
+		if ( cnt > 1 )
+			graphics.DrawLines(m_temperature_pen[i], points, cnt);
+		else if ( 1 == cnt )
+			DrawTempPoint(i, graphics, points[0].X, points[0].Y, 0, 3);
 	}
 	delete[] points;
 }
@@ -1484,102 +1487,11 @@ CMyImageUI_1::CMyImageUI_1() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	m_SingleDayZeroTime = 0;
 	m_bSetSecondsPerPixel = FALSE;
 	m_fSecondsPerPixel = 0.0f;
-
-#if TEST_FLAG_2
-	DWORD  i = 0;
-	string * s = 0;
-	s = new string("e030000000000001");
-	m_vTagId.push_back(s);
-	s = new string("e030000000000002");
-	m_vTagId.push_back(s);
-
-	s = new string("张三");
-	m_vTagName.push_back(s);
-	s = new string("李四");
-	m_vTagName.push_back(s);
-	
-
-	TempData * pItem = 0;
-	vector<TempData *> * p = 0;
-	p = new vector<TempData *>;
-	m_vData.push_back(p);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3720;
-	pItem->tTime = DateTime2String("2019-03-10 11:01:01");
-	STRNCPY(pItem->szRemark, "111", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3640;
-	pItem->tTime = DateTime2String("2019-03-10 13:02:11");
-	STRNCPY(pItem->szRemark, "222", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3690;
-	pItem->tTime = DateTime2String("2019-03-10 16:03:20");
-	STRNCPY(pItem->szRemark, "333", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3530;
-	pItem->tTime = DateTime2String("2019-03-11 11:00:01");
-	STRNCPY(pItem->szRemark, "444", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3580;
-	pItem->tTime = DateTime2String("2019-03-11 13:01:11");
-	STRNCPY(pItem->szRemark, "555", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3610;
-	pItem->tTime = DateTime2String("2019-03-11 16:02:20");
-	STRNCPY(pItem->szRemark, "666", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-
-
-	p = new vector<TempData *>;
-	m_vData.push_back(p);
-
-	pItem = new TempData;
-	memset(pItem, 0, sizeof(TempData));
-	pItem->dwIndex = i++;
-	pItem->dwTemperature = 3680;
-	pItem->tTime = DateTime2String("2019-03-11 16:03:05");
-	STRNCPY(pItem->szRemark, "777", sizeof(pItem->szRemark));
-	p->push_back(pItem);
-
-	m_nCurIndex = 0;
-#endif
+	m_dwNextTempIndex = 0;
 }
 
 CMyImageUI_1::~CMyImageUI_1() {
-	vector< vector<TempData *> * >::iterator it;
-	for (it = m_vData.begin(); it != m_vData.end(); it++) {
-		vector<TempData *> * p = *it;
-		ClearVector(*p);
-		delete p;
-	}
-	m_vData.clear();
-
-	ClearVector(m_vTagId);
-	ClearVector(m_vTagName);
+	ClearData();
 
 	DeleteObject(m_hCommonThreadPen);
 	DeleteObject(m_hBrighterThreadPen);
@@ -1755,7 +1667,10 @@ void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 		}
 		// 只有一个点
 		else {
-
+			POINT  top_left;
+			top_left.x = rect.left + MYIMAGE_LEFT_BLANK; //rectLeft.right;
+			top_left.y = nFirstTop + rectLeft.top;
+			DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nGridHeight, top_left, graphics, TRUE, TRUE);
 		}
 	}
 
@@ -2083,7 +1998,7 @@ time_t  CMyImageUI_1::GetFirstTime() {
 
 void    CMyImageUI_1::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
 	int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics,
-	BOOL  bDrawPoints /*= FALSE*/) {
+	BOOL  bDrawPoints /*= FALSE*/, BOOL bOnlyOnePoint /*= FALSE*/ ) {
 
 	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
 		return;
@@ -2125,7 +2040,9 @@ void    CMyImageUI_1::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fS
 			}
 		}
 
-		int  nX = (int)((pItem->tTime - tFirstTime) / fSecondsPerPixel);
+		int nX = 0;
+		if ( !bOnlyOnePoint )
+			nX = (int)((pItem->tTime - tFirstTime) / fSecondsPerPixel);
 
 		if (vTmp.size() == 0) {
 			vTmp.push_back(pItem);
@@ -2180,7 +2097,13 @@ void    CMyImageUI_1::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fS
 		}
 	}
 
-	graphics.DrawLines(m_temperature_pen, points, cnt);
+	if ( 1 == cnt ) {
+		DrawTempPoint(0, graphics, points[0].X, points[0].Y, 0, 3);
+	}
+	else {
+		graphics.DrawLines(m_temperature_pen, points, cnt);
+	}
+	
 	
 	delete[] points;
 
@@ -2350,4 +2273,167 @@ void   CMyImageUI_1::CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax
 
 void    CMyImageUI_1::DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS /*= DEFAULT_POINT_RADIUS*/) {
 	g.FillEllipse(m_temperature_brush, x - RADIUS, y - RADIUS, 2 * RADIUS, 2 * RADIUS);
+}
+
+void   CMyImageUI_1::ClearData() {
+	vector< vector<TempData *> * >::iterator it;
+	for (it = m_vData.begin(); it != m_vData.end(); it++) {
+		vector<TempData *> * p = *it;
+		ClearVector(*p);
+		delete p;
+	}
+	m_vData.clear();
+
+	ClearVector(m_vTagId);
+	ClearVector(m_vTagName);
+}
+
+void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
+	                                  vector< string * > & vTagId, vector< string * > & vTagName) {
+	ClearData();
+
+	m_dwNextTempIndex = vData.size();
+	m_vData.insert(m_vData.begin(), vData.begin(), vData.end());
+	m_vTagId.insert(m_vTagId.begin(), vTagId.begin(), vTagId.end());
+	m_vTagName.insert(m_vTagName.begin(), vTagName.begin(), vTagName.end());
+
+#if TEST_FLAG_2
+	ClearData();
+
+	DWORD  i = 0;
+	string * s = 0;
+	s = new string("e030000000000001");
+	m_vTagId.push_back(s);
+	s = new string("e030000000000002");
+	m_vTagId.push_back(s);
+
+	s = new string("张三");
+	m_vTagName.push_back(s);
+	s = new string("李四");
+	m_vTagName.push_back(s);
+
+
+	TempData * pItem = 0;
+	vector<TempData *> * p = 0;
+	p = new vector<TempData *>;
+	m_vData.push_back(p);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3720;
+	pItem->tTime = DateTime2String("2019-03-10 11:01:01");
+	STRNCPY(pItem->szRemark, "111", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3640;
+	pItem->tTime = DateTime2String("2019-03-10 13:02:11");
+	STRNCPY(pItem->szRemark, "222", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3690;
+	pItem->tTime = DateTime2String("2019-03-10 16:03:20");
+	STRNCPY(pItem->szRemark, "333", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3530;
+	pItem->tTime = DateTime2String("2019-03-11 11:00:01");
+	STRNCPY(pItem->szRemark, "444", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3580;
+	pItem->tTime = DateTime2String("2019-03-11 13:01:11");
+	STRNCPY(pItem->szRemark, "555", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3610;
+	pItem->tTime = DateTime2String("2019-03-11 16:02:20");
+	STRNCPY(pItem->szRemark, "666", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+
+	p = new vector<TempData *>;
+	m_vData.push_back(p);
+
+	pItem = new TempData;
+	memset(pItem, 0, sizeof(TempData));
+	pItem->dwIndex = i++;
+	pItem->dwTemperature = 3680;
+	pItem->tTime = DateTime2String("2019-03-11 16:03:05");
+	STRNCPY(pItem->szRemark, "777", sizeof(pItem->szRemark));
+	p->push_back(pItem);
+
+	m_nCurIndex = 0;
+	m_dwNextTempIndex = i;
+#endif
+}
+
+void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag ) {
+	time_t now = time(0);
+
+	TempData * pTemp = new TempData;
+	pTemp->dwTemperature = pNewData->m_dwTemp;
+	pTemp->tTime = now;
+	pTemp->dwIndex = m_dwNextTempIndex;
+	m_dwNextTempIndex++;
+	// skip -1 index
+	if (m_dwNextTempIndex == -1) {
+		m_dwNextTempIndex = 0;
+	}
+	pTemp->szRemark[0] = '\0';
+
+	vector<string *>::iterator it;
+	for ( it = m_vTagId.begin(); it != m_vTagId.end(); ++it) {
+		string * pId = *it;
+		if (0 == strcmp(pId->c_str(), pNewData->m_szTagId)) {
+			break;
+		}
+	}
+
+	assert( (m_vData.size() == m_vTagId.size()) && (m_vTagId.size() == m_vTagName.size()) );
+
+	// 没有找到
+	if ( it == m_vTagId.end() ) {
+		string * pName = new string;
+		m_vTagName.push_back(pName);
+
+		string * pId = new string(pNewData->m_szTagId);
+		m_vTagId.push_back(pId);
+
+		vector<TempData *> * p = new vector<TempData *>;
+		p->push_back(pTemp);
+		m_vData.push_back(p);
+
+		bNewTag = TRUE;
+	}
+	// 找到
+	else {
+		int nIndex = it - m_vTagId.begin();
+		vector<TempData *> * p = m_vData[nIndex];
+		p->push_back(pTemp);
+
+		bNewTag = FALSE;
+	}
+
+	if (m_nCurIndex == -1) {
+		m_nCurIndex = 0;
+	}
+
+	// 重绘
+	MyInvalidate();
 }

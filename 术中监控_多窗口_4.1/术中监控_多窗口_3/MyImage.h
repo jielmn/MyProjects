@@ -136,6 +136,9 @@ public:
 	void  OnDbClick();
 	void  MyInvalidate();
 	void  OnMouseWheel(BOOL bPositive);
+	void  OnTempSqliteRet(vector< vector<TempData *> * > & vData, 
+		vector< string * > & vTagId, vector< string * > & vTagName);
+	void  OnTempData(const HandReaderTemp * pTemp, BOOL & bNewTag);
 
 private:
 	enum   E_STATE {
@@ -152,6 +155,7 @@ private:
 	time_t                                       m_SingleDayZeroTime;
 	BOOL                                         m_bSetSecondsPerPixel;
 	float                                        m_fSecondsPerPixel;    // 用于单天的记录每个像素代表的点
+	DWORD                                        m_dwNextTempIndex;
 
 	HPEN                                         m_hCommonThreadPen;
 	HPEN                                         m_hBrighterThreadPen;
@@ -170,7 +174,8 @@ private:
 	time_t  GetFirstTime();
 	void    DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
 		int  nHighestTemp, int nPixelPerCelsius, POINT  tTopLeft, Graphics & graphics,
-		BOOL  bDrawPoints = FALSE);
+		BOOL  bDrawPoints = FALSE, BOOL bOnlyOnePoint = FALSE );
 	void   CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, BOOL & bFindMax);
-	void    DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
+	void   DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
+	void   ClearData();
 };

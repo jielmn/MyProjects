@@ -17,7 +17,7 @@ using namespace DuiLib;
 #ifdef   _DEBUG
 #define  TEST_FLAG                0
 #define  TEST_FLAG_1              0
-#define  TEST_FLAG_2              1
+#define  TEST_FLAG_2              0
 #endif
 
 #if TEST_FLAG
@@ -191,6 +191,7 @@ using namespace DuiLib;
 #define UM_BIND_TAGS_RET                 (WM_USER+9)
 #define UM_QUERY_TEMP_SQLITE_RET         (WM_USER+10)
 #define UM_QUERY_HAND_READER_TEMP_SQLITE_RET         (WM_USER+11)
+#define UM_HAND_READER_TEMP                          (WM_USER+12)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
@@ -358,6 +359,13 @@ typedef struct tagTagBinding {
 	char     m_szTagId[20];
 }TagBinding;
 
+typedef struct tagHandReaderTemp {
+	DWORD   m_dwTemp;                      // ÎÂ¶È
+	char    m_szTagId[20];                 // tag id
+	char    m_szReaderId[20];              // Reader id
+	char    m_szCardId[20];                // card id
+}HandReaderTemp;
+
 class CSaveTempParam : public LmnToolkits::MessageData {
 public:
 	CSaveTempParam(DWORD dwIndex, DWORD dwSubIndex, const LastTemp * pTemp)
@@ -486,6 +494,8 @@ extern char * MyEncrypt(const void * pSrc, DWORD dwSrcSize, char * dest, DWORD d
 extern int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, BYTE * pData, DWORD dwDataLen);
 extern char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD dwDataLen);
+extern char *  GetReaderId_1(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData);
+
 #if DBG_FLAG
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 #endif

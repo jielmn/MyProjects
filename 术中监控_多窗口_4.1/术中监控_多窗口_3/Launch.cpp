@@ -231,8 +231,6 @@ int  CLaunch::ReadComData() {
 			// 55 1E 0B 02    00 00 00 01     34 4C 8C 7E E3 59 02 E0     10 5A     00 00 00 00     2E F1 79 A4 00 01 04 E0     00 FF 
 			//     信道 地址      SN码                 TagID               温度                             白卡ID
 			else if (buf[1] == (BYTE)'\x1E') {
-				//DebugStream(debug_buf, sizeof(debug_buf), buf, 29);
-				//g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "数据：\n%s\n", debug_buf);
 
 				// 如果得到足够数据
 				if (m_recv_buf.GetDataLength() >= TEMP_DATA_LENGTH_1 - MIN_DATA_LENGTH) {
@@ -242,41 +240,17 @@ int  CLaunch::ReadComData() {
 					if (buf[31] != (BYTE)'\xFF') {
 						DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH_1);
 						g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
-
 						CloseLaunch();
 						m_sigReconnect.emit(RECONNECT_LAUNCH_TIME_INTERVAL);
 					}
 					else {
-						DWORD  dwBedNo = buf[2] * 256 + buf[3];
-						DWORD  dwAreaNo = buf[4];
-						DWORD  dwTemp = buf[24] * 1000 + buf[25] * 100 + buf[26] * 10 + buf[27];
-
-#if TEST_FLAG_1
-						dwAreaNo = g_data.m_CfgData.m_dwAreaNo;
-#endif
-
-						// 如果病区号不同
-						if (dwAreaNo != g_data.m_CfgData.m_dwAreaNo) {
-							DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH);
-							g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
-						}
-						else {
-							DWORD dwRet = FindReaderIndexByBed(dwBedNo);
-
-							// 找到
-							if (dwRet != -1) {
-								LastTemp t;
-								memset(&t, 0, sizeof(t));
-								t.m_dwTemp = dwTemp;
-								GetTagId(t.m_szTagId, sizeof(t.m_szTagId), buf + 16, 8);
-								GetReaderId(t.m_szReaderId, sizeof(t.m_szReaderId), buf + 5, 11);
-								m_sigReaderTemp.emit(LOWORD(dwRet), HIWORD(dwRet), t);
-							}
-							else {
-								DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH);
-								g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子温度：\n%s\n", debug_buf);
-							}
-						}
+						HandReaderTemp  item;
+						memset(&item, 0, sizeof(item));						
+						item.m_dwTemp = buf[16] * 100 + buf[17];
+						GetTagId(item.m_szTagId, sizeof(item.m_szTagId), buf + 8, 8);
+						GetReaderId_1(item.m_szReaderId, sizeof(item.m_szReaderId), buf + 4);
+						GetTagId(item.m_szCardId, sizeof(item.m_szCardId), buf + 22, 8);
+						m_sigHandReaderTemp.emit(item);
 					}
 				}
 				else {

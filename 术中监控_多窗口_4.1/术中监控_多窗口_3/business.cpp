@@ -18,6 +18,7 @@ CBusiness::CBusiness() {
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
 	m_launch.m_sigCheck.connect(this, &CBusiness::OnCheckReader);
+	m_launch.m_sigHandReaderTemp.connect( this, &CBusiness::OnHandReaderTemp );
 
 	memset(m_szAlarmFile, 0, sizeof(m_szAlarmFile));
 	memset(m_reader_status, 0, sizeof(m_reader_status));
@@ -625,6 +626,18 @@ void  CBusiness::OnCheckReader() {
 	}
 }
 
+// 手持读卡器温度
+void  CBusiness::OnHandReaderTemp(const HandReaderTemp & t) {
+	if (0 == g_data.m_hWnd)
+		return;
+
+	HandReaderTemp * pTemp = new HandReaderTemp;
+	memcpy(pTemp, &t, sizeof(HandReaderTemp));
+
+	// 通知UI温度
+	::PostMessage( g_data.m_hWnd, UM_HAND_READER_TEMP, (WPARAM)pTemp, 0 );
+}
+
 int   CBusiness::CheckLaunchStatusAsyn() {
 	g_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
 	return 0;
@@ -955,6 +968,7 @@ int   CBusiness::QueryHandReaderTempFromSqlite() {
 	vector< string * >  * pvTagId = new vector< string * >; 
 	vector< string * > * pvTagName = new vector< string * >;
 	m_sqlite.QueryHandReaderTemp( *pvData, *pvTagId, *pvTagName );
+	assert( (pvData->size() == pvTagId->size()) && (pvTagId->size() == pvTagName->size()) );
 
 	void ** pParam = new void*[3];
 	pParam[0] = pvData;

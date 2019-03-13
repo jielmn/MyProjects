@@ -466,6 +466,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_QUERY_HAND_READER_TEMP_SQLITE_RET) {
 		OnHandReaderTempSqliteRet(wParam, lParam);
 	}
+	else if (uMsg == UM_HAND_READER_TEMP) {
+		OnHandReaderTemp(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -478,6 +481,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 			}
 		}
 	}
+	g_data.m_hWnd = 0;
 }
 
 void   CDuiFrameWnd::OnSize(WPARAM wParam, LPARAM lParam) {
@@ -1935,29 +1939,29 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 	vector< string * >  * pvTagId = ( vector< string * > * )pParam[1];
 	vector< string * > * pvTagName = ( vector< string * > * ) pParam[2];
 
+	m_MyImage_hand_reader->OnTempSqliteRet( *pvData, *pvTagId, *pvTagName );
 
 	if (0 != pvData) {
-		vector< vector<TempData *> * >::iterator it;
-		for (it = pvData->begin(); it != pvData->end(); it++) {
-			vector<TempData *> * p = *it;
-			ClearVector(*p);
-			delete p;
-		}
-		pvData->clear();
 		delete pvData;
 	}
 
 	if (0 != pvTagId) {
-		ClearVector(*pvTagId);
 		delete pvTagId;
 	}
 
 	if (0 != pvTagName) {
-		ClearVector(*pvTagName);
 		delete pvTagName;
 	}
 
 	delete[] pParam;
+}
+
+//
+void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
+	HandReaderTemp * pTemp = (HandReaderTemp*)wParam;
+	BOOL  bNewTag = FALSE;
+	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag);
+	delete pTemp;
 }
 
 

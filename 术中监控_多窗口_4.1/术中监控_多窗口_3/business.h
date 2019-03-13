@@ -81,6 +81,8 @@ public:
 	int   ReadLaunch();
 	void  OnReaderTemp(DWORD dwIndex, DWORD dwSubIndex, const LastTemp & t);
 	void  OnCheckReader();
+	// 手持读卡器温度
+	void  OnHandReaderTemp(const HandReaderTemp & t);
 
 	// 硬件改动，检查状态
 	int   CheckLaunchStatusAsyn();

@@ -617,6 +617,12 @@ char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD 
 	return szReaderId;
 }
 
+char *  GetReaderId_1(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData) {
+	DWORD  dwSn = (pData[0] << 24) | (pData[1] << 16) | (pData[2] << 8) | pData[3];
+	SNPRINTF( szReaderId, dwReaderIdLen, "%06lu", dwSn );
+	return 0;
+}
+
 LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
 {
 	if (IsDebuggerPresent())

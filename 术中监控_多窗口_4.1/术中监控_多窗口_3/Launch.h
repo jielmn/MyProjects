@@ -35,4 +35,5 @@ public:
 	sigslot::signal3<DWORD, DWORD, DWORD> m_sigReaderStatus;
 	sigslot::signal3<DWORD, DWORD, const LastTemp &> m_sigReaderTemp;
 	sigslot::signal0<>                    m_sigCheck;
+	sigslot::signal1<const HandReaderTemp &> m_sigHandReaderTemp;
 };
