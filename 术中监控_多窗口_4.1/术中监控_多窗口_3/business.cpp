@@ -548,7 +548,7 @@ int   CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 }
 
 int   CBusiness::ReadLaunch() {
-	// m_launch.ReadComData();
+	m_launch.ReadComData();
 	ReadLaunchAsyn(READ_INTERVAL_TIME);
 	return 0;
 }
