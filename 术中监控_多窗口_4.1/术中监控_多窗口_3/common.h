@@ -37,6 +37,10 @@ using namespace DuiLib;
 #define  TIMER_CHECK_AUTO_SAVE              102
 #define  TIMER_CHECK_AUTO_SAVE_INTERVAL     60000
 
+#define  TIMER_AUTO_PRUNE                   103
+#define  TIMER_AUTO_PRUNE_INTERVAL          10000
+
+
 #define  DB_FLAG  0
 #define  DBG_FLAG 1
 
@@ -365,6 +369,11 @@ typedef struct tagHandReaderTemp {
 	char    m_szReaderId[20];              // Reader id
 	char    m_szCardId[20];                // card id
 }HandReaderTemp;
+
+typedef struct tagTagControlItem {
+	CControlUI *    m_Control;
+	string *        m_pTagId;
+}TagControlItem;
 
 class CSaveTempParam : public LmnToolkits::MessageData {
 public:

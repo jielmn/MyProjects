@@ -138,7 +138,8 @@ public:
 	void  OnMouseWheel(BOOL bPositive);
 	void  OnTempSqliteRet(vector< vector<TempData *> * > & vData, 
 		vector< string * > & vTagId, vector< string * > & vTagName);
-	void  OnTempData(const HandReaderTemp * pTemp, BOOL & bNewTag);
+	void  OnTempData(const HandReaderTemp * pTemp, BOOL & bNewTag, string * & pTagId );
+	void  OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems);
 
 private:
 	enum   E_STATE {

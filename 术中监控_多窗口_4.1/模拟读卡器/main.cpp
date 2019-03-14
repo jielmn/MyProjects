@@ -47,6 +47,7 @@ static  BYTE  g_TagId[180][8] = { 0 };
 
 static  BYTE  g_TagId_1[2][8] = { 0 };
 static  BYTE  g_CardId_1[2][8] = { 0 };
+static  int   g_SendCnt[2] = { 0 };
 
 // 上一次温度数据
 static  DWORD  g_Temp[180] = { 0 };
@@ -184,11 +185,17 @@ void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::Message
 	}
 	// 定时发送数据
 	else if (dwMessageId == MSG_SEND_DATA_1) {
+		int nIndex = 0;
+		if ( g_SendCnt[nIndex] >= 10 ) {
+			return;
+		}
+		g_SendCnt[nIndex]++;
+
 		BYTE   byData[128];
 		DWORD  dwDataLen = 32;
 		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
-		memcpy(byData + 8,  g_TagId_1[0], 8);
-		memcpy(byData + 22, g_CardId_1[0], 8);
+		memcpy(byData + 8,  g_TagId_1[nIndex], 8);
+		memcpy(byData + 22, g_CardId_1[nIndex], 8);
 		DWORD dwTemp = GetRand(3530, 3920);
 		byData[16] = (BYTE)(dwTemp / 100);
 		byData[17] = (BYTE)(dwTemp % 100);
@@ -196,11 +203,17 @@ void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::Message
 		g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1);
 	}
 	else if (dwMessageId == MSG_SEND_DATA_2) {
+		int nIndex = 1;
+		if (g_SendCnt[nIndex] >= 10) {
+			return;
+		}
+		g_SendCnt[nIndex]++;
+
 		BYTE   byData[128];
 		DWORD  dwDataLen = 32;
 		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
-		memcpy(byData + 8, g_TagId_1[1], 8);
-		memcpy(byData + 22, g_CardId_1[1], 8);
+		memcpy(byData + 8, g_TagId_1[nIndex], 8);
+		memcpy(byData + 22, g_CardId_1[nIndex], 8);
 		DWORD dwTemp = GetRand(3590, 3730);
 		byData[16] = (BYTE)(dwTemp / 100);
 		byData[17] = (BYTE)(dwTemp % 100);
@@ -236,6 +249,8 @@ void HandleChoice(ConsoleMenuHandle hMenu, const void * pArg, DWORD dwIndex) {
 			g_thrd_1 = new LmnToolkits::Thread;
 			g_thrd_1->Start();
 			g_thrd_1->PostMessage(&g_handler_1, MSG_CONNECT_1);
+
+			memset(g_SendCnt, 0, sizeof(g_SendCnt));
 		}
 		else {
 			printf("模拟手持已经启动！\n");

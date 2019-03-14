@@ -2383,7 +2383,7 @@ void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
 #endif
 }
 
-void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag ) {
+void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag, string * & pTagId ) {
 	time_t now = time(0);
 
 	TempData * pTemp = new TempData;
@@ -2410,16 +2410,24 @@ void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag )
 	// 没有找到
 	if ( it == m_vTagId.end() ) {
 		string * pName = new string;
-		m_vTagName.push_back(pName);
+		m_vTagName.insert( m_vTagName.begin(), pName);
 
 		string * pId = new string(pNewData->m_szTagId);
-		m_vTagId.push_back(pId);
+		m_vTagId.insert( m_vTagId.begin(), pId);
 
 		vector<TempData *> * p = new vector<TempData *>;
 		p->push_back(pTemp);
-		m_vData.push_back(p);
+		m_vData.insert( m_vData.begin(),p);
 
 		bNewTag = TRUE;
+		pTagId = pId;
+
+		if (m_nCurIndex == -1) {
+			m_nCurIndex = 0;
+		}
+		else {
+			m_nCurIndex++;
+		}
 	}
 	// 找到
 	else {
@@ -2428,12 +2436,80 @@ void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag )
 		p->push_back(pTemp);
 
 		bNewTag = FALSE;
-	}
-
-	if (m_nCurIndex == -1) {
-		m_nCurIndex = 0;
+		pTagId = m_vTagId[nIndex];
 	}
 
 	// 重绘
 	MyInvalidate();
+}
+
+void  CMyImageUI_1::OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems) {
+	//time_t  today_zero_time = GetTodayZeroTime();
+	//time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	time_t  today_zero_time = time(0);
+	time_t  tWeekBegin = today_zero_time - 60;
+
+	BOOL bPruned = FALSE;
+	assert((m_vData.size() == m_vTagId.size()) && (m_vTagId.size() == m_vTagName.size()));
+	vector< vector<TempData *> * >::iterator it;
+	for ( it = m_vData.begin(); it != m_vData.end();  ) {
+		vector<TempData *> * pvData = *it;
+
+		vector<TempData *>::iterator ix;
+		for (ix = pvData->begin(); ix != pvData->end(); ++ix) {
+			TempData * pItemData = *ix;
+			// 一周前的数据
+			if ( pItemData->tTime < tWeekBegin ) {
+				delete pItemData;				
+			}
+			// 第一个不是过时数据
+			else {
+				break;
+			}
+		}
+
+		// 没有需要清除的过期的数据
+		if (ix == pvData->begin()) {
+			++it;
+			continue;
+		}
+		else {
+			bPruned = TRUE;
+			pvData->erase(pvData->begin(), ix);
+			int cnt = pvData->size();
+
+			// 如果没有数据了
+			if ( 0 == cnt ) {
+				int nIndex = it - m_vData.begin();
+				delete pvData;
+				it = m_vData.erase(it);
+
+				string * s = m_vTagId[nIndex];
+				delete s;
+				m_vTagId.erase(m_vTagId.begin() + nIndex);
+
+				s = m_vTagName[nIndex];
+				delete s;
+				m_vTagName.erase(m_vTagName.begin() + nIndex);
+
+				// 如果当前显示被删除，显示第一个
+				if ( m_nCurIndex == nIndex ) {
+					if ( m_vData.size() > 0 )
+						m_nCurIndex = 0;
+					else
+						m_nCurIndex = -1;
+				}
+
+				// 显示界面也要删除
+				TagControlItem * pTagControlItem = vItems[nIndex];
+				delete pTagControlItem;
+				vItems.erase(vItems.begin() + nIndex);
+				layTags->RemoveAt(nIndex);
+			}
+		}
+	}
+
+	if (bPruned)
+		MyInvalidate();
 }

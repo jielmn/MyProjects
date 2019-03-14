@@ -290,7 +290,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	SetTimer(m_hWnd, TIMER_UPDATE_TIME_DESC, TIMER_UPDATE_TIME_DESC_INTERVAL, NULL);
 	SetTimer(m_hWnd, TIMER_CHECK_CONFLICT,   TIMER_CHECK_CONFLICT_INTERVAL, NULL);
-	SetTimer(m_hWnd, TIMER_CHECK_AUTO_SAVE, TIMER_CHECK_AUTO_SAVE_INTERVAL, NULL);
+	SetTimer(m_hWnd, TIMER_CHECK_AUTO_SAVE,  TIMER_CHECK_AUTO_SAVE_INTERVAL, NULL);
+	SetTimer(m_hWnd, TIMER_AUTO_PRUNE,       TIMER_AUTO_PRUNE_INTERVAL, NULL);
 
 	OnMyDeviceChanged();
 	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
@@ -429,6 +430,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (wParam == TIMER_CHECK_AUTO_SAVE) {
 			OnCheckAutoSaveTimer();
 		}
+		else if (wParam == TIMER_AUTO_PRUNE) {
+			OnAutoPruneTimer();
+		}
 	}
 	else if (uMsg == UM_UPDATE_SCROLL) {
 		OnUpdateGridScroll(wParam, lParam);
@@ -483,6 +487,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 		}
 	}
 	g_data.m_hWnd = 0;
+	ClearVector(m_vHandTagUIs);
 }
 
 void   CDuiFrameWnd::OnSize(WPARAM wParam, LPARAM lParam) {
@@ -1961,16 +1966,52 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	HandReaderTemp * pTemp = (HandReaderTemp*)wParam;
 	BOOL  bNewTag = FALSE;
-	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag);
+	string * pTagId = 0;
+	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag, pTagId);
 
 	if ( bNewTag ) {
 		CDialogBuilder builder_child;
 		CControlUI * pTagUI = builder_child.Create("HandTag.xml", (UINT)0, &m_callback, &m_PaintManager);
 		pTagUI->FindControl(CS_FINDCONTROLPROC, 0, 0);
 		m_layTags->AddAt(pTagUI,0);
-		m_vHandTagUIs.push_back(pTagUI); 
+		SetHandTagData(pTemp, pTagUI);
+
+		TagControlItem * pItem = new TagControlItem;
+		pItem->m_Control = pTagUI;
+		pItem->m_pTagId = pTagId;
+		m_vHandTagUIs.insert( m_vHandTagUIs.begin(), pItem );
 	}
+	else {
+		vector<TagControlItem *>::iterator it;
+		for (it = m_vHandTagUIs.begin(); it != m_vHandTagUIs.end(); ++it) {
+			TagControlItem * pItem = *it;
+			// ÕÒµ½
+			if ( 0 == strcmp(pItem->m_pTagId->c_str(), pTemp->m_szTagId) ) {
+				SetHandTagData(pTemp, pItem->m_Control);
+				break;
+			}
+		}
+	}
+
 	delete pTemp;
+}
+
+//
+void   CDuiFrameWnd::SetHandTagData(const HandReaderTemp * pTemp, CControlUI * pTagUI) {
+	CLabelUI * pLblReaderId = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblReaderSn", 0));
+	pLblReaderId->SetText(pTemp->m_szReaderId);
+
+	CLabelUI * pLblTagId = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblHandTagId", 0));
+	pLblTagId->SetText(pTemp->m_szTagId);
+
+	CDuiString strText;
+	CLabelUI * pLblTemp = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblHandTagTemp", 0));
+	strText.Format("%.2f", pTemp->m_dwTemp / 100.0f);
+	pLblTemp->SetText(strText);
+}
+
+void   CDuiFrameWnd::OnAutoPruneTimer() {
+	m_MyImage_hand_reader->OnAutoPrune(m_layTags, m_vHandTagUIs);
 }
 
 
