@@ -63,7 +63,7 @@
 						<Control bkimage="file='tag.png' dest='0,15,35,26'" width="35" /><Control width="10" /><Label text="所有Tag信息"   textcolor="#FFFFFFFF" width="200" font="2" />
 					</HorizontalLayout>
 					
-					<VerticalLayout inset="0,0,0,0" name="layTags" />
+					<VerticalLayout inset="0,0,0,0" name="layTags" hscrollbar="false" vscrollbar="true" sepheight="4" />
 				</VerticalLayout>
 				
 				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4">

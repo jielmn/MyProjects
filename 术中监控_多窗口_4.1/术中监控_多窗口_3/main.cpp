@@ -791,6 +791,18 @@ void   CDuiFrameWnd::OnSetting() {
 			}
 		}
 
+		dwValue = DEFAULT_MIN_TEMP_INDEX;
+		g_data.m_cfg->SetConfig("hand min temperature", g_data.m_CfgData.m_dwHandReaderMinTemp, &dwValue);
+
+		dwValue = DEFAULT_MAX_TEMP_INDEX;
+		g_data.m_cfg->SetConfig("hand max temperature", g_data.m_CfgData.m_dwHandReaderMaxTemp, &dwValue);
+
+		dwValue = 3500;
+		g_data.m_cfg->SetConfig("hand low temperature alarm", g_data.m_CfgData.m_dwHandReaderLowTempAlarm, &dwValue);
+
+		dwValue = 4000;
+		g_data.m_cfg->SetConfig("hand high temperature alarm", g_data.m_CfgData.m_dwHandReaderHighTempAlarm, &dwValue);
+
 		g_data.m_cfg->Save();
 
 		// 程序内存变动
@@ -1184,6 +1196,10 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 		if (pCtl->GetName() == LAY_READER_NAME) {
 			DWORD  dwTag = pCtl->GetTag();
 			OnLayReaderSelected( LOWORD(dwTag), HIWORD(dwTag) );
+			break;
+		}
+		else if (pCtl->GetName() == "layHandTag") {
+			OnLayHandTagSelected(pCtl);
 			break;
 		}
 		pCtl = pCtl->GetParent();
@@ -1980,6 +1996,10 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		pItem->m_Control = pTagUI;
 		pItem->m_pTagId = pTagId;
 		m_vHandTagUIs.insert( m_vHandTagUIs.begin(), pItem );
+
+		if (m_vHandTagUIs.size() == 1) {
+			OnLayHandTagSelected(pTagUI);
+		}
 	}
 	else {
 		vector<TagControlItem *>::iterator it;
@@ -2008,10 +2028,39 @@ void   CDuiFrameWnd::SetHandTagData(const HandReaderTemp * pTemp, CControlUI * p
 	CLabelUI * pLblTemp = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblHandTagTemp", 0));
 	strText.Format("%.2f", pTemp->m_dwTemp / 100.0f);
 	pLblTemp->SetText(strText);
+
+	if ( pTemp->m_dwTemp >= g_data.m_CfgData.m_dwHandReaderHighTempAlarm) {
+		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else if (pTemp->m_dwTemp <= g_data.m_CfgData.m_dwHandReaderLowTempAlarm ) {
+		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else {
+		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+	}
 }
 
 void   CDuiFrameWnd::OnAutoPruneTimer() {
-	m_MyImage_hand_reader->OnAutoPrune(m_layTags, m_vHandTagUIs);
+	BOOL bChanged = FALSE;;
+	int  nNewIndex = 0;
+	m_MyImage_hand_reader->OnAutoPrune(m_layTags, m_vHandTagUIs, bChanged, nNewIndex);
+	if ( bChanged && nNewIndex < (int)m_vHandTagUIs.size() ) {
+		OnLayHandTagSelected(m_vHandTagUIs[nNewIndex]->m_Control);
+	}
+}
+
+void   CDuiFrameWnd::OnLayHandTagSelected(CControlUI* pCtrl) {
+	vector<TagControlItem *>::iterator it;
+	for ( it = m_vHandTagUIs.begin(); it != m_vHandTagUIs.end(); ++it ) {
+		TagControlItem * pItem = *it;
+		if ( pItem->m_Control == pCtrl) {
+			pItem->m_Control->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_READER_BK]);
+			m_MyImage_hand_reader->OnTagSelected(it -  m_vHandTagUIs.begin());
+		}
+		else {
+			pItem->m_Control->SetBkColor(0);
+		}
+	}
 }
 
 

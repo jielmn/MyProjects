@@ -271,6 +271,10 @@ typedef struct tagCfgData {
 	DWORD     m_dwTempFont;
 	BOOL      m_bAutoSaveExcel;
 	BOOL      m_bCrossAnchor;         // Ê®×ÖÃª
+	DWORD     m_dwHandReaderMinTemp;
+	DWORD     m_dwHandReaderMaxTemp;
+	DWORD     m_dwHandReaderLowTempAlarm;
+	DWORD     m_dwHandReaderHighTempAlarm;
 	GridCfg   m_GridCfg[MAX_GRID_COUNT];
 }CfgData;
 

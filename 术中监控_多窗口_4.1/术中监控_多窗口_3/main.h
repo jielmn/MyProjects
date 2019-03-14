@@ -182,4 +182,6 @@ private:
 	void   SetHandTagData(const HandReaderTemp * pTemp, CControlUI * pTagUI);
 	//
 	void   OnAutoPruneTimer();
+	//
+	void   OnLayHandTagSelected(CControlUI* pCtrl);
 };

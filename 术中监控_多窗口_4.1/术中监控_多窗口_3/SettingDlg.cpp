@@ -33,6 +33,8 @@ void   CSettingDlg::InitWindow() {
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 		InitGridCfg(pTitleNode, i);
 	}
+
+	InitHandReaderCfg();
 	WindowImplBase::InitWindow();   
 }
 
@@ -248,6 +250,10 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 		}
 	}
 
+	if (!GetHandReaderConfig()) {
+		return;
+	}
+
 	// 检查Reader编号是否重复
 	for ( int i = 0; i < MAX_GRID_COUNT; i++ ) {
 		for ( int j = 0; j < MAX_READERS_PER_GRID; j++ ) {
@@ -445,3 +451,102 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	return TRUE;
 }
 
+
+void    CSettingDlg::InitHandReaderCfg() {
+	DuiLib::CDuiString  strText;
+	CMyTreeCfgUI::Node* pTitleNode = NULL;
+	CComboUI * pCombo = 0;
+	CEditUI * pEdit = 0;
+
+	strText.Format("手持测温设置");
+	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
+
+	// 显示最低温度
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "20℃", 0);
+	AddComboItem(pCombo, "24℃", 1);
+	AddComboItem(pCombo, "28℃", 2);
+	AddComboItem(pCombo, "32℃", 3);
+	AddComboItem(pCombo, "34℃", 4);
+	AddComboItem(pCombo, "36℃", 5);
+	pCombo->SelectItem(g_data.m_CfgData.m_dwHandReaderMinTemp);
+	m_tree->AddNode("显示的最低温度", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
+
+	// 显示最高温度
+	pCombo = new CComboUI;
+	AddComboItem(pCombo, "42℃", 0);
+	AddComboItem(pCombo, "40℃", 1);
+	AddComboItem(pCombo, "38℃", 2);
+	AddComboItem(pCombo, "34℃", 3);
+	AddComboItem(pCombo, "30℃", 4);
+	pCombo->SelectItem(g_data.m_CfgData.m_dwHandReaderMaxTemp);
+	m_tree->AddNode("显示的最高温度", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
+
+	// 低温报警
+	pEdit = new CEditUI;
+	strText.Format("%.2f", g_data.m_CfgData.m_dwHandReaderLowTempAlarm / 100.0);
+	pEdit->SetText(strText);
+	m_tree->AddNode("低温报警", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+
+	// 高温报警
+	pEdit = new CEditUI;
+	strText.Format("%.2f", g_data.m_CfgData.m_dwHandReaderHighTempAlarm / 100.0);
+	pEdit->SetText(strText);
+	m_tree->AddNode("高温报警", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+}
+
+BOOL    CSettingDlg::GetHandReaderConfig() {
+
+	CDuiString  strText;
+	CMyTreeCfgUI::ConfigValue  cfgValue;
+	bool bGetCfg = false;
+	double dNumber = 0.0;
+	int  nCfgRowIndex = ((5 * MAX_READERS_PER_GRID) + 1 + 5) * MAX_GRID_COUNT + 11;
+
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_dwHandReaderMinTemp = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	m_data.m_dwHandReaderMaxTemp = cfgValue.m_tag;
+	nCfgRowIndex++;
+
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%lf", &dNumber)) {
+		strText.Format("手持测温，低温报警请输入数字");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (dNumber > 42 || dNumber < 20) {
+		strText.Format("手持测温，低温报警请输入范围(20~42)");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	m_data.m_dwHandReaderLowTempAlarm = (DWORD)(dNumber * 100);
+	nCfgRowIndex++;
+
+	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	strText = cfgValue.m_strEdit;
+	if (1 != sscanf_s(strText, "%lf", &dNumber)) {
+		strText.Format("手持测温，高温报警请输入数字");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	if (dNumber > 42 || dNumber < 20) {
+		strText.Format("手持测温，高温报警请输入范围(20~42)" );
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+	m_data.m_dwHandReaderHighTempAlarm = (DWORD)(dNumber * 100);
+
+	if (m_data.m_dwHandReaderHighTempAlarm < m_data.m_dwHandReaderLowTempAlarm) {
+		strText.Format("手持测温，高温报警请大于低温报警");
+		::MessageBox(this->GetHWND(), strText, "设置", 0);
+		return FALSE;
+	}
+
+	return TRUE;
+}

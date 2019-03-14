@@ -83,6 +83,18 @@ int CBusiness::Init() {
 	g_data.m_cfg->GetBooleanConfig("cross anchor", g_data.m_CfgData.m_bCrossAnchor, FALSE);
 	g_data.m_cfg->GetBooleanConfig("curve thread", g_data.m_bCurve, FALSE);
 
+	g_data.m_cfg->GetBooleanConfig("hand min temperature", g_data.m_bCurve, FALSE);
+	g_data.m_cfg->GetConfig("hand min temperature", g_data.m_CfgData.m_dwHandReaderMinTemp, DEFAULT_MIN_TEMP_INDEX);
+	g_data.m_cfg->GetConfig("hand max temperature", g_data.m_CfgData.m_dwHandReaderMaxTemp, DEFAULT_MAX_TEMP_INDEX);
+	g_data.m_cfg->GetConfig("hand low temperature alarm", g_data.m_CfgData.m_dwHandReaderLowTempAlarm, 3500);
+	g_data.m_cfg->GetConfig("hand high temperature alarm", g_data.m_CfgData.m_dwHandReaderHighTempAlarm, 4000);
+	if (g_data.m_CfgData.m_dwHandReaderLowTempAlarm > 4200) {
+		g_data.m_CfgData.m_dwHandReaderLowTempAlarm = 3500;
+	}
+	if (g_data.m_CfgData.m_dwHandReaderHighTempAlarm > 4200) {
+		g_data.m_CfgData.m_dwHandReaderHighTempAlarm = 4000;
+	}
+
 	// Æ¤·ô
 	g_data.m_cfg->GetConfig(CFG_SKIN, g_data.m_CfgData.m_dwSkinIndex, DEFAULT_SKIN);
 	if (g_data.m_CfgData.m_dwSkinIndex > 1) {

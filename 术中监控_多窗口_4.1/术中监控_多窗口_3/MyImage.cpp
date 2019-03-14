@@ -1482,6 +1482,8 @@ CMyImageUI_1::CMyImageUI_1() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, g_data.m_skin.GetRgb(CMySkin::BRIGHT_PEN));
 	m_temperature_pen = new Pen(Gdiplus::Color(g_data.m_argb[0]), 1.0);
 	m_temperature_brush = new SolidBrush(Gdiplus::Color(g_data.m_argb[0]));
+	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::LOW_ALARM_PEN));
+	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, g_data.m_skin.GetRgb(CMySkin::HIGH_ALARM_PEN));
 
 	m_nSingleDayIndex = 0; // -6, -5, -4, ......, 0
 	m_SingleDayZeroTime = 0;
@@ -1497,6 +1499,8 @@ CMyImageUI_1::~CMyImageUI_1() {
 	DeleteObject(m_hBrighterThreadPen);
 	DeleteObject(m_hCommonBrush);
 	DeleteObject(m_hDaySplitThreadPen);
+	DeleteObject(m_hLowTempAlarmPen);
+	DeleteObject(m_hHighTempAlarmPen);
 	delete m_temperature_pen;
 	delete m_temperature_brush;
 }
@@ -1547,8 +1551,8 @@ void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 	::ScreenToClient(g_data.m_hWnd, &cursor_point);
 
 	/* 开始作图 */
-	int nMinTemp = 20;
-	int nMaxTemp = 42;
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_dwHandReaderMinTemp);
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_dwHandReaderHighTempAlarm);
 	int nGridCount = nMaxTemp - nMinTemp;
 
 	int nGridHeight = height / nGridCount;
@@ -1705,6 +1709,25 @@ void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 
 	// 画出报警线
 	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+	::SelectObject(hDC, m_hLowTempAlarmPen);
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_dwHandReaderLowTempAlarm) / 100.0 * nGridHeight);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
+	strText.Format("低温报警");
+	::TextOut(hDC, rectLeft.right + 5,
+		middle + nY + rect.top + 5,
+		strText, strText.GetLength());
+
+
+	::SelectObject(hDC, m_hHighTempAlarmPen);
+	nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_dwHandReaderHighTempAlarm) / 100.0 * nGridHeight);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
+	strText.Format("高温报警");
+	::TextOut(hDC, rectLeft.right + 5,
+		middle + nY + rect.top + (-20),
+		strText, strText.GetLength());
+
 
 	// 画出类似注释的框
 	::SetBkMode(hDC, TRANSPARENT);
@@ -1795,10 +1818,9 @@ void   CMyImageUI_1::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 	int  width = pParent->GetWidth();
 	int  height = rect.bottom - rect.top;
 
-
 	/* 开始作图 */
-	int nMinTemp = 20;
-	int nMaxTemp = 42;
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_dwHandReaderMinTemp);
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_dwHandReaderMaxTemp);
 	int nGridCount = nMaxTemp - nMinTemp;
 
 	int nGridHeight = height / nGridCount;
@@ -1874,6 +1896,24 @@ void   CMyImageUI_1::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 	}
 
 	// 画出报警线
+	::SelectObject(hDC, m_hLowTempAlarmPen);
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_dwHandReaderLowTempAlarm) / 100.0 * nGridHeight);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
+	strText.Format("低温报警");
+	::TextOut(hDC, rectLeft.right + 5,
+		middle + nY + rect.top + 5,
+		strText, strText.GetLength());
+
+
+	::SelectObject(hDC, m_hHighTempAlarmPen);
+	nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_dwHandReaderHighTempAlarm) / 100.0 * nGridHeight);
+	::MoveToEx(hDC, rectLeft.right, middle + nY + rect.top, 0);
+	::LineTo(hDC, rectLeft.left + width - 1, middle + nY + rect.top);
+	strText.Format("高温报警");
+	::TextOut(hDC, rectLeft.right + 5,
+		middle + nY + rect.top + (-20),
+		strText, strText.GetLength());
 
 	// 计算温度曲线跨越几个日子
 	int  nDayCounts = GetDayCounts();
@@ -2422,7 +2462,8 @@ void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag, 
 		bNewTag = TRUE;
 		pTagId = pId;
 
-		if (m_nCurIndex == -1) {
+		// 第一个
+		if (m_vData.size() == 1) {
 			m_nCurIndex = 0;
 		}
 		else {
@@ -2443,7 +2484,11 @@ void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag, 
 	MyInvalidate();
 }
 
-void  CMyImageUI_1::OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems) {
+void  CMyImageUI_1::OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems, 
+	BOOL & bSelectedChanged, int & nNewIndex) {
+	bSelectedChanged = FALSE;
+	nNewIndex = 0;
+
 	//time_t  today_zero_time = GetTodayZeroTime();
 	//time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
 
@@ -2495,10 +2540,16 @@ void  CMyImageUI_1::OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlIt
 
 				// 如果当前显示被删除，显示第一个
 				if ( m_nCurIndex == nIndex ) {
-					if ( m_vData.size() > 0 )
+					if (m_vData.size() > 0) {
 						m_nCurIndex = 0;
+						bSelectedChanged = TRUE;
+						nNewIndex = 0;
+					}						
 					else
 						m_nCurIndex = -1;
+				}
+				else if ( m_nCurIndex > nIndex) {
+					m_nCurIndex--;
 				}
 
 				// 显示界面也要删除
@@ -2512,4 +2563,12 @@ void  CMyImageUI_1::OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlIt
 
 	if (bPruned)
 		MyInvalidate();
+}
+
+void  CMyImageUI_1::OnTagSelected(int nIndex) {
+	assert( nIndex < (int)m_vData.size() );
+	if (nIndex != m_nCurIndex) {
+		m_nCurIndex = nIndex;
+		MyInvalidate();
+	}
 }

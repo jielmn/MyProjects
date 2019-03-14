@@ -139,7 +139,8 @@ public:
 	void  OnTempSqliteRet(vector< vector<TempData *> * > & vData, 
 		vector< string * > & vTagId, vector< string * > & vTagName);
 	void  OnTempData(const HandReaderTemp * pTemp, BOOL & bNewTag, string * & pTagId );
-	void  OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems);
+	void  OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems, BOOL & bSelectedChanged, int & nNewIndex);
+	void  OnTagSelected(int nIndex);
 
 private:
 	enum   E_STATE {
@@ -166,6 +167,8 @@ private:
 	Pen                                          m_remark_pen;
 	SolidBrush                                   m_remark_brush;
 	SolidBrush *                                 m_temperature_brush;
+	HPEN                                         m_hLowTempAlarmPen;
+	HPEN                                         m_hHighTempAlarmPen;
 
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);

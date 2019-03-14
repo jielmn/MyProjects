@@ -31,5 +31,8 @@ private:
 	void    OnBtnOk(DuiLib::TNotifyUI& msg);
 	BOOL    GetCommonConfig();
 	BOOL    GetGridConfig(int nIndex);
+
+	void    InitHandReaderCfg();
+	BOOL    GetHandReaderConfig();
 };
 

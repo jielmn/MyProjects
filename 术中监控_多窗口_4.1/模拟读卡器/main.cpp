@@ -8,14 +8,11 @@
 
 #define   COM_PORT                    "com3"
 #define   RECONNECT_TIME              10000
-#define   DELAY_SEND_DATA_1           10000
-#define   DELAY_SEND_DATA_2           11000
 
 #define   MSG_CONNECT                 1            // 打开串口
 #define   MSG_READ_COM                2            // 读串口数据并处理
 #define   MSG_CONNECT_1               3 
-#define   MSG_SEND_DATA_1             4
-#define   MSG_SEND_DATA_2             5
+#define   MSG_SEND_DATA_1             4             // 4 - 100
 
 // 制造1A和16A的tag冲突 
 #define   TAG_CONFLICT      1
@@ -45,9 +42,11 @@ static  CDataBuf          g_buf;
 static  BYTE  g_ReaderId[180][11] = { 0 };
 static  BYTE  g_TagId[180][8] = { 0 };
 
-static  BYTE  g_TagId_1[2][8] = { 0 };
-static  BYTE  g_CardId_1[2][8] = { 0 };
-static  int   g_SendCnt[2] = { 0 };
+#define  MAX_HAND_TAG_CNT 10
+static  BYTE  g_TagId_1[MAX_HAND_TAG_CNT][8] = { 0 };
+static  BYTE  g_CardId_1[MAX_HAND_TAG_CNT][8] = { 0 };
+static  int   g_SendCnt[MAX_HAND_TAG_CNT] = { 0 };
+static  int   g_HandDelay[MAX_HAND_TAG_CNT] = {10000, 11000, 12000,13000,14000,15000,16000,17000,18000,19000};
 
 // 上一次温度数据
 static  DWORD  g_Temp[180] = { 0 };
@@ -169,14 +168,16 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageData * pMessageData) {
 	if (dwMessageId == MSG_CONNECT_1) {
 		if (g_com.GetStatus() == CLmnSerialPort::OPEN) {
-			g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1);
-			g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_2, &g_handler_1, MSG_SEND_DATA_2);
+			for (int i = 0; i < MAX_HAND_TAG_CNT; i++) {
+				g_thrd_1->PostMessage(&g_handler_1, MSG_SEND_DATA_1+i);
+			}			
 		}
 		else {
 			g_com.OpenUartPort(COM_PORT);
 			if (g_com.GetStatus() == CLmnSerialPort::OPEN) {
-				g_thrd_1->PostDelayMessage( DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1 );
-				g_thrd_1->PostDelayMessage( DELAY_SEND_DATA_2, &g_handler_1, MSG_SEND_DATA_2);
+				for (int i = 0; i < MAX_HAND_TAG_CNT; i++) {
+					g_thrd_1->PostMessage(&g_handler_1, MSG_SEND_DATA_1 + i);
+				}
 			}
 			else {
 				g_thrd_1->PostDelayMessage(RECONNECT_TIME, &g_handler_1, MSG_CONNECT_1);
@@ -184,8 +185,9 @@ void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::Message
 		}
 	}
 	// 定时发送数据
-	else if (dwMessageId == MSG_SEND_DATA_1) {
-		int nIndex = 0;
+	else if (dwMessageId >= MSG_SEND_DATA_1 && dwMessageId < MSG_SEND_DATA_1 + 100) {
+		int nIndex = dwMessageId - MSG_SEND_DATA_1;
+		// 最多发送10个数据
 		if ( g_SendCnt[nIndex] >= 10 ) {
 			return;
 		}
@@ -196,29 +198,11 @@ void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::Message
 		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
 		memcpy(byData + 8,  g_TagId_1[nIndex], 8);
 		memcpy(byData + 22, g_CardId_1[nIndex], 8);
-		DWORD dwTemp = GetRand(3530, 3920);
+		DWORD dwTemp = GetRand( 3530, 3940 );
 		byData[16] = (BYTE)(dwTemp / 100);
 		byData[17] = (BYTE)(dwTemp % 100);
 		g_com.Write(byData, dwDataLen);
-		g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_1, &g_handler_1, MSG_SEND_DATA_1);
-	}
-	else if (dwMessageId == MSG_SEND_DATA_2) {
-		int nIndex = 1;
-		if (g_SendCnt[nIndex] >= 10) {
-			return;
-		}
-		g_SendCnt[nIndex]++;
-
-		BYTE   byData[128];
-		DWORD  dwDataLen = 32;
-		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
-		memcpy(byData + 8, g_TagId_1[nIndex], 8);
-		memcpy(byData + 22, g_CardId_1[nIndex], 8);
-		DWORD dwTemp = GetRand(3590, 3730);
-		byData[16] = (BYTE)(dwTemp / 100);
-		byData[17] = (BYTE)(dwTemp % 100);
-		g_com.Write(byData, dwDataLen);
-		g_thrd_1->PostDelayMessage(DELAY_SEND_DATA_2, &g_handler_1, MSG_SEND_DATA_2);
+		g_thrd_1->PostDelayMessage(g_HandDelay[nIndex], &g_handler_1, MSG_SEND_DATA_1+nIndex);
 	}
 }
 
@@ -328,7 +312,7 @@ int main() {
 #endif
 	}
 
-	for (int i = 0; i < 2; i++) {
+	for (int i = 0; i < MAX_HAND_TAG_CNT; i++) {
 		memcpy(g_TagId_1[i], "\x00\x00\x00\x00\x00\x00\x30\xe0", 8);
 		g_TagId_1[i][0] = (BYTE)(i + 1);
 
