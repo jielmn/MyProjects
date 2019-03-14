@@ -1552,7 +1552,7 @@ void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 
 	/* ¿ªÊ¼×÷Í¼ */
 	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_dwHandReaderMinTemp);
-	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_dwHandReaderHighTempAlarm);
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_dwHandReaderMaxTemp);
 	int nGridCount = nMaxTemp - nMinTemp;
 
 	int nGridHeight = height / nGridCount;
