@@ -184,4 +184,8 @@ private:
 	void   OnAutoPruneTimer();
 	//
 	void   OnLayHandTagSelected(CControlUI* pCtrl);
+	//
+	void   OnBtnTagNickname(TNotifyUI& msg);
+	//
+	void   OnEdtTagNicknameKillFocus(TNotifyUI& msg);
 };

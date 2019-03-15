@@ -358,6 +358,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnBinding") {
 			OnBinding(msg.pSender->GetTag());
 		}
+		else if (name == "btnTagNickName") {
+			OnBtnTagNickname(msg);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -383,6 +386,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if ( name == "edRemark" ) {
 			OnEdtRemarkKillFocus();
+		}
+		else if (name == "edtTagNickName") {
+			OnEdtTagNicknameKillFocus(msg);
 		}
 	}
 	else if (msg.sType == "menu") {
@@ -2061,6 +2067,25 @@ void   CDuiFrameWnd::OnLayHandTagSelected(CControlUI* pCtrl) {
 			pItem->m_Control->SetBkColor(0);
 		}
 	}
+}
+
+void   CDuiFrameWnd::OnBtnTagNickname(TNotifyUI& msg) {
+	CControlUI * pParent = msg.pSender->GetParent();
+	CEditUI * pedName = static_cast<CEditUI*>(pParent->FindControl(MY_FINDCONTROLPROC, "edtTagNickName", 0));
+
+	msg.pSender->SetVisible(false);
+	pedName->SetText(msg.pSender->GetText());
+	pedName->SetVisible(true);
+	pedName->SetFocus();
+}
+
+void   CDuiFrameWnd::OnEdtTagNicknameKillFocus(TNotifyUI& msg) {
+	CControlUI * pParent = msg.pSender->GetParent();
+	CButtonUI * pbtnName = static_cast<CButtonUI*>(pParent->FindControl(MY_FINDCONTROLPROC, "btnTagNickName", 0));
+
+	msg.pSender->SetVisible(false);
+	pbtnName->SetText(msg.pSender->GetText());
+	pbtnName->SetVisible(true);
 }
 
 
