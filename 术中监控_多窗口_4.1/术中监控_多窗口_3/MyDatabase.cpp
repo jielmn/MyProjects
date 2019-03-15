@@ -1,7 +1,7 @@
 #include "MyDatabase.h"
 #include <time.h>
 
-#define  DB_NAME                          "surgery3.db"
+#define  DB_NAME                          "TelemedCenter.db"
 #define  TEMP_TABLE_NAME                  "temperature"
 // ÊÖ³Ö¶Á¿¨Æ÷
 #define  TEMP_TABLE_NAME_1                "temperature_1"

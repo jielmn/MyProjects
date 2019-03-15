@@ -46,9 +46,10 @@ using namespace DuiLib;
 
 #define  MAX_POINTS_COUNT         60481
 
-#define   GLOBAL_LOCK_NAME        "surgery_surveil_3"
-#define   LOG_FILE_NAME           "surgery3.log"
-#define   CONFIG_FILE_NAME        "surgery3.cfg"
+#define   GLOBAL_LOCK_NAME        "TelemedCenter"
+#define   LOG_FILE_NAME           "TelemedCenter.log"
+#define   CONFIG_FILE_NAME        "TelemedCenter.cfg"
+
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               "mainframe.xml"
 #define   SKIN_FOLDER             "res\\surgery_res_3"
