@@ -1,0 +1,43 @@
+.banner {
+    width: 100%;
+    height: 180px;
+    background: url(../images/background.png) no-repeat center 0;
+}
+
+.divMain {
+	width: 1024px;
+	margin: 0 auto;
+	background-color: gray;
+}
+
+.divItem {
+	width: 1024px;
+	height: 600px;
+	background-color: yellow;
+}
+
+.divImg {
+	display: inline;
+	width: 100px;
+	height:100px;
+	background-color: red;
+}
+
+.divContent {
+	display: inline;
+	width: 500px;
+	height:100px;
+	background-color: green;
+}
+
+.divDownload {
+	display: inline;
+	width: 100px;
+	height:100px;
+	background-color: blue;
+}
+
+.softImg {
+	width: 100px;
+	height: 100px;
+}
