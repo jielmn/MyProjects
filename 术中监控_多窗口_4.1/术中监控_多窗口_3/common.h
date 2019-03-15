@@ -479,15 +479,17 @@ public:
 
 class CSaveHandTempParam : public LmnToolkits::MessageData {
 public:
-	CSaveHandTempParam(const char * szTagId, DWORD dwTemp, const char * szCardId) {
+	CSaveHandTempParam(const char * szTagId, DWORD dwTemp, const char * szCardId, time_t tTime) {
 		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
 		STRNCPY(m_szCardId, szCardId, sizeof(m_szCardId));
 		m_dwTemp = dwTemp;
+		m_time = tTime;
 	}
 
 	char           m_szTagId[20];
 	char           m_szCardId[20];
 	DWORD          m_dwTemp;
+	time_t         m_time;
 };
 
 class CSaveHandTagNicknameParam : public LmnToolkits::MessageData {
@@ -501,16 +503,16 @@ public:
 	char           m_szName[16];
 };
 
-class CSaveHandTagRemarkParam : public LmnToolkits::MessageData {
-public:
-	CSaveHandTagRemarkParam(DWORD dwId, const char * szRemark) {
-		m_dwId = dwId;
-		STRNCPY(m_szRemark, szRemark, sizeof(m_szRemark));
-	}
-
-	DWORD          m_dwId;
-	char           m_szRemark[30];
-};
+//class CSaveHandTagRemarkParam : public LmnToolkits::MessageData {
+//public:
+//	CSaveHandTagRemarkParam(DWORD dwId, const char * szRemark) {
+//		m_dwId = dwId;
+//		STRNCPY(m_szRemark, szRemark, sizeof(m_szRemark));
+//	}
+//
+//	DWORD          m_dwId;
+//	char           m_szRemark[30];
+//};
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

@@ -2431,12 +2431,11 @@ void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
 	MyInvalidate();
 }
 
-void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag, string * & pTagId ) {
-	time_t now = time(0);
+void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag, string * & pTagId, time_t tTime) {
 
 	TempData * pTemp = new TempData;
 	pTemp->dwTemperature = pNewData->m_dwTemp;
-	pTemp->tTime = now;
+	pTemp->tTime = tTime;
 	pTemp->dwIndex = m_dwNextTempIndex;
 	m_dwNextTempIndex++;
 	// skip -1 index
@@ -2690,12 +2689,13 @@ void   CMyImageUI_1::SetRemark(DuiLib::CDuiString & strRemark) {
 
 	vector<TempData *>::iterator it;
 	vector<TempData *> & vTempData = *p;
+	string * sTagId = m_vTagId[m_nCurIndex];
 
 	for (it = vTempData.begin(); it != vTempData.end(); it++) {
 		TempData * pItem = *it;
 		if (pItem->dwIndex == m_dwCurTempIndex) {
 			STRNCPY(pItem->szRemark, strRemark, sizeof(pItem->szRemark));
-			// CBusiness::GetInstance()->SetHandRemarkAsyn(pItem->dwIndex, pItem->szRemark);
+			CBusiness::GetInstance()->SetHandRemarkAsyn(sTagId->c_str(), pItem->tTime, pItem->szRemark);
 			return;
 		}
 	}

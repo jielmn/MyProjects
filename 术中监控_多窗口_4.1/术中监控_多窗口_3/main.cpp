@@ -2022,7 +2022,8 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	HandReaderTemp * pTemp = (HandReaderTemp*)wParam;
 	BOOL  bNewTag = FALSE;
 	string * pTagId = 0;
-	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag, pTagId);
+	time_t now = time(0);
+	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag, pTagId,now);
 
 	if ( bNewTag ) {
 		CDialogBuilder builder_child;
@@ -2053,7 +2054,7 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	}
 
 	// ±£´æÊý¾Ý¿â
-	CBusiness::GetInstance()->SaveHandTempAsyn(pTemp->m_szTagId, pTemp->m_dwTemp, pTemp->m_szCardId);
+	CBusiness::GetInstance()->SaveHandTempAsyn(pTemp->m_szTagId, pTemp->m_dwTemp, pTemp->m_szCardId, now);
 
 	delete pTemp;
 }

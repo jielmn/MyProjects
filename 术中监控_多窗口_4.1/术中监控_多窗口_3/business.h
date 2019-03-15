@@ -141,7 +141,7 @@ public:
 	int   QueryHandReaderTempFromSqlite();
 
 	// 保存手持读卡器的温度
-	int   SaveHandTempAsyn(const char * szTagId, DWORD dwTemp, const char * szCardId);
+	int   SaveHandTempAsyn(const char * szTagId, DWORD dwTemp, const char * szCardId, time_t tTime);
 	int   SaveHandTemp(const CSaveHandTempParam * pParam);
 
 	// 保存手持读卡器Tag的别名
@@ -149,8 +149,8 @@ public:
 	int   SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam);
 
 	// 保存手持读卡器Tag注释
-	int   SetHandRemarkAsyn(DWORD dwId, const char * szRemark);
-	int   SetHandRemark(const CSaveHandTagRemarkParam * pParam);
+	int   SetHandRemarkAsyn(const char * szTagId, time_t tTime, const char * szRemark);
+	int   SetHandRemark(const CSetRemarkSqliteParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

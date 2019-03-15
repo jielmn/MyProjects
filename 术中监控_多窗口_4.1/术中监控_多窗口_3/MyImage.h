@@ -138,7 +138,7 @@ public:
 	void  OnMouseWheel(BOOL bPositive);
 	void  OnTempSqliteRet(vector< vector<TempData *> * > & vData, 
 		vector< string * > & vTagId, vector< string * > & vTagName);
-	void  OnTempData(const HandReaderTemp * pTemp, BOOL & bNewTag, string * & pTagId );
+	void  OnTempData(const HandReaderTemp * pTemp, BOOL & bNewTag, string * & pTagId, time_t tTime );
 	void  OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlItem *> & vItems, BOOL & bSelectedChanged, int & nNewIndex);
 	void  OnTagSelected(int nIndex);
 	void  OnMyClick(const POINT * pPoint);

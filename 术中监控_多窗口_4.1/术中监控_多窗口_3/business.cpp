@@ -991,8 +991,8 @@ int   CBusiness::QueryHandReaderTempFromSqlite() {
 	return 0;
 }
 
-int  CBusiness::SaveHandTempAsyn(const char * szTagId, DWORD dwTemp, const char * szCardId) {
-	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_READER_TEMP, new CSaveHandTempParam(szTagId, dwTemp, szCardId) );
+int  CBusiness::SaveHandTempAsyn(const char * szTagId, DWORD dwTemp, const char * szCardId, time_t tTime) {
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_READER_TEMP, new CSaveHandTempParam(szTagId, dwTemp, szCardId, tTime) );
 	return 0;
 }
 
@@ -1011,12 +1011,12 @@ int   CBusiness::SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam) {
 	return 0;
 }
 
-int   CBusiness::SetHandRemarkAsyn(DWORD dwId, const char * szRemark) {
-	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_TAG_REMARK, new CSaveHandTagRemarkParam(dwId, szRemark));
+int   CBusiness::SetHandRemarkAsyn(const char * szTagId, time_t tTime, const char * szRemark) {
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_TAG_REMARK, new CSetRemarkSqliteParam(szTagId, tTime, szRemark));
 	return 0;
 }
 
-int  CBusiness::SetHandRemark(const CSaveHandTagRemarkParam * pParam) {
+int  CBusiness::SetHandRemark(const CSetRemarkSqliteParam * pParam) {
 	m_sqlite.SaveHandRemark(pParam);
 	return 0;
 }
@@ -1146,7 +1146,7 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 
 	case MSG_SAVE_HAND_TAG_REMARK:
 	{
-		CSaveHandTagRemarkParam * pParam = (CSaveHandTagRemarkParam *)pMessageData;
+		CSetRemarkSqliteParam * pParam = (CSetRemarkSqliteParam *)pMessageData;
 		SetHandRemark(pParam);
 	}
 	break;

@@ -376,11 +376,10 @@ int  CMySqliteDatabase::SaveHandTemp(const CSaveHandTempParam * pParam) {
 	char sql[8192];
 	char *zErrMsg = 0;
 	int  ret = 0;
-	time_t now = time(0);
 
 	//  id,  tag, temp, time, remark, cardid
 	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', '%s' )", TEMP_TABLE_NAME_1,
-		pParam->m_szTagId, pParam->m_dwTemp, (DWORD)now, pParam->m_szCardId );
+		pParam->m_szTagId, pParam->m_dwTemp, (DWORD)pParam->m_time, pParam->m_szCardId );
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 
@@ -423,7 +422,7 @@ int  CMySqliteDatabase::SaveHandTagNickname(const CSaveHandTagNicknameParam * pP
 	return 0;
 }
 
-int  CMySqliteDatabase::SaveHandRemark(const CSaveHandTagRemarkParam * pParam) {
+int  CMySqliteDatabase::SaveHandRemark(const CSetRemarkSqliteParam * pParam) {
 	char sql[8192];
 	char *zErrMsg = 0;
 	int  ret = 0;
@@ -431,8 +430,9 @@ int  CMySqliteDatabase::SaveHandRemark(const CSaveHandTagRemarkParam * pParam) {
 	char szRemark[256];
 	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
 
-	SNPRINTF(sql, sizeof(sql), "update %s set remark='%s' where id=%lu", TEMP_TABLE_NAME_1,
-		szRemark, pParam->m_dwId );
+	SNPRINTF(sql, sizeof(sql), "update %s set remark='%s' "
+		"where tag_id='%s' and time=%lu", TEMP_TABLE_NAME_1,
+		szRemark, pParam->m_szTagId, (DWORD)pParam->m_tTime);
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 
