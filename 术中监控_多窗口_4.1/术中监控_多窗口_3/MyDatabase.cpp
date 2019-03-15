@@ -208,6 +208,8 @@ int  CMySqliteDatabase::SaveRemark(const CSetRemarkSqliteParam * pParam) {
 	return 0;
 }
 
+#if 0
+// 按照tagid的字母顺序排列的。但是用户更希望最新的tag显示在最前面
 int  CMySqliteDatabase::QueryHandReaderTemp(vector< vector<TempData *> * > & vData,
 	                vector< string * >  & vTagId, vector< string * > & vTagName) {
 
@@ -275,6 +277,80 @@ int  CMySqliteDatabase::QueryHandReaderTemp(vector< vector<TempData *> * > & vDa
 
 	return 0;
 }
+#else
+int  CMySqliteDatabase::QueryHandReaderTemp( vector< vector<TempData *> * > & vData,
+	                                         vector< string * >  & vTagId, vector< string * > & vTagName) {
+
+	char szSql[8192];
+	time_t now = time(0);
+
+	struct tm tTmTime;
+	localtime_s(&tTmTime, &now);
+
+	tTmTime.tm_hour = 0;
+	tTmTime.tm_min = 0;
+	tTmTime.tm_sec = 0;
+
+	time_t today_zero_time = mktime(&tTmTime);
+
+	// 一周前的开始位置
+	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where time >= %lu order by time desc", TEMP_TABLE_NAME_1,
+		(DWORD)tWeekBegin);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	for (int i = 0; i < nrow; i++) {
+		TempData * pItem = new TempData;
+		memset(pItem, 0, sizeof(TempData));
+
+		// get record
+		DWORD  dw;
+		sscanf_s(azResult[(i + 1)*ncolumn + 2], "%lu", &pItem->dwTemperature);    // temp
+		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dw);                      // time
+		pItem->tTime = (time_t)dw;
+		strncpy_s(pItem->szRemark, azResult[(i + 1)*ncolumn + 4], sizeof(pItem->szRemark));   // remark
+		sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &pItem->dwIndex);                      //id
+		char szCurTagId[20] = { 0 };
+		STRNCPY(szCurTagId, azResult[(i + 1)*ncolumn + 1], sizeof(szCurTagId));    // tagid
+		// end of get record
+
+		vector< string * >::iterator it;
+		for (it = vTagId.begin(); it != vTagId.end(); ++it) {
+			string * sTagId = *it;
+			if (0 == strcmp(sTagId->c_str(), szCurTagId)) {
+				break;
+			}
+		}
+
+		// 新的一组Tag
+		if (it == vTagId.end()) {
+			vector<TempData *> * pvTemp = new vector<TempData *>;
+			pvTemp->push_back(pItem);
+			vData.push_back(pvTemp);
+
+			string * sTagId = new string(szCurTagId);
+			vTagId.push_back(sTagId);
+
+			string * sTagName = new string;
+			QueryTagNameByTagId(szCurTagId, *sTagName);
+			vTagName.push_back(sTagName);
+		}
+		// 已存在的tag
+		else {
+			int nIndex = it - vTagId.begin();
+			vector<TempData *> * pvTemp = vData[nIndex];
+			pvTemp->insert(pvTemp->begin(), pItem);
+		}
+	}
+	sqlite3_free_table(azResult);
+
+	return 0;
+}
+#endif
 
 int  CMySqliteDatabase::QueryTagNameByTagId(const char * szTagId, string & sName) {
 	assert(szTagId);

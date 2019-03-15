@@ -2336,13 +2336,8 @@ void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
 	m_dwNextTempIndex = vData.size();
 
 	m_vData.insert(m_vData.begin(), vData.begin(), vData.end());
-	reverse(m_vData.begin(), m_vData.end());
-
 	m_vTagId.insert(m_vTagId.begin(), vTagId.begin(), vTagId.end());
-	reverse(m_vTagId.begin(), m_vTagId.end());
-
 	m_vTagName.insert(m_vTagName.begin(), vTagName.begin(), vTagName.end());
-	reverse(m_vTagName.begin(), m_vTagName.end());
 
 	if (m_vData.size() > 0) {
 		m_nCurIndex = 0;

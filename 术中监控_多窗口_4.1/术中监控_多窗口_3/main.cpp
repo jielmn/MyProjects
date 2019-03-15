@@ -1984,7 +1984,7 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 		CDialogBuilder builder_child;
 		CControlUI * pTagUI = builder_child.Create("HandTag.xml", (UINT)0, &m_callback, &m_PaintManager);
 		pTagUI->FindControl(CS_FINDCONTROLPROC, 0, 0);
-		m_layTags->AddAt(pTagUI, 0);
+		m_layTags->Add(pTagUI);
 
 		string * pTagId  = pvTagId->at(nIndex);
 		HandReaderTemp tTemp;
@@ -1995,7 +1995,7 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 		TagControlItem * pItem = new TagControlItem;
 		pItem->m_Control = pTagUI;
 		pItem->m_pTagId = pTagId;
-		m_vHandTagUIs.insert(m_vHandTagUIs.begin(), pItem);
+		m_vHandTagUIs.push_back(pItem);
 	}
 
 	if (m_vHandTagUIs.size() > 0) {
