@@ -1969,6 +1969,31 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 
 	m_MyImage_hand_reader->OnTempSqliteRet( *pvData, *pvTagId, *pvTagName );
 
+	vector< vector<TempData *> * >::iterator it;
+	int nIndex = 0;
+	for (it = pvData->begin(), nIndex =0; it != pvData->end(); ++it,++nIndex) {
+
+		CDialogBuilder builder_child;
+		CControlUI * pTagUI = builder_child.Create("HandTag.xml", (UINT)0, &m_callback, &m_PaintManager);
+		pTagUI->FindControl(CS_FINDCONTROLPROC, 0, 0);
+		m_layTags->AddAt(pTagUI, 0);
+
+		string * pTagId  = pvTagId->at(nIndex);
+		HandReaderTemp tTemp;
+		memset( &tTemp, 0, sizeof(tTemp) );
+		STRNCPY( tTemp.m_szTagId, pTagId->c_str(), sizeof(tTemp.m_szTagId) );
+		SetHandTagData(&tTemp, pTagUI, pvTagName->at(nIndex)->c_str() );
+
+		TagControlItem * pItem = new TagControlItem;
+		pItem->m_Control = pTagUI;
+		pItem->m_pTagId = pTagId;
+		m_vHandTagUIs.insert(m_vHandTagUIs.begin(), pItem);
+	}
+
+	if (m_vHandTagUIs.size() > 0) {
+		OnLayHandTagSelected(m_vHandTagUIs[0]->m_Control);
+	}
+
 	if (0 != pvData) {
 		delete pvData;
 	}
@@ -2019,31 +2044,50 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		}
 	}
 
+	// ±£´æÊý¾Ý¿â
+	CBusiness::GetInstance()->SaveHandTempAsyn(pTemp->m_szTagId, pTemp->m_dwTemp, pTemp->m_szCardId);
+
 	delete pTemp;
 }
 
 //
-void   CDuiFrameWnd::SetHandTagData(const HandReaderTemp * pTemp, CControlUI * pTagUI) {
+void   CDuiFrameWnd::SetHandTagData(const HandReaderTemp * pTemp, CControlUI * pTagUI, const char * szTagName /*= 0*/) {
 	CLabelUI * pLblReaderId = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblReaderSn", 0));
 	pLblReaderId->SetText(pTemp->m_szReaderId);
 
 	CLabelUI * pLblTagId = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblHandTagId", 0));
 	pLblTagId->SetText(pTemp->m_szTagId);
 
+	if (szTagName) {
+		CButtonUI * pbtnName = static_cast<CButtonUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "btnTagNickName", 0));
+		pbtnName->SetText(szTagName);
+
+		CEditUI * pedName = static_cast<CEditUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "edtTagNickName", 0));
+		pedName->SetText(szTagName);
+	}
+
 	CDuiString strText;
 	CLabelUI * pLblTemp = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblHandTagTemp", 0));
-	strText.Format("%.2f", pTemp->m_dwTemp / 100.0f);
-	pLblTemp->SetText(strText);
 
-	if ( pTemp->m_dwTemp >= g_data.m_CfgData.m_dwHandReaderHighTempAlarm) {
-		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
-	}
-	else if (pTemp->m_dwTemp <= g_data.m_CfgData.m_dwHandReaderLowTempAlarm ) {
-		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	if (pTemp->m_dwTemp > 0) {
+		strText.Format("%.2f", pTemp->m_dwTemp / 100.0f);
+		pLblTemp->SetText(strText);
+
+		if (pTemp->m_dwTemp >= g_data.m_CfgData.m_dwHandReaderHighTempAlarm) {
+			pLblTemp->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+		}
+		else if (pTemp->m_dwTemp <= g_data.m_CfgData.m_dwHandReaderLowTempAlarm) {
+			pLblTemp->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+		}
+		else {
+			pLblTemp->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+		}
 	}
 	else {
-		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+		pLblTemp->SetText("--");
+		pLblTemp->SetTextColor(g_data.m_skin[CMySkin::COMMON_TEXT]);
 	}
+	
 }
 
 void   CDuiFrameWnd::OnAutoPruneTimer() {
@@ -2081,11 +2125,19 @@ void   CDuiFrameWnd::OnBtnTagNickname(TNotifyUI& msg) {
 
 void   CDuiFrameWnd::OnEdtTagNicknameKillFocus(TNotifyUI& msg) {
 	CControlUI * pParent = msg.pSender->GetParent();
+	CControlUI * pGrandParent = pParent->GetParent()->GetParent()->GetParent();
 	CButtonUI * pbtnName = static_cast<CButtonUI*>(pParent->FindControl(MY_FINDCONTROLPROC, "btnTagNickName", 0));
+	CLabelUI * pLblTagId = static_cast<CLabelUI*>(pGrandParent->FindControl(MY_FINDCONTROLPROC, "lblHandTagId", 0));
 
-	msg.pSender->SetVisible(false);
+	CDuiString strText;
+	strText = pbtnName->GetText();
+
 	pbtnName->SetText(msg.pSender->GetText());
+	msg.pSender->SetVisible(false);
 	pbtnName->SetVisible(true);
+
+	if (strText != msg.pSender->GetText())
+		CBusiness::GetInstance()->SaveHandTagNicknameAsyn(pLblTagId->GetText(), pbtnName->GetText());
 }
 
 

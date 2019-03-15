@@ -991,6 +991,26 @@ int   CBusiness::QueryHandReaderTempFromSqlite() {
 	return 0;
 }
 
+int  CBusiness::SaveHandTempAsyn(const char * szTagId, DWORD dwTemp, const char * szCardId) {
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_READER_TEMP, new CSaveHandTempParam(szTagId, dwTemp, szCardId) );
+	return 0;
+}
+
+int  CBusiness::SaveHandTemp(const CSaveHandTempParam * pParam) {
+	m_sqlite.SaveHandTemp(pParam);
+	return 0;
+}
+
+int   CBusiness::SaveHandTagNicknameAsyn(const char * szTagId, const char * szName) {
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_READER_NAME, new CSaveHandTagNicknameParam(szTagId, szName));
+	return 0;
+}
+
+int   CBusiness::SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam) {
+	m_sqlite.SaveHandTagNickname(pParam);
+	return 0;
+}
+
 
 // 消息处理
 void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1097,6 +1117,20 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 	case MSG_QUERY_HAND_READER_TEMP_SQLITE:
 	{
 		QueryHandReaderTempFromSqlite();
+	}
+	break;
+
+	case MSG_SAVE_HAND_READER_TEMP:
+	{
+		CSaveHandTempParam * pParam = (CSaveHandTempParam*)pMessageData;
+		SaveHandTemp(pParam);
+	}
+	break;
+
+	case MSG_SAVE_HAND_READER_NAME:
+	{
+		CSaveHandTagNicknameParam * pParam = (CSaveHandTagNicknameParam *)pMessageData;
+		SaveHandTagNickname(pParam);
 	}
 	break;
 

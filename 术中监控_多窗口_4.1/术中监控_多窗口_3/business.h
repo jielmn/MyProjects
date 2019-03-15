@@ -140,6 +140,14 @@ public:
 	int   QueryHandReaderTempFromSqliteAsyn();
 	int   QueryHandReaderTempFromSqlite();
 
+	// 保存手持读卡器的温度
+	int   SaveHandTempAsyn(const char * szTagId, DWORD dwTemp, const char * szCardId);
+	int   SaveHandTemp(const CSaveHandTempParam * pParam);
+
+	// 保存手持读卡器Tag的别名
+	int   SaveHandTagNicknameAsyn(const char * szTagId, const char * szName);
+	int   SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

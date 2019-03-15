@@ -14,6 +14,8 @@ public:
 	int  SaveRemark(const CSetRemarkSqliteParam * pParam);
 	int  QueryHandReaderTemp( vector< vector<TempData *> * > & vData, 
 		                      vector< string * >  & vTagId, vector< string * > & vTagName );
+	int  SaveHandTemp(const CSaveHandTempParam * pParam);
+	int  SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam);
 
 private:
 	sqlite3 *           m_db;

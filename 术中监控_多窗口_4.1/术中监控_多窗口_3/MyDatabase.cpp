@@ -297,3 +297,54 @@ int  CMySqliteDatabase::QueryTagNameByTagId(const char * szTagId, string & sName
 
 	return 0;
 }
+
+int  CMySqliteDatabase::SaveHandTemp(const CSaveHandTempParam * pParam) {
+	char sql[8192];
+	char *zErrMsg = 0;
+	int  ret = 0;
+	time_t now = time(0);
+
+	//  id,  tag, temp, time, remark, cardid
+	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', '%s' )", TEMP_TABLE_NAME_1,
+		pParam->m_szTagId, pParam->m_dwTemp, (DWORD)now, pParam->m_szCardId );
+	/* Execute SQL statement */
+	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+
+	return 0;
+}
+
+int  CMySqliteDatabase::SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam) {
+	char sql[8192];
+	int  ret = 0;
+	time_t now = time(0);
+
+	//  id,  name, time
+	SNPRINTF(sql, sizeof(sql), "select * from %s where tag_id='%s' ", TAG_NICKNAME, pParam->m_szTagId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	sqlite3_free_table(azResult);
+
+	char  szName[256];
+	StrReplaceAll(szName, sizeof(szName), pParam->m_szName, "'", "''");
+
+	// tag_id, name, time
+	// 如果存在
+	if ( nrow > 0 ) {
+		SNPRINTF( sql, sizeof(sql), "update %s set name = '%s' where tag_id = '%s' ", TAG_NICKNAME,
+			      szName, pParam->m_szTagId );
+		/* Execute SQL statement */
+		sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	}
+	// 不存在
+	else {
+		SNPRINTF(sql, sizeof(sql), "insert into %s values ( '%s', '%s', %lu ) ", TAG_NICKNAME,
+			pParam->m_szTagId, szName, (DWORD)now );
+		/* Execute SQL statement */
+		sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+	}
+
+	return 0;
+}

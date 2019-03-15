@@ -179,7 +179,7 @@ private:
 	//
 	void   OnHandReaderTemp(WPARAM wParam, LPARAM  lParam);
 	//
-	void   SetHandTagData(const HandReaderTemp * pTemp, CControlUI * pTagUI);
+	void   SetHandTagData(const HandReaderTemp * pTemp, CControlUI * pTagUI, const char * szTagName = 0 );
 	//
 	void   OnAutoPruneTimer();
 	//

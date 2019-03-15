@@ -126,7 +126,7 @@
 					<Control bkimage="file='reader_1.png' dest='0,0,25,40'" width="30" /><Control width="10" /><Label text="读卡器信息"   textcolor="#FFFFFFFF" width="200" font="2" />
 				</HorizontalLayout>
 				
-				<VerticalLayout inset="0,0,0,0" name="layReaders" />
+				<VerticalLayout inset="0,0,0,0" name="layReaders" hscrollbar="false" vscrollbar="true" sepheight="4" />
 				
 			</VerticalLayout>
 			

@@ -2336,6 +2336,9 @@ void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
 	m_vData.insert(m_vData.begin(), vData.begin(), vData.end());
 	m_vTagId.insert(m_vTagId.begin(), vTagId.begin(), vTagId.end());
 	m_vTagName.insert(m_vTagName.begin(), vTagName.begin(), vTagName.end());
+	if (m_vData.size() > 0) {
+		m_nCurIndex = 0;
+	}
 
 #if TEST_FLAG_2
 	ClearData();
@@ -2421,6 +2424,8 @@ void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
 	m_nCurIndex = 0;
 	m_dwNextTempIndex = i;
 #endif
+
+	MyInvalidate();
 }
 
 void  CMyImageUI_1::OnTempData(const HandReaderTemp * pNewData, BOOL & bNewTag, string * & pTagId ) {
@@ -2489,11 +2494,13 @@ void  CMyImageUI_1::OnAutoPrune(CVerticalLayoutUI * layTags, vector<TagControlIt
 	bSelectedChanged = FALSE;
 	nNewIndex = 0;
 
-	//time_t  today_zero_time = GetTodayZeroTime();
-	//time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
-
+#if 1
+	time_t  today_zero_time = GetTodayZeroTime();
+	time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
+#else
 	time_t  today_zero_time = time(0);
 	time_t  tWeekBegin = today_zero_time - 60;
+#endif
 
 	BOOL bPruned = FALSE;
 	assert((m_vData.size() == m_vTagId.size()) && (m_vTagId.size() == m_vTagName.size()));

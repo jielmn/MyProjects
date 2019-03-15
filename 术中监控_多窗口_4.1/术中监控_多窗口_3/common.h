@@ -183,6 +183,8 @@ using namespace DuiLib;
 #define MSG_QUERY_TEMP_SQLITE            4001
 #define MSG_SAVE_REMARK_SQLITE           4002
 #define MSG_QUERY_HAND_READER_TEMP_SQLITE   4003
+#define MSG_SAVE_HAND_READER_TEMP           4004
+#define MSG_SAVE_HAND_READER_NAME           4005
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -472,6 +474,30 @@ public:
 	char           m_szTagId[20];
 	time_t         m_tTime;
 	char           m_szRemark[MAX_REMARK_LENGTH];
+};
+
+class CSaveHandTempParam : public LmnToolkits::MessageData {
+public:
+	CSaveHandTempParam(const char * szTagId, DWORD dwTemp, const char * szCardId) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		STRNCPY(m_szCardId, szCardId, sizeof(m_szCardId));
+		m_dwTemp = dwTemp;
+	}
+
+	char           m_szTagId[20];
+	char           m_szCardId[20];
+	DWORD          m_dwTemp;
+};
+
+class CSaveHandTagNicknameParam : public LmnToolkits::MessageData {
+public:
+	CSaveHandTagNicknameParam(const char * szTagId, const char * szName) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		STRNCPY(m_szName, szName, sizeof(m_szName));
+	}
+
+	char           m_szTagId[20];
+	char           m_szName[16];
 };
 
 extern CGlobalData  g_data;
