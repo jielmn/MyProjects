@@ -16,6 +16,7 @@ public:
 		                      vector< string * >  & vTagId, vector< string * > & vTagName );
 	int  SaveHandTemp(const CSaveHandTempParam * pParam);
 	int  SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam);
+	int  SaveHandRemark(const CSaveHandTagRemarkParam * pParam);
 
 private:
 	sqlite3 *           m_db;

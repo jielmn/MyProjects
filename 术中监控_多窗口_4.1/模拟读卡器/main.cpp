@@ -187,8 +187,11 @@ void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::Message
 	// 定时发送数据
 	else if (dwMessageId >= MSG_SEND_DATA_1 && dwMessageId < MSG_SEND_DATA_1 + 100) {
 		int nIndex = dwMessageId - MSG_SEND_DATA_1;
+		if (nIndex <= 8) {
+			return;
+		}
 		// 最多发送10个数据
-		if ( g_SendCnt[nIndex] >= 10 ) {
+		if ( g_SendCnt[nIndex] >= 1000 ) {
 			return;
 		}
 		g_SendCnt[nIndex]++;

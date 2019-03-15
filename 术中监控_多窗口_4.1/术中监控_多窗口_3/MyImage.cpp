@@ -1490,6 +1490,7 @@ CMyImageUI_1::CMyImageUI_1() : m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0),
 	m_bSetSecondsPerPixel = FALSE;
 	m_fSecondsPerPixel = 0.0f;
 	m_dwNextTempIndex = 0;
+	m_dwCurTempIndex = -1;
 }
 
 CMyImageUI_1::~CMyImageUI_1() {
@@ -2333,9 +2334,16 @@ void  CMyImageUI_1::OnTempSqliteRet(  vector< vector<TempData *> * > & vData,
 	ClearData();
 
 	m_dwNextTempIndex = vData.size();
+
 	m_vData.insert(m_vData.begin(), vData.begin(), vData.end());
+	reverse(m_vData.begin(), m_vData.end());
+
 	m_vTagId.insert(m_vTagId.begin(), vTagId.begin(), vTagId.end());
+	reverse(m_vTagId.begin(), m_vTagId.end());
+
 	m_vTagName.insert(m_vTagName.begin(), vTagName.begin(), vTagName.end());
+	reverse(m_vTagName.begin(), m_vTagName.end());
+
 	if (m_vData.size() > 0) {
 		m_nCurIndex = 0;
 	}
@@ -2577,5 +2585,123 @@ void  CMyImageUI_1::OnTagSelected(int nIndex) {
 	if (nIndex != m_nCurIndex) {
 		m_nCurIndex = nIndex;
 		MyInvalidate();
+	}
+}
+
+void  CMyImageUI_1::OnMyClick(const POINT * pPoint) {
+	if (m_state == STATE_7_DAYS) {
+		return;
+	}
+
+	if (!m_bSetSecondsPerPixel) {
+		return;
+	}
+
+	if (m_fSecondsPerPixel > 6.0f) {
+		return;
+	}
+
+	DWORD  dwIndex = this->GetTag();
+
+	// 找到点击了哪个点
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_dwHandReaderMinTemp);
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_dwHandReaderMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	time_t  tFirstTime, tLastTime;
+	BOOL bFindMin, bFindMax;
+	CalcSingleDay(tFirstTime, bFindMin, tLastTime, bFindMax);
+
+	int middle = height / 2;
+	int nRadius = 6;
+
+	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
+		return;
+	}
+
+	vector<TempData *> * p = m_vData[m_nCurIndex];
+	if (p->size() == 0) {
+		return;
+	}
+
+	vector<TempData *>::iterator it;
+	vector<TempData *> & vTempData = *p;
+	for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		TempData * pItem = *it;
+		if (!(pItem->tTime >= tFirstTime && pItem->tTime < tLastTime)) {
+			continue;
+		}
+
+		int nDiff = (int)(pItem->tTime - tFirstTime);
+		int nX = (int)(nDiff / m_fSecondsPerPixel);
+		int nY = (int)((nMiddleTemp * 100.0 - (double)pItem->dwTemperature) / 100.0 * nGridHeight);
+
+		int nX1 = nX + MYIMAGE_LEFT_BLANK + rect.left;
+		int nY1 = nY + middle + rect.top;
+
+		if (pPoint->x >= nX1 - 6 && pPoint->x <= nX1 + 6
+			&& pPoint->y >= nY1 - 6 && pPoint->y <= nY1 + 6) {
+			//JTelSvrPrint("you clicked the point!");
+
+			// 如果之前在编辑状态
+			if (g_edRemark_1->IsVisible()) {
+				OnEdtRemarkKillFocus1_g(this);
+			}
+
+			m_dwCurTempIndex = pItem->dwIndex;
+			RECT rectRemark;
+			rectRemark.left = nX1 - EDT_REMARK_WIDTH / 2 + 1;
+			rectRemark.top = nY1 + EDT_REMARK_Y_OFFSET + 3;
+			rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH - 2;
+			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT - 6;
+			g_edRemark_1->SetPos(rectRemark);
+			g_edRemark_1->SetText(pItem->szRemark);
+			g_edRemark_1->SetVisible(true);
+			g_edRemark_1->SetFocus();
+
+			break;
+		}
+	}
+	
+}
+
+void   CMyImageUI_1::SetRemark(DuiLib::CDuiString & strRemark) {
+	if (m_dwCurTempIndex == -1) {
+		return;
+	}
+
+	if (m_nCurIndex < 0 || m_nCurIndex >= (int)m_vData.size()) {
+		return;
+	}
+
+	vector<TempData *> * p = m_vData[m_nCurIndex];
+	if (p->size() == 0) {
+		return;
+	}
+
+	vector<TempData *>::iterator it;
+	vector<TempData *> & vTempData = *p;
+
+	for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		TempData * pItem = *it;
+		if (pItem->dwIndex == m_dwCurTempIndex) {
+			STRNCPY(pItem->szRemark, strRemark, sizeof(pItem->szRemark));
+			// CBusiness::GetInstance()->SetHandRemarkAsyn(pItem->dwIndex, pItem->szRemark);
+			return;
+		}
 	}
 }

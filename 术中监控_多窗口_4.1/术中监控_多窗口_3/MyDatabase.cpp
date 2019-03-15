@@ -234,7 +234,6 @@ int  CMySqliteDatabase::QueryHandReaderTemp(vector< vector<TempData *> * > & vDa
 	char *zErrMsg = 0;            // ¥ÌŒÛ√Ë ˆ
 	char szTagId[20] = {0};
 	vector<TempData *> * pvTemp = 0;
-	DWORD  dwIndex = 0;
 
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, &zErrMsg);
 	for (int i = 0; i < nrow; i++) {
@@ -247,8 +246,7 @@ int  CMySqliteDatabase::QueryHandReaderTemp(vector< vector<TempData *> * > & vDa
 		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dw);                      // time
 		pItem->tTime = (time_t)dw;
 		strncpy_s(pItem->szRemark, azResult[(i + 1)*ncolumn + 4], sizeof(pItem->szRemark));   // remark
-		pItem->dwIndex = dwIndex;
-		dwIndex++;
+		sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &pItem->dwIndex);   //id
 
 		char szCurTagId[20] = { 0 };
 		STRNCPY(szCurTagId, azResult[(i + 1)*ncolumn + 1], sizeof(szCurTagId));
@@ -345,6 +343,22 @@ int  CMySqliteDatabase::SaveHandTagNickname(const CSaveHandTagNicknameParam * pP
 		/* Execute SQL statement */
 		sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 	}
+
+	return 0;
+}
+
+int  CMySqliteDatabase::SaveHandRemark(const CSaveHandTagRemarkParam * pParam) {
+	char sql[8192];
+	char *zErrMsg = 0;
+	int  ret = 0;
+
+	char szRemark[256];
+	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
+
+	SNPRINTF(sql, sizeof(sql), "update %s set remark='%s' where id=%lu", TEMP_TABLE_NAME_1,
+		szRemark, pParam->m_dwId );
+	/* Execute SQL statement */
+	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 
 	return 0;
 }

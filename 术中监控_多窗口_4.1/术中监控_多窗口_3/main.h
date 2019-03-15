@@ -188,4 +188,6 @@ private:
 	void   OnBtnTagNickname(TNotifyUI& msg);
 	//
 	void   OnEdtTagNicknameKillFocus(TNotifyUI& msg);
+	//
+	void   OnEdtRemarkKillFocus_1();
 };

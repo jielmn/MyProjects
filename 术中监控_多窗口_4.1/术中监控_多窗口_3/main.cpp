@@ -40,6 +40,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LABEL_STATUS_NAME));
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblBarTips"));
 	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
+	g_edRemark_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark_1"));
 	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
 	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
 	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
@@ -361,6 +362,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnTagNickName") {
 			OnBtnTagNickname(msg);
 		}
+		else if (name == "my_image_hand_reader") {
+			POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+			m_MyImage_hand_reader->OnMyClick(&pt);
+		}
 	}
 	else if (msg.sType == "menu_setting") {
 		OnSetting();
@@ -389,6 +394,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "edtTagNickName") {
 			OnEdtTagNicknameKillFocus(msg);
+		}
+		else if (name == "edRemark_1") {
+			OnEdtRemarkKillFocus_1();
 		}
 	}
 	else if (msg.sType == "menu") {
@@ -2138,6 +2146,10 @@ void   CDuiFrameWnd::OnEdtTagNicknameKillFocus(TNotifyUI& msg) {
 
 	if (strText != msg.pSender->GetText())
 		CBusiness::GetInstance()->SaveHandTagNicknameAsyn(pLblTagId->GetText(), pbtnName->GetText());
+}
+
+void   CDuiFrameWnd::OnEdtRemarkKillFocus_1() {
+	OnEdtRemarkKillFocus1_g(m_MyImage_hand_reader);
 }
 
 

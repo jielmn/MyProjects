@@ -29,6 +29,7 @@ LmnToolkits::Thread *  g_thrd_launch = 0;
 LmnToolkits::Thread *  g_thrd_db = 0;
 LmnToolkits::Thread *  g_thrd_sqlite = 0;
 DuiLib::CEditUI * g_edRemark = 0;
+DuiLib::CEditUI * g_edRemark_1 = 0;
 DWORD g_dwPrintExcelMaxPointsCnt = 0;
 std::vector<BodyPart *>    g_vBodyParts;
 
@@ -442,6 +443,22 @@ void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage) {
 	// g_data.m_bAutoScroll = TRUE;
 
 	CMyImageUI * pImage = (CMyImageUI *)pUiImage;
+	pImage->SetRemark(strRemark);
+}
+
+void  OnEdtRemarkKillFocus1_g(CControlUI * pUiImage) {
+	DuiLib::CDuiString  strRemark = g_edRemark_1->GetText();
+	bool bVisible = g_edRemark_1->IsVisible();
+
+	// 如果是由于g_edRemark_1->SetVisible(false);导致的又一次堆栈调用，则跳过
+	if (!bVisible) {
+		return;
+	}
+
+	g_edRemark_1->SetText("");
+	g_edRemark_1->SetVisible(false);
+
+	CMyImageUI_1 * pImage = (CMyImageUI_1 *)pUiImage;
 	pImage->SetRemark(strRemark);
 }
 

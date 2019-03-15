@@ -185,6 +185,7 @@ using namespace DuiLib;
 #define MSG_QUERY_HAND_READER_TEMP_SQLITE   4003
 #define MSG_SAVE_HAND_READER_TEMP           4004
 #define MSG_SAVE_HAND_READER_NAME           4005
+#define MSG_SAVE_HAND_TAG_REMARK            4006
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -500,6 +501,17 @@ public:
 	char           m_szName[16];
 };
 
+class CSaveHandTagRemarkParam : public LmnToolkits::MessageData {
+public:
+	CSaveHandTagRemarkParam(DWORD dwId, const char * szRemark) {
+		m_dwId = dwId;
+		STRNCPY(m_szRemark, szRemark, sizeof(m_szRemark));
+	}
+
+	DWORD          m_dwId;
+	char           m_szRemark[30];
+};
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern ARGB g_default_argb[MAX_READERS_PER_GRID];
@@ -509,6 +521,7 @@ extern LmnToolkits::Thread *  g_thrd_launch;
 extern LmnToolkits::Thread *  g_thrd_db;
 extern LmnToolkits::Thread *  g_thrd_sqlite;
 extern DuiLib::CEditUI * g_edRemark;
+extern DuiLib::CEditUI * g_edRemark_1;
 extern DWORD g_dwPrintExcelMaxPointsCnt;
 extern std::vector<BodyPart *>    g_vBodyParts;
 
@@ -525,6 +538,7 @@ extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern DWORD  FindReaderIndexByBed(DWORD dwBedNo);
 extern BOOL  CheckComPortExist(int nCheckComPort);
 extern void  OnEdtRemarkKillFocus_g(CControlUI * pUiImage);
+extern void  OnEdtRemarkKillFocus1_g(CControlUI * pUiImage);
 extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String_2(char * szDest, DWORD dwDestSize, const time_t * t);

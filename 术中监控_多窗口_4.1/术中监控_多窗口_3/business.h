@@ -148,6 +148,10 @@ public:
 	int   SaveHandTagNicknameAsyn(const char * szTagId, const char * szName);
 	int   SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam);
 
+	// ±£´æÊÖ³Ö¶Á¿¨Æ÷Tag×¢ÊÍ
+	int   SetHandRemarkAsyn(DWORD dwId, const char * szRemark);
+	int   SetHandRemark(const CSaveHandTagRemarkParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

@@ -1011,6 +1011,16 @@ int   CBusiness::SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam) {
 	return 0;
 }
 
+int   CBusiness::SetHandRemarkAsyn(DWORD dwId, const char * szRemark) {
+	g_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_TAG_REMARK, new CSaveHandTagRemarkParam(dwId, szRemark));
+	return 0;
+}
+
+int  CBusiness::SetHandRemark(const CSaveHandTagRemarkParam * pParam) {
+	m_sqlite.SaveHandRemark(pParam);
+	return 0;
+}
+
 
 // 消息处理
 void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1131,6 +1141,13 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 	{
 		CSaveHandTagNicknameParam * pParam = (CSaveHandTagNicknameParam *)pMessageData;
 		SaveHandTagNickname(pParam);
+	}
+	break;
+
+	case MSG_SAVE_HAND_TAG_REMARK:
+	{
+		CSaveHandTagRemarkParam * pParam = (CSaveHandTagRemarkParam *)pMessageData;
+		SetHandRemark(pParam);
 	}
 	break;
 
