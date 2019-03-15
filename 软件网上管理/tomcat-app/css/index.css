@@ -2,42 +2,44 @@
     width: 100%;
     height: 180px;
     background: url(../images/background.png) no-repeat center 0;
+	display: block;
 }
 
 .divMain {
-	width: 1024px;
+	width: 700px;
 	margin: 0 auto;
 	background-color: gray;
+	display: block;
 }
 
 .divItem {
-	width: 1024px;
-	height: 600px;
+	width: 700px;
+	height: 100px;
 	background-color: yellow;
+	display: block;
 }
 
 .divImg {
-	display: inline;
+	display: inline-block;
 	width: 100px;
 	height:100px;
-	background-color: red;
+	background-color: green;
+	vertical-align:top;
 }
 
 .divContent {
-	display: inline;
-	width: 500px;
-	height:100px;
-	background-color: green;
+	display: inline-block;
+	width: 480px;
+	height:90px;
+	background-color: blue;
+	vertical-align:top;
+	padding:5px;
 }
 
 .divDownload {
-	display: inline;
+	display: inline-block;
 	width: 100px;
 	height:100px;
-	background-color: blue;
-}
-
-.softImg {
-	width: 100px;
-	height: 100px;
+	background-color: gray;
+	vertical-align:top;
 }
