@@ -8,22 +8,20 @@
 .divMain {
 	width: 700px;
 	margin: 0 auto;
-	background-color: gray;
 	display: block;
 }
 
 .divItem {
 	width: 700px;
 	height: 100px;
-	background-color: yellow;
 	display: block;
+	background: url(../images/bk1.png) no-repeat center 0;
 }
 
 .divImg {
 	display: inline-block;
 	width: 100px;
 	height:100px;
-	background-color: green;
 	vertical-align:top;
 }
 
@@ -31,15 +29,42 @@
 	display: inline-block;
 	width: 480px;
 	height:90px;
-	background-color: blue;
 	vertical-align:top;
-	padding:5px;
+	padding:20px 5px;
 }
 
 .divDownload {
 	display: inline-block;
-	width: 100px;
-	height:100px;
-	background-color: gray;
+	width: 90px;
+	height:90px;
 	vertical-align:top;
+	padding:40px 5px;
+}
+
+.overFlow{
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+}
+
+.softDown{
+	display:block;
+	background-color: #008EE1;
+	color:#FFF;
+	text-align: center;
+	height:32px;
+	width:68px;
+	line-height:32px;
+	border:0px solid #027CC3;
+	font-size:12px;
+	text-decoration:none;
+}
+
+.softDown:hover{
+	background-color: #027CC3;
+}
+
+.title {
+	text-decoration:none;
+	color:#000;
 }
