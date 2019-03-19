@@ -49,8 +49,8 @@
 			
 			<!-- 客户区 -->
 			<HorizontalLayout height="85" inset="8,5,0,0">
-				<Option width="100" height="80" name="opn_monitor" text="实时测温" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='monitor.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
-				<Option width="100" height="80" name="opn_reader"  text="非实时测温" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Option width="100" height="80" name="opn_monitor" text="床位视窗" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='monitor.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
+				<Option width="100" height="80" name="opn_reader"  text="手持测温" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
 			</HorizontalLayout>
 			
 			<TileLayout bkcolor="#FF192431" inset="0,0,0,0" name="layMain" columns="2" >
@@ -66,13 +66,16 @@
 					<VerticalLayout inset="0,0,0,0" name="layTags" hscrollbar="false" vscrollbar="true" sepheight="4" />
 				</VerticalLayout>
 				
-				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4">
+				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" name="layHandTagView" >
 					<MyImage_1 name="my_image_hand_reader" bordercolor="#FF666666" bordersize="1" bkcolor="#FF43424C" />
 				</VerticalLayout>
+				
+				<TileLayout bkcolor="#FF192431" inset="0,0,0,0" name="layGridsView" columns="2" visible="false" />
 			</HorizontalLayout>
 			
 			<Edit name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" visible="false" />
 			<Edit name="edRemark_1" float="true" pos="100,100,200,150" text="123" font="1" visible="false" />
+			<Control name="dragDropTag" float="true" pos="100,100,580,200" text="123" font="1" visible="false" bkcolor="#AA000000" />
 		</VerticalLayout>
 	
 		<!-- 状态栏 -->

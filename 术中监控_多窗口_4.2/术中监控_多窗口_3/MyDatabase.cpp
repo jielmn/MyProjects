@@ -4,7 +4,6 @@
 #define  DB_NAME                          "TelemedCenter.db"
 #define  TEMP_TABLE_NAME                  "temperature"
 // 手持读卡器
-#define  TEMP_TABLE_NAME_1                "temperature_1"
 #define  TAG_NICKNAME                     "tagname_1"
 
 CMySqliteDatabase::CMySqliteDatabase() {
@@ -33,7 +32,8 @@ int CMySqliteDatabase::InitDb() {
 			"tag_id         CHAR(16)    NOT NULL," \
 			"temp           int         NOT NULL," \
 			"time           int         NOT NULL,"  \
-			"remark         varchar(28) NOT NULL" \
+			"remark         varchar(28) NOT NULL," \
+			"type           int         NOT NULL DEFAULT 0"              // 0 连续测温，1: 手持读卡器测温
 			");";
 
 		ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
@@ -68,35 +68,6 @@ int CMySqliteDatabase::InitDb() {
 	}
 	sqlite3_free_table(azResult);
 
-
-	nrow = 0;
-	ncolumn = 0;
-	azResult = 0;
-	zErrMsg = 0;
-	// 查看手持读卡器温度表是否存在，如果不存在，则创建
-	sql = "select name from sqlite_master where name = '" TEMP_TABLE_NAME_1 "';";
-	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
-
-	// 表不存在，则创建表
-	if (0 == nrow) {
-		sql = "CREATE TABLE " TEMP_TABLE_NAME_1 "("  \
-			"id             INTEGER PRIMARY KEY AUTOINCREMENT," \
-			"tag_id         CHAR(16)    NOT NULL," \
-			"temp           int         NOT NULL," \
-			"time           int         NOT NULL,"  \
-			"remark         varchar(28) NOT NULL," \
-			"card_id        CHAR(16)    NOT NULL" \
-			");";
-
-		ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
-		if (ret != 0) {
-			sqlite3_free_table(azResult);
-			return -1;
-		}
-	}
-	sqlite3_free_table(azResult);
-
-
 	// 删除一周前的温度
 	char szSql[8192];
 	time_t now = time(0);
@@ -118,11 +89,6 @@ int CMySqliteDatabase::InitDb() {
 		(DWORD)tWeekBegin );
 	sqlite3_exec(m_db, szSql, 0, 0, &zErrMsg);
 
-	// 删除一周前的手持温度数据
-	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE_NAME_1,
-		(DWORD)tWeekBegin);
-	sqlite3_exec(m_db, szSql, 0, 0, &zErrMsg);
-
 	// 删除三个月前的tag name
 	time_t tThreeMonthAgo = today_zero_time - 3600 * 24 * 89;
 	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TAG_NICKNAME,
@@ -141,7 +107,7 @@ int  CMySqliteDatabase::SaveTemp(const CSaveTempSqliteParam * pParam) {
 	char *zErrMsg = 0;
 	int  ret = 0;
 
-	SNPRINTF(sql, sizeof(sql), "insert into temperature values (null, '%s', %lu, %lu, '' )",
+	SNPRINTF(sql, sizeof(sql), "insert into temperature values (null, '%s', %lu, %lu, '', 0 )",
 		pParam->m_szTagId, pParam->m_dwTemp, (DWORD)pParam->m_time);
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
@@ -200,7 +166,7 @@ int  CMySqliteDatabase::SaveRemark(const CSetRemarkSqliteParam * pParam) {
 	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
 
 	SNPRINTF(sql, sizeof(sql), "update temperature set remark='%s' "
-		"where tag_id='%s' and time=%lu",
+		"where tag_id='%s' and time=%lu and type=0",
 		szRemark, pParam->m_szTagId, (DWORD)pParam->m_tTime);
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
@@ -296,7 +262,7 @@ int  CMySqliteDatabase::QueryHandReaderTemp( vector< vector<TempData *> * > & vD
 	// 一周前的开始位置
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
 
-	SNPRINTF(szSql, sizeof(szSql), "select * from %s where time >= %lu order by time desc", TEMP_TABLE_NAME_1,
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where time >= %lu AND type = 1 order by time desc", TEMP_TABLE_NAME,
 		(DWORD)tWeekBegin);
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
@@ -378,8 +344,8 @@ int  CMySqliteDatabase::SaveHandTemp(const CSaveHandTempParam * pParam) {
 	int  ret = 0;
 
 	//  id,  tag, temp, time, remark, cardid
-	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', '%s' )", TEMP_TABLE_NAME_1,
-		pParam->m_szTagId, pParam->m_dwTemp, (DWORD)pParam->m_time, pParam->m_szCardId );
+	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', 1 )", TEMP_TABLE_NAME,
+		pParam->m_szTagId, pParam->m_dwTemp, (DWORD)pParam->m_time );
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
 
@@ -431,7 +397,7 @@ int  CMySqliteDatabase::SaveHandRemark(const CSetRemarkSqliteParam * pParam) {
 	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
 
 	SNPRINTF(sql, sizeof(sql), "update %s set remark='%s' "
-		"where tag_id='%s' and time=%lu", TEMP_TABLE_NAME_1,
+		"where tag_id='%s' and time=%lu and type=1", TEMP_TABLE_NAME,
 		szRemark, pParam->m_szTagId, (DWORD)pParam->m_tTime);
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);

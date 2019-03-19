@@ -24,6 +24,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_layMain = 0;
 	m_LastSaveExcelTime = 0;
 	m_nSelTabIndex = 0;
+	m_dragDropTagIndex = -1;
+	m_dragDropGridIndex = -1;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -41,12 +43,15 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblBarTips"));
 	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
 	g_edRemark_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark_1"));
+	m_dragDropTag = m_PaintManager.FindControl("dragDropTag");
 	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
 	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
 	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
 	m_layMain_1 = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain_1"));
 	m_MyImage_hand_reader = static_cast<CMyImageUI_1*>(m_PaintManager.FindControl("my_image_hand_reader"));
 	m_layTags = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl("layTags"));
+	m_layHandTagView = static_cast<CVerticalLayoutUI*>(m_PaintManager.FindControl("layHandTagView"));
+	m_layGridsView = static_cast<CTileLayoutUI *>(m_PaintManager.FindControl("layGridsView"));	
 
 	m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);            
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -280,6 +285,19 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 	} 
 
+	m_layGridsView->SetFixedColumns(6);
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		CLabelUI * pLabel = new CLabelUI;
+		strText.Format("%d", i + 1);
+		pLabel->SetText(strText);
+		pLabel->SetFont(10);
+		pLabel->SetTextColor(0xFFFFFFFF);
+		pLabel->SetBorderColor(0xFFFFFFFF);
+		pLabel->SetBorderSize(1);
+		pLabel->SetAttribute("align", "center"); 
+		m_layGridsView->Add(pLabel);
+	}
+
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU_NAME));
 
 	OnChangeSkin();
@@ -453,6 +471,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_LBUTTONDOWN) {
 		OnMyLButtonDown(wParam, lParam);
+	}
+	else if (uMsg == WM_LBUTTONUP) {
+		OnMyLButtonUp(wParam, lParam);
+	}
+	else if (uMsg == WM_MOUSEMOVE) {
+		OnMyMouseMove(wParam, lParam);
 	}
 	else if ( uMsg == UM_LAUNCH_STATUS ) {
 		OnLaunchStatus(wParam, lParam);
@@ -1197,6 +1221,7 @@ void   CDuiFrameWnd::OnEdtReaderNameKillFocus(TNotifyUI& msg) {
 	m_UiBtnReaderNames[dwIndex][dwSubIndex]->SetVisible(true);
 }
 
+
 void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 	POINT pt;
 	pt.x = LOWORD(lParam);
@@ -1213,10 +1238,49 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 			break;
 		}
 		else if (pCtl->GetName() == "layHandTag") {
-			OnLayHandTagSelected(pCtl);
+			m_dragDropTagIndex = OnLayHandTagSelected(pCtl);
+			m_dragDropGridIndex = -1;
 			break;
 		}
 		pCtl = pCtl->GetParent();
+	}
+}
+
+void   CDuiFrameWnd::OnMyLButtonUp(WPARAM wParam, LPARAM lParam) {
+	if ( m_dragDropTagIndex >= 0 ) {
+		m_dragDropTag->SetVisible(false);
+		m_dragDropTagIndex = -1;
+		m_layHandTagView->SetVisible(true);
+		m_layGridsView->SetVisible(false);
+	}	
+}
+
+void   CDuiFrameWnd::OnMyMouseMove(WPARAM wParam, LPARAM lParam) {
+	if (m_dragDropTagIndex >= 0 ) {
+		if (!m_dragDropTag->IsVisible()) {
+			RECT rect = m_layHandTagView->GetPos();
+
+			m_dragDropTag->SetVisible(true);
+			m_layHandTagView->SetVisible(false);
+			m_layGridsView->SetVisible(true);
+			OnGridsViewSize( rect.right - rect.left, rect.bottom - rect.top );
+		}
+
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+
+		int x = 100 / 2;
+		int y = 100 / 2;
+
+		RECT r;
+		r.left = pt.x - x;
+		r.right = r.left + x * 2;
+		r.top = pt.y - y;
+		r.bottom = r.top + y * 2;
+		m_dragDropTag->SetPos(r);
+
+		m_dragDropGridIndex = OnMouseMoveGridsView(pt);
 	}
 }
 
@@ -2108,18 +2172,23 @@ void   CDuiFrameWnd::OnAutoPruneTimer() {
 	}
 }
 
-void   CDuiFrameWnd::OnLayHandTagSelected(CControlUI* pCtrl) {
+int   CDuiFrameWnd::OnLayHandTagSelected(CControlUI* pCtrl) {
 	vector<TagControlItem *>::iterator it;
-	for ( it = m_vHandTagUIs.begin(); it != m_vHandTagUIs.end(); ++it ) {
+	int nIndex = -1;
+	int i = 0;
+	for ( it = m_vHandTagUIs.begin(), i = 0; it != m_vHandTagUIs.end(); ++it, ++i ) {
 		TagControlItem * pItem = *it;
 		if ( pItem->m_Control == pCtrl) {
 			pItem->m_Control->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_READER_BK]);
 			m_MyImage_hand_reader->OnTagSelected(it -  m_vHandTagUIs.begin());
+			nIndex = i;
 		}
 		else {
 			pItem->m_Control->SetBkColor(0);
 		}
 	}
+
+	return nIndex;
 }
 
 void   CDuiFrameWnd::OnBtnTagNickname(TNotifyUI& msg) {
@@ -2151,6 +2220,58 @@ void   CDuiFrameWnd::OnEdtTagNicknameKillFocus(TNotifyUI& msg) {
 
 void   CDuiFrameWnd::OnEdtRemarkKillFocus_1() {
 	OnEdtRemarkKillFocus1_g(m_MyImage_hand_reader);
+}
+
+void   CDuiFrameWnd::OnGridsViewSize(DWORD  dwWidth, DWORD  dwHeight) {
+	SIZE s;
+	s.cx = (dwWidth - 1) / DRAG_DROP_COLUMNS + 1;
+	s.cy = (dwHeight - 1) / DRAG_DROP_ROWS + 1;
+	m_layGridsView->SetItemSize(s);
+}
+
+int  CDuiFrameWnd::OnMouseMoveGridsView(const POINT & pt) {
+	RECT rect = m_layGridsView->GetPos();
+	int nWidth = rect.right - rect.left;
+	int nHeight = rect.bottom - rect.top;
+	if (nWidth <= 0 || nHeight <= 0 ) {
+		return -1;
+	}
+
+	if ( pt.x <= rect.left || pt.x >= rect.right || pt.y <= rect.top || pt.y >= rect.bottom ) {
+		for (int i = 0; i < DRAG_DROP_COLUMNS; i++) {
+			for (int j = 0; j < DRAG_DROP_ROWS; j++) {
+				CLabelUI* pCtl = (CLabelUI*)m_layGridsView->GetItemAt(j*DRAG_DROP_COLUMNS + i);
+				pCtl->SetBorderColor(0xFFFFFFFF);
+				pCtl->SetTextColor(0xFFFFFFFF);
+			}
+		}
+		return -1;
+	}
+
+	SIZE s;
+	s.cx = (nWidth - 1) / DRAG_DROP_COLUMNS + 1;
+	s.cy = (nHeight - 1) / DRAG_DROP_ROWS + 1;
+
+	int nIndex = -1;
+	for (int i = 0; i < DRAG_DROP_COLUMNS; i++) {
+		for (int j = 0; j < DRAG_DROP_ROWS; j++) {
+			if ( (pt.x > rect.left + s.cx * i) && (pt.x < rect.left + s.cx * (i+1)) 
+				&& (pt.y > rect.top + s.cy * j) && (pt.y < rect.top + s.cy * (j+1) ) ) {
+				CLabelUI* pCtl = (CLabelUI*)m_layGridsView->GetItemAt(j*DRAG_DROP_COLUMNS + i);
+				pCtl->SetBorderColor(0xFFCAF100);
+				pCtl->SetTextColor(0xFF000000);
+				pCtl->SetBkColor(0xFFCCCCCC);
+				nIndex = j*DRAG_DROP_COLUMNS + i;
+			}
+			else {
+				CLabelUI* pCtl = (CLabelUI*)m_layGridsView->GetItemAt(j*DRAG_DROP_COLUMNS + i);
+				pCtl->SetBorderColor(0xFFFFFFFF);
+				pCtl->SetTextColor(0xFFFFFFFF);
+				pCtl->SetBkColor(0xFF192431);
+			}
+		}
+	}
+	return nIndex;
 }
 
 

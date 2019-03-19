@@ -204,6 +204,9 @@ using namespace DuiLib;
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
 
+#define DRAG_DROP_COLUMNS                6
+#define DRAG_DROP_ROWS                   5
+
 // ¿‡
 typedef struct tagTempData {
 	DWORD    dwIndex;

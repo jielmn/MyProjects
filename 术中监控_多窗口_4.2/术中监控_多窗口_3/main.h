@@ -106,6 +106,11 @@ private:
 	CMyImageUI_1 *                     m_MyImage_hand_reader;
 	CVerticalLayoutUI *                m_layTags;
 	vector<TagControlItem *>           m_vHandTagUIs;
+	CControlUI *                       m_dragDropTag;
+	int                                m_dragDropTagIndex;
+	CVerticalLayoutUI *                m_layHandTagView;
+	CTileLayoutUI *                    m_layGridsView;
+	int                                m_dragDropGridIndex;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -137,6 +142,8 @@ private:
 	void   OnReaderName(TNotifyUI& msg);
 	void   OnEdtReaderNameKillFocus(TNotifyUI& msg);
 	void   OnMyLButtonDown(WPARAM wParam, LPARAM lParam);
+	void   OnMyLButtonUp(WPARAM wParam, LPARAM lParam);
+	void   OnMyMouseMove(WPARAM wParam, LPARAM lParam);
 	void   OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex);
 	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
 	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
@@ -183,11 +190,15 @@ private:
 	//
 	void   OnAutoPruneTimer();
 	//
-	void   OnLayHandTagSelected(CControlUI* pCtrl);
+	int    OnLayHandTagSelected(CControlUI* pCtrl);
 	//
 	void   OnBtnTagNickname(TNotifyUI& msg);
 	//
 	void   OnEdtTagNicknameKillFocus(TNotifyUI& msg);
 	//
 	void   OnEdtRemarkKillFocus_1();
+	//
+	void   OnGridsViewSize(DWORD  dwWidth, DWORD  dwHeight);
+	//
+	int    OnMouseMoveGridsView(const POINT & pt);
 };
