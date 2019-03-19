@@ -152,6 +152,14 @@ public:
 	int   SetHandRemarkAsyn(const char * szTagId, time_t tTime, const char * szRemark);
 	int   SetHandRemark(const CSetRemarkSqliteParam * pParam);
 
+	// 请求Tag绑定的视窗格子
+	int   QueryTagBindingGridsAsyn();
+	int   QueryTagBindingGrids();
+
+	// Tag绑定窗格
+	int   SetTagBindingGridAsyn(const char * szTagId, int nGridIndex);
+	int   SetTagBindingGrid(const CSetTagBindingGridParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

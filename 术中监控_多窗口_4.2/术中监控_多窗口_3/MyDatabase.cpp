@@ -5,6 +5,8 @@
 #define  TEMP_TABLE_NAME                  "temperature"
 // 手持读卡器
 #define  TAG_NICKNAME                     "tagname_1"
+// 绑定窗格
+#define  BINDING_GRID                     "BindingGrid"
 
 CMySqliteDatabase::CMySqliteDatabase() {
 	m_db = 0;
@@ -67,6 +69,30 @@ int CMySqliteDatabase::InitDb() {
 		}
 	}
 	sqlite3_free_table(azResult);
+
+
+	nrow = 0;
+	ncolumn = 0;
+	azResult = 0;
+	zErrMsg = 0;
+	sql = "select name from sqlite_master where name = '" BINDING_GRID "';";
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, &zErrMsg);
+
+	// 表不存在，则创建表
+	if (0 == nrow) {
+		sql = "CREATE TABLE " BINDING_GRID "("  \
+			"grid_index     int         NOT NULL PRIMARY KEY," \
+			"tag_id         CHAR(16)    NOT NULL" \
+			");";
+
+		ret = sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+		if (ret != 0) {
+			sqlite3_free_table(azResult);
+			return -1;
+		}
+	}
+	sqlite3_free_table(azResult);
+
 
 	// 删除一周前的温度
 	char szSql[8192];
@@ -401,6 +427,58 @@ int  CMySqliteDatabase::SaveHandRemark(const CSetRemarkSqliteParam * pParam) {
 		szRemark, pParam->m_szTagId, (DWORD)pParam->m_tTime);
 	/* Execute SQL statement */
 	sqlite3_exec(m_db, sql, 0, 0, &zErrMsg);
+
+	return 0;
+}
+
+int  CMySqliteDatabase::QueryTagBindingGrids(vector<TagBindingGrid*> & vRet) {
+
+	char szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s", BINDING_GRID );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char *zErrMsg = 0;            // 错误描述
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, &zErrMsg);
+	for (int i = 0; i < nrow; i++) {
+		TagBindingGrid * pItem = new TagBindingGrid;
+		memset(pItem, 0, sizeof(TagBindingGrid));
+		sscanf_s(azResult[(i + 1)*ncolumn + 0], "%d",  &pItem->m_nGridIndex);
+		STRNCPY(pItem->m_szTagId, azResult[(i + 1)*ncolumn + 1], sizeof(pItem->m_szTagId));
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+
+	return 0;
+}
+
+int  CMySqliteDatabase::SetTagBindingGrid(const CSetTagBindingGridParam * pParam) {
+	char sql[8192];
+	int  ret = 0;
+
+	// grid_index, tag_id  
+	SNPRINTF(sql, sizeof(sql), "update %s set tag_id = '' where tag_id='%s' ", BINDING_GRID, pParam->m_szTagId );
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	SNPRINTF(sql, sizeof(sql), "select * from  %s where grid_index=%d ", BINDING_GRID, pParam->m_nGridIndex);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	// 如果存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "update %s set tag_id = '%s' where grid_index = %d ", BINDING_GRID,
+			pParam->m_szTagId, pParam->m_nGridIndex );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	// 不存在
+	else {
+		SNPRINTF(sql, sizeof(sql), "insert into %s values ( %d, '%s' ) ", BINDING_GRID,
+			pParam->m_nGridIndex, pParam->m_szTagId );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
 
 	return 0;
 }

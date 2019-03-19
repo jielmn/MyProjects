@@ -187,6 +187,8 @@ using namespace DuiLib;
 #define MSG_SAVE_HAND_READER_TEMP           4004
 #define MSG_SAVE_HAND_READER_NAME           4005
 #define MSG_SAVE_HAND_TAG_REMARK            4006
+#define MSG_GET_TAG_BINDING_GRIDS           4007
+#define MSG_SET_TAG_BINDING_GRID            4008
 
 #define UM_UPDATE_SCROLL                 (WM_USER+1)
 #define UM_LAUNCH_STATUS                 (WM_USER+2)
@@ -200,6 +202,7 @@ using namespace DuiLib;
 #define UM_QUERY_TEMP_SQLITE_RET         (WM_USER+10)
 #define UM_QUERY_HAND_READER_TEMP_SQLITE_RET         (WM_USER+11)
 #define UM_HAND_READER_TEMP                          (WM_USER+12)
+#define UM_TAG_BINDING_GRIDS_RET                     (WM_USER+13)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
 #define GET_TEMPERATURE_TIMEOUT           2000
@@ -384,7 +387,13 @@ typedef struct tagHandReaderTemp {
 typedef struct tagTagControlItem {
 	CControlUI *    m_Control;
 	string *        m_pTagId;
+	int             m_nBindingGridIndex;
 }TagControlItem;
+
+typedef  struct  tagTagBindingGrid {
+	int             m_nGridIndex;     // °üÀ¨A - F
+	char            m_szTagId[20];
+}TagBindingGrid;
 
 class CSaveTempParam : public LmnToolkits::MessageData {
 public:
@@ -505,6 +514,17 @@ public:
 
 	char           m_szTagId[20];
 	char           m_szName[16];
+};
+
+class CSetTagBindingGridParam : public LmnToolkits::MessageData {
+public:
+	CSetTagBindingGridParam(const char * szTagId, int nGridIndex) {
+		m_nGridIndex = nGridIndex;
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+	}
+
+	char           m_szTagId[20];
+	int            m_nGridIndex;
 };
 
 //class CSaveHandTagRemarkParam : public LmnToolkits::MessageData {

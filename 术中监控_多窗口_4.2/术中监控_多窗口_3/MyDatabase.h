@@ -17,6 +17,8 @@ public:
 	int  SaveHandTemp(const CSaveHandTempParam * pParam);
 	int  SaveHandTagNickname(const CSaveHandTagNicknameParam * pParam);
 	int  SaveHandRemark(const CSetRemarkSqliteParam * pParam);
+	int  QueryTagBindingGrids(vector<TagBindingGrid*> & vRet);
+	int  SetTagBindingGrid(const CSetTagBindingGridParam * pParam);
 
 private:
 	sqlite3 *           m_db;

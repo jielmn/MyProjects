@@ -312,9 +312,10 @@ void  CDuiFrameWnd::InitWindow() {
 	SetTimer(m_hWnd, TIMER_CHECK_AUTO_SAVE,  TIMER_CHECK_AUTO_SAVE_INTERVAL, NULL);
 	SetTimer(m_hWnd, TIMER_AUTO_PRUNE,       TIMER_AUTO_PRUNE_INTERVAL, NULL);
 
-	OnMyDeviceChanged();
-	// CBusiness::GetInstance()->ReconnectLaunchAsyn(200);
+	// OnMyDeviceChanged();    // 放在获得所有的sqlite数据后，即QueryTagBindingGridsAsyn()的结果拿到后
+
 	CBusiness::GetInstance()->QueryHandReaderTempFromSqliteAsyn(); 
+	CBusiness::GetInstance()->QueryTagBindingGridsAsyn();
 
 #if DB_FLAG
 	CBusiness::GetInstance()->ReconnectDbAsyn();
@@ -512,6 +513,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_HAND_READER_TEMP) {
 		OnHandReaderTemp(wParam, lParam);
 	}
+	else if (uMsg == UM_TAG_BINDING_GRIDS_RET) {
+		OnTagBindingGridsRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -526,6 +530,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 	}
 	g_data.m_hWnd = 0;
 	ClearVector(m_vHandTagUIs);
+	ClearVector(m_vTagBindingGrids);
 }
 
 void   CDuiFrameWnd::OnSize(WPARAM wParam, LPARAM lParam) {
@@ -1239,6 +1244,9 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 		}
 		else if (pCtl->GetName() == "layHandTag") {
 			m_dragDropTagIndex = OnLayHandTagSelected(pCtl);
+			if ( m_dragDropTagIndex >= 0 ) {
+				m_dragDropTagId = *m_vHandTagUIs[m_dragDropTagIndex]->m_pTagId;
+			}
 			m_dragDropGridIndex = -1;
 			break;
 		}
@@ -1248,10 +1256,25 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 
 void   CDuiFrameWnd::OnMyLButtonUp(WPARAM wParam, LPARAM lParam) {
 	if ( m_dragDropTagIndex >= 0 ) {
-		m_dragDropTag->SetVisible(false);
-		m_dragDropTagIndex = -1;
+		m_dragDropTag->SetVisible(false);		
 		m_layHandTagView->SetVisible(true);
 		m_layGridsView->SetVisible(false);
+
+		// 最后拖动到的grid index
+		if ( m_dragDropGridIndex >= 0 ) {
+			// 如果m_dragDropTagIndex还有效
+			if ( (int)m_vHandTagUIs.size() > m_dragDropTagIndex ) {
+				// 如果tagid 验证也对
+				if ( 0 == strcmp( m_dragDropTagId.c_str(), m_vHandTagUIs[m_dragDropTagIndex]->m_pTagId->c_str() ) ) {
+					// 如果绑定的index有改变
+					if ( m_vHandTagUIs[m_dragDropTagIndex]->m_nBindingGridIndex != m_dragDropGridIndex ) {
+						OnHandTagBindingGrid(m_dragDropTagIndex, m_dragDropGridIndex);
+					}
+				}
+			}
+		}
+
+		m_dragDropTagIndex = -1;
 	}	
 }
 
@@ -1446,7 +1469,7 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
 	
 	delete pTemp;
-}         
+}           
  
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
@@ -2099,6 +2122,7 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		TagControlItem * pItem = new TagControlItem;
 		pItem->m_Control = pTagUI;
 		pItem->m_pTagId = pTagId;
+		pItem->m_nBindingGridIndex = -1;
 		m_vHandTagUIs.insert( m_vHandTagUIs.begin(), pItem );
 
 		if (m_vHandTagUIs.size() == 1) {
@@ -2272,6 +2296,44 @@ int  CDuiFrameWnd::OnMouseMoveGridsView(const POINT & pt) {
 		}
 	}
 	return nIndex;
+}
+
+void  CDuiFrameWnd::OnTagBindingGridsRet(WPARAM wParam, LPARAM  lParam) {
+	vector<TagBindingGrid*> * pvRet = (vector<TagBindingGrid*> *)wParam;
+	m_vTagBindingGrids.insert(m_vTagBindingGrids.begin(), pvRet->begin(), pvRet->end());
+	delete pvRet;	
+
+	OnMyDeviceChanged();
+}
+
+//
+void  CDuiFrameWnd::OnHandTagBindingGrid(int nTagIndex, int nGridIndex) {
+	vector<TagControlItem *>::iterator it;
+	int i = 0;
+	CDuiString strText;
+
+	for (it = m_vHandTagUIs.begin(), i = 0; it != m_vHandTagUIs.end(); ++it, ++i) {
+		TagControlItem * pItem = *it;
+		// 绑定
+		if ( i == nTagIndex ) {
+			CLabelUI * plblBindingGrid = static_cast<CLabelUI*>(pItem->m_Control->FindControl(MY_FINDCONTROLPROC, "bindingGrid", 0));
+			strText.Format("绑定窗格%02dA", nGridIndex+1);
+			plblBindingGrid->SetText(strText);
+			pItem->m_nBindingGridIndex = nGridIndex;
+			plblBindingGrid->SetTextColor(0xFFCAF100);
+		}
+		else {
+			// 取消绑定
+			if (pItem->m_nBindingGridIndex == nGridIndex) {
+				CLabelUI * plblBindingGrid = static_cast<CLabelUI*>(pItem->m_Control->FindControl(MY_FINDCONTROLPROC, "bindingGrid", 0));
+				plblBindingGrid->SetText("未绑定窗格");
+				pItem->m_nBindingGridIndex = -1;
+				plblBindingGrid->SetTextColor(0xFFFFFFFF);
+			}
+		}
+	}
+
+	CBusiness::GetInstance()->SetTagBindingGridAsyn(m_vHandTagUIs[nTagIndex]->m_pTagId->c_str(), nGridIndex * MAX_READERS_PER_GRID);
 }
 
 

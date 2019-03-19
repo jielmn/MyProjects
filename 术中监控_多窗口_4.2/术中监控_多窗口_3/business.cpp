@@ -1021,6 +1021,28 @@ int  CBusiness::SetHandRemark(const CSetRemarkSqliteParam * pParam) {
 	return 0;
 }
 
+int   CBusiness::QueryTagBindingGridsAsyn() {
+	g_thrd_sqlite->PostMessage(this, MSG_GET_TAG_BINDING_GRIDS );
+	return 0;
+}
+
+int   CBusiness::QueryTagBindingGrids() {
+	vector<TagBindingGrid*> * pvRet = new vector<TagBindingGrid*>;
+	m_sqlite.QueryTagBindingGrids(*pvRet);
+	::PostMessage(g_data.m_hWnd, UM_TAG_BINDING_GRIDS_RET, (WPARAM)pvRet, 0);
+	return 0;
+}
+
+int   CBusiness::SetTagBindingGridAsyn(const char * szTagId, int nGridIndex) {
+	g_thrd_sqlite->PostMessage(this, MSG_SET_TAG_BINDING_GRID, new CSetTagBindingGridParam(szTagId,nGridIndex) );
+	return 0;
+}
+
+int   CBusiness::SetTagBindingGrid(const CSetTagBindingGridParam * pParam) {
+	m_sqlite.SetTagBindingGrid(pParam);
+	return 0;
+}
+
 
 // 消息处理
 void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1148,6 +1170,19 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 	{
 		CSetRemarkSqliteParam * pParam = (CSetRemarkSqliteParam *)pMessageData;
 		SetHandRemark(pParam);
+	}
+	break;
+
+	case MSG_GET_TAG_BINDING_GRIDS:
+	{
+		QueryTagBindingGrids();
+	}
+	break;
+
+	case MSG_SET_TAG_BINDING_GRID:
+	{
+		CSetTagBindingGridParam * pParam = (CSetTagBindingGridParam *)pMessageData;
+		SetTagBindingGrid(pParam);
 	}
 	break;
 

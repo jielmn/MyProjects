@@ -108,9 +108,12 @@ private:
 	vector<TagControlItem *>           m_vHandTagUIs;
 	CControlUI *                       m_dragDropTag;
 	int                                m_dragDropTagIndex;
+	string                             m_dragDropTagId;
 	CVerticalLayoutUI *                m_layHandTagView;
 	CTileLayoutUI *                    m_layGridsView;
 	int                                m_dragDropGridIndex;
+
+	vector<TagBindingGrid*>            m_vTagBindingGrids;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -201,4 +204,8 @@ private:
 	void   OnGridsViewSize(DWORD  dwWidth, DWORD  dwHeight);
 	//
 	int    OnMouseMoveGridsView(const POINT & pt);
+	//
+	void   OnTagBindingGridsRet(WPARAM wParam, LPARAM  lParam);
+	//
+	void   OnHandTagBindingGrid(int nTagIndex, int nGridIndex);
 };
