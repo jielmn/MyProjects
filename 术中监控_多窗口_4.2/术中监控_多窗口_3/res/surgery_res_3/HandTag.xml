@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	<VerticalLayout height="100" name="layHandTag" bordersize="1" bordercolor="#FFCCCCCC" >	
+		<HorizontalLayout height="70" inset="30,10,0,10" >	
+			
+			<VerticalLayout width="105">
+				<Control />
+				<HorizontalLayout height="30">
+					<Edit name="edtTagNickName" text="--"    textcolor="#FF000000" width="105" font="1" visible="false" />		
+					<Button name="btnTagNickName" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="105" font="1" />
+				</HorizontalLayout>
+				<Control />
+			</VerticalLayout>		
+			
+			<Control width="10" />
+			<Label name="lblHandTagTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
+			<Control />	
+
+		</HorizontalLayout>
+		
+		<HorizontalLayout inset="30,0,0,0">
+			<Label text="读卡器SN" textcolor="#FF000000" font="1" width="80" />
+			<Label name="lblReaderSn" text="ER0040000001" textcolor="#FF000000" font="1" width="135" />
+			<Label text="Tag ID" textcolor="#FF000000" font="1" width="70" />
+			<Label name="lblHandTagId" text="e901020304050607" textcolor="#FF000000" font="1" width="160" />
+		</HorizontalLayout>
+	</VerticalLayout>
+</Window>
