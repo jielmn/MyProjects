@@ -208,4 +208,6 @@ private:
 	void   OnTagBindingGridsRet(WPARAM wParam, LPARAM  lParam);
 	//
 	void   OnHandTagBindingGrid(int nTagIndex, int nGridIndex);
+	//
+	void   SetBindingGridText(TagControlItem * pItem, int nGridIndex);
 };

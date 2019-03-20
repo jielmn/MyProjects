@@ -457,7 +457,7 @@ int  CMySqliteDatabase::SetTagBindingGrid(const CSetTagBindingGridParam * pParam
 	int  ret = 0;
 
 	// grid_index, tag_id  
-	SNPRINTF(sql, sizeof(sql), "update %s set tag_id = '' where tag_id='%s' ", BINDING_GRID, pParam->m_szTagId );
+	SNPRINTF(sql, sizeof(sql), "delete from %s where tag_id='%s' ", BINDING_GRID, pParam->m_szTagId );
 	sqlite3_exec(m_db, sql, 0, 0, 0);
 
 	SNPRINTF(sql, sizeof(sql), "select * from  %s where grid_index=%d ", BINDING_GRID, pParam->m_nGridIndex);

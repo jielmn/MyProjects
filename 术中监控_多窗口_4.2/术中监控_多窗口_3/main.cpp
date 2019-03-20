@@ -138,6 +138,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_LblCurTemp_grid1[i]->SetTag(i);
 		m_LblCurTemp_grid1[i]->SetText("--");
 		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);	
+		m_LblCurTemp_grid1[i]->SetVisible(true);
 
 		m_LblCurTempTime[i] = static_cast<CLabelUI*>(m_pGrids[i]->FindControl(MY_FINDCONTROLPROC, "lblCurTime_2", 0));
 		m_LblCurTempTime[i]->SetTag(i);
@@ -268,7 +269,7 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 
 		if (!g_data.m_CfgData.m_GridCfg[i].m_bSwitch) {
-			m_LblCurTemp_grid1[i]->SetVisible(false);
+			//m_LblCurTemp_grid1[i]->SetVisible(false);
 		}
 		else {
 			if ( nSelectedIndex >= MAX_READERS_PER_GRID ) {
@@ -279,7 +280,7 @@ void  CDuiFrameWnd::InitWindow() {
 					m_LblCurTemp_grid1[i]->SetVisible(true);
 				}
 				else {
-					m_LblCurTemp_grid1[i]->SetVisible(false);
+					//m_LblCurTemp_grid1[i]->SetVisible(false);
 				}
 			}
 		}
@@ -997,10 +998,10 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 	DWORD  dwSelectedIndex = m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex;
 
 	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
-		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		//m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		for (int k = 0; k < MAX_READERS_PER_GRID; k++) {
-			m_UiReaderTemp[dwIndex][k]->SetVisible(false);
+			//m_UiReaderTemp[dwIndex][k]->SetVisible(false);
 			m_tLastTemp[dwIndex][k].m_dwTemp = 0;
 			m_tLastTemp[dwIndex][k].m_Time = 0;
 		}
@@ -1015,7 +1016,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 			}
 			else
 			{
-				m_UiReaderTemp[dwIndex][k]->SetVisible(false);
+				//m_UiReaderTemp[dwIndex][k]->SetVisible(false);
 				m_tLastTemp[dwIndex][k].m_dwTemp = 0;
 				m_tLastTemp[dwIndex][k].m_Time = 0;
 			}
@@ -1032,7 +1033,7 @@ void    CDuiFrameWnd::OnGridSwitch(TNotifyUI& msg) {
 				m_LblCurTemp_grid1[dwIndex]->SetText("--");
 			}
 			else {
-				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+				//m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 				m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 			}
 		}
@@ -1124,10 +1125,10 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 	g_data.m_cfg->Save();
 
 	if ( !g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
-		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+		//m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
 		m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = 0;
 		m_tLastTemp[dwIndex][dwSubIndex].m_Time = 0;
-		m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+		//m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 		m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 	}
 	else {
@@ -1139,7 +1140,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 		}
 		else
 		{
-			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+			//m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
 			m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = 0;
 			m_tLastTemp[dwIndex][dwSubIndex].m_Time = 0;
 		}
@@ -1154,7 +1155,7 @@ void   CDuiFrameWnd::OnReaderSwitch(TNotifyUI& msg) {
 			}
 			else
 			{
-				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+				//m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 				m_MyAlarm_grid[dwIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 			}
 		}
@@ -1267,8 +1268,8 @@ void   CDuiFrameWnd::OnMyLButtonUp(WPARAM wParam, LPARAM lParam) {
 				// 如果tagid 验证也对
 				if ( 0 == strcmp( m_dragDropTagId.c_str(), m_vHandTagUIs[m_dragDropTagIndex]->m_pTagId->c_str() ) ) {
 					// 如果绑定的index有改变
-					if ( m_vHandTagUIs[m_dragDropTagIndex]->m_nBindingGridIndex != m_dragDropGridIndex ) {
-						OnHandTagBindingGrid(m_dragDropTagIndex, m_dragDropGridIndex);
+					if ( m_vHandTagUIs[m_dragDropTagIndex]->m_nBindingGridIndex != m_dragDropGridIndex * MAX_READERS_PER_GRID ) {
+						OnHandTagBindingGrid(m_dragDropTagIndex, m_dragDropGridIndex * MAX_READERS_PER_GRID );
 					}
 				}
 			}
@@ -1323,7 +1324,7 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_MyImage_grid[dwIndex]->OnReaderSelected(dwSubIndex);
 
 	m_LblCurTemp_grid1[dwIndex]->SetTextColor(m_UiReaderTemp[dwIndex][dwSubIndex]->GetTextColor());
-	m_LblCurTemp_grid1[dwIndex]->SetVisible(m_UiReaderTemp[dwIndex][dwSubIndex]->IsVisible());
+	//m_LblCurTemp_grid1[dwIndex]->SetVisible(m_UiReaderTemp[dwIndex][dwSubIndex]->IsVisible());
 	m_LblCurTemp_grid1[dwIndex]->SetText(m_UiReaderTemp[dwIndex][dwSubIndex]->GetText());
 	
 	time_t  now = time(0);
@@ -1479,7 +1480,7 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 
 	if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
-		m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+		//m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
 	}
 	else {
 		if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
@@ -1494,7 +1495,7 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 			}
 		}
 		else {
-			m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
+			//m_UiReaderTemp[dwIndex][dwSubIndex]->SetVisible(false);
 		}
 	}
 
@@ -1503,7 +1504,7 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 		m_LblCurTemp_grid[dwIndex]->SetText("--");		
 
 		if (!g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
-			m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+			//m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 		}
 		else {
 			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch) {
@@ -1518,7 +1519,7 @@ void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 				}
 			}
 			else {
-				m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
+				//m_LblCurTemp_grid1[dwIndex]->SetVisible(false);
 			}
 		}
 	}
@@ -2034,6 +2035,7 @@ void   CDuiFrameWnd::OnTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 	m_MyImage_max[dwIndex]->OnTempSqliteRet(*pvRet, dwSubIndex);
 	m_MyImage_max[dwIndex]->MyInvalidate();
 
+	::InvalidateRect(GetHWND(), 0, TRUE);
 	// ClearVector(*pvRet);
 	delete pvRet;
 }
@@ -2082,6 +2084,7 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 		TagControlItem * pItem = new TagControlItem;
 		pItem->m_Control = pTagUI;
 		pItem->m_pTagId = pTagId;
+		pItem->m_nBindingGridIndex = -1;
 		m_vHandTagUIs.push_back(pItem);
 	}
 
@@ -2303,6 +2306,18 @@ void  CDuiFrameWnd::OnTagBindingGridsRet(WPARAM wParam, LPARAM  lParam) {
 	m_vTagBindingGrids.insert(m_vTagBindingGrids.begin(), pvRet->begin(), pvRet->end());
 	delete pvRet;	
 
+	vector<TagControlItem *>::iterator it;
+	vector<TagBindingGrid*>::iterator ix;
+	for (it = m_vHandTagUIs.begin(); it != m_vHandTagUIs.end(); ++it) {
+		TagControlItem * pItem = *it;
+		for (ix = m_vTagBindingGrids.begin(); ix != m_vTagBindingGrids.end(); ++ix) {
+			TagBindingGrid* pBinding = *ix;
+			if (0 == strcmp(pBinding->m_szTagId, pItem->m_pTagId->c_str())) {
+				SetBindingGridText(pItem, pBinding->m_nGridIndex);
+			}
+		}
+	}
+
 	OnMyDeviceChanged();
 }
 
@@ -2316,24 +2331,55 @@ void  CDuiFrameWnd::OnHandTagBindingGrid(int nTagIndex, int nGridIndex) {
 		TagControlItem * pItem = *it;
 		// 绑定
 		if ( i == nTagIndex ) {
-			CLabelUI * plblBindingGrid = static_cast<CLabelUI*>(pItem->m_Control->FindControl(MY_FINDCONTROLPROC, "bindingGrid", 0));
-			strText.Format("绑定窗格%02dA", nGridIndex+1);
-			plblBindingGrid->SetText(strText);
-			pItem->m_nBindingGridIndex = nGridIndex;
-			plblBindingGrid->SetTextColor(0xFFCAF100);
+			SetBindingGridText( pItem, nGridIndex );
 		}
 		else {
 			// 取消绑定
 			if (pItem->m_nBindingGridIndex == nGridIndex) {
-				CLabelUI * plblBindingGrid = static_cast<CLabelUI*>(pItem->m_Control->FindControl(MY_FINDCONTROLPROC, "bindingGrid", 0));
-				plblBindingGrid->SetText("未绑定窗格");
-				pItem->m_nBindingGridIndex = -1;
-				plblBindingGrid->SetTextColor(0xFFFFFFFF);
+				SetBindingGridText(pItem, -1);
 			}
 		}
 	}
 
-	CBusiness::GetInstance()->SetTagBindingGridAsyn(m_vHandTagUIs[nTagIndex]->m_pTagId->c_str(), nGridIndex * MAX_READERS_PER_GRID);
+	CBusiness::GetInstance()->SetTagBindingGridAsyn(m_vHandTagUIs[nTagIndex]->m_pTagId->c_str(), nGridIndex);
+
+	
+}
+
+//
+void  CDuiFrameWnd::SetBindingGridText( TagControlItem * pItem, int nGridIndex ) {
+	CDuiString strText;
+	CLabelUI * plblBindingGrid = static_cast<CLabelUI*>(pItem->m_Control->FindControl(MY_FINDCONTROLPROC, "bindingGrid", 0));
+	if ( nGridIndex >= 0 ) {
+		int x = nGridIndex / MAX_READERS_PER_GRID;
+		int y = nGridIndex % MAX_READERS_PER_GRID;
+
+		strText.Format("绑定窗格%02d%c", x+1, 'A'+y);
+		plblBindingGrid->SetText(strText);
+		pItem->m_nBindingGridIndex = nGridIndex;
+		plblBindingGrid->SetTextColor(0xFFCAF100);
+
+		m_MyImage_max[x]->SetTagId(y, pItem->m_pTagId->c_str());
+		m_MyImage_max[x]->EmptyData(y);
+		m_MyImage_max[x]->Invalidate();
+		CBusiness::GetInstance()->QueryTempFromSqliteByTagAsyn(pItem->m_pTagId->c_str(), x, y);
+		m_LblTagId[x][y]->SetText(pItem->m_pTagId->c_str());
+	}
+	else {
+		plblBindingGrid->SetText("未绑定窗格");
+		plblBindingGrid->SetTextColor(0xFFCCCCCC);
+
+		if (pItem->m_nBindingGridIndex >= 0) {
+			int x = pItem->m_nBindingGridIndex / MAX_READERS_PER_GRID;
+			int y = pItem->m_nBindingGridIndex % MAX_READERS_PER_GRID;
+			m_MyImage_max[x]->SetTagId(y, "");
+			m_MyImage_max[x]->EmptyData(y);
+			m_MyImage_max[x]->Invalidate();
+			m_LblTagId[x][y]->SetText("");
+		}
+		
+		pItem->m_nBindingGridIndex = -1;
+	}
 }
 
 
