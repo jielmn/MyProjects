@@ -1237,6 +1237,8 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 		return;
 	}
 
+	CControlUI* pOriginalCtl = pCtl;
+
 	while (pCtl) {
 		if (pCtl->GetName() == LAY_READER_NAME) {
 			DWORD  dwTag = pCtl->GetTag();
@@ -1245,10 +1247,17 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 		}
 		else if (pCtl->GetName() == "layHandTag") {
 			m_dragDropTagIndex = OnLayHandTagSelected(pCtl);
-			if ( m_dragDropTagIndex >= 0 ) {
-				m_dragDropTagId = *m_vHandTagUIs[m_dragDropTagIndex]->m_pTagId;
+			// 如果不是点击修改名字按钮
+			if ( 0 != strcmp( pOriginalCtl->GetClass(),"Button") ) {
+				if (m_dragDropTagIndex >= 0) {
+					m_dragDropTagId = *m_vHandTagUIs[m_dragDropTagIndex]->m_pTagId;
+				}
+				m_dragDropGridIndex = -1;
 			}
-			m_dragDropGridIndex = -1;
+			// 点击了按钮，不用drag drop操作
+			else {
+				m_dragDropTagIndex = -1;
+			}
 			break;
 		}
 		pCtl = pCtl->GetParent();
