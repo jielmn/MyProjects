@@ -503,11 +503,14 @@ char * GetElapsedTimeDesc(char * buf, DWORD dwBufSize, time_t  tTimeDiff) {
 	else if ( tTimeDiff < 60 ) {
 		SNPRINTF(buf, dwBufSize, "半分钟前");
 	}
-	else if (tTimeDiff >= 3600 ) {
+	else if (tTimeDiff < 3600) {
+		SNPRINTF(buf, dwBufSize, "%lu分钟前", (DWORD)((tTimeDiff - 60) / 60 + 1));
+	}
+	else if (tTimeDiff < 86400 ) {
 		SNPRINTF(buf, dwBufSize, "%lu小时前", (DWORD)(( tTimeDiff - 3600 ) / 3600 + 1) );
 	}
 	else {
-		SNPRINTF(buf, dwBufSize, "%lu分钟前", (DWORD)((tTimeDiff - 60) / 60 + 1) );
+		SNPRINTF(buf, dwBufSize, "%lu天前", (DWORD)((tTimeDiff - 86400 ) / 86400 + 1));
 	}
 	
 	return buf;

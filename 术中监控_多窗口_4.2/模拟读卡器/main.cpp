@@ -198,7 +198,7 @@ void MyMessageHandler_1::OnMessage(DWORD dwMessageId, const LmnToolkits::Message
 		memcpy(byData, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
 		memcpy(byData + 8,  g_TagId_1[nIndex], 8);
 		memcpy(byData + 22, g_CardId_1[nIndex], 8);
-		DWORD dwTemp = GetRand( 3530, 3940 );
+		DWORD dwTemp = GetRand( 3000 + nIndex * 100, 3100 + nIndex * 100 );
 		byData[16] = (BYTE)(dwTemp / 100);
 		byData[17] = (BYTE)(dwTemp % 100);
 		g_com.Write(byData, dwDataLen);

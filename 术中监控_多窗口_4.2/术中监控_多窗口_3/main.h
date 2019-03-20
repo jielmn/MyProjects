@@ -113,7 +113,7 @@ private:
 	CTileLayoutUI *                    m_layGridsView;
 	int                                m_dragDropGridIndex;
 
-	vector<TagBindingGrid*>            m_vTagBindingGrids;
+	//vector<TagBindingGrid*>            m_vTagBindingGrids;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -148,7 +148,7 @@ private:
 	void   OnMyLButtonUp(WPARAM wParam, LPARAM lParam);
 	void   OnMyMouseMove(WPARAM wParam, LPARAM lParam);
 	void   OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex);
-	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp);
+	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp, BOOL bChangeAlarm = TRUE);
 	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
 	void   OnReaderTemp(WPARAM wParam, LPARAM  lParam);
 	void   OnReaderDisconnected(WPARAM wParam, LPARAM  lParam);
@@ -210,4 +210,8 @@ private:
 	void   OnHandTagBindingGrid(int nTagIndex, int nGridIndex);
 	//
 	void   SetBindingGridText(TagControlItem * pItem, int nGridIndex);
+	//
+	void   PassTemp2Grid(DWORD  dwInde, DWORD  dwSubIndex, LastTemp * pTemp);
+	//
+	int    GetHandTagGridIndex(const char * szTagId);
 };

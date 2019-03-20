@@ -531,7 +531,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 	}
 	g_data.m_hWnd = 0;
 	ClearVector(m_vHandTagUIs);
-	ClearVector(m_vTagBindingGrids);
+	//ClearVector(m_vTagBindingGrids);
 }
 
 void   CDuiFrameWnd::OnSize(WPARAM wParam, LPARAM lParam) {
@@ -1346,29 +1346,38 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 	m_MyImage_grid[dwIndex]->MyInvalidate();  
 }
 
-void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp ) {	
+void   CDuiFrameWnd::OnTemp( DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp, BOOL bChangeAlarm /*= TRUE*/) {
 
 	m_MyImage_grid[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 	m_MyImage_max[dwIndex]->AddTemp(dwSubIndex, dwTemp);
 
-	if ( dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm ) {
-		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::HIGH_TEMP);		
+	CAlarmImageUI::ENUM_ALARM e = CAlarmImageUI::ALARM_OK;
+	if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
+		e = CAlarmImageUI::HIGH_TEMP;
+		//m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::HIGH_TEMP);
 	}
-	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm ) {
-		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::LOW_TEMP);		
+	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm) {
+		e = CAlarmImageUI::LOW_TEMP;
+		//m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(CAlarmImageUI::LOW_TEMP);
 	}
 	else {
-		m_UiAlarms[dwIndex][dwSubIndex]->StopAlarm();		
+		e = CAlarmImageUI::ALARM_OK;
+		//m_UiAlarms[dwIndex][dwSubIndex]->StopAlarm();
+	}
+
+	if (bChangeAlarm) {
+		m_UiAlarms[dwIndex][dwSubIndex]->StartAlarm(e);
 	}
 	//m_LblCurTemp_grid1[dwIndex]->SetTextColor(0xFF4E8B20);
 
 	if ( dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex ) {
-		m_MyAlarm_grid[dwIndex]->StartAlarm(m_UiAlarms[dwIndex][dwSubIndex]->m_alarm);
+		if (bChangeAlarm)
+			m_MyAlarm_grid[dwIndex]->StartAlarm(e);
 
-		if ( m_MyAlarm_grid[dwIndex]->m_alarm == CAlarmImageUI::HIGH_TEMP ) {
+		if ( e == CAlarmImageUI::HIGH_TEMP ) {
 			m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
 		}
-		else if (m_MyAlarm_grid[dwIndex]->m_alarm == CAlarmImageUI::LOW_TEMP) {
+		else if (e == CAlarmImageUI::LOW_TEMP) {
 			m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
 		}
 		else {
@@ -2131,6 +2140,19 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		if (m_vHandTagUIs.size() == 1) {
 			OnLayHandTagSelected(pTagUI);
 		}
+
+		int nGridIndex = GetHandTagGridIndex(pTemp->m_szTagId);
+		if (nGridIndex >= 0) {
+			DWORD  dwIndex = nGridIndex / MAX_READERS_PER_GRID;
+			DWORD  dwSubIndex = nGridIndex % MAX_READERS_PER_GRID;
+			LastTemp temp;
+			memset(&temp, 0, sizeof(LastTemp));
+			temp.m_dwTemp = pTemp->m_dwTemp;
+			STRNCPY(temp.m_szReaderId, pTemp->m_szReaderId, sizeof(temp.m_szReaderId));
+			STRNCPY(temp.m_szTagId, pTemp->m_szTagId, sizeof(temp.m_szTagId));
+			temp.m_Time = time(0);
+			PassTemp2Grid(dwIndex, dwSubIndex, &temp);
+		}
 	}
 	else {
 		vector<TagControlItem *>::iterator it;
@@ -2139,6 +2161,19 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 			// ÕÒµ½
 			if ( 0 == strcmp(pItem->m_pTagId->c_str(), pTemp->m_szTagId) ) {
 				SetHandTagData(pTemp, pItem->m_Control);
+
+				int nGridIndex = GetHandTagGridIndex(pTemp->m_szTagId);
+				if (nGridIndex >= 0) {
+					DWORD  dwIndex = nGridIndex / MAX_READERS_PER_GRID;
+					DWORD  dwSubIndex = nGridIndex % MAX_READERS_PER_GRID;
+					LastTemp temp;
+					memset(&temp, 0, sizeof(LastTemp));
+					temp.m_dwTemp = pTemp->m_dwTemp;
+					STRNCPY(temp.m_szReaderId, pTemp->m_szReaderId, sizeof(temp.m_szReaderId));
+					STRNCPY(temp.m_szTagId, pTemp->m_szTagId, sizeof(temp.m_szTagId));
+					temp.m_Time = time(0);
+					PassTemp2Grid(dwIndex, dwSubIndex, &temp);
+				}
 				break;
 			}
 		}
@@ -2303,14 +2338,13 @@ int  CDuiFrameWnd::OnMouseMoveGridsView(const POINT & pt) {
 
 void  CDuiFrameWnd::OnTagBindingGridsRet(WPARAM wParam, LPARAM  lParam) {
 	vector<TagBindingGrid*> * pvRet = (vector<TagBindingGrid*> *)wParam;
-	m_vTagBindingGrids.insert(m_vTagBindingGrids.begin(), pvRet->begin(), pvRet->end());
-	delete pvRet;	
+	//m_vTagBindingGrids.insert(m_vTagBindingGrids.begin(), pvRet->begin(), pvRet->end());	
 
 	vector<TagControlItem *>::iterator it;
 	vector<TagBindingGrid*>::iterator ix;
 	for (it = m_vHandTagUIs.begin(); it != m_vHandTagUIs.end(); ++it) {
 		TagControlItem * pItem = *it;
-		for (ix = m_vTagBindingGrids.begin(); ix != m_vTagBindingGrids.end(); ++ix) {
+		for (ix = pvRet->begin(); ix != pvRet->end(); ++ix) {
 			TagBindingGrid* pBinding = *ix;
 			if (0 == strcmp(pBinding->m_szTagId, pItem->m_pTagId->c_str())) {
 				SetBindingGridText(pItem, pBinding->m_nGridIndex);
@@ -2319,6 +2353,9 @@ void  CDuiFrameWnd::OnTagBindingGridsRet(WPARAM wParam, LPARAM  lParam) {
 	}
 
 	OnMyDeviceChanged();
+
+	ClearVector(*pvRet);
+	delete pvRet;
 }
 
 //
@@ -2380,6 +2417,47 @@ void  CDuiFrameWnd::SetBindingGridText( TagControlItem * pItem, int nGridIndex )
 		
 		pItem->m_nBindingGridIndex = -1;
 	}
+}
+
+void   CDuiFrameWnd::PassTemp2Grid(DWORD  dwIndex, DWORD  dwSubIndex, LastTemp * pTemp ) {
+	DWORD  dwTemp = pTemp->m_dwTemp;
+
+	memcpy(&m_tLastTemp[dwIndex][dwSubIndex], pTemp, sizeof(LastTemp));
+	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
+	CBusiness::GetInstance()->ExcelTempAsyn(dwIndex, dwSubIndex, &m_tLastTemp[dwIndex][dwSubIndex]);
+
+	OnTemp(dwIndex, dwSubIndex, dwTemp, FALSE);
+
+	if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+	}
+
+	DuiLib::CDuiString  strText;
+	strText.Format("%.2f¡æ", dwTemp / 100.0);
+	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
+	m_lblProcTips->SetText("");
+
+	m_LblReaderId[dwIndex][dwSubIndex]->SetText(pTemp->m_szReaderId);
+	m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
+}
+
+int   CDuiFrameWnd::GetHandTagGridIndex(const char * szTagId) {
+	assert(szTagId);
+
+	vector<TagControlItem *>::iterator it;
+	for (it = m_vHandTagUIs.begin(); it != m_vHandTagUIs.end(); ++it) {
+		TagControlItem * pItem = *it;
+		if ( 0 == strcmp(szTagId, pItem->m_pTagId->c_str()) ) {
+			return pItem->m_nBindingGridIndex;
+		}
+	}
+	return -1;
 }
 
 
