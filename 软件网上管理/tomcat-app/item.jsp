@@ -1,12 +1,14 @@
 <%@ page contentType="text/html; charset=utf-8" %>
 <% 
+	// 必须登录
 	String name = ""; 
 	name = (String)session.getAttribute("username");
 	if ( name == null ) 
 		name = "";
 	
 	if ( name.equals("") ) {
-		request.getRequestDispatcher("/login.jsp").forward(request,response);
+		response.sendRedirect("login.jsp");
+		return;
 	}
 %>
 
@@ -34,18 +36,33 @@
 		<table border="0">		  
 		  <tr>
 			<td width="100">标题：</td>
-			<td><input type="text" /></td>
+			<td><input type="text" style="width:300px;" /></td>
 		  </tr>
 		  
 		  <tr>
 			<td>简略描述：</td>
-			<td><input type="text" /></td>
-		  </tr>	
+			<td><input type="text" style="width: 100%; " /></td>
+		  </tr>
+
+		  <tr>
+			<td>软件名称：</td>
+			<td><input type="text" style="width:300px;" /></td>
+		  </tr>
+		  
+		  <tr>
+			<td>软件路径：</td>
+			<td><input type="text" style="width:300px;" /></td>
+		  </tr>
+		  
+		  <tr>
+			<td>待上传软件：</td>
+			<td><input type="file" /></td>
+		  </tr>
 
 		  <tr>
 			<td valign="top">详细描述：</td>
 			<td><script id="editor" type="text/plain" style="width:100%; height:500px;" ></script></td>
-		  </tr>
+		  </tr>	
 		  
 		  <tr>
 			<td colspan="2" align="center"><input type="submit" /></td>
