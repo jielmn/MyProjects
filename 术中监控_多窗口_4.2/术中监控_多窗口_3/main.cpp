@@ -1335,7 +1335,7 @@ void   CDuiFrameWnd::OnLayReaderSelected(DWORD dwIndex, DWORD dwSubIndex) {
 		m_LblCurTempTime[dwIndex]->SetText(buf);
 	}
 	else {
-		m_LblCurTempTime[dwIndex]->SetText("");
+		m_LblCurTempTime[dwIndex]->SetText("");  
 	}
 
 	CDuiString strText;
@@ -2217,6 +2217,12 @@ void   CDuiFrameWnd::SetHandTagData(const HandReaderTemp * pTemp, CControlUI * p
 		else {
 			pLblTemp->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
 		}
+
+		CLabelUI * pLblTime = static_cast<CLabelUI*>(pTagUI->FindControl(MY_FINDCONTROLPROC, "lblTempTime", 0));
+		time_t now = time(0);
+		char buf[256];
+		Date2String_2(buf, sizeof(buf), &now); 
+		pLblTime->SetText(buf);
 	}
 	else {
 		pLblTemp->SetText("--");

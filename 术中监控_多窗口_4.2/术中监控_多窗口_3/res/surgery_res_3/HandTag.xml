@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>
 	<VerticalLayout height="100" name="layHandTag" bordersize="1" bordercolor="#FFCCCCCC" >	
-		<HorizontalLayout height="70" inset="30,10,0,10" >	
+		<HorizontalLayout height="60" inset="30,5,0,5" >	
 			
 			<VerticalLayout width="105">
 				<Control />
@@ -25,6 +25,11 @@
 			<Label name="lblReaderSn" text="ER0040000001" textcolor="#FF000000" font="1" width="135" />
 			<Label text="Tag ID" textcolor="#FF000000" font="1" width="70" />
 			<Label name="lblHandTagId" text="e901020304050607" textcolor="#FF000000" font="1" width="160" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout inset="30,0,0,0">
+			<Label text="时间" textcolor="#FF000000" font="1" width="80" />
+			<Label name="lblTempTime" text="" textcolor="#FF000000" font="1" width="180" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>
