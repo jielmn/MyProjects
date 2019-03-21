@@ -1,4 +1,11 @@
 <%@ page contentType="text/html; charset=utf-8" %>
+<%@ page import="org.apache.commons.fileupload.FileItem" %>
+<%@ page import="org.apache.commons.fileupload.FileUploadException" %>
+<%@ page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %>
+<%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.*" %>
+
 <% 
 	// 必须登录
 	String name = ""; 
@@ -9,6 +16,73 @@
 	if ( name.equals("") ) {
 		response.sendRedirect("login.jsp");
 		return;
+	}
+%>
+
+<%
+	String type = request.getParameter("type");
+	if ( type == null ) {
+		type = "";
+	}
+	
+	String strItemId = request.getParameter("itemid");
+	if ( strItemId == null ) {
+		strItemId = "-1";
+	}
+	
+	int itemId = Integer.parseInt(strItemId);
+	
+	// 如果是本页面提交
+	if ( type.equals("submit")  ) {
+		DiskFileItemFactory factory = new DiskFileItemFactory();
+		ServletFileUpload upload = new ServletFileUpload(factory);
+		
+		try {
+			List items = upload.parseRequest(request);
+			Iterator itr = items.iterator();
+			String    itemName = null;
+			FileItem  itemFile = null;
+			
+			while (itr.hasNext()) {				
+				FileItem item = (FileItem) itr.next();
+				if (item.isFormField()) {
+					if ( item.getFieldName().equals("filename") ) {
+						itemName = item.getString("UTF-8");
+					}
+				} else {
+					if (item.getName() != null && !item.getName().equals("")) {
+						itemFile = item;
+					}
+				}
+			}
+			
+			//out.print("itemName="+itemName);
+			//out.print("itemFile="+itemFile);
+			
+			if ( itemName != null && itemFile != null ) {
+				int pos = itemFile.getName().lastIndexOf(".");  
+				String post_fix = new String();
+				if ( pos > -1 ) {
+					post_fix = itemFile.getName().substring( pos );
+				}
+									
+				String newRelativeName = "software/" + itemName + post_fix;
+				String newFileName = this.getServletContext().getRealPath("/") + newRelativeName;
+														
+				File file = new File(newFileName);
+				itemFile.write(file);
+			}
+			
+			response.sendRedirect("manage.jsp");
+		} catch (Exception e) {
+			out.print(e.getMessage());
+		}
+		return;
+	}
+	
+	boolean bAdd = true;
+	if ( type.equals("modify") ) {
+		bAdd = false;
 	}
 %>
 
@@ -24,39 +98,84 @@
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="lang/zh-cn/zh-cn.js"></script>
 
-    <style type="text/css">
-        div{
-            width:100%;
-        }
-    </style>
+    <script type="text/javascript">
+		function check( form ) {
+			
+			if ( form.title.value.length == 0 ) {
+				alert("标题不能为空");
+				return false;
+			}
+			
+			if ( form.brief.value.length == 0 ) {
+				alert("简略描述不能为空");
+				return false;
+			}
+			
+<%
+	if ( bAdd ) {
+%>
+			if ( form.filename.value.length == 0 ) {
+				alert("软件上传名不能为空");
+				return false;
+			}
+			
+			if ( form.file.value.length == 0 ) {
+				alert("待上传软件不能为空");
+				return false;
+			}
+<%	} else { %>
+			if ( form.file.value.length > 0 ) {
+				if ( form.filename.value.length == 0 ) {
+					alert("如果要上传文件，软件上传名不能为空");
+					return false;
+				}
+			}
+<%
+	}
+%>
+			var content = UE.getEditor('editor').getContent();
+			if ( content.length == 0 ) {
+				alert("内容不能为空");
+				return false;
+			}
+			
+			return true;
+		}
+	</script>
 </head>
 <body>
 <div>
-	<form style="width:1024px;margin:0 auto;">
+	<form style="width:1024px;margin:0 auto;" action="item.jsp?type=submit" onsubmit="return check(this);" method="post" enctype="multipart/form-data" >
 		<table border="0">		  
 		  <tr>
 			<td width="100">标题：</td>
-			<td><input type="text" style="width:300px;" /></td>
+			<td><input type="text" style="width:300px;" name="title" /></td>
 		  </tr>
 		  
 		  <tr>
 			<td>简略描述：</td>
-			<td><input type="text" style="width: 100%; " /></td>
-		  </tr>
-
-		  <tr>
-			<td>软件名称：</td>
-			<td><input type="text" style="width:300px;" /></td>
+			<td><input type="text" style="width: 100%; " name="brief" /></td>
 		  </tr>
 		  
+<%
+	if ( !bAdd ) {
+%>
 		  <tr>
-			<td>软件路径：</td>
-			<td><input type="text" style="width:300px;" /></td>
+			<td>软件：</td>
+			<td><img src="dialogs/attachment/fileTypeImages/icon_default.png" />&nbsp;test.rar</td>
+		  </tr>
+<%
+	}
+%>
+
+		  <tr>
+			<td>软件上传名：</td>
+			<td><input type="text" style="width:300px;" name="filename" /></td>
 		  </tr>
 		  
 		  <tr>
 			<td>待上传软件：</td>
-			<td><input type="file" /></td>
+			<td><input type="file" name="file" /></td>
 		  </tr>
 
 		  <tr>
@@ -65,164 +184,23 @@
 		  </tr>	
 		  
 		  <tr>
-			<td colspan="2" align="center"><input type="submit" /></td>
+			<td colspan="2" align="center"><input type="submit"  /></td>
 		  </tr>
+		  
+		  <tr>
+			<td colspan="2" align="center"><input type="hidden" name="itemid" value="<%=itemId%>" /></td>
+		  </tr>
+		  
 		</table>
 		
 	</form>
 </div>
 
-<!--
-<div id="btns">
-    <div>
-        <button onclick="getAllHtml()">获得整个html的内容</button>
-        <button onclick="getContent()">获得内容</button>
-        <button onclick="setContent()">写入内容</button>
-        <button onclick="setContent(true)">追加内容</button>
-        <button onclick="getContentTxt()">获得纯文本</button>
-        <button onclick="getPlainTxt()">获得带格式的纯文本</button>
-        <button onclick="hasContent()">判断是否有内容</button>
-        <button onclick="setFocus()">使编辑器获得焦点</button>
-        <button onmousedown="isFocus(event)">编辑器是否获得焦点</button>
-        <button onmousedown="setblur(event)" >编辑器失去焦点</button>
-
-    </div>
-    <div>
-        <button onclick="getText()">获得当前选中的文本</button>
-        <button onclick="insertHtml()">插入给定的内容</button>
-        <button id="enable" onclick="setEnabled()">可以编辑</button>
-        <button onclick="setDisabled()">不可编辑</button>
-        <button onclick=" UE.getEditor('editor').setHide()">隐藏编辑器</button>
-        <button onclick=" UE.getEditor('editor').setShow()">显示编辑器</button>
-        <button onclick=" UE.getEditor('editor').setHeight(300)">设置高度为300默认关闭了自动长高</button>
-    </div>
-
-    <div>
-        <button onclick="getLocalData()" >获取草稿箱内容</button>
-        <button onclick="clearLocalData()" >清空草稿箱</button>
-    </div>
-
-</div>
-<div>
-    <button onclick="createEditor()">
-    创建编辑器</button>
-    <button onclick="deleteEditor()">
-    删除编辑器</button>
-</div>
--->
-
 <script type="text/javascript">
-
     //实例化编辑器
     //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
     var ue = UE.getEditor('editor');
-
-
-    function isFocus(e){
-        alert(UE.getEditor('editor').isFocus());
-        UE.dom.domUtils.preventDefault(e)
-    }
-    function setblur(e){
-        UE.getEditor('editor').blur();
-        UE.dom.domUtils.preventDefault(e)
-    }
-    function insertHtml() {
-        var value = prompt('插入html代码', '');
-        UE.getEditor('editor').execCommand('insertHtml', value)
-    }
-    function createEditor() {
-        enableBtn();
-        UE.getEditor('editor');
-    }
-    function getAllHtml() {
-        alert(UE.getEditor('editor').getAllHtml())
-    }
-    function getContent() {
-        var arr = [];
-        arr.push("使用editor.getContent()方法可以获得编辑器的内容");
-        arr.push("内容为：");
-        arr.push(UE.getEditor('editor').getContent());
-        alert(arr.join("\n"));
-    }
-    function getPlainTxt() {
-        var arr = [];
-        arr.push("使用editor.getPlainTxt()方法可以获得编辑器的带格式的纯文本内容");
-        arr.push("内容为：");
-        arr.push(UE.getEditor('editor').getPlainTxt());
-        alert(arr.join('\n'))
-    }
-    function setContent(isAppendTo) {
-        var arr = [];
-        arr.push("使用editor.setContent('欢迎使用ueditor')方法可以设置编辑器的内容");
-        UE.getEditor('editor').setContent('欢迎使用ueditor', isAppendTo);
-        alert(arr.join("\n"));
-    }
-    function setDisabled() {
-        UE.getEditor('editor').setDisabled('fullscreen');
-        disableBtn("enable");
-    }
-
-    function setEnabled() {
-        UE.getEditor('editor').setEnabled();
-        enableBtn();
-    }
-
-    function getText() {
-        //当你点击按钮时编辑区域已经失去了焦点，如果直接用getText将不会得到内容，所以要在选回来，然后取得内容
-        var range = UE.getEditor('editor').selection.getRange();
-        range.select();
-        var txt = UE.getEditor('editor').selection.getText();
-        alert(txt)
-    }
-
-    function getContentTxt() {
-        var arr = [];
-        arr.push("使用editor.getContentTxt()方法可以获得编辑器的纯文本内容");
-        arr.push("编辑器的纯文本内容为：");
-        arr.push(UE.getEditor('editor').getContentTxt());
-        alert(arr.join("\n"));
-    }
-    function hasContent() {
-        var arr = [];
-        arr.push("使用editor.hasContents()方法判断编辑器里是否有内容");
-        arr.push("判断结果为：");
-        arr.push(UE.getEditor('editor').hasContents());
-        alert(arr.join("\n"));
-    }
-    function setFocus() {
-        UE.getEditor('editor').focus();
-    }
-    function deleteEditor() {
-        disableBtn();
-        UE.getEditor('editor').destroy();
-    }
-    function disableBtn(str) {
-        var div = document.getElementById('btns');
-        var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
-        for (var i = 0, btn; btn = btns[i++];) {
-            if (btn.id == str) {
-                UE.dom.domUtils.removeAttributes(btn, ["disabled"]);
-            } else {
-                btn.setAttribute("disabled", "true");
-            }
-        }
-    }
-    function enableBtn() {
-        var div = document.getElementById('btns');
-        var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
-        for (var i = 0, btn; btn = btns[i++];) {
-            UE.dom.domUtils.removeAttributes(btn, ["disabled"]);
-        }
-    }
-
-    function getLocalData () {
-        alert(UE.getEditor('editor').execCommand( "getlocaldata" ));
-    }
-
-    function clearLocalData () {
-        UE.getEditor('editor').execCommand( "clearlocaldata" );
-        alert("已清空草稿箱")
-    }
 </script>
+
 </body>
 </html>
