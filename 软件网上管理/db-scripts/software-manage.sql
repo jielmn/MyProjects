@@ -9,4 +9,5 @@ create table items (
 	abstract varchar(32) not null,
 	content varchar(4000) not null,
 	create_time datetime not null,
-	software_path varchar(100) not null ) DEFAULT CHARSET=utf8;					   
+	software_path varchar(100) not null,
+	cover varchar(100) not null ) DEFAULT CHARSET=utf8;					   
