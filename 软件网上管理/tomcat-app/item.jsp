@@ -8,6 +8,8 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="javax.sql.*" %>
 <%@ page import="javax.naming.*" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <%!
 	public Connection getConnection() throws NamingException, SQLException  {
@@ -41,12 +43,7 @@
 		type = "";
 	}
 	
-	String strItemId = request.getParameter("itemid");
-	if ( strItemId == null ) {
-		strItemId = "-1";
-	}
-	
-	int itemId = Integer.parseInt(strItemId);
+	int itemId = -1;
 	
 	// 如果是本页面提交
 	if ( type.equals("submit")  ) {
@@ -56,13 +53,19 @@
 		try {
 			List items = upload.parseRequest(request);
 			Iterator itr = items.iterator();
-			String    itemName = null;
-			FileItem  itemFile = null;
+			
+			String    itemName  = null;
+			FileItem  itemFile  = null;
+			FileItem  coverFile = null;
 			
 			String title   = null;
 			String brief   = null;
 			String content = null;
 			
+			String filePath = null;
+			String coverPath = null;
+			
+			// iterate 所有参数
 			while (itr.hasNext()) {				
 				FileItem item = (FileItem) itr.next();
 				if (item.isFormField()) {
@@ -79,14 +82,16 @@
 					}
 				} else {
 					if (item.getName() != null && !item.getName().equals("")) {
-						itemFile = item;
+						if ( item.getFieldName().equals("file") ) {
+							itemFile = item;
+						} else if ( item.getFieldName().equals("cover") ) {
+							coverFile = item;
+						}
 					}
 				}
 			}
 			
-			//out.print("itemName="+itemName);
-			//out.print("itemFile="+itemFile);
-			
+			// 先保存文件
 			if ( itemName != null && itemFile != null ) {
 				int pos = itemFile.getName().lastIndexOf(".");  
 				String post_fix = new String();
@@ -94,37 +99,67 @@
 					post_fix = itemFile.getName().substring( pos );
 				}
 									
-				String newRelativeName = "software/" + itemName + post_fix;
-				String newFileName = this.getServletContext().getRealPath("/") + newRelativeName;
+				filePath = "software/" + itemName + post_fix;
+				String newFileName = this.getServletContext().getRealPath("/") + filePath;
 														
 				File file = new File(newFileName);
 				itemFile.write(file);
+			}
+			
+			// 如果有图片，保存图片
+			if ( coverFile != null ) {
+				int pos = coverFile.getName().lastIndexOf(".");  
+				String post_fix = new String();
+				if ( pos > -1 ) {
+					post_fix = coverFile.getName().substring( pos );
+				}
 				
-				// 得到各个参数				
-				// out.print("title="+title+"<br/>");
-				// out.print("brief="+brief+"<br/>");
-				// out.print("content="+content+"<br/>");
-				// out.print("id="+itemId+"<br/>");
+				Date d = new Date();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");						
+				coverPath = "covers/" + sdf.format(d) + post_fix;
 				
+				String newFileName = this.getServletContext().getRealPath("/") + coverPath;
+				File file = new File(newFileName);
+				coverFile.write(file);
+			}
+			
+			// 新增请求
+			if ( itemId == -1 ) {
 				String newTitle   = title.replace("'", "''");
 				String newBrief   = brief.replace("'", "''");
 				String newContent = content.replace("'", "''");
-				String newName = newRelativeName.replace("'", "''");
+				String newName    = filePath.replace("'", "''");
+				String newCover   = null;
+				if ( coverPath != null ) {
+					newCover   = coverPath.replace("'", "''");
+				} else {
+					newCover   = "images/default_cover.png";
+				}
 				
-				// 写sql
 				Connection con = null;
 				con = getConnection();				
 				Statement stmt = con.createStatement();      
-				stmt.executeUpdate( "insert into items values( null, '" + title + "', '" + brief + "', '" + content + "', now(), '" + newName + "' ) " );
+				stmt.executeUpdate( "insert into items values( null, '" + title + "', '" + brief + "', '" + content + "', now(), '" + newName + "', '" + newCover + "' ) " );
 				stmt.close();
 				con.close();
+			} else {
+				
 			}
 			
 			response.sendRedirect("manage.jsp");
+			
 		} catch (Exception e) {
 			out.print(e.getMessage());
 		}
 		return;
+	} 
+	// 非 submit type
+	else {
+		String strItemId = request.getParameter("itemid");
+		if ( strItemId == null ) {
+			strItemId = "-1";
+		}
+		itemId = Integer.parseInt(strItemId);
 	}
 	
 	boolean bAdd = true;
@@ -176,6 +211,7 @@
 				alert("待上传软件不能大于20M");
 				return false;
 			}
+			
 			
 <%	} else { %>
 			if ( form.file.value.length > 0 ) {
@@ -236,6 +272,11 @@
 		  <tr>
 			<td>待上传软件：</td>
 			<td><input type="file" name="file" /></td>
+		  </tr>
+		  
+		  <tr>
+			<td>软件封面：</td>
+			<td><input type="file" name="cover" accept="image/*" /></td>
 		  </tr>
 
 		  <tr>

@@ -57,9 +57,10 @@
 			String     content      = rs.getString(4);
 			Timestamp  c_time       = rs.getTimestamp(5);
 			String     softwarePath = rs.getString(6);
+			String     coverPath    = rs.getString(7);
 %>
 			<div class="divItem">
-				<div class="divImg"><img src="images/1.png" style="width:90px;height:90px;margin:5px;" /></div>
+				<div class="divImg"><img src="<%=coverPath%>" style="width:90px;height:90px;margin:5px;" /></div>
 				<div class="divContent">
 					<div style="height:35px;"><a class="title" style="font-size:20px;" href="item.jsp?type=modify&itemid=<%=item_id%>"><b><%=title%></b></a></div>
 					<div class="overFlow" style="font-size:18px;height:35px;color:#BC1739;" ><%=brief%></div>
