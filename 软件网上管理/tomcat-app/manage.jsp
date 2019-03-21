@@ -1,4 +1,18 @@
 <%@ page contentType="text/html; charset=utf-8" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.sql.*" %>
+<%@ page import="javax.naming.*" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+
+<%!
+	public Connection getConnection() throws NamingException, SQLException  {
+		Context ctx = new InitialContext();
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/myjdbc");
+		Connection con = ds.getConnection();
+		return con;
+	}
+%>
+
 <% 
 	// 必须登录
 	String name = ""; 
@@ -25,6 +39,44 @@
 			<div class="divAdd" align="right"><a class="softDown" href="item.jsp?type=add">添加</a></div>
 			<div style="width:100%;height:1px;background-color:gray;"></div>
 			
+<%
+	try {
+		
+		Connection con = null;
+		con = getConnection();
+		
+		Statement stmt = con.createStatement();      
+		ResultSet rs = stmt.executeQuery( "select * from items order by id desc" );
+		
+		SimpleDateFormat time=new SimpleDateFormat("yyyy年MM月dd日"); 
+		// result
+		while ( rs.next() ) {
+			int        item_id      = rs.getInt(1);
+			String     title        = rs.getString(2);
+			String     brief        = rs.getString(3);
+			String     content      = rs.getString(4);
+			Timestamp  c_time       = rs.getTimestamp(5);
+			String     softwarePath = rs.getString(6);
+%>
+			<div class="divItem">
+				<div class="divImg"><img src="images/1.png" style="width:90px;height:90px;margin:5px;" /></div>
+				<div class="divContent">
+					<div style="height:35px;"><a class="title" style="font-size:20px;" href="item.jsp?type=modify&itemid=<%=item_id%>"><b><%=title%></b></a></div>
+					<div class="overFlow" style="font-size:18px;height:35px;color:#BC1739;" ><%=brief%></div>
+					<div style="font-size:10px;"><%=time.format(c_time)%></div>
+				</div>
+				<div class="divDownload"><a class="softDown" href="abc.text">删除</a></div>
+			</div>
+<%
+		} 
+		rs.close();
+		stmt.close();
+		con.close();
+	} catch (Exception ex ) {
+		out.print(ex.getMessage());
+		return;
+	}
+%>			
 			<!--
 			<div class="divItem">
 				<div class="divImg"><img src="images/1.png" style="width:90px;height:90px;margin:5px;" /></div>

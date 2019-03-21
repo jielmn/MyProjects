@@ -5,6 +5,21 @@
 <%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.sql.*" %>
+<%@ page import="javax.naming.*" %>
+
+<%!
+	public Connection getConnection() throws NamingException, SQLException  {
+		Context ctx = new InitialContext();
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/myjdbc");
+		Connection con = ds.getConnection();
+		return con;
+	}
+%>
+
+
+
 
 <% 
 	// 必须登录
@@ -18,6 +33,7 @@
 		return;
 	}
 %>
+
 
 <%
 	String type = request.getParameter("type");
@@ -43,11 +59,23 @@
 			String    itemName = null;
 			FileItem  itemFile = null;
 			
+			String title   = null;
+			String brief   = null;
+			String content = null;
+			
 			while (itr.hasNext()) {				
 				FileItem item = (FileItem) itr.next();
 				if (item.isFormField()) {
 					if ( item.getFieldName().equals("filename") ) {
 						itemName = item.getString("UTF-8");
+					} else if ( item.getFieldName().equals("title") ) {
+						title = item.getString("UTF-8");
+					} else if ( item.getFieldName().equals("brief") ) {
+						brief = item.getString("UTF-8");
+					} else if ( item.getFieldName().equals("editorValue") ) {
+						content = item.getString("UTF-8");
+					} else if ( item.getFieldName().equals("itemid") ) {
+						itemId = Integer.parseInt( item.getString("UTF-8") );
 					}
 				} else {
 					if (item.getName() != null && !item.getName().equals("")) {
@@ -71,6 +99,25 @@
 														
 				File file = new File(newFileName);
 				itemFile.write(file);
+				
+				// 得到各个参数				
+				// out.print("title="+title+"<br/>");
+				// out.print("brief="+brief+"<br/>");
+				// out.print("content="+content+"<br/>");
+				// out.print("id="+itemId+"<br/>");
+				
+				String newTitle   = title.replace("'", "''");
+				String newBrief   = brief.replace("'", "''");
+				String newContent = content.replace("'", "''");
+				String newName = newRelativeName.replace("'", "''");
+				
+				// 写sql
+				Connection con = null;
+				con = getConnection();				
+				Statement stmt = con.createStatement();      
+				stmt.executeUpdate( "insert into items values( null, '" + title + "', '" + brief + "', '" + content + "', now(), '" + newName + "' ) " );
+				stmt.close();
+				con.close();
 			}
 			
 			response.sendRedirect("manage.jsp");
