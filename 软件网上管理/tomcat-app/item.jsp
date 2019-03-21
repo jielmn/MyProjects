@@ -123,10 +123,23 @@
 				alert("待上传软件不能为空");
 				return false;
 			}
+			
+			// 文件不能大于20M
+			if ( form.file.files[0].size > 1024 * 1024 * 20 ) {
+				alert("待上传软件不能大于20M");
+				return false;
+			}
+			
 <%	} else { %>
 			if ( form.file.value.length > 0 ) {
 				if ( form.filename.value.length == 0 ) {
 					alert("如果要上传文件，软件上传名不能为空");
+					return false;
+				}
+				
+				// 文件不能大于20M
+				if ( form.file.files[0].size > 1024 * 1024 * 20 ) {
+					alert("待上传软件不能大于20M");
 					return false;
 				}
 			}
