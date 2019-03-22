@@ -13,6 +13,12 @@
 	}
 %>
 
+<%!
+	public String translateHtml( String s )  {
+		return s.replace("\"", "&quot;").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace(" ", "&nbsp;");
+	}
+%>
+
 <% 
 	// 必须登录
 	String name = ""; 
@@ -62,11 +68,11 @@
 			<div class="divItem">
 				<div class="divImg"><img src="<%=coverPath%>" style="width:90px;height:90px;margin:5px;" /></div>
 				<div class="divContent">
-					<div style="height:35px;"><a class="title" style="font-size:20px;" href="item.jsp?type=modify&itemid=<%=item_id%>"><b><%=title%></b></a></div>
-					<div class="overFlow" style="font-size:18px;height:35px;color:#BC1739;" ><%=brief%></div>
+					<div style="height:35px;"><a class="title" style="font-size:20px;" href="item.jsp?type=modify&itemid=<%=item_id%>"><b><%=translateHtml(title)%></b></a></div>
+					<div class="overFlow" style="font-size:18px;height:35px;color:#BC1739;" ><%=translateHtml(brief)%></div>
 					<div style="font-size:10px;"><%=time.format(c_time)%></div>
 				</div>
-				<div class="divDownload"><a class="softDown" href="abc.text">删除</a></div>
+				<div class="divDownload"><a class="softDown" href="item.jsp?type=delete&itemid=<%=item_id%>">删除</a></div>
 			</div>
 <%
 		} 

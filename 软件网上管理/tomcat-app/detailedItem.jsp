@@ -1,58 +1,121 @@
 <%@ page contentType="text/html; charset=utf-8" %>
-<% 
-	String name = ""; 
-	name = (String)session.getAttribute("username");
-	if ( name == null ) 
-		name = "";
-	
-	if ( name.equals("") ) {
-		request.getRequestDispatcher("/login.jsp").forward(request,response);
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.sql.*" %>
+<%@ page import="javax.naming.*" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+
+<%!
+	private Connection getConnection() throws NamingException, SQLException  {
+		Context ctx = new InitialContext();
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/myjdbc");
+		Connection con = ds.getConnection();
+		return con;
 	}
 %>
+
+<%!
+	public String translateHtml( String s )  {
+		return s.replace("\"", "&quot;").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace(" ", "&nbsp;");
+	}
+%>
+
+<%
+	String strItemId = request.getParameter("itemid");
+	if ( strItemId == null ) {
+		strItemId = "-1";
+	}
+	int itemId = Integer.parseInt(strItemId);
+	
+	if ( itemId <= 0 ) {
+		return;
+	}
+	
+	String title   = "";
+	String brief   = "";
+	String content = "";
+	
+	String filePath = "";
+	String coverPath = "";
+	
+	boolean bFound = false;
+	
+	// 查询item
+	try {
+		Connection con = null;
+		con = getConnection();
+		
+		Statement stmt = con.createStatement();      
+		ResultSet rs = stmt.executeQuery( "select * from items where id = " + itemId );
+		if ( rs.next() ) {
+			title        = rs.getString(2);
+			brief        = rs.getString(3);
+			content      = rs.getString(4);
+			filePath     = rs.getString(6);
+			coverPath    = rs.getString(7);
+			bFound = true;
+		}
+		rs.close();
+		stmt.close();
+		con.close();
+	} catch (Exception ex ) {
+		out.print(ex.getMessage());
+		return;
+	}
+	
+	if ( !bFound ) {
+		return;
+	}
+%>
+
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>软件后台管理</title>
+    <title>软件详细</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <script type="text/javascript" charset="utf-8" src="ueditor.config.js"></script>
     <script type="text/javascript" charset="utf-8" src="ueditor.all.min.js"> </script>
     <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="lang/zh-cn/zh-cn.js"></script>
-
-    <style type="text/css">
-        div{
-            width:100%;
-        }
-    </style>
+	<link href="css/index.css" rel="stylesheet">
 </head>
 <body>
 <div>
-	<form style="width:1024px;margin:0 auto;">
-		<table border="0">		  
-		  <tr>
-			<td width="100">标题：</td>
-			<td><input type="text" /></td>
-		  </tr>
-		  
-		  <tr>
-			<td>简略描述：</td>
-			<td><input type="text" /></td>
-		  </tr>	
+	<table border="0" style="width:1024px;margin:0 auto;" cellspacing="0" cellpadding="0" >		  
+	  
+	  <tr style="height:40px;">
+		 <td colspan="2" align="center" style="font-size:20px;"><b><%=translateHtml(title)%></b></td>
+	  </tr>
+	  
+	  <tr style="height:1px;background:url(images/bk2.png) no-repeat center 0;">
+		 <td colspan="2" ></td>
+	  </tr>
+	  
+	  <tr style="height:40px;">
+		<td width="100" valign="top">简介：</td>
+		<td style="word-wrap:break-word;word-break:break-all;"><%=translateHtml(brief)%></td>
+	  </tr>
 
-		  <tr>
-			<td valign="top">详细描述：</td>
-			<td><script id="editor" type="text/plain" style="width:100%; height:500px;" ></script></td>
-		  </tr>
-		  
-		  <tr>
-			<td colspan="2" align="center"><input type="submit" /></td>
-		  </tr>
-		</table>
-		
-	</form>
+	  <tr style="height:1px;background:url(images/bk2.png) no-repeat center 0;">
+		 <td colspan="2" ></td>
+	  </tr>	  
+
+	  <tr>
+		<td valign="top">内容：</td>
+		<td><%=content%></td>
+	  </tr>
+	  
+	  <tr style="height:1px;background:url(images/bk2.png) no-repeat center 0;">
+		 <td colspan="2" ></td>
+	  </tr>	
+	  
+	  <tr style="height:40px;">
+		 <td colspan="2" align="center" style="font-size:20px;"><a class="softDown" href="<%=filePath%>">下载</a></td>
+	  </tr>
+	  
+	</table>
 </div>
 
 <!--

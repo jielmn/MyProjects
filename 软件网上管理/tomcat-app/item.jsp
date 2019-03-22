@@ -12,11 +12,42 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 
 <%!
-	public Connection getConnection() throws NamingException, SQLException  {
+	private Connection getConnection() throws NamingException, SQLException  {
 		Context ctx = new InitialContext();
 		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/myjdbc");
 		Connection con = ds.getConnection();
 		return con;
+	}
+%>
+
+<%!
+	private String getFileTypeImg(String postFix)  {
+		if ( postFix.equals(".rar") ) {
+			return "icon_rar.gif";
+		} else if (postFix.equals(".exe")) {
+			return "icon_exe.gif";
+		} else if (postFix.equals(".jpg")) {
+			return "icon_jpg.gif";
+		} else if (postFix.equals(".mp3")) {
+			return "icon_mp3.gif";
+		} else if (postFix.equals(".chm")) {
+			return "icon_chm.gif";
+		} else if ( postFix.equals(".doc") || postFix.equals(".docx") ) {
+			return "icon_doc.gif";
+		} else if ( postFix.equals(".mv") ) {
+			return "icon_mv.gif";
+		} else if ( postFix.equals(".pdf") ) {
+			return "icon_pdf.gif";
+		} else if ( postFix.equals(".ppt") ) {
+			return "icon_ppt.gif";
+		} else if ( postFix.equals(".txt") ) {
+			return "icon_txt.gif";
+		} else if ( postFix.equals(".xls") ||  postFix.equals(".xlsx") ) {
+			return "icon_xls.gif";
+		}
+		else {
+			return "icon_default.png";
+		}
 	}
 %>
 
@@ -44,6 +75,22 @@
 	}
 	
 	int itemId = -1;
+	String title   = "";
+	String brief   = "";
+	String content = "";
+	
+	String filePath = "";
+	String coverPath = "";
+	
+	String filePostFix = "";
+	String coverPostFix = "";
+	
+	String fileName = "";
+	
+	String newTitle   = "";
+	String newBrief   = "";
+	String newContent = "";
+	String newName = "";
 	
 	// 如果是本页面提交
 	if ( type.equals("submit")  ) {
@@ -57,13 +104,6 @@
 			String    itemName  = null;
 			FileItem  itemFile  = null;
 			FileItem  coverFile = null;
-			
-			String title   = null;
-			String brief   = null;
-			String content = null;
-			
-			String filePath = null;
-			String coverPath = null;
 			
 			// iterate 所有参数
 			while (itr.hasNext()) {				
@@ -125,12 +165,13 @@
 			
 			// 新增请求
 			if ( itemId == -1 ) {
-				String newTitle   = title.replace("'", "''");
-				String newBrief   = brief.replace("'", "''");
-				String newContent = content.replace("'", "''");
-				String newName    = filePath.replace("'", "''");
+				
+				newTitle   = title.replace("'", "''");
+				newBrief   = brief.replace("'", "''");
+				newContent = content.replace("'", "''");
+				newName    = filePath.replace("'", "''");
 				String newCover   = null;
-				if ( coverPath != null ) {
+				if ( coverPath.length() > 0 ) {
 					newCover   = coverPath.replace("'", "''");
 				} else {
 					newCover   = "images/default_cover.png";
@@ -141,9 +182,29 @@
 				Statement stmt = con.createStatement();      
 				stmt.executeUpdate( "insert into items values( null, '" + title + "', '" + brief + "', '" + content + "', now(), '" + newName + "', '" + newCover + "' ) " );
 				stmt.close();
-				con.close();
+				con.close();		
+				
 			} else {
 				
+				newTitle   = title.replace("'", "''");
+				newBrief   = brief.replace("'", "''");
+				newContent = content.replace("'", "''");
+				
+				Connection con = null;
+				con = getConnection();				
+				Statement stmt = con.createStatement();      
+				stmt.executeUpdate( "update items set title = '" + newTitle + "', abstract = '" + newBrief + "', content = '" + newContent + "' where id = " + itemId );
+				
+				if ( filePath.length() > 0 )  {
+					stmt.executeUpdate( "update items set software_path = '" + filePath + "' where id = " + itemId );
+				}
+				
+				if ( coverPath.length() > 0 )  {
+					stmt.executeUpdate( "update items set cover = '" + coverPath + "' where id = " + itemId );
+				}
+				
+				stmt.close();
+				con.close();
 			}
 			
 			response.sendRedirect("manage.jsp");
@@ -160,6 +221,69 @@
 			strItemId = "-1";
 		}
 		itemId = Integer.parseInt(strItemId);
+		
+		if ( type.equals("delete") ) {
+			if ( itemId > 0 ) {
+				try {
+					Connection con = null;
+					con = getConnection();				
+					Statement stmt = con.createStatement();      
+					stmt.executeUpdate( "delete from items where id = " + itemId );					
+					stmt.close();
+					con.close();
+					response.sendRedirect("manage.jsp");
+				} catch (Exception e) {
+					out.print(e.getMessage());
+				}
+			}			
+			return;
+		}
+		
+		if ( itemId > 0 ) {
+			// 查询item
+			try {
+				Connection con = null;
+				con = getConnection();
+				
+				Statement stmt = con.createStatement();      
+				ResultSet rs = stmt.executeQuery( "select * from items where id = " + itemId );
+				if ( rs.next() ) {
+					title        = rs.getString(2);
+					brief        = rs.getString(3);
+					content      = rs.getString(4);
+					filePath     = rs.getString(6);
+					coverPath    = rs.getString(7);
+				} 
+				rs.close();
+				stmt.close();
+				con.close();
+			} catch (Exception ex ) {
+				out.print(ex.getMessage());
+				return;
+			}
+		}
+		
+		int pos = filePath.lastIndexOf(".");  
+		if ( pos > -1 ) {
+			filePostFix = filePath.substring( pos );
+		}
+		
+		pos = coverPath.lastIndexOf(".");  
+		if ( pos > -1 ) {
+			coverPostFix = coverPath.substring( pos );
+		}
+		
+		pos = filePath.lastIndexOf("/");  
+		if ( pos > -1 ) {
+			fileName = filePath.substring( pos + 1 );
+		} else {
+			fileName = filePath;
+		}
+		
+		newTitle   = title.replace("\"", "\"\"");
+		newBrief   = brief.replace("\"", "\"\"");
+		newName    = fileName.replace("\"", "\"\"");
+		newContent = content.replace("'", "''");
 	}
 	
 	boolean bAdd = true;
@@ -245,12 +369,12 @@
 		<table border="0">		  
 		  <tr>
 			<td width="100">标题：</td>
-			<td><input type="text" style="width:300px;" name="title" /></td>
+			<td><input type="text" style="width:300px;" name="title" maxlength="100" value="<%=newTitle%>" /></td>
 		  </tr>
 		  
 		  <tr>
 			<td>简略描述：</td>
-			<td><input type="text" style="width: 100%; " name="brief" /></td>
+			<td><input type="text" style="width: 100%; " name="brief" maxlength="200" value="<%=newBrief%>" /></td>
 		  </tr>
 		  
 <%
@@ -258,7 +382,7 @@
 %>
 		  <tr>
 			<td>软件：</td>
-			<td><img src="dialogs/attachment/fileTypeImages/icon_default.png" />&nbsp;test.rar</td>
+			<td><img src="dialogs/attachment/fileTypeImages/<%=getFileTypeImg(filePostFix)%>" />&nbsp;<%=newName%></td>
 		  </tr>
 <%
 	}
@@ -273,6 +397,17 @@
 			<td>待上传软件：</td>
 			<td><input type="file" name="file" /></td>
 		  </tr>
+		  
+<%
+	if ( !bAdd ) {
+%>
+		  <tr>
+			<td>封面：</td>
+			<td><img src="<%=coverPath%>" style="width:90px;height:90px;margin:5px;" /></td>
+		  </tr>
+<%
+	}
+%>
 		  
 		  <tr>
 			<td>软件封面：</td>
@@ -301,6 +436,9 @@
     //实例化编辑器
     //建议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
     var ue = UE.getEditor('editor');
+	ue.addListener("ready", function () { 
+		ue.setContent('<%=newContent%>', false); 
+	});
 </script>
 
 </body>
