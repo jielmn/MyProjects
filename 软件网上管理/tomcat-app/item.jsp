@@ -369,7 +369,7 @@
 		<table border="0">		  
 		  <tr>
 			<td width="100">标题：</td>
-			<td><input type="text" style="width:300px;" name="title" maxlength="100" value="<%=newTitle%>" /></td>
+			<td width="924"><input type="text" style="width:300px;" name="title" maxlength="100" value="<%=newTitle%>" /></td>
 		  </tr>
 		  
 		  <tr>
