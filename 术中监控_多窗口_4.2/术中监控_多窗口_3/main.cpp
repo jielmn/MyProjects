@@ -2320,6 +2320,7 @@ int  CDuiFrameWnd::OnMouseMoveGridsView(const POINT & pt) {
 				CLabelUI* pCtl = (CLabelUI*)m_layGridsView->GetItemAt(j*DRAG_DROP_COLUMNS + i);
 				pCtl->SetBorderColor(0xFFFFFFFF);
 				pCtl->SetTextColor(0xFFFFFFFF);
+				pCtl->SetBkColor(0xFF192431);
 			}
 		}
 		return -1;
