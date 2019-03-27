@@ -173,6 +173,10 @@ private:
 	HPEN                                         m_hHighTempAlarmPen;
 	DWORD                                        m_dwCurTempIndex;
 
+	int                                          m_nCursorChanged;               // 鼠标形状改变
+	HCURSOR                                      m_hc;
+	int                                          m_nDropDropIndex;               // 拖高温，低温曲线
+
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void   SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -185,4 +189,6 @@ private:
 	void   CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, BOOL & bFindMax);
 	void   DrawTempPoint(int nIndex, Graphics & g, int x, int y, HDC hDc, int RADIUS = DEFAULT_POINT_RADIUS);
 	void   ClearData();
+	void   CheckCursor(const POINT & pt);
+	void   SetNewAlarmValue(const POINT & pt);
 };

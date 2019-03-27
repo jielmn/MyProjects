@@ -44,6 +44,7 @@ void  CDuiFrameWnd::InitWindow() {
 	g_edRemark = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark"));
 	g_edRemark_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edRemark_1"));
 	m_dragDropTag = m_PaintManager.FindControl("dragDropTag");
+	g_dragDropTag = m_dragDropTag;
 	m_lblProcTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblProcessTips"));
 	m_LblDbStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblDbTips"));
 	m_LblConflictTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblConflict"));
