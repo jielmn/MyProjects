@@ -36,6 +36,7 @@ void  CDuiFrameWnd::InitWindow() {
 	CDuiString strText;
 	g_data.m_hWnd = GetHWND();
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+	g_hc = LoadCursor(NULL, IDC_SIZENS);
 
 	m_layMain = static_cast<CTileLayoutUI*>(m_PaintManager.FindControl(LAYOUT_MAIN_NAME));
 	m_layStatus = static_cast<CHorizontalLayoutUI*>(m_PaintManager.FindControl(LAYOUT_STATUS_NAME));

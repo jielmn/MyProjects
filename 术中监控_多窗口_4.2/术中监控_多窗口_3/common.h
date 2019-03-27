@@ -551,6 +551,7 @@ extern DuiLib::CEditUI * g_edRemark_1;
 extern DWORD g_dwPrintExcelMaxPointsCnt;
 extern std::vector<BodyPart *>    g_vBodyParts;
 extern CControlUI *               g_dragDropTag;
+extern HCURSOR                    g_hc;
 
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern DuiLib::CControlUI* CALLBACK MY_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData);

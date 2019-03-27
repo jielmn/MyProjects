@@ -36,6 +36,9 @@ CMyImageUI::CMyImageUI(E_TYPE e) :	m_remark_pen(Gdiplus::Color(0x803D5E49), 3.0)
 	m_SingleDayZeroTime = 0;
 	m_fSecondsPerPixel = 0.0f;
 	m_bSetSecondsPerPixel = FALSE;
+
+	m_nCursorChanged = -1;
+	m_nDropDropIndex = -1;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -656,13 +659,55 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 	if (event.Type == UIEVENT_BUTTONDOWN)
 	{
+		// 如果鼠标指针已经变为可拖拉
+		if (m_nCursorChanged >= 0) {
+			m_nDropDropIndex = m_nCursorChanged;
+			m_nCursorChanged = -1;
+		}
+
 		//告诉UIManager这个消息需要处理
 		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
 		return;
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
+		// 如果没有开始鼠标拖放
+		if (-1 == m_nDropDropIndex) {
+			CheckCursor(event.ptMouse);
+		}
+		else {
+			if (!g_dragDropTag->IsVisible()) {
+				g_dragDropTag->SetVisible(true);
+			}
+
+			DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+			RECT rectParent = pParent->GetPos();
+
+			RECT r;
+			r.left = rectParent.left + MYIMAGE_LEFT_BLANK;
+			r.right = rectParent.right;
+			r.top = event.ptMouse.y - 4;
+			r.bottom = r.top + 4 * 2;
+
+			if (r.top < rectParent.top) {
+				r.top = rectParent.top;
+				r.bottom = r.top + 4 * 2;
+			}
+			else if (r.bottom > rectParent.bottom) {
+				r.bottom = rectParent.bottom;
+				r.top = r.bottom - 4 * 2;
+			}
+			g_dragDropTag->SetPos(r);
+		}
+
 		if (g_data.m_CfgData.m_bCrossAnchor)
 			this->Invalidate();
+	}
+	else if (event.Type == UIEVENT_BUTTONUP) {
+		if (m_nDropDropIndex >= 0) {
+			g_dragDropTag->SetVisible(false);
+			SetNewAlarmValue(event.ptMouse);
+			m_nDropDropIndex = -1;
+		}
 	}
 	DuiLib::CControlUI::DoEvent(event);
 }
@@ -1433,6 +1478,137 @@ void  CMyImageUI::SetTagId(DWORD  dwSubIndex, const char * szTagId) {
 		m_sTagId[dwSubIndex] = szTagId;
 	else
 		m_sTagId[dwSubIndex] = "";
+}
+
+void   CMyImageUI::CheckCursor(const POINT & pt) {
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+	DWORD  dwIndex = this->GetTag();
+
+	/* 开始作图 */
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	// 中间温度的位置
+	int middle = height / 2;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	RECT rectLeft;
+	rectLeft.left = rect.left;
+	rectLeft.top = rect.top;
+	rectLeft.right = rectLeft.left + MYIMAGE_LEFT_BLANK;
+	rectLeft.bottom = rect.bottom;
+
+	// 画出报警线
+	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm ) / 100.0 * nGridHeight);
+	int nMargin = 3;
+
+	RECT r;
+	r.left = rectLeft.right;
+	r.top = middle + nY + rect.top - nMargin;
+	r.right = rectLeft.left + width - nMargin;
+	r.bottom = middle + nY + rect.top + 1;
+
+	m_nCursorChanged = -1;
+	if (PtInRect(&r, pt)) {
+		m_nCursorChanged = 0;
+		SetCursor(g_hc);
+		this->Invalidate();
+	}
+	else {
+		nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwHighTempAlarm ) / 100.0 * nGridHeight);
+		r.left = rectLeft.right;
+		r.top = middle + nY + rect.top - nMargin;
+		r.right = rectLeft.left + width - nMargin;
+		r.bottom = middle + nY + rect.top + 1;
+
+		if (PtInRect(&r, pt)) {
+			m_nCursorChanged = 1;
+			SetCursor(g_hc);
+			this->Invalidate();
+		}
+	}
+}
+
+void   CMyImageUI::SetNewAlarmValue(const POINT & pt) {
+	CDuiString strText;
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	RECT rect = this->GetPos();
+	int  width = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+	DWORD  dwIndex = this->GetTag();
+
+	/* 开始作图 */
+	int nMinTemp = GetMinTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMinTemp);
+	int nMaxTemp = GetMaxTemp(g_data.m_CfgData.m_GridCfg[dwIndex].m_dwMaxTemp);
+	int nGridCount = nMaxTemp - nMinTemp;
+
+	int nGridHeight = height / nGridCount;
+	int nReminder = height % nGridCount;
+	int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > nReminder) {
+		int nSpared = (nVMargin * 2 - nReminder - 1) / nGridCount + 1;
+		nGridHeight -= nSpared;
+	}
+
+	// 中间温度的位置
+	int middle = height / 2;
+	int nMiddleTemp = (nMaxTemp + nMinTemp) / 2;
+
+	// 低温
+	if (m_nDropDropIndex == 0) {
+		int nY = pt.y - middle - rect.top;
+		DWORD dwValue = (DWORD)((double)nMiddleTemp * 100.0 - (double)nY / nGridHeight * 100.0);
+
+		if (dwValue > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwHighTempAlarm) {
+			dwValue = g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwHighTempAlarm;
+		}
+		else if (dwValue > 4200) {
+			dwValue = 4200;
+		}
+		else if (dwValue < 2000) {
+			dwValue = 2000;
+		}
+		g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm = dwValue;
+
+		strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, dwIndex + 1, m_dwSelectedReaderIndex + 1);
+		dwValue = 3500;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm, &dwValue);
+	}
+	else {
+		int nY = pt.y - middle - rect.top;
+		DWORD dwValue = (DWORD)((double)nMiddleTemp * 100.0 - (double)nY / nGridHeight * 100.0);
+
+		if (dwValue < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm) {
+			dwValue = g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwLowTempAlarm;
+		}
+		else if (dwValue > 4200) {
+			dwValue = 4200;
+		}
+		else if (dwValue < 2000) {
+			dwValue = 2000;
+		}
+		g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwHighTempAlarm = dwValue;
+
+		strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, dwIndex + 1, m_dwSelectedReaderIndex + 1);
+		dwValue = 4000;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[m_dwSelectedReaderIndex].m_dwHighTempAlarm, &dwValue);
+	}
+
+	this->Invalidate();
 }
 
 
@@ -2781,9 +2957,6 @@ void  CMyImageUI_1::CheckCursor(const POINT & pt) {
 
 	// 画出报警线
 	int nY = (int)((nMiddleTemp * 100.0 - (double)g_data.m_CfgData.m_dwHandReaderLowTempAlarm) / 100.0 * nGridHeight);
-	::MoveToEx(0, rectLeft.right, middle + nY + rect.top, 0);
-	::LineTo(0, rectLeft.left + width - 1, middle + nY + rect.top);
-
 	int nMargin = 3;
 
 	RECT r;

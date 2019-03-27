@@ -68,10 +68,16 @@ private:
 	float                        m_fSecondsPerPixel;    // 用于单天的记录每个像素代表的点
 	BOOL                         m_bSetSecondsPerPixel;
 
+	int                                          m_nCursorChanged;               // 鼠标形状改变
+	int                                          m_nDropDropIndex;               // 拖高温，低温曲线
+
 private:
 	void   SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void   SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void   CalcSingleDay(time_t & tMin, BOOL & bFindMin, time_t & tMax, BOOL & bFindMax);
+
+	void   CheckCursor(const POINT & pt);
+	void   SetNewAlarmValue(const POINT & pt);
 
 public:
 	sigslot::signal1<DWORD>      m_sigUpdateScroll;

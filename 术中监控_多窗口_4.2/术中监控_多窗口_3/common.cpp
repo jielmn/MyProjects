@@ -33,6 +33,7 @@ DuiLib::CEditUI * g_edRemark_1 = 0;
 DWORD g_dwPrintExcelMaxPointsCnt = 0;
 std::vector<BodyPart *>    g_vBodyParts;
 CControlUI *               g_dragDropTag = 0;
+HCURSOR                    g_hc;
 
 char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
