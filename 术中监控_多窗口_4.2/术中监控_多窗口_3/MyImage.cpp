@@ -2624,6 +2624,7 @@ void  CMyImageUI_1::OnTagSelected(int nIndex) {
 	assert( nIndex < (int)m_vData.size() );
 	if (nIndex != m_nCurIndex) {
 		m_nCurIndex = nIndex;
+		m_state = STATE_7_DAYS;
 		MyInvalidate();
 	}
 }
