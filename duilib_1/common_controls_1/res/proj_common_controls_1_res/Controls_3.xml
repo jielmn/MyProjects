@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout inset="1,1,1,1"   >		
-		<Label text="3" />
+	<VerticalLayout inset="10,10,10,10"   >		
+		<MyControl bordercolor="#FF000000" bordersize="1" name="cstMyControl_1" />
 	</VerticalLayout>
 </Window>

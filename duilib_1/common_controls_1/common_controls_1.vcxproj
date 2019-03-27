@@ -155,12 +155,16 @@
   <ItemGroup>
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="DragDropUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyControlUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="DragDropUI.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MyControlUI.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

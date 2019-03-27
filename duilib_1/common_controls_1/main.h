@@ -6,6 +6,8 @@
 using namespace DuiLib;
 
 #include "resource.h"
+#include "DragDropUI.h"
+#include "MyControlUI.h"
 
 #define TIMER_ID_PROGRESS 200
 //#define TIMER_ID_REPAINT  201
@@ -74,6 +76,9 @@ private:
 	HWND                     m_hWndBrowser;
 	DWORD                    m_dwBrowerProcId;
 	RECT                     m_BrowserRect;
+
+	CMyControlUI *           m_mycontrol;
+	CDragDropUI *            m_dragdrop;
 };
  
 
@@ -98,3 +103,7 @@ public:
 		delete this;
 	}
 };
+
+
+
+

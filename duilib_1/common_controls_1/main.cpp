@@ -11,6 +11,9 @@
 #include "resource.h"
 
 CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, "MyControl")) {
+		return new CMyControlUI;
+	}
 	return 0;   
 }
 
@@ -42,6 +45,12 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layBrowser = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layBrowser"));
 	m_List1 = static_cast<CListUI *>(m_PaintManager.FindControl("list_1"));
 	m_Combo1 = static_cast<CComboUI *>(m_PaintManager.FindControl("combo_1"));
+	m_dragdrop = static_cast<CDragDropUI *>(m_PaintManager.FindControl("cstDragDrop_1"));
+	m_mycontrol = static_cast<CMyControlUI *>(m_PaintManager.FindControl("cstMyControl_1"));
+
+	HCURSOR h = LoadCursor(NULL, IDC_SIZEWE);
+	m_dragdrop->SetCursor(h);
+	m_dragdrop->SetDragDropType(CDragDropUI::DragDropType_WE);
 
 	m_ip->SetIP("192.168.0.1");           
 	m_hotkey->SetHotKey(65, 2);
@@ -155,6 +164,9 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 		DuiLib::CControlUI * pUI = builder.Create(_T("Controls_4.xml"), (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
+	else if (0 == strcmp("DragDrop", pstrClass)) {
+		return new CDragDropUI;
+	}
 	return WindowImplBase::CreateControl(pstrClass); 
 }
     
@@ -206,6 +218,17 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}  
 	else if (msg.sType == "windowinit") {
 		OnWndInit();
+	}
+	else if (msg.sType == "init_splits") {
+		RECT rect = m_mycontrol->GetPos();
+
+		RECT r;
+		r = rect;
+		r.left = m_mycontrol->m_nSplitX - 2;
+		r.right = r.left + 2 * 2;
+
+		m_dragdrop->SetVisible(true); 
+		m_dragdrop->SetPos(r);		
 	}
 	WindowImplBase::Notify(msg);
 }                                            
