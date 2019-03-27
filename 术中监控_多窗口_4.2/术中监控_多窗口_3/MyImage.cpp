@@ -663,6 +663,7 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 		if (m_nCursorChanged >= 0) {
 			m_nDropDropIndex = m_nCursorChanged;
 			m_nCursorChanged = -1;
+			SetCursor(g_hc);
 		}
 
 		//告诉UIManager这个消息需要处理
@@ -697,6 +698,7 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 				r.top = r.bottom - 4 * 2;
 			}
 			g_dragDropTag->SetPos(r);
+			SetCursor(g_hc);
 		}
 
 		if (g_data.m_CfgData.m_bCrossAnchor)
@@ -1705,6 +1707,7 @@ void CMyImageUI_1::DoEvent(DuiLib::TEventUI& event) {
 		if (m_nCursorChanged >= 0) {
 			m_nDropDropIndex = m_nCursorChanged;
 			m_nCursorChanged = -1;
+			SetCursor(m_hc);
 		}
 		//告诉UIManager这个消息需要处理
 		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
@@ -1738,6 +1741,7 @@ void CMyImageUI_1::DoEvent(DuiLib::TEventUI& event) {
 				r.top = r.bottom - 4 * 2;
 			}
 			g_dragDropTag->SetPos(r);
+			SetCursor(m_hc);
 		}
 		
 
