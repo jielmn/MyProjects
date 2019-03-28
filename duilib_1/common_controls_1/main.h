@@ -8,6 +8,7 @@ using namespace DuiLib;
 #include "resource.h"
 #include "DragDropUI.h"
 #include "MyControlUI.h"
+#include "PatientCardUI.h"
 
 #define TIMER_ID_PROGRESS 200
 //#define TIMER_ID_REPAINT  201

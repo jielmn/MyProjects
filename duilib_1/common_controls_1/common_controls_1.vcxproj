@@ -158,6 +158,7 @@
     <ClCompile Include="DragDropUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyControlUI.cpp" />
+    <ClCompile Include="PatientCardUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="DragDropUI.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyControlUI.h" />
+    <ClInclude Include="PatientCardUI.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

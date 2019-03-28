@@ -14,6 +14,9 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyControl")) {
 		return new CMyControlUI;
 	}
+	else if (0 == strcmp(pstrClass, "PatientCard")) {
+		return new CPatinfoCardUI;
+	}
 	return 0;   
 }
 

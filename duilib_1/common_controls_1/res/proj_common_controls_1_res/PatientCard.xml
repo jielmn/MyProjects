@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout width="350" height="300"  >
+		<Control name="PatImage" loat="true" pos="20,20,188,188" bkimage="" />		
+		<Label name=""        text="姓名" float="true" font="3" pos="151,54,0,0" width="55" height="22" align="center" ></Label>
+		<Label name=""        text="年龄" float="true" font="3" pos="210,54,0,0" width="55" height="22" align="center" ></Label>
+		<Label name=""        text="性别" float="true" font="3" pos="272,54,0,0" width="55" height="22" align="center" ></Label>
+		<Label name="PatName" text=""     float="true" font="4" pos="151,90,0,0" width="55" height="22" align="center" ></Label>
+		<Label name="PatAge"  text=""     float="true" font="4" pos="210,90,0,0" width="55" height="22" align="center"  ></Label>
+		<Label name="PatSex"  text=""     float="true" font="4" pos="272,90,0,0" width="55" height="22" align="center"  ></Label>		
+		
+		<Label name=""      text="ID"     font="3" float="true" pos="21,190,0,0" width="124" height="24" align="center" ></Label>
+		<Label name="PatID" text=""       font="4" float="true" pos="21,228,0,0" width="124" height="34" align="center" ></Label>
+		
+		<Label name="" text="出生日期:" font="3" float="true" pos="155,175,0,0" width="70" height="17" ></Label>
+		<Label name="" text="联系电话:" font="3" float="true" pos="155,212,0,0" width="70" height="17" ></Label>
+		<Label name="" text="创建时间:" font="3" float="true" pos="155,248,0,0" width="70" height="17" ></Label>
+		
+		<Label align="left" name="PatBirth"      text=""  font="4" float="true" pos="250,175,0,0" width="120" height="17" ></Label>
+		<Label align="left" name="PatTel"        text=""  font="4" float="true" pos="250,212,0,0" width="120" height="17" ></Label>
+		<Label align="left" name="PatCreateDate" text=""  font="4" float="true" pos="250,248,0,0" width="120" height="17" ></Label>
+	</HorizontalLayout>
+</Window>
