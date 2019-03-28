@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1" bkcolor="#FFD1E8F5"  >		
+	
+		<VerticalLayout height="160" inset="10,25,10,5">
+			<Label text="注意事项：" font="2" textcolor="#FF386382" />
+			<Label text="1. Reader和电脑用USB线连接" font="2" textcolor="#FF386382" />
+			<Label text="2. 设置成功的标志是听到Reader嘀的一声响" font="2" textcolor="#FFFF0000" />
+			<Label text="3. 断电重启，配置才生效" font="2" textcolor="#FF386382" />
+		</VerticalLayout>
+		
+		<HorizontalLayout height="60" inset="10,25,10,5">
+			<Label text="选择串口" width="150" font="3" textcolor="#FF386382" />
+			<Combo name="cmbComPort_2" width="400" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382"  >
+			</Combo>
+		</HorizontalLayout>
+		
+	</VerticalLayout>
+</Window>
