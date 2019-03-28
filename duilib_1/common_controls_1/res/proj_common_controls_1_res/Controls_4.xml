@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window>	
-	<HorizontalLayout inset="1,1,1,1"   >		
-		<PatientCard width="350" height="300" bordercolor="#FF000000" bordersize="1" patient_name="张三" sex="男" age="60" birth="1980-07-05" tel="18901038856" id="952711" />
-		<Control width="10" />
-		<PatientCard width="350" height="300" bordercolor="#FF000000" bordersize="1" patient_name="李四" sex="女" age="50" birth="1990-03-20" tel="18199348878" id="3681032" patient_image="woman.png" />
-	</HorizontalLayout>
+<Window>
+	<VerticalLayout>
+		<HorizontalLayout inset="1,1,1,1"   >		
+			<PatientCard width="350" height="300" bordercolor="#FF000000" bordersize="1" patient_name="张三" sex="男" age="60" birth="1980-07-05" tel="18901038856" id="952711" />
+			<Control width="10" />
+			<PatientCard width="350" height="300" bordercolor="#FF000000" bordersize="1" patient_name="李四" sex="女" age="50" birth="1990-03-20" tel="18199348878" id="3681032" patient_image="woman.png" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout>
+		</HorizontalLayout>
+	</VerticalLayout>	
 </Window>
