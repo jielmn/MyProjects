@@ -156,6 +156,7 @@
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="DragDropUI.cpp" />
+    <ClCompile Include="EditableButtonUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyControlUI.cpp" />
     <ClCompile Include="PatientCardUI.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="DragDropUI.h" />
+    <ClInclude Include="EditableButtonUI.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyControlUI.h" />
     <ClInclude Include="PatientCardUI.h" />

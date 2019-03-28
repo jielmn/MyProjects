@@ -9,6 +9,7 @@ using namespace DuiLib;
 #include "DragDropUI.h"
 #include "MyControlUI.h"
 #include "PatientCardUI.h"
+#include "EditableButtonUI.h"
 
 #define TIMER_ID_PROGRESS 200
 //#define TIMER_ID_REPAINT  201
@@ -81,6 +82,9 @@ private:
 	CMyControlUI *           m_mycontrol;
 	CDragDropUI *            m_dragdrop;
 	CDragDropUI *            m_dragdrop_1;
+
+	CEditableButtonUI *      m_edbtn_1;
+	CLabelUI *               m_lblShowEdbtnText;
 };
  
 

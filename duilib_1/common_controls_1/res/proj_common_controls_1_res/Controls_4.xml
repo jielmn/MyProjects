@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>
 	<VerticalLayout>
-		<HorizontalLayout inset="1,1,1,1"   >		
+		<HorizontalLayout inset="1,1,1,1" height="320"  >		
 			<PatientCard width="350" height="300" bordercolor="#FF000000" bordersize="1" patient_name="张三" sex="男" age="60" birth="1980-07-05" tel="18901038856" id="952711" />
 			<Control width="10" />
 			<PatientCard width="350" height="300" bordercolor="#FF000000" bordersize="1" patient_name="李四" sex="女" age="50" birth="1990-03-20" tel="18199348878" id="3681032" patient_image="woman.png" />
 		</HorizontalLayout>
 		
-		<HorizontalLayout>
+		<HorizontalLayout height="40" bkcolor="#FF333333" inset="5,5,5,5" >		
+			<EditableButton name="cstEdtBtn_1" width="100" text="点击改变我" btncolor="#FFFFFF00" btnfont="3" editfont="4" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
+			<Control width="20" />
+			<Label text="==>" textcolor="#FFFFFFFF" width="60" />
+			<Label name="lblEdtBtnText" text="" textcolor="#FFFFFFFF" />
 		</HorizontalLayout>
 	</VerticalLayout>	
 </Window>

@@ -17,6 +17,9 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "PatientCard")) {
 		return new CPatinfoCardUI;
 	}
+	else if (0 == strcmp(pstrClass, "EditableButton")) {
+		return new CEditableButtonUI; 
+	}
 	return 0;   
 }
 
@@ -51,6 +54,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_dragdrop = static_cast<CDragDropUI *>(m_PaintManager.FindControl("cstDragDrop_1"));
 	m_dragdrop_1 = static_cast<CDragDropUI *>(m_PaintManager.FindControl("cstDragDrop_2"));
 	m_mycontrol = static_cast<CMyControlUI *>(m_PaintManager.FindControl("cstMyControl_1"));
+	m_edbtn_1 = static_cast<CEditableButtonUI *>(m_PaintManager.FindControl("cstEdtBtn_1"));
+	m_lblShowEdbtnText = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblEdtBtnText"));
 
 	HCURSOR h = LoadCursor(NULL, IDC_SIZEWE);
 	m_dragdrop->SetCursor(h);
@@ -256,6 +261,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "cstDragDrop_2") {
 			m_mycontrol->m_nSplitY = (rect.bottom + rect.top) / 2;
 			m_mycontrol->Invalidate();
+		}
+	}
+	else if (msg.sType == "textchanged") {
+		if ( name == "cstEdtBtn_1" ) {
+			m_lblShowEdbtnText->SetText(m_edbtn_1->GetText());
 		}
 	}
 	WindowImplBase::Notify(msg);
