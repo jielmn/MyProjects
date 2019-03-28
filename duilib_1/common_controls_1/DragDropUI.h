@@ -21,8 +21,12 @@ public:
 
 	void  SetCursor(HCURSOR h);
 	void  SetDragDropType(DragDropType e);
+	void  SetBoundingRect(const RECT & r);
+
 private:
 	HCURSOR       m_cursor;
 	RECT          m_rcNewPos;
 	DragDropType  m_eDragDropType;
+	RECT          m_rcBounding;
+	BOOL          m_bBounding;
 };

@@ -79,6 +79,7 @@ private:
 
 	CMyControlUI *           m_mycontrol;
 	CDragDropUI *            m_dragdrop;
+	CDragDropUI *            m_dragdrop_1;
 };
  
 

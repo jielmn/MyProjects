@@ -46,11 +46,16 @@ void  CDuiFrameWnd::InitWindow() {
 	m_List1 = static_cast<CListUI *>(m_PaintManager.FindControl("list_1"));
 	m_Combo1 = static_cast<CComboUI *>(m_PaintManager.FindControl("combo_1"));
 	m_dragdrop = static_cast<CDragDropUI *>(m_PaintManager.FindControl("cstDragDrop_1"));
+	m_dragdrop_1 = static_cast<CDragDropUI *>(m_PaintManager.FindControl("cstDragDrop_2"));
 	m_mycontrol = static_cast<CMyControlUI *>(m_PaintManager.FindControl("cstMyControl_1"));
 
 	HCURSOR h = LoadCursor(NULL, IDC_SIZEWE);
 	m_dragdrop->SetCursor(h);
 	m_dragdrop->SetDragDropType(CDragDropUI::DragDropType_WE);
+
+	h = LoadCursor(NULL, IDC_SIZENS);
+	m_dragdrop_1->SetCursor(h);
+	m_dragdrop_1->SetDragDropType(CDragDropUI::DragDropType_NS);
 
 	m_ip->SetIP("192.168.0.1");           
 	m_hotkey->SetHotKey(65, 2);
@@ -228,7 +233,27 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		r.right = r.left + 2 * 2;
 
 		m_dragdrop->SetVisible(true); 
-		m_dragdrop->SetPos(r);		
+		m_dragdrop->SetBoundingRect(rect);
+		m_dragdrop->SetPos(r);	
+
+		r = rect;
+		r.top = m_mycontrol->m_nSplitY - 2;
+		r.bottom = r.top + 2 * 2;
+		m_dragdrop_1->SetVisible(true);
+		m_dragdrop_1->SetBoundingRect(rect);
+		m_dragdrop_1->SetPos(r);
+	}
+	else if (msg.sType == "dragdrop_complete") {
+		RECT rect = msg.pSender->GetPos();
+
+		if (name == "cstDragDrop_1") {
+			m_mycontrol->m_nSplitX = (rect.right + rect.left) / 2;
+			m_mycontrol->Invalidate();
+		}
+		else if (name == "cstDragDrop_2") {
+			m_mycontrol->m_nSplitY = (rect.bottom + rect.top) / 2;
+			m_mycontrol->Invalidate();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }                                            
