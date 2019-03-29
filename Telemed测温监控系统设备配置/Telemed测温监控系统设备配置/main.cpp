@@ -22,8 +22,52 @@ void  CDuiFrameWnd::InitWindow() {
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
 	m_cmbHandReaderCom = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbComPort_1"));
 	m_cmbSurgencyReaderCom = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbComPort_2"));
+	m_cmbHandReaderAddr = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbAddr_1"));
+	m_cmbHandReaderChannel = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbChannel_1"));
+	m_btnHandReader = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_1"));
 
-	OnDeviceChanged(0, 0);
+	CDuiString  strText;
+
+#ifndef RESTRICTED_FLAG
+	for ( int i = 1; i <= 255; i++ ) {
+		strText.Format("%d", i);
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(strText);
+		pElement->SetTag(i);
+		m_cmbHandReaderAddr->Add(pElement); 
+	}
+
+	for (int i = 1; i <= 91; i++ ) {
+		strText.Format("%d", i);
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(strText);
+		pElement->SetTag(i);
+		m_cmbHandReaderChannel->Add(pElement);
+	}
+
+#else
+	for (int i = 1; i <= 10; i++) {
+		strText.Format("%d", i);
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(strText);
+		pElement->SetTag(i);
+		m_cmbHandReaderAddr->Add(pElement);
+	}
+
+	for (int i = 1; i <= 91; i += 10 ) {
+		strText.Format("%d", i);
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(strText);
+		pElement->SetTag(i);
+		m_cmbHandReaderChannel->Add(pElement);
+	}
+#endif
+
+	m_cmbHandReaderAddr->SelectItem(0);  
+	m_cmbHandReaderChannel->SelectItem(0);                            
+
+
+	OnDeviceChanged(0, 0);  
 	WindowImplBase::InitWindow();
 }
 
@@ -81,7 +125,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
-
+             
 void  CDuiFrameWnd::OnDeviceChanged(WPARAM wParm, LPARAM  lParam) {
 	std::vector<std::string> vComPorts;
 	EnumPortsWdm(vComPorts);

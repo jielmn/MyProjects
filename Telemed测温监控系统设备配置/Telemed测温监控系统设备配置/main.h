@@ -45,5 +45,7 @@ private:
 	DuiLib::CTabLayoutUI *              m_tabs;
 	DuiLib::CComboUI *                  m_cmbHandReaderCom;
 	DuiLib::CComboUI *                  m_cmbSurgencyReaderCom;
-
+	DuiLib::CComboUI *                  m_cmbHandReaderAddr;
+	DuiLib::CComboUI *                  m_cmbHandReaderChannel;
+	DuiLib::CButtonUI *                 m_btnHandReader;
 };
