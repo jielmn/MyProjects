@@ -44,7 +44,7 @@
 			<HorizontalLayout height="60" inset="0,10,0,10" >
 				<HorizontalLayout height="40" inset="10,5,10,5">
 					<Label text="读卡器SN" width="150" font="3" textcolor="#FF386382" />
-					<Edit  name="edtSN" font="3" textcolor="#FF386382" width="100" text="1" />
+					<Edit  name="edtSN_1" font="3" textcolor="#FF386382" width="100" text="1" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout width="200" inset="25,0,25,0" >

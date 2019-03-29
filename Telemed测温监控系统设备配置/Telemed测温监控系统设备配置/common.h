@@ -19,20 +19,41 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
-#define   RESTRICTED_FLAG          
+#define   MAX_SURGENCY_BEDS_CNT  30
+#define   MAX_READERS_PER_BED    6
+
+#define   MSG_SETTING_HAND_READER      1101
+
+#define   UM_SETTING_HAND_READER_RET   (WM_USER+1)
+
+#define   RESTRICTED_FLAG       
+
+class CSettingHandReaderParam : public LmnToolkits::MessageData {
+public:
+	CSettingHandReaderParam(int nChannel, int nAddr, int nCom) {
+		m_nChannel = nChannel;
+		m_nAddr = nAddr;
+		m_nCom = nCom;
+	}
+
+	int   m_nChannel;
+	int   m_nAddr;
+	int   m_nCom;
+};
 
 
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_com;
+	HWND                      m_hWnd;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_db = 0;
+		m_thrd_com = 0;
 	}
 };
 

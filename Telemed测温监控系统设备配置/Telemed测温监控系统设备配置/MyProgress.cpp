@@ -35,7 +35,7 @@ void CMyProgress::DoEvent(DuiLib::TEventUI& event) {
 				m_nPos - PROGRESS_WIDTH + HORIZONTAL_MARGIN, MARGIN, m_nPos + HORIZONTAL_MARGIN, height - MARGIN);
 		}
 
-		this->SetForeImage(imageProp);
+		this->SetForeImage(imageProp);  
 
 		m_nPos += STEP;
 		if (m_nPos > width + PROGRESS_WIDTH) {

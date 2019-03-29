@@ -7,6 +7,7 @@ using namespace DuiLib;
 
 #include "resource.h"
 #include "MyProgress.h"
+#include "MyProgress.h"
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -40,12 +41,24 @@ public:
 
 private:
 	void  OnDeviceChanged(WPARAM wParm, LPARAM  lParam);
+	void  OnSettingHandReader();
 
 private:
 	DuiLib::CTabLayoutUI *              m_tabs;
+	// tab 1
 	DuiLib::CComboUI *                  m_cmbHandReaderCom;
-	DuiLib::CComboUI *                  m_cmbSurgencyReaderCom;
 	DuiLib::CComboUI *                  m_cmbHandReaderAddr;
 	DuiLib::CComboUI *                  m_cmbHandReaderChannel;
-	DuiLib::CButtonUI *                 m_btnHandReader;
+	DuiLib::CButtonUI *                 m_btnHandReader_1;
+	DuiLib::CButtonUI *                 m_btnHandReader_2;
+	DuiLib::CEditUI *                   m_edHandReaderSn;
+	// tab 2
+	DuiLib::CComboUI *                  m_cmbSurgencyReaderCom;
+	DuiLib::CComboUI *                  m_cmbArea_1;
+	DuiLib::CComboUI *                  m_cmbBed_1;
+	DuiLib::CComboUI *                  m_cmbBed_2;
+	DuiLib::CEditUI *                   m_edSurgencyReaderSn;
+	// progress
+	CMyProgress *                       m_progress;
+
 };

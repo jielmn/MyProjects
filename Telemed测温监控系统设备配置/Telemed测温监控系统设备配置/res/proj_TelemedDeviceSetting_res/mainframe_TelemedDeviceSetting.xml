@@ -65,7 +65,7 @@
 		
 		<!-- 状态栏 -->
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
-			<MyProgress name="progress" height="30" visible="false" />		
+			<MyProgress name="progress" height="30" visible="false"  />		
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>
