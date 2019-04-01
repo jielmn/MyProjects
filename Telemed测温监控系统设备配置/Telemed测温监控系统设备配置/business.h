@@ -21,6 +21,9 @@ public:
 	int  SetHandReaderSnAsyn(DWORD  dwSn, int nCom);
 	int  SetHandReaderSn(const CSetHandReaderSnParam * pParam);
 
+	int  SetReceriverChannelAsyn(BYTE byChannelA, BYTE byChannelB, BYTE byChannelC, int nCom);
+	int  SetReceriverChannel(const CSetReceiverChannelParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

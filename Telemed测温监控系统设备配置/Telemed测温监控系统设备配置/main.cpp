@@ -47,6 +47,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_cmbArea_2 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbArea_2"));
 	m_btnReceiver_1 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_5"));
 	m_btnReceiver_2 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_6"));
+	m_cmbChannel_a = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbChannel_a"));
+	m_edtChannel_b = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtChannel_b"));
+	m_edtChannel_c = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtChannel_c"));
 
 	// tab 4
 	m_lstArea = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstArea"));
@@ -125,6 +128,15 @@ void  CDuiFrameWnd::InitWindow() {
 		pItem->SetTag(pArea->dwAreaNo);
 	}
 
+	for (int i = 1; i <= 61; i += 30) {
+		strText.Format("%d", i);
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(strText);
+		pElement->SetTag(i);
+		m_cmbChannel_a->Add(pElement);
+	}
+	m_cmbChannel_a->SelectItem(0);
+
 	OnDeviceChanged(0, 0);  
 	OnAreasChanged();  
 
@@ -191,6 +203,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnSetting_4") {
 			  
 		}
+		else if (name == "btnSetting_5") {
+
+		}
+		else if (name == "btnSetting_6") {
+			OnSetReceiverChannel();
+		}
 	}
 	else if (msg.sType == "menu")
 	{
@@ -207,6 +225,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "menu_delete_area") {
 		OnDeleteArea();
 	}
+	else if (msg.sType == "itemselect") {
+		if (name == "cmbChannel_a") {
+			OnChannelAChanged();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -219,6 +242,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_SET_HAND_READER_SN_RET) {
 		OnSetHandReaderSnRet(wParam, lParam);
+	}
+	else if (uMsg == UM_SET_RECIEVER_CHANNEL_RET) {
+		OnSetReceiverChannelRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -432,6 +458,52 @@ void  CDuiFrameWnd::OnAreasChanged() {
 		if (cmbAreas[i]->GetCount() > 0) {
 			cmbAreas[i]->SelectItem(0);
 		}
+	}
+}
+
+void  CDuiFrameWnd::OnChannelAChanged() {
+	int nSel  = m_cmbChannel_a->GetCurSel();
+	assert(nSel >= 0);
+
+	CControlUI * pCtl = m_cmbChannel_a->GetItemAt(nSel);
+	int nChannel = pCtl->GetTag();
+
+	CDuiString  strText;
+	strText.Format("%d", nChannel + 10);
+	m_edtChannel_b->SetText(strText);
+
+	strText.Format("%d", nChannel + 20);
+	m_edtChannel_c->SetText(strText);
+}
+
+void  CDuiFrameWnd::OnSetReceiverChannel() {
+	int nSel = m_cmbReceiverCom->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	CControlUI * pCtl = m_cmbReceiverCom->GetItemAt(nSel);
+	int nCom = (int)pCtl->GetTag();
+
+	nSel = m_cmbChannel_a->GetCurSel();
+	assert(nSel >= 0);
+	pCtl = m_cmbChannel_a->GetItemAt(nSel);
+	BYTE byChannel_a = (BYTE)pCtl->GetTag();
+	BYTE byChannel_b = byChannel_a + 10;
+	BYTE byChannel_c = byChannel_a + 20;
+
+	CBusiness::GetInstance()->SetReceriverChannelAsyn( byChannel_a, byChannel_b, byChannel_c, nCom);
+	SetBusy();
+}
+
+void  CDuiFrameWnd::OnSetReceiverChannelRet(WPARAM wParm, LPARAM  lParam) {
+	SetBusy(FALSE);
+
+	if (0 == wParm) {
+		MessageBox(GetHWND(), "设置非连续测温模块成功", "设置", 0);
+	}
+	else {
+		MessageBox(GetHWND(), "设置非连续测温模块失败", "设置", 0);
 	}
 }
 

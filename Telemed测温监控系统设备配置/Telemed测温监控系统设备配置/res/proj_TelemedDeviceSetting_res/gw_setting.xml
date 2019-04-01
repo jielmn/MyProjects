@@ -51,18 +51,18 @@
 				<VerticalLayout>
 					<HorizontalLayout height="40" inset="10,5,10,5">
 						<Label text="模块1信道" width="150" font="3" textcolor="#FF386382" />
-						<Combo name="cmbArea_21" width="100" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true"  >
+						<Combo name="cmbChannel_a" width="100" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true"  >
 							</Combo>
 					</HorizontalLayout>
 					
 					<HorizontalLayout height="40" inset="10,5,10,5">
 						<Label text="模块2信道" width="150" font="3" textcolor="#FF386382" />
-						<Edit  name="edtSN_21" font="3" textcolor="#FF386382" width="100" text="1" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
+						<Edit  name="edtChannel_b" font="3" textcolor="#FF386382" width="100" text="1" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
 					</HorizontalLayout>
 					
 					<HorizontalLayout height="40" inset="10,5,10,5">
 						<Label text="模块3信道" width="150" font="3" textcolor="#FF386382" />
-						<Edit  name="edtSN_21" font="3" textcolor="#FF386382" width="100" text="1" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
+						<Edit  name="edtChannel_c" font="3" textcolor="#FF386382" width="100" text="1" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
 					</HorizontalLayout>
 				</VerticalLayout>
 				

@@ -51,6 +51,9 @@ private:
 	void  OnModifyArea();
 	void  OnDeleteArea();
 	void  OnAreasChanged();
+	void  OnChannelAChanged();
+	void  OnSetReceiverChannel();
+	void  OnSetReceiverChannelRet(WPARAM wParm, LPARAM  lParam);
 
 private:
 	DuiLib::CTabLayoutUI *              m_tabs;
@@ -74,6 +77,9 @@ private:
 	DuiLib::CComboUI *                  m_cmbArea_2;
 	DuiLib::CButtonUI *                 m_btnReceiver_1;
 	DuiLib::CButtonUI *                 m_btnReceiver_2;
+	DuiLib::CComboUI *                  m_cmbChannel_a;
+	DuiLib::CEditUI *                   m_edtChannel_b;
+	DuiLib::CEditUI *                   m_edtChannel_c;
 	// tab 4
 	DuiLib::CListUI *                   m_lstArea;
 	// progress
