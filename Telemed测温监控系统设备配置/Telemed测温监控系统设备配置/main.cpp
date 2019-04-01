@@ -19,6 +19,8 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	g_data.m_hWnd = m_hWnd;
+
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl("switch"));
 
 	// tab 1
@@ -151,6 +153,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (name == "btnSetting_1") {
 			OnSettingHandReader();
 		}
+		// 设置手持SN
+		else if (name == "btnSetting_2") {
+			OnSetHandReaderSn();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -158,6 +164,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_DEVICECHANGE) {
 		OnDeviceChanged(wParam, lParam);
+	}
+	else if (uMsg == UM_SETTING_HAND_READER_RET) {
+		OnHandReaderSettingRet(wParam, lParam);
+	}
+	else if (uMsg == UM_SET_HAND_READER_SN_RET) {
+		OnSetHandReaderSnRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -170,6 +182,21 @@ void  CDuiFrameWnd::OnDeviceChanged(WPARAM wParm, LPARAM  lParam) {
 	SetComboCom(m_cmbSurgencyReaderCom, vComPorts);
 }
 
+void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
+	if (bBusy) {
+		m_btnHandReader_1->SetEnabled(false);
+		m_btnHandReader_2->SetEnabled(false);
+		m_progress->SetVisible(true);
+		m_progress->Start();
+	}
+	else {
+		m_btnHandReader_1->SetEnabled(true);
+		m_btnHandReader_2->SetEnabled(true);		
+		m_progress->Stop();
+		m_progress->SetVisible(false);
+	}
+}
+
 void  CDuiFrameWnd::OnSettingHandReader() {
 	int nSel = m_cmbHandReaderCom->GetCurSel();
 	if (nSel < 0) {
@@ -177,7 +204,69 @@ void  CDuiFrameWnd::OnSettingHandReader() {
 		return;
 	}
 
+	CControlUI * pCtl = m_cmbHandReaderCom->GetItemAt(nSel);
+	int nCom = (int)pCtl->GetTag();
+
+	nSel = m_cmbHandReaderChannel->GetCurSel();
+	pCtl = m_cmbHandReaderChannel->GetItemAt(nSel);
+	BYTE byChannel = (BYTE)pCtl->GetTag();
+
+	nSel = m_cmbHandReaderAddr->GetCurSel();
+	pCtl = m_cmbHandReaderAddr->GetItemAt(nSel);
+	BYTE byAddr = (BYTE)pCtl->GetTag();
+
+	CBusiness::GetInstance()->SetHandReaderAsyn(byChannel, byAddr, nCom);
+	SetBusy();
 }
+
+void  CDuiFrameWnd::OnHandReaderSettingRet(WPARAM wParm, LPARAM  lParam) {
+	SetBusy(FALSE);
+
+	if (0 == wParm) {
+		MessageBox(GetHWND(), "设置成功", "设置", 0);
+	}
+	else {
+		MessageBox(GetHWND(), "设置失败", "设置", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSetHandReaderSn() {
+	int nSel = m_cmbHandReaderCom->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	CControlUI * pCtl = m_cmbHandReaderCom->GetItemAt(nSel);
+	int nCom = (int)pCtl->GetTag();
+
+	CDuiString strText = m_edHandReaderSn->GetText();
+	if (strText.GetLength() == 0) {
+		MessageBox(GetHWND(), "请输入SN", "错误", 0);
+		return;
+	}
+
+	DWORD  dwSn = 0;
+	int ret = sscanf(strText, "%lu", &dwSn);
+	if (0 == ret) {
+		MessageBox(GetHWND(), "SN必须为数字", "错误", 0);
+		return;
+	}
+	
+	CBusiness::GetInstance()->SetHandReaderSnAsyn(dwSn, nCom);
+	SetBusy();
+}
+
+void  CDuiFrameWnd::OnSetHandReaderSnRet(WPARAM wParm, LPARAM  lParam) {
+	SetBusy(FALSE);
+
+	if (0 == wParm) {
+		MessageBox(GetHWND(), "设置SN成功", "设置", 0);
+	}
+	else {
+		MessageBox(GetHWND(), "设置SN失败", "设置", 0);
+	}
+}
+
 
 
 

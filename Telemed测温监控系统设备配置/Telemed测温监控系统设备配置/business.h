@@ -15,8 +15,11 @@ public:
 	int Init();
 	int DeInit();
 
-	int  SetHandReaderAsyn(int nChannel, int nAddr, int nCom);
+	int  SetHandReaderAsyn(BYTE byChannel, BYTE byAddr, int nCom);
 	int  SetHandReader(const CSettingHandReaderParam * pParam);
+
+	int  SetHandReaderSnAsyn(DWORD  dwSn, int nCom);
+	int  SetHandReaderSn(const CSetHandReaderSnParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

@@ -42,6 +42,10 @@ public:
 private:
 	void  OnDeviceChanged(WPARAM wParm, LPARAM  lParam);
 	void  OnSettingHandReader();
+	void  OnHandReaderSettingRet(WPARAM wParm, LPARAM  lParam);
+	void  SetBusy(BOOL bBusy = TRUE);
+	void  OnSetHandReaderSn();
+	void  OnSetHandReaderSnRet(WPARAM wParm, LPARAM  lParam);
 
 private:
 	DuiLib::CTabLayoutUI *              m_tabs;

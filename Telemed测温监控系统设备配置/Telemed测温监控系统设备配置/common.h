@@ -23,22 +23,36 @@ using namespace DuiLib;
 #define   MAX_READERS_PER_BED    6
 
 #define   MSG_SETTING_HAND_READER      1101
+#define   MSG_SET_HAND_READER_SN       1102
 
 #define   UM_SETTING_HAND_READER_RET   (WM_USER+1)
+#define   UM_SET_HAND_READER_SN_RET    (WM_USER+2)
 
 #define   RESTRICTED_FLAG       
 
 class CSettingHandReaderParam : public LmnToolkits::MessageData {
 public:
-	CSettingHandReaderParam(int nChannel, int nAddr, int nCom) {
-		m_nChannel = nChannel;
-		m_nAddr = nAddr;
+	CSettingHandReaderParam(BYTE byChannel, BYTE byAddr, int nCom) {
+		m_byChannel = byChannel;
+		m_byAddr = byAddr;
 		m_nCom = nCom;
 	}
 
-	int   m_nChannel;
-	int   m_nAddr;
-	int   m_nCom;
+	int    m_nCom;
+	BYTE   m_byChannel;
+	BYTE   m_byAddr;	
+	char   m_reserverd[2];
+};
+
+class CSetHandReaderSnParam : public LmnToolkits::MessageData {
+public:
+	CSetHandReaderSnParam(DWORD dwSn, int nCom) {
+		m_dwSn = dwSn;
+		m_nCom = nCom;
+	}
+
+	int    m_nCom;
+	DWORD  m_dwSn;
 };
 
 
