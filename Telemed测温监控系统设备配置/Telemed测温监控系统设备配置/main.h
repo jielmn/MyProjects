@@ -62,6 +62,10 @@ private:
 	DuiLib::CComboUI *                  m_cmbBed_1;
 	DuiLib::CComboUI *                  m_cmbBed_2;
 	DuiLib::CEditUI *                   m_edSurgencyReaderSn;
+	DuiLib::CButtonUI *                 m_btnSurgencyReader_1;
+	DuiLib::CButtonUI *                 m_btnSurgencyReader_2;
+	// tab 3
+	DuiLib::CComboUI *                  m_cmbReceiverCom;
 	// progress
 	CMyProgress *                       m_progress;
 

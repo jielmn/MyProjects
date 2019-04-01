@@ -37,6 +37,11 @@ void  CDuiFrameWnd::InitWindow() {
 	m_cmbBed_1 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbBed_1"));
 	m_cmbBed_2 = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbBed_2"));
 	m_edSurgencyReaderSn = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtSN_2"));
+	m_btnSurgencyReader_1 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_3"));
+	m_btnSurgencyReader_2 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_4"));
+
+	// tab 3
+	m_cmbReceiverCom = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbComPort_3"));
 
 	// progress
 	m_progress = static_cast<CMyProgress*>(m_PaintManager.FindControl("progress"));
@@ -157,6 +162,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnSetting_2") {
 			OnSetHandReaderSn();
 		}
+		else if (name == "btnSetting_3") {
+
+		}
+		else if (name == "btnSetting_4") {
+			  
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -180,18 +191,23 @@ void  CDuiFrameWnd::OnDeviceChanged(WPARAM wParm, LPARAM  lParam) {
 
 	SetComboCom(m_cmbHandReaderCom, vComPorts);
 	SetComboCom(m_cmbSurgencyReaderCom, vComPorts);
+	SetComboCom(m_cmbReceiverCom, vComPorts);                           	
 }
 
 void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 	if (bBusy) {
 		m_btnHandReader_1->SetEnabled(false);
 		m_btnHandReader_2->SetEnabled(false);
+		m_btnSurgencyReader_1->SetEnabled(false);
+		m_btnSurgencyReader_2->SetEnabled(false);
 		m_progress->SetVisible(true);
 		m_progress->Start();
 	}
 	else {
 		m_btnHandReader_1->SetEnabled(true);
 		m_btnHandReader_2->SetEnabled(true);		
+		m_btnSurgencyReader_1->SetEnabled(true);
+		m_btnSurgencyReader_2->SetEnabled(true);
 		m_progress->Stop();
 		m_progress->SetVisible(false);
 	}
