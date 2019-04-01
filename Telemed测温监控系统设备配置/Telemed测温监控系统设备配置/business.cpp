@@ -232,6 +232,14 @@ int  CBusiness::SetReceriverChannel(const CSetReceiverChannelParam * pParam) {
 	return 0;
 }
 
+int  CBusiness::SetSurgencyReaderAsyn(WORD wAddr, BYTE byChannel, int nCom) {
+	return 0;
+}
+
+int CBusiness::SetSurgencyReader() {
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {

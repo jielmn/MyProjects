@@ -198,7 +198,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnSetHandReaderSn();
 		}
 		else if (name == "btnSetting_3") {
-
+			OnSetSurgencyReader();
 		}
 		else if (name == "btnSetting_4") {
 			  
@@ -505,6 +505,42 @@ void  CDuiFrameWnd::OnSetReceiverChannelRet(WPARAM wParm, LPARAM  lParam) {
 	else {
 		MessageBox(GetHWND(), "设置非连续测温模块失败", "设置", 0);
 	}
+}
+
+void  CDuiFrameWnd::OnSetSurgencyReader() {
+	int nSel = m_cmbSurgencyReaderCom->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	CControlUI * pCtl = m_cmbSurgencyReaderCom->GetItemAt(nSel);
+	int nCom = (int)pCtl->GetTag();
+
+	nSel = m_cmbArea_1->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中病区", "错误", 0);
+		return;
+	}
+	pCtl = m_cmbArea_1->GetItemAt(nSel);
+	BYTE byAreaNo = (BYTE)pCtl->GetTag();
+
+	int nSel_1 = m_cmbBed_1->GetCurSel();
+	int nSel_2 = m_cmbBed_2->GetCurSel();
+
+	if (nSel_1 < 0 || nSel_2 < 0) {
+		MessageBox(GetHWND(), "请选择床位号，例如2A, 3C等", "错误", 0);
+		return;
+	}
+
+	WORD wBedNo = (WORD)(nSel_1 * MAX_READERS_PER_BED + nSel_2 + 1);
+
+	CBusiness::GetInstance()->SetSurgencyReaderAsyn(wBedNo, byAreaNo, nCom);
+
+	SetBusy();
+}
+
+void  CDuiFrameWnd::OnSetSurgencyReaderRet(WPARAM wParm, LPARAM  lParam) {
+
 }
 
 

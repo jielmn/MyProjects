@@ -24,6 +24,9 @@ public:
 	int  SetReceriverChannelAsyn(BYTE byChannelA, BYTE byChannelB, BYTE byChannelC, int nCom);
 	int  SetReceriverChannel(const CSetReceiverChannelParam * pParam);
 
+	int  SetSurgencyReaderAsyn(WORD wAddr, BYTE byChannel, int nCom);
+	int  SetSurgencyReader();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

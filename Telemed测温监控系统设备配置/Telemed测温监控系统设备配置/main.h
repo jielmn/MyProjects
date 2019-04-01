@@ -54,6 +54,8 @@ private:
 	void  OnChannelAChanged();
 	void  OnSetReceiverChannel();
 	void  OnSetReceiverChannelRet(WPARAM wParm, LPARAM  lParam);
+	void  OnSetSurgencyReader();
+	void  OnSetSurgencyReaderRet(WPARAM wParm, LPARAM  lParam);
 
 private:
 	DuiLib::CTabLayoutUI *              m_tabs;
