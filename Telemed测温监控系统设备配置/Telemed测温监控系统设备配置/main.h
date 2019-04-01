@@ -46,6 +46,11 @@ private:
 	void  SetBusy(BOOL bBusy = TRUE);
 	void  OnSetHandReaderSn();
 	void  OnSetHandReaderSnRet(WPARAM wParm, LPARAM  lParam);
+	void  OnAreaListMenu(TNotifyUI& msg);
+	void  OnAddArea();
+	void  OnModifyArea();
+	void  OnDeleteArea();
+	void  OnAreasChanged();
 
 private:
 	DuiLib::CTabLayoutUI *              m_tabs;
@@ -66,6 +71,11 @@ private:
 	DuiLib::CButtonUI *                 m_btnSurgencyReader_2;
 	// tab 3
 	DuiLib::CComboUI *                  m_cmbReceiverCom;
+	DuiLib::CComboUI *                  m_cmbArea_2;
+	DuiLib::CButtonUI *                 m_btnReceiver_1;
+	DuiLib::CButtonUI *                 m_btnReceiver_2;
+	// tab 4
+	DuiLib::CListUI *                   m_lstArea;
 	// progress
 	CMyProgress *                       m_progress;
 

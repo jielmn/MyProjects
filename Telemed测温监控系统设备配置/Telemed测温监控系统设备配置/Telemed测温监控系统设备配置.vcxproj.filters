@@ -30,6 +30,12 @@
     <ClInclude Include="MyProgress.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MenuUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AreaDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Telemed测温监控系统设备配置.rc">
@@ -52,6 +58,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MyProgress.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AreaDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

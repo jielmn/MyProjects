@@ -30,6 +30,14 @@ void CBusiness::Clear() {
 		delete g_data.m_cfg;
 		g_data.m_cfg = 0;
 	}
+
+	if (g_cfg_area) {
+		g_cfg_area->Deinit();
+		delete g_cfg_area;
+		g_cfg_area = 0;
+	}
+
+	ClearVector(g_vArea);
 }
 
 int CBusiness::Init() {
@@ -49,6 +57,33 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
+
+	g_cfg_area = new FileConfigEx();
+	if (0 == g_cfg_area) {
+		return -1;
+	}
+	g_cfg_area->Init("area.cfg");
+
+	DuiLib::CDuiString strText;
+	for (int i = 0; i < MAX_AREA_COUNT; i++) {
+		TArea area;
+		strText.Format("area name %d", i + 1);
+
+		g_cfg_area->GetConfig(strText, area.szAreaName, sizeof(area.szAreaName), "");
+		if (area.szAreaName[0] == '\0') {
+			break;
+		}
+
+		strText.Format("area no %d", i + 1);
+		g_cfg_area->GetConfig(strText, area.dwAreaNo, 0);
+		if (0 == area.dwAreaNo || area.dwAreaNo > 100) {
+			break;
+		}
+
+		TArea * pArea = new TArea;
+		memcpy(pArea, &area, sizeof(TArea));
+		g_vArea.push_back(pArea);
+	}
 
 	g_data.m_thrd_com = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_com) {

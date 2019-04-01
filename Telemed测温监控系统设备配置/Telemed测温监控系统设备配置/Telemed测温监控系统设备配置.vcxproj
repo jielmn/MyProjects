@@ -152,9 +152,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AreaDlg.h" />
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MenuUI.h" />
     <ClInclude Include="MyProgress.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -165,9 +167,11 @@
     <Image Include="res\main.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AreaDlg.cpp" />
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MenuUI.cpp" />
     <ClCompile Include="MyProgress.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

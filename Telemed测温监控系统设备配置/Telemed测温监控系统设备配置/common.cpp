@@ -3,6 +3,8 @@
 #include <setupapi.h>
 
 CGlobalData  g_data;
+IConfig * g_cfg_area = 0;
+std::vector<TArea *>  g_vArea;
 
 // The following define is from ntddser.h in the DDK. It is also
 // needed for serial port enumeration.
@@ -167,4 +169,56 @@ void SetComboCom(DuiLib::CComboUI * pCombo, std::vector<std::string> & vComPorts
 			pCombo->SelectItem(0);
 		}
 	}
+}
+
+static DWORD  FindMaxAreaId(const std::vector<TArea *> & v) {
+	DWORD  dwMax = 0;
+	std::vector<TArea *>::const_iterator  it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TArea * pArea = *it;
+		if (pArea->dwAreaNo > dwMax) {
+			dwMax = pArea->dwAreaNo;
+		}
+	}
+	return dwMax + 1;
+}
+
+DWORD  FindNewAreaId(const std::vector<TArea *> & v) {
+	DWORD dwMaxId = FindMaxAreaId(v);
+	if (dwMaxId <= 100) {
+		return dwMaxId;
+	}
+
+	for (DWORD i = 1; i <= 100; i++) {
+		std::vector<TArea *>::const_iterator  it;
+		for (it = v.begin(); it != v.end(); ++it) {
+			TArea * pArea = *it;
+			if (pArea->dwAreaNo == i) {
+				break;
+			}
+		}
+		// 如果没有找到相同的id，就用这个id
+		if (it == v.end()) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void  SaveAreas() {
+	g_cfg_area->ClearConfig();
+
+	std::vector<TArea *>::iterator it;
+	int i = 0;
+	DuiLib::CDuiString strText;
+
+	for (it = g_vArea.begin(); it != g_vArea.end(); it++, i++) {
+		TArea * pArea = *it;
+		strText.Format("area no %d", i + 1);
+		g_cfg_area->SetConfig(strText, pArea->dwAreaNo);
+		strText.Format("area name %d", i + 1);
+		g_cfg_area->SetConfig(strText, pArea->szAreaName);
+	}
+
+	g_cfg_area->Save();
 }

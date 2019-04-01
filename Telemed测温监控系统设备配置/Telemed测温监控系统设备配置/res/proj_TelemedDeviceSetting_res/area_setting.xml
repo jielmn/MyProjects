@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout inset="1,1,1,1" bkcolor="#FFD1E8F5"  >		
-		<Label text="4" />
+	<VerticalLayout inset="10,1,10,1" bkcolor="#FFD1E8F5"  >
+
+		<HorizontalLayout height="20" />
+		
+		<VerticalLayout height="100" inset="10,0,10,0">
+			<Label text="注意事项：" font="2" textcolor="#FF386382" />
+			<Label text="1.右键进行增、删、改操作" font="2" textcolor="#FF386382" />
+			<Label text="2.完成病区配置后，把area.cfg复制到监控软件所在的目录下，供其使用" font="2" textcolor="#FF386382" />
+		</VerticalLayout>
+		
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout inset="10,0,10,0"  width="500" height="450" >
+			<List name="lstArea" bkcolor="#FFFFFFFF" inset="0,0,0,0" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="0" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" itemhottextcolor="#FF386382" >
+				<ListHeader height="24" menu="true">
+					<ListHeaderItem text="病区编号"      font="3" width="199"   textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+					<ListHeaderItem text="病区名称"      font="3" width="279"   textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+				</ListHeader>
+			</List>
+		</HorizontalLayout>
+		
+		
+		
 	</VerticalLayout>
 </Window>

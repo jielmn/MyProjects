@@ -22,6 +22,8 @@ using namespace DuiLib;
 #define   MAX_SURGENCY_BEDS_CNT  30
 #define   MAX_READERS_PER_BED    6
 
+#define   MAX_AREA_COUNT         20
+
 #define   MSG_SETTING_HAND_READER      1101
 #define   MSG_SET_HAND_READER_SN       1102
 
@@ -71,10 +73,19 @@ public:
 	}
 };
 
+typedef struct tagArea {
+	char   szAreaName[64];
+	DWORD  dwAreaNo;
+}TArea;
+
 extern CGlobalData  g_data;
+extern std::vector<TArea *>  g_vArea;
+extern IConfig * g_cfg_area;
 
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern void SetComboCom(DuiLib::CComboUI * pCombo, std::vector<std::string> & v);
+extern DWORD  FindNewAreaId(const std::vector<TArea *> & v);
+extern void  SaveAreas();
 
 // templates
 template <class T>

@@ -29,13 +29,13 @@
 				<VerticalLayout inset="0,10,0,10">
 					<HorizontalLayout height="40" inset="10,5,10,5">
 						<Label text="病区号" width="150" font="3" textcolor="#FF386382" />
-						<Combo name="cmbArea_11" width="100" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true"  >
+						<Combo name="cmbArea_2" width="210" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true"  >
 						</Combo>
 					</HorizontalLayout>
 				</VerticalLayout>
 				
 				<HorizontalLayout width="200" inset="25,10,25,10" >
-					<Button name="btnSetting_31" text="设置" font="3" textcolor="#FF386382" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Button name="btnSetting_5" text="设置" font="3" textcolor="#FF386382" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
 				</HorizontalLayout>
 			</HorizontalLayout>
 			
@@ -68,7 +68,7 @@
 				
 				<VerticalLayout width="200" inset="25,0,25,0"  >
 					<Control />
-					<Button name="btnSetting_41" text="设置" font="3" textcolor="#FF386382" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " height="40" />
+					<Button name="btnSetting_6" text="设置" font="3" textcolor="#FF386382" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " height="40" />
 					<Control />
 				</VerticalLayout>
 			</HorizontalLayout>

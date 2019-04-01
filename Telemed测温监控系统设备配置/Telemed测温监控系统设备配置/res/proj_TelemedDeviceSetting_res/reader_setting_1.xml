@@ -23,7 +23,7 @@
 				<VerticalLayout>
 					<HorizontalLayout height="40" inset="10,5,10,5">
 						<Label text="读卡器病区号" width="150" font="3" textcolor="#FF386382" />
-						<Combo name="cmbArea_1" width="100" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true"  >
+						<Combo name="cmbArea_1" width="210" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true"  >
 						</Combo>
 					</HorizontalLayout>
 					
