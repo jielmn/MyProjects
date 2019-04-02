@@ -205,7 +205,7 @@ using namespace DuiLib;
 #define UM_TAG_BINDING_GRIDS_RET                     (WM_USER+13)
 
 #define PRINT_EXCEL_MAX_POINTS_COUNT      100
-#define GET_TEMPERATURE_TIMEOUT           2000
+#define GET_TEMPERATURE_TIMEOUT           5000
 
 #define DRAG_DROP_COLUMNS                6
 #define DRAG_DROP_ROWS                   5
