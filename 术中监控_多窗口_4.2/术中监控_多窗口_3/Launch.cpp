@@ -123,8 +123,8 @@ int  CLaunch::ReadComData() {
 	// 55 0E 00 06 01 45 52 00 00 03 00 00 00 00 00 01 FF
 
 	char debug_buf[8192];
-	const int MIN_DATA_LENGTH = 19;
-	const int TEMP_DATA_LENGTH = 31;
+	const int MIN_DATA_LENGTH = 17;
+	const int TEMP_DATA_LENGTH = 29;
 	const int TEMP_DATA_LENGTH_1 = 32;
 
 	if (m_recv_buf.GetDataLength() >= MIN_DATA_LENGTH) {
