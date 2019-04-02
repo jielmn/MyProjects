@@ -246,6 +246,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_SET_RECIEVER_CHANNEL_RET) {
 		OnSetReceiverChannelRet(wParam, lParam);
 	}
+	else if (uMsg == UM_SET_SURGENCY_READER_RET) {
+		OnSetSurgencyReaderRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
              
@@ -540,6 +543,21 @@ void  CDuiFrameWnd::OnSetSurgencyReader() {
 }
 
 void  CDuiFrameWnd::OnSetSurgencyReaderRet(WPARAM wParm, LPARAM  lParam) {
+	SetBusy(FALSE);
+
+	if (0 == wParm) {
+		MessageBox(GetHWND(), "设置连续测温读卡器成功", "设置", 0);
+	}
+	else {
+		MessageBox(GetHWND(), "设置连续测温读卡器失败", "设置", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSetReceiverArea() {
+
+}
+
+void  CDuiFrameWnd::OnSetReceiverAreaRet(WPARAM wParm, LPARAM  lParam) {
 
 }
 

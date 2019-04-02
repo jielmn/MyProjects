@@ -27,10 +27,12 @@ using namespace DuiLib;
 #define   MSG_SETTING_HAND_READER      1101
 #define   MSG_SET_HAND_READER_SN       1102
 #define   MSG_SET_RECIEVER_CHANNEL     1103
+#define   MSG_SET_SURGENCY_READER      1104
 
 #define   UM_SETTING_HAND_READER_RET   (WM_USER+1)
 #define   UM_SET_HAND_READER_SN_RET    (WM_USER+2)
 #define   UM_SET_RECIEVER_CHANNEL_RET  (WM_USER+3)
+#define   UM_SET_SURGENCY_READER_RET   (WM_USER+4)
 
 #define   RESTRICTED_FLAG       
 
@@ -72,6 +74,20 @@ public:
 	BYTE    m_byChannelA;
 	BYTE    m_byChannelB;
 	BYTE    m_byChannelC;
+	BYTE    m_reserved[1];
+};
+
+class CSetSurgencyReaderParam : public LmnToolkits::MessageData {
+public:
+	CSetSurgencyReaderParam(WORD wAddr, BYTE byChannel, int nCom) {
+		m_wAddr = wAddr;
+		m_byChannel = byChannel;
+		m_nCom = nCom;
+	}
+
+	int     m_nCom;
+	WORD    m_wAddr;
+	BYTE    m_byChannel;
 	BYTE    m_reserved[1];
 };
 

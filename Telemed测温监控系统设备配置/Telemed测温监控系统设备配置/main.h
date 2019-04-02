@@ -56,6 +56,8 @@ private:
 	void  OnSetReceiverChannelRet(WPARAM wParm, LPARAM  lParam);
 	void  OnSetSurgencyReader();
 	void  OnSetSurgencyReaderRet(WPARAM wParm, LPARAM  lParam);
+	void  OnSetReceiverArea();
+	void  OnSetReceiverAreaRet(WPARAM wParm, LPARAM  lParam);
 
 private:
 	DuiLib::CTabLayoutUI *              m_tabs;

@@ -233,10 +233,37 @@ int  CBusiness::SetReceriverChannel(const CSetReceiverChannelParam * pParam) {
 }
 
 int  CBusiness::SetSurgencyReaderAsyn(WORD wAddr, BYTE byChannel, int nCom) {
+	g_data.m_thrd_com->PostMessage(this, MSG_SET_SURGENCY_READER, new CSetSurgencyReaderParam(wAddr, byChannel, nCom));
 	return 0;
 }
 
-int CBusiness::SetSurgencyReader() {
+int CBusiness::SetSurgencyReader(const CSetSurgencyReaderParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	char  write_data[256];
+	DWORD dwWriteLen = 7;
+	int   nRegMsg = UM_SET_SURGENCY_READER_RET;
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nCom);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return 0;
+	}
+
+	//                         µØÖ· ÐÅµÀ
+	memcpy(write_data, "\xC0\x00\x00\x00\xC0\xDD\xAA", dwWriteLen);
+	write_data[1] = (BYTE)((pParam->m_wAddr >> 8) & 0xFF);
+	write_data[2] = (BYTE)( pParam->m_wAddr & 0xFF );
+	write_data[3] = pParam->m_byChannel;
+	serial_port.Write(write_data, dwWriteLen);
+	LmnSleep(1000);
+
+	serial_port.CloseUartPort();
+	int ret = 0;
+
+	::PostMessage(g_data.m_hWnd, nRegMsg, ret, 0);
 	return 0;
 }
 
@@ -263,6 +290,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSetReceiverChannelParam * pParam = (CSetReceiverChannelParam *)pMessageData;
 		SetReceriverChannel(pParam);
+	}
+	break;
+
+	case MSG_SET_SURGENCY_READER:
+	{
+		CSetSurgencyReaderParam * pParam = (CSetSurgencyReaderParam *)pMessageData;
+		SetSurgencyReader(pParam);
 	}
 	break;
 
