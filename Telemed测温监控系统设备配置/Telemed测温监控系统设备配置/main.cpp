@@ -201,7 +201,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnSetSurgencyReader();
 		}
 		else if (name == "btnSetting_4") {
-			  
+			OnSetSurgencyReaderSn();
 		}
 		else if (name == "btnSetting_5") {
 			OnSetReceiverArea();
@@ -251,6 +251,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_SET_RECIEVER_AREA_RET) {
 		OnSetReceiverAreaRet(wParam, lParam);
+	}
+	else if (uMsg == UM_SET_SURGENCY_READER_SN_RET) {
+		OnSetSurgencyReaderSnRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -587,6 +590,43 @@ void  CDuiFrameWnd::OnSetReceiverAreaRet(WPARAM wParm, LPARAM  lParam) {
 	}
 	else {
 		MessageBox(GetHWND(), "设置连续测温模块成功", "设置", 0);
+	}
+}
+
+void  CDuiFrameWnd::OnSetSurgencyReaderSn() {
+	int nSel = m_cmbSurgencyReaderCom->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	CControlUI * pCtl = m_cmbSurgencyReaderCom->GetItemAt(nSel);
+	int nCom = (int)pCtl->GetTag();
+
+	CDuiString strText = m_edSurgencyReaderSn->GetText();
+	if (strText.GetLength() == 0) {
+		MessageBox(GetHWND(), "请输入SN", "错误", 0);
+		return;
+	}
+
+	DWORD  dwSn = 0;
+	int ret = sscanf(strText, "%lu", &dwSn);
+	if (0 == ret) {
+		MessageBox(GetHWND(), "SN必须为数字", "错误", 0);
+		return;
+	}
+
+	CBusiness::GetInstance()->SetSurgencyReaderSnAsyn(dwSn, nCom);
+	SetBusy();
+}
+
+void  CDuiFrameWnd::OnSetSurgencyReaderSnRet(WPARAM wParm, LPARAM  lParam) {
+	SetBusy(FALSE);
+
+	if (0 == wParm) {
+		MessageBox(GetHWND(), "设置连续测温读卡器SN成功", "设置", 0);
+	}
+	else {
+		MessageBox(GetHWND(), "设置连续测温读卡器SN失败", "设置", 0);
 	}
 }
 

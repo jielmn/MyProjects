@@ -30,6 +30,9 @@ public:
 	int  SetReceriverAreaAsyn(BYTE byChannel,int nCom);
 	int  SetReceriverArea(const CSetReceiverAreaParam * pParam);
 
+	int  SetSurgencyReaderSnAsyn(DWORD  dwSn, int nCom);
+	int  SetSurgencyReaderSn(const CSetHandReaderSnParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
