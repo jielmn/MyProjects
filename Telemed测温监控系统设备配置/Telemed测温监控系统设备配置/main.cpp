@@ -204,7 +204,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			  
 		}
 		else if (name == "btnSetting_5") {
-
+			OnSetReceiverArea();
 		}
 		else if (name == "btnSetting_6") {
 			OnSetReceiverChannel();
@@ -248,6 +248,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_SET_SURGENCY_READER_RET) {
 		OnSetSurgencyReaderRet(wParam, lParam);
+	}
+	else if (uMsg == UM_SET_RECIEVER_AREA_RET) {
+		OnSetReceiverAreaRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -554,11 +557,37 @@ void  CDuiFrameWnd::OnSetSurgencyReaderRet(WPARAM wParm, LPARAM  lParam) {
 }
 
 void  CDuiFrameWnd::OnSetReceiverArea() {
+	int nSel = m_cmbReceiverCom->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "错误", 0);
+		return;
+	}
+	CControlUI * pCtl = m_cmbReceiverCom->GetItemAt(nSel);
+	int nCom = (int)pCtl->GetTag();
 
+	nSel = m_cmbArea_2->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中病区", "错误", 0);
+		return;
+	}
+	pCtl = m_cmbArea_2->GetItemAt(nSel);
+	BYTE byAreaNo = (BYTE)pCtl->GetTag();
+
+
+	CBusiness::GetInstance()->SetReceriverAreaAsyn(byAreaNo, nCom);
+
+	SetBusy();
 }
 
 void  CDuiFrameWnd::OnSetReceiverAreaRet(WPARAM wParm, LPARAM  lParam) {
+	SetBusy(FALSE);
 
+	if (0 == wParm) {
+		MessageBox(GetHWND(), "设置连续测温模块成功", "设置", 0);
+	}
+	else {
+		MessageBox(GetHWND(), "设置连续测温模块成功", "设置", 0);
+	}
 }
 
 

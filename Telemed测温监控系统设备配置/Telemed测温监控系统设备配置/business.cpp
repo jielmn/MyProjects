@@ -267,6 +267,44 @@ int CBusiness::SetSurgencyReader(const CSetSurgencyReaderParam * pParam) {
 	return 0;
 }
 
+int  CBusiness::SetReceriverAreaAsyn(BYTE byChannel, int nCom) {
+	g_data.m_thrd_com->PostMessage(this, MSG_SET_RECIEVER_AREA, new CSetReceiverAreaParam(byChannel, nCom));
+	return 0;
+}
+
+int  CBusiness::SetReceriverArea(const CSetReceiverAreaParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	char  write_data[256];
+	DWORD dwWriteLen = 7;
+	int   nRegMsg = UM_SET_RECIEVER_AREA_RET;
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nCom);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return 0;
+	}
+
+	//                         地址 信道
+	memcpy(write_data, "\xC0\x10\x00\x00\xC0\xDD\xAA", dwWriteLen);
+	write_data[3] = pParam->m_byChannel;
+	serial_port.Write(write_data, dwWriteLen);
+	LmnSleep(1000);
+
+	dwWriteLen = sizeof(write_data);
+	serial_port.Read(write_data, dwWriteLen);
+	int ret = -1;
+	if (dwWriteLen == 2 && write_data[0] == 'O' && write_data[1] == 'K') {
+		ret = 0;
+	}
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_data.m_hWnd, nRegMsg, ret, 0);
+	return 0;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -297,6 +335,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSetSurgencyReaderParam * pParam = (CSetSurgencyReaderParam *)pMessageData;
 		SetSurgencyReader(pParam);
+	}
+	break;
+
+	case MSG_SET_RECIEVER_AREA:
+	{
+		CSetReceiverAreaParam * pParam = (CSetReceiverAreaParam *)pMessageData;
+		SetReceriverArea(pParam);
 	}
 	break;
 

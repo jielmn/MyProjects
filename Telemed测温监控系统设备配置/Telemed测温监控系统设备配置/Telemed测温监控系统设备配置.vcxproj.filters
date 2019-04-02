@@ -67,4 +67,7 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\proj_TelemedDeviceSetting_res.zip" />
+  </ItemGroup>
 </Project>
