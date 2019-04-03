@@ -26,6 +26,9 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager, this) {
 	m_nSelTabIndex = 0;
 	m_dragDropTagIndex = -1;
 	m_dragDropGridIndex = -1;
+
+	m_dragDropGridIndex_1 = -1;
+	m_dragDropGridIndex_2 = -1;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -922,6 +925,8 @@ void   CDuiFrameWnd::OnAbout() {
 }
 
 void   CDuiFrameWnd::OnBtnBed_grid(TNotifyUI& msg) {
+	return;
+
 #if !DB_FLAG
 	int nIndex = msg.pSender->GetTag();
 	msg.pSender->SetVisible(false);
@@ -1262,6 +1267,17 @@ void   CDuiFrameWnd::OnMyLButtonDown(WPARAM wParam, LPARAM lParam) {
 			}
 			break;
 		}
+		else if (pCtl->GetName() == LAYOUT_GRID_NAME) {
+			m_dragDropGridIndex_1 = pCtl->GetTag();
+			// 如果不是点击修改名字按钮
+			if (0 != strcmp(pOriginalCtl->GetClass(), "Button")) {
+				m_dragDropGridIndex_2 = -1;
+			}
+			// 点击了按钮，不用drag drop操作
+			else {
+				m_dragDropGridIndex_1 = -1;
+			}
+		}
 		pCtl = pCtl->GetParent();
 	}
 }
@@ -1287,7 +1303,18 @@ void   CDuiFrameWnd::OnMyLButtonUp(WPARAM wParam, LPARAM lParam) {
 		}
 
 		m_dragDropTagIndex = -1;
-	}	
+	}
+	else if (m_dragDropGridIndex_1 >= 0 ){
+		m_dragDropTag->SetVisible(false);
+
+		if ( m_dragDropGridIndex_2 >= 0 ) {
+			CControlUI* pCtl = m_layMain->GetItemAt(m_dragDropGridIndex_2);
+			pCtl->SetBorderColor(g_data.m_skin[CMySkin::GRID_BORDER]);
+		}
+
+		m_dragDropGridIndex_2 = -1;
+		m_dragDropGridIndex_1 = -1;
+	}
 }
 
 void   CDuiFrameWnd::OnMyMouseMove(WPARAM wParam, LPARAM lParam) {
@@ -1316,6 +1343,28 @@ void   CDuiFrameWnd::OnMyMouseMove(WPARAM wParam, LPARAM lParam) {
 		m_dragDropTag->SetPos(r);
 
 		m_dragDropGridIndex = OnMouseMoveGridsView(pt);
+	}
+	else if (m_dragDropGridIndex_1 >= 0) {
+
+		if (!m_dragDropTag->IsVisible()) {
+			m_dragDropTag->SetVisible(true);
+		}
+
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+
+		int x = 100 / 2;
+		int y = 100 / 2;
+
+		RECT r;
+		r.left = pt.x - x;
+		r.right = r.left + x * 2;
+		r.top = pt.y - y;
+		r.bottom = r.top + y * 2;
+		m_dragDropTag->SetPos(r);
+
+		m_dragDropGridIndex_2 = OnMouseMoveGridsView_1(pt);
 	}
 }
 
@@ -2476,6 +2525,54 @@ int   CDuiFrameWnd::GetHandTagGridIndex(const char * szTagId) {
 		}
 	}
 	return -1;
+}
+
+//
+int    CDuiFrameWnd::OnMouseMoveGridsView_1(const POINT & pt) {
+	RECT rect = m_layMain->GetPos();
+	int nWidth = rect.right - rect.left;
+	int nHeight = rect.bottom - rect.top;
+	if (nWidth <= 0 || nHeight <= 0) {
+		return -1;
+	}
+	
+	assert(g_data.m_CfgData.m_dwLayoutColumns > 0);
+	assert(g_data.m_CfgData.m_dwLayoutRows > 0);
+
+	if (pt.x <= rect.left || pt.x >= rect.right || pt.y <= rect.top || pt.y >= rect.bottom) {
+		m_layMain->SetBkColor(g_data.m_skin[CMySkin::LAYOUT_MAIN_BK]);
+		for (int i = 0; i < (int)g_data.m_CfgData.m_dwLayoutColumns; i++) {
+			for (int j = 0; j < (int)g_data.m_CfgData.m_dwLayoutRows; j++) {
+				CControlUI * pCtl = m_layMain->GetItemAt(j*g_data.m_CfgData.m_dwLayoutColumns + i);
+				pCtl->SetBorderColor(g_data.m_skin[CMySkin::GRID_BORDER]);
+			}
+		}
+		return -1;
+	}
+
+	
+	SIZE s;
+	s.cx = (nWidth - 1) / g_data.m_CfgData.m_dwLayoutColumns + 1;
+	s.cy = (nHeight - 1) / g_data.m_CfgData.m_dwLayoutRows + 1;
+
+	CDuiString strText;
+	int nIndex = -1;
+	for (int i = 0; i < (int)g_data.m_CfgData.m_dwLayoutColumns; i++) {
+		for (int j = 0; j < (int)g_data.m_CfgData.m_dwLayoutRows; j++) {
+			if ((pt.x > rect.left + s.cx * i) && (pt.x < rect.left + s.cx * (i + 1))
+				&& (pt.y > rect.top + s.cy * j) && (pt.y < rect.top + s.cy * (j + 1))) {
+				CControlUI* pCtl = m_layMain->GetItemAt(j*g_data.m_CfgData.m_dwLayoutColumns + i);
+				pCtl->SetBorderColor(0xFFCAF100);
+				nIndex = j*g_data.m_CfgData.m_dwLayoutColumns + i;
+			}
+			else {
+				CControlUI* pCtl = m_layMain->GetItemAt(j*g_data.m_CfgData.m_dwLayoutColumns + i);
+				pCtl->SetBorderColor(g_data.m_skin[CMySkin::GRID_BORDER]);
+			}
+		}
+	}
+
+	return nIndex;
 }
 
 

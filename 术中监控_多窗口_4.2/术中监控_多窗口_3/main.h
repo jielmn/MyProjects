@@ -114,6 +114,8 @@ private:
 	int                                m_dragDropGridIndex;
 
 	//vector<TagBindingGrid*>            m_vTagBindingGrids;
+	int                                m_dragDropGridIndex_1;
+	int                                m_dragDropGridIndex_2;
 
 private:
 	void   OnSize(WPARAM wParam, LPARAM lParam);
@@ -214,4 +216,6 @@ private:
 	void   PassTemp2Grid(DWORD  dwInde, DWORD  dwSubIndex, LastTemp * pTemp);
 	//
 	int    GetHandTagGridIndex(const char * szTagId);
+	//
+	int    OnMouseMoveGridsView_1(const POINT & pt);
 };

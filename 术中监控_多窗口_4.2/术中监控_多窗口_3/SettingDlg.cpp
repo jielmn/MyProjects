@@ -222,6 +222,8 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 			}
 		}
 		pCombo->SelectItem(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwBed);
+		pCombo->SetEnabled(false);
+
 #if DB_FLAG
 		pCombo->SetEnabled(false);
 #endif
