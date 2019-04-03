@@ -734,3 +734,30 @@ const char * GetWeekDayName(int nWeekIndex) {
 	}
 	return "";
 }
+
+DWORD   GetGridOrder(DWORD dwGrindIndex) {
+	assert(dwGrindIndex < MAX_GRID_COUNT);
+
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		if ( g_data.m_GridOrder[i] == dwGrindIndex ) {
+			return i;
+		}
+	}
+
+	assert(0);
+	return 0;
+}
+
+void SaveGridOrder() {
+	CDuiString  strText;
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		CDuiString  strTmp;
+		if (i == 0)
+			strTmp.Format("%lu", g_data.m_GridOrder[i] + 1);
+		else
+			strTmp.Format(",%lu", g_data.m_GridOrder[i] + 1);
+		strText += strTmp;
+	}
+
+	g_data.m_cfg->SetConfig("grid orders", (const char *)strText, g_data.m_szDefaultGridOrder);
+}

@@ -305,6 +305,8 @@ public:
 	char      m_szDbPwd[64];
 	BOOL      m_bUtf8;                                 // 是否utf8编码	
 	BOOL      m_bCurve;                                // 线条是否曲线
+	DWORD     m_GridOrder[MAX_GRID_COUNT];           // 格子顺序
+	char      m_szDefaultGridOrder[256];
 };
 
 #define  MAX_AREA_NAME_LENGTH   64
@@ -576,6 +578,8 @@ extern int MyDecrypt(const char * szSrc, void * pDest, DWORD & dwDestSize);
 extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, BYTE * pData, DWORD dwDataLen);
 extern char *  GetReaderId(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData, DWORD dwDataLen);
 extern char *  GetReaderId_1(char * szReaderId, DWORD dwReaderIdLen, BYTE * pData);
+extern DWORD   GetGridOrder(DWORD dwGrindIndex);
+extern void    SaveGridOrder();
 
 #if DBG_FLAG
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);

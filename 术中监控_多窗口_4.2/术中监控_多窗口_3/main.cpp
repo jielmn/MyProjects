@@ -251,10 +251,11 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 		/* END 最大化显示 */
 
-		if ( i >= g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows ) {
-			m_pGrids[i]->SetVisible(false);
-		}
-		m_layMain->Add(m_pGrids[i]);
+		m_pGrids[i]->SetVisible(false);
+		//if (i >= g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows) {
+		//	m_pGrids[i]->SetVisible(false);
+		//}
+		//m_layMain->Add(m_pGrids[i]);
 		 
 		m_MyAlarm_grid[i]->StartAlarm(CAlarmImageUI::DISCONNECTED);
 		for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
@@ -290,6 +291,13 @@ void  CDuiFrameWnd::InitWindow() {
 			}
 		}
 	} 
+
+	DWORD  dwCnt = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		if ( i < dwCnt )
+			m_pGrids[g_data.m_GridOrder[i]]->SetVisible(true);
+		m_layMain->Add(m_pGrids[g_data.m_GridOrder[i]]);
+	}
 
 	m_layGridsView->SetFixedColumns(6);
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
@@ -719,8 +727,9 @@ void  CDuiFrameWnd::OnGridInflate(DWORD dwIndex) {
 		assert(m_dwInflateGridIndex == dwIndex);
 
 		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
-			if (i != dwIndex) {
-				m_layMain->AddAt(m_pGrids[i], i);
+			DWORD  dwOrder = g_data.m_GridOrder[i];
+			if (dwOrder != dwIndex) {
+				m_layMain->AddAt(m_pGrids[dwOrder], i);
 			}
 		}
 
@@ -880,11 +889,12 @@ void   CDuiFrameWnd::OnSetting() {
 void   CDuiFrameWnd::UpdateLayout() {
 	DWORD dwInvisibleIndex = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		DWORD dwOrder = g_data.m_GridOrder[i];
 		if (i < dwInvisibleIndex) {
-			m_pGrids[i]->SetVisible(true);
+			m_pGrids[dwOrder]->SetVisible(true);
 		}
 		else {
-			m_pGrids[i]->SetVisible(false);
+			m_pGrids[dwOrder]->SetVisible(false);
 		}
 	}
 
@@ -894,14 +904,16 @@ void   CDuiFrameWnd::UpdateLayout() {
 	}
 	else {
 		assert(m_eGridStatus == GRID_STATUS_MAXIUM);
+		DWORD  dwOrder = GetGridOrder(m_dwInflateGridIndex);
 		// 如果当前格子超出范围
-		if (m_dwInflateGridIndex >= (int)(g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows)) {
+		if ( dwOrder >= (int)(g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows) ) {			
 			m_layMain->Remove(m_pGrids[m_dwInflateGridIndex], true);
 			for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
-				m_layMain->AddAt(m_pGrids[i], i);
+				m_layMain->AddAt(m_pGrids[g_data.m_GridOrder[i]], i);
 			}
 			m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 			m_eGridStatus = GRID_STATUS_GRIDS;
+			OnGridInflateSub(m_dwInflateGridIndex);
 			m_dwInflateGridIndex = -1;
 			ReLayout(m_layMain->GetWidth(), m_layMain->GetHeight());
 		}
@@ -1308,8 +1320,38 @@ void   CDuiFrameWnd::OnMyLButtonUp(WPARAM wParam, LPARAM lParam) {
 		m_dragDropTag->SetVisible(false);
 
 		if ( m_dragDropGridIndex_2 >= 0 ) {
-			CControlUI* pCtl = m_layMain->GetItemAt(m_dragDropGridIndex_2);
-			pCtl->SetBorderColor(g_data.m_skin[CMySkin::GRID_BORDER]);
+			CControlUI* pCtl_2 = m_layMain->GetItemAt(m_dragDropGridIndex_2);
+			pCtl_2->SetBorderColor(g_data.m_skin[CMySkin::GRID_BORDER]);
+
+			// m_dragDropGridIndex_1 是id号
+			// m_dragDropGridIndex_2 是顺序号
+			DWORD  dwOrder1 = GetGridOrder(m_dragDropGridIndex_1);
+			DWORD  dwOrder2 = m_dragDropGridIndex_2;
+			// 如果不同，要插入
+			if ( dwOrder1 != dwOrder2) {
+				CControlUI* pCtl_1 = m_layMain->GetItemAt(dwOrder1);
+
+				if ( dwOrder1 > dwOrder2 ) {
+					m_layMain->Remove(pCtl_1, true);
+					m_layMain->AddAt(pCtl_1, dwOrder2);
+
+					for ( DWORD i = dwOrder1; i > dwOrder2; i-- ) {
+						g_data.m_GridOrder[i] = g_data.m_GridOrder[i - 1];
+					}
+					g_data.m_GridOrder[dwOrder2] = m_dragDropGridIndex_1;
+				}
+				else {
+					m_layMain->Remove(pCtl_1, true);
+					m_layMain->AddAt(pCtl_1, dwOrder2);
+
+					for (DWORD i = dwOrder1; i < dwOrder2; i++) {
+						g_data.m_GridOrder[i] = g_data.m_GridOrder[i + 1];
+					}
+					g_data.m_GridOrder[dwOrder2] = m_dragDropGridIndex_1;
+				}
+
+				SaveGridOrder();
+			}
 		}
 
 		m_dragDropGridIndex_2 = -1;

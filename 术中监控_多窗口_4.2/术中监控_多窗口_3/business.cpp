@@ -205,6 +205,72 @@ int CBusiness::Init() {
 		g_data.m_CfgData.m_dwLayoutRows = DEFAULT_MAIN_LAYOUT_ROWS;
 	}
 
+	g_data.m_cfg->GetConfig("grid orders", buf, sizeof(buf), "");
+	SplitString  split;
+	split.Split(buf, ",");
+
+	// 是否有效的顺序配置
+	BOOL  bValidOrder = TRUE;
+
+	// 个数必须为30个
+	if ( split.Size() != MAX_GRID_COUNT ) {
+		bValidOrder = FALSE;
+	}
+	else {
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			DWORD  dwTemp = 0;
+			// 是数字
+			if (1 == sscanf(split[i], "%lu", &dwTemp)) {
+				if (dwTemp == 0 || dwTemp > MAX_GRID_COUNT) {
+					bValidOrder = FALSE;
+					break;
+				}
+				g_data.m_GridOrder[i] = dwTemp - 1;
+			}
+			// 不是数字
+			else {
+				bValidOrder = FALSE;
+				break;
+			}
+		}
+
+		// 再检查
+		if (bValidOrder) {
+			for ( DWORD i = 0; i < MAX_GRID_COUNT - 1; i++ ) {
+				for (DWORD j = i + 1; j < MAX_GRID_COUNT; j++) {
+					// 重复
+					if ( g_data.m_GridOrder[i] == g_data.m_GridOrder[j] ) {
+						bValidOrder = FALSE;
+						break;
+					}
+				}
+				if (!bValidOrder) {
+					break;
+				}
+			}
+		}
+	}
+
+	// 如果没有正确的顺序配置，取默认的顺序
+	if (!bValidOrder) {
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			g_data.m_GridOrder[i] = i;
+		}
+	}
+
+	strText = "";
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		CDuiString  strTmp;
+		if ( i == 0 )
+			strTmp.Format("%lu", i + 1);
+		else
+			strTmp.Format(",%lu", i + 1);
+		strText += strTmp;
+	}
+	STRNCPY(g_data.m_szDefaultGridOrder, strText, sizeof(g_data.m_szDefaultGridOrder));
+	
+	
+
 	// 区号列表
 	IConfig * cfg_area = new FileConfigEx();
 	if (0 == cfg_area) {
