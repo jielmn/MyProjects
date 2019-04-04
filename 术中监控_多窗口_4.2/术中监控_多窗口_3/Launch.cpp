@@ -219,6 +219,18 @@ int  CLaunch::ReadComData() {
 								g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子温度：\n%s\n", debug_buf);
 							}
 						}
+
+						// 清除结尾可能存在的"dd aa"
+						if ( m_recv_buf.GetDataLength() >= 2 ) {
+							m_recv_buf.Read(buf, 2);
+							// 如果是 dd aa结尾
+							if ( buf[0] == (BYTE)'\xDD' && buf[1] == (BYTE)'\xAA' ) {
+								m_recv_buf.Reform();
+							}
+							else {
+								m_recv_buf.ResetReadPos();
+							}
+						}
 					}
 				}
 				else {
