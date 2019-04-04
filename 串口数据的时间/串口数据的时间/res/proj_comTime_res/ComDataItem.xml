@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10"  >
+		<RichEdit text="" name="rchData" readonly="true" font="1" textcolor="#FF386382" width="610" />
+		<Control width="80" />
+		<VerticalLayout >
+			<Control />
+			<Label text="" name="lblTime" font="1" textcolor="#FF386382" height="40" />
+			<Control />
+		</VerticalLayout>
+	</HorizontalLayout>
+</Window>

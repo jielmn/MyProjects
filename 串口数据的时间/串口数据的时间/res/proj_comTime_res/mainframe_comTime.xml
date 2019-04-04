@@ -10,7 +10,7 @@
 			<!-- 标题栏区 -->
 			<HorizontalLayout height="32" bkcolor="#FFCCE3F0" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
 				<HorizontalLayout inset="10,1,10,1" width="250" >
-					<Container width="61" height="27" bkimage="file='logo.png'" />
+					<Container width="27" height="27" bkimage="file='logo.png'" />
 					<VerticalLayout>
 						<Control />
 						<Text text="串口数据分析" textcolor="#FF447AA1" font="0" />
@@ -31,19 +31,21 @@
 				<Label text="串口：" width="100" textcolor="#FF447AA1" font="1" />
 				<Combo name="cmbComPort" width="400" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" vscrollbar="true" />
 				<Control width="20" />
+				<Combo name="cmbBaud" width="150" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" />
+				<Control width="20" />
 				<Button name="btnHandle" text="打开" font="1" textcolor="#FF386382" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " width="80" />
 			</HorizontalLayout>
 			
-			<HorizontalLayout inset="20,20,20,0" height="50" >
-				<RichEdit text="123456789\r\nabcdefg" name="test" readonly="true" />
-			</HorizontalLayout>
+			<HorizontalLayout height="20" />
+			
+			<VerticalLayout name="layMain" vscrollbar="true" inset="20,0,20,0" width="920" />
 			
 			<!--Tab区-->		
 		</VerticalLayout>
 		
 		<!-- 状态栏 -->
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
-			<Label name="lblDatabaseStatus"         text=""         width="250" font="0" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />		
+			<MyProgress name="progress" height="30" visible="false"  />	
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

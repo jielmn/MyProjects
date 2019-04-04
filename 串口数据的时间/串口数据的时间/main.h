@@ -6,6 +6,7 @@
 using namespace DuiLib;
 
 #include "resource.h"
+#include "MyProgress.h"
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -39,7 +40,16 @@ public:
 
 private:
 	void  OnDeviceChanged(WPARAM wParm, LPARAM  lParam);
+	void  OnBtnHandle();
+	void  OnOpenComRet(WPARAM wParm, LPARAM  lParam);
+	void  OnCloseComRet(WPARAM wParm, LPARAM  lParam);
+	void  OnComData(WPARAM wParm, LPARAM  lParam);
 
 private:
 	CComboUI *                    m_cmbCom;
+	BOOL                          m_bComOpened;
+	CButtonUI *                   m_btnHandle;
+	CComboUI *                    m_cmbBaud;
+	CMyProgress *                 m_progress;
+	CVerticalLayoutUI*            m_layMain;
 };

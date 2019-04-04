@@ -19,18 +19,40 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
+#define   MSG_OPEN_COM_PORT       201
+#define   MSG_CLOSE_COM_PORT      202
+#define   MSG_GET_COM_DATA        203
+
+#define   UM_OPEN_COM_PORT_RET    (WM_USER+1)
+#define   UM_CLOSE_COM_PORT_RET   (WM_USER+2)
+#define   UM_GET_COM_DATA_RET     (WM_USER+3)
+
+class COpenComPortParam : public LmnToolkits::MessageData {
+public:
+	COpenComPortParam(int nCom, int nBaud) {
+		m_nCom = nCom;
+		m_nBaud = nBaud;
+	}
+
+	int     m_nCom;
+	int     m_nBaud;
+};
 
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_com;
+	HWND                      m_hWnd;
+	int                       m_nMaxItemsCnt;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_db = 0;
+		m_thrd_com = 0;
+		m_hWnd = 0;
+		m_nMaxItemsCnt = 0;
 	}
 };
 
@@ -38,6 +60,7 @@ extern CGlobalData  g_data;
 
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern void SetComboCom(DuiLib::CComboUI * pCombo, std::vector<std::string> & vComPorts);
+extern char * Date2String_1(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>
