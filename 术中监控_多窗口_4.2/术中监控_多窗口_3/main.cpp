@@ -2531,6 +2531,12 @@ void  CDuiFrameWnd::SetBindingGridText( TagControlItem * pItem, int nGridIndex )
 void   CDuiFrameWnd::PassTemp2Grid(DWORD  dwIndex, DWORD  dwSubIndex, LastTemp * pTemp ) {
 	DWORD  dwTemp = pTemp->m_dwTemp;
 
+	// 如果同时在进行术中监控测量
+	if (m_tLastTemp[dwIndex][dwSubIndex].m_szTagId[0] != '\0' && 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
+		// 简单处理，不传递值
+		return;
+	}
+
 	memcpy(&m_tLastTemp[dwIndex][dwSubIndex], pTemp, sizeof(LastTemp));
 	m_tLastTemp[dwIndex][dwSubIndex].m_Time = time(0);
 	CBusiness::GetInstance()->ExcelTempAsyn(dwIndex, dwSubIndex, &m_tLastTemp[dwIndex][dwSubIndex]);

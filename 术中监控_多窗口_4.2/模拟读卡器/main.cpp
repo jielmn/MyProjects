@@ -5,6 +5,7 @@
 #include "LmnCommon.h"
 #include "LmnThread.h"
 #include "LmnSerialPort.h"
+#include <assert.h>
 
 #define   COM_PORT                    "com3"
 #define   RECONNECT_TIME              10000
@@ -52,7 +53,13 @@ static  int   g_HandDelay[MAX_HAND_TAG_CNT] = {10000, 11000, 12000,13000,14000,1
 static  DWORD  g_Temp[180] = { 0 };
 
 DWORD  GetRandTemp(BYTE  byBed) {
-	g_Temp[byBed] = GetRand(3000 + byBed * 100, 3100  + byBed * 100);
+	BYTE a = 0;
+	assert(byBed > 0);
+
+	if ( byBed > 0 )
+		a = (byBed - 1 ) / 6;
+
+	g_Temp[byBed] = GetRand(3000 + a * 100, 3100  + a * 100);
 	return g_Temp[byBed];
 }
 
