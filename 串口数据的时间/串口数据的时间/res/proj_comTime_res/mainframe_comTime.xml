@@ -35,7 +35,7 @@
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="20,20,20,0" height="50" >
-				<RichEdit text="123456789\r\nabcdefg" name="test" />
+				<RichEdit text="123456789\r\nabcdefg" name="test" readonly="true" />
 			</HorizontalLayout>
 			
 			<!--Tab区-->		
