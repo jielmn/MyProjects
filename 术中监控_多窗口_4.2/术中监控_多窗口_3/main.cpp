@@ -1737,6 +1737,8 @@ void   CDuiFrameWnd::OnEmpty(TNotifyUI& msg) {
 	for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_tLastTemp[dwIndex][i].m_dwTemp = 0;
 		m_tLastTemp[dwIndex][i].m_Time = 0;
+		m_tLastTemp[dwIndex][i].m_szTagId[0] = '\0';
+		m_tLastTemp[dwIndex][i].m_szReaderId[0] = '\0';
 		OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
 	}	
 }
