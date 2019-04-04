@@ -190,15 +190,23 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if ( msg.sType == _T("selectchanged") ) {
 		if (name == _T("option_1")) {
 			m_tabs->SelectItem(0);
+			m_dragdrop->SetVisible(false);
+			m_dragdrop_1->SetVisible(false);
 		}
 		else if (name == _T("option_2")) {
 			m_tabs->SelectItem(1);
+			m_dragdrop->SetVisible(false);
+			m_dragdrop_1->SetVisible(false);
 		}
 		else if (name == _T("option_3")) {
 			m_tabs->SelectItem(2);
+			m_dragdrop->SetVisible(true);
+			m_dragdrop_1->SetVisible(true);
 		}
 		else if (name == "option_4") {
 			m_tabs->SelectItem(3);
+			m_dragdrop->SetVisible(false);
+			m_dragdrop_1->SetVisible(false);
 		}
 	}
 	else if (msg.sType == "click") {
