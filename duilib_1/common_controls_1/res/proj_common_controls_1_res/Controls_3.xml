@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout inset="10,10,10,10"   >		
-		<MyControl bordercolor="#FF000000" bordersize="1" name="cstMyControl_1" />
+	<VerticalLayout inset="100,50,100,50"   >		
+		<VerticalLayout inset="10,10,10,10"   >
+			<MyControl bordercolor="#FF000000" bordersize="1" name="cstMyControl_1" />
+			<DragDrop name="cstDragDrop_1" float="true" pos="100,100,200,200" visible="false" bkcolor="#00FFFFFF" />
+			<DragDrop name="cstDragDrop_2" float="true" pos="100,100,200,200" visible="false" bkcolor="#00FFFFFF" />
+		</VerticalLayout>
 	</VerticalLayout>
 </Window>

@@ -40,17 +40,20 @@ void CDragDropUI::DoEvent(DuiLib::TEventUI& event) {
 
 		// 如果有范围限制
 		if (m_bBounding) {
-			if (m_rcNewPos.left < m_rcBounding.left) {
-				m_rcNewPos.left = m_rcBounding.left;
-			} else if (m_rcNewPos.left + width > m_rcBounding.right) {
-				m_rcNewPos.left = m_rcBounding.right - width;
+			RECT rectParent = this->GetParent()->GetPos();
+
+			if (m_rcNewPos.left < m_rcBounding.left + rectParent.left ) {
+				m_rcNewPos.left = m_rcBounding.left + rectParent.left;
+			}
+			else if (m_rcNewPos.left + width > m_rcBounding.right + rectParent.left ) {
+				m_rcNewPos.left = m_rcBounding.right - width + rectParent.left ;
 			}
 
-			if (m_rcNewPos.top < m_rcBounding.top) {
-				m_rcNewPos.top = m_rcBounding.top;
+			if (m_rcNewPos.top < m_rcBounding.top + rectParent.top) {
+				m_rcNewPos.top = m_rcBounding.top + rectParent.top;
 			}
-			else if (m_rcNewPos.top + height > m_rcBounding.bottom) {
-				m_rcNewPos.top = m_rcBounding.bottom - height;
+			else if (m_rcNewPos.top + height > m_rcBounding.bottom + rectParent.top ) {
+				m_rcNewPos.top = m_rcBounding.bottom - height + rectParent.top ;
 			}
 		}
 
@@ -68,8 +71,17 @@ void CDragDropUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
 		m_pManager->RemovePostPaint(this);
-		this->SetPos(m_rcNewPos);
-		m_pManager->SendNotify(this, "dragdrop_complete");
+
+		RECT rectParent = this->GetParent()->GetPos();
+		RECT r;
+		r.left = m_rcNewPos.left - rectParent.left;
+		r.top = m_rcNewPos.top - rectParent.top;
+		r.right = r.left + (m_rcNewPos.right - m_rcNewPos.left);
+		r.bottom = r.top + (m_rcNewPos.bottom - m_rcNewPos.top);
+
+		this->SetPos(r);
+
+		m_pManager->SendNotify(this, "dragdropcomplete");
 		m_pManager->Invalidate();
 	}
 	CControlUI::DoEvent(event);
@@ -89,5 +101,5 @@ void  CDragDropUI::SetBoundingRect(const RECT & r) {
 }
 
 void CDragDropUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
-	CRenderEngine::DrawColor(hDC, m_rcNewPos, 0xAA000000);
+	CRenderEngine::DrawColor(hDC, m_rcNewPos, 0xAA000000); 
 }

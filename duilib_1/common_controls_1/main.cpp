@@ -20,6 +20,9 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "EditableButton")) {
 		return new CEditableButtonUI; 
 	}
+	else if (0 == strcmp("DragDrop", pstrClass)) {
+		return new CDragDropUI;
+	}
 	return 0;   
 }
 
@@ -114,7 +117,7 @@ void CDuiFrameWnd::MoveBrowser() {
 		OutputDebugString((const char *)strText);
 		SetParent(m_hWndBrowser, this->GetHWND());
 		memcpy(&m_BrowserRect, &rect, sizeof(RECT)); 
-	}
+	} 
 }
 
 void CDuiFrameWnd::OnWndInit() {	
@@ -190,23 +193,15 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if ( msg.sType == _T("selectchanged") ) {
 		if (name == _T("option_1")) {
 			m_tabs->SelectItem(0);
-			m_dragdrop->SetVisible(false);
-			m_dragdrop_1->SetVisible(false);
 		}
 		else if (name == _T("option_2")) {
 			m_tabs->SelectItem(1);
-			m_dragdrop->SetVisible(false);
-			m_dragdrop_1->SetVisible(false);
 		}
 		else if (name == _T("option_3")) {
 			m_tabs->SelectItem(2);
-			m_dragdrop->SetVisible(true);
-			m_dragdrop_1->SetVisible(true);
 		}
 		else if (name == "option_4") {
 			m_tabs->SelectItem(3);
-			m_dragdrop->SetVisible(false);
-			m_dragdrop_1->SetVisible(false);
 		}
 	}
 	else if (msg.sType == "click") {
@@ -241,7 +236,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		OnWndInit();
 	}
 	else if (msg.sType == "init_splits") {
-		RECT rect = m_mycontrol->GetPos();
+		RECT rect = m_mycontrol->GetRelativePos();
 
 		RECT r;
 		r = rect;
@@ -257,10 +252,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		r.bottom = r.top + 2 * 2;
 		m_dragdrop_1->SetVisible(true);
 		m_dragdrop_1->SetBoundingRect(rect);
-		m_dragdrop_1->SetPos(r);
+		m_dragdrop_1->SetPos(r); 
 	}
-	else if (msg.sType == "dragdrop_complete") {
-		RECT rect = msg.pSender->GetPos();
+	else if (msg.sType == "dragdropcomplete") {
+		RECT rect = msg.pSender->GetRelativePos();
 
 		if (name == "cstDragDrop_1") {
 			m_mycontrol->m_nSplitX = (rect.right + rect.left) / 2;

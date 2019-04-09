@@ -23,34 +23,40 @@ CMyControlUI::~CMyControlUI() {
 bool  CMyControlUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
 	RECT  rect = this->GetPos();
+	RECT  rectR = this->GetRelativePos();
 
 	if (!m_bPainted) {
-		m_nSplitX = (rect.left + rect.right) / 2;
-		m_nSplitY = (rect.top + rect.bottom) / 2;
+		m_nSplitX = (rectR.left + rectR.right) / 2;
+		m_nSplitY = (rectR.top + rectR.bottom) / 2;
 
 		m_pManager->SendNotify(this, "init_splits");
 		m_bPainted = TRUE;
 	}
 
+	int nX = m_nSplitX;
+	int nY = m_nSplitY;
+
+	RECT rectParent = this->GetParent()->GetPos();
+
 	RECT r;
 	r = rect;
-	r.right = m_nSplitX;
-	r.bottom = m_nSplitY;
+	r.right = nX + rectParent.left;
+	r.bottom = nY + rectParent.top;
 	FillRect(hDC, &r, m_brushs[0]);
 
 	r = rect;
-	r.left = m_nSplitX;
-	r.bottom = m_nSplitY;
+	r.left = nX + rectParent.left;
+	r.bottom = nY + rectParent.top;
 	FillRect(hDC, &r, m_brushs[1]);
 
 	r = rect;
-	r.right = m_nSplitX;
-	r.top   = m_nSplitY;
+	r.right = nX + rectParent.left;
+	r.top   = nY + rectParent.top;
 	FillRect(hDC, &r, m_brushs[2]);
 
 	r = rect;
-	r.left = m_nSplitX;
-	r.top  = m_nSplitY;
+	r.left = nX + rectParent.left;
+	r.top  = nY + rectParent.top;
 	FillRect(hDC, &r, m_brushs[3]);
 
 	return true;

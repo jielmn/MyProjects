@@ -74,7 +74,9 @@
 			<Label name="lblDatabaseStatus"         text="数据库连接失败"         width="250" font="0" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />		
 		</HorizontalLayout>
 		
+		<!--
 		<DragDrop name="cstDragDrop_1" float="true" pos="100,100,200,200" visible="false" bkcolor="#00FFFFFF" />
 		<DragDrop name="cstDragDrop_2" float="true" pos="100,100,200,200" visible="false" bkcolor="#00FFFFFF" />
+		-->
 	</VerticalLayout>
 </Window>
