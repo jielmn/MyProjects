@@ -23,7 +23,7 @@
 <html>
     <head>
 		<META http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title>测试</title>
+        <title>软件列表</title>
 		<link href="css/index.css" rel="stylesheet">
     </head>
     <body>
