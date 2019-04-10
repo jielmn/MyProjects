@@ -2200,6 +2200,8 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 		pItem->m_Control = pTagUI;
 		pItem->m_pTagId = pTagId;
 		pItem->m_nBindingGridIndex = -1;
+		STRNCPY(pItem->m_szNickName, pvTagName->at(nIndex)->c_str(), sizeof(pItem->m_szNickName));
+		pTagUI->SetTag((UINT_PTR)pItem);
 		m_vHandTagUIs.push_back(pItem);
 	}
 
@@ -2241,7 +2243,9 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		pItem->m_Control = pTagUI;
 		pItem->m_pTagId = pTagId;
 		pItem->m_nBindingGridIndex = -1;
+		pItem->m_szNickName[0] = '\0';
 		m_vHandTagUIs.insert( m_vHandTagUIs.begin(), pItem );
+		pTagUI->SetTag((UINT)pItem);
 
 		if (m_vHandTagUIs.size() == 1) {
 			OnLayHandTagSelected(pTagUI);
@@ -2388,8 +2392,20 @@ void   CDuiFrameWnd::OnEdtTagNicknameKillFocus(TNotifyUI& msg) {
 	msg.pSender->SetVisible(false);
 	pbtnName->SetVisible(true);
 
-	if (strText != msg.pSender->GetText())
-		CBusiness::GetInstance()->SaveHandTagNicknameAsyn(pLblTagId->GetText(), pbtnName->GetText());
+	if (strText != msg.pSender->GetText()) {
+		CDuiString strText1 = pbtnName->GetText();
+		CBusiness::GetInstance()->SaveHandTagNicknameAsyn(pLblTagId->GetText(), strText1);
+		TagControlItem * p = (TagControlItem *)pGrandParent->GetTag();
+		assert(p);
+		STRNCPY(p->m_szNickName, strText1, sizeof(p->m_szNickName));
+		if ( p->m_nBindingGridIndex >= 0 ) {
+			int nIndex = p->m_nBindingGridIndex / MAX_READERS_PER_GRID;
+			m_BtnName_max[nIndex]->SetText(strText1);
+			m_EdtName_max[nIndex]->SetText(strText1);
+			m_BtnName_grid[nIndex]->SetText(strText1);
+			m_EdtName_grid[nIndex]->SetText(strText1);
+		}
+	}
 }
 
 void   CDuiFrameWnd::OnEdtRemarkKillFocus_1() {
@@ -2514,6 +2530,11 @@ void  CDuiFrameWnd::SetBindingGridText( TagControlItem * pItem, int nGridIndex )
 		m_MyImage_max[x]->Invalidate();
 		CBusiness::GetInstance()->QueryTempFromSqliteByTagAsyn(pItem->m_pTagId->c_str(), x, y);
 		m_LblTagId[x][y]->SetText(pItem->m_pTagId->c_str());
+
+		m_BtnName_max[x]->SetText(pItem->m_szNickName);
+		m_EdtName_max[x]->SetText(pItem->m_szNickName);
+		m_BtnName_grid[x]->SetText(pItem->m_szNickName);
+		m_EdtName_grid[x]->SetText(pItem->m_szNickName);
 	}
 	else {
 		plblBindingGrid->SetText("Î´°ó¶¨´°¸ñ");

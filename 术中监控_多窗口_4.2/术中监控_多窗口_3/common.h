@@ -390,6 +390,7 @@ typedef struct tagTagControlItem {
 	CControlUI *    m_Control;
 	string *        m_pTagId;
 	int             m_nBindingGridIndex;
+	char            m_szNickName[20];
 }TagControlItem;
 
 typedef  struct  tagTagBindingGrid {
