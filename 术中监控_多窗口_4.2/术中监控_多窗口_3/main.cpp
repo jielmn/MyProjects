@@ -696,7 +696,9 @@ void   CDuiFrameWnd::OnDbClick() {
 	}
 	else {
 		pFindControl = m_PaintManager.FindSubControlByPoint(m_layMain_1, point);
-
+		if (0 == pFindControl) {
+			return;
+		}
 		DuiLib::CDuiString  clsName = pFindControl->GetClass();
 		if (0 == strcmp(clsName, "MyImage_1")) {
 			CMyImageUI_1 * pMyImage = (CMyImageUI_1 *)pFindControl;
