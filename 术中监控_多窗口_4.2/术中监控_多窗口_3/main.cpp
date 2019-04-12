@@ -568,6 +568,48 @@ void   CDuiFrameWnd::ReLayout(DWORD dwWidth, DWORD dwHeight) {
 
 		// 重新修正标题栏的高度
 		m_layStatus->SetFixedHeight(STATUS_PANE_HEIGHT - (s.cy * g_data.m_CfgData.m_dwLayoutRows - dwHeight));
+
+		// 修改字体大小
+		if (s.cx >= 950 && s.cy >= 425) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(17);
+			}
+		}
+		else if (s.cx >= 816 && s.cy >= 365) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(16);
+			}
+		}
+		else if (s.cx > 680 && s.cy > 304) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(15);
+			}
+		}
+		else if (s.cx > 572 && s.cy > 256) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(14);
+			}
+		}
+		else if (s.cx > 466 && s.cy > 208) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(13);
+			}
+		}
+		else if (s.cx > 350 && s.cy > 157) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(12);
+			}
+		}
+		else if (s.cx > 280 && s.cy > 125) {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(11);
+			}
+		}
+		else {
+			for (int i = 0; i < MAX_GRID_COUNT; i++) {
+				m_LblCurTemp_grid1[i]->SetFont(10);
+			}
+		}
 	}
 	else {
 		s.cx = dwWidth;
@@ -876,11 +918,11 @@ void   CDuiFrameWnd::OnSetting() {
 			CBusiness::GetInstance()->ReconnectLaunchAsyn();
 		}
 
-		if ( oldData.m_dwTempFont != g_data.m_CfgData.m_dwTempFont ) {
-			for (int i = 0; i < MAX_GRID_COUNT; i++) {
-				m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);
-			}			
-		}
+		//if ( oldData.m_dwTempFont != g_data.m_CfgData.m_dwTempFont ) {
+		//	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		//		m_LblCurTemp_grid1[i]->SetFont(g_data.m_CfgData.m_dwTempFont);
+		//	}			
+		//} 
 		
 		::InvalidateRect(this->GetHWND(), 0, TRUE);   
 	}

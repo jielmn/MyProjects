@@ -117,6 +117,7 @@ void  CSettingDlg::InitCommonCfg() {
 		AddComboItem(pCombo, strText, i+10);
 	}
 	pCombo->SelectItem(g_data.m_CfgData.m_dwTempFont - 10);
+	pCombo->SetEnabled(false);
 	m_tree->AddNode("温度字体大小", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 自动保存excel 
