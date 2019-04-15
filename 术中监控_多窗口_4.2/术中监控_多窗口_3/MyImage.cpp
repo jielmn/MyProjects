@@ -356,6 +356,44 @@ void   CMyImageUI::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopCon
 			}
 		}
 	}
+
+
+	// 画十字线
+	RECT rCross;
+	rCross.left = rectLeft.right;
+	rCross.right = rectLeft.left + width - 1;
+	rCross.top = rectLeft.top;
+	rCross.bottom = rectLeft.bottom;
+
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	// 如果有点
+	if (g_data.m_CfgData.m_bCrossAnchor 
+		&& ::PtInRect(&rCross, cursor_point)) {
+		::SelectObject(hDC, m_hCommonThreadPen);
+		::MoveToEx(hDC, cursor_point.x, rectLeft.top, 0);
+		::LineTo(hDC, cursor_point.x, rectLeft.bottom);
+		::MoveToEx(hDC, rectLeft.right, cursor_point.y, 0);
+		::LineTo(hDC, rectLeft.left + width - 1, cursor_point.y);
+
+		float  fTempCursor = nFistTemperature - (float)(cursor_point.y - rect.top - nFirstTop) / nGridHeight;
+		int n1 = cursor_point.x - rect.left - MYIMAGE_LEFT_BLANK;
+		time_t tCursor = (time_t)((float)n1 * fSecondsPerPixel) + tFirstTime;
+
+		struct tm tTmTime;
+		localtime_s(&tTmTime, &tCursor);
+
+		strText.Format("%.2f℃,%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min);
+		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+
+		// 判断是在左边，还是右边
+		if (rCross.right - cursor_point.x >= 120)
+			::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		else
+			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
+	}
 	
 }
 
@@ -640,7 +678,12 @@ void  CMyImageUI::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopCont
 
 		strText.Format("%.2f℃,%02d:%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
 		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
-		::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+
+		// 判断是在左边，还是右边
+		if ( rCross.right - cursor_point.x >= 120 )
+			::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		else
+			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
 	}
 }
 
@@ -2030,7 +2073,12 @@ void   CMyImageUI_1::SubPaint_0(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 
 		strText.Format("%.2f℃,%02d:%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min, tTmTime.tm_sec);
 		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
-		::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		
+		// 判断是在左边，还是右边
+		if (rCross.right - cursor_point.x >= 120)
+			::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		else
+			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
 	}
 }
 
@@ -2223,6 +2271,43 @@ void   CMyImageUI_1::SubPaint_1(HDC hDC, const RECT& rcPaint, CControlUI* pStopC
 			}
 			::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 		}
+	}
+
+	// 画十字线
+	RECT rCross;
+	rCross.left = rectLeft.right;
+	rCross.right = rectLeft.left + width - 1;
+	rCross.top = rectLeft.top;
+	rCross.bottom = rectLeft.bottom;
+
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	// 如果有点
+	if (g_data.m_CfgData.m_bCrossAnchor
+		&& ::PtInRect(&rCross, cursor_point)) {
+		::SelectObject(hDC, m_hCommonThreadPen);
+		::MoveToEx(hDC, cursor_point.x, rectLeft.top, 0);
+		::LineTo(hDC, cursor_point.x, rectLeft.bottom);
+		::MoveToEx(hDC, rectLeft.right, cursor_point.y, 0);
+		::LineTo(hDC, rectLeft.left + width - 1, cursor_point.y);
+
+		float  fTempCursor = nFistTemperature - (float)(cursor_point.y - rect.top - nFirstTop) / nGridHeight;
+		int n1 = cursor_point.x - rect.left - MYIMAGE_LEFT_BLANK;
+		time_t tCursor = (time_t)((float)n1 * fSecondsPerPixel) + tFirstTime;
+
+		struct tm tTmTime;
+		localtime_s(&tTmTime, &tCursor);
+
+		strText.Format("%.2f℃,%02d:%02d", fTempCursor, tTmTime.tm_hour, tTmTime.tm_min);
+		int nFirstTop = middle - nGridHeight * (nGridCount / 2);
+
+		// 判断是在左边，还是右边
+		if (rCross.right - cursor_point.x >= 120)
+			::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		else
+			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
 	}
 	
 }
