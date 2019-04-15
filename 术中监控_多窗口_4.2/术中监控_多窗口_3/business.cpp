@@ -1012,7 +1012,7 @@ int  CBusiness::SaveTemp2Sqlite(const CSaveTempSqliteParam * pParam) {
 //  查询sqlite记录的某个tag的温度记录
 int   CBusiness::QueryTempFromSqliteByTagAsyn(const char * szTagId, DWORD  dwIndex, DWORD  dwSubIndex) {
 	g_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_SQLITE,
-		new CQueryTempSqliteParam(szTagId, dwIndex, dwSubIndex));
+		new CQueryTempSqliteParam(szTagId, dwIndex, dwSubIndex),TRUE);
 	return 0;
 }
 

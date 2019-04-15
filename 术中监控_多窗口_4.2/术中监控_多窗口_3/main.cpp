@@ -2567,6 +2567,30 @@ void  CDuiFrameWnd::SetBindingGridText( TagControlItem * pItem, int nGridIndex )
 		pItem->m_nBindingGridIndex = nGridIndex;
 		plblBindingGrid->SetTextColor(0xFFCAF100);
 
+
+		DWORD  dwIndex = x;
+		DWORD  dwSubIndex = y;
+		// 如果同时在进行术中监控测量
+		if (m_tLastTemp[dwIndex][dwSubIndex].m_szTagId[0] != '\0'
+			&& 0 != strcmp(pItem->m_pTagId->c_str(), m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
+
+			// 如果开关还打开
+			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch
+				&& g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch) {
+				// 简单处理，不传递值
+				return;
+			}			
+		}
+
+		m_MyImage_max[dwIndex]->EmptyData(y);
+		for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+			m_tLastTemp[dwIndex][i].m_dwTemp = 0;
+			m_tLastTemp[dwIndex][i].m_Time = 0;
+			m_tLastTemp[dwIndex][i].m_szTagId[0] = '\0';
+			m_tLastTemp[dwIndex][i].m_szReaderId[0] = '\0';
+			OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
+		}
+
 		m_MyImage_max[x]->SetTagId(y, pItem->m_pTagId->c_str());
 		m_MyImage_max[x]->EmptyData(y);
 		m_MyImage_max[x]->Invalidate();
@@ -2599,9 +2623,27 @@ void   CDuiFrameWnd::PassTemp2Grid(DWORD  dwIndex, DWORD  dwSubIndex, LastTemp *
 	DWORD  dwTemp = pTemp->m_dwTemp;
 
 	// 如果同时在进行术中监控测量
-	if (m_tLastTemp[dwIndex][dwSubIndex].m_szTagId[0] != '\0' && 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId)) {
-		// 简单处理，不传递值
-		return;
+	if (   m_tLastTemp[dwIndex][dwSubIndex].m_szTagId[0] != '\0' 
+		&& 0 != strcmp(pTemp->m_szTagId, m_tLastTemp[dwIndex][dwSubIndex].m_szTagId) ) {
+
+		// 如果开关还打开
+		if ( g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_bSwitch
+			&& g_data.m_CfgData.m_GridCfg[dwIndex].m_bSwitch ) {
+			// 简单处理，不传递值
+			return;
+		}
+		// 开关已关闭，清空数据
+		else {
+			m_MyImage_max[dwIndex]->EmptyData(dwSubIndex);
+			for (int i = 0; i < MAX_READERS_PER_GRID; i++) {
+				m_tLastTemp[dwIndex][i].m_dwTemp = 0;
+				m_tLastTemp[dwIndex][i].m_Time = 0;
+				m_tLastTemp[dwIndex][i].m_szTagId[0] = '\0';
+				m_tLastTemp[dwIndex][i].m_szReaderId[0] = '\0';
+				OnReaderDisconnected(MAKELONG(dwIndex, i), 0);
+			}
+			CBusiness::GetInstance()->QueryTempFromSqliteByTagAsyn(pTemp->m_szTagId, dwIndex, dwSubIndex);
+		}
 	}
 
 	memcpy(&m_tLastTemp[dwIndex][dwSubIndex], pTemp, sizeof(LastTemp));
