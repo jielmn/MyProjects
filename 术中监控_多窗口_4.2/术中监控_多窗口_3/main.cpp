@@ -2267,12 +2267,16 @@ void   CDuiFrameWnd::OnHandReaderTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 }
 
 // 需要设置一个定时器，定时清除7天前的数据和tag栏
-void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
-	HandReaderTemp * pTemp = (HandReaderTemp*)wParam;
+void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {	
+
+	HandReaderTemp * pTemp = (HandReaderTemp*)wParam;	
 	BOOL  bNewTag = FALSE;
 	string * pTagId = 0;
 	time_t now = time(0);
 	m_MyImage_hand_reader->OnTempData(pTemp, bNewTag, pTagId,now);
+
+	// 保存数据库
+	CBusiness::GetInstance()->SaveHandTempAsyn(pTemp->m_szTagId, pTemp->m_dwTemp, pTemp->m_szCardId, now);
 
 	if ( bNewTag ) {
 		CDialogBuilder builder_child;
@@ -2329,10 +2333,7 @@ void  CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 				break;
 			}
 		}
-	}
-
-	// 保存数据库
-	CBusiness::GetInstance()->SaveHandTempAsyn(pTemp->m_szTagId, pTemp->m_dwTemp, pTemp->m_szCardId, now);
+	}	
 
 	delete pTemp;
 }
