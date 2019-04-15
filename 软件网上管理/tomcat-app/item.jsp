@@ -193,7 +193,7 @@
 				Connection con = null;
 				con = getConnection();				
 				Statement stmt = con.createStatement();      
-				stmt.executeUpdate( "update items set title = '" + newTitle + "', abstract = '" + newBrief + "', content = '" + newContent + "' where id = " + itemId );
+				stmt.executeUpdate( "update items set title = '" + newTitle + "', abstract = '" + newBrief + "', content = '" + newContent + "', create_time=now() where id = " + itemId );
 				
 				if ( filePath.length() > 0 )  {
 					stmt.executeUpdate( "update items set software_path = '" + filePath + "' where id = " + itemId );
