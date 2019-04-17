@@ -10,6 +10,10 @@
 
 CGlobalData  g_data;
 
+CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	return NULL;
+}
+
 LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
 {
 	if (IsDebuggerPresent())

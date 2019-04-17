@@ -5,6 +5,7 @@
 #include "common.h"
 #include "sigslot.h"
 
+class CDuiFrameWnd;
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
 public:
@@ -14,10 +15,12 @@ public:
 	static CBusiness *  GetInstance();
 	int Init();
 	int DeInit();
+	void InitSigslot(CDuiFrameWnd * pMainWnd);
 
 private:
 	static CBusiness *  pInstance;
 	void Clear();
+	void GetGridsOrderCfg();
 
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);

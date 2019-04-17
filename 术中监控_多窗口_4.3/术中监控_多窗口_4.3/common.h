@@ -2,12 +2,14 @@
 
 #include <vector>
 #include <algorithm>
+#include <assert.h>
 
 #include "LmnCommon.h"
 #include "LmnConfig.h"
 #include "LmnLog.h"
 #include "LmnThread.h"
 #include "LmnString.h"
+#include "sigslot.h"
 
 #include "UIlib.h"
 using namespace DuiLib;
@@ -21,11 +23,21 @@ using namespace DuiLib;
 
 #define   MAX_GRID_COUNT           60             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
+#define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
+#define   MAX_ROWS_COUNT           5              // 每个页面最大几行
 
 // 控件id
 #define   TABS_ID                  "switch"
 #define   TAB_INDEX_MONITOR        0
 #define   TAB_INDEX_READER         1
+#define   LAYOUT_MAIN_NAME         "layGrids"
+#define   GRID_XML_FILE            "grid.xml"
+#define   GRID_NAME                "MyGrid"
+#define   GRID_BORDER_SIZE         4
+#define   GRID_BORDER_COLOR        0xFF4F4F4F
+#define   LAYOUT_PAGES            "layPages"
+#define   BUTTON_PREV_PAGE        "btnPrevPage"
+#define   BUTTON_NEXT_PAGE        "btnNextPage"
 
 
 // CONFIG
@@ -35,6 +47,26 @@ using namespace DuiLib;
 #define   DEFAULT_MAIN_LAYOUT_ROWS          2
 #define   CFG_MAIN_LAYOUT_GRIDS_COUNT       "main layout grids count"
 #define   DEFAULT_MAIN_LAYOUT_GRIDS_COUNT   4
+#define   CFG_GRIDS_ORDER                   "grids order"
+
+// thread消息
+
+
+// windows 消息
+
+
+
+// 创建duilib控件的回调
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+private:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
 
 // 术中读卡器
 typedef struct tagReaderCfg
@@ -63,6 +95,7 @@ typedef struct tagCfgData {
 	BOOL      m_bAutoSaveExcel;                         // 自动保存Excel
 	BOOL      m_bCrossAnchor;                           // 十字锚
 	GridCfg   m_GridCfg[MAX_GRID_COUNT];                // 术中格子配置
+	DWORD     m_GridOrder[MAX_GRID_COUNT];              // 格子顺序，例如: 2,1,3,4,5,6,30,7,8,9...
 
 	DWORD     m_dwHandReaderMinTemp;                    // 手持读卡器显示最低温度
 	DWORD     m_dwHandReaderMaxTemp;                    // 手持读卡器显示最高温度
@@ -74,14 +107,14 @@ class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_timer;
 	CfgData                   m_CfgData;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_db = 0;
+		m_thrd_timer = 0;
 	}
 };
 
