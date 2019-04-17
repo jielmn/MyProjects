@@ -19,14 +19,41 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(TABS_ID));
 	WindowImplBase::InitWindow();
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	DuiLib::CDialogBuilder builder;
+	DuiLib::CDuiString  strText;
+	DuiLib::CControlUI * pUI = 0;
+
+	if ( 0 == strcmp("SurgencyTemp", pstrClass) ) {		
+		strText.Format( "%s.xml", pstrClass );
+		pUI = builder.Create( (const char *)strText, (UINT)0, 0, &m_PaintManager );
+		return pUI; 
+	}
+	else if (0 == strcmp("HandReaderTemp", pstrClass)) {
+		strText.Format("%s.xml", pstrClass);
+		pUI = builder.Create((const char *)strText, (UINT)0, 0, &m_PaintManager);
+		return pUI;
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	DuiLib::CDuiString name = msg.pSender->GetName();
+
+	if (msg.sType == _T("selectchanged"))
+	{
+		if (name == _T("opn_monitor")) {
+			m_tabs->SelectItem(TAB_INDEX_MONITOR);
+		}
+		else if (name == _T("opn_reader")) {
+			m_tabs->SelectItem(TAB_INDEX_READER);                  
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 

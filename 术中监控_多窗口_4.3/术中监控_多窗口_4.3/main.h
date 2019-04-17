@@ -37,4 +37,7 @@ public:
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+
+private:
+	DuiLib::CTabLayoutUI *   m_tabs;
 };

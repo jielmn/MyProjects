@@ -9,12 +9,23 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#include "UIlib.h"
+using namespace DuiLib;
+
 #define   PROJ_NAME               "temp_monitor"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
+
+#define   MAX_GRID_COUNTS          30             // 最多几个格子
+#define   MAX_REDER_PER_GRID       6              // 每个格子最多几个测温点
+
+// 控件id
+#define   TABS_ID                  "switch"
+#define   TAB_INDEX_MONITOR        0
+#define   TAB_INDEX_READER         1
 
 
 class  CGlobalData {
@@ -33,6 +44,7 @@ public:
 
 extern CGlobalData  g_data;
 
+extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 
 // templates
 template <class T>
