@@ -6,7 +6,7 @@
 			<VerticalLayout width="70">
 				<Control />
 				<HorizontalLayout height="30">								
-					<Option width="30" height="30" name="opn_grid_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="true" />								
+					<Option width="30" height="30" name="opn_grid_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="false" />								
 				</HorizontalLayout>
 				<Control />
 			</VerticalLayout>
@@ -53,11 +53,11 @@
 		
 		<HorizontalLayout inset="10,0,10,0">
 			<!-- 显示温度和温度曲线 -->
-			<Label  name="lblTemperature"  text="35.64"  textcolor="#FFCCCCCC" font="4" align="center"  />
+			<Label  name="lblTemperature"  text="35.64"  textcolor="#FFCCCCCC" font="4" align="center"  />			
 			
 			<VerticalLayout width="80">
 				<Control />
-				<Label   name="lblElapsed"  height="30"  text="180天前"  textcolor="#FFFFFFFF" font="5" align="center"   />
+				<Label   name="lblElapsed"  height="30"  text="24小时前"  textcolor="#FFCCCCCC" font="5" align="center"   />
 			</VerticalLayout>					
 		</HorizontalLayout>	
 	</VerticalLayout>

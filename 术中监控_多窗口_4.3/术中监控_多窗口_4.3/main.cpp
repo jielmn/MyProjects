@@ -97,6 +97,14 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			m_tabs->SelectItem(TAB_INDEX_READER);                  
 		}
 	}
+	else if (msg.sType == "click") {
+		if ( name == BUTTON_NEXT_PAGE ) {
+			NextPage();
+		}
+		else if (name == BUTTON_PREV_PAGE) {
+			PrevPage();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -136,7 +144,7 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 		// 设定固定列数
 		m_layMain->SetFixedColumns(g_data.m_CfgData.m_dwLayoutColumns);
 		for (DWORD i = dwFirstGridIndexCurPage; i < dwMaxGridIndex; i++) {
-			assert(g_data.m_CfgData.m_GridOrder[i] < MAX_GRID_COUNT);
+			assert(g_data.m_CfgData.m_GridOrder[i] < g_data.m_CfgData.m_dwLayoutGridsCnt);
 			m_layMain->Add(m_pGrids[g_data.m_CfgData.m_GridOrder[i]]);
 		}
 
@@ -148,9 +156,15 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 			if ( dwGridPageIndex == 0 ) {
 				m_btnPrevPage->SetEnabled(false);
 			}
+			else {
+				m_btnPrevPage->SetEnabled(true);
+			}
 
-			if (dwGridPageIndex == (g_data.m_CfgData.m_dwLayoutGridsCnt - 1) / dwCntPerPage + 1) {
+			if (dwGridPageIndex == (g_data.m_CfgData.m_dwLayoutGridsCnt - 1) / dwCntPerPage) {
 				m_btnNextPage->SetEnabled(false); 
+			}
+			else {
+				m_btnNextPage->SetEnabled(true);
 			}
 		}
 		else {
@@ -190,6 +204,34 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 		//pParent->SetInset(inset);
 		m_layMain->SetItemSize(s);
 	}
+}
+
+void   CDuiFrameWnd::NextPage() {
+	// 每页多少grids
+	DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	// 当前页index
+	DWORD   dwGridPageIndex = m_dwCurGridIndex / dwCntPerPage;
+	// 当前页的第一个grid index
+	DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
+	// 下一页的第一grid index，并修改当前的grid index
+	m_dwCurGridIndex = dwFirstGridIndexCurPage + dwCntPerPage;
+
+	RefreshGridsPage();
+}
+
+void   CDuiFrameWnd::PrevPage() {
+	// 每页多少grids
+	DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	// 当前页index
+	DWORD   dwGridPageIndex = m_dwCurGridIndex / dwCntPerPage;
+	// 当前页的第一个grid index
+	DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
+
+	// 上一页的第一grid index，并修改当前的grid index
+	assert(dwFirstGridIndexCurPage >= dwCntPerPage);
+	m_dwCurGridIndex = dwFirstGridIndexCurPage - dwCntPerPage;
+
+	RefreshGridsPage();
 }
 
 

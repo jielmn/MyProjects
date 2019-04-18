@@ -14,6 +14,7 @@ CEditableButtonUI::CEditableButtonUI() {
 	m_dwEditColor = 0xFF000000;
 	m_nBtnFont = -1;
 	m_nEdtFont = -1; 
+	m_bInited = FALSE;
 }
 
 CEditableButtonUI::~CEditableButtonUI() {
@@ -21,6 +22,10 @@ CEditableButtonUI::~CEditableButtonUI() {
 }
 
 void CEditableButtonUI::DoInit() {
+	if (m_bInited) {
+		return;                     
+	}
+
 	CDialogBuilder builder;
 	CContainerUI* pChildWindow =
 		static_cast<CHorizontalLayoutUI*>(
@@ -42,6 +47,8 @@ void CEditableButtonUI::DoInit() {
 	else {
 		this->RemoveAll();
 	}
+
+	m_bInited = TRUE;
 }
 
 void CEditableButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {

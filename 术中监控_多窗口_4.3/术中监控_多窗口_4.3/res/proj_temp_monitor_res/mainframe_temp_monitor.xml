@@ -11,7 +11,7 @@
 	<!-- grid head -->
 	<Font id="4" name="微软雅黑" size="40"  bold="true" />
 	<!-- elapsed time -->
-	<Font id="5" name="宋体" size="18"  bold="true" />
+	<Font id="5" name="宋体" size="17"  bold="true" />
 	<!-- ben no font -->
 	<Font id="6" name="微软雅黑" size="80"  bold="true" />
 	<!-- patient name -->

@@ -27,4 +27,5 @@ private:
 
 	CButtonUI *   m_btn;
 	CEditUI *     m_edit;
+	BOOL          m_bInited;
 };

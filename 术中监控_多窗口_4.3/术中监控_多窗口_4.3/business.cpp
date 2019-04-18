@@ -102,16 +102,17 @@ void CBusiness::GetGridsOrderCfg() {
 	// 是否有效的顺序配置
 	BOOL  bValidOrder = TRUE;
 
+	DWORD  dwGridsCount = g_data.m_CfgData.m_dwLayoutGridsCnt;
 	// 个数必须为MAX_GRID_COUNT个
-	if ( split.Size() != MAX_GRID_COUNT ) {
+	if ( split.Size() != dwGridsCount) {
 		bValidOrder = FALSE;
 	}
 	else {
-		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		for (DWORD i = 0; i < dwGridsCount; i++) {
 			DWORD  dwTemp = 0;
 			// 是数字
 			if (1 == sscanf(split[i], "%lu", &dwTemp)) {
-				if (dwTemp == 0 || dwTemp > MAX_GRID_COUNT) {
+				if (dwTemp == 0 || dwTemp > dwGridsCount) {
 					bValidOrder = FALSE;
 					break;
 				}
@@ -126,8 +127,8 @@ void CBusiness::GetGridsOrderCfg() {
 
 		// 再检查
 		if (bValidOrder) {
-			for (DWORD i = 0; i < MAX_GRID_COUNT - 1; i++) {
-				for (DWORD j = i + 1; j < MAX_GRID_COUNT; j++) {
+			for (DWORD i = 0; i < dwGridsCount - 1; i++) {
+				for (DWORD j = i + 1; j < dwGridsCount; j++) {
 					// 重复
 					if (g_data.m_CfgData.m_GridOrder[i] == g_data.m_CfgData.m_GridOrder[j]) {
 						bValidOrder = FALSE;
@@ -143,7 +144,7 @@ void CBusiness::GetGridsOrderCfg() {
 
 	// 如果没有正确的顺序配置，取默认的顺序
 	if (!bValidOrder) {
-		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		for (DWORD i = 0; i < dwGridsCount; i++) {
 			g_data.m_CfgData.m_GridOrder[i] = i;
 		}
 	}

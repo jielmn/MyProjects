@@ -52,6 +52,10 @@ private:
 	void   RefreshGridsPage();
 	// 更新grids size
 	void   RefreshGridsSize(int width, int height);
+	// 下一页
+	void   NextPage();
+	// 上一页
+	void   PrevPage();
 
 private:
 	CDialogBuilderCallbackEx                    m_callback;
