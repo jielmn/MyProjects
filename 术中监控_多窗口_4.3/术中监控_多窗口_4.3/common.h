@@ -40,6 +40,7 @@ using namespace DuiLib;
 #define   BUTTON_NEXT_PAGE        "btnNextPage"
 #define   BTN_BED_NO              "btnBed"
 #define   LBL_READER_NO           "lblReaderNo"
+#define   GRID_TABS               "gridtabs"
 
 
 // CONFIG
@@ -123,6 +124,7 @@ public:
 extern CGlobalData  g_data;
 
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
+extern DWORD GetGridOrderByGridId(DWORD  dwId);
 
 // templates
 template <class T>

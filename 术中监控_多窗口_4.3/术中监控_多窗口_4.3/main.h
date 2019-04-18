@@ -56,8 +56,10 @@ private:
 	void   NextPage();
 	// 上一页
 	void   PrevPage();
+	// 双击事件
+	void   OnDbClick();
 
-private:
+private:	
 	CDialogBuilderCallbackEx                    m_callback;
 	DWORD                                       m_dwCurGridIndex;         // 当前的格子序号
 	ENUM_GRID_STATUS                            m_eGridStatus;            // 多格子态，还是最大化的单个格子

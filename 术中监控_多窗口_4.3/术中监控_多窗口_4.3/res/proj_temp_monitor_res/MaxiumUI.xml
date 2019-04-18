@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout>
+		<Label text="test123" textcolor="#FFFFFFFF" />
+	</VerticalLayout>
+</Window>

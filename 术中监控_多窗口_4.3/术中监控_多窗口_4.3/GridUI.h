@@ -9,6 +9,8 @@ public:
 	~CGridUI();
 
 	void  SetBedNo(DWORD dwIndex);
+	// Ë«»÷ºóµÄÊÓÍ¼ÇÐ»»
+	void  SwitchView();
 
 private:
 	LPCTSTR GetClass() const;
@@ -17,7 +19,9 @@ private:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 
 private:
+	BOOL                                        m_bInited;
 	CDialogBuilderCallbackEx                    m_callback;
+	DuiLib::CTabLayoutUI *                      m_tabs;
 
 	CButtonUI *                                 m_btnBedNo;
 	DWORD                                       m_dwBedNo;

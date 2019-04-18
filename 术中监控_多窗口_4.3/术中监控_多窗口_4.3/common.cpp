@@ -21,6 +21,11 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 		pUI = builder.Create((const char *)strText, (UINT)0, this, m_pManager);
 		return pUI;         
 	}
+	else if (0 == strcmp(pstrClass, "MaxiumUI")) {
+		strText.Format("%s.xml", pstrClass); 
+		pUI = builder.Create((const char *)strText, (UINT)0, this, m_pManager);
+		return pUI;
+	}
 	else if (0 == strcmp(pstrClass, "EditableButton")) {  
 		return new CEditableButtonUI; 
 	}
@@ -75,4 +80,14 @@ LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo)
 	FreeLibrary(hDbgHelp);
 
 	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+DWORD GetGridOrderByGridId(DWORD  dwId) {
+	for ( DWORD i = 0; i < g_data.m_CfgData.m_dwLayoutGridsCnt; i++ ) {
+		if ( g_data.m_CfgData.m_GridOrder[i] == dwId ) {
+			return i;
+		}
+	}
+	assert(0);
+	return -1;
 }

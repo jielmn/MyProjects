@@ -57,7 +57,6 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pGrids[i]->SetBorderColor(GRID_BORDER_COLOR);
 		m_pGrids[i]->SetName(GRID_NAME);
 		m_pGrids[i]->SetTag(i);
-
 		m_pGrids[i]->SetBedNo(i + 1);
 	}
 	/*************  end 获取控件 *****************/
@@ -109,6 +108,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (uMsg == WM_LBUTTONDBLCLK) {
+		OnDbClick();
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -172,7 +174,12 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 		}
 	}
 	else {
-
+		// 设定固定列数
+		m_layMain->SetFixedColumns(1);
+		// 添加单个窗格
+		m_layMain->Add(m_pGrids[g_data.m_CfgData.m_GridOrder[m_dwCurGridIndex]]);
+		// 关闭上下页
+		m_layPages->SetVisible(false);
 	}
 	
 }
@@ -182,16 +189,16 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 	if (0 == m_layMain)
 		return;
 
-	// 如果需要多页显示
-	if ( g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows 
-		< g_data.m_CfgData.m_dwLayoutGridsCnt ) {
-		height -= 30;
-	}
-
 	SIZE s;
 	CContainerUI * pParent = (CContainerUI *)m_layMain->GetParent();
 
 	if ( GRID_STATUS_GRIDS == m_eGridStatus ) {
+
+		// 如果需要多页显示
+		if (g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows
+			< g_data.m_CfgData.m_dwLayoutGridsCnt) {
+			height -= 30;
+		}
 
 		s.cx = ( width - 1 ) / (int)g_data.m_CfgData.m_dwLayoutColumns + 1;
 		s.cy = ( height - 1 ) / (int)g_data.m_CfgData.m_dwLayoutRows + 1;
@@ -202,6 +209,12 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 		inset.left = inset.right  = margin_h;
 		inset.top  = inset.bottom = margin_v;
 		//pParent->SetInset(inset);
+		m_layMain->SetItemSize(s);
+	}
+	else {
+		height += 30;
+		s.cx = width;
+		s.cy = height;
 		m_layMain->SetItemSize(s);
 	}
 }
@@ -234,6 +247,55 @@ void   CDuiFrameWnd::PrevPage() {
 	RefreshGridsPage();
 }
 
+void  CDuiFrameWnd::OnDbClick() {
+	POINT point;
+	CDuiString strName;
+
+	GetCursorPos(&point);
+	::ScreenToClient(m_hWnd, &point);
+
+	CControlUI * pFindControl = m_PaintManager.FindSubControlByPoint(m_tabs, point);
+	if (0 == pFindControl) {
+		return;
+	}
+
+	DuiLib::CDuiString  clsName = pFindControl->GetClass();
+	// 如果双击一些按钮，滑动条类的，不处理
+	if (0 == strcmp(clsName, DUI_CTR_BUTTON)) {
+		return;
+	}
+	else if (0 == strcmp(clsName, DUI_CTR_OPTION)) {
+		return;
+	}
+	else if (0 == strcmp(clsName, DUI_CTR_SCROLLBAR)) {
+		return;
+	}
+
+	while (pFindControl) {
+		strName = pFindControl->GetName();
+		if (0 == strcmp(strName, GRID_NAME)) {
+
+			if (m_eGridStatus == GRID_STATUS_GRIDS) {
+				// 找到序号
+				DWORD dwGridIndex = GetGridOrderByGridId(pFindControl->GetTag());
+				m_dwCurGridIndex = dwGridIndex;
+				m_eGridStatus = GRID_STATUS_MAXIUM;
+			}
+			else {
+				m_eGridStatus = GRID_STATUS_GRIDS;
+			}
+			
+			CGridUI * pGrid = (CGridUI *)pFindControl;
+			pGrid->SwitchView(); 
+
+			RefreshGridsPage();
+			RECT rect = m_layMain->GetPos();
+			RefreshGridsSize(rect.right - rect.left, rect.bottom - rect.top);
+			break;
+		}
+		pFindControl = pFindControl->GetParent();
+	}
+}
 
 
 
