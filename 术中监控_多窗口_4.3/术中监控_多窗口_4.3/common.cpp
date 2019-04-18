@@ -11,6 +11,15 @@
 CGlobalData  g_data;
 
 CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	DuiLib::CDialogBuilder builder;
+	DuiLib::CDuiString  strText;
+	DuiLib::CControlUI * pUI = 0;
+
+	if ( 0 == strcmp(pstrClass, "GridUI") ) {
+		strText.Format("%s.xml", pstrClass);   
+		pUI = builder.Create((const char *)strText, (UINT)0, this, m_pManager);
+		return pUI;         
+	}
 	return NULL;
 }
 

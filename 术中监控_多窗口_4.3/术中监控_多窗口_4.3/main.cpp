@@ -73,12 +73,12 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 
 	if ( 0 == strcmp("SurgencyTemp", pstrClass) ) {		
 		strText.Format( "%s.xml", pstrClass );
-		pUI = builder.Create( (const char *)strText, (UINT)0, 0, &m_PaintManager );
+		pUI = builder.Create( (const char *)strText, (UINT)0, &m_callback, &m_PaintManager );
 		return pUI; 
 	}
 	else if (0 == strcmp("HandReaderTemp", pstrClass)) {
 		strText.Format("%s.xml", pstrClass);
-		pUI = builder.Create((const char *)strText, (UINT)0, 0, &m_PaintManager);
+		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
 	return WindowImplBase::CreateControl(pstrClass);

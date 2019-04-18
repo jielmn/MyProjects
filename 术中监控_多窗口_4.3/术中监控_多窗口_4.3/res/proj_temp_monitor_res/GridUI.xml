@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout>
+		<HorizontalLayout height="74" name="layGridHead" inset="5,2,5,2" >
+			<Control />
+			
+			<!-- 床号图片 -->
+			<VerticalLayout width="40" >
+				<Control />
+				<Control bkimage="bed.png" height="30" tooltip="床号" />
+				<Control />
+			</VerticalLayout>
+			
+			<!-- 大写的床位号 -->
+			<EditableButton name="cstEdtBtnBedNo" width="100" btncolor="#FFFFFF00" btnfont="4" editfont="4" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
+			<!-- 第几个Reader标志位 -->
+			<Label  name="lblReaderNo" text="A"  textcolor="#FFCCCCCC" width="30" font="4" />
+			<Control width="30" />
+			
+			<VerticalLayout width="100">
+				<Control />
+				<HorizontalLayout height="30">								
+					
+					<Control bkimage="file='user.png' dest='0,2,30,27'"  width="30" tooltip="病人姓名" />
+					<EditableButton name="cstEdtBtnPatientName" width="100" btncolor="#FFFFFF00" btnfont="4" editfont="4" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
+					
+					<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" visible="false" />
+					<Label   name="lblCur_1"   text="36.50"    textcolor="#FFFFFFFF" width="50" font="1" visible="false" />
+				</HorizontalLayout>
+				<HorizontalLayout />
+			</VerticalLayout>
+			
+			<VerticalLayout />
+			
+			<VerticalLayout width="30" >
+				<HorizontalLayout />
+				<HorizontalLayout height="30">																
+					<AlarmImage name="alarm_1" width="30" height="30" />
+				</HorizontalLayout>
+				<HorizontalLayout />
+			</VerticalLayout>
+			
+			<VerticalLayout width="10" />
+		</HorizontalLayout>
+		
+		
+		<HorizontalLayout inset="10,0,10,0">
+			<HorizontalLayout>
+				<MyLabel   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
+			</HorizontalLayout>					
+			
+			<VerticalLayout width="80">
+				<Control />
+				<Label   name="lblCurTime_2"  height="30"  text="24小时前"  textcolor="#FFFFFFFF" font="101" align="center"   />
+			</VerticalLayout>					
+		</HorizontalLayout>	
+	</VerticalLayout>
+</Window>

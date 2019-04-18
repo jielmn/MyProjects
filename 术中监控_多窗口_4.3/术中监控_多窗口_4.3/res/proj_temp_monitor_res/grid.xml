@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
 	<VerticalLayout>	
-		<Label text="123" textcolor="#FFFFFFFF" />
-		
+		<!-- grid 或者 maxium -->
+		<TabLayout name="gridtabs">
+			<GridUI />
+			<MaxiumUI />				
+		</TabLayout>			
 	</VerticalLayout>
-	
-	
 </Window>
