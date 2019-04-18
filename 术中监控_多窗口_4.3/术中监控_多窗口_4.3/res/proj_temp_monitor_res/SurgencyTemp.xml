@@ -2,7 +2,7 @@
 <Window>	
 	<VerticalLayout>
 		<HorizontalLayout inset="0,0,0,0">
-			<TileLayout bkcolor="#FF192431" inset="0,0,0,0" name="layGrids" columns="2" />
+			<TileLayout bkcolor="#FF434248" inset="0,0,0,0" name="layGrids" columns="2" />
 		</HorizontalLayout>
 		
 		

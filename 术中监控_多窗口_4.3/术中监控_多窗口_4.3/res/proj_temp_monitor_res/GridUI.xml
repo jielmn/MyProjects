@@ -2,6 +2,15 @@
 <Window>	
 	<VerticalLayout>
 		<HorizontalLayout height="74" name="layGridHead" inset="5,2,5,2" >
+		
+			<VerticalLayout width="70">
+				<Control />
+				<HorizontalLayout height="30">								
+					<Option width="30" height="30" name="opn_grid_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="true" />								
+				</HorizontalLayout>
+				<Control />
+			</VerticalLayout>
+			
 			<Control />
 			
 			<!-- 床号图片 -->
@@ -12,46 +21,43 @@
 			</VerticalLayout>
 			
 			<!-- 大写的床位号 -->
-			<EditableButton name="cstEdtBtnBedNo" width="100" btncolor="#FFFFFF00" btnfont="4" editfont="4" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
+			<Button  name="btnBed"  textpadding="4,0,4,0" textcolor="#FFCCCCCC" text="01" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="110" font="6" tooltip="床号" />
 			<!-- 第几个Reader标志位 -->
 			<Label  name="lblReaderNo" text="A"  textcolor="#FFCCCCCC" width="30" font="4" />
 			<Control width="30" />
 			
-			<VerticalLayout width="100">
+			<!-- 病人姓名 -->
+			<VerticalLayout width="130" >
 				<Control />
-				<HorizontalLayout height="30">								
-					
+				<HorizontalLayout height="30">													
 					<Control bkimage="file='user.png' dest='0,2,30,27'"  width="30" tooltip="病人姓名" />
-					<EditableButton name="cstEdtBtnPatientName" width="100" btncolor="#FFFFFF00" btnfont="4" editfont="4" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
-					
-					<Label   name="lblCurTitle_1"  text="温度"    textcolor="#FFFFFFFF" width="40" font="1" visible="false" />
-					<Label   name="lblCur_1"   text="36.50"    textcolor="#FFFFFFFF" width="50" font="1" visible="false" />
+					<EditableButton name="cstEdtBtnPatientName" width="100" btncolor="#FFCCCCCC" btnfont="7" editfont="7" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
 				</HorizontalLayout>
-				<HorizontalLayout />
+				<Control />
 			</VerticalLayout>
 			
-			<VerticalLayout />
+			<Control />
 			
+			<!-- 状态标识 -->
 			<VerticalLayout width="30" >
-				<HorizontalLayout />
-				<HorizontalLayout height="30">																
-					<AlarmImage name="alarm_1" width="30" height="30" />
+				<Control />
+				<HorizontalLayout height="30">
+					<Control bkimage="disconnected.png" width="30" height="30" />
 				</HorizontalLayout>
-				<HorizontalLayout />
+				<Control />
 			</VerticalLayout>
 			
-			<VerticalLayout width="10" />
+			<Control width="10" />
 		</HorizontalLayout>
 		
 		
 		<HorizontalLayout inset="10,0,10,0">
-			<HorizontalLayout>
-				<MyLabel   name="lblCur_2"   text="35.64"    textcolor="#FFFFFFFF" font="12" align="center"  />
-			</HorizontalLayout>					
+			<!-- 显示温度和温度曲线 -->
+			<Label  name="lblTemperature"  text="35.64"  textcolor="#FFCCCCCC" font="4" align="center"  />
 			
 			<VerticalLayout width="80">
 				<Control />
-				<Label   name="lblCurTime_2"  height="30"  text="24小时前"  textcolor="#FFFFFFFF" font="101" align="center"   />
+				<Label   name="lblElapsed"  height="30"  text="180天前"  textcolor="#FFFFFFFF" font="5" align="center"   />
 			</VerticalLayout>					
 		</HorizontalLayout>	
 	</VerticalLayout>

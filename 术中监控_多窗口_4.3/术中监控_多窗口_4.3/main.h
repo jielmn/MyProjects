@@ -7,6 +7,8 @@ using namespace DuiLib;
 
 #include "resource.h"
 
+#include "GridUI.h"
+
 class CDuiFrameWnd : public WindowImplBase , public sigslot::has_slots<>
 {
 public:
@@ -58,7 +60,7 @@ private:
 
 	DuiLib::CTabLayoutUI *                      m_tabs;
 	DuiLib::CTileLayoutUI *                     m_layMain;
-	CControlUI *                                m_pGrids[MAX_GRID_COUNT];
+	CGridUI *                                   m_pGrids[MAX_GRID_COUNT];
 	CHorizontalLayoutUI *                       m_layPages;
 	CButtonUI *                                 m_btnPrevPage;
 	CButtonUI *                                 m_btnNextPage;

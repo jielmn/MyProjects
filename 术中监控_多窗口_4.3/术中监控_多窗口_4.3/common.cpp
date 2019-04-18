@@ -3,6 +3,7 @@
 #include <windows.h>  
 #include <setupapi.h>
 #include "common.h"
+#include "EditableButtonUI.h"
 
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
@@ -19,6 +20,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 		strText.Format("%s.xml", pstrClass);   
 		pUI = builder.Create((const char *)strText, (UINT)0, this, m_pManager);
 		return pUI;         
+	}
+	else if (0 == strcmp(pstrClass, "EditableButton")) {  
+		return new CEditableButtonUI; 
 	}
 	return NULL;
 }

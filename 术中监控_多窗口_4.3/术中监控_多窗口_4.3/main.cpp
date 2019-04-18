@@ -35,6 +35,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 
 	// 销毁grids
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		assert(m_pGrids[i]);
 		m_pGrids[i]->Delete();
 	}
 }
@@ -51,13 +52,13 @@ void  CDuiFrameWnd::InitWindow() {
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
-		CDialogBuilder builder;
-		m_pGrids[i] = builder.Create( GRID_XML_FILE, (UINT)0, &m_callback, &m_PaintManager );
+		m_pGrids[i] = new CGridUI;
 		m_pGrids[i]->SetBorderSize(GRID_BORDER_SIZE);
 		m_pGrids[i]->SetBorderColor(GRID_BORDER_COLOR);
 		m_pGrids[i]->SetName(GRID_NAME);
 		m_pGrids[i]->SetTag(i);
-		m_pGrids[i]->SetVisible(true); 
+
+		m_pGrids[i]->SetBedNo(i + 1);
 	}
 	/*************  end 获取控件 *****************/
 
