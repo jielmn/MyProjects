@@ -41,6 +41,7 @@ using namespace DuiLib;
 #define   BTN_BED_NO              "btnBed"
 #define   LBL_READER_NO           "lblReaderNo"
 #define   GRID_TABS               "gridtabs"
+#define   DRAG_DROP_GRID          "cstDragDropGrid"
 
 
 // CONFIG

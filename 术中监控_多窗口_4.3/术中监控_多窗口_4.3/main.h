@@ -8,6 +8,7 @@ using namespace DuiLib;
 #include "resource.h"
 
 #include "GridUI.h"
+#include "DragDropUI.h"
 
 class CDuiFrameWnd : public WindowImplBase , public sigslot::has_slots<>
 {
@@ -45,6 +46,9 @@ public:
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual void     OnFinalMessage(HWND hWnd);
 	virtual LRESULT  OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	virtual LRESULT  OnLButtonDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
+	virtual LRESULT  OnLButtonUp(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
+	virtual LRESULT  OnMouseMove(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 
 private:
 	void   RemoveAllGrids();
@@ -70,4 +74,9 @@ private:
 	CHorizontalLayoutUI *                       m_layPages;
 	CButtonUI *                                 m_btnPrevPage;
 	CButtonUI *                                 m_btnNextPage;
+
+	/**** drag drop操作  ****/
+	int                                         m_nDgSourceIndex;         // drag drop 开始拖动的grid index
+	int                                         m_nDgDestIndex;           // drag drop 拖动的目标grid index
+	CDragDropUI *                               m_dragdropGrid;
 };

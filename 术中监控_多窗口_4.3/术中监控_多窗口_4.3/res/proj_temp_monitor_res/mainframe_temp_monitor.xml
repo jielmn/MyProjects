@@ -77,5 +77,7 @@
 			<Control width="1" bkimage="sep.png" />
 			<Control width="10" />
 		</HorizontalLayout>
+		
+		<DragDrop name="cstDragDropGrid" float="true" pos="100,100,200,200" visible="false" bkcolor="#FFFFFFFF" />
 	</VerticalLayout>
 </Window>

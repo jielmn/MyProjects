@@ -10,12 +10,20 @@
 #include "business.h"
 #include "resource.h"
 
-CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
+CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
+	m_dwCurGridIndex = 0;
+	m_eGridStatus = GRID_STATUS_GRIDS;
+
 	m_tabs = 0;
 	m_layMain = 0;
 	memset(m_pGrids, 0, sizeof(m_pGrids));
-	m_dwCurGridIndex = 0;
-	m_eGridStatus = GRID_STATUS_GRIDS;
+	m_layPages = 0;
+	m_btnPrevPage = 0;
+	m_btnNextPage = 0;
+
+	m_nDgSourceIndex = -1;
+	m_nDgDestIndex = -1;
+	m_dragdropGrid = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -49,6 +57,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layPages = static_cast<DuiLib::CHorizontalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_PAGES));
 	m_btnPrevPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_PREV_PAGE));
 	m_btnNextPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_NEXT_PAGE));
+	m_dragdropGrid = static_cast<CDragDropUI *>(m_PaintManager.FindControl(DRAG_DROP_GRID));
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
@@ -80,6 +89,9 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 		strText.Format("%s.xml", pstrClass);
 		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
+	}
+	else if (0 == strcmp("DragDrop", pstrClass)) {
+		return new CDragDropUI;
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
@@ -122,6 +134,60 @@ LRESULT  CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 	RefreshGridsSize(dwWidth, dwHeight);
 
 	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	POINT pt;
+	pt.x = LOWORD(lParam);
+	pt.y = HIWORD(lParam);
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(0, pt);
+	// 如果没有点击到任何控件
+	if (0 == pCtl) {
+		return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
+	}
+
+	// 保存原始点击的控件
+	CControlUI* pOriginalCtl = pCtl;
+
+	while (pCtl) {
+		if (pCtl->GetName() == GRID_NAME) {
+			// 如果不是点击修改名字按钮
+			if ( 0 != strcmp(pOriginalCtl->GetClass(), "Button") ) {
+				m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
+				m_nDgDestIndex = -1;
+			}
+			break;
+		}
+		pCtl = pCtl->GetParent();
+	}
+	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (m_nDgSourceIndex >= 0) {
+		if ( !m_dragdropGrid->IsVisible() ) {
+			m_dragdropGrid->SetVisible(true); 
+
+			POINT pt;
+			pt.x = LOWORD(lParam);
+			pt.y = HIWORD(lParam);
+
+			int x = 100 / 2;
+			int y = 100 / 2;
+
+			RECT r;
+			r.left = pt.x - x;
+			r.right = r.left + x * 2;
+			r.top = pt.y - y;
+			r.bottom = r.top + y * 2;
+			m_dragdropGrid->SetPos(r);
+		}
+	}
+	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
 }
 
 // 更新grids一页(比如点击了"上一页", "下一页"，初始化等等)
@@ -296,7 +362,7 @@ void  CDuiFrameWnd::OnDbClick() {
 		pFindControl = pFindControl->GetParent();
 	}
 }
-
+ 
 
 
 
