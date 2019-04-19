@@ -41,7 +41,8 @@ using namespace DuiLib;
 #define   BTN_BED_NO              "btnBed"
 #define   LBL_READER_NO           "lblReaderNo"
 #define   GRID_TABS               "gridtabs"
-#define   DRAG_DROP_GRID          "cstDragDropGrid"
+#define   DRAG_DROP_GRID          "DragDropGrid"
+#define   GRID_HILIGHT_BORDER_COLOR 0xFFCAF100
 
 
 // CONFIG
@@ -126,6 +127,8 @@ extern CGlobalData  g_data;
 
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 extern DWORD GetGridOrderByGridId(DWORD  dwId);
+extern char * GetDefaultGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt);
+extern char * GetGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt, DWORD * pOrder);
 
 // templates
 template <class T>

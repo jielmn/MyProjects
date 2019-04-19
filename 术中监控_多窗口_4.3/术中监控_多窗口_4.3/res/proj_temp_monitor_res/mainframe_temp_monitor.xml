@@ -78,6 +78,6 @@
 			<Control width="10" />
 		</HorizontalLayout>
 		
-		<DragDrop name="cstDragDropGrid" float="true" pos="100,100,200,200" visible="false" bkcolor="#FFFFFFFF" />
+		<Control name="DragDropGrid" float="true" pos="100,100,200,200" visible="false" bkcolor="#AA000000" />
 	</VerticalLayout>
 </Window>

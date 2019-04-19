@@ -11,7 +11,7 @@
 #include "resource.h"
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
-	m_dwCurGridIndex = 0;
+	m_dwCurSelGridIndex = 0;
 	m_eGridStatus = GRID_STATUS_GRIDS;
 
 	m_tabs = 0;
@@ -57,7 +57,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layPages = static_cast<DuiLib::CHorizontalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_PAGES));
 	m_btnPrevPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_PREV_PAGE));
 	m_btnNextPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_NEXT_PAGE));
-	m_dragdropGrid = static_cast<CDragDropUI *>(m_PaintManager.FindControl(DRAG_DROP_GRID));
+	m_dragdropGrid = m_PaintManager.FindControl(DRAG_DROP_GRID); 
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
@@ -164,30 +164,141 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 }
 
 LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (m_nDgSourceIndex >= 0) {
+		StopMoveGrid();
+	}
 	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
 }
 
 LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (m_nDgSourceIndex >= 0) {
-		if ( !m_dragdropGrid->IsVisible() ) {
-			m_dragdropGrid->SetVisible(true); 
-
-			POINT pt;
-			pt.x = LOWORD(lParam);
-			pt.y = HIWORD(lParam);
-
-			int x = 100 / 2;
-			int y = 100 / 2;
-
-			RECT r;
-			r.left = pt.x - x;
-			r.right = r.left + x * 2;
-			r.top = pt.y - y;
-			r.bottom = r.top + y * 2;
-			m_dragdropGrid->SetPos(r);
-		}
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		MoveGrid(pt);
 	}
 	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+}
+
+// 移动格子，调整顺序
+void   CDuiFrameWnd::MoveGrid(const POINT & pt) {
+	if (!m_dragdropGrid->IsVisible()) {
+		m_dragdropGrid->SetVisible(true);
+	}
+
+	int x = 100 / 2;
+	int y = 100 / 2;
+
+	RECT r;
+	r.left   = pt.x - x;
+	r.right  = r.left + x * 2;
+	r.top    = pt.y - y;
+	r.bottom = r.top + y * 2;
+	m_dragdropGrid->SetPos(r);
+
+	// 高亮经过的格子
+	OnMoveGrid(pt);
+}
+
+// 格子移动过程中，经过的格子要高亮
+void   CDuiFrameWnd::OnMoveGrid(const POINT & pt) {
+	RECT rect   = m_layMain->GetPos();
+	int nWidth  = rect.right - rect.left;
+	int nHeight = rect.bottom - rect.top;
+
+	if ( nWidth <= 0 || nHeight <= 0 ) {
+		return;
+	}
+
+	assert(g_data.m_CfgData.m_dwLayoutColumns > 0);
+	assert(g_data.m_CfgData.m_dwLayoutRows > 0);
+
+	// 每页多少grids
+	DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	// 当前页index
+	DWORD   dwGridPageIndex = m_dwCurSelGridIndex / dwCntPerPage;
+	// 当前页的第一个grid index
+	DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
+	// 当前页的最大grid index
+	DWORD   dwMaxGridIndex = dwFirstGridIndexCurPage + dwCntPerPage < g_data.m_CfgData.m_dwLayoutGridsCnt
+		? dwFirstGridIndexCurPage + dwCntPerPage : g_data.m_CfgData.m_dwLayoutGridsCnt;
+
+	// 超出了范围
+	if ( pt.x <= rect.left || pt.x >= rect.right || pt.y <= rect.top || pt.y >= rect.bottom ) {	
+		if (m_nDgDestIndex >= 0) {
+			m_pGrids[g_data.m_CfgData.m_GridOrder[m_nDgDestIndex]]->SetBorderColor(GRID_BORDER_COLOR);
+		}
+		m_nDgDestIndex = -1;
+		return;
+	}
+
+	SIZE s = m_layMain->GetItemSize();
+	for ( DWORD i = dwFirstGridIndexCurPage; i < dwMaxGridIndex; i++ ) {
+		int  nRowIndex = (i - dwFirstGridIndexCurPage) / g_data.m_CfgData.m_dwLayoutColumns;
+		int  nColIndex = (i - dwFirstGridIndexCurPage) % g_data.m_CfgData.m_dwLayoutColumns;
+		if ((pt.x > rect.left + s.cx * nColIndex) && (pt.x < rect.left + s.cx * (nColIndex + 1))
+			&& (pt.y > rect.top + s.cy * nRowIndex) && (pt.y < rect.top + s.cy * (nRowIndex + 1))) {
+			m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetBorderColor(GRID_HILIGHT_BORDER_COLOR);
+			m_nDgDestIndex = i;
+		}
+		else {
+			m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetBorderColor(GRID_BORDER_COLOR);
+		}
+	}
+}
+
+// 停止移动格子，确定最终位置
+void  CDuiFrameWnd::StopMoveGrid() {
+	m_dragdropGrid->SetVisible(false);
+
+	// 没有选定要拖动的位置
+	if (m_nDgDestIndex < 0) {
+		m_nDgSourceIndex = -1;
+		m_nDgDestIndex = -1;
+		return;
+	}
+
+	// 取消高亮的border
+	assert(m_nDgDestIndex < (int)g_data.m_CfgData.m_dwLayoutGridsCnt);
+	m_pGrids[g_data.m_CfgData.m_GridOrder[m_nDgDestIndex]]->SetBorderColor(GRID_BORDER_COLOR);
+
+	// 如果source和dest相等
+	if (m_nDgSourceIndex == m_nDgDestIndex) {
+		m_nDgSourceIndex = -1;
+		m_nDgDestIndex = -1;
+		return;
+	}
+
+	// 例如：grid 2拖到grid 4位置
+	// 新位置排序: 1, 3, 4, 2
+	if ( m_nDgSourceIndex < m_nDgDestIndex ) {
+		DWORD  dwSourceId = g_data.m_CfgData.m_GridOrder[m_nDgSourceIndex];
+		for ( int i = m_nDgSourceIndex; i < m_nDgDestIndex; i++ ) {
+			g_data.m_CfgData.m_GridOrder[i] = g_data.m_CfgData.m_GridOrder[i + 1];
+		}
+		g_data.m_CfgData.m_GridOrder[m_nDgDestIndex] = dwSourceId;
+		m_dwCurSelGridIndex = m_nDgDestIndex;
+	}
+	else {
+		DWORD  dwSourceId = g_data.m_CfgData.m_GridOrder[m_nDgSourceIndex];
+		for (int i = m_nDgSourceIndex; i > m_nDgDestIndex; i--) {
+			g_data.m_CfgData.m_GridOrder[i] = g_data.m_CfgData.m_GridOrder[i - 1];
+		}
+		g_data.m_CfgData.m_GridOrder[m_nDgDestIndex] = dwSourceId;
+		m_dwCurSelGridIndex = m_nDgDestIndex;
+	}
+	RefreshGridsPage();
+
+	char szDefaultOrder[256];	
+	GetDefaultGridOrder(szDefaultOrder, sizeof(szDefaultOrder), g_data.m_CfgData.m_dwLayoutGridsCnt);
+
+	char szOrder[256];
+	GetGridOrder(szOrder, sizeof(szOrder), g_data.m_CfgData.m_dwLayoutGridsCnt, g_data.m_CfgData.m_GridOrder);
+
+	g_data.m_cfg->SetConfig ( CFG_GRIDS_ORDER, szOrder, szDefaultOrder );
+
+	m_nDgSourceIndex = -1;
+	m_nDgDestIndex = -1;
 }
 
 // 更新grids一页(比如点击了"上一页", "下一页"，初始化等等)
@@ -202,7 +313,7 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 		// 每页多少grids
 		DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
 		// 当前页index
-		DWORD   dwGridPageIndex = m_dwCurGridIndex / dwCntPerPage;
+		DWORD   dwGridPageIndex = m_dwCurSelGridIndex / dwCntPerPage;
 		// 当前页的第一个grid index
 		DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
 		// 当前页的最大grid index
@@ -243,7 +354,7 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 		// 设定固定列数
 		m_layMain->SetFixedColumns(1);
 		// 添加单个窗格
-		m_layMain->Add(m_pGrids[g_data.m_CfgData.m_GridOrder[m_dwCurGridIndex]]);
+		m_layMain->Add(m_pGrids[g_data.m_CfgData.m_GridOrder[m_dwCurSelGridIndex]]);
 		// 关闭上下页
 		m_layPages->SetVisible(false);
 	}
@@ -289,11 +400,11 @@ void   CDuiFrameWnd::NextPage() {
 	// 每页多少grids
 	DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
 	// 当前页index
-	DWORD   dwGridPageIndex = m_dwCurGridIndex / dwCntPerPage;
+	DWORD   dwGridPageIndex = m_dwCurSelGridIndex / dwCntPerPage;
 	// 当前页的第一个grid index
 	DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
 	// 下一页的第一grid index，并修改当前的grid index
-	m_dwCurGridIndex = dwFirstGridIndexCurPage + dwCntPerPage;
+	m_dwCurSelGridIndex = dwFirstGridIndexCurPage + dwCntPerPage;
 
 	RefreshGridsPage();
 }
@@ -302,13 +413,13 @@ void   CDuiFrameWnd::PrevPage() {
 	// 每页多少grids
 	DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
 	// 当前页index
-	DWORD   dwGridPageIndex = m_dwCurGridIndex / dwCntPerPage;
+	DWORD   dwGridPageIndex = m_dwCurSelGridIndex / dwCntPerPage;
 	// 当前页的第一个grid index
 	DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
 
 	// 上一页的第一grid index，并修改当前的grid index
 	assert(dwFirstGridIndexCurPage >= dwCntPerPage);
-	m_dwCurGridIndex = dwFirstGridIndexCurPage - dwCntPerPage;
+	m_dwCurSelGridIndex = dwFirstGridIndexCurPage - dwCntPerPage;
 
 	RefreshGridsPage();
 }
@@ -344,7 +455,7 @@ void  CDuiFrameWnd::OnDbClick() {
 			if (m_eGridStatus == GRID_STATUS_GRIDS) {
 				// 找到序号
 				DWORD dwGridIndex = GetGridOrderByGridId(pFindControl->GetTag());
-				m_dwCurGridIndex = dwGridIndex;
+				m_dwCurSelGridIndex = dwGridIndex;
 				m_eGridStatus = GRID_STATUS_MAXIUM;
 			}
 			else {

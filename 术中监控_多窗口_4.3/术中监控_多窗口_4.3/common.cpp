@@ -91,3 +91,41 @@ DWORD GetGridOrderByGridId(DWORD  dwId) {
 	assert(0);
 	return -1;
 }
+
+char * GetDefaultGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt) {
+	assert(buf);
+	assert(dwGridsCnt > 0);
+
+	CDuiString  strText;
+	for (DWORD i = 0; i < dwGridsCnt; i++) {
+		CDuiString strTmp;
+		strTmp.Format("%lu", i+1);
+
+		if (i > 0)
+			strText += ",";
+
+		strText += strTmp;
+	}
+
+	STRNCPY(buf, strText, dwBufLen);
+	return buf;
+}
+
+char * GetGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt, DWORD * pOrder) {
+	assert(buf);
+	assert(dwGridsCnt > 0);
+
+	CDuiString  strText;
+	for (DWORD i = 0; i < dwGridsCnt; i++) {
+		CDuiString strTmp;
+		strTmp.Format("%lu", pOrder[i]+1);
+
+		if (i > 0)
+			strText += ",";
+
+		strText += strTmp;
+	}
+
+	STRNCPY(buf, strText, dwBufLen);
+	return buf;
+}

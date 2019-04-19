@@ -62,10 +62,16 @@ private:
 	void   PrevPage();
 	// 双击事件
 	void   OnDbClick();
+	// 移动格子，调整顺序
+	void   MoveGrid(const POINT & pt);
+	// 停止移动格子，确定最终位置
+	void   StopMoveGrid();
+	// 格子移动过程中，经过的格子要高亮
+	void   OnMoveGrid(const POINT & pt);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
-	DWORD                                       m_dwCurGridIndex;         // 当前的格子序号
+	DWORD                                       m_dwCurSelGridIndex;      // 当前选择的格子序号
 	ENUM_GRID_STATUS                            m_eGridStatus;            // 多格子态，还是最大化的单个格子
 
 	DuiLib::CTabLayoutUI *                      m_tabs;
@@ -78,5 +84,5 @@ private:
 	/**** drag drop操作  ****/
 	int                                         m_nDgSourceIndex;         // drag drop 开始拖动的grid index
 	int                                         m_nDgDestIndex;           // drag drop 拖动的目标grid index
-	CDragDropUI *                               m_dragdropGrid;
+	CControlUI *                                m_dragdropGrid;
 };
