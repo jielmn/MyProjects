@@ -10,6 +10,9 @@
 #include "business.h"
 #include "resource.h"
 
+#define   TIMER_DRAG_DROP_GRID                   1001
+#define   INTERVAL_TIMER_DRAG_DROP_GRIDS         1500
+
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
 	m_dwCurSelGridIndex = 0;
 	m_eGridStatus = GRID_STATUS_GRIDS;
@@ -24,6 +27,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_nDgSourceIndex = -1;
 	m_nDgDestIndex = -1;
 	m_dragdropGrid = 0;
+	m_bDragTimer = FALSE;
+	m_bFlipPrevPage = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -122,6 +127,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_LBUTTONDBLCLK) {
 		OnDbClick();
+	}
+	else if (uMsg == WM_TIMER) {
+		if (wParam == TIMER_DRAG_DROP_GRID) {
+			OnFlipPage();
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -229,6 +239,51 @@ void   CDuiFrameWnd::OnMoveGrid(const POINT & pt) {
 			m_pGrids[g_data.m_CfgData.m_GridOrder[m_nDgDestIndex]]->SetBorderColor(GRID_BORDER_COLOR);
 		}
 		m_nDgDestIndex = -1;
+
+		// 如果是垂直方向超出范围，水平方向没有超出
+		if ( pt.x > rect.left && pt.x < rect.right ) {
+			// 进入了确定区域，关闭Timer
+			if (m_bDragTimer) {
+				KillTimer( GetHWND(), TIMER_DRAG_DROP_GRID );
+				m_bDragTimer = FALSE;
+			}
+		}
+		// 如果是水平方向超出范围，垂直方向没有超出
+		else if (pt.y > rect.top && pt.y < rect.bottom) {
+			// 可能上下翻页，需要开启定时器
+			// 向前翻页
+			if ( pt.x <= rect.left ) {
+				// 如果可以向前翻页
+				if ( dwGridPageIndex > 0) {
+					// 如果没有开启定时器
+					if (!m_bDragTimer) {
+						SetTimer(GetHWND(), TIMER_DRAG_DROP_GRID, INTERVAL_TIMER_DRAG_DROP_GRIDS, 0);
+						m_bDragTimer = TRUE;
+						m_bFlipPrevPage = TRUE;
+					}
+				}				
+			}
+			// 向后翻页
+			else if (pt.x >= rect.right) {
+				// 可以向后翻页
+				if ( dwMaxGridIndex < g_data.m_CfgData.m_dwLayoutGridsCnt - 1 ) {
+					// 如果没有开启定时器
+					if (!m_bDragTimer) {
+						SetTimer(GetHWND(), TIMER_DRAG_DROP_GRID, INTERVAL_TIMER_DRAG_DROP_GRIDS, 0);
+						m_bDragTimer = TRUE;
+						m_bFlipPrevPage = FALSE;
+					}
+				}
+			}
+		}
+		// 水平和垂直方向都超出范围
+		else {
+			// 进入了确定区域，关闭Timer
+			if (m_bDragTimer) {
+				KillTimer(GetHWND(), TIMER_DRAG_DROP_GRID);
+				m_bDragTimer = FALSE;
+			}
+		}
 		return;
 	}
 
@@ -245,11 +300,15 @@ void   CDuiFrameWnd::OnMoveGrid(const POINT & pt) {
 			m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetBorderColor(GRID_BORDER_COLOR);
 		}
 	}
+	KillTimer(GetHWND(), TIMER_DRAG_DROP_GRID);
+	m_bDragTimer = FALSE;
 }
 
 // 停止移动格子，确定最终位置
 void  CDuiFrameWnd::StopMoveGrid() {
 	m_dragdropGrid->SetVisible(false);
+	KillTimer(GetHWND(), TIMER_DRAG_DROP_GRID);
+	m_bDragTimer = FALSE;
 
 	// 没有选定要拖动的位置
 	if (m_nDgDestIndex < 0) {
@@ -299,6 +358,40 @@ void  CDuiFrameWnd::StopMoveGrid() {
 
 	m_nDgSourceIndex = -1;
 	m_nDgDestIndex = -1;
+}
+
+// 拖动格子过程中，拖到最左或最右，导致翻页
+void  CDuiFrameWnd::OnFlipPage() {
+	// 每页多少grids
+	DWORD   dwCntPerPage = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	// 当前页index
+	DWORD   dwGridPageIndex = m_dwCurSelGridIndex / dwCntPerPage;
+	// 当前页的第一个grid index
+	DWORD   dwFirstGridIndexCurPage = dwGridPageIndex * dwCntPerPage;
+	// 当前页的最大grid index
+	DWORD   dwMaxGridIndex = dwFirstGridIndexCurPage + dwCntPerPage < g_data.m_CfgData.m_dwLayoutGridsCnt
+		? dwFirstGridIndexCurPage + dwCntPerPage : g_data.m_CfgData.m_dwLayoutGridsCnt;
+
+	if (m_bFlipPrevPage) {
+		if ( dwGridPageIndex > 0 ) {
+			m_dwCurSelGridIndex = dwFirstGridIndexCurPage - dwCntPerPage;
+			RefreshGridsPage();
+		}
+		else {
+			KillTimer(GetHWND(), TIMER_DRAG_DROP_GRID);
+			m_bDragTimer = FALSE;
+		}
+	}
+	else {
+		if ( dwMaxGridIndex < g_data.m_CfgData.m_dwLayoutGridsCnt - 1 ) {
+			m_dwCurSelGridIndex = dwFirstGridIndexCurPage + dwCntPerPage;
+			RefreshGridsPage();
+		}
+		else {
+			KillTimer(GetHWND(), TIMER_DRAG_DROP_GRID);
+			m_bDragTimer = FALSE;
+		}
+	}
 }
 
 // 更新grids一页(比如点击了"上一页", "下一页"，初始化等等)

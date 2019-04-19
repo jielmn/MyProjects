@@ -68,6 +68,8 @@ private:
 	void   StopMoveGrid();
 	// 格子移动过程中，经过的格子要高亮
 	void   OnMoveGrid(const POINT & pt);
+	// 拖动格子过程中，拖到最左或最右，导致翻页
+	void   OnFlipPage();
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
@@ -85,4 +87,7 @@ private:
 	int                                         m_nDgSourceIndex;         // drag drop 开始拖动的grid index
 	int                                         m_nDgDestIndex;           // drag drop 拖动的目标grid index
 	CControlUI *                                m_dragdropGrid;
+	// 添加定时器，完成跨页间的格子拖动
+	BOOL                                        m_bDragTimer;
+	BOOL                                        m_bFlipPrevPage;
 };
