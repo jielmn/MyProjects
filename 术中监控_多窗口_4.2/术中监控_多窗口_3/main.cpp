@@ -1626,6 +1626,61 @@ void   CDuiFrameWnd::OnReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	
 	delete pTemp;
 }           
+
+void   CDuiFrameWnd::OnReaderTemp_1(DWORD  dwIndex, DWORD  dwSubIndex, LastTemp * pTemp) {
+	DWORD  dwTemp = pTemp->m_dwTemp;
+
+	m_tLastTemp[dwIndex][dwSubIndex].m_Time = pTemp->m_Time;
+	m_tLastTemp[dwIndex][dwSubIndex].m_dwTemp = pTemp->m_dwTemp;
+
+	{
+		CAlarmImageUI::ENUM_ALARM e = CAlarmImageUI::ALARM_OK;
+		if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
+			e = CAlarmImageUI::HIGH_TEMP;
+		}
+		else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm) {
+			e = CAlarmImageUI::LOW_TEMP;
+		}
+		else {
+			e = CAlarmImageUI::ALARM_OK;
+		}
+
+		if (dwSubIndex == m_MyImage_max[dwIndex]->m_dwSelectedReaderIndex) {
+			if (e == CAlarmImageUI::HIGH_TEMP) {
+				m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+			}
+			else if (e == CAlarmImageUI::LOW_TEMP) {
+				m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+			}
+			else {
+				m_LblCurTemp_grid1[dwIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+			}
+
+			DuiLib::CDuiString  strText;
+			strText.Format("%.2f¡æ", dwTemp / 100.0);
+			m_LblCurTemp_grid[dwIndex]->SetText(strText);
+			m_LblCurTemp_grid1[dwIndex]->SetText(strText);
+		}
+	}
+
+	if (dwTemp > g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwHighTempAlarm) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::HIGH_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else if (dwTemp < g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[dwSubIndex].m_dwLowTempAlarm) {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::LOW_TEMP_ALARM_TEXT_COLOR]);
+	}
+	else {
+		m_UiReaderTemp[dwIndex][dwSubIndex]->SetTextColor(g_data.m_skin[CMySkin::NORMAL_TEMP_TEXT_COLOR]);
+	}
+
+	DuiLib::CDuiString  strText;
+	strText.Format("%.2f¡æ", dwTemp / 100.0);
+	m_UiReaderTemp[dwIndex][dwSubIndex]->SetText(strText);
+
+	//m_lblProcTips->SetText("");
+	//m_LblReaderId[dwIndex][dwSubIndex]->SetText(pTemp->m_szReaderId);
+	//m_LblTagId[dwIndex][dwSubIndex]->SetText(pTemp->m_szTagId);
+}
  
 void   CDuiFrameWnd::OnReaderDisconnected(WPARAM wParam, LPARAM  lParam) {
 	DuiLib::CDuiString  strText;
@@ -2191,6 +2246,15 @@ void   CDuiFrameWnd::OnTempSqliteRet(WPARAM wParam, LPARAM  lParam) {
 
 	m_MyImage_max[dwIndex]->OnTempSqliteRet(*pvRet, dwSubIndex);
 	m_MyImage_max[dwIndex]->MyInvalidate();
+
+	if (pvRet->size() > 0) {
+		LastTemp t;
+		memset(&t, 0, sizeof(LastTemp));
+		TempData* pItem = pvRet->at(pvRet->size() - 1);
+		t.m_dwTemp = pItem->dwTemperature;
+		t.m_Time = pItem->tTime;
+		OnReaderTemp_1(dwIndex, dwSubIndex, &t);
+	}
 
 	::InvalidateRect(GetHWND(), 0, TRUE);
 	// ClearVector(*pvRet);

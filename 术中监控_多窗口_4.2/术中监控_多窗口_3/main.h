@@ -153,6 +153,8 @@ private:
 	void   OnTemp(DWORD dwIndex, DWORD dwSubIndex, DWORD dwTemp, BOOL bChangeAlarm = TRUE);
 	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
 	void   OnReaderTemp(WPARAM wParam, LPARAM  lParam);
+	// 用在查询历史记录后，显示最后一次温度
+	void   OnReaderTemp_1(DWORD  dwIndex, DWORD  dwSubIndex, LastTemp * pTemp);
 	void   OnReaderDisconnected(WPARAM wParam, LPARAM  lParam);
 	// 鼠轮
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
