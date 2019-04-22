@@ -34,7 +34,7 @@
 				<Control bkcolor="#FFFFFFFF"  />				
 			</HorizontalLayout>
 			<HorizontalLayout height="20" inset="35,0,35,0" bkcolor="#FFFFFFFF" >
-				<Label text="版本号：2.0.1(2019.04.15)" bkcolor="#FFFFFFFF" />
+				<Label text="版本号：2.0.2(2019.04.22)" bkcolor="#FFFFFFFF" />
 			</HorizontalLayout>
 		</VerticalLayout>
 		
