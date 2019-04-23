@@ -92,6 +92,7 @@ private:
 	/**** drag drop操作  ****/
 	int                                         m_nDgSourceIndex;         // drag drop 开始拖动的grid index
 	int                                         m_nDgDestIndex;           // drag drop 拖动的目标grid index
+	DWORD                                       m_dwDgStartTick;          // drag drop 开始的时间
 	CControlUI *                                m_dragdropGrid;
 	// 添加定时器，完成跨页间的格子拖动
 	BOOL                                        m_bDragTimer;

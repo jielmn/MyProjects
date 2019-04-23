@@ -26,6 +26,7 @@ using namespace DuiLib;
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
 #define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
 #define   MAX_ROWS_COUNT           5              // 每个页面最大几行
+#define   DRAG_DROP_DELAY_TIME     100            // drag drop操作的延时时间
 
 #define   VERSION                  "3.0.1"
 
@@ -50,6 +51,8 @@ using namespace DuiLib;
 #define   LBL_VERSION             "lblVersion"
 #define   MYTREE_CLASS_NAME       "MyTree"
 #define   MYTREE_CONFIG_NAME      "CfgTree"
+#define   SETTING_FRAME_NAME      "DUISettingFrame"
+#define   SETTING_FILE            "Setting.xml"
 
 
 // CONFIG
@@ -60,6 +63,38 @@ using namespace DuiLib;
 #define   CFG_MAIN_LAYOUT_GRIDS_COUNT       "main layout grids count"
 #define   DEFAULT_MAIN_LAYOUT_GRIDS_COUNT   4
 #define   CFG_GRIDS_ORDER                   "grids order"
+#define   AREA_CFG_FILE_NAME                "area.cfg"
+#define   MAX_AREA_COUNT                    20
+#define   CFG_AREA_NAME                     "area name"
+#define   CFG_AREA_NO                       "area no"
+#define   MAX_AREA_ID                       100
+#define   CFG_AREA_ID_NAME                  "area id"
+#define   CFG_ALARM_VOICE_SWITCH            "alarm voice switch"
+#define   DEFAULT_ALARM_VOICE_SWITCH        TRUE
+#define   CFG_AUTO_SAVE_EXCEL               "auto save excel"
+#define   CFG_CROSS_ANCHOR                  "cross anchor"
+#define   MIN_TEMP_IN_SHOW                  20
+#define   MAX_TEMP_IN_SHOW                  42
+#define   DEFAULT_MIN_TEMP_IN_SHOW          28
+#define   DEFAULT_MAX_TEMP_IN_SHOW          40
+#define   LOW_TEMP_ALARM                    2000
+#define   HIGH_TEMP_ALARM                   4200
+#define   DEFAULT_LOW_TEMP_ALARM            3500
+#define   DEFAULT_HIGH_TEMP_ALARM           3800
+#define   CFG_HAND_MIN_TEMP_IN_SHOW         "hand min temperature"
+#define   CFG_HAND_MAX_TEMP_IN_SHOW         "hand max temperature"
+#define   CFG_HAND_LOW_TEMP_ALARM           "hand low temperature alarm"
+#define   CFG_HAND_HIGH_TEMP_ALARM          "hand max temperature alarm"
+#define   CFG_GRID_SWITCH                   "grid switch"
+#define   DEFAULT_GRID_SWITCH               FALSE
+#define   CFG_COLLECT_INTERVAL              "collect interval"
+#define   MAX_COLLECT_INTERVAL_INDEX        6
+#define   CFG_GRID_MIN_TEMP                 "grid min temperature"
+#define   CFG_GRID_MAX_TEMP                 "grid max temperature"
+#define   CFG_READER_SWITCH                 "reader switch"
+#define   DEFAULT_READER_SWITCH             FALSE
+#define   CFG_LOW_TEMP_ALARM                "low temperature alarm"
+#define   CFG_HIGH_TEMP_ALARM               "high temperature alarm"
 
 // thread消息
 
@@ -79,6 +114,12 @@ public:
 private:
 	DuiLib::CPaintManagerUI *  m_pManager;
 };
+
+#define  MAX_AREA_NAME_LENGTH   64
+typedef struct tagArea {
+	char   szAreaName[MAX_AREA_NAME_LENGTH];
+	DWORD  dwAreaNo;
+}TArea;
 
 // 术中读卡器
 typedef struct tagReaderCfg
@@ -131,6 +172,7 @@ public:
 };
 
 extern CGlobalData  g_data;
+extern std::vector<TArea *>  g_vArea;
 
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 extern DWORD GetGridOrderByGridId(DWORD  dwId);

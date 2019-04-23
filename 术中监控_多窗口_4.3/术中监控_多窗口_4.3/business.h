@@ -20,7 +20,12 @@ public:
 private:
 	static CBusiness *  pInstance;
 	void Clear();
+	// 窗格顺序配置
 	void GetGridsOrderCfg();
+	// 病区配置
+	void GetAreaCfg();
+	// 床位的配置
+	void GetGridsCfg();
 
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);

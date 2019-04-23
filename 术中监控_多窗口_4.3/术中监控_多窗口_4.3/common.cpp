@@ -10,6 +10,7 @@
 
 
 CGlobalData  g_data;
+std::vector<TArea *>  g_vArea;
 
 CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	DuiLib::CDialogBuilder builder;

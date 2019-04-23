@@ -34,6 +34,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_bFlipPrevPage = FALSE;
 
 	m_btnMenu = 0;
+	m_dwDgStartTick = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -180,6 +181,7 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 			if ( 0 != strcmp(pOriginalCtl->GetClass(), "Button") ) {
 				m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
 				m_nDgDestIndex = -1;
+				m_dwDgStartTick = LmnGetTickCount();
 			}
 			break;
 		}
@@ -197,6 +199,11 @@ LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
 LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (m_nDgSourceIndex >= 0) {
+		DWORD dwCurTick = LmnGetTickCount();
+		if (dwCurTick - m_dwDgStartTick < DRAG_DROP_DELAY_TIME) {
+			return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+		}
+
 		POINT pt;
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
@@ -599,8 +606,8 @@ void  CDuiFrameWnd::OnSetting() {
 	BOOL   bValue = FALSE;
 
 	CfgData  oldData = g_data.m_CfgData;
-
 	CSettingDlg * pSettingDlg = new CSettingDlg;
+	pSettingDlg->m_data = g_data.m_CfgData;
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSettingDlg->CenterWindow();
 	int ret = pSettingDlg->ShowModal();
@@ -610,6 +617,32 @@ void  CDuiFrameWnd::OnSetting() {
 		delete pSettingDlg;
 		return;
 	}
+
+	g_data.m_CfgData = pSettingDlg->m_data;
+
+	dwValue = DEFAULT_MAIN_LAYOUT_COLUMNS;
+	g_data.m_cfg->SetConfig(CFG_MAIN_LAYOUT_COLUMNS, g_data.m_CfgData.m_dwLayoutColumns, &dwValue);
+
+	dwValue = DEFAULT_MAIN_LAYOUT_ROWS;
+	g_data.m_cfg->SetConfig(CFG_MAIN_LAYOUT_ROWS, g_data.m_CfgData.m_dwLayoutRows, &dwValue);
+
+	dwValue = DEFAULT_MAIN_LAYOUT_GRIDS_COUNT;
+	g_data.m_cfg->SetConfig(CFG_MAIN_LAYOUT_GRIDS_COUNT, g_data.m_CfgData.m_dwLayoutGridsCnt, &dwValue);
+
+	dwValue = 0;
+	g_data.m_cfg->SetConfig(CFG_AREA_ID_NAME, g_data.m_CfgData.m_dwAreaNo, &dwValue);
+
+	// 报警声音开关
+	bValue = DEFAULT_ALARM_VOICE_SWITCH;
+	g_data.m_cfg->SetBooleanConfig(CFG_ALARM_VOICE_SWITCH, g_data.m_CfgData.m_bAlarmVoiceOff, &bValue);
+
+	// 自动保存excel
+	bValue = FALSE;
+	g_data.m_cfg->SetBooleanConfig(CFG_AUTO_SAVE_EXCEL, g_data.m_CfgData.m_bAutoSaveExcel, &bValue);
+
+	// 十字锚
+	bValue = FALSE;
+	g_data.m_cfg->SetBooleanConfig(CFG_CROSS_ANCHOR, g_data.m_CfgData.m_bCrossAnchor, &bValue);
 
 	delete pSettingDlg;
 }
