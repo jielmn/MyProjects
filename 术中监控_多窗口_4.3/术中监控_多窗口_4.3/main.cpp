@@ -9,10 +9,13 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "DuiMenu.h"
+#include "AboutDlg.h"
+#include "SettingDlg.h"
 
 #define   TIMER_DRAG_DROP_GRID                   1001
 #define   INTERVAL_TIMER_DRAG_DROP_GRIDS         1500
-
+  
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
 	m_dwCurSelGridIndex = 0;
 	m_eGridStatus = GRID_STATUS_GRIDS;
@@ -29,6 +32,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_dragdropGrid = 0;
 	m_bDragTimer = FALSE;
 	m_bFlipPrevPage = FALSE;
+
+	m_btnMenu = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -63,6 +68,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnPrevPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_PREV_PAGE));
 	m_btnNextPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_NEXT_PAGE));
 	m_dragdropGrid = m_PaintManager.FindControl(DRAG_DROP_GRID); 
+	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU));
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
@@ -120,6 +126,15 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == BUTTON_PREV_PAGE) {
 			PrevPage();
 		}
+		else if (name == BTN_MENU) {
+			OnBtnMenu(msg);
+		}
+	}
+	else if (msg.sType == "setting") {
+		OnSetting();
+	}
+	else if (msg.sType == "about") {
+		OnAbout();
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -565,6 +580,49 @@ void  CDuiFrameWnd::OnDbClick() {
 		}
 		pFindControl = pFindControl->GetParent();
 	}
+}
+
+// 点击了“菜单”按钮
+void   CDuiFrameWnd::OnBtnMenu(TNotifyUI& msg) {
+	RECT r = m_btnMenu->GetPos();
+	POINT pt = { r.left, r.bottom };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
+}
+
+// 点击了“设置”
+void  CDuiFrameWnd::OnSetting() {
+	CDuiString  strText;
+	DWORD  dwValue = 0;
+	BOOL   bValue = FALSE;
+
+	CfgData  oldData = g_data.m_CfgData;
+
+	CSettingDlg * pSettingDlg = new CSettingDlg;
+	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pSettingDlg->CenterWindow();
+	int ret = pSettingDlg->ShowModal();
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pSettingDlg;
+		return;
+	}
+
+	delete pSettingDlg;
+}
+
+// 点击了“关于”
+void  CDuiFrameWnd::OnAbout() {   
+	CAboutDlg * pAboutDlg = new CAboutDlg;
+
+	pAboutDlg->Create(this->m_hWnd, _T("关于"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAboutDlg->CenterWindow();
+	pAboutDlg->ShowModal();
+
+	delete pAboutDlg;
 }
  
 

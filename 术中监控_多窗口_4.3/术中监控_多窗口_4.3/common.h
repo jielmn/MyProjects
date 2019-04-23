@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <assert.h>
+#include <time.h>
 
 #include "LmnCommon.h"
 #include "LmnConfig.h"
@@ -26,6 +27,8 @@ using namespace DuiLib;
 #define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
 #define   MAX_ROWS_COUNT           5              // 每个页面最大几行
 
+#define   VERSION                  "3.0.1"
+
 // 控件id
 #define   TABS_ID                  "switch"
 #define   TAB_INDEX_MONITOR        0
@@ -43,6 +46,10 @@ using namespace DuiLib;
 #define   GRID_TABS               "gridtabs"
 #define   DRAG_DROP_GRID          "DragDropGrid"
 #define   GRID_HILIGHT_BORDER_COLOR 0xFFCAF100
+#define   BTN_MENU                "menubtn"
+#define   LBL_VERSION             "lblVersion"
+#define   MYTREE_CLASS_NAME       "MyTree"
+#define   MYTREE_CONFIG_NAME      "CfgTree"
 
 
 // CONFIG
@@ -129,6 +136,9 @@ extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInf
 extern DWORD GetGridOrderByGridId(DWORD  dwId);
 extern char * GetDefaultGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt);
 extern char * GetGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt, DWORD * pOrder);
+extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>

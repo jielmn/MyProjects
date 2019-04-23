@@ -70,6 +70,12 @@ private:
 	void   OnMoveGrid(const POINT & pt);
 	// 拖动格子过程中，拖到最左或最右，导致翻页
 	void   OnFlipPage();
+	// 点击了“菜单”按钮
+	void   OnBtnMenu(TNotifyUI& msg);
+	// 点击了“设置”
+	void   OnSetting();
+	// 点击了“关于”
+	void   OnAbout();
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
@@ -90,4 +96,7 @@ private:
 	// 添加定时器，完成跨页间的格子拖动
 	BOOL                                        m_bDragTimer;
 	BOOL                                        m_bFlipPrevPage;
+
+	// 菜单按钮
+	DuiLib::CButtonUI *                         m_btnMenu;
 };
