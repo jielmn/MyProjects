@@ -88,7 +88,7 @@ using namespace DuiLib;
 #define   CFG_GRID_SWITCH                   "grid switch"
 #define   DEFAULT_GRID_SWITCH               FALSE
 #define   CFG_COLLECT_INTERVAL              "collect interval"
-#define   MAX_COLLECT_INTERVAL_INDEX        6
+#define   MAX_COLLECT_INTERVAL_INDEX        5
 #define   CFG_GRID_MIN_TEMP                 "grid min temperature"
 #define   CFG_GRID_MAX_TEMP                 "grid max temperature"
 #define   CFG_READER_SWITCH                 "reader switch"
@@ -178,6 +178,7 @@ extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInf
 extern DWORD GetGridOrderByGridId(DWORD  dwId);
 extern char * GetDefaultGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt);
 extern char * GetGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt, DWORD * pOrder);
+void   ResetGridOrder();
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);

@@ -155,3 +155,9 @@ char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 		tmp.tm_hour, tmp.tm_min, tmp.tm_sec );
 	return szDest;
 }
+
+void   ResetGridOrder() {
+	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+		g_data.m_CfgData.m_GridOrder[i] = i;
+	}
+}

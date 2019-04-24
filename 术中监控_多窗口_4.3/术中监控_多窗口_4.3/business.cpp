@@ -108,8 +108,20 @@ int CBusiness::Init() {
 
 	// 手持低温报警
 	g_data.m_cfg->GetConfig(CFG_HAND_LOW_TEMP_ALARM, g_data.m_CfgData.m_dwHandReaderLowTempAlarm, DEFAULT_LOW_TEMP_ALARM);
+	if (g_data.m_CfgData.m_dwHandReaderLowTempAlarm < MIN_TEMP_IN_SHOW) {
+		g_data.m_CfgData.m_dwHandReaderLowTempAlarm = MIN_TEMP_IN_SHOW;
+	}
+
 	// 手持高温报警
 	g_data.m_cfg->GetConfig(CFG_HAND_HIGH_TEMP_ALARM, g_data.m_CfgData.m_dwHandReaderHighTempAlarm, DEFAULT_HIGH_TEMP_ALARM);
+	if (g_data.m_CfgData.m_dwHandReaderHighTempAlarm > MAX_TEMP_IN_SHOW) {
+		g_data.m_CfgData.m_dwHandReaderHighTempAlarm = MAX_TEMP_IN_SHOW;
+	}
+
+	if ( g_data.m_CfgData.m_dwHandReaderLowTempAlarm >= g_data.m_CfgData.m_dwHandReaderHighTempAlarm) {
+		g_data.m_CfgData.m_dwHandReaderLowTempAlarm = DEFAULT_LOW_TEMP_ALARM;
+		g_data.m_CfgData.m_dwHandReaderHighTempAlarm = DEFAULT_HIGH_TEMP_ALARM;
+	}
 
 	// 病区
 	GetAreaCfg();
@@ -179,9 +191,7 @@ void CBusiness::GetGridsOrderCfg() {
 
 	// 如果没有正确的顺序配置，取默认的顺序
 	if (!bValidOrder) {
-		for (DWORD i = 0; i < dwGridsCount; i++) {
-			g_data.m_CfgData.m_GridOrder[i] = i;
-		}
+		ResetGridOrder();
 	}
 }
 

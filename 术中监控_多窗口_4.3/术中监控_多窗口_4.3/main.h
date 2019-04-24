@@ -76,6 +76,8 @@ private:
 	void   OnSetting();
 	// 点击了“关于”
 	void   OnAbout();
+	// 保存格子配置
+	void   SaveGrid(DWORD  dwIndex);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

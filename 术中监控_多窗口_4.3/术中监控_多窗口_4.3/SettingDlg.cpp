@@ -312,8 +312,9 @@ BOOL  CSettingDlg::GetCommonConfig() {
 BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
+	const  DWORD  ITEMS_COUNT_PER_READER = 4;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 15 + ((4 * MAX_READERS_PER_GRID)+6) * nIndex;
+	int  nCfgRowIndex = 15 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+6) * nIndex;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 
@@ -331,55 +332,68 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
 	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_GridCfg[nIndex].m_dwMinTemp);
 	nCfgRowIndex++;
+	if (m_data.m_GridCfg[nIndex].m_dwMinTemp < MIN_TEMP_IN_SHOW) {
+		strText.Format("¥≤Œª%d£¨◊ÓµÕœ‘ æŒ¬∂»±ÿ–Î¥Û”⁄µ»”⁄%lu°Ê", nIndex + 1, MIN_TEMP_IN_SHOW);
+		::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
+		return FALSE;
+	}
+
 
 	// ◊Ó∏ﬂœ‘ æø…∂¡
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
 	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_GridCfg[nIndex].m_dwMaxTemp);
 	nCfgRowIndex++;
-
-	if ( m_data.m_GridCfg[nIndex].m_dwMaxTemp <= m_data.m_GridCfg[nIndex].m_dwMinTemp ) {
-		strText.Format("¥∞ø⁄%d£¨◊Ó∏ﬂœ‘ æŒ¬∂»±ÿ–Î¥Û”⁄◊ÓµÕœ‘ æŒ¬∂»", nIndex + 1);
+	if (m_data.m_GridCfg[nIndex].m_dwMinTemp > MAX_TEMP_IN_SHOW) {
+		strText.Format("¥≤Œª%d£¨◊Ó∏ﬂœ‘ æŒ¬∂»±ÿ–Î–°”⁄µ»”⁄%lu°Ê", nIndex + 1, MAX_TEMP_IN_SHOW);
 		::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 		return FALSE;
 	}
 
+	if ( m_data.m_GridCfg[nIndex].m_dwMaxTemp <= m_data.m_GridCfg[nIndex].m_dwMinTemp ) {
+		strText.Format("¥≤Œª%d£¨◊Ó∏ﬂœ‘ æŒ¬∂»±ÿ–Î¥Û”⁄◊ÓµÕœ‘ æŒ¬∂»", nIndex + 1);
+		::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
+		return FALSE;
+	}
+
+	double dMax = HIGH_TEMP_ALARM / 100.0;
+	double dMin = LOW_TEMP_ALARM / 100.0;
 	// ªÒ»°Reader≈‰÷√
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 4 * i + 2, cfgValue);
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + ITEMS_COUNT_PER_READER * i + 2, cfgValue);
 		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_bSwitch = cfgValue.m_bCheckbox;
 
-		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 4 * i + 3, cfgValue);
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + ITEMS_COUNT_PER_READER * i + 3, cfgValue);
 		strText = cfgValue.m_strEdit;
 		if (1 != sscanf_s(strText, "%lf", &dNumber)) {
-			strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨µÕŒ¬±®æØ«Î ‰»Î ˝◊÷", nIndex + 1, i+1);
+			strText.Format("¥≤Œª%d∂¡ø®∆˜%c≈‰÷√£¨µÕŒ¬±®æØ«Î ‰»Î ˝◊÷", nIndex + 1, (char)i+'A' );
 			::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 			return FALSE;
 		}
 
-		if (dNumber > 42 || dNumber < 20) {
-			strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨µÕŒ¬±®æØ«Î ‰»Î∑∂Œß(20~42)", nIndex + 1, i+1);
+		if (dNumber > dMax || dNumber < dMin) {
+			strText.Format("¥≤Œª%d∂¡ø®∆˜%c≈‰÷√£¨µÕŒ¬±®æØ«Î ‰»Î∑∂Œß(%.2f~%.2f)", nIndex + 1, (char)i + 'A', dMin, dMax);
 			::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 			return FALSE;
 		}
 		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwLowTempAlarm = (DWORD)(dNumber * 100);
 		
-		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + 5 * i + 4, cfgValue);
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + ITEMS_COUNT_PER_READER * i + 4, cfgValue);
 		strText = cfgValue.m_strEdit;
 		if (1 != sscanf_s(strText, "%lf", &dNumber)) {
-			strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨∏ﬂŒ¬±®æØ«Î ‰»Î ˝◊÷", nIndex + 1, i + 1);
+			strText.Format("¥≤Œª%d∂¡ø®∆˜%c≈‰÷√£¨∏ﬂŒ¬±®æØ«Î ‰»Î ˝◊÷", nIndex + 1, (char)i + 'A');
 			::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 			return FALSE;
 		}
 
-		if (dNumber > 42 || dNumber < 20) {
-			strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨∏ﬂŒ¬±®æØ«Î ‰»Î∑∂Œß(20~42)", nIndex + 1, i + 1);
+		if (dNumber > dMax || dNumber < dMin) {
+			strText.Format("¥≤Œª%d∂¡ø®∆˜%c≈‰÷√£¨∏ﬂŒ¬±®æØ«Î ‰»Î∑∂Œß(%.2f~%.2f)", nIndex + 1, (char)i + 'A', dMin, dMax);
 			::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 			return FALSE;
 		}
 		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwHighTempAlarm = (DWORD)(dNumber * 100);
 
 		if (m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwHighTempAlarm < m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwLowTempAlarm) {
-			strText.Format("¥∞ø⁄%d∂¡ø®∆˜%d≈‰÷√£¨∏ﬂŒ¬±®æØ«Î¥Û”⁄µÕŒ¬±®æØ",  nIndex + 1, i+1);
+			strText.Format("¥≤Œª%d∂¡ø®∆˜%c≈‰÷√£¨∏ﬂŒ¬±®æØ«Î¥Û”⁄µÕŒ¬±®æØ",  nIndex + 1, (char)i + 'A');
 			::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 			return FALSE;
 		}
@@ -467,8 +481,8 @@ BOOL    CSettingDlg::GetHandReaderConfig() {
 
 	double dMax = HIGH_TEMP_ALARM / 100.0;
 	double dMin = LOW_TEMP_ALARM / 100.0;
-	if (dNumber > 42 || dNumber < 20) {
-		strText.Format(" ÷≥÷≤‚Œ¬£¨µÕŒ¬±®æØ«Î ‰»Î∑∂Œß(20~42)");
+	if (dNumber > dMax || dNumber < dMin) {
+		strText.Format(" ÷≥÷≤‚Œ¬£¨µÕŒ¬±®æØ«Î ‰»Î∑∂Œß(%.2f~%.2f)", dMin, dMax);
 		::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 		return FALSE;
 	}
@@ -483,8 +497,8 @@ BOOL    CSettingDlg::GetHandReaderConfig() {
 		return FALSE;
 	}
 
-	if (dNumber > 42 || dNumber < 20) {
-		strText.Format(" ÷≥÷≤‚Œ¬£¨∏ﬂŒ¬±®æØ«Î ‰»Î∑∂Œß(20~42)" );
+	if (dNumber > dMax || dNumber < dMin) {
+		strText.Format(" ÷≥÷≤‚Œ¬£¨∏ﬂŒ¬±®æØ«Î ‰»Î∑∂Œß(%.2f~%.2f)", dMin, dMax );
 		::MessageBox(this->GetHWND(), strText, "…Ë÷√", 0);
 		return FALSE;
 	}

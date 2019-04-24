@@ -377,6 +377,7 @@ void  CDuiFrameWnd::StopMoveGrid() {
 	GetGridOrder(szOrder, sizeof(szOrder), g_data.m_CfgData.m_dwLayoutGridsCnt, g_data.m_CfgData.m_GridOrder);
 
 	g_data.m_cfg->SetConfig ( CFG_GRIDS_ORDER, szOrder, szDefaultOrder );
+	g_data.m_cfg->Save();
 
 	m_nDgSourceIndex = -1;
 	m_nDgDestIndex = -1;
@@ -644,7 +645,72 @@ void  CDuiFrameWnd::OnSetting() {
 	bValue = FALSE;
 	g_data.m_cfg->SetBooleanConfig(CFG_CROSS_ANCHOR, g_data.m_CfgData.m_bCrossAnchor, &bValue);
 
+	// 手持最低显示温度
+	dwValue = DEFAULT_MIN_TEMP_IN_SHOW;
+	g_data.m_cfg->SetConfig(CFG_HAND_MIN_TEMP_IN_SHOW, g_data.m_CfgData.m_dwHandReaderMinTemp, &dwValue);
+	// 手持最高显示温度
+	dwValue = DEFAULT_MAX_TEMP_IN_SHOW;
+	g_data.m_cfg->SetConfig(CFG_HAND_MAX_TEMP_IN_SHOW, g_data.m_CfgData.m_dwHandReaderMaxTemp, &dwValue);
+
+	// 手持低温报警
+	dwValue = DEFAULT_LOW_TEMP_ALARM;
+	g_data.m_cfg->SetConfig(CFG_HAND_LOW_TEMP_ALARM, g_data.m_CfgData.m_dwHandReaderLowTempAlarm, &dwValue);
+	// 手持高温报警
+	dwValue = DEFAULT_HIGH_TEMP_ALARM;
+	g_data.m_cfg->SetConfig(CFG_HAND_HIGH_TEMP_ALARM, g_data.m_CfgData.m_dwHandReaderHighTempAlarm, &dwValue);
+
+	for (DWORD i = 0; i < g_data.m_CfgData.m_dwLayoutGridsCnt; i++) {
+		SaveGrid(i);
+	}
+
+	if (oldData.m_dwLayoutGridsCnt != g_data.m_CfgData.m_dwLayoutGridsCnt) {
+		g_data.m_cfg->RemoveConfig(CFG_GRIDS_ORDER);
+		m_dwCurSelGridIndex = 0;
+		m_eGridStatus = GRID_STATUS_GRIDS;
+		ResetGridOrder();
+		RefreshGridsPage();
+	}
+	g_data.m_cfg->Save();
+
 	delete pSettingDlg;
+}
+
+// 保存格子配置
+void  CDuiFrameWnd::SaveGrid(DWORD  i) {
+	CDuiString  strText;
+	BOOL  bValue = FALSE;
+	DWORD  dwValue = 0;
+
+	strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
+	bValue = DEFAULT_GRID_SWITCH;
+	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_bSwitch, &bValue);
+
+	strText.Format("%s %lu", CFG_COLLECT_INTERVAL, i + 1);
+	dwValue = 0;
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval, &dwValue);
+	
+
+	strText.Format("%s %lu", CFG_GRID_MIN_TEMP, i + 1);
+	dwValue = DEFAULT_MIN_TEMP_IN_SHOW;
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, &dwValue);
+
+	strText.Format("%s %lu", CFG_GRID_MAX_TEMP, i + 1);
+	dwValue = DEFAULT_MAX_TEMP_IN_SHOW;
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, &dwValue);
+
+	for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
+		strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
+		bValue = DEFAULT_READER_SWITCH;
+		g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, &bValue);
+
+		strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
+		dwValue = DEFAULT_LOW_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm, &dwValue);
+
+		strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
+		dwValue = DEFAULT_HIGH_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
+	}
 }
 
 // 点击了“关于”
