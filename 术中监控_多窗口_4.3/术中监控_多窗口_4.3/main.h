@@ -56,6 +56,7 @@ private:
 	void   RefreshGridsPage();
 	// 更新grids size
 	void   RefreshGridsSize(int width, int height);
+	void   RefreshGridsSize();
 	// 下一页
 	void   NextPage();
 	// 上一页

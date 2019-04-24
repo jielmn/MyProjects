@@ -39,6 +39,7 @@ using namespace DuiLib;
 #define   GRID_NAME                "MyGrid"
 #define   GRID_BORDER_SIZE         4
 #define   GRID_BORDER_COLOR        0xFF4F4F4F
+//#define   GRID_BORDER_COLOR        0xFFFF0000
 #define   LAYOUT_PAGES            "layPages"
 #define   BUTTON_PREV_PAGE        "btnPrevPage"
 #define   BUTTON_NEXT_PAGE        "btnNextPage"

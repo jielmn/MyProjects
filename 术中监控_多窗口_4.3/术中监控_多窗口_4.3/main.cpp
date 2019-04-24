@@ -478,6 +478,7 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 }
 
 // 更新grids size
+// width, height: m_layMain的parent的
 void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 	if (0 == m_layMain)
 		return;
@@ -485,7 +486,7 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 	SIZE s;
 	CContainerUI * pParent = (CContainerUI *)m_layMain->GetParent();
 
-	if ( GRID_STATUS_GRIDS == m_eGridStatus ) {
+	if ( GRID_STATUS_GRIDS == m_eGridStatus ) { 
 
 		// 如果需要多页显示
 		if (g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows
@@ -505,11 +506,19 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 		m_layMain->SetItemSize(s);
 	}
 	else {
-		height += 30;
+		// height += 30;
 		s.cx = width;
 		s.cy = height;
 		m_layMain->SetItemSize(s);
 	}
+}
+
+void   CDuiFrameWnd::RefreshGridsSize() {
+	if (0 == m_layMain)
+		return;
+	CControlUI* pParent = m_layMain->GetParent();
+	RECT rect = pParent->GetPos();
+	RefreshGridsSize(rect.right - rect.left, rect.bottom - rect.top);
 }
 
 void   CDuiFrameWnd::NextPage() {
@@ -582,8 +591,7 @@ void  CDuiFrameWnd::OnDbClick() {
 			pGrid->SwitchView(); 
 
 			RefreshGridsPage();
-			RECT rect = m_layMain->GetPos();
-			RefreshGridsSize(rect.right - rect.left, rect.bottom - rect.top);
+			RefreshGridsSize();
 			break;
 		}
 		pFindControl = pFindControl->GetParent();
@@ -663,13 +671,24 @@ void  CDuiFrameWnd::OnSetting() {
 		SaveGrid(i);
 	}
 
-	if (oldData.m_dwLayoutGridsCnt != g_data.m_CfgData.m_dwLayoutGridsCnt) {
+	// 格子数目改变
+	if ( oldData.m_dwLayoutGridsCnt != g_data.m_CfgData.m_dwLayoutGridsCnt ) {
 		g_data.m_cfg->RemoveConfig(CFG_GRIDS_ORDER);
+
 		m_dwCurSelGridIndex = 0;
 		m_eGridStatus = GRID_STATUS_GRIDS;
 		ResetGridOrder();
 		RefreshGridsPage();
+		RefreshGridsSize();
 	}
+	// 格子数目不变；行，列改变
+	else if ( oldData.m_dwLayoutColumns != g_data.m_CfgData.m_dwLayoutColumns
+		|| oldData.m_dwLayoutRows != g_data.m_CfgData.m_dwLayoutRows ) {
+		m_eGridStatus = GRID_STATUS_GRIDS;
+		RefreshGridsPage();
+		RefreshGridsSize();
+	}
+
 	g_data.m_cfg->Save();
 
 	delete pSettingDlg;
