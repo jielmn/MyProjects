@@ -44,6 +44,7 @@ using namespace DuiLib;
 #define   BUTTON_PREV_PAGE        "btnPrevPage"
 #define   BUTTON_NEXT_PAGE        "btnNextPage"
 #define   BTN_BED_NO              "btnBed"
+#define   BTN_BED_NO_M            "btnBedM"
 #define   LBL_READER_NO           "lblReaderNo"
 #define   GRID_TABS               "gridtabs"
 #define   DRAG_DROP_GRID          "DragDropGrid"

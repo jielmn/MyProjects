@@ -5,6 +5,7 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 	m_tabs = 0;
 
 	m_btnBedNo = 0;
+	m_btnBedNoM = 0;
 	m_dwBedNo = 0;
 
 	m_lblReaderNo = 0;
@@ -40,8 +41,12 @@ void CGridUI::DoInit() {
 	m_tabs = static_cast<DuiLib::CTabLayoutUI  *>(m_pManager->FindControl(GRID_TABS));
 
 	m_btnBedNo = static_cast<DuiLib::CButtonUI *>(m_pManager->FindControl(BTN_BED_NO));
+	m_btnBedNoM = static_cast<DuiLib::CButtonUI *>(m_pManager->FindControl(BTN_BED_NO_M));
+
 	strText.Format("%02u", m_dwBedNo);
 	m_btnBedNo->SetText(strText);
+	m_btnBedNoM->SetText(strText);
+	
 
 	m_lblReaderNo = static_cast<DuiLib::CLabelUI *>(m_pManager->FindControl(LBL_READER_NO));
 	strText.Format("%c", ('A' + (char)m_dwReaderNo) );

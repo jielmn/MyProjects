@@ -24,6 +24,7 @@ private:
 	DuiLib::CTabLayoutUI *                      m_tabs;
 
 	CButtonUI *                                 m_btnBedNo;
+	CButtonUI *                                 m_btnBedNoM;
 	DWORD                                       m_dwBedNo;
 
 	CLabelUI *                                  m_lblReaderNo;
