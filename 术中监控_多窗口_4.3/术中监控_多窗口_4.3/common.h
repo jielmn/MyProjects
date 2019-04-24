@@ -46,6 +46,7 @@ using namespace DuiLib;
 #define   BTN_BED_NO              "btnBed"
 #define   BTN_BED_NO_M            "btnBedM"
 #define   LBL_READER_NO           "lblReaderNo"
+#define   LAY_READERS             "layReaders"
 #define   GRID_TABS               "gridtabs"
 #define   DRAG_DROP_GRID          "DragDropGrid"
 #define   GRID_HILIGHT_BORDER_COLOR 0xFFCAF100
@@ -55,6 +56,7 @@ using namespace DuiLib;
 #define   MYTREE_CONFIG_NAME      "CfgTree"
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   SETTING_FILE            "Setting.xml"
+#define   READER_FILE_NAME        "reader.xml"
 
 
 // CONFIG

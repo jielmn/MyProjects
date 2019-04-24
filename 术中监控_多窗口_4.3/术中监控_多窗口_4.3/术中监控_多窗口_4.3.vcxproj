@@ -162,6 +162,7 @@
     <ClCompile Include="GridUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
+    <ClCompile Include="ReaderUI.cpp" />
     <ClCompile Include="SettingDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +175,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="DuiMenu.h" />
     <ClInclude Include="MyTreeCfgUI.h" />
+    <ClInclude Include="ReaderUI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SettingDlg.h" />
   </ItemGroup>

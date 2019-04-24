@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "ReaderUI.h"
 
 class CGridUI : public CContainerUI
 {
@@ -29,4 +30,8 @@ private:
 
 	CLabelUI *                                  m_lblReaderNo;
 	DWORD                                       m_dwReaderNo;
+
+	// ¶Á¿¨Æ÷ºÏ¼¯
+	CVerticalLayoutUI *                         m_layReaders;
+	CReaderUI *                                 m_readers[MAX_READERS_PER_GRID];
 };

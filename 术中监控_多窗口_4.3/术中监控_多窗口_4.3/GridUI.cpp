@@ -10,6 +10,9 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 
 	m_lblReaderNo = 0;
 	m_dwReaderNo = 0;
+
+	m_layReaders = 0;
+	memset(m_readers, 0, sizeof(m_readers));
 }
 
 CGridUI::~CGridUI() {
@@ -51,6 +54,13 @@ void CGridUI::DoInit() {
 	m_lblReaderNo = static_cast<DuiLib::CLabelUI *>(m_pManager->FindControl(LBL_READER_NO));
 	strText.Format("%c", ('A' + (char)m_dwReaderNo) );
 	m_lblReaderNo->SetText(strText);
+
+	m_layReaders = static_cast<DuiLib::CVerticalLayoutUI *>(m_pManager->FindControl(LAY_READERS));
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		m_readers[i] = new CReaderUI;
+		m_readers[i]->SetTag(i);
+		m_layReaders->Add(m_readers[i]);
+	}
 
 	m_bInited = TRUE;
 }
