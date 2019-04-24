@@ -589,7 +589,7 @@ void  CDuiFrameWnd::OnSetReceiverAreaRet(WPARAM wParm, LPARAM  lParam) {
 		MessageBox(GetHWND(), "设置连续测温模块成功", "设置", 0);
 	}
 	else {
-		MessageBox(GetHWND(), "设置连续测温模块成功", "设置", 0);
+		MessageBox(GetHWND(), "设置连续测温模块失败", "设置", 0);
 	}
 }
 
