@@ -6,7 +6,7 @@
 //#include "610InvReader.h"
 //#include "TelemedInvReader.h"
 
-//#define   READER_TYPE_INV
+#define   READER_TYPE_INV
 #ifdef READER_TYPE_INV
 #include "InvReader.h"
 #else
