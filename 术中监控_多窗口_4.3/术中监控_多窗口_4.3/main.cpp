@@ -768,16 +768,36 @@ void  CDuiFrameWnd::CheckDevice() {
 	else {
 		m_lblBarTips->SetText("");
 	}
+
+	CBusiness::GetInstance()->CheckLaunchAsyn();
 }
 
 
 
+
+void PrintStatus(int nCnt, void * args[]) {
+	CBusiness::GetInstance()->PrintStatusAsyn();
+}
              
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	SetUnhandledExceptionFilter(pfnUnhandledExceptionFilter);
+
+	HANDLE handle = ::CreateMutex(NULL, FALSE, GLOBAL_LOCK_NAME);//handle为声明的HANDLE类型的全局变量 
+	if (GetLastError() == ERROR_ALREADY_EXISTS) {
+		::MessageBox(0, "程序已经打开或没有关闭完全，请先关闭或等待完全关闭!", "错误", 0);
+		return 0;
+	}
+
+	CoInitialize(NULL);
+	JTelSvrRegCommand("status", "print status", PrintStatus, 0);
+	DWORD  dwPort = 2019;
+	JTelSvrStart((unsigned short)dwPort, 10);
+
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
@@ -804,6 +824,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();
+	CoUninitialize();
 
 	return 0;
 }

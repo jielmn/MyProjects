@@ -10,6 +10,7 @@
 #include "LmnLog.h"
 #include "LmnThread.h"
 #include "LmnString.h"
+#include "LmnTelSvr.h"
 #include "sigslot.h"
 
 #include "UIlib.h"
@@ -21,6 +22,8 @@ using namespace DuiLib;
 #define   MAIN_CLASS_WINDOW_NAME  "DUIMainFrame"
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
+#define   GLOBAL_LOCK_NAME        PROJ_NAME
+
 
 #define   MAX_GRID_COUNT           64             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
@@ -104,7 +107,8 @@ using namespace DuiLib;
 #define   CFG_HIGH_TEMP_ALARM               "high temperature alarm"
 
 // thread消息
-
+#define MSG_CHECK_LAUNCH_STATUS             1001
+#define MSG_PRINT_STATUS                    1002
 
 // windows 消息
 
@@ -170,6 +174,7 @@ public:
 	LmnToolkits::Thread *     m_thrd_launch;
 	LmnToolkits::Thread *     m_thrd_sqlite;
 	CfgData                   m_CfgData;
+	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
 
 public:
 	CGlobalData() {
@@ -179,6 +184,21 @@ public:
 		m_thrd_sqlite = 0;
 	}
 };
+
+enum  ReaderStatus {
+	ReaderStatus_Open = 0,
+	ReaderStatus_Close
+};
+
+#define  MAX_TAG_ID_LENGTH          20
+#define  MAX_READER_ID_LENGTH       20
+// 温度数据
+typedef struct  tagTempItem {
+	DWORD   m_dwTemp;                                        // 温度
+	time_t  m_Time;                                          // 时间
+	char    m_szTagId[MAX_TAG_ID_LENGTH];                    // tag id
+	char    m_szReaderId[MAX_READER_ID_LENGTH];              // reader id
+}TempItem;
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
@@ -195,7 +215,7 @@ extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t)
 // 今天的零点时间
 extern time_t  GetTodayZeroTime();
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
-
+extern BOOL  CheckComPortExist(int nCheckComPort);
 
 // templates
 template <class T>

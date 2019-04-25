@@ -5,6 +5,7 @@
 #include "common.h"
 #include "sigslot.h"
 #include "MyDatabase.h"
+#include "Launch.h"
 
 class CDuiFrameWnd;
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
@@ -17,6 +18,14 @@ public:
 	int Init();
 	int DeInit();
 	void InitSigslot(CDuiFrameWnd * pMainWnd);
+
+	// 打印状态(调试用)
+	void   PrintStatusAsyn();
+	void   PrintStatus();
+
+	// 硬件改动，检查接收器串口状态
+	void   CheckLaunchAsyn();
+	void   CheckLaunch();
 
 private:
 	static CBusiness *  pInstance;
@@ -33,7 +42,8 @@ private:
 	BOOL CanBeFreed() { return false; }
 
 private:
-	CMySqliteDatabase   m_sqlite;
+	CMySqliteDatabase             m_sqlite;
+	CLaunch                       m_launch;
 };
 
 

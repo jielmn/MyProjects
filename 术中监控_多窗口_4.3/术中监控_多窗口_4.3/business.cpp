@@ -342,14 +342,39 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	return;
 }
 
+// 硬件改动，检查接收器串口状态
+void  CBusiness::CheckLaunchAsyn() {
+	g_data.m_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
+}
+
+void  CBusiness::CheckLaunch() {
+	m_launch.CheckStatus();
+}
+
+// 打印状态(调试用)
+void   CBusiness::PrintStatusAsyn() {
+	g_data.m_thrd_launch->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
+}
+
+void  CBusiness::PrintStatus() {
+	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+	JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
 	{
-	case 0:
+	case MSG_CHECK_LAUNCH_STATUS:
 	{
+		CheckLaunch();
+	}
+	break;
 
+	case MSG_PRINT_STATUS:
+	{
+		PrintStatus();
 	}
 	break;
 
