@@ -22,7 +22,7 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
-#define   MAX_GRID_COUNT           60             // 最多几个格子
+#define   MAX_GRID_COUNT           64             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
 #define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
 #define   MAX_ROWS_COUNT           5              // 每个页面最大几行
