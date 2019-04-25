@@ -5,7 +5,7 @@
 			<!-- A-F指示器 -->
 			<VerticalLayout width="20">
 				<Control />
-				<Label name="lblIndicatorAlpha" text="A" textcolor="#FFFFFFFF" font="11"  />
+				<Label name="lblIndicator" text="A" textcolor="#FFCCCCCC" font="11"  />
 				<Control />
 			</VerticalLayout>
 			
@@ -34,7 +34,7 @@
 			</VerticalLayout>		
 			
 			<Control width="10" />
-			<Label name="lblReaderTemp" text="34.56" textcolor="#FFFFFFFF" font="12" width="250" />
+			<Label name="lblReaderTemp" text="34.56" textcolor="#FFCCCCCC" font="12" width="250" />
 			<Control />
 			
 			<VerticalLayout width="30">
@@ -47,10 +47,10 @@
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="30,0,0,0">
-			<Label text="读卡器ID" textcolor="#FFFFFFFF" font="11" width="80" />
-			<Label name="lblReaderId" text="ER0040000001" textcolor="#FFFFFFFF" font="11" width="135" />
-			<Label text="Tag ID" textcolor="#FFFFFFFF" font="11" width="70" />
-			<Label name="lblTagId" text="e901020304050607" textcolor="#FFFFFFFF" font="11" width="160" />
+			<Label text="读卡器ID" textcolor="#FFCCCCCC" font="11" width="80" />
+			<Label name="lblReaderId" text="ER0040000001" textcolor="#FFCCCCCC" font="11" width="135" />
+			<Label text="Tag ID" textcolor="#FFCCCCCC" font="11" width="70" />
+			<Label name="lblTagId" text="e901020304050607" textcolor="#FFCCCCCC" font="11" width="160" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

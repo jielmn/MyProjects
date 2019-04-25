@@ -8,6 +8,8 @@ public:
 	CReaderUI();
 	~CReaderUI();
 
+	void  SetIndicator(DWORD dwIndex);
+
 private:
 	LPCTSTR GetClass() const;
 
@@ -17,4 +19,8 @@ private:
 private:
 	BOOL                                        m_bInited;
 	CDialogBuilderCallbackEx                    m_callback;
+
+	CLabelUI *                                  m_lblIndicator;           // A~F指示器
+	DWORD                                       m_dwIndicator;
+	CControlUI *                                m_indicator;              // 颜色指示器
 };

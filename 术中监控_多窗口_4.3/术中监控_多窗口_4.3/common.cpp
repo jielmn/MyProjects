@@ -12,6 +12,8 @@
 
 CGlobalData  g_data;
 std::vector<TArea *>  g_vArea;
+DWORD g_ReaderIndicator[MAX_READERS_PER_GRID] 
+	= { 0xFF00FF00, 0xFF1b9375, 0xFF00FFFF, 0xFF51786C, 0xFFFFFF00, 0xFFCA5100 };
 
 CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	DuiLib::CDialogBuilder builder;

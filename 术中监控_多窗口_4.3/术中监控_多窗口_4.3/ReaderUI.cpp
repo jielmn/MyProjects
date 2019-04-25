@@ -2,6 +2,9 @@
 
 CReaderUI::CReaderUI() : m_callback( m_pManager ) {
 	m_bInited = FALSE;
+	m_lblIndicator = 0;
+	m_dwIndicator = 0;
+	m_indicator = 0;
 }
 
 CReaderUI::~CReaderUI() {
@@ -28,9 +31,28 @@ void CReaderUI::DoInit() {
 		return;
 	}
 
+	m_lblIndicator = static_cast<DuiLib::CLabelUI  *>(m_pManager->FindControl(LBL_READER_INDICATOR));
+	m_indicator = m_pManager->FindControl(READER_INDICATOR);
+	SetIndicator(m_dwIndicator);
+
 	m_bInited = TRUE;
 }
 
 void CReaderUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 	CContainerUI::SetAttribute(pstrName, pstrValue);
+}
+
+void  CReaderUI::SetIndicator(DWORD dwIndex) {
+	m_dwIndicator = dwIndex;
+
+	if (m_lblIndicator) {
+		CDuiString  strText;
+		strText.Format("%c", 'A' + dwIndex);
+		m_lblIndicator->SetText(strText);
+	}
+
+	if (m_indicator) {
+		assert(m_dwIndicator < MAX_READERS_PER_GRID);
+		m_indicator->SetBkColor(g_ReaderIndicator[m_dwIndicator]);
+	}
 }

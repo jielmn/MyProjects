@@ -57,6 +57,8 @@ using namespace DuiLib;
 #define   SETTING_FRAME_NAME      "DUISettingFrame"
 #define   SETTING_FILE            "Setting.xml"
 #define   READER_FILE_NAME        "reader.xml"
+#define   LBL_READER_INDICATOR    "lblIndicator"
+#define   READER_INDICATOR        "indicator"
 
 
 // CONFIG
@@ -177,6 +179,7 @@ public:
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
+extern DWORD g_ReaderIndicator[MAX_READERS_PER_GRID];
 
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 extern DWORD GetGridOrderByGridId(DWORD  dwId);

@@ -59,6 +59,7 @@ void CGridUI::DoInit() {
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_readers[i] = new CReaderUI;
 		m_readers[i]->SetTag(i);
+		m_readers[i]->SetIndicator(i);    
 		m_layReaders->Add(m_readers[i]);
 	}
 
