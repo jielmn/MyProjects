@@ -79,6 +79,8 @@ private:
 	void   OnAbout();
 	// 保存格子配置
 	void   SaveGrid(DWORD  dwIndex);
+	// 硬件设备变动，可能有串口变动
+	void   CheckDevice();
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
@@ -103,4 +105,7 @@ private:
 
 	// 菜单按钮
 	DuiLib::CButtonUI *                         m_btnMenu;
+
+	/******* 状态栏 ******/
+	CLabelUI *                                  m_lblBarTips;
 };

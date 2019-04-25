@@ -59,6 +59,7 @@ using namespace DuiLib;
 #define   READER_FILE_NAME        "reader.xml"
 #define   LBL_READER_INDICATOR    "lblIndicator"
 #define   READER_INDICATOR        "indicator"
+#define   LBL_BAR_TIPS            "lblBarTips"
 
 
 // CONFIG
@@ -166,14 +167,16 @@ class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_timer;
+	LmnToolkits::Thread *     m_thrd_launch;
+	LmnToolkits::Thread *     m_thrd_sqlite;
 	CfgData                   m_CfgData;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_timer = 0;
+		m_thrd_launch = 0;
+		m_thrd_sqlite = 0;
 	}
 };
 
@@ -189,6 +192,10 @@ void   ResetGridOrder();
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
+// 今天的零点时间
+extern time_t  GetTodayZeroTime();
+extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
+
 
 // templates
 template <class T>

@@ -130,11 +130,24 @@ int CBusiness::Init() {
 
 	/******************** end 配置项 **********************/
 
-	g_data.m_thrd_timer = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_timer) {
+
+	/***************     数据库    ******************/
+	m_sqlite.InitDb();
+	/***************   end 数据库    ******************/
+
+
+	/******** 线程 ********/
+	g_data.m_thrd_launch = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_launch) {
 		return -1;
 	}
-	g_data.m_thrd_timer->Start(TRUE, 20);
+	g_data.m_thrd_launch->Start();
+
+	g_data.m_thrd_sqlite = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_sqlite) {
+		return -1;
+	}
+	g_data.m_thrd_sqlite->Start();
 
 	return 0;
 }
@@ -306,13 +319,22 @@ void CBusiness::GetGridsCfg() {
 
 int CBusiness::DeInit() {
 
-	if (g_data.m_thrd_timer) {
-		g_data.m_thrd_timer->Stop();
-		delete g_data.m_thrd_timer;
-		g_data.m_thrd_timer = 0;
+	if (g_data.m_thrd_launch) {
+		g_data.m_thrd_launch->Stop();
+		delete g_data.m_thrd_launch;
+		g_data.m_thrd_launch = 0;
+	}
+
+	if (g_data.m_thrd_sqlite) {
+		g_data.m_thrd_sqlite->Stop();
+		delete g_data.m_thrd_sqlite;
+		g_data.m_thrd_sqlite = 0;
 	}
 
 	Clear();
+
+	m_sqlite.DeinitDb();
+
 	return 0;
 }
 

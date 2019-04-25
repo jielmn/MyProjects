@@ -70,6 +70,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnNextPage = static_cast<DuiLib::CButtonUI *>(m_PaintManager.FindControl(BUTTON_NEXT_PAGE));
 	m_dragdropGrid = m_PaintManager.FindControl(DRAG_DROP_GRID); 
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU));
+	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_BAR_TIPS));
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
@@ -84,6 +85,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	RefreshGridsPage();
 
+	CheckDevice();
 	WindowImplBase::InitWindow();
 }
 
@@ -148,6 +150,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (wParam == TIMER_DRAG_DROP_GRID) {
 			OnFlipPage();
 		}
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		CheckDevice();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -749,7 +754,21 @@ void  CDuiFrameWnd::OnAbout() {
 
 	delete pAboutDlg;
 }
- 
+
+// 硬件设备变动，可能有串口变动
+void  CDuiFrameWnd::CheckDevice() {
+	char szComPort[16];
+	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+	if (nFindCount > 1) {
+		m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+	}
+	else if (0 == nFindCount) {
+		m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+	}
+	else {
+		m_lblBarTips->SetText("");
+	}
+}
 
 
 

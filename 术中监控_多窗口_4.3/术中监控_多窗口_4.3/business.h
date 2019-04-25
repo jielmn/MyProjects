@@ -4,6 +4,7 @@
 #include "LmnThread.h"
 #include "common.h"
 #include "sigslot.h"
+#include "MyDatabase.h"
 
 class CDuiFrameWnd;
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
@@ -30,6 +31,9 @@ private:
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
 	BOOL CanBeFreed() { return false; }
+
+private:
+	CMySqliteDatabase   m_sqlite;
 };
 
 
