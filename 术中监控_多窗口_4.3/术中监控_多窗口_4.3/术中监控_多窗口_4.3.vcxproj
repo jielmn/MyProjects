@@ -161,6 +161,7 @@
     <ClCompile Include="EditableButtonUI.cpp" />
     <ClCompile Include="GridUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyImageUI.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
     <ClCompile Include="ReaderUI.cpp" />
     <ClCompile Include="SettingDlg.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="GridUI.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="DuiMenu.h" />
+    <ClInclude Include="MyImageUI.h" />
     <ClInclude Include="MyTreeCfgUI.h" />
     <ClInclude Include="ReaderUI.h" />
     <ClInclude Include="resource.h" />

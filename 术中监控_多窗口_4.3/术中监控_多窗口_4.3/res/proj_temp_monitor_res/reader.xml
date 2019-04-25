@@ -2,15 +2,24 @@
 <Window>
 	<VerticalLayout height="100" name="layReader" bordersize="1" bordercolor="#FFCCCCCC" >	
 		<HorizontalLayout height="70" inset="30,10,0,10" >	
+			<!-- A-F指示器 -->
+			<VerticalLayout width="20">
+				<Control />
+				<Label name="lblIndicatorAlpha" text="A" textcolor="#FFFFFFFF" font="11"  />
+				<Control />
+			</VerticalLayout>
+			
+		    <!-- 颜色知识器 -->
 			<VerticalLayout width="30">
 				<Control />
 				<Control name="indicator" width="20" height="12" bkcolor="#FFFF0000" />
 				<Control />
 			</VerticalLayout>
 			
+			<!-- reader switch -->
 			<VerticalLayout width="30">
 				<Control />
-				<Option width="30" height="30" name="opn_reader_switch" normalimage="not_checked_0.png" selectedimage="checked_0.png" selected="true" />
+				<Option width="30" height="30" name="opn_reader_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="true" />
 				<Control />
 			</VerticalLayout>
 			
@@ -19,19 +28,18 @@
 			<VerticalLayout width="105">
 				<Control />
 				<HorizontalLayout height="30">
-					<Edit name="edtReaderName" text="--"    textcolor="#FF000000" width="105" font="1" visible="false" />		
-					<Button name="btnReaderName" textpadding="4,0,4,0" textcolor="#FFFFFFFF" text="--" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="105" font="1" />
+					<EditableButton name="cstEdtBtnTagName" width="105" btncolor="#FFCCCCCC" btnfont="11" editfont="11" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
 				</HorizontalLayout>
 				<Control />
 			</VerticalLayout>		
 			
 			<Control width="10" />
-			<Label name="lblReaderTemp" text="--" textcolor="#FFFFFFFF" font="8" width="250" />
+			<Label name="lblReaderTemp" text="34.56" textcolor="#FFFFFFFF" font="12" width="250" />
 			<Control />
 			
 			<VerticalLayout width="30">
 				<Control />
-				<AlarmImage name="alarm_image" width="30" height="30" />
+				<Control bkimage="disconnected.png" width="30" height="30" />
 				<Control />
 			</VerticalLayout>		
 			
@@ -39,11 +47,10 @@
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="30,0,0,0">
-			<Label text="读卡器ID" textcolor="#FF000000" font="1" width="80" />
-			<Label name="lblReaderId" text="ER0040000001" textcolor="#FF000000" font="1" width="135" />
-			<Label text="Tag ID" textcolor="#FF000000" font="1" width="70" />
-			<Label name="lblTagId" text="e901020304050607" textcolor="#FF000000" font="1" width="160" />
-			<Label name="lblTagBindingStatus" text="未绑定" textcolor="#FFFF0000" font="1"  />
+			<Label text="读卡器ID" textcolor="#FFFFFFFF" font="11" width="80" />
+			<Label name="lblReaderId" text="ER0040000001" textcolor="#FFFFFFFF" font="11" width="135" />
+			<Label text="Tag ID" textcolor="#FFFFFFFF" font="11" width="70" />
+			<Label name="lblTagId" text="e901020304050607" textcolor="#FFFFFFFF" font="11" width="160" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

@@ -48,6 +48,9 @@
     <ClCompile Include="ReaderUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MyImageUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -84,6 +87,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ReaderUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyImageUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

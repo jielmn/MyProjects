@@ -44,7 +44,7 @@
 			</HorizontalLayout>
 		
 			<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
-				<MyImage name="cstMyImage" bordercolor="#FF666666" bordersize="1" bkcolor="#FF192431" menu="true" /> 
+				<MyImage name="cstMyImage" bordercolor="#FF666666" bordersize="1" bkcolor="#FF434248" menu="true" /> 
 			</VerticalLayout>
 		</VerticalLayout>
 		

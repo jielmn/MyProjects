@@ -175,18 +175,22 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 	// 保存原始点击的控件
 	CControlUI* pOriginalCtl = pCtl;
 
-	while (pCtl) {
-		if (pCtl->GetName() == GRID_NAME) {
-			// 如果不是点击修改名字按钮
-			if ( 0 != strcmp(pOriginalCtl->GetClass(), "Button") ) {
-				m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
-				m_nDgDestIndex = -1;
-				m_dwDgStartTick = LmnGetTickCount();
+	// 如果是多格子状态
+	if (m_eGridStatus == GRID_STATUS_GRIDS) {
+		while (pCtl) {
+			if (pCtl->GetName() == GRID_NAME) {
+				// 如果不是点击修改名字按钮
+				if (0 != strcmp(pOriginalCtl->GetClass(), "Button")) {
+					m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
+					m_nDgDestIndex = -1;
+					m_dwDgStartTick = LmnGetTickCount();
+				}
+				break;
 			}
-			break;
+			pCtl = pCtl->GetParent();           
 		}
-		pCtl = pCtl->GetParent();
 	}
+	
 	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
 }
 
@@ -572,6 +576,9 @@ void  CDuiFrameWnd::OnDbClick() {
 	else if (0 == strcmp(clsName, DUI_CTR_SCROLLBAR)) {
 		return;
 	}
+	else if (0 == strcmp(clsName, "MyImage")) {
+		return; 
+	}
 
 	while (pFindControl) {
 		strName = pFindControl->GetName();
@@ -746,7 +753,7 @@ void  CDuiFrameWnd::OnAbout() {
 
 
 
-
+       
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
