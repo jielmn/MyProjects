@@ -9,6 +9,7 @@ using namespace DuiLib;
 
 #include "GridUI.h"
 #include "DragDropUI.h"
+#include "Launch.h"
 
 class CDuiFrameWnd : public WindowImplBase , public sigslot::has_slots<>
 {
@@ -81,6 +82,12 @@ private:
 	void   SaveGrid(DWORD  dwIndex);
 	// 硬件设备变动，可能有串口变动
 	void   CheckDevice();
+	// 接收器状态
+	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
+
+public:
+	// 接收器连接状态通知
+	void   OnLauchStatusNotify(CLmnSerialPort::PortStatus e);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
@@ -108,4 +115,5 @@ private:
 
 	/******* 状态栏 ******/
 	CLabelUI *                                  m_lblBarTips;
+	CLabelUI *                                  m_lblLaunchStatus;
 };

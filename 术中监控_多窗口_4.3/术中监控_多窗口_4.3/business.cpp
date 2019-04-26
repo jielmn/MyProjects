@@ -11,7 +11,7 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() {
-
+	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 }
 
 CBusiness::~CBusiness() {
@@ -339,6 +339,7 @@ int CBusiness::DeInit() {
 }
 
 void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
+	m_sigLanchStatus.connect(pMainWnd, &CDuiFrameWnd::OnLauchStatusNotify);
 	return;
 }
 
@@ -351,6 +352,19 @@ void  CBusiness::CheckLaunch() {
 	m_launch.CheckStatus();
 }
 
+void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
+	m_sigLanchStatus.emit(e);
+	//if (e == CLmnSerialPort::OPEN) {
+	//	DWORD  dwCount = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
+	//	DWORD  dwDelay = 200;
+	//	for (DWORD i = 0; i < dwCount; i++) {
+	//		GetGridTemperatureAsyn(i, dwDelay);
+	//		dwDelay += 200;
+	//	}
+	//	ReadLaunchAsyn(1000);
+	//}
+}
+
 // ´òÓ¡×´Ì¬(µ÷ÊÔÓÃ)
 void   CBusiness::PrintStatusAsyn() {
 	g_data.m_thrd_launch->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
@@ -358,6 +372,9 @@ void   CBusiness::PrintStatusAsyn() {
 
 void  CBusiness::PrintStatus() {
 	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+	if (m_launch.GetStatus() == CLmnSerialPort::OPEN) {
+		JTelSvrPrint("launch com port = com%d", m_launch.GetPort());
+	}
 	JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
 }
 

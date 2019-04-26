@@ -35,6 +35,9 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 	m_btnMenu = 0;
 	m_dwDgStartTick = 0;
+
+	m_lblBarTips = 0;
+	m_lblLaunchStatus = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -71,6 +74,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_dragdropGrid = m_PaintManager.FindControl(DRAG_DROP_GRID); 
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU));
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_BAR_TIPS));
+	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_LAUNCH_STATUS));
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
@@ -153,6 +157,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		CheckDevice();
+	}
+	else if (uMsg == UM_LAUNCH_STATUS) {
+		OnLaunchStatus(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -770,6 +777,22 @@ void  CDuiFrameWnd::CheckDevice() {
 	}
 
 	CBusiness::GetInstance()->CheckLaunchAsyn();
+}
+
+// 接收器状态
+void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
+	CLmnSerialPort::PortStatus e = (CLmnSerialPort::PortStatus)wParam;
+	if (e == CLmnSerialPort::OPEN) {
+		m_lblLaunchStatus->SetText("发射器连接成功");
+	}
+	else {
+		m_lblLaunchStatus->SetText("发射器连接断开");
+	}
+}
+
+// 接收器连接状态通知
+void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
+	::PostMessage( GetHWND(), UM_LAUNCH_STATUS, (WPARAM)e, 0);
 }
 
 

@@ -63,6 +63,7 @@ using namespace DuiLib;
 #define   LBL_READER_INDICATOR    "lblIndicator"
 #define   READER_INDICATOR        "indicator"
 #define   LBL_BAR_TIPS            "lblBarTips"
+#define   LBL_LAUNCH_STATUS       "lblLaunchStatus"
 
 
 // CONFIG
@@ -111,7 +112,7 @@ using namespace DuiLib;
 #define MSG_PRINT_STATUS                    1002
 
 // windows 消息
-
+#define UM_LAUNCH_STATUS                     (WM_USER+1)
 
 
 // 创建duilib控件的回调

@@ -27,6 +27,9 @@ public:
 	void   CheckLaunchAsyn();
 	void   CheckLaunch();
 
+	// 发射器相关的回调
+	void  OnStatus(CLmnSerialPort::PortStatus e);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -44,6 +47,7 @@ private:
 private:
 	CMySqliteDatabase             m_sqlite;
 	CLaunch                       m_launch;
+	sigslot::signal1<CLmnSerialPort::PortStatus>    m_sigLanchStatus;
 };
 
 

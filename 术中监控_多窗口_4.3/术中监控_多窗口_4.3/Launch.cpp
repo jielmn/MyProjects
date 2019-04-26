@@ -12,6 +12,7 @@ CLaunch::~CLaunch() {
 }
 
 void  CLaunch::CloseLaunch() {
+	JTelSvrPrint("launch close");
 	CloseUartPort();
 	m_recv_buf.Clear();
 	m_sigStatus.emit(GetStatus());
@@ -20,6 +21,7 @@ void  CLaunch::CloseLaunch() {
 // ÖØÁ¬
 int  CLaunch::Reconnect() {
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "launch reconnect \n");
+	JTelSvrPrint("launch reconnect");
 
 	if (GetStatus() == CLmnSerialPort::OPEN) {
 		CloseLaunch();
@@ -27,7 +29,7 @@ int  CLaunch::Reconnect() {
 
 	char  szComPort[16] = { 0 };
 
-	if ( g_data.m_szLaunchPort[0] != 0 ) {
+	if ( g_data.m_szLaunchPort[0] != 0 ) {		
 		STRNCPY(szComPort, g_data.m_szLaunchPort, sizeof(szComPort));
 	}
 	else {
@@ -42,6 +44,7 @@ int  CLaunch::Reconnect() {
 		}
 	}
 
+	JTelSvrPrint("config com port = %s", szComPort);
 	BOOL bRet = OpenUartPort(szComPort);
 	if (!bRet) {
 		return 0;
