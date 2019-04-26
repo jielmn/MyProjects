@@ -793,8 +793,8 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
 	::PostMessage( GetHWND(), UM_LAUNCH_STATUS, (WPARAM)e, 0);
-}
-
+}      
+                      
 
 
 

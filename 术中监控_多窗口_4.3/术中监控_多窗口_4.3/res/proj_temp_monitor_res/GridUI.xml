@@ -3,10 +3,12 @@
 	<VerticalLayout>
 		<HorizontalLayout height="74" name="layGridHead" inset="5,2,5,2" >
 		
-			<VerticalLayout width="70">
+			<Control width="10" />
+			
+			<VerticalLayout width="30">
 				<Control />
-				<HorizontalLayout height="30">								
-					<Option width="30" height="30" name="opn_grid_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="false" />								
+				<HorizontalLayout height="30">
+					<Button  name="btnMode"  bkimage="file='hand.png' dest='2,2,28,28'" hotimage="file='btn_hot.png' corner='2,8,2,2'" tooltip="模式" />
 				</HorizontalLayout>
 				<Control />
 			</VerticalLayout>
