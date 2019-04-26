@@ -267,8 +267,6 @@ void CBusiness::GetGridsCfg() {
 	CDuiString  strText;
 
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
-		g_data.m_cfg->GetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_bSwitch, DEFAULT_GRID_SWITCH);
 
 		strText.Format("%s %lu", CFG_COLLECT_INTERVAL, i + 1);
 		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval, 0);

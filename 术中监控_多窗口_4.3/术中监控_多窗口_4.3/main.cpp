@@ -719,10 +719,6 @@ void  CDuiFrameWnd::SaveGrid(DWORD  i) {
 	BOOL  bValue = FALSE;
 	DWORD  dwValue = 0;
 
-	strText.Format("%s %lu", CFG_GRID_SWITCH, i + 1);
-	bValue = DEFAULT_GRID_SWITCH;
-	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_bSwitch, &bValue);
-
 	strText.Format("%s %lu", CFG_COLLECT_INTERVAL, i + 1);
 	dwValue = 0;
 	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval, &dwValue);
@@ -735,22 +731,8 @@ void  CDuiFrameWnd::SaveGrid(DWORD  i) {
 	strText.Format("%s %lu", CFG_GRID_MAX_TEMP, i + 1);
 	dwValue = DEFAULT_MAX_TEMP_IN_SHOW;
 	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, &dwValue);
-
-	for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
-		strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
-		bValue = DEFAULT_READER_SWITCH;
-		g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, &bValue);
-
-		strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
-		dwValue = DEFAULT_LOW_TEMP_ALARM;
-		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm, &dwValue);
-
-		strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
-		dwValue = DEFAULT_HIGH_TEMP_ALARM;
-		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
-	}
 }
-
+ 
 // 点击了“关于”
 void  CDuiFrameWnd::OnAbout() {   
 	CAboutDlg * pAboutDlg = new CAboutDlg;

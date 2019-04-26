@@ -96,8 +96,6 @@ using namespace DuiLib;
 #define   CFG_HAND_MAX_TEMP_IN_SHOW         "hand max temperature"
 #define   CFG_HAND_LOW_TEMP_ALARM           "hand low temperature alarm"
 #define   CFG_HAND_HIGH_TEMP_ALARM          "hand max temperature alarm"
-#define   CFG_GRID_SWITCH                   "grid switch"
-#define   DEFAULT_GRID_SWITCH               FALSE
 #define   CFG_COLLECT_INTERVAL              "collect interval"
 #define   MAX_COLLECT_INTERVAL_INDEX        5
 #define   CFG_GRID_MIN_TEMP                 "grid min temperature"
@@ -144,7 +142,6 @@ typedef struct tagReaderCfg
 // 术中窗格
 typedef struct tagGridCfg
 {
-	BOOL        m_bSwitch;                              // 总开关
 	DWORD       m_dwCollectInterval;                    // 采集间隔(单位:秒)
 	DWORD       m_dwMinTemp;                            // 显示的最低温度(单位:℃)
 	DWORD       m_dwMaxTemp;                            // 显示的最高温度(单位:℃)

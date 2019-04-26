@@ -157,11 +157,6 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	CEditUI * pEdit = 0;
 	CCheckBoxUI * pCheckBox = 0;
 
-	// 启用/禁用
-	pCheckBox = new CCheckBoxUI;
-	pCheckBox->Selected(m_data.m_GridCfg[dwIndex].m_bSwitch ? true : false);
-	m_tree->AddNode("是否启用全部读卡器", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-
 	// 间隔时间
 	pCombo = new CComboUI;
 	AddComboItem(pCombo, "10秒", 0);
@@ -187,37 +182,6 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	pEdit->SetText(strText);
 	pEdit->SetNumberOnly(true);
 	m_tree->AddNode("显示的最高温度(℃)", pSubTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
-
-	CMyTreeCfgUI::Node* pSubTitleNode_1 = NULL;
-	strText.Format("读卡器");
-	pSubTitleNode_1 = m_tree->AddNode(strText, pSubTitleNode, 0, 0, 3, 0xFF666666);
-	
-	for ( DWORD i = 0; i < MAX_READERS_PER_GRID; i++ ) {
-
-		CMyTreeCfgUI::Node* pSubTitleNode_2 = NULL;
-		strText.Format("读卡器%c", i+'A');
-		pSubTitleNode_2 = m_tree->AddNode(strText, pSubTitleNode_1, 0, 0, 3, 0xFF666666);
-
-		pCheckBox = new CCheckBoxUI;
-		pCheckBox->Selected(m_data.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ? true : false);
-		m_tree->AddNode("是否启用", pSubTitleNode_2, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-
-		// 低温报警
-		pEdit = new CEditUI;
-		strText.Format("%.2f", m_data.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwLowTempAlarm / 100.0 );
-		pEdit->SetText(strText);
-		m_tree->AddNode("低温报警(℃)", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
-
-		// 高温报警
-		pEdit = new CEditUI;
-		strText.Format("%.2f", m_data.m_GridCfg[dwIndex].m_ReaderCfg[i].m_dwHighTempAlarm / 100.0);
-		pEdit->SetText(strText);
-		m_tree->AddNode("高温报警(℃)", pSubTitleNode_2, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
-
-		if ( i > 0 ) {
-			m_tree->ExpandNode(pSubTitleNode_2, false);
-		}
-	}
 
 	m_tree->ExpandNode(pSubTitleNode, false);	
 }
@@ -312,16 +276,11 @@ BOOL  CSettingDlg::GetCommonConfig() {
 BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
-	const  DWORD  ITEMS_COUNT_PER_READER = 4;
+	const  DWORD  ITEMS_COUNT_PER_READER = 0;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 15 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+6) * nIndex;
+	int  nCfgRowIndex = 15 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+4) * nIndex;
 	int  nNumber = 0;
 	double dNumber = 0.0;
-
-	// 格子开关
-	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	m_data.m_GridCfg[nIndex].m_bSwitch = cfgValue.m_bCheckbox;
-	nCfgRowIndex++;
 
 	// 采集间隔
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
@@ -353,50 +312,6 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 		strText.Format("床位%d，最高显示温度必须大于最低显示温度", nIndex + 1);
 		::MessageBox(this->GetHWND(), strText, "设置", 0);
 		return FALSE;
-	}
-
-	double dMax = HIGH_TEMP_ALARM / 100.0;
-	double dMin = LOW_TEMP_ALARM / 100.0;
-	// 获取Reader配置
-	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + ITEMS_COUNT_PER_READER * i + 2, cfgValue);
-		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_bSwitch = cfgValue.m_bCheckbox;
-
-		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + ITEMS_COUNT_PER_READER * i + 3, cfgValue);
-		strText = cfgValue.m_strEdit;
-		if (1 != sscanf_s(strText, "%lf", &dNumber)) {
-			strText.Format("床位%d读卡器%c配置，低温报警请输入数字", nIndex + 1, (char)i+'A' );
-			::MessageBox(this->GetHWND(), strText, "设置", 0);
-			return FALSE;
-		}
-
-		if (dNumber > dMax || dNumber < dMin) {
-			strText.Format("床位%d读卡器%c配置，低温报警请输入范围(%.2f~%.2f)", nIndex + 1, (char)i + 'A', dMin, dMax);
-			::MessageBox(this->GetHWND(), strText, "设置", 0);
-			return FALSE;
-		}
-		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwLowTempAlarm = (DWORD)(dNumber * 100);
-		
-		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + ITEMS_COUNT_PER_READER * i + 4, cfgValue);
-		strText = cfgValue.m_strEdit;
-		if (1 != sscanf_s(strText, "%lf", &dNumber)) {
-			strText.Format("床位%d读卡器%c配置，高温报警请输入数字", nIndex + 1, (char)i + 'A');
-			::MessageBox(this->GetHWND(), strText, "设置", 0);
-			return FALSE;
-		}
-
-		if (dNumber > dMax || dNumber < dMin) {
-			strText.Format("床位%d读卡器%c配置，高温报警请输入范围(%.2f~%.2f)", nIndex + 1, (char)i + 'A', dMin, dMax);
-			::MessageBox(this->GetHWND(), strText, "设置", 0);
-			return FALSE;
-		}
-		m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwHighTempAlarm = (DWORD)(dNumber * 100);
-
-		if (m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwHighTempAlarm < m_data.m_GridCfg[nIndex].m_ReaderCfg[i].m_dwLowTempAlarm) {
-			strText.Format("床位%d读卡器%c配置，高温报警请大于低温报警",  nIndex + 1, (char)i + 'A');
-			::MessageBox(this->GetHWND(), strText, "设置", 0);
-			return FALSE;
-		}
 	}
 
 	return TRUE;
