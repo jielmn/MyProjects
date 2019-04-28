@@ -68,6 +68,7 @@ using namespace DuiLib;
 #define   OPT_READER_SELECTED     "opn_reader_switch"
 #define   CST_EDT_BTN_BodyPart    "cstEdtBtnBodyPart"
 #define   CTR_READER_STATE        "ReaderState"
+#define   CTR_CUR_READER_STATE    "CurReaderState"
 
 
 // CONFIG

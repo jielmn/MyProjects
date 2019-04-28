@@ -192,7 +192,8 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 		while (pCtl) {
 			if (pCtl->GetName() == GRID_NAME) {
 				// 如果不是点击修改名字按钮
-				if (0 != strcmp(pOriginalCtl->GetClass(), "Button")) {
+				if (0 != strcmp(pOriginalCtl->GetClass(), "Button") 
+					&& 0 != strcmp(pOriginalCtl->GetClass(), "ModeButton")) {
 					m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
 					m_nDgDestIndex = -1;
 					m_dwDgStartTick = LmnGetTickCount();

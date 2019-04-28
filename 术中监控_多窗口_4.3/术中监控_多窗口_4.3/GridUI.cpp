@@ -16,6 +16,7 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 
 	m_cstModeBtn = 0;
 	m_hand_reader = 0;
+	m_CurReaderState = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -37,6 +38,7 @@ void CGridUI::DoInit() {
 	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(GRID_XML_FILE, (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
+		m_pManager->AddNotifier(this);
 	}
 	else {
 		this->RemoveAll();
@@ -55,16 +57,18 @@ void CGridUI::DoInit() {
 	m_btnBedNo->SetText(strText);
 	m_btnBedNoM->SetText(strText);
 	
-	m_lblReaderNo = static_cast<DuiLib::CLabelUI *>(m_pManager->FindControl(LBL_READER_NO));
-	strText.Format("%c", ('A' + (char)m_dwReaderNo) );
-	m_lblReaderNo->SetText(strText);
+	m_lblReaderNo = static_cast<DuiLib::CLabelUI *>(m_pManager->FindControl(LBL_READER_NO));	
+	m_lblReaderNo->SetText("");
+
+	m_CurReaderState = m_pManager->FindControl(CTR_CUR_READER_STATE);
+	m_CurReaderState->SetVisible(false);
 
 	m_cstModeBtn = static_cast<CModeButton *>(m_pManager->FindControl(MODE_BUTTON));
 
 	// A~F 6¸öÁ¬Ðø²âÎÂ¶Á¿¨Æ÷
 	m_layReaders = static_cast<DuiLib::CVerticalLayoutUI *>(m_pManager->FindControl(LAY_READERS));
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		m_readers[i] = new CReaderUI;
+		m_readers[i] = new CReaderUI(CReaderUI::Surgency);
 		m_readers[i]->SetTag(i+1);
 		m_readers[i]->SetIndicator(i);    
 		m_readers[i]->SetFixedHeight(100);
@@ -103,5 +107,64 @@ void  CGridUI::SwitchView() {
 	}
 	else {
 		m_tabs->SelectItem(0);
+	}
+}
+
+void CGridUI::Notify(TNotifyUI& msg) {
+	if (msg.sType == "ModeChanged") {
+		if (msg.pSender == m_cstModeBtn) {
+			OnModeChanged();
+		}
+	}
+}
+
+void CGridUI::OnModeChanged() {
+	switch (m_cstModeBtn->GetMode())
+	{
+	case CModeButton::Mode_Hand:
+	{
+		m_hand_reader->SetVisible(true);
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			m_readers[i]->SetVisible(false);
+		}
+		m_CurReaderState->SetVisible(false);
+
+		m_lblReaderNo->SetText("");
+	}
+	break;
+
+	case CModeButton::Mode_Single:
+	{
+		m_hand_reader->SetVisible(false);
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			if ( 0 == i )
+				m_readers[i]->SetVisible(true);
+			else
+				m_readers[i]->SetVisible(false);
+		}
+		m_CurReaderState->SetVisible(true);
+
+		CDuiString strText;
+		strText.Format("%c", ('A' + (char)m_dwReaderNo));
+		m_lblReaderNo->SetText(strText);
+	}
+	break;
+
+	case CModeButton::Mode_Multiple:
+	{
+		m_hand_reader->SetVisible(false);
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			m_readers[i]->SetVisible(true);
+		}
+		m_CurReaderState->SetVisible(true);
+
+		CDuiString strText;
+		strText.Format("%c", ('A' + (char)m_dwReaderNo));
+		m_lblReaderNo->SetText(strText);
+	}
+	break;
+
+	default:
+		break;
 	}
 }

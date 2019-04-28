@@ -47,7 +47,7 @@ void CReaderUI::DoInit() {
 		m_lblIndicator->SetVisible(false);
 		m_optSelected->SetVisible(false);
 		m_cstBodyPart->SetEnabled(false);
-		m_state->SetVisible(false);
+		m_state->SetVisible(false); 
 	}
 
 	m_bInited = TRUE;

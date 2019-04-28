@@ -13,6 +13,7 @@ public:
 
 	CModeButton();
 	~CModeButton();
+	Mode GetMode() const;
 
 private:
 	virtual void DoEvent(DuiLib::TEventUI& event);

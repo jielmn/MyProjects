@@ -41,4 +41,10 @@ void CModeButton::SwitchMode() {
 	default:
 		break;
 	}
+
+	m_pManager->SendNotify(this, "ModeChanged");;
+}
+
+CModeButton::Mode CModeButton::GetMode() const {
+	return m_mode;
 }

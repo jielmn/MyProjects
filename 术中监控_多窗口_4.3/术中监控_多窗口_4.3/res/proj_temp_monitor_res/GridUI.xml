@@ -44,7 +44,7 @@
 			<VerticalLayout width="30" >
 				<Control />
 				<HorizontalLayout height="30">
-					<Control bkimage="disconnected.png" width="30" height="30" />
+					<Control name="CurReaderState" bkimage="disconnected.png" width="30" height="30" />
 				</HorizontalLayout>
 				<Control />
 			</VerticalLayout>

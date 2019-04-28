@@ -18,12 +18,7 @@
 			<HorizontalLayout height="40" inset="30,5,0,5" >
 				<Control bkimage="file='user.png' dest='0,7,30,32'"  width="50" tooltip="病人姓名" />
 				<EditableButton name="cstEdtBtnPatientNameM" width="150" btncolor="#FFCCCCCC" btnfont="9" editfont="9" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
-			</HorizontalLayout>
-			
-			<HorizontalLayout height="40" inset="30,5,0,5" >
-				<Label   text="启用"   textcolor="#FFCCCCCC" width="50" font="10" />
-				<Option  width="30" name="opnGridSwitchM" normalimage="not_checked.png" selectedimage="checked.png" selected="true" />
-			</HorizontalLayout>
+			</HorizontalLayout>			
 			
 			<HorizontalLayout height="70" inset="10,40,10,0" >
 				<Control bkimage="file='reader_info.png' dest='0,0,25,40'" width="30" />

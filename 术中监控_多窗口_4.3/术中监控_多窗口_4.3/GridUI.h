@@ -4,7 +4,7 @@
 #include "ReaderUI.h"
 #include "ModeButtonUI.h"
 
-class CGridUI : public CContainerUI
+class CGridUI : public CContainerUI, INotifyUI
 {
 public:
 	CGridUI();
@@ -19,6 +19,8 @@ private:
 
 	void DoInit();
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+	void Notify(TNotifyUI& msg);
+	void OnModeChanged();
 
 private:
 	BOOL                                        m_bInited;
@@ -33,6 +35,8 @@ private:
 	DWORD                                       m_dwReaderNo;
 
 	CModeButton *                               m_cstModeBtn;
+
+	CControlUI *                                m_CurReaderState;
 
 	// ¶Á¿¨Æ÷ºÏ¼¯
 	CVerticalLayoutUI *                         m_layReaders;
