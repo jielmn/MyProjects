@@ -48,3 +48,22 @@ void CModeButton::SwitchMode() {
 CModeButton::Mode CModeButton::GetMode() const {
 	return m_mode;
 }
+
+void CModeButton::SetMode(CModeButton::Mode e) {
+	m_mode = e;
+
+	switch (m_mode)
+	{
+	case CModeButton::Mode_Hand:
+		this->SetBkImage("file='hand.png' dest='2,2,28,28'");
+		break;
+	case CModeButton::Mode_Single:
+		this->SetBkImage("file='single.png' dest='2,2,28,28'");
+		break;
+	case CModeButton::Mode_Multiple:
+		this->SetBkImage("file='multiple.png' dest='2,2,28,28'");
+		break;
+	default:
+		break;
+	}
+}

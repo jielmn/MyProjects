@@ -109,6 +109,7 @@ using namespace DuiLib;
 #define   DEFAULT_READER_SWITCH             FALSE
 #define   CFG_LOW_TEMP_ALARM                "low temperature alarm"
 #define   CFG_HIGH_TEMP_ALARM               "high temperature alarm"
+#define   CFG_GRID_MODE                     "grid mode"
 
 // thread消息
 #define MSG_CHECK_LAUNCH_STATUS             1001
@@ -151,6 +152,7 @@ typedef struct tagGridCfg
 	DWORD       m_dwCollectInterval;                    // 采集间隔(单位:秒)
 	DWORD       m_dwMinTemp;                            // 显示的最低温度(单位:℃)
 	DWORD       m_dwMaxTemp;                            // 显示的最高温度(单位:℃)
+	DWORD       m_dwGridMode;                           // 手持0，单点连续1，多点连续2
 	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];
 }GridCfg;
 

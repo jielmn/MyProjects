@@ -265,6 +265,7 @@ void CBusiness::GetAreaCfg() {
 // ¥≤Œªµƒ≈‰÷√
 void CBusiness::GetGridsCfg() {
 	CDuiString  strText;
+	DWORD  dwValue = 0;
 
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 
@@ -289,6 +290,13 @@ void CBusiness::GetGridsCfg() {
 		if (g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp >= g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp) {
 			g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp = DEFAULT_MIN_TEMP_IN_SHOW;
 			g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp = DEFAULT_MAX_TEMP_IN_SHOW;
+		}
+
+		strText.Format("%s %lu", CFG_GRID_MODE, i + 1);
+		dwValue = CModeButton::Mode_Hand;
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwGridMode, dwValue);
+		if (g_data.m_CfgData.m_GridCfg[i].m_dwGridMode > CModeButton::Mode_Multiple) {
+			g_data.m_CfgData.m_GridCfg[i].m_dwGridMode = CModeButton::Mode_Hand;
 		}
 
 		for (int j = 0; j < MAX_READERS_PER_GRID; j++) {

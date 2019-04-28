@@ -11,6 +11,8 @@ public:
 	~CGridUI();
 
 	void  SetBedNo(DWORD dwIndex);
+	void  SetMode(CModeButton::Mode e);
+
 	// Ë«»÷ºóµÄÊÓÍ¼ÇÐ»»
 	void  SwitchView();
 

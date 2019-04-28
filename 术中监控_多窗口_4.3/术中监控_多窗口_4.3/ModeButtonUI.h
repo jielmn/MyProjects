@@ -14,6 +14,7 @@ public:
 	CModeButton();
 	~CModeButton();
 	Mode GetMode() const;
+	void SetMode(Mode e);
 
 private:
 	virtual void DoEvent(DuiLib::TEventUI& event);

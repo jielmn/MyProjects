@@ -65,6 +65,12 @@ void CGridUI::DoInit() {
 
 	m_cstModeBtn = static_cast<CModeButton *>(m_pManager->FindControl(MODE_BUTTON));
 
+	// 格子模式
+	strText = this->GetCustomAttribute("GridMode");
+	DWORD dwMode = 0;
+	sscanf(strText, "%lu", &dwMode);
+	m_cstModeBtn->SetMode((CModeButton::Mode)dwMode);
+
 	// A~F 6个连续测温读卡器
 	m_layReaders = static_cast<DuiLib::CVerticalLayoutUI *>(m_pManager->FindControl(LAY_READERS));
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
@@ -72,14 +78,15 @@ void CGridUI::DoInit() {
 		m_readers[i]->SetTag(i+1);
 		m_readers[i]->SetIndicator(i);    
 		m_readers[i]->SetFixedHeight(100);
-		m_readers[i]->SetVisible(false);
 		m_layReaders->Add(m_readers[i]);
 	}
 
 	m_hand_reader = new CReaderUI;
 	m_hand_reader->SetTag(0);
 	m_hand_reader->SetFixedHeight(100);       
-	m_layReaders->Add(m_hand_reader);
+	m_layReaders->Add(m_hand_reader);	
+
+	OnModeChanged();
 
 	m_bInited = TRUE;
 }
@@ -167,4 +174,18 @@ void CGridUI::OnModeChanged() {
 	default:
 		break;
 	}
+
+	CDuiString  strText;
+	DWORD  dwIndex = GetTag();
+	strText.Format("%s %lu", CFG_GRID_MODE, dwIndex+1);
+
+	g_data.m_CfgData.m_GridCfg[dwIndex].m_dwGridMode = (DWORD)m_cstModeBtn->GetMode();
+	DWORD dwDefValue = CModeButton::Mode_Hand;
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_dwGridMode, &dwDefValue);
+}
+
+void  CGridUI::SetMode(CModeButton::Mode e) {
+	CDuiString strText;
+	strText.Format("%lu", (DWORD)e);
+	this->SetAttribute("GridMode", strText);
 }
