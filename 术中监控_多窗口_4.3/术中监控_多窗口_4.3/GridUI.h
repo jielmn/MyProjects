@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "ReaderUI.h"
+#include "ModeButtonUI.h"
 
 class CGridUI : public CContainerUI
 {
@@ -28,10 +29,13 @@ private:
 	CButtonUI *                                 m_btnBedNoM;
 	DWORD                                       m_dwBedNo;
 
-	CLabelUI *                                  m_lblReaderNo;
+	CLabelUI *                                  m_lblReaderNo;         // A ~ F
 	DWORD                                       m_dwReaderNo;
+
+	CModeButton *                               m_cstModeBtn;
 
 	// ¶Á¿¨Æ÷ºÏ¼¯
 	CVerticalLayoutUI *                         m_layReaders;
-	CReaderUI *                                 m_readers[MAX_READERS_PER_GRID];
+	CReaderUI *                                 m_readers[MAX_READERS_PER_GRID];             // Á¬Ðø²âÎÂ¶Á¿¨Æ÷
+	CReaderUI *                                 m_hand_reader;                               // ·ÇÁ¬Ðø²âÎÂ¶Á¿¨Æ÷
 };

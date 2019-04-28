@@ -13,6 +13,9 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 
 	m_layReaders = 0;
 	memset(m_readers, 0, sizeof(m_readers));
+
+	m_cstModeBtn = 0;
+	m_hand_reader = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -29,6 +32,8 @@ void CGridUI::DoInit() {
 	}
 
 	CDialogBuilder builder;
+	if ( m_callback.m_pManager == 0 )
+		m_callback.m_pManager = m_pManager;
 	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(GRID_XML_FILE, (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
@@ -50,18 +55,27 @@ void CGridUI::DoInit() {
 	m_btnBedNo->SetText(strText);
 	m_btnBedNoM->SetText(strText);
 	
-
 	m_lblReaderNo = static_cast<DuiLib::CLabelUI *>(m_pManager->FindControl(LBL_READER_NO));
 	strText.Format("%c", ('A' + (char)m_dwReaderNo) );
 	m_lblReaderNo->SetText(strText);
 
+	m_cstModeBtn = static_cast<CModeButton *>(m_pManager->FindControl(MODE_BUTTON));
+
+	// A~F 6¸öÁ¬Ðø²âÎÂ¶Á¿¨Æ÷
 	m_layReaders = static_cast<DuiLib::CVerticalLayoutUI *>(m_pManager->FindControl(LAY_READERS));
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_readers[i] = new CReaderUI;
-		m_readers[i]->SetTag(i);
+		m_readers[i]->SetTag(i+1);
 		m_readers[i]->SetIndicator(i);    
+		m_readers[i]->SetFixedHeight(100);
+		m_readers[i]->SetVisible(false);
 		m_layReaders->Add(m_readers[i]);
 	}
+
+	m_hand_reader = new CReaderUI;
+	m_hand_reader->SetTag(0);
+	m_hand_reader->SetFixedHeight(100);       
+	m_layReaders->Add(m_hand_reader);
 
 	m_bInited = TRUE;
 }

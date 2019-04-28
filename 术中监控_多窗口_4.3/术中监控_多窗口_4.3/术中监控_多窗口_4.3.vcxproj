@@ -162,6 +162,7 @@
     <ClCompile Include="GridUI.cpp" />
     <ClCompile Include="Launch.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ModeButton.cpp" />
     <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="MyImageUI.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Launch.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="DuiMenu.h" />
+    <ClInclude Include="ModeButtonUI.h" />
     <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="MyImageUI.h" />
     <ClInclude Include="MyTreeCfgUI.h" />

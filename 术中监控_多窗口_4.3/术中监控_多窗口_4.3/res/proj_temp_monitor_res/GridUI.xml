@@ -8,7 +8,7 @@
 			<VerticalLayout width="30">
 				<Control />
 				<HorizontalLayout height="30">
-					<Button  name="btnMode"  bkimage="file='hand.png' dest='2,2,28,28'" hotimage="file='btn_hot.png' corner='2,8,2,2'" tooltip="模式" />
+					<ModeButton  name="btnMode"  bkimage="file='hand.png' dest='2,2,28,28'" hotimage="file='btn_hot.png' corner='2,8,2,2'" tooltip="模式" />
 				</HorizontalLayout>
 				<Control />
 			</VerticalLayout>

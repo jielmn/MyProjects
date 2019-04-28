@@ -1,11 +1,18 @@
 #pragma once
 
 #include "common.h"
+#include "EditableButtonUI.h"
 
 class CReaderUI : public CContainerUI
 {
 public:
-	CReaderUI();
+	enum ReaderType
+	{
+		Hand = 0,            // 手持Reader
+		Surgency             // 术中Reader
+	};
+
+	CReaderUI(ReaderType e = Hand);
 	~CReaderUI();
 
 	void  SetIndicator(DWORD dwIndex);
@@ -23,4 +30,12 @@ private:
 	CLabelUI *                                  m_lblIndicator;           // A~F指示器
 	DWORD                                       m_dwIndicator;
 	CControlUI *                                m_indicator;              // 颜色指示器
+
+	ReaderType                                  m_type; 
+
+	COptionUI *                                 m_optSelected;            // 选择框
+
+	CEditableButtonUI *                         m_cstBodyPart;            // 身体部位
+
+	CControlUI *                                m_state;                  // 断线状态
 };

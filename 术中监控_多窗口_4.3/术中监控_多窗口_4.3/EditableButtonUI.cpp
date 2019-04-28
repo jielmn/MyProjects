@@ -97,3 +97,10 @@ void CEditableButtonUI::Notify(TNotifyUI& msg) {
 CDuiString CEditableButtonUI::GetText() const {
 	return m_btn->GetText();
 }
+
+void CEditableButtonUI::SetEnabled(bool bEnable /*= true*/) {
+	if (m_btn)
+		m_btn->SetEnabled(bEnable);
+	if (m_edit)
+		m_edit->SetEnabled(bEnable);
+}

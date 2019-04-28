@@ -28,7 +28,7 @@
 			<VerticalLayout width="105">
 				<Control />
 				<HorizontalLayout height="30">
-					<EditableButton name="cstEdtBtnTagName" width="105" btncolor="#FFCCCCCC" btnfont="11" editfont="11" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
+					<EditableButton name="cstEdtBtnBodyPart" width="105" btncolor="#FFCCCCCC" btnfont="11" editfont="11" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
 				</HorizontalLayout>
 				<Control />
 			</VerticalLayout>		
@@ -39,7 +39,7 @@
 			
 			<VerticalLayout width="30">
 				<Control />
-				<Control bkimage="disconnected.png" width="30" height="30" />
+				<Control name="ReaderState" bkimage="disconnected.png" width="30" height="30" />
 				<Control />
 			</VerticalLayout>		
 			

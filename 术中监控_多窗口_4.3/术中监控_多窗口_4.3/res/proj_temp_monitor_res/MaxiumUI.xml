@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window>	
+<Window>		
 	<HorizontalLayout inset="1,1,1,1" bordercolor="#FF768D9B" bordersize="1" >			
 	
 		<!-- 左边的grid属性 -->

@@ -64,6 +64,10 @@ using namespace DuiLib;
 #define   READER_INDICATOR        "indicator"
 #define   LBL_BAR_TIPS            "lblBarTips"
 #define   LBL_LAUNCH_STATUS       "lblLaunchStatus"
+#define   MODE_BUTTON             "btnMode"
+#define   OPT_READER_SELECTED     "opn_reader_switch"
+#define   CST_EDT_BTN_BodyPart    "cstEdtBtnBodyPart"
+#define   CTR_READER_STATE        "ReaderState"
 
 
 // CONFIG
@@ -121,7 +125,8 @@ public:
 		m_pManager = pManager;
 	}
 	CControlUI* CreateControl(LPCTSTR pstrClass);
-private:
+
+public:
 	DuiLib::CPaintManagerUI *  m_pManager;
 };
 

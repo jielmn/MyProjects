@@ -5,6 +5,7 @@
 #include "common.h"
 #include "EditableButtonUI.h"
 #include "MyImageUI.h"
+#include "ModeButtonUI.h"
 
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
@@ -37,6 +38,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(pstrClass, "MyImage")) {
 		return new CMyImageUI;
+	}
+	else if (0 == strcmp(pstrClass, "ModeButton")) {
+		return new CModeButton;
 	}
 	return NULL;
 }
