@@ -80,6 +80,8 @@ private:
 	void   OnAbout();
 	// 保存格子配置
 	void   SaveGrid(DWORD  dwIndex);
+	// 删除格子配置
+	void   RemoveGridCfg(DWORD  dwIndex);
 	// 硬件设备变动，可能有串口变动
 	void   CheckDevice();
 	// 接收器状态

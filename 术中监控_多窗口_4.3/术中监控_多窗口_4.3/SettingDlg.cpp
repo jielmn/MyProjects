@@ -3,19 +3,11 @@
 /*
   通用设置         ............................      8项
       7
-  手持测温设置 ..............................  5项
-	  4
+  手持测温设置 ..............................        3项
+	  2
   床位
-      床位1         ..............................     30项
-	      4
-	      读卡器
-		      读卡器A
-			      3
-			  读卡器B
-			      3
-			  ...
-			  读卡器F
-			      3   
+      床位1         ..............................    4项
+	      3
 */
 
 
@@ -278,7 +270,7 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	const  DWORD  ITEMS_COUNT_PER_READER = 0;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 15 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+4) * nIndex;
+	int  nCfgRowIndex = 13 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+4) * nIndex;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 
@@ -340,18 +332,6 @@ void    CSettingDlg::InitHandReaderCfg() {
 	pEdit->SetText(strText);
 	pEdit->SetNumberOnly(true);
 	m_tree->AddNode("显示的最高温度(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
-
-	// 低温报警
-	pEdit = new CEditUI;
-	strText.Format("%.2f", m_data.m_dwHandReaderLowTempAlarm / 100.0);
-	pEdit->SetText(strText);
-	m_tree->AddNode("低温报警(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
-
-	// 高温报警
-	pEdit = new CEditUI;
-	strText.Format("%.2f", m_data.m_dwHandReaderHighTempAlarm / 100.0);
-	pEdit->SetText(strText);
-	m_tree->AddNode("高温报警(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 }
 
 BOOL    CSettingDlg::GetHandReaderConfig() {
@@ -382,45 +362,6 @@ BOOL    CSettingDlg::GetHandReaderConfig() {
 
 	if (m_data.m_dwHandReaderMaxTemp <= m_data.m_dwHandReaderMinTemp) {
 		strText.Format("手持测温，显示的最高温度必须大于显示的最低温度");
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
-
-	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	strText = cfgValue.m_strEdit;
-	if (1 != sscanf_s(strText, "%lf", &dNumber)) {
-		strText.Format("手持测温，低温报警请输入数字");
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
-
-	double dMax = HIGH_TEMP_ALARM / 100.0;
-	double dMin = LOW_TEMP_ALARM / 100.0;
-	if (dNumber > dMax || dNumber < dMin) {
-		strText.Format("手持测温，低温报警请输入范围(%.2f~%.2f)", dMin, dMax);
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
-	m_data.m_dwHandReaderLowTempAlarm = (DWORD)(dNumber * 100);
-	nCfgRowIndex++;
-
-	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	strText = cfgValue.m_strEdit;
-	if (1 != sscanf_s(strText, "%lf", &dNumber)) {
-		strText.Format("手持测温，高温报警请输入数字");
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
-
-	if (dNumber > dMax || dNumber < dMin) {
-		strText.Format("手持测温，高温报警请输入范围(%.2f~%.2f)", dMin, dMax );
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
-	m_data.m_dwHandReaderHighTempAlarm = (DWORD)(dNumber * 100);
-
-	if (m_data.m_dwHandReaderHighTempAlarm < m_data.m_dwHandReaderLowTempAlarm) {
-		strText.Format("手持测温，高温报警请大于低温报警");
 		::MessageBox(this->GetHWND(), strText, "设置", 0);
 		return FALSE;
 	}
@@ -461,6 +402,20 @@ void   CSettingDlg::OnGridsChanged() {
 	if ( dwNumber > m_data.m_dwLayoutGridsCnt ) {
 		int nCnt = m_tree->GetCount();
 		DWORD  dwDiff =  dwNumber - m_data.m_dwLayoutGridsCnt;
+
+		// 初始化增加的格子，给默认值
+		for (DWORD i = 0; i < dwDiff; i++) {
+			DWORD  dwIndex = m_data.m_dwLayoutGridsCnt + i;
+			memset( &m_data.m_GridCfg[dwIndex], 0, sizeof(GridCfg));
+			m_data.m_GridCfg[dwIndex].m_dwMinTemp = DEFAULT_MIN_TEMP_IN_SHOW;
+			m_data.m_GridCfg[dwIndex].m_dwMaxTemp = DEFAULT_MAX_TEMP_IN_SHOW;
+			for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++ ) {
+				m_data.m_GridCfg[dwIndex].m_ReaderCfg[j].m_dwHighTempAlarm = DEFAULT_HIGH_TEMP_ALARM;
+				m_data.m_GridCfg[dwIndex].m_ReaderCfg[j].m_dwLowTempAlarm  = DEFAULT_LOW_TEMP_ALARM;
+			}
+		}
+
+		// 界面显示
 		for (DWORD i = 0; i < dwDiff; i++) {
 			InitGridCfg(m_pBedTitleNode, m_data.m_dwLayoutGridsCnt+i);
 		}
@@ -470,7 +425,7 @@ void   CSettingDlg::OnGridsChanged() {
 		int nCnt = m_tree->GetCount();
 		DWORD  dwDiff = m_data.m_dwLayoutGridsCnt - dwNumber;
 		for ( DWORD i = 0; i < dwDiff; i++ ) {
-			m_tree->RemoveAt( nCnt - 30 * dwDiff );
+			m_tree->RemoveAt( nCnt - 4 * dwDiff );
 		}
 	}
 	m_data.m_dwLayoutGridsCnt = dwNumber;

@@ -695,6 +695,11 @@ void  CDuiFrameWnd::OnSetting() {
 		SaveGrid(i);
 	}
 
+	// 多余的grid配置删除
+	for (DWORD i = g_data.m_CfgData.m_dwLayoutGridsCnt; i < MAX_GRID_COUNT; i++) {
+		RemoveGridCfg(i);
+	}
+
 	// 格子数目改变
 	if ( oldData.m_dwLayoutGridsCnt != g_data.m_CfgData.m_dwLayoutGridsCnt ) {
 		g_data.m_cfg->RemoveConfig(CFG_GRIDS_ORDER);
@@ -736,6 +741,34 @@ void  CDuiFrameWnd::SaveGrid(DWORD  i) {
 	strText.Format("%s %lu", CFG_GRID_MAX_TEMP, i + 1);
 	dwValue = DEFAULT_MAX_TEMP_IN_SHOW;
 	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, &dwValue);
+}
+
+// 删除格子配置
+void  CDuiFrameWnd::RemoveGridCfg(DWORD  i) {
+	CDuiString  strText;
+
+	strText.Format("%s %lu", CFG_COLLECT_INTERVAL, i + 1);
+	g_data.m_cfg->RemoveConfig(strText);
+
+	strText.Format("%s %lu", CFG_GRID_MIN_TEMP, i + 1);
+	g_data.m_cfg->RemoveConfig(strText);
+
+	strText.Format("%s %lu", CFG_GRID_MAX_TEMP, i + 1);
+	g_data.m_cfg->RemoveConfig(strText);
+
+	strText.Format("%s %lu", CFG_GRID_MODE, i + 1);
+	g_data.m_cfg->RemoveConfig(strText);
+
+	for (int j = 0; j < MAX_READERS_PER_GRID; j++) {
+		strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
+		g_data.m_cfg->RemoveConfig(strText);
+
+		strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
+		g_data.m_cfg->RemoveConfig(strText);
+
+		strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
+		g_data.m_cfg->RemoveConfig(strText);
+	}
 }
  
 // 点击了“关于”
