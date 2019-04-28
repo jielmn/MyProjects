@@ -709,6 +709,8 @@ void  CDuiFrameWnd::OnSetting() {
 		ResetGridOrder();
 		RefreshGridsPage();
 		RefreshGridsSize();
+
+		CBusiness::GetInstance()->RestartLaunchAsyn();
 	}
 	// 格子数目不变；行，列改变
 	else if ( oldData.m_dwLayoutColumns != g_data.m_CfgData.m_dwLayoutColumns

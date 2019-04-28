@@ -128,6 +128,8 @@ int CBusiness::Init() {
 
 	GetGridsCfg();
 
+	// 发射器端口
+	g_data.m_cfg->GetConfig(CFG_LAUNCH_COM_PORT, g_data.m_szLaunchPort, sizeof(g_data.m_szLaunchPort), "");
 	/******************** end 配置项 **********************/
 
 
@@ -358,17 +360,60 @@ void  CBusiness::CheckLaunch() {
 	m_launch.CheckStatus();
 }
 
+// 重新连接接收器(因配置改动，grid count变化)
+void   CBusiness::RestartLaunchAsyn() {
+	g_data.m_thrd_launch->DeleteMessages();
+	g_data.m_thrd_launch->PostMessage(this, MSG_RESTART_LAUNCH);
+}
+
+void   CBusiness::RestartLaunch() {
+	m_launch.Reconnect();
+}
+
+// 获取温度
+void  CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
+	if (0 == dwDelay) {
+		g_data.m_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
+	}
+	else {
+		g_data.m_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
+	}
+}
+
+void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
+	DWORD   i      = pParam->m_dwIndex;
+	GridCfg cfg    = g_data.m_CfgData.m_GridCfg[i];
+	BYTE    byArea = (BYTE)g_data.m_CfgData.m_dwAreaNo;
+
+	// 如果是手持读卡器模式
+	if ( cfg.m_dwGridMode == CModeButton::Mode_Hand ) {
+		GetGridTemperatureAsyn(i, DEF_GET_TEMPERATURE_DELAY);
+		return;
+	}
+
+	// 如果是单点连续术中读卡器
+	if ( cfg.m_dwGridMode == CModeButton::Mode_Single ) {
+		m_launch.QueryTemperature( byArea, (WORD)(MAX_READERS_PER_GRID * i + 1) );
+		GetGridTemperatureAsyn(i, DEF_GET_TEMPERATURE_DELAY);
+		return;
+	}
+
+	for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+
+	}
+}
+
 void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 	m_sigLanchStatus.emit(e);
-	//if (e == CLmnSerialPort::OPEN) {
-	//	DWORD  dwCount = g_data.m_CfgData.m_dwLayoutColumns * g_data.m_CfgData.m_dwLayoutRows;
-	//	DWORD  dwDelay = 200;
-	//	for (DWORD i = 0; i < dwCount; i++) {
-	//		GetGridTemperatureAsyn(i, dwDelay);
-	//		dwDelay += 200;
-	//	}
-	//	ReadLaunchAsyn(1000);
-	//}
+
+	if (e == CLmnSerialPort::OPEN) {
+		DWORD  dwDelay = 200;
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			GetGridTemperatureAsyn(i, dwDelay);
+			dwDelay += 200;
+		}
+		//ReadLaunchAsyn(1000);
+	}
 }
 
 // 打印状态(调试用)
@@ -401,7 +446,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	}
 	break;
 
+	case MSG_RESTART_LAUNCH:
+	{
+		RestartLaunch();
+	}
+	break;
+
 	default:
-		break;
+	{
+		if ( dwMessageId >= MSG_GET_GRID_TEMP && dwMessageId <= MSG_GET_GRID_TEMP_MAX ) {
+			CGetGridTempParam * pParam = (CGetGridTempParam *)pMessageData;
+			GetGridTemperature(pParam);
+		}
+	}
+	break;
+
 	}
 }

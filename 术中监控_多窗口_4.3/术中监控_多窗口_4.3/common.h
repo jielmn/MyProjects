@@ -30,6 +30,7 @@ using namespace DuiLib;
 #define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
 #define   MAX_ROWS_COUNT           5              // 每个页面最大几行
 #define   DRAG_DROP_DELAY_TIME     100            // drag drop操作的延时时间
+#define   DEF_GET_TEMPERATURE_DELAY   10000       // 术中读卡器默认10秒后再次读取温度
 
 #define   VERSION                  "3.0.1"
 
@@ -110,10 +111,14 @@ using namespace DuiLib;
 #define   CFG_LOW_TEMP_ALARM                "low temperature alarm"
 #define   CFG_HIGH_TEMP_ALARM               "high temperature alarm"
 #define   CFG_GRID_MODE                     "grid mode"
+#define   CFG_LAUNCH_COM_PORT               "launch com port"
 
 // thread消息
 #define MSG_CHECK_LAUNCH_STATUS             1001
 #define MSG_PRINT_STATUS                    1002
+#define MSG_RESTART_LAUNCH                  1003
+#define MSG_GET_GRID_TEMP                   1100
+#define MSG_GET_GRID_TEMP_MAX               1199
 
 // windows 消息
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -205,6 +210,12 @@ typedef struct  tagTempItem {
 	char    m_szTagId[MAX_TAG_ID_LENGTH];                    // tag id
 	char    m_szReaderId[MAX_READER_ID_LENGTH];              // reader id
 }TempItem;
+
+class CGetGridTempParam : public LmnToolkits::MessageData {
+public:
+	CGetGridTempParam(DWORD dwIndex) : m_dwIndex(dwIndex) { }
+	DWORD     m_dwIndex;
+};
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

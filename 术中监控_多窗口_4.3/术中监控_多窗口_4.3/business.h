@@ -27,6 +27,14 @@ public:
 	void   CheckLaunchAsyn();
 	void   CheckLaunch();
 
+	// 重新连接接收器(因配置改动，grid count变化)
+	void   RestartLaunchAsyn();
+	void   RestartLaunch();
+
+	// 获取温度
+	void   GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay = 0);
+	void   GetGridTemperature(const CGetGridTempParam * pParam);
+
 	// 发射器相关的回调
 	void  OnStatus(CLmnSerialPort::PortStatus e);
 
