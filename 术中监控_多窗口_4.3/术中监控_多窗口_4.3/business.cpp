@@ -506,8 +506,22 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 			GetGridTemperatureAsyn(i, dwDelay);
 			dwDelay += 200;
 		}
-		//ReadLaunchAsyn(1000);
+		ReadLaunchAsyn(1000);
 	}
+}
+
+void  CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
+	if (0 == dwDelayTime) {
+		g_data.m_thrd_launch->PostMessage(this, MSG_READ_LAUNCH);
+	}
+	else {
+		g_data.m_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READ_LAUNCH);
+	}
+}
+
+void  CBusiness::ReadLaunch() {
+	m_launch.ReadComData();
+	ReadLaunchAsyn(READ_LAUNCH_INTERVAL_TIME);
 }
 
 // ´òÓ¡×´Ì¬(µ÷ÊÔÓÃ)
@@ -543,6 +557,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_RESTART_LAUNCH:
 	{
 		RestartLaunch();
+	}
+	break;
+
+	case MSG_READ_LAUNCH:
+	{
+		ReadLaunch();
 	}
 	break;
 

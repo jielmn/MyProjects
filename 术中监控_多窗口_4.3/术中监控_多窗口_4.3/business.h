@@ -36,6 +36,10 @@ public:
 	void   GetGridTemperature(const CGetGridTempParam * pParam);
 	void   GetGridTemperature(DWORD dwIndex, DWORD dwSubIndex, BYTE byArea, DWORD  dwOldMode );
 
+	// launch 读串口数据
+	void   ReadLaunchAsyn(DWORD dwDelayTime = 0);
+	void   ReadLaunch();
+
 	// 发射器相关的回调
 	void  OnStatus(CLmnSerialPort::PortStatus e);
 

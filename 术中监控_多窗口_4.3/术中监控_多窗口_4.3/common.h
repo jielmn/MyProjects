@@ -32,6 +32,7 @@ using namespace DuiLib;
 #define   DRAG_DROP_DELAY_TIME     100            // drag drop操作的延时时间
 #define   DEF_GET_TEMPERATURE_DELAY    10000      // 术中读卡器默认10秒后再次读取温度
 #define   MAX_TIME_NEEDED_BY_SUR_TEMP  5000       // 一次获取术中读卡器温度的软件最大等待时间，如果超过，则认为超时失败(单位：毫秒)
+#define   READ_LAUNCH_INTERVAL_TIME    1000
 
 #define   VERSION                  "3.0.1"
 
@@ -119,6 +120,7 @@ using namespace DuiLib;
 #define MSG_CHECK_LAUNCH_STATUS             1001
 #define MSG_PRINT_STATUS                    1002
 #define MSG_RESTART_LAUNCH                  1003
+#define MSG_READ_LAUNCH                     1004
 #define MSG_GET_GRID_TEMP                   1100
 #define MSG_GET_GRID_TEMP_MAX               1199
 
