@@ -86,10 +86,14 @@ private:
 	void   CheckDevice();
 	// 接收器状态
 	void   OnLaunchStatus(WPARAM wParam, LPARAM  lParam);
+	// 术中读卡器正在读数的提示
+	void   OnTrySurReader(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
 	void   OnLauchStatusNotify(CLmnSerialPort::PortStatus e);
+	// 接收器尝试读取术中读卡器的温度数据
+	void   OnTrySurReaderNotify(DWORD dwBed, BOOL bStart);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
@@ -118,4 +122,5 @@ private:
 	/******* 状态栏 ******/
 	CLabelUI *                                  m_lblBarTips;
 	CLabelUI *                                  m_lblLaunchStatus;
+	CLabelUI *                                  m_lblSurReaderTry;
 };

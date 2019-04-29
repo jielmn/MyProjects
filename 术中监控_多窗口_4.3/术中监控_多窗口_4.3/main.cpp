@@ -75,6 +75,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnMenu = static_cast<CButtonUI*>(m_PaintManager.FindControl(BTN_MENU));
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_BAR_TIPS));
 	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_LAUNCH_STATUS));
+	m_lblSurReaderTry = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_PROC_TIPS));
 
 	// 添加窗格
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
@@ -161,6 +162,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_LAUNCH_STATUS) {
 		OnLaunchStatus(wParam, lParam);
+	}
+	else if (uMsg == UM_TRY_SUR_READER) {
+		OnTrySurReader(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -812,10 +816,31 @@ void   CDuiFrameWnd::OnLaunchStatus(WPARAM wParam, LPARAM  lParam) {
 	}
 }
 
+// 术中读卡器正在读数的提示
+void    CDuiFrameWnd::OnTrySurReader(WPARAM wParam, LPARAM  lParam) {
+	DWORD  i = (wParam - 1) / MAX_READERS_PER_GRID;
+	DWORD  j = (wParam - 1) % MAX_READERS_PER_GRID;
+	BOOL   bStart = (BOOL)lParam;
+
+	CDuiString  strText;
+	if (bStart) {
+		strText.Format("%lu%c正在测温...", i + 1, (char)(j + 'A'));
+		m_lblSurReaderTry->SetText(strText);
+	}
+	else {
+		m_lblSurReaderTry->SetText("");
+	}
+}
+
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
 	::PostMessage( GetHWND(), UM_LAUNCH_STATUS, (WPARAM)e, 0);
 }      
+
+// 接收器尝试读取术中读卡器的温度数据
+void   CDuiFrameWnd::OnTrySurReaderNotify(DWORD dwBed, BOOL bStart) {
+	::PostMessage(GetHWND(), UM_TRY_SUR_READER, dwBed, bStart);
+}
                       
 
 
@@ -865,6 +890,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	delete duiFrame;
 
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main close.\n");
+	g_data.m_bClosing = TRUE;
 
 	CBusiness::GetInstance()->DeInit();
 	delete CBusiness::GetInstance();

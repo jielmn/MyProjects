@@ -358,3 +358,32 @@ BOOL  CheckComPortExist(int nCheckComPort) {
 
 	return FALSE;
 }
+
+DWORD   GetCollectInterval(DWORD dwIndex) {
+	switch (dwIndex)
+	{
+	case 0:
+		return 10;
+	case 1:
+		return 60;
+	case 2:
+		return 300;
+	case 3:
+		return 900;
+	case 4:
+		return 1800;
+	case 5:
+		return 3600;
+	default:
+		break;
+	}
+	return 10;
+}
+
+void  SaveReaderSwitch(DWORD i, DWORD j) {
+	CDuiString  strText;
+	strText.Format("%s %lu %lu", CFG_READER_SWITCH, i + 1, j + 1);
+	BOOL  bValue = DEFAULT_READER_SWITCH;
+	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, &bValue);
+	g_data.m_cfg->Save();
+}

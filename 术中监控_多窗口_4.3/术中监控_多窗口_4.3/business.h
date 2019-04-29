@@ -34,6 +34,7 @@ public:
 	// 获取温度
 	void   GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay = 0);
 	void   GetGridTemperature(const CGetGridTempParam * pParam);
+	void   GetGridTemperature(DWORD dwIndex, DWORD dwSubIndex, BYTE byArea);
 
 	// 发射器相关的回调
 	void  OnStatus(CLmnSerialPort::PortStatus e);
@@ -56,6 +57,9 @@ private:
 	CMySqliteDatabase             m_sqlite;
 	CLaunch                       m_launch;
 	sigslot::signal1<CLmnSerialPort::PortStatus>    m_sigLanchStatus;
+	sigslot::signal2<DWORD,BOOL>                    m_sigTrySurReader;         // param: bed no, is try read
+	// 术中读卡器是否得到温度数据
+	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 };
 
 

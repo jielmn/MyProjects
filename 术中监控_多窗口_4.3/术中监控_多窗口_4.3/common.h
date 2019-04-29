@@ -30,7 +30,8 @@ using namespace DuiLib;
 #define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
 #define   MAX_ROWS_COUNT           5              // 每个页面最大几行
 #define   DRAG_DROP_DELAY_TIME     100            // drag drop操作的延时时间
-#define   DEF_GET_TEMPERATURE_DELAY   10000       // 术中读卡器默认10秒后再次读取温度
+#define   DEF_GET_TEMPERATURE_DELAY    10000      // 术中读卡器默认10秒后再次读取温度
+#define   MAX_TIME_NEEDED_BY_SUR_TEMP  5000       // 一次获取术中读卡器温度的软件最大等待时间，如果超过，则认为超时失败(单位：毫秒)
 
 #define   VERSION                  "3.0.1"
 
@@ -70,6 +71,7 @@ using namespace DuiLib;
 #define   CST_EDT_BTN_BodyPart    "cstEdtBtnBodyPart"
 #define   CTR_READER_STATE        "ReaderState"
 #define   CTR_CUR_READER_STATE    "CurReaderState"
+#define   LBL_PROC_TIPS           "lblProcessTips"
 
 
 // CONFIG
@@ -122,6 +124,7 @@ using namespace DuiLib;
 
 // windows 消息
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
+#define UM_TRY_SUR_READER                    (WM_USER+2)
 
 
 // 创建duilib控件的回调
@@ -186,6 +189,7 @@ public:
 	LmnToolkits::Thread *     m_thrd_sqlite;
 	CfgData                   m_CfgData;
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
+	BOOL                      m_bClosing;              // 应用程序是否正在退出
 
 public:
 	CGlobalData() {
@@ -193,6 +197,7 @@ public:
 		m_cfg = 0;
 		m_thrd_launch = 0;
 		m_thrd_sqlite = 0;
+		m_bClosing = FALSE;		
 	}
 };
 
@@ -233,6 +238,9 @@ extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t)
 extern time_t  GetTodayZeroTime();
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
 extern BOOL  CheckComPortExist(int nCheckComPort);
+// 采集间隔时间
+extern DWORD GetCollectInterval(DWORD dwIndex);
+extern void  SaveReaderSwitch(DWORD i, DWORD j);
 
 // templates
 template <class T>

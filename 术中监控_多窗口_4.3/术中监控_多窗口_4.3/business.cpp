@@ -348,6 +348,7 @@ int CBusiness::DeInit() {
 
 void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigLanchStatus.connect(pMainWnd, &CDuiFrameWnd::OnLauchStatusNotify);
+	m_sigTrySurReader.connect(pMainWnd, &CDuiFrameWnd::OnTrySurReaderNotify);
 	return;
 }
 
@@ -384,6 +385,7 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 	DWORD   i      = pParam->m_dwIndex;
 	GridCfg cfg    = g_data.m_CfgData.m_GridCfg[i];
 	BYTE    byArea = (BYTE)g_data.m_CfgData.m_dwAreaNo;
+	DWORD  dwDelay = GetCollectInterval(cfg.m_dwCollectInterval) * 1000;
 
 	// 如果是手持读卡器模式
 	if ( cfg.m_dwGridMode == CModeButton::Mode_Hand ) {
@@ -391,16 +393,69 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 		return;
 	}
 
+	// 把是否取得数据结果置为False
+	memset( m_bSurReaderTemp[i], 0, sizeof(BOOL) * MAX_READERS_PER_GRID );
+
 	// 如果是单点连续术中读卡器
 	if ( cfg.m_dwGridMode == CModeButton::Mode_Single ) {
-		m_launch.QueryTemperature( byArea, (WORD)(MAX_READERS_PER_GRID * i + 1) );
-		GetGridTemperatureAsyn(i, DEF_GET_TEMPERATURE_DELAY);
+		GetGridTemperature( i, 0, byArea );		
+		GetGridTemperatureAsyn(i, dwDelay);
 		return;
 	}
 
+	// 如果是多点连续术中读卡器
 	for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
-
+		// 如果Reader开关已经打开
+		if ( cfg.m_ReaderCfg[j].m_bSwitch )
+			GetGridTemperature( i,j, byArea );
 	}
+	GetGridTemperatureAsyn(i, dwDelay);
+}
+
+void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea) {
+	DWORD  dwQueryTick   = 0;
+	DWORD  dwTryCnt      = 0;
+	DWORD  dwCurTick     = 0;
+
+	WORD   wBed = (WORD)(i * MAX_READERS_PER_GRID + j + 1);
+	m_sigTrySurReader.emit( wBed, TRUE );
+	do 
+	{		
+		dwQueryTick = LmnGetTickCount();
+		m_launch.QueryTemperature(byArea, wBed);		
+		m_launch.ReadComData();		
+
+		// 如果拿到数据
+		if ( m_bSurReaderTemp[i][j] ) {
+			m_sigTrySurReader.emit(wBed,FALSE);
+			return;
+		}
+
+		while (TRUE) {
+			LmnSleep(200);			
+			m_launch.ReadComData();
+
+			// 如果拿到数据
+			if ( m_bSurReaderTemp[i][j] ) {
+				m_sigTrySurReader.emit(wBed, FALSE);
+				return;
+			}
+			
+			// 如果应用程序正在关闭
+			if (g_data.m_bClosing) {
+				return;
+			}
+
+			dwCurTick = LmnGetTickCount();
+			// 如果超时
+			if ( dwCurTick - dwQueryTick >= MAX_TIME_NEEDED_BY_SUR_TEMP) {
+				dwTryCnt++;
+				break;
+			}
+		}
+	} while (dwTryCnt < 3);	
+
+	m_sigTrySurReader.emit(wBed, FALSE);
 }
 
 void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {

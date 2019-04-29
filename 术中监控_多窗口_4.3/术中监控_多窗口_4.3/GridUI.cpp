@@ -126,6 +126,8 @@ void CGridUI::Notify(TNotifyUI& msg) {
 }
 
 void CGridUI::OnModeChanged() {
+	DWORD  dwIndex = GetTag();
+
 	switch (m_cstModeBtn->GetMode())
 	{
 	case CModeButton::Mode_Hand:
@@ -144,8 +146,10 @@ void CGridUI::OnModeChanged() {
 	{
 		m_hand_reader->SetVisible(false);
 		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-			if ( 0 == i )
+			if ( 0 == i ) {
 				m_readers[i]->SetVisible(true);
+				m_readers[i]->m_optSelected->SetVisible(false);
+			}				
 			else
 				m_readers[i]->SetVisible(false);
 		}
@@ -162,6 +166,10 @@ void CGridUI::OnModeChanged() {
 		m_hand_reader->SetVisible(false);
 		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 			m_readers[i]->SetVisible(true);
+			if (0==i)
+				m_readers[i]->m_optSelected->SetVisible(true);
+			m_readers[i]->m_optSelected->Selected(
+				g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ? true : false, false );
 		}
 		m_CurReaderState->SetVisible(true);
 
@@ -175,8 +183,7 @@ void CGridUI::OnModeChanged() {
 		break;
 	}
 
-	CDuiString  strText;
-	DWORD  dwIndex = GetTag();
+	CDuiString  strText;	
 	strText.Format("%s %lu", CFG_GRID_MODE, dwIndex+1);
 
 	g_data.m_CfgData.m_GridCfg[dwIndex].m_dwGridMode = (DWORD)m_cstModeBtn->GetMode();

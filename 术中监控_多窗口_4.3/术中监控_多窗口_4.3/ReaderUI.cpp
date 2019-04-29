@@ -28,6 +28,7 @@ void CReaderUI::DoInit() {
 	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(READER_FILE_NAME, (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
+		m_pManager->AddNotifier(this);
 	}
 	else {
 		this->RemoveAll();
@@ -70,4 +71,25 @@ void  CReaderUI::SetIndicator(DWORD dwIndex) {
 		assert(m_dwIndicator < MAX_READERS_PER_GRID);
 		m_indicator->SetBkColor(g_ReaderIndicator[m_dwIndicator]);
 	}
+}
+
+void CReaderUI::Notify(TNotifyUI& msg) {
+	if (msg.sType == "selectchanged" ) {
+		if (msg.pSender == m_optSelected) {
+			OnReaderSelected();
+		}
+	}
+}
+
+void CReaderUI::OnReaderSelected() {
+	bool bRet = m_optSelected->IsSelected();
+	DWORD i = GetParent()->GetParent()->GetParent()->GetParent()->GetParent()->GetParent()->GetTag();
+	DWORD j = GetTag() - 1;
+
+	assert(i >= 0 && i < MAX_READERS_PER_GRID);
+	assert(j >= 0 && j < MAX_READERS_PER_GRID);
+
+	g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch = bRet ? TRUE : FALSE;
+
+	SaveReaderSwitch(i, j);
 }
