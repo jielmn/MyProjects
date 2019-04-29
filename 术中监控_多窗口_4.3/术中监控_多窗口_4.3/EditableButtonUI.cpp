@@ -98,6 +98,11 @@ CDuiString CEditableButtonUI::GetText() const {
 	return m_btn->GetText();
 }
 
+void CEditableButtonUI::SetText(LPCTSTR pstrText) {
+	m_btn->SetText(pstrText);
+	m_edit->SetText(pstrText);
+}
+
 void CEditableButtonUI::SetEnabled(bool bEnable /*= true*/) {
 	if (m_btn)
 		m_btn->SetEnabled(bEnable);

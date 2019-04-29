@@ -35,8 +35,8 @@ private:
 
 public:
 	COptionUI *                                 m_optSelected;            // 选择框
+	CEditableButtonUI *                         m_cstBodyPart;            // 身体部位
 
 private:
-	CEditableButtonUI *                         m_cstBodyPart;            // 身体部位
 	CControlUI *                                m_state;                  // 断线状态
 };

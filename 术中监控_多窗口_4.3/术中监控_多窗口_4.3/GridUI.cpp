@@ -133,6 +133,7 @@ void CGridUI::OnModeChanged() {
 	case CModeButton::Mode_Hand:
 	{
 		m_hand_reader->SetVisible(true);
+		m_hand_reader->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_HandReaderCfg.m_szReaderName);
 		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 			m_readers[i]->SetVisible(false);
 		}
@@ -149,6 +150,7 @@ void CGridUI::OnModeChanged() {
 			if ( 0 == i ) {
 				m_readers[i]->SetVisible(true);
 				m_readers[i]->m_optSelected->SetVisible(false);
+				m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 			}				
 			else
 				m_readers[i]->SetVisible(false);
@@ -170,6 +172,7 @@ void CGridUI::OnModeChanged() {
 				m_readers[i]->m_optSelected->SetVisible(true);
 			m_readers[i]->m_optSelected->Selected(
 				g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ? true : false, false );
+			m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 		}
 		m_CurReaderState->SetVisible(true);
 

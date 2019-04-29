@@ -7,6 +7,7 @@ public:
 	CEditableButtonUI();
 	~CEditableButtonUI();
 	virtual CDuiString GetText() const;
+	void  SetText(LPCTSTR pstrText);
 	void SetEnabled(bool bEnable = true);
 
 private:

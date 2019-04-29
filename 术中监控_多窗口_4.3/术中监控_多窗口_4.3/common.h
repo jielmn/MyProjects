@@ -115,6 +115,10 @@ using namespace DuiLib;
 #define   CFG_HIGH_TEMP_ALARM               "high temperature alarm"
 #define   CFG_GRID_MODE                     "grid mode"
 #define   CFG_LAUNCH_COM_PORT               "launch com port"
+#define   CFG_READER_NAME                   "reader name"
+#define   CFG_HAND_READER_LOW_TEMP_ALARM    "hand reader low temperature alarm"
+#define   CFG_HAND_READER_HIGH_TEMP_ALARM   "hand reader high temperature alarm"
+#define   CFG_HAND_READER_NAME              "hand reader name"
 
 // thread消息
 #define MSG_CHECK_LAUNCH_STATUS             1001
@@ -148,12 +152,14 @@ typedef struct tagArea {
 	DWORD  dwAreaNo;
 }TArea;
 
+#define  MAX_READER_NAME_LENGTH             20
 // 术中读卡器
 typedef struct tagReaderCfg
 {
-	BOOL      m_bSwitch;                             // 读卡器开关
-	DWORD     m_dwLowTempAlarm;                      // 低温报警(单位：摄氏度)
-	DWORD     m_dwHighTempAlarm;                     // 高温报警(单位：摄氏度)
+	BOOL      m_bSwitch;                              // 读卡器开关
+	DWORD     m_dwLowTempAlarm;                       // 低温报警(单位：摄氏度)
+	DWORD     m_dwHighTempAlarm;                      // 高温报警(单位：摄氏度)
+	char      m_szReaderName[MAX_READER_NAME_LENGTH]; // 名称(对应body part name)
 }ReaderCfg;
 
 // 术中窗格
@@ -163,7 +169,8 @@ typedef struct tagGridCfg
 	DWORD       m_dwMinTemp;                            // 显示的最低温度(单位:℃)
 	DWORD       m_dwMaxTemp;                            // 显示的最高温度(单位:℃)
 	DWORD       m_dwGridMode;                           // 手持0，单点连续1，多点连续2
-	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];
+	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];      // 术中Reader配置
+	ReaderCfg   m_HandReaderCfg;                        // 手持Reader配置
 }GridCfg;
 
 typedef struct tagCfgData {
@@ -229,6 +236,8 @@ public:
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern DWORD g_ReaderIndicator[MAX_READERS_PER_GRID];
+extern const char * g_BodyParts[MAX_READERS_PER_GRID];
+extern const char * g_BodyPart;
 
 extern LONG WINAPI pfnUnhandledExceptionFilter(PEXCEPTION_POINTERS pExceptionInfo);
 extern DWORD GetGridOrderByGridId(DWORD  dwId);

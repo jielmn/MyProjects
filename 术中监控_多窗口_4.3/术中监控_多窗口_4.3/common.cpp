@@ -18,6 +18,9 @@ std::vector<TArea *>  g_vArea;
 DWORD g_ReaderIndicator[MAX_READERS_PER_GRID] 
 	= { 0xFF00FF00, 0xFF1b9375, 0xFF00FFFF, 0xFF51786C, 0xFFFFFF00, 0xFFCA5100 };
 
+const char * g_BodyParts[MAX_READERS_PER_GRID] = { "左腋下", "右腋下", "左腹股沟", "右腹股沟", "前胸", "后背" };
+const char * g_BodyPart = "腋下";
+
 CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	DuiLib::CDialogBuilder builder;
 	DuiLib::CDuiString  strText;
