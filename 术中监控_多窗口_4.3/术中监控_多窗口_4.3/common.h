@@ -187,6 +187,7 @@ public:
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_launch;
 	LmnToolkits::Thread *     m_thrd_sqlite;
+	LmnToolkits::Thread *     m_thrd_work;
 	CfgData                   m_CfgData;
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
 	BOOL                      m_bClosing;              // 应用程序是否正在退出
@@ -197,6 +198,7 @@ public:
 		m_cfg = 0;
 		m_thrd_launch = 0;
 		m_thrd_sqlite = 0;
+		m_thrd_work   = 0;
 		m_bClosing = FALSE;		
 	}
 };

@@ -824,7 +824,7 @@ void    CDuiFrameWnd::OnTrySurReader(WPARAM wParam, LPARAM  lParam) {
 
 	CDuiString  strText;
 	if (bStart) {
-		strText.Format("%lu%cÕýÔÚ²âÎÂ...", i + 1, (char)(j + 'A'));
+		strText.Format("%lu%c¶Á¿¨Æ÷ÕýÔÚ²âÎÂ...", i + 1, (char)(j + 'A'));
 		m_lblSurReaderTry->SetText(strText);
 	}
 	else {

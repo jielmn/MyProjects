@@ -151,6 +151,12 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_sqlite->Start();
 
+	g_data.m_thrd_work = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_work) {
+		return -1;
+	}
+	g_data.m_thrd_work->Start();
+
 	return 0;
 }
 
@@ -339,6 +345,12 @@ int CBusiness::DeInit() {
 		g_data.m_thrd_sqlite = 0;
 	}
 
+	if (g_data.m_thrd_work) {
+		g_data.m_thrd_work->Stop();
+		delete g_data.m_thrd_work;
+		g_data.m_thrd_work = 0;
+	}
+
 	Clear();
 
 	m_sqlite.DeinitDb();
@@ -398,7 +410,7 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 
 	// 如果是单点连续术中读卡器
 	if ( cfg.m_dwGridMode == CModeButton::Mode_Single ) {
-		GetGridTemperature( i, 0, byArea );		
+		GetGridTemperature( i, 0, byArea, cfg.m_dwGridMode);
 		GetGridTemperatureAsyn(i, dwDelay);
 		return;
 	}
@@ -407,12 +419,12 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 	for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
 		// 如果Reader开关已经打开
 		if ( cfg.m_ReaderCfg[j].m_bSwitch )
-			GetGridTemperature( i,j, byArea );
+			GetGridTemperature( i,j, byArea, cfg.m_dwGridMode );
 	}
 	GetGridTemperatureAsyn(i, dwDelay);
 }
 
-void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea) {
+void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldMode) {
 	DWORD  dwQueryTick   = 0;
 	DWORD  dwTryCnt      = 0;
 	DWORD  dwCurTick     = 0;
@@ -446,6 +458,33 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea) {
 				return;
 			}
 
+			DWORD  dwNewMode = g_data.m_CfgData.m_GridCfg[i].m_dwGridMode;			
+
+			// 如果模式改变( hand <---> single <--->  multiple )
+			if (dwOldMode != dwNewMode) {
+				// 手持模式
+				if (dwNewMode == CModeButton::Mode_Hand) {
+					m_sigTrySurReader.emit(wBed, FALSE);
+					return;
+				}
+				// 单点模式
+				else if (dwNewMode == CModeButton::Mode_Single) {
+					// 如果不是第一个读卡器
+					if (0 != j) {
+						m_sigTrySurReader.emit(wBed, FALSE);
+						return;
+					}
+				}
+				// 多点模式
+				else {
+					// 如果开关关闭
+					if (!g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
+						m_sigTrySurReader.emit(wBed, FALSE);
+						return;
+					}
+				}
+			}
+
 			dwCurTick = LmnGetTickCount();
 			// 如果超时
 			if ( dwCurTick - dwQueryTick >= MAX_TIME_NEEDED_BY_SUR_TEMP) {
@@ -473,7 +512,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 
 // 打印状态(调试用)
 void   CBusiness::PrintStatusAsyn() {
-	g_data.m_thrd_launch->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
+	g_data.m_thrd_work->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
 }
 
 void  CBusiness::PrintStatus() {
