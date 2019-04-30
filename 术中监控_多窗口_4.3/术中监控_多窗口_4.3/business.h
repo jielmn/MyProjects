@@ -42,6 +42,7 @@ public:
 
 	// 发射器相关的回调
 	void  OnStatus(CLmnSerialPort::PortStatus e);
+	void  OnReaderTemp(WORD wBed, const TempItem & item);
 
 private:
 	static CBusiness *  pInstance;

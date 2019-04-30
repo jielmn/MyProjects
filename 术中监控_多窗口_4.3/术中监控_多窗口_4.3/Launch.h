@@ -25,6 +25,7 @@ public:
 
 private:
 	void   CloseLaunch();
+	void   ProcSurReader(const BYTE * pData, DWORD dwDataLen);
 
 private:
 	CDataBuf   m_recv_buf;
@@ -32,6 +33,6 @@ private:
 public:
 	sigslot::signal1<PortStatus>                      m_sigStatus;
 	sigslot::signal3<DWORD, DWORD, ReaderStatus>      m_sigReaderStatus;          // params: index, subindex, status
-	sigslot::signal3<DWORD, DWORD, const TempItem &>  m_sigReaderTemp;            // 术中温度
+	sigslot::signal2<WORD, const TempItem &>          m_sigReaderTemp;            // 术中温度
 	sigslot::signal1<const TempItem &>                m_sigHandReaderTemp;        // 手持温度
 };

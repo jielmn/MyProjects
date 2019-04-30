@@ -12,6 +12,7 @@ CBusiness *  CBusiness::GetInstance() {
 
 CBusiness::CBusiness() {
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
+	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
 }
 
 CBusiness::~CBusiness() {
@@ -536,6 +537,20 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 	else {
 		g_data.m_thrd_launch->DeleteMessages();
 	}
+}
+
+void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {
+	DWORD  i = (wBed - 1) / MAX_READERS_PER_GRID;
+	DWORD  j = (wBed - 1) % MAX_READERS_PER_GRID;
+	assert(i < MAX_GRID_COUNT);
+	assert(j < MAX_READERS_PER_GRID);
+	if (i >= MAX_GRID_COUNT || j >= MAX_READERS_PER_GRID) {
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "术中读卡器的返回数据的床位号有问题(bed=%lu)\n", (DWORD)wBed);
+		return;
+	}
+
+	// 设置已经拿到数据
+	m_bSurReaderTemp[i][j] = TRUE;
 }
 
 void  CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {

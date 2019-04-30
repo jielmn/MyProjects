@@ -132,7 +132,7 @@ int  CLaunch::ReadComData() {
 	m_recv_buf.Read(buf, MIN_DATA_LENGTH);
 
 	// 数据头错误
-	if (buf[0] != (BYTE)'\x55') {
+	if (buf[0] != 0x55) {
 		DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
 		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf);
 		CloseLaunch();
@@ -142,61 +142,69 @@ int  CLaunch::ReadComData() {
 	// 如果是术中读卡器温度数据
 	if ( buf[1] == 0x1A ) {
 		m_recv_buf.Reform();
-
-		if (buf[28] != (BYTE)'\xFF') {
-			DebugStream(debug_buf, sizeof(debug_buf), buf, SURGENCY_TEMP_DATA_LENGTH);
-			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
-			CloseLaunch();
-			return 0;
-		}
-
-		WORD   wBedNo   = (buf[2] << 8) | buf[3];
-		BYTE   byAreaNo = buf[4];
-		DWORD  dwTemp   = buf[24] * 1000 + buf[25] * 100 + buf[26] * 10 + buf[27];
-
-		// 如果病区号不同
-		if ( byAreaNo != g_data.m_CfgData.m_dwAreaNo) {
-			DebugStream(debug_buf, sizeof(debug_buf), buf, SURGENCY_TEMP_DATA_LENGTH);
-			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
-			return 0;
-		}
-
-		//DWORD dwRet = FindReaderIndexByBed(dwBedNo);
-
-		//// 找到
-		//if (dwRet != -1) {
-		//	LastTemp t;
-		//	memset(&t, 0, sizeof(t));
-		//	t.m_dwTemp = dwTemp;
-		//	GetTagId(t.m_szTagId, sizeof(t.m_szTagId), buf + 16, 8);
-		//	GetReaderId(t.m_szReaderId, sizeof(t.m_szReaderId), buf + 5, 11);
-		//	m_sigReaderTemp.emit(LOWORD(dwRet), HIWORD(dwRet), t);
-		//}
-		//else {
-		//	DebugStream(debug_buf, sizeof(debug_buf), buf, TEMP_DATA_LENGTH);
-		//	g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "得到不存在的窗格子温度：\n%s\n", debug_buf);
-		//}
-
-		//// 清除结尾可能存在的"dd aa"
-		//if ( m_recv_buf.GetDataLength() >= 2 ) {
-		//	m_recv_buf.Read(buf, 2);
-		//	// 如果是 dd aa结尾
-		//	if ( buf[0] == (BYTE)'\xDD' && buf[1] == (BYTE)'\xAA' ) {
-		//		m_recv_buf.Reform();
-		//	}
-		//	else {
-		//		m_recv_buf.ResetReadPos();
-		//	}
-		//}
-		
-	
+		ProcSurReader(buf, SURGENCY_TEMP_DATA_LENGTH);
 	}
 	// 如果是手持温度数据
-	else if (buf[1] == (BYTE)'\x1E') {
+	else if (buf[1] == 0x1E) {
+
 	}
-	
-	
 	return 0;
+}
+
+// 术中读卡器温度
+//  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28
+// -----------------------------------------------------------------------------------------
+// 55 1A 00 06 01 45 52 00 00 03 00 00 00 00 00 01 8F 50 D9 93 CD 59 02 E0 02 07 08 05 FF 
+// 
+void  CLaunch::ProcSurReader(const BYTE * pData, DWORD dwDataLen) {
+	char debug_buf[8192];
+
+	if ( pData[28] != (BYTE)'\xFF' ) {
+		DebugStream( debug_buf, sizeof(debug_buf), pData, dwDataLen );
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
+		CloseLaunch();
+		return;
+	}
+
+	WORD   wBedNo   = (pData[2] << 8) | pData[3];
+	BYTE   byAreaNo = pData[4];
+	DWORD  dwTemp   = pData[24] * 1000 + pData[25] * 100 + pData[26] * 10 + pData[27];
+
+	// 如果病区号不同
+	if (byAreaNo != g_data.m_CfgData.m_dwAreaNo) {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
+		return;
+	}
+
+	// 床位号太大
+	if (wBedNo > MAX_READERS_PER_GRID * MAX_GRID_COUNT) {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "太大的床位号：\n%s\n", debug_buf);
+		return;
+	}
+
+	TempItem temp_item;
+	memset(&temp_item, 0, sizeof(temp_item));
+
+	temp_item.m_dwTemp = dwTemp;
+	temp_item.m_time = time(0);
+	GetTagId(temp_item.m_szTagId, sizeof(temp_item.m_szTagId), pData + 16, 8);
+	GetSurReaderId(temp_item.m_szReaderId, sizeof(temp_item.m_szReaderId), pData + 5, 11);
+	m_sigReaderTemp.emit(wBedNo, temp_item);
+
+	// 清除结尾可能存在的"dd aa"
+	if (m_recv_buf.GetDataLength() >= 2) {
+		BYTE  buf[32];
+		m_recv_buf.Read(buf, 2);
+		// 如果是 dd aa结尾
+		if ( buf[0] == 0xDD && buf[1] == 0xAA ) {
+			m_recv_buf.Reform();
+		}
+		else {
+			m_recv_buf.ResetReadPos();
+		}
+	}
 }
 
 BOOL  CLaunch::WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen) {

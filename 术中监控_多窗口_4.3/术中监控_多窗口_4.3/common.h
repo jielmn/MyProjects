@@ -222,7 +222,7 @@ enum  ReaderStatus {
 // 温度数据
 typedef struct  tagTempItem {
 	DWORD   m_dwTemp;                                        // 温度
-	time_t  m_Time;                                          // 时间
+	time_t  m_time;                                          // 时间
 	char    m_szTagId[MAX_TAG_ID_LENGTH];                    // tag id
 	char    m_szReaderId[MAX_READER_ID_LENGTH];              // reader id
 }TempItem;
@@ -255,6 +255,8 @@ extern BOOL  CheckComPortExist(int nCheckComPort);
 extern DWORD GetCollectInterval(DWORD dwIndex);
 extern void  SaveReaderSwitch(DWORD i, DWORD j);
 extern void  SaveReaderName(DWORD i, DWORD j);
+extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DWORD dwDataLen);
+extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData, DWORD dwDataLen);
 
 // templates
 template <class T>
