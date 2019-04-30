@@ -131,6 +131,7 @@ using namespace DuiLib;
 // windows 消息
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
 #define UM_TRY_SUR_READER                    (WM_USER+2)
+#define UM_SUR_READER_STATUS                 (WM_USER+3)
 
 
 // 创建duilib控件的回调
@@ -201,6 +202,9 @@ public:
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
 	BOOL                      m_bClosing;              // 应用程序是否正在退出
 
+	// 术中读卡器是否连接上
+	BOOL                      m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+
 public:
 	CGlobalData() {
 		m_log = 0;
@@ -208,7 +212,8 @@ public:
 		m_thrd_launch = 0;
 		m_thrd_sqlite = 0;
 		m_thrd_work   = 0;
-		m_bClosing = FALSE;		
+		m_bClosing = FALSE;	
+		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
 	}
 };
 

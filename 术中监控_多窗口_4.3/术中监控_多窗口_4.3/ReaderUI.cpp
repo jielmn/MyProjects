@@ -130,3 +130,13 @@ DWORD CReaderUI::GetGridIndex() {
 DWORD CReaderUI::GetReaderIndex() {
 	return GetTag() - 1;
 }
+
+void  CReaderUI::SetReaderStatus(BOOL bConnected) {
+
+	if ( bConnected ) {
+		m_state->SetBkImage("");
+	}
+	else {
+		m_state->SetBkImage("disconnected.png");
+	}
+}

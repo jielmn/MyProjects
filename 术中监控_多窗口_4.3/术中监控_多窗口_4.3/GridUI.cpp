@@ -17,6 +17,9 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 	m_cstModeBtn = 0;
 	m_hand_reader = 0;
 	m_CurReaderState = 0;
+
+	memset(m_aLastTemp, 0, sizeof(m_aLastTemp));
+	m_dwSelSurReaderIndex = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -140,6 +143,7 @@ void CGridUI::OnModeChanged() {
 		m_CurReaderState->SetVisible(false);
 
 		m_lblReaderNo->SetText("");
+		m_dwSelSurReaderIndex = 0;
 	}
 	break;
 
@@ -160,6 +164,7 @@ void CGridUI::OnModeChanged() {
 		CDuiString strText;
 		strText.Format("%c", ('A' + (char)m_dwReaderNo));
 		m_lblReaderNo->SetText(strText);
+		m_dwSelSurReaderIndex = 1;
 	}
 	break;
 
@@ -179,6 +184,7 @@ void CGridUI::OnModeChanged() {
 		CDuiString strText;
 		strText.Format("%c", ('A' + (char)m_dwReaderNo));
 		m_lblReaderNo->SetText(strText);
+		m_dwSelSurReaderIndex = 1;
 	}
 	break;
 
@@ -198,4 +204,27 @@ void  CGridUI::SetMode(CModeButton::Mode e) {
 	CDuiString strText;
 	strText.Format("%lu", (DWORD)e);
 	this->SetAttribute("GridMode", strText);
+}
+
+// 设置术中读卡器的连接状态
+void  CGridUI::SetSurReaderStatus(DWORD j, BOOL bConnected) {
+	// 如果是手持状态
+	if (m_cstModeBtn->GetMode() == CModeButton::Mode_Hand) {
+		return;
+	}
+
+	assert(m_dwSelSurReaderIndex >= 1);
+	m_readers[j]->SetReaderStatus(bConnected);
+
+	// 如果当前选中的Reader Index和数据的index一致
+	if (m_dwSelSurReaderIndex == j + 1) {
+		SetCurReaderStatus(bConnected);
+	}
+}
+
+void CGridUI::SetCurReaderStatus(BOOL bConnected) {
+	if (bConnected)
+		m_CurReaderState->SetBkImage("");
+	else
+		m_CurReaderState->SetBkImage("disconnected.png");
 }

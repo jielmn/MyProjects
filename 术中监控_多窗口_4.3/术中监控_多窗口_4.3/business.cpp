@@ -11,8 +11,6 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() {
-	memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
-
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
 }
@@ -389,6 +387,7 @@ int CBusiness::DeInit() {
 void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigLanchStatus.connect(pMainWnd, &CDuiFrameWnd::OnLauchStatusNotify);
 	m_sigTrySurReader.connect(pMainWnd, &CDuiFrameWnd::OnTrySurReaderNotify);
+	m_sigSurReaderStatus.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderStatusNotify);
 	return;
 }
 
@@ -492,7 +491,6 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 			if (dwOldMode != dwNewMode) {
 				// 手持模式
 				if (dwNewMode == CModeButton::Mode_Hand) {
-					m_bSurReaderConnected[i][j] = FALSE;
 					m_sigTrySurReader.emit(wBed, FALSE);
 					return;
 				}
@@ -500,7 +498,6 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 				else if (dwNewMode == CModeButton::Mode_Single) {
 					// 如果不是第一个读卡器
 					if (0 != j) {
-						m_bSurReaderConnected[i][j] = FALSE;
 						m_sigTrySurReader.emit(wBed, FALSE);
 						return;
 					}
@@ -509,7 +506,6 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 				else {
 					// 如果开关关闭
 					if (!g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
-						m_bSurReaderConnected[i][j] = FALSE;
 						m_sigTrySurReader.emit(wBed, FALSE);
 						return;
 					}
@@ -526,9 +522,9 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 	} while (dwTryCnt < 3);	
 
 	// 3次超时
-	if (m_bSurReaderConnected[i][j]) {
-		m_bSurReaderConnected[i][j] = FALSE;
-		m_sigSurReaderStatus.emit(FALSE);
+	if ( g_data.m_bSurReaderConnected[i][j]) {
+		g_data.m_bSurReaderConnected[i][j] = FALSE;
+		m_sigSurReaderStatus.emit(wBed, FALSE);
 	}	
 	m_sigTrySurReader.emit(wBed, FALSE);
 }
@@ -546,7 +542,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 	}
 	else {
 		g_data.m_thrd_launch->DeleteMessages();
-		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
+		memset(g_data.m_bSurReaderConnected, 0, sizeof(g_data.m_bSurReaderConnected));
 	}
 }
 
@@ -563,9 +559,9 @@ void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {
 	// 设置已经拿到数据
 	m_bSurReaderTemp[i][j] = TRUE;
 	// 设置读卡器连接状态
-	if (!m_bSurReaderConnected[i][j]) {
-		m_bSurReaderConnected[i][j] = TRUE;
-		m_sigSurReaderStatus.emit(TRUE);
+	if (!g_data.m_bSurReaderConnected[i][j]) {
+		g_data.m_bSurReaderConnected[i][j] = TRUE;
+		m_sigSurReaderStatus.emit( wBed,TRUE);
 	}
 }
 

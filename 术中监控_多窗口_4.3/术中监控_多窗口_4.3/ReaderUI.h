@@ -16,6 +16,7 @@ public:
 	~CReaderUI();
 
 	void  SetIndicator(DWORD dwIndex);
+	void  SetReaderStatus(BOOL bConnected);
 
 private:
 	LPCTSTR GetClass() const;

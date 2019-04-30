@@ -16,6 +16,9 @@ public:
 	// 双击后的视图切换
 	void  SwitchView();
 
+	// 设置术中读卡器的连接状态
+	void  SetSurReaderStatus(DWORD dwSubIndex, BOOL bConnected);
+
 private:
 	LPCTSTR GetClass() const;
 
@@ -23,6 +26,7 @@ private:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
 	void OnModeChanged();
+	void SetCurReaderStatus(BOOL bConnected);
 
 private:
 	BOOL                                        m_bInited;
@@ -44,4 +48,10 @@ private:
 	CVerticalLayoutUI *                         m_layReaders;
 	CReaderUI *                                 m_readers[MAX_READERS_PER_GRID];             // 连续测温读卡器
 	CReaderUI *                                 m_hand_reader;                               // 非连续测温读卡器
+
+private:
+	// 最后一次的温度数据
+	TempItem              m_aLastTemp[MAX_READERS_PER_GRID];
+	// 当前选中的术中读卡器index(从1开始)
+	DWORD                 m_dwSelSurReaderIndex;
 };
