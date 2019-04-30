@@ -20,6 +20,8 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 
 	memset(m_aLastTemp, 0, sizeof(m_aLastTemp));
 	m_dwSelSurReaderIndex = 0;
+
+	m_cstImgLabel = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -88,6 +90,8 @@ void CGridUI::DoInit() {
 	m_hand_reader->SetTag(0);
 	m_hand_reader->SetFixedHeight(100);       
 	m_layReaders->Add(m_hand_reader);	
+
+	m_cstImgLabel = static_cast<CImageLabelUI *>(m_pManager->FindControl(CST_IMG_LBL_TEMP));
 
 	OnModeChanged();
 
@@ -227,4 +231,24 @@ void CGridUI::SetCurReaderStatus(BOOL bConnected) {
 		m_CurReaderState->SetBkImage("");
 	else
 		m_CurReaderState->SetBkImage("disconnected.png");
+}
+
+// 术中读卡器温度
+void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
+	// 如果是手持状态
+	if (m_cstModeBtn->GetMode() == CModeButton::Mode_Hand) {
+		return;
+	}
+
+	assert(m_dwSelSurReaderIndex >= 1);
+	// 如果当前选中的Reader Index和数据的index一致
+	if (m_dwSelSurReaderIndex == j + 1) {
+		SetCurReaderTemp(item.m_dwTemp);
+	}
+}
+
+void CGridUI::SetCurReaderTemp(DWORD  dwTemp) {
+	CDuiString  strText;
+	strText.Format("%.2f", dwTemp / 100.0);
+	m_cstImgLabel->SetText(strText);
 }

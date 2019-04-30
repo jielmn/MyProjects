@@ -3,6 +3,7 @@
 #include "common.h"
 #include "ReaderUI.h"
 #include "ModeButtonUI.h"
+#include "MyImageUI.h"
 
 class CGridUI : public CContainerUI, INotifyUI
 {
@@ -19,6 +20,9 @@ public:
 	// 设置术中读卡器的连接状态
 	void  SetSurReaderStatus(DWORD dwSubIndex, BOOL bConnected);
 
+	// 术中读卡器温度
+	void  OnSurReaderTemp(DWORD dwSubIndex, const TempItem & item);
+
 private:
 	LPCTSTR GetClass() const;
 
@@ -27,6 +31,7 @@ private:
 	void Notify(TNotifyUI& msg);
 	void OnModeChanged();
 	void SetCurReaderStatus(BOOL bConnected);
+	void SetCurReaderTemp(DWORD  dwTemp);
 
 private:
 	BOOL                                        m_bInited;
@@ -40,9 +45,14 @@ private:
 	CLabelUI *                                  m_lblReaderNo;         // A ~ F
 	DWORD                                       m_dwReaderNo;
 
+	// 三种模式按钮
 	CModeButton *                               m_cstModeBtn;
 
+	// 当前选中读卡器的连接状态
 	CControlUI *                                m_CurReaderState;
+
+	// 显示温度数据和曲线的
+	CImageLabelUI *                             m_cstImgLabel;
 
 	// 读卡器合集
 	CVerticalLayoutUI *                         m_layReaders;

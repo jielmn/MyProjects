@@ -169,6 +169,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_SUR_READER_STATUS) {
 		OnSurReaderStatus(wParam, lParam);
 	}
+	else if (uMsg == UM_SUR_READER_TEMP) {
+		OnSurReaderTemp(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -844,6 +847,15 @@ void  CDuiFrameWnd::OnSurReaderStatus(WPARAM wParam, LPARAM  lParam) {
 	m_pGrids[i]->SetSurReaderStatus(j, bConnected);
 }
 
+// 术中读卡器温度
+void   CDuiFrameWnd::OnSurReaderTemp(WPARAM wParam, LPARAM  lParam) {
+	DWORD  i = (wParam - 1) / MAX_READERS_PER_GRID;
+	DWORD  j = (wParam - 1) % MAX_READERS_PER_GRID;
+	TempItem * pItem = (TempItem *)lParam;
+	m_pGrids[i]->OnSurReaderTemp(j, *pItem);
+	delete pItem;
+}
+
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
 	::PostMessage( GetHWND(), UM_LAUNCH_STATUS, (WPARAM)e, 0);
@@ -857,6 +869,13 @@ void   CDuiFrameWnd::OnTrySurReaderNotify(WORD wBed, BOOL bStart) {
 // 接收到术中读卡器连接状态的通知
 void   CDuiFrameWnd::OnSurReaderStatusNotify(WORD wBed, BOOL bConnected) {
 	::PostMessage(GetHWND(), UM_SUR_READER_STATUS, (WPARAM)wBed, bConnected);
+}
+
+// 术中读卡器的温度数据
+void   CDuiFrameWnd::OnSurReaderTempNotify(WORD wBed, const TempItem & item) {
+	TempItem * pItem = new TempItem;
+	memcpy(pItem, &item, sizeof(TempItem));
+	::PostMessage(GetHWND(), UM_SUR_READER_TEMP, (WPARAM)wBed, (LPARAM)pItem );
 }
                       
 

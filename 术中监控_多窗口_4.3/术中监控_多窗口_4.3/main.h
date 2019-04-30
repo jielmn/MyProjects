@@ -90,6 +90,8 @@ private:
 	void   OnTrySurReader(WPARAM wParam, LPARAM  lParam);
 	// 术中读卡器状态
 	void   OnSurReaderStatus(WPARAM wParam, LPARAM  lParam);
+	// 术中读卡器温度
+	void   OnSurReaderTemp(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
@@ -98,6 +100,8 @@ public:
 	void   OnTrySurReaderNotify(WORD wBed, BOOL bStart);
 	// 接收到术中读卡器连接状态的通知
 	void   OnSurReaderStatusNotify(WORD wBed, BOOL bConnected);
+	// 术中读卡器的温度数据
+	void   OnSurReaderTempNotify(WORD wBed, const TempItem & item);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

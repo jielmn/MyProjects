@@ -73,6 +73,7 @@ using namespace DuiLib;
 #define   CTR_READER_STATE        "ReaderState"
 #define   CTR_CUR_READER_STATE    "CurReaderState"
 #define   LBL_PROC_TIPS           "lblProcessTips"
+#define   CST_IMG_LBL_TEMP        "cstImgLblTemp"
 
 
 // CONFIG
@@ -132,6 +133,7 @@ using namespace DuiLib;
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
 #define UM_TRY_SUR_READER                    (WM_USER+2)
 #define UM_SUR_READER_STATUS                 (WM_USER+3)
+#define UM_SUR_READER_TEMP                   (WM_USER+4)
 
 
 // 创建duilib控件的回调
