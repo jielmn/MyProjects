@@ -79,12 +79,17 @@ void CReaderUI::Notify(TNotifyUI& msg) {
 			OnReaderSelected();
 		}
 	}
+	else if ( msg.sType == "textchanged" ) {
+		if (msg.pSender == m_cstBodyPart) {
+			OnReaderNameChanged();
+		}
+	}
 }
 
 void CReaderUI::OnReaderSelected() {
 	bool bRet = m_optSelected->IsSelected();
-	DWORD i = GetParent()->GetParent()->GetParent()->GetParent()->GetParent()->GetParent()->GetTag();
-	DWORD j = GetTag() - 1;
+	DWORD i = GetGridIndex();
+	DWORD j = GetReaderIndex();
 
 	assert(i >= 0 && i < MAX_READERS_PER_GRID);
 	assert(j >= 0 && j < MAX_READERS_PER_GRID);
@@ -92,4 +97,36 @@ void CReaderUI::OnReaderSelected() {
 	g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch = bRet ? TRUE : FALSE;
 
 	SaveReaderSwitch(i, j);
+}
+
+void CReaderUI::OnReaderNameChanged() {
+	DWORD i = GetGridIndex();
+	DWORD j = GetReaderIndex();
+	assert(i >= 0 && i < MAX_READERS_PER_GRID);
+	assert(j >= 0 && j < MAX_READERS_PER_GRID);
+
+	CDuiString  strText = m_cstBodyPart->GetText();
+	STRNCPY(g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szReaderName, strText, MAX_READER_NAME_LENGTH);
+	SaveReaderName(i, j);
+}
+
+DWORD CReaderUI::GetGridIndex() {
+	CControlUI * pParent = GetParent();
+	DWORD  i = 0;
+
+	while (pParent && i < 5) {
+		pParent = pParent->GetParent();
+		i++;
+	}
+
+	if (pParent)
+		return pParent->GetTag();
+	else {
+		assert(0);
+		return 0;
+	}
+}
+
+DWORD CReaderUI::GetReaderIndex() {
+	return GetTag() - 1;
 }

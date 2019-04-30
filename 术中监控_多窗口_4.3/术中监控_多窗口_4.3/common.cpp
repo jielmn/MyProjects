@@ -390,3 +390,10 @@ void  SaveReaderSwitch(DWORD i, DWORD j) {
 	g_data.m_cfg->SetBooleanConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch, &bValue);
 	g_data.m_cfg->Save();
 }
+
+void  SaveReaderName(DWORD i, DWORD j) {
+	CDuiString  strText;
+	strText.Format("%s %lu %lu", CFG_READER_NAME, i + 1, j + 1);
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_szReaderName, 0);
+	g_data.m_cfg->Save();
+}

@@ -86,10 +86,14 @@ void CEditableButtonUI::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "killfocus") {
 		if (msg.pSender == m_edit) {
-			m_edit->SetVisible(false);
 			m_btn->SetText(m_edit->GetText());
+			if (m_edit->IsVisible()) {
+				m_pManager->SendNotify(this, "textchanged");
+			}
+
+			// 又会触发一个edit的kill focus
+			m_edit->SetVisible(false);           			
 			m_btn->SetVisible(true); 
-			m_pManager->SendNotify(this, "textchanged");
 		}
 	}
 }

@@ -24,6 +24,9 @@ private:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
 	void OnReaderSelected();
+	void OnReaderNameChanged();
+	DWORD GetGridIndex();
+	DWORD GetReaderIndex();
 
 private:
 	BOOL                                        m_bInited;

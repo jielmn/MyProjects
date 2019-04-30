@@ -254,6 +254,7 @@ extern BOOL  CheckComPortExist(int nCheckComPort);
 // 采集间隔时间
 extern DWORD GetCollectInterval(DWORD dwIndex);
 extern void  SaveReaderSwitch(DWORD i, DWORD j);
+extern void  SaveReaderName(DWORD i, DWORD j);
 
 // templates
 template <class T>

@@ -28,6 +28,8 @@ private:
 	CDuiString    m_strHotImg;
 
 	CButtonUI *   m_btn;
+public:
 	CEditUI *     m_edit;
+private:
 	BOOL          m_bInited;
 };
