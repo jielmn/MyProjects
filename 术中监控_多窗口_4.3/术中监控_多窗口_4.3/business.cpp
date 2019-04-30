@@ -533,6 +533,9 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 		}
 		ReadLaunchAsyn(1000);
 	}
+	else {
+		g_data.m_thrd_launch->DeleteMessages();
+	}
 }
 
 void  CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
