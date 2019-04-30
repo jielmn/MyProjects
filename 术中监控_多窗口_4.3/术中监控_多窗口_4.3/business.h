@@ -63,8 +63,11 @@ private:
 	CLaunch                       m_launch;
 	sigslot::signal1<CLmnSerialPort::PortStatus>    m_sigLanchStatus;
 	sigslot::signal2<DWORD,BOOL>                    m_sigTrySurReader;         // param: bed no, is try read
+	sigslot::signal1<BOOL>                          m_sigSurReaderStatus;      // param: connected
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
+	// 术中读卡器是否连接上
+	BOOL                          m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 };
 
 
