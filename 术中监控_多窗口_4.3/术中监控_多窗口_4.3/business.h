@@ -64,6 +64,7 @@ private:
 	sigslot::signal1<CLmnSerialPort::PortStatus>    m_sigLanchStatus;
 	sigslot::signal2<WORD,BOOL>                     m_sigTrySurReader;         // param: bed no, is try read
 	sigslot::signal2<WORD,BOOL>                     m_sigSurReaderStatus;      // param: bed no, connected
+	sigslot::signal2<WORD, const TempItem &>        m_sigSurReaderTemp;        // param: bed no, temperature
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	
 };

@@ -34,7 +34,7 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "MaxiumUI")) {
 		strText.Format("%s.xml", pstrClass); 
 		pUI = builder.Create((const char *)strText, (UINT)0, this, m_pManager);
-		return pUI;
+		return pUI; 
 	}
 	else if (0 == strcmp(pstrClass, "EditableButton")) {  
 		return new CEditableButtonUI; 
@@ -44,6 +44,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(pstrClass, "ModeButton")) {
 		return new CModeButton;
+	}
+	else if (0 == strcmp(pstrClass, "ImageLabel")) {
+		return new CImageLabelUI;
 	}
 	return NULL;
 }

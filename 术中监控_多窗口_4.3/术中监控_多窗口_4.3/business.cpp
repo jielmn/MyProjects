@@ -558,6 +558,8 @@ void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {
 
 	// 设置已经拿到数据
 	m_bSurReaderTemp[i][j] = TRUE;
+	m_sigSurReaderTemp.emit(wBed, item);
+
 	// 设置读卡器连接状态
 	if (!g_data.m_bSurReaderConnected[i][j]) {
 		g_data.m_bSurReaderConnected[i][j] = TRUE;
