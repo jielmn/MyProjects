@@ -32,6 +32,7 @@ private:
 	void OnModeChanged();
 	void SetCurReaderStatus(BOOL bConnected);
 	void SetCurReaderTemp(DWORD  dwTemp);
+	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp);
 
 private:
 	BOOL                                        m_bInited;

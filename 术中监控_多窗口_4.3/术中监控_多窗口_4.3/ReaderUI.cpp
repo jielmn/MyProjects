@@ -9,6 +9,7 @@ CReaderUI::CReaderUI(ReaderType e /*= Hand*/) : m_callback( m_pManager ) {
 	m_optSelected = 0;
 	m_cstBodyPart = 0;
 	m_state = 0;
+	m_lblTemp = 0;
 }
 
 CReaderUI::~CReaderUI() {
@@ -43,6 +44,7 @@ void CReaderUI::DoInit() {
 	m_optSelected = static_cast<DuiLib::COptionUI  *>(m_pManager->FindControl(OPT_READER_SELECTED));
 	m_cstBodyPart = static_cast<CEditableButtonUI  *>(m_pManager->FindControl(CST_EDT_BTN_BodyPart));
 	m_state = m_pManager->FindControl(CTR_READER_STATE);
+	m_lblTemp = static_cast<DuiLib::CLabelUI  *>(m_pManager->FindControl(LBL_READER_TEMP));
 
 	if ( m_type == Hand ) {
 		m_lblIndicator->SetVisible(false);

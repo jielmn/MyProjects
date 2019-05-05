@@ -74,6 +74,7 @@ using namespace DuiLib;
 #define   CTR_CUR_READER_STATE    "CurReaderState"
 #define   LBL_PROC_TIPS           "lblProcessTips"
 #define   CST_IMG_LBL_TEMP        "cstImgLblTemp"
+#define   LBL_READER_TEMP         "lblReaderTemp"
 
 
 // CONFIG

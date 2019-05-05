@@ -241,6 +241,10 @@ void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
 	}
 
 	assert(m_dwSelSurReaderIndex >= 1);
+	memcpy( &m_aLastTemp[j], &item, sizeof(TempItem) );
+
+	SetReaderTemp(j, item.m_dwTemp);
+
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
 		SetCurReaderTemp(item.m_dwTemp);
@@ -251,4 +255,10 @@ void CGridUI::SetCurReaderTemp(DWORD  dwTemp) {
 	CDuiString  strText;
 	strText.Format("%.2f", dwTemp / 100.0);
 	m_cstImgLabel->SetText(strText);
+}
+
+void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp) {
+	CDuiString  strText;
+	strText.Format("%.2f", dwTemp / 100.0);
+	m_readers[j]->m_lblTemp->SetText(strText);
 }
