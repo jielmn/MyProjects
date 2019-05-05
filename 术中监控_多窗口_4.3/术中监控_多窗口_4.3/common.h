@@ -34,6 +34,9 @@ using namespace DuiLib;
 #define   MAX_TIME_NEEDED_BY_SUR_TEMP  5000       // 一次获取术中读卡器温度的软件最大等待时间，如果超过，则认为超时失败(单位：毫秒)
 #define   READ_LAUNCH_INTERVAL_TIME    1000
 #define   SELECTED_READER_BG_COLOR     0xFF555555
+#define   HIGH_TEMP_TEXT_COLOR        0xFFDF455F
+#define   LOW_TEMP_TEXT_COLOR         0xFF01AFC3
+#define   NORMAL_TEMP_TEXT_COLOR      0xFF4E8B20
 
 #define   VERSION                  "3.0.1"
 

@@ -37,8 +37,8 @@ private:
 	void Notify(TNotifyUI& msg);
 	void OnModeChanged();
 	void SetCurReaderStatus(BOOL bConnected);
-	void SetCurReaderTemp(DWORD  dwTemp);
-	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp);
+	void SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
+	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
 
 private:
 	BOOL                                        m_bInited;

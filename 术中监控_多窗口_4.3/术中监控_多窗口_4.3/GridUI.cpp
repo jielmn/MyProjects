@@ -247,24 +247,47 @@ void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
 	assert(m_dwSelSurReaderIndex >= 1);
 	memcpy( &m_aLastTemp[j], &item, sizeof(TempItem) );
 
-	SetReaderTemp(j, item.m_dwTemp);
+	DWORD  i = GetTag();
+	DWORD  dwHighAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm;
+	DWORD  dwLowAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm;
+	SetReaderTemp(j, item.m_dwTemp, dwHighAlarm, dwLowAlarm);
 
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
-		SetCurReaderTemp(item.m_dwTemp);
+		SetCurReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm);
 	}
 }
 
-void CGridUI::SetCurReaderTemp(DWORD  dwTemp) {
+void CGridUI::SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
 	CDuiString  strText;
 	strText.Format("%.2f", dwTemp / 100.0);
 	m_cstImgLabel->SetText(strText);
+
+	if (dwTemp >= dwHighAlarm) {
+		m_cstImgLabel->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+	}
+	else if (dwTemp <= dwLowAlarm) {
+		m_cstImgLabel->SetTextColor(LOW_TEMP_TEXT_COLOR);
+	}
+	else {
+		m_cstImgLabel->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
+	}
 }
 
-void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp) {
+void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
 	CDuiString  strText;
 	strText.Format("%.2f", dwTemp / 100.0);
 	m_readers[j]->m_lblTemp->SetText(strText);
+
+	if (dwTemp >= dwHighAlarm) {
+		m_readers[j]->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+	}
+	else if (dwTemp <= dwLowAlarm) {
+		m_readers[j]->m_lblTemp->SetTextColor(LOW_TEMP_TEXT_COLOR);
+	}
+	else {
+		m_readers[j]->m_lblTemp->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
+	}
 }
 
 // 选中读卡器
