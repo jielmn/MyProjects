@@ -537,13 +537,7 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 
 		s.cx = ( width - 1 ) / (int)g_data.m_CfgData.m_dwLayoutColumns + 1;
 		s.cy = ( height - 1 ) / (int)g_data.m_CfgData.m_dwLayoutRows + 1;
-		int margin_h = (width - s.cx * (int)g_data.m_CfgData.m_dwLayoutColumns) / 2;
-		int margin_v = (height - s.cy * (int)g_data.m_CfgData.m_dwLayoutRows) / 2;
-
-		RECT  inset;
-		inset.left = inset.right  = margin_h;
-		inset.top  = inset.bottom = margin_v;
-		//pParent->SetInset(inset);
+		OnSetTempFont(s);
 		m_layMain->SetItemSize(s);
 	}
 	else {
@@ -867,6 +861,51 @@ void   CDuiFrameWnd::OnSurReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	TempItem * pItem = (TempItem *)lParam;
 	m_pGrids[i]->OnSurReaderTemp(j, *pItem);
 	delete pItem;
+}
+
+// 设置温度字体大小
+void   CDuiFrameWnd::OnSetTempFont(const SIZE & s) {
+	// 修改字体大小
+	if (s.cx >= 950 && s.cy >= 425) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(27);
+		}
+	}
+	else if (s.cx >= 816 && s.cy >= 365) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(26);
+		}
+	}
+	else if (s.cx > 680 && s.cy > 304) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(25);
+		}
+	}
+	else if (s.cx > 572 && s.cy > 256) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(24);
+		}
+	}
+	else if (s.cx > 466 && s.cy > 208) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(23);
+		}
+	}
+	else if (s.cx > 350 && s.cy > 157) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(22);
+		}
+	}
+	else if (s.cx > 280 && s.cy > 125) {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(21);
+		}
+	}
+	else {
+		for (int i = 0; i < MAX_GRID_COUNT; i++) {
+			m_pGrids[i]->SetFont(20);
+		}
+	}
 }
 
 // 接收器连接状态通知

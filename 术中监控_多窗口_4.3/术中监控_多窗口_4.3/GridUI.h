@@ -26,6 +26,9 @@ public:
 	// 选中读卡器
 	void  OnSurReaderSelected(DWORD  dwSubIndex);
 
+	// 设置温度字体
+	void SetFont(int index);
+
 private:
 	LPCTSTR GetClass() const;
 

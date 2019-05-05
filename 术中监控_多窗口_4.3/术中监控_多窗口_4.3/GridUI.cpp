@@ -289,3 +289,9 @@ void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
 
 	m_cstImgLabel->SetText(m_readers[dwSelected]->m_lblTemp->GetText());
 }
+
+// ÉèÖÃÎÂ¶È×ÖÌå
+void CGridUI::SetFont(int index) {
+	if (m_cstImgLabel)
+		m_cstImgLabel->SetFont(index);
+}

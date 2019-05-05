@@ -92,6 +92,8 @@ private:
 	void   OnSurReaderStatus(WPARAM wParam, LPARAM  lParam);
 	// 术中读卡器温度
 	void   OnSurReaderTemp(WPARAM wParam, LPARAM  lParam);
+	// 设置温度字体大小
+	void   OnSetTempFont(const SIZE & s);
 
 public:
 	// 接收器连接状态通知
