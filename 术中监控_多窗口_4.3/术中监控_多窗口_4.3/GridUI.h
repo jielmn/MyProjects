@@ -23,6 +23,9 @@ public:
 	// 术中读卡器温度
 	void  OnSurReaderTemp(DWORD dwSubIndex, const TempItem & item);
 
+	// 选中读卡器
+	void  OnSurReaderSelected(DWORD  dwSubIndex);
+
 private:
 	LPCTSTR GetClass() const;
 
@@ -44,7 +47,6 @@ private:
 	DWORD                                       m_dwBedNo;
 
 	CLabelUI *                                  m_lblReaderNo;         // A ~ F
-	DWORD                                       m_dwReaderNo;
 
 	// 三种模式按钮
 	CModeButton *                               m_cstModeBtn;

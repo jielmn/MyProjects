@@ -45,6 +45,7 @@ void CReaderUI::DoInit() {
 	m_cstBodyPart = static_cast<CEditableButtonUI  *>(m_pManager->FindControl(CST_EDT_BTN_BodyPart));
 	m_state = m_pManager->FindControl(CTR_READER_STATE);
 	m_lblTemp = static_cast<DuiLib::CLabelUI  *>(m_pManager->FindControl(LBL_READER_TEMP));
+	m_lblTemp->SetText("");
 
 	if ( m_type == Hand ) {
 		m_lblIndicator->SetVisible(false);
@@ -78,7 +79,7 @@ void  CReaderUI::SetIndicator(DWORD dwIndex) {
 void CReaderUI::Notify(TNotifyUI& msg) {
 	if (msg.sType == "selectchanged" ) {
 		if (msg.pSender == m_optSelected) {
-			OnReaderSelected();
+			OnReaderSwitch();
 		}
 	}
 	else if ( msg.sType == "textchanged" ) {
@@ -88,7 +89,7 @@ void CReaderUI::Notify(TNotifyUI& msg) {
 	}
 }
 
-void CReaderUI::OnReaderSelected() {
+void CReaderUI::OnReaderSwitch() {
 	bool bRet = m_optSelected->IsSelected();
 	DWORD i = GetGridIndex();
 	DWORD j = GetReaderIndex();

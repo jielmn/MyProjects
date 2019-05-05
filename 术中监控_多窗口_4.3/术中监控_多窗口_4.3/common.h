@@ -33,6 +33,7 @@ using namespace DuiLib;
 #define   DEF_GET_TEMPERATURE_DELAY    10000      // 术中读卡器默认10秒后再次读取温度
 #define   MAX_TIME_NEEDED_BY_SUR_TEMP  5000       // 一次获取术中读卡器温度的软件最大等待时间，如果超过，则认为超时失败(单位：毫秒)
 #define   READ_LAUNCH_INTERVAL_TIME    1000
+#define   SELECTED_READER_BG_COLOR     0xFF555555
 
 #define   VERSION                  "3.0.1"
 
@@ -75,6 +76,7 @@ using namespace DuiLib;
 #define   LBL_PROC_TIPS           "lblProcessTips"
 #define   CST_IMG_LBL_TEMP        "cstImgLblTemp"
 #define   LBL_READER_TEMP         "lblReaderTemp"
+#define   LAY_READER              "layReader"
 
 
 // CONFIG

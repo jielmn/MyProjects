@@ -9,7 +9,6 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 	m_dwBedNo = 0;
 
 	m_lblReaderNo = 0;
-	m_dwReaderNo = 0;
 
 	m_layReaders = 0;
 	memset(m_readers, 0, sizeof(m_readers));
@@ -83,6 +82,7 @@ void CGridUI::DoInit() {
 		m_readers[i]->SetTag(i+1);
 		m_readers[i]->SetIndicator(i);    
 		m_readers[i]->SetFixedHeight(100);
+		m_readers[i]->SetName(LAY_READER);
 		m_layReaders->Add(m_readers[i]);
 	}
 
@@ -164,31 +164,35 @@ void CGridUI::OnModeChanged() {
 				m_readers[i]->SetVisible(false);
 		}
 		m_CurReaderState->SetVisible(true);
-
-		CDuiString strText;
-		strText.Format("%c", ('A' + (char)m_dwReaderNo));
-		m_lblReaderNo->SetText(strText);
-		m_dwSelSurReaderIndex = 1;
+		
+		OnSurReaderSelected(0);
 	}
 	break;
 
 	case CModeButton::Mode_Multiple:
 	{
 		m_hand_reader->SetVisible(false);
+		int  nSel = -1;
 		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 			m_readers[i]->SetVisible(true);
 			if (0==i)
 				m_readers[i]->m_optSelected->SetVisible(true);
-			m_readers[i]->m_optSelected->Selected(
-				g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch ? true : false, false );
+
+			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
+				m_readers[i]->m_optSelected->Selected(true);
+				if (nSel < 0)
+					nSel = i;
+			}
+			else {
+				m_readers[i]->m_optSelected->Selected(false);
+			}
 			m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 		}
 		m_CurReaderState->SetVisible(true);
-
-		CDuiString strText;
-		strText.Format("%c", ('A' + (char)m_dwReaderNo));
-		m_lblReaderNo->SetText(strText);
-		m_dwSelSurReaderIndex = 1;
+		
+		if (nSel < 0)
+			nSel = 0;
+		OnSurReaderSelected(nSel);
 	}
 	break;
 
@@ -261,4 +265,27 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp) {
 	CDuiString  strText;
 	strText.Format("%.2f", dwTemp / 100.0);
 	m_readers[j]->m_lblTemp->SetText(strText);
+}
+
+// Ñ¡ÖÐ¶Á¿¨Æ÷
+void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
+	assert(dwSelected < MAX_READERS_PER_GRID);
+	for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+		if (j == dwSelected) {
+			m_readers[j]->SetBkColor(SELECTED_READER_BG_COLOR);
+		}
+		else {
+			m_readers[j]->SetBkColor(0);
+		}
+	}
+
+	m_dwSelSurReaderIndex = dwSelected + 1;
+
+	CDuiString strText;
+	strText.Format("%c", ('A' + (char)dwSelected));
+	m_lblReaderNo->SetText(strText);
+
+	m_CurReaderState->SetBkImage(m_readers[dwSelected]->m_state->GetBkImage());
+
+	m_cstImgLabel->SetText(m_readers[dwSelected]->m_lblTemp->GetText());
 }

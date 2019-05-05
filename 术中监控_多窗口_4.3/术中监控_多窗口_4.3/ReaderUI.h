@@ -24,8 +24,10 @@ private:
 	void DoInit();
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
-	void OnReaderSelected();
+	void OnReaderSwitch();
 	void OnReaderNameChanged();
+
+public:
 	DWORD GetGridIndex();
 	DWORD GetReaderIndex();
 
@@ -41,7 +43,5 @@ public:
 	COptionUI *                                 m_optSelected;            // 选择框
 	CEditableButtonUI *                         m_cstBodyPart;            // 身体部位
 	CLabelUI *                                  m_lblTemp;                // 温度数据
-
-private:
 	CControlUI *                                m_state;                  // 断线状态
 };

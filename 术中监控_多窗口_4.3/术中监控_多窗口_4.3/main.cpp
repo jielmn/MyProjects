@@ -214,6 +214,19 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 			pCtl = pCtl->GetParent();           
 		}
 	}
+	// 如果是最大化状态
+	else if (m_eGridStatus == GRID_STATUS_MAXIUM) {
+		while (pCtl) {
+			if (pCtl->GetName() == LAY_READER) {
+				CReaderUI * pReader = (CReaderUI *)pCtl;
+				DWORD i = pReader->GetGridIndex();
+				DWORD j = pReader->GetReaderIndex();
+				m_pGrids[i]->OnSurReaderSelected(j);
+				break;
+			}
+			pCtl = pCtl->GetParent();
+		}
+	}
 	
 	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
 }
