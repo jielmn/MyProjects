@@ -94,6 +94,8 @@ private:
 	void   OnSurReaderTemp(WPARAM wParam, LPARAM  lParam);
 	// 设置温度字体大小
 	void   OnSetTempFont(const SIZE & s);
+	//  定时更新逝去时间
+	void   OnUpdateElapsed();
 
 public:
 	// 接收器连接状态通知

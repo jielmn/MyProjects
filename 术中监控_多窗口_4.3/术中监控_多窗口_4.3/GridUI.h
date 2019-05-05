@@ -29,6 +29,9 @@ public:
 	// 设置温度字体
 	void SetFont(int index);
 
+	// 更新显示逝去的时间
+	void UpdateElapsed();
+
 private:
 	LPCTSTR GetClass() const;
 
@@ -38,9 +41,7 @@ private:
 	void OnModeChanged();
 	void SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
-	// 更新显示逝去的时间
-	void UpdateElapsed();
-
+	
 private:
 	BOOL                                        m_bInited;
 	CDialogBuilderCallbackEx                    m_callback;

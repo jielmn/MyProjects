@@ -15,6 +15,9 @@
 
 #define   TIMER_DRAG_DROP_GRID                   1001
 #define   INTERVAL_TIMER_DRAG_DROP_GRIDS         1500
+
+#define   TIMER_UPDATE_ELAPSED                   1002
+#define   INTERVAL_TIMER_UPDATE_ELAPSED          60000
   
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
 	m_dwCurSelGridIndex = 0;
@@ -92,6 +95,9 @@ void  CDuiFrameWnd::InitWindow() {
 	RefreshGridsPage();
 
 	CheckDevice();
+
+	/***** 启动定时器 ****/
+	SetTimer( GetHWND(), TIMER_UPDATE_ELAPSED, INTERVAL_TIMER_UPDATE_ELAPSED, 0 );
 	WindowImplBase::InitWindow();
 }
 
@@ -155,6 +161,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == WM_TIMER) {
 		if (wParam == TIMER_DRAG_DROP_GRID) {
 			OnFlipPage();
+		}
+		else if (wParam == TIMER_UPDATE_ELAPSED) {
+			OnUpdateElapsed();
 		}
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
@@ -729,12 +738,24 @@ void  CDuiFrameWnd::OnSetting() {
 
 		CBusiness::GetInstance()->RestartLaunchAsyn();
 	}
-	// 格子数目不变；行，列改变
-	else if ( oldData.m_dwLayoutColumns != g_data.m_CfgData.m_dwLayoutColumns
-		|| oldData.m_dwLayoutRows != g_data.m_CfgData.m_dwLayoutRows ) {
-		m_eGridStatus = GRID_STATUS_GRIDS;
-		RefreshGridsPage();
-		RefreshGridsSize();
+	// 格子数目不变
+	else {
+		// 行，列改变
+		if (oldData.m_dwLayoutColumns != g_data.m_CfgData.m_dwLayoutColumns
+			|| oldData.m_dwLayoutRows != g_data.m_CfgData.m_dwLayoutRows) {
+			m_eGridStatus = GRID_STATUS_GRIDS;
+			RefreshGridsPage();
+			RefreshGridsSize();
+		}		
+
+		DWORD  dwDelay = 0;
+		for ( DWORD i = 0; i < g_data.m_CfgData.m_dwLayoutGridsCnt; i++ ) {
+			// 如果定时采集间隔改变
+			if (oldData.m_GridCfg[i].m_dwCollectInterval != g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval) {
+				CBusiness::GetInstance()->GetGridTemperatureAsyn(i, dwDelay);
+				dwDelay += 200;
+			}
+		}
 	}
 
 	g_data.m_cfg->Save();
@@ -905,6 +926,13 @@ void   CDuiFrameWnd::OnSetTempFont(const SIZE & s) {
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
 			m_pGrids[i]->SetFont(20);
 		}
+	}
+}
+
+//  定时更新逝去时间
+void   CDuiFrameWnd::OnUpdateElapsed() {
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		m_pGrids[i]->UpdateElapsed();
 	}
 }
 

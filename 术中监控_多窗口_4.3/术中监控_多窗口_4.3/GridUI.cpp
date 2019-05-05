@@ -333,15 +333,20 @@ void CGridUI::UpdateElapsed() {
 	char buf[256];
 	DWORD dwBufSize = sizeof(buf);
 
-	if (m_dwSelSurReaderIndex < 1)
-		return;
+	time_t last_time = 0;
+	if (m_dwSelSurReaderIndex < 1) {
+		last_time = m_HandLastTemp.m_time;
+	}
+	else {
+		last_time = m_aLastTemp[m_dwSelSurReaderIndex - 1].m_time;
+	}
 
 	time_t  now = time(0);
-	if ( now < m_aLastTemp[m_dwSelSurReaderIndex-1].m_time ) {
+	if ( 0 == last_time || now < last_time ) {
 		buf[0] = '\0';
 	}
 	else {
-		time_t diff = now - m_aLastTemp[m_dwSelSurReaderIndex-1].m_time;
+		time_t diff = now - last_time;
 
 		if (diff < 60) {
 			SNPRINTF(buf, dwBufSize, "¸Õ¸Õ");
@@ -357,5 +362,6 @@ void CGridUI::UpdateElapsed() {
 		}
 	}
 
-	m_lblElapsed->SetText(buf);
+	if ( m_lblElapsed )
+		m_lblElapsed->SetText(buf);
 }
