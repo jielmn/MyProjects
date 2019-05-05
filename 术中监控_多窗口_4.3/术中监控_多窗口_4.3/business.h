@@ -44,6 +44,10 @@ public:
 	void  OnStatus(CLmnSerialPort::PortStatus e);
 	void  OnReaderTemp(WORD wBed, const TempItem & item);
 
+	// 保存温度数据
+	void  SaveSurTempAsyn( WORD wBedNo, const TempItem & item);
+	void  SaveSurTemp(CSaveSurTempParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

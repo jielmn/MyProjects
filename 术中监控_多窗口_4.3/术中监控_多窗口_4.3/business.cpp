@@ -559,7 +559,9 @@ void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {
 
 	// 设置已经拿到数据
 	m_bSurReaderTemp[i][j] = TRUE;
-	m_sigSurReaderTemp.emit(wBed, item);
+	// 先保存数据库，拿到item id，再推送给窗体
+	// m_sigSurReaderTemp.emit(wBed, item);
+	SaveSurTempAsyn( wBed, item);
 
 	// 设置读卡器连接状态
 	if (!g_data.m_bSurReaderConnected[i][j]) {
@@ -595,6 +597,16 @@ void  CBusiness::PrintStatus() {
 	JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
 }
 
+// 保存温度数据
+void  CBusiness::SaveSurTempAsyn(WORD wBedNo, const TempItem & item) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_SUR_TEMP, new CSaveSurTempParam(wBedNo, item));
+}
+
+void  CBusiness::SaveSurTemp(CSaveSurTempParam * pParam) {
+	m_sqlite.SaveSurTemp(pParam);
+	m_sigSurReaderTemp.emit(pParam->m_wBedNo, pParam->m_item);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -621,6 +633,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_LAUNCH:
 	{
 		ReadLaunch();
+	}
+	break;
+
+	case MSG_SAVE_SUR_TEMP:
+	{
+		CSaveSurTempParam * pParam = (CSaveSurTempParam *)pMessageData;
+		SaveSurTemp(pParam);
 	}
 	break;
 

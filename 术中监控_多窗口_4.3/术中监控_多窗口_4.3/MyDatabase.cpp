@@ -72,7 +72,7 @@ int CMySqliteDatabase::DeinitDb() {
 void  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szSql ) {
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
-	char *zErrMsg = 0;            // 错误描述
+	//char *zErrMsg = 0;            // 错误描述
 	char buf[8192];
 
 	// 查看温度表是否存在，如果不存在，则创建
@@ -108,4 +108,32 @@ void  CMySqliteDatabase::PruneOldData() {
 	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TAGS_TABLE, (DWORD)tThreeMonthAgo);
 	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
 	assert(0 == ret);
+}
+
+void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
+	char sql[8192];
+	int  ret = 0;
+	int  nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;           // 二维数组存放结果
+
+	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', 0 )", 
+		TEMP_TABLE, pParam->m_item.m_szTagId, pParam->m_item.m_dwTemp, (DWORD)pParam->m_item.m_time );
+	ret = sqlite3_exec( m_db, sql, 0, 0, 0);
+	if (0 != ret) {
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "保存数据库术中温度失败!\n");
+		return;
+	}
+
+	// 获取最后插入结果的id
+	SNPRINTF(sql, sizeof(sql), "select last_insert_rowid();");
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+
+	if (nrow <= 0) {
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "保存数据库术中温度失败!\n");
+		sqlite3_free_table(azResult);
+		return;
+	}
+
+	sscanf_s( azResult[ncolumn], "%lu", &pParam->m_item.m_dwDbId );
+	sqlite3_free_table(azResult);
 }

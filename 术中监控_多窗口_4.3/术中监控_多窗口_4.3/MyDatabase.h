@@ -9,6 +9,8 @@ public:
 	int InitDb();
 	int DeinitDb();
 
+	void  SaveSurTemp(CSaveSurTempParam * pParam);
+
 private:
 	sqlite3 *                         m_db;
 

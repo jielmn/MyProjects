@@ -128,6 +128,7 @@ using namespace DuiLib;
 #define MSG_READ_LAUNCH                     1004
 #define MSG_GET_GRID_TEMP                   1100
 #define MSG_GET_GRID_TEMP_MAX               1199
+#define MSG_SAVE_SUR_TEMP                   2000
 
 // windows 消息
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -226,18 +227,32 @@ enum  ReaderStatus {
 
 #define  MAX_TAG_ID_LENGTH          20
 #define  MAX_READER_ID_LENGTH       20
+#define  MAX_REMARK_LENGTH          28
 // 温度数据
 typedef struct  tagTempItem {
+	DWORD   m_dwDbId;                                        // 数据库的Id
 	DWORD   m_dwTemp;                                        // 温度
 	time_t  m_time;                                          // 时间
 	char    m_szTagId[MAX_TAG_ID_LENGTH];                    // tag id
 	char    m_szReaderId[MAX_READER_ID_LENGTH];              // reader id
+	char    m_szRemark[MAX_REMARK_LENGTH];                   // 注释
 }TempItem;
 
 class CGetGridTempParam : public LmnToolkits::MessageData {
 public:
 	CGetGridTempParam(DWORD dwIndex) : m_dwIndex(dwIndex) { }
 	DWORD     m_dwIndex;
+};
+
+class CSaveSurTempParam : public LmnToolkits::MessageData {
+public:
+	CSaveSurTempParam(WORD wBedNo, const TempItem & item) {
+		memcpy(&m_item, &item, sizeof(TempItem));
+		m_wBedNo = wBedNo;
+	}
+
+	TempItem       m_item;
+	WORD           m_wBedNo;
 };
 
 extern CGlobalData  g_data;
