@@ -94,7 +94,7 @@ void CReaderUI::OnReaderSwitch() {
 	DWORD i = GetGridIndex();
 	DWORD j = GetReaderIndex();
 
-	assert(i >= 0 && i < MAX_READERS_PER_GRID);
+	assert(i >= 0 && i < MAX_GRID_COUNT);
 	assert(j >= 0 && j < MAX_READERS_PER_GRID);
 
 	g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch = bRet ? TRUE : FALSE;
@@ -105,7 +105,7 @@ void CReaderUI::OnReaderSwitch() {
 void CReaderUI::OnReaderNameChanged() {
 	DWORD i = GetGridIndex();
 	DWORD j = GetReaderIndex();
-	assert(i >= 0 && i < MAX_READERS_PER_GRID);
+	assert(i >= 0 && i < MAX_GRID_COUNT);
 	assert(j >= 0 && j < MAX_READERS_PER_GRID);
 
 	CDuiString  strText = m_cstBodyPart->GetText();
@@ -140,6 +140,16 @@ void  CReaderUI::SetReaderStatus(BOOL bConnected) {
 		m_state->SetBkImage("");
 	}
 	else {
-		m_state->SetBkImage("disconnected.png");
+		m_state->SetBkImage(DISCONNECTED_IMAGE);
 	}
+}
+
+// 显示断线状态下的上一次温度
+void  CReaderUI::SetDisconnectedTemp(DWORD dwTemp) {
+	if (dwTemp == 0)
+		return;
+
+	CDuiString  strText;
+	strText.Format("-/%.2f", dwTemp / 100.0);
+	m_lblTemp->SetText(strText);
 }

@@ -36,7 +36,6 @@ private:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
 	void OnModeChanged();
-	void SetCurReaderStatus(BOOL bConnected);
 	void SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
 
@@ -68,6 +67,8 @@ private:
 private:
 	// 最后一次的温度数据
 	TempItem              m_aLastTemp[MAX_READERS_PER_GRID];
+	// 手持读卡器的最后一次温度数据
+	TempItem              m_HandLastTemp;
 	// 当前选中的术中读卡器index(从1开始)
 	DWORD                 m_dwSelSurReaderIndex;
 };

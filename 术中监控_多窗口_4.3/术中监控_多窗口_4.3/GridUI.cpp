@@ -21,6 +21,7 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 	m_dwSelSurReaderIndex = 0;
 
 	m_cstImgLabel = 0;
+	memset( &m_HandLastTemp, 0, sizeof(TempItem) );
 }
 
 CGridUI::~CGridUI() {
@@ -148,6 +149,9 @@ void CGridUI::OnModeChanged() {
 
 		m_lblReaderNo->SetText("");
 		m_dwSelSurReaderIndex = 0;
+
+		m_cstImgLabel->SetText(m_hand_reader->m_lblTemp->GetText());
+		m_cstImgLabel->SetTextColor(m_hand_reader->m_lblTemp->GetTextColor());
 	}
 	break;
 
@@ -159,6 +163,9 @@ void CGridUI::OnModeChanged() {
 				m_readers[i]->SetVisible(true);
 				m_readers[i]->m_optSelected->SetVisible(false);
 				m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
+				g_data.m_bSurReaderConnected[dwIndex][i] = FALSE;
+				m_readers[i]->SetReaderStatus(FALSE);
+				m_readers[i]->SetDisconnectedTemp(m_aLastTemp[i].m_dwTemp);
 			}				
 			else
 				m_readers[i]->SetVisible(false);
@@ -184,8 +191,11 @@ void CGridUI::OnModeChanged() {
 					nSel = i;
 			}
 			else {
-				m_readers[i]->m_optSelected->Selected(false);
+				m_readers[i]->m_optSelected->Selected(false);								
 			}
+			g_data.m_bSurReaderConnected[dwIndex][i] = FALSE;
+			m_readers[i]->SetReaderStatus(FALSE);
+			m_readers[i]->SetDisconnectedTemp(m_aLastTemp[i].m_dwTemp);
 			m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 		}
 		m_CurReaderState->SetVisible(true);
@@ -226,15 +236,8 @@ void  CGridUI::SetSurReaderStatus(DWORD j, BOOL bConnected) {
 
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
-		SetCurReaderStatus(bConnected);
+		m_CurReaderState->SetBkImage(m_readers[j]->m_state->GetBkImage());
 	}
-}
-
-void CGridUI::SetCurReaderStatus(BOOL bConnected) {
-	if (bConnected)
-		m_CurReaderState->SetBkImage("");
-	else
-		m_CurReaderState->SetBkImage("disconnected.png");
 }
 
 // 术中读卡器温度
@@ -311,6 +314,7 @@ void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
 	m_CurReaderState->SetBkImage(m_readers[dwSelected]->m_state->GetBkImage());
 
 	m_cstImgLabel->SetText(m_readers[dwSelected]->m_lblTemp->GetText());
+	m_cstImgLabel->SetTextColor(m_readers[dwSelected]->m_lblTemp->GetTextColor());
 }
 
 // 设置温度字体

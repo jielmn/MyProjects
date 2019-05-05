@@ -37,6 +37,7 @@ using namespace DuiLib;
 #define   HIGH_TEMP_TEXT_COLOR        0xFFDF455F
 #define   LOW_TEMP_TEXT_COLOR         0xFF01AFC3
 #define   NORMAL_TEMP_TEXT_COLOR      0xFF4E8B20
+#define   DISCONNECTED_IMAGE          "disconnected.png"
 
 #define   VERSION                  "3.0.1"
 

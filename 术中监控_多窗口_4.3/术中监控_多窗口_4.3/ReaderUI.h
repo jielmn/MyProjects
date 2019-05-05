@@ -17,6 +17,8 @@ public:
 
 	void  SetIndicator(DWORD dwIndex);
 	void  SetReaderStatus(BOOL bConnected);
+	// 显示断线状态下的上一次温度
+	void  SetDisconnectedTemp(DWORD dwTemp);
 
 private:
 	LPCTSTR GetClass() const;
