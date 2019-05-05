@@ -38,6 +38,8 @@ private:
 	void OnModeChanged();
 	void SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
+	// 更新显示逝去的时间
+	void UpdateElapsed();
 
 private:
 	BOOL                                        m_bInited;
@@ -58,6 +60,9 @@ private:
 
 	// 显示温度数据和曲线的
 	CImageLabelUI *                             m_cstImgLabel;
+
+	// 逝去的时间
+	CLabelUI *                                  m_lblElapsed;
 
 	// 读卡器合集
 	CVerticalLayoutUI *                         m_layReaders;

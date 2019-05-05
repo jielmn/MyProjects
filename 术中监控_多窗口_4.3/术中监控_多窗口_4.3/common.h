@@ -81,6 +81,7 @@ using namespace DuiLib;
 #define   CST_IMG_LBL_TEMP        "cstImgLblTemp"
 #define   LBL_READER_TEMP         "lblReaderTemp"
 #define   LAY_READER              "layReader"
+#define   LBL_ELAPSED             "lblElapsed"
 
 
 // CONFIG

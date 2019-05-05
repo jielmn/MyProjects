@@ -22,6 +22,8 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 
 	m_cstImgLabel = 0;
 	memset( &m_HandLastTemp, 0, sizeof(TempItem) );
+
+	m_lblElapsed = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -93,6 +95,8 @@ void CGridUI::DoInit() {
 	m_layReaders->Add(m_hand_reader);	
 
 	m_cstImgLabel = static_cast<CImageLabelUI *>(m_pManager->FindControl(CST_IMG_LBL_TEMP));
+	m_lblElapsed = static_cast<CImageLabelUI *>(m_pManager->FindControl(LBL_ELAPSED));
+	m_lblElapsed->SetText("");
 
 	OnModeChanged();
 
@@ -258,6 +262,7 @@ void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
 		SetCurReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm);
+		UpdateElapsed();
 	}
 }
 
@@ -321,4 +326,36 @@ void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
 void CGridUI::SetFont(int index) {
 	if (m_cstImgLabel)
 		m_cstImgLabel->SetFont(index);
+}
+
+// 更新显示逝去的时间
+void CGridUI::UpdateElapsed() {
+	char buf[256];
+	DWORD dwBufSize = sizeof(buf);
+
+	if (m_dwSelSurReaderIndex < 1)
+		return;
+
+	time_t  now = time(0);
+	if ( now < m_aLastTemp[m_dwSelSurReaderIndex-1].m_time ) {
+		buf[0] = '\0';
+	}
+	else {
+		time_t diff = now - m_aLastTemp[m_dwSelSurReaderIndex-1].m_time;
+
+		if (diff < 60) {
+			SNPRINTF(buf, dwBufSize, "刚刚");
+		}
+		else if (diff < 3600) {
+			SNPRINTF(buf, dwBufSize, "%lu分钟前", (DWORD)((diff - 60) / 60 + 1));
+		}
+		else if (diff < 86400) {
+			SNPRINTF(buf, dwBufSize, "%lu小时前", (DWORD)((diff - 3600) / 3600 + 1));
+		}
+		else {
+			SNPRINTF(buf, dwBufSize, "%lu天前", (DWORD)((diff - 86400) / 86400 + 1));
+		}
+	}
+
+	m_lblElapsed->SetText(buf);
 }
