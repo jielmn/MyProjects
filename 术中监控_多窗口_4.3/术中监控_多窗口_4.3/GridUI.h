@@ -22,6 +22,7 @@ public:
 
 	// 术中读卡器温度
 	void  OnSurReaderTemp(DWORD dwSubIndex, const TempItem & item);
+	void  ShowSurReaderTemp(DWORD j, const TempItem & item);
 
 	// 选中读卡器
 	void  OnSurReaderSelected(DWORD  dwSubIndex);
@@ -31,6 +32,9 @@ public:
 
 	// 更新显示逝去的时间
 	void UpdateElapsed();
+
+	// 得到温度历史数据
+	void OnQueryTempRet(DWORD dwSubIndex, const char * szTagId, const std::vector<TempItem*> & vRet);
 
 private:
 	LPCTSTR GetClass() const;
@@ -77,4 +81,7 @@ private:
 	TempItem              m_HandLastTemp;
 	// 当前选中的术中读卡器index(从1开始)
 	DWORD                 m_dwSelSurReaderIndex;
+
+	std::vector<TempItem * >           m_vTemp[MAX_READERS_PER_GRID];
+	std::vector<TempItem * >           m_vHandTemp;
 };

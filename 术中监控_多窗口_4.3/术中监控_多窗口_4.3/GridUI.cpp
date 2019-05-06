@@ -28,7 +28,10 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 }
 
 CGridUI::~CGridUI() {
-
+	for ( DWORD i = 0; i < MAX_READERS_PER_GRID; i++ ) {
+		ClearVector(m_vTemp[i]);
+	}
+	ClearVector(m_vHandTemp);
 }
 
 LPCTSTR CGridUI::GetClass() const {
@@ -191,12 +194,12 @@ void CGridUI::OnModeChanged() {
 				m_readers[i]->m_optSelected->SetVisible(true);
 
 			if (g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_bSwitch) {
-				m_readers[i]->m_optSelected->Selected(true);
+				m_readers[i]->m_optSelected->Selected(true,false);
 				if (nSel < 0)
 					nSel = i;
 			}
 			else {
-				m_readers[i]->m_optSelected->Selected(false);								
+				m_readers[i]->m_optSelected->Selected(false,false);								
 			}
 			g_data.m_bSurReaderConnected[dwIndex][i] = FALSE;
 			m_readers[i]->SetReaderStatus(FALSE);
@@ -238,10 +241,13 @@ void  CGridUI::SetSurReaderStatus(DWORD j, BOOL bConnected) {
 
 	assert(m_dwSelSurReaderIndex >= 1);
 	m_readers[j]->SetReaderStatus(bConnected);
+	if ( !bConnected )
+		m_readers[j]->SetDisconnectedTemp(m_aLastTemp[j].m_dwTemp);
 
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
 		m_CurReaderState->SetBkImage(m_readers[j]->m_state->GetBkImage());
+		m_cstImgLabel->SetText(m_readers[j]->m_lblTemp->GetText());
 	}
 }
 
@@ -260,10 +266,18 @@ void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
 		DWORD i = GetTag();
 		WORD  wBed = (WORD)(i * MAX_READERS_PER_GRID + j);
 		CBusiness::GetInstance()->QueryTempByTagAsyn(item.m_szTagId, wBed);
+		return;
 	}
 
-	memcpy( &m_aLastTemp[j], &item, sizeof(TempItem) );
+	memcpy( &m_aLastTemp[j], &item, sizeof(TempItem) );	
+	TempItem * pNewItem = new TempItem;
+	memcpy(pNewItem, &item, sizeof(TempItem));
+	m_vTemp[j].push_back(pNewItem);
 
+	ShowSurReaderTemp(j, item);
+}
+
+void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 	DWORD  i = GetTag();
 	DWORD  dwHighAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm;
 	DWORD  dwLowAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm;
@@ -374,4 +388,23 @@ void CGridUI::UpdateElapsed() {
 
 	if ( m_lblElapsed )
 		m_lblElapsed->SetText(buf);
+}
+
+// 得到温度历史数据
+void CGridUI::OnQueryTempRet(DWORD j, const char * szTagId, const std::vector<TempItem*> & vRet) {
+	assert(j < MAX_READERS_PER_GRID);
+
+	ClearVector(m_vTemp[j]);
+	m_vTemp[j].insert(m_vTemp[j].begin(), vRet.begin(), vRet.end());
+
+	DWORD  dwCnt = vRet.size();
+	if ( dwCnt > 0 ) {		
+		TempItem* pLastItem = vRet[dwCnt - 1];
+		memcpy(&m_aLastTemp[j], pLastItem, sizeof(TempItem));
+		ShowSurReaderTemp(j,*pLastItem);
+	}
+	else {
+		assert(0);
+	}
+	
 }

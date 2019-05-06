@@ -28,6 +28,7 @@ private:
 	void Notify(TNotifyUI& msg);
 	void OnReaderSwitch();
 	void OnReaderNameChanged();
+	CControlUI *  GetGridUI();
 
 public:
 	DWORD GetGridIndex();

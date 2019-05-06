@@ -952,8 +952,10 @@ void   CDuiFrameWnd::OnQueryTempRet(WPARAM wParam, LPARAM  lParam) {
 	DWORD  j = wBedNo % MAX_READERS_PER_GRID;
 	assert(i < MAX_GRID_COUNT);
 
+	m_pGrids[i]->OnQueryTempRet( j, pTagId, *pvRet );
+
 	delete[] pTagId;
-	ClearVector(*pvRet);
+	//ClearVector(*pvRet);
 	delete pvRet;
 	delete[] pParam;
 }

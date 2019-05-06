@@ -11,6 +11,7 @@
 	time       int            NOT NULL
 	remark     varchar(28)    NOT NULL
 	type       int            NOT NULL        DEFAULT 0            **** 0: 连续测温，1: 手持读卡器测温
+	readerid   CHAR(16)       NOT NULL
 */
 
 // 温度贴
@@ -45,7 +46,8 @@ int CMySqliteDatabase::InitDb() {
 		"temp       int            NOT NULL," \
 		"time       int            NOT NULL," \
 		"remark     varchar(28)    NOT NULL," \
-		"type       int            NOT NULL        DEFAULT 0");
+		"type       int            NOT NULL        DEFAULT 0," \
+	    "readerid   CHAR(16)       NOT NULL" );
 
 
 	CreateTable(TAGS_TABLE,
@@ -93,6 +95,7 @@ void  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szS
 
 // 删除过时的温度数据，Tag数据
 void  CMySqliteDatabase::PruneOldData() {
+	char *zErrMsg = 0;
 	// 删除一周前的温度
 	char szSql[8192];
 	time_t today_zero_time = GetTodayZeroTime();
@@ -100,7 +103,7 @@ void  CMySqliteDatabase::PruneOldData() {
 
 	// 删除一周前的温度数据
 	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE, (DWORD)tWeekBegin);
-	int ret = sqlite3_exec( m_db, szSql, 0, 0, 0 );
+	int ret = sqlite3_exec( m_db, szSql, 0, 0, &zErrMsg);
 	assert(0 == ret);
 
 	// 删除三个月前的tag数据
@@ -116,8 +119,9 @@ void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
 	int  nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;           // 二维数组存放结果
 
-	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', 0 )", 
-		TEMP_TABLE, pParam->m_item.m_szTagId, pParam->m_item.m_dwTemp, (DWORD)pParam->m_item.m_time );
+	SNPRINTF(sql, sizeof(sql), "insert into %s values (null, '%s', %lu, %lu, '', 0, '%s' )", 
+		TEMP_TABLE, pParam->m_item.m_szTagId, pParam->m_item.m_dwTemp, (DWORD)pParam->m_item.m_time, 
+		pParam->m_item.m_szReaderId );
 	ret = sqlite3_exec( m_db, sql, 0, 0, 0);
 	if (0 != ret) {
 		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "保存数据库术中温度失败!\n");

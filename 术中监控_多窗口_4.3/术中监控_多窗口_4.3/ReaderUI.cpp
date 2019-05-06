@@ -1,4 +1,5 @@
 #include "ReaderUI.h"
+#include "GridUI.h"
 
 CReaderUI::CReaderUI(ReaderType e /*= Hand*/) : m_callback( m_pManager ) {
 	m_bInited = FALSE;
@@ -99,6 +100,12 @@ void CReaderUI::OnReaderSwitch() {
 
 	g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch = bRet ? TRUE : FALSE;
 
+	if (!g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
+		g_data.m_bSurReaderConnected[i][j] = FALSE;
+		CGridUI * pGrid = (CGridUI*)GetGridUI();
+		pGrid->SetSurReaderStatus(j, FALSE);
+	}
+
 	SaveReaderSwitch(i, j);
 }
 
@@ -152,4 +159,16 @@ void  CReaderUI::SetDisconnectedTemp(DWORD dwTemp) {
 	CDuiString  strText;
 	strText.Format("-/%.2f", dwTemp / 100.0);
 	m_lblTemp->SetText(strText);
+}
+
+CControlUI *  CReaderUI::GetGridUI() {
+	CControlUI * pParent = GetParent();
+	DWORD  i = 0;
+
+	while (pParent && i < 5) {
+		pParent = pParent->GetParent();
+		i++;
+	}
+
+	return pParent;
 }
