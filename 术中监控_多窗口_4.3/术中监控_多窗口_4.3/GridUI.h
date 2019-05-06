@@ -36,6 +36,10 @@ public:
 	// 得到温度历史数据
 	void OnQueryTempRet(DWORD dwSubIndex, const char * szTagId, const std::vector<TempItem*> & vRet);
 
+	// 一周前的数据删除
+	void PruneData();
+	void PruneData(std::vector<TempItem*> & v,time_t t);
+
 private:
 	LPCTSTR GetClass() const;
 

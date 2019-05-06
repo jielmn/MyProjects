@@ -16,8 +16,9 @@
 #define   TIMER_DRAG_DROP_GRID                   1001
 #define   INTERVAL_TIMER_DRAG_DROP_GRIDS         1500
 
-#define   TIMER_UPDATE_ELAPSED                   1002
-#define   INTERVAL_TIMER_UPDATE_ELAPSED          60000
+// 1分钟定时器
+#define   TIMER_60_SECONDS                       1002
+#define   INTERVAL_TIMER_60_SECONDS              60000
   
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
 	m_dwCurSelGridIndex = 0;
@@ -98,7 +99,7 @@ void  CDuiFrameWnd::InitWindow() {
 	CheckDevice();
 
 	/***** 启动定时器 ****/
-	SetTimer( GetHWND(), TIMER_UPDATE_ELAPSED, INTERVAL_TIMER_UPDATE_ELAPSED, 0 );
+	SetTimer( GetHWND(), TIMER_60_SECONDS, INTERVAL_TIMER_60_SECONDS, 0 );
 	WindowImplBase::InitWindow();
 }
 
@@ -163,8 +164,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (wParam == TIMER_DRAG_DROP_GRID) {
 			OnFlipPage();
 		}
-		else if (wParam == TIMER_UPDATE_ELAPSED) {
-			OnUpdateElapsed();
+		else if (wParam == TIMER_60_SECONDS) {
+			On60SecondsTimer();
 		}
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
@@ -933,10 +934,11 @@ void   CDuiFrameWnd::OnSetTempFont(const SIZE & s) {
 	}
 }
 
-//  定时更新逝去时间
-void   CDuiFrameWnd::OnUpdateElapsed() {
+//  1分钟定时器( 1. 定时更新逝去时间; 2. 删除一周前的温度数据 )
+void   CDuiFrameWnd::On60SecondsTimer() {
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		m_pGrids[i]->UpdateElapsed();
+		m_pGrids[i]->PruneData();
 	}
 }
 

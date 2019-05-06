@@ -94,8 +94,8 @@ private:
 	void   OnSurReaderTemp(WPARAM wParam, LPARAM  lParam);
 	// 设置温度字体大小
 	void   OnSetTempFont(const SIZE & s);
-	//  定时更新逝去时间
-	void   OnUpdateElapsed();
+	//  1分钟定时器( 1. 定时更新逝去时间; 2. 删除一周前的温度数据 )
+	void   On60SecondsTimer();
 	// 查询温度结果
 	void   OnQueryTempRet(WPARAM wParam, LPARAM  lParam);
 

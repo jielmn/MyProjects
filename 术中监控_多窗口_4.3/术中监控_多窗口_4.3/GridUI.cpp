@@ -408,3 +408,30 @@ void CGridUI::OnQueryTempRet(DWORD j, const char * szTagId, const std::vector<Te
 	}
 	
 }
+
+// 一周前的数据删除
+void  CGridUI::PruneData() {
+	std::vector<TempItem * >::iterator it;
+	time_t today_zero_time = GetTodayZeroTime();
+	// 一周前0点时分
+	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	for ( DWORD i = 0; i < MAX_READERS_PER_GRID; i++ ) {
+		PruneData(m_vTemp[i], tWeekBegin);
+	}
+	PruneData(m_vHandTemp, tWeekBegin);
+}
+
+void CGridUI::PruneData(std::vector<TempItem*> & v, time_t t) {
+	std::vector<TempItem * >::iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem* pItem = *it;
+		if (pItem->m_time < t) {
+			delete pItem;
+		}
+		else {
+			break;
+		}
+	}
+	v.erase(v.begin(), it);
+}
