@@ -389,6 +389,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigTrySurReader.connect(pMainWnd, &CDuiFrameWnd::OnTrySurReaderNotify);
 	m_sigSurReaderStatus.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderStatusNotify);
 	m_sigSurReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderTempNotify);
+	m_sigQueyTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryTempRetNotify);	
 	return;
 }
 
@@ -607,6 +608,16 @@ void  CBusiness::SaveSurTemp(CSaveSurTempParam * pParam) {
 	m_sigSurReaderTemp.emit(pParam->m_wBedNo, pParam->m_item);
 }
 
+void  CBusiness::QueryTempByTagAsyn(const char * szTagId, WORD wBedNo) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_TAG, new CQueryTempByTagParam(szTagId, wBedNo));
+}
+
+void  CBusiness::QueryTempByTag(const CQueryTempByTagParam * pParam) {
+	std::vector<TempItem*> * pvRet = new std::vector<TempItem*>;
+	m_sqlite.QueryTempByTag(pParam->m_szTagId, *pvRet);
+	m_sigQueyTemp.emit(pParam->m_szTagId, pParam->m_wBedNo, pvRet);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -640,6 +651,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveSurTempParam * pParam = (CSaveSurTempParam *)pMessageData;
 		SaveSurTemp(pParam);
+	}
+	break;
+
+	case MSG_QUERY_TEMP_BY_TAG:
+	{
+		CQueryTempByTagParam * pParam = (CQueryTempByTagParam *)pMessageData;
+		QueryTempByTag(pParam);
 	}
 	break;
 

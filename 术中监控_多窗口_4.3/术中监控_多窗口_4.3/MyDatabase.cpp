@@ -137,3 +137,33 @@ void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
 	sscanf_s( azResult[ncolumn], "%lu", &pParam->m_item.m_dwDbId );
 	sqlite3_free_table(azResult);
 }
+
+void  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet) {
+
+	time_t today_zero_time = GetTodayZeroTime();
+	// 一周前0点时分
+	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	char szSql[8192];
+	SNPRINTF( szSql, sizeof(szSql), "select * from %s where tag_id = '%s' and time >= %lu order by time",
+		      TEMP_TABLE, szTagId, (DWORD)tWeekBegin );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		TempItem * pItem = new TempItem;
+		memset(pItem, 0, sizeof(TempItem));
+
+		sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &pItem->m_dwDbId);
+		sscanf_s(azResult[(i + 1)*ncolumn + 2], "%lu", &pItem->m_dwTemp);
+		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
+		pItem->m_time = (time_t)dwValue;
+		strncpy_s(pItem->m_szRemark, azResult[(i + 1)*ncolumn + 4], sizeof(pItem->m_szRemark));
+
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+}

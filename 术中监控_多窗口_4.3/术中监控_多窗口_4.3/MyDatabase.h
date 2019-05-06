@@ -10,6 +10,8 @@ public:
 	int DeinitDb();
 
 	void  SaveSurTemp(CSaveSurTempParam * pParam);
+	// 根据TagID查询温度数据
+	void  QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet);
 
 private:
 	sqlite3 *                         m_db;

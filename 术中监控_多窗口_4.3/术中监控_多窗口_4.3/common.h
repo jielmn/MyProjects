@@ -137,12 +137,14 @@ using namespace DuiLib;
 #define MSG_GET_GRID_TEMP                   1100
 #define MSG_GET_GRID_TEMP_MAX               1199
 #define MSG_SAVE_SUR_TEMP                   2000
+#define MSG_QUERY_TEMP_BY_TAG               2001
 
 // windows 消息
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
 #define UM_TRY_SUR_READER                    (WM_USER+2)
 #define UM_SUR_READER_STATUS                 (WM_USER+3)
 #define UM_SUR_READER_TEMP                   (WM_USER+4)
+#define UM_QUERY_TEMP_BY_TAG_ID_RET          (WM_USER+5)
 
 
 // 创建duilib控件的回调
@@ -261,6 +263,17 @@ public:
 
 	TempItem       m_item;
 	WORD           m_wBedNo;
+};
+
+class CQueryTempByTagParam : public LmnToolkits::MessageData {
+public:
+	CQueryTempByTagParam(const char * szTagId, WORD wBedNo) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		m_wBedNo = wBedNo;
+	}
+
+	char       m_szTagId[MAX_TAG_ID_LENGTH];
+	WORD       m_wBedNo;
 };
 
 extern CGlobalData  g_data;

@@ -182,6 +182,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_SUR_READER_TEMP) {
 		OnSurReaderTemp(wParam, lParam);
 	}
+	else if (uMsg == UM_QUERY_TEMP_BY_TAG_ID_RET) {
+		OnQueryTempRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -937,6 +940,25 @@ void   CDuiFrameWnd::OnUpdateElapsed() {
 	}
 }
 
+// 查询温度结果
+void   CDuiFrameWnd::OnQueryTempRet(WPARAM wParam, LPARAM  lParam) {
+	void ** pParam = (void **)wParam;
+
+	char * pTagId = (char *)pParam[0];
+	WORD   wBedNo = (WORD)(pParam[1]);
+	std::vector<TempItem*> * pvRet = (std::vector<TempItem*> *)pParam[2];
+
+	DWORD  i = wBedNo / MAX_READERS_PER_GRID;
+	DWORD  j = wBedNo % MAX_READERS_PER_GRID;
+	assert(i < MAX_GRID_COUNT);
+
+	delete[] pTagId;
+	ClearVector(*pvRet);
+	delete pvRet;
+	delete[] pParam;
+}
+
+
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
 	::PostMessage( GetHWND(), UM_LAUNCH_STATUS, (WPARAM)e, 0);
@@ -957,6 +979,20 @@ void   CDuiFrameWnd::OnSurReaderTempNotify(WORD wBed, const TempItem & item) {
 	TempItem * pItem = new TempItem;
 	memcpy(pItem, &item, sizeof(TempItem));
 	::PostMessage(GetHWND(), UM_SUR_READER_TEMP, (WPARAM)wBed, (LPARAM)pItem );
+}
+
+// 查询到温度结果(根据TagId)
+void   CDuiFrameWnd::OnQueryTempRetNotify(const char * szTagId, WORD wBed, std::vector<TempItem*> * pvRet) {
+	void ** pParam = new void *[3];
+
+	char * pTagId = new char[MAX_TAG_ID_LENGTH];
+	STRNCPY(pTagId, szTagId, MAX_TAG_ID_LENGTH);
+
+	pParam[0] = (void *)pTagId;
+	pParam[1] = (void *)wBed;
+	pParam[2] = (void *)pvRet;
+
+	::PostMessage(GetHWND(), UM_QUERY_TEMP_BY_TAG_ID_RET, (WPARAM)pParam, 0);
 }
                       
 

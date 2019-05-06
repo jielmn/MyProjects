@@ -96,6 +96,8 @@ private:
 	void   OnSetTempFont(const SIZE & s);
 	//  定时更新逝去时间
 	void   OnUpdateElapsed();
+	// 查询温度结果
+	void   OnQueryTempRet(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
@@ -106,6 +108,8 @@ public:
 	void   OnSurReaderStatusNotify(WORD wBed, BOOL bConnected);
 	// 术中读卡器的温度数据
 	void   OnSurReaderTempNotify(WORD wBed, const TempItem & item);
+	// 查询到温度结果(根据TagId)
+	void   OnQueryTempRetNotify(const char *, WORD, std::vector<TempItem*> *);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
