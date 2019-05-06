@@ -89,6 +89,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pGrids[i]->SetTag(i);
 		m_pGrids[i]->SetBedNo(i + 1);
 		m_pGrids[i]->SetMode( (CModeButton::Mode)g_data.m_CfgData.m_GridCfg[i].m_dwGridMode );
+		m_layMain->Add(m_pGrids[i]);
 	}
 	/*************  end »ñÈ¡¿Ø¼þ *****************/
 
