@@ -47,4 +47,6 @@ public:
 	CEditableButtonUI *                         m_cstBodyPart;            // 身体部位
 	CLabelUI *                                  m_lblTemp;                // 温度数据
 	CControlUI *                                m_state;                  // 断线状态
+	CLabelUI *                                  m_lblReaderId;            // ReaderId
+	CLabelUI *                                  m_lblTagId;               // TagId
 };

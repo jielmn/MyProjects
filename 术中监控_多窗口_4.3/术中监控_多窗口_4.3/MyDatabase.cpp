@@ -162,10 +162,12 @@ void  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempIt
 		memset(pItem, 0, sizeof(TempItem));
 
 		sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &pItem->m_dwDbId);
+		//strncpy_s(pItem->m_szTagId, azResult[(i + 1)*ncolumn + 1], sizeof(pItem->m_szTagId));
 		sscanf_s(azResult[(i + 1)*ncolumn + 2], "%lu", &pItem->m_dwTemp);
 		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
 		pItem->m_time = (time_t)dwValue;
 		strncpy_s(pItem->m_szRemark, azResult[(i + 1)*ncolumn + 4], sizeof(pItem->m_szRemark));
+		strncpy_s(pItem->m_szReaderId, azResult[(i + 1)*ncolumn + 6], sizeof(pItem->m_szReaderId));
 
 		vRet.push_back(pItem);
 	}

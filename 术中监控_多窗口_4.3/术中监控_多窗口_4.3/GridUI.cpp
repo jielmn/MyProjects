@@ -282,6 +282,8 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 	DWORD  dwHighAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm;
 	DWORD  dwLowAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm;
 	SetReaderTemp(j, item.m_dwTemp, dwHighAlarm, dwLowAlarm);
+	m_readers[j]->m_lblReaderId->SetText(item.m_szReaderId);
+	m_readers[j]->m_lblTagId->SetText(item.m_szTagId);
 
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
@@ -401,6 +403,7 @@ void CGridUI::OnQueryTempRet(DWORD j, const char * szTagId, const std::vector<Te
 	if ( dwCnt > 0 ) {		
 		TempItem* pLastItem = vRet[dwCnt - 1];
 		memcpy(&m_aLastTemp[j], pLastItem, sizeof(TempItem));
+		STRNCPY(m_aLastTemp[j].m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
 		ShowSurReaderTemp(j,*pLastItem);
 	}
 	else {

@@ -82,6 +82,8 @@ using namespace DuiLib;
 #define   LBL_READER_TEMP         "lblReaderTemp"
 #define   LAY_READER              "layReader"
 #define   LBL_ELAPSED             "lblElapsed"
+#define   LBL_READER_ID           "lblReaderId"
+#define   LBL_TAG_ID              "lblTagId"
 
 
 // CONFIG

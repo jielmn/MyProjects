@@ -11,6 +11,8 @@ CReaderUI::CReaderUI(ReaderType e /*= Hand*/) : m_callback( m_pManager ) {
 	m_cstBodyPart = 0;
 	m_state = 0;
 	m_lblTemp = 0;
+	m_lblReaderId = 0;
+	m_lblTagId = 0;
 }
 
 CReaderUI::~CReaderUI() {
@@ -47,6 +49,10 @@ void CReaderUI::DoInit() {
 	m_state = m_pManager->FindControl(CTR_READER_STATE);
 	m_lblTemp = static_cast<DuiLib::CLabelUI  *>(m_pManager->FindControl(LBL_READER_TEMP));
 	m_lblTemp->SetText("");
+	m_lblReaderId = static_cast<DuiLib::CLabelUI  *>(m_pManager->FindControl(LBL_READER_ID));
+	m_lblReaderId->SetText("");
+	m_lblTagId = static_cast<DuiLib::CLabelUI  *>(m_pManager->FindControl(LBL_TAG_ID));
+	m_lblTagId->SetText("");
 
 	if ( m_type == Hand ) {
 		m_lblIndicator->SetVisible(false);
