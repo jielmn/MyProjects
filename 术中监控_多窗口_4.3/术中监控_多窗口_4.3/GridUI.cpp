@@ -404,7 +404,7 @@ void CGridUI::OnQueryTempRet(DWORD j, const char * szTagId, const std::vector<Te
 		TempItem* pLastItem = vRet[dwCnt - 1];
 		memcpy(&m_aLastTemp[j], pLastItem, sizeof(TempItem));
 		STRNCPY(m_aLastTemp[j].m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
-		ShowSurReaderTemp(j,*pLastItem);
+		ShowSurReaderTemp(j, m_aLastTemp[j]);
 	}
 	else {
 		assert(0);
