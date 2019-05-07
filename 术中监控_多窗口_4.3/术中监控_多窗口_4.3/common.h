@@ -38,8 +38,11 @@ using namespace DuiLib;
 #define   LOW_TEMP_TEXT_COLOR         0xFF01AFC3
 #define   NORMAL_TEMP_TEXT_COLOR      0xFF4E8B20
 #define   DISCONNECTED_IMAGE          "disconnected.png"
+#define   MIN_MYIMAGE_VMARGIN         40
+#define   SCALE_RECT_WIDTH            50          // 刻度区域的宽度
+#define   BRIGHT_DARK_INTERVAL        30          // 明暗刻度的间隔
 
-#define   VERSION                  "3.0.1"
+#define   VERSION                     "3.0.1"
 
 // 控件id
 #define   TABS_ID                  "switch"
@@ -84,7 +87,7 @@ using namespace DuiLib;
 #define   LBL_ELAPSED             "lblElapsed"
 #define   LBL_READER_ID           "lblReaderId"
 #define   LBL_TAG_ID              "lblTagId"
-
+#define   CST_IMAGE               "cstMyImage"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"

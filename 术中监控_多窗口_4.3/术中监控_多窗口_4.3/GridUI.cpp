@@ -25,6 +25,7 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 	memset( &m_HandLastTemp, 0, sizeof(TempItem) );
 
 	m_lblElapsed = 0;
+	m_cstImg = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -101,6 +102,7 @@ void CGridUI::DoInit() {
 	m_cstImgLabel = static_cast<CImageLabelUI *>(m_pManager->FindControl(CST_IMG_LBL_TEMP));
 	m_lblElapsed = static_cast<CImageLabelUI *>(m_pManager->FindControl(LBL_ELAPSED));
 	m_lblElapsed->SetText("");
+	m_cstImg = static_cast<CMyImageUI *>(m_pManager->FindControl(CST_IMAGE));
 
 	OnModeChanged();
 
@@ -346,6 +348,8 @@ void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
 
 	m_cstImgLabel->SetText(m_readers[dwSelected]->m_lblTemp->GetText());
 	m_cstImgLabel->SetTextColor(m_readers[dwSelected]->m_lblTemp->GetTextColor());
+
+	m_cstImg->Invalidate();
 }
 
 // …Ë÷√Œ¬∂»◊÷ÃÂ
@@ -437,4 +441,8 @@ void CGridUI::PruneData(std::vector<TempItem*> & v, time_t t) {
 		}
 	}
 	v.erase(v.begin(), it);
+}
+
+DWORD  CGridUI::GetReaderIndex() const {
+	return m_dwSelSurReaderIndex;
 }

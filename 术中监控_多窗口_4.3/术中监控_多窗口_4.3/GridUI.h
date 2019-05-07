@@ -40,6 +40,8 @@ public:
 	void PruneData();
 	void PruneData(std::vector<TempItem*> & v,time_t t);
 
+	DWORD  GetReaderIndex() const;
+
 private:
 	LPCTSTR GetClass() const;
 
@@ -69,6 +71,7 @@ private:
 
 	// 显示温度数据和曲线的
 	CImageLabelUI *                             m_cstImgLabel;
+	CMyImageUI *                                m_cstImg;
 
 	// 逝去的时间
 	CLabelUI *                                  m_lblElapsed;
@@ -77,6 +80,7 @@ private:
 	CVerticalLayoutUI *                         m_layReaders;
 	CReaderUI *                                 m_readers[MAX_READERS_PER_GRID];             // 连续测温读卡器
 	CReaderUI *                                 m_hand_reader;                               // 非连续测温读卡器
+	
 
 private:
 	// 最后一次的温度数据
