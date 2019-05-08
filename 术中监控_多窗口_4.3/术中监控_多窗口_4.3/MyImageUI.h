@@ -42,7 +42,15 @@ private:
 	// 画日子分割线
 	void    DrawDaySplit( HDC hDC, int nDayCounts, const RECT & rectScale, int nDayWidth, int nMaxY,
 		                  int nCelsiusCnt, int nHeightPerCelsius, time_t  tFirstDayZeroTime);
-
+	// 画折线图 范围[tFirstTime, tLastTime)
+	void    DrawPolyline( time_t tFirstTime, time_t tLastTime,      float fSecondsPerPixel,
+		                  int    nMaxTemp,   int nHeightPerCelsius, POINT  tTopLeft,    Graphics & graphics,
+		                  BOOL  bDrawPoints, DWORD i, DWORD j, CModeButton::Mode mode );
+	void    DrawPolyline( time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+		                  int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
+		                  BOOL  bDrawPoints, const  std::vector<TempItem * > & vTempData, 
+		                  Pen * pen, SolidBrush * brush);
+	void    DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
 
 private:
 	enum   E_STATE {
@@ -57,6 +65,8 @@ private:
 	HPEN                         m_hLowTempAlarmPen;
 	HPEN                         m_hHighTempAlarmPen;
 	HPEN                         m_hDaySplitThreadPen;
+	Pen *                        m_temperature_pen[MAX_READERS_PER_GRID];
+	SolidBrush *                 m_temperature_brush[MAX_READERS_PER_GRID];
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

@@ -11,6 +11,11 @@ CMyImageUI::CMyImageUI() {
 	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0x02, 0xA5, 0xF1));
 	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0xFC, 0x23, 0x5C));
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
+
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		m_temperature_pen[i] = new Pen(Gdiplus::Color(g_ReaderIndicator[i]), 1.0);
+		m_temperature_brush[i] = new SolidBrush(Gdiplus::Color(g_ReaderIndicator[i]));
+	}
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -20,6 +25,11 @@ CMyImageUI::~CMyImageUI() {
 	DeleteObject(m_hLowTempAlarmPen);
 	DeleteObject(m_hHighTempAlarmPen);
 	DeleteObject(m_hDaySplitThreadPen);
+
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		delete m_temperature_pen[i];
+		delete m_temperature_brush[i];
+	}
 }
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -295,6 +305,131 @@ void   CMyImageUI::DrawDaySplit( HDC hDC, int nDayCounts, const RECT & rectScale
 	}
 }
 
+// 画折线图 范围[tFirstTime, tLastTime)
+void    CMyImageUI::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+	int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
+	BOOL  bDrawPoints, DWORD i, DWORD j, CModeButton::Mode mode ) {
+
+	if ( mode == CModeButton::Mode_Hand ) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		DrawPolyline(tFirstTime, tLastTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, 
+			tTopLeft, graphics, bDrawPoints, v, m_temperature_pen[0], m_temperature_brush[0]);
+	}
+	else if ( mode == CModeButton::Mode_Single ) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		DrawPolyline(tFirstTime, tLastTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+			tTopLeft, graphics, bDrawPoints, v, m_temperature_pen[0], m_temperature_brush[0]);
+	}
+	else {
+		for ( DWORD k = 0; k < MAX_READERS_PER_GRID; k++ ) {
+			const std::vector<TempItem * > & v = GetTempData(k+1);
+			DrawPolyline(tFirstTime, tLastTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+				tTopLeft, graphics, bDrawPoints, v, m_temperature_pen[k], m_temperature_brush[k]);
+		}
+	}
+}
+
+// 画折线图 范围[tFirstTime, tLastTime)，只画单个vector
+void    CMyImageUI::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+	int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
+	BOOL  bDrawPoints, const  std::vector<TempItem * > & vTempData, Pen * pen, SolidBrush * brush) {
+
+	DWORD dwMaxTempCnt = vTempData.size();
+	Gdiplus::Point * points = new Gdiplus::Point[dwMaxTempCnt];
+	vector<TempItem *>::const_iterator it;
+
+	// 找到第一个点
+	for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		TempItem * pItem = *it;
+		if ( pItem->m_time >= tFirstTime ) {
+			break;
+		}
+	}
+
+	// 找到第一个点后，其他的点不在和起始时间点比较
+	// 临时存储相同x坐标的vector
+	vector<TempItem *>  vTmp;
+	// 临时vector的item有共同的点，它们的x坐标相同
+	int nTmpX = 0;
+	// points数组的大小
+	int cnt = 0;
+
+	for (; it != vTempData.end(); it++) {
+		TempItem * pItem = *it;
+		// 如果最后时间有值
+		if (tLastTime > 0) {
+			// 如果超出范围
+			if ( pItem->m_time >= tLastTime ) {
+				break;
+			}
+		}
+
+		int  nX = (int)((pItem->m_time - tFirstTime) / fSecondsPerPixel);
+
+		if (vTmp.size() == 0) {
+			vTmp.push_back(pItem);
+			nTmpX = nX;
+		}
+		else {
+			// 如果偏移量和上次的相同，放置在临时vector中
+			if (nX <= nTmpX + 1) {
+				vTmp.push_back(pItem);
+			}
+			else {
+				vector<TempItem *>::iterator  it_tmp;
+				int  sum = 0;
+				for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+					TempItem * pTmpItem = *it_tmp;
+					sum += pTmpItem->m_dwTemp;
+				}
+				// 求平均值
+				int  ave = sum / vTmp.size();
+
+				points[cnt].X = nTmpX + tTopLeft.x;
+				points[cnt].Y = tTopLeft.y + (int)((nMaxTemp - ave / 100.0) * nHeightPerCelsius);
+				cnt++;
+
+				vTmp.clear();
+				vTmp.push_back(pItem);
+				nTmpX = nX;
+			}
+		}
+	}
+
+	if (vTmp.size() > 0) {
+		vector<TempItem *>::iterator  it_tmp;
+		int  sum = 0;
+		for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+			TempItem * pTmpItem = *it_tmp;
+			sum += pTmpItem->m_dwTemp;
+		}
+		// 求平均值
+		int  ave = sum / vTmp.size();
+
+		points[cnt].X = nTmpX + tTopLeft.x;
+		points[cnt].Y = tTopLeft.y + (int)((nMaxTemp - ave / 100.0) * nHeightPerCelsius);
+		cnt++;
+
+		vTmp.clear();
+	}
+
+	if (bDrawPoints && fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f) {
+		for (int m = 0; m < cnt; ++m) {
+			DrawPoint( brush, graphics, points[m].X, points[m].Y, 0, 3);
+		}
+	}
+
+	if (cnt > 1)
+		graphics.DrawLines(pen, points, cnt);
+	else if (1 == cnt)
+		DrawPoint(brush, graphics, points[0].X, points[0].Y, 0, 3);
+
+	delete[] points;
+}
+
+void    CMyImageUI::DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius) {
+	g.FillEllipse(brush, x - radius, y - radius, 2 * radius, 2 * radius);
+}
 
 void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	DuiLib::CDuiString strText;
@@ -313,7 +448,7 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	DWORD  i = GetGridIndex();
 	DWORD  j = GetReaderIndex();
 	CModeButton::Mode mode = GetMode();
-	 
+	  
 	// 显示的最低温度和最高温度
 	int  nMinTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
 	int  nMaxTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
@@ -357,6 +492,17 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 
 	// 画日子的分割线
 	DrawDaySplit(hDC, nDayCounts, rectScale, nDayWidth, nMaxY, nCelsiusCount, nHeightPerCelsius, tFirstDayZeroTime);
+	
+	float fSecondsPerPixel = 0.0f;
+	// 画折线
+	if (nDayWidth > 0) {
+		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		POINT  top_left;
+		top_left.x = rectScale.right;
+		top_left.y = nMaxY;
+		DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, 
+			top_left, graphics, TRUE, i,j,mode);
+	}
 	
 }
 
