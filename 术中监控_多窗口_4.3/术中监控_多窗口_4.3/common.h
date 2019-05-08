@@ -305,6 +305,8 @@ extern void  SaveReaderSwitch(DWORD i, DWORD j);
 extern void  SaveReaderName(DWORD i, DWORD j);
 extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DWORD dwDataLen);
 extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData, DWORD dwDataLen);
+extern int  GetWeekDay(time_t t);
+extern const char * GetWeekDayName(int nWeekIndex);
 
 // templates
 template <class T>

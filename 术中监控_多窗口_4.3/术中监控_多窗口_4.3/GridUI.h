@@ -41,6 +41,8 @@ public:
 	void PruneData(std::vector<TempItem*> & v,time_t t);
 
 	DWORD  GetReaderIndex() const;
+	const std::vector<TempItem * > & GetTempData(DWORD dwReaderIndex) const;
+	CModeButton::Mode  GetMode() const;
 
 private:
 	LPCTSTR GetClass() const;

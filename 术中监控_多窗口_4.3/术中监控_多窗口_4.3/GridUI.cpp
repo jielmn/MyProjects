@@ -446,3 +446,17 @@ void CGridUI::PruneData(std::vector<TempItem*> & v, time_t t) {
 DWORD  CGridUI::GetReaderIndex() const {
 	return m_dwSelSurReaderIndex;
 }
+
+const std::vector<TempItem * > & CGridUI::GetTempData(DWORD dwReaderIndex) const {
+	if (0 == dwReaderIndex) {
+		return  m_vHandTemp;
+	}
+	else {
+		assert(dwReaderIndex <= MAX_READERS_PER_GRID);
+		return m_vTemp[dwReaderIndex - 1];
+	}
+}
+
+CModeButton::Mode  CGridUI::GetMode() const {
+	return m_cstModeBtn->GetMode();
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "ModeButtonUI.h"
 
 class CMyImageUI : public DuiLib::CControlUI
 {
@@ -20,6 +21,8 @@ private:
 	int    GetMyScrollX();
 	DWORD  GetGridIndex();
 	DWORD  GetReaderIndex();
+	const  std::vector<TempItem * > & GetTempData(DWORD j);
+	CModeButton::Mode   GetMode();
 	CControlUI * GetGrid();
 	int    GetCelsiusHeight(int height, int nCelsiusCount);
 	// 画水平刻度线
@@ -33,6 +36,12 @@ private:
 	// 画报警线
 	void   DrawWarning( HDC hDC, DWORD i, DWORD j, int nMaxTemp, int nHeightPerCelsius, int nMaxY,
 		                const RECT & rectScale, int width );
+	// 7日视图有几天数据
+	int     GetDayCounts(DWORD i, DWORD j, CModeButton::Mode mode);
+	time_t  GetFirstTime(DWORD i, DWORD j, CModeButton::Mode mode);
+	// 画日子分割线
+	void    DrawDaySplit( HDC hDC, int nDayCounts, const RECT & rectScale, int nDayWidth, int nMaxY,
+		                  int nCelsiusCnt, int nHeightPerCelsius, time_t  tFirstDayZeroTime);
 
 
 private:
@@ -47,6 +56,7 @@ private:
 	HBRUSH                       m_hCommonBrush;
 	HPEN                         m_hLowTempAlarmPen;
 	HPEN                         m_hHighTempAlarmPen;
+	HPEN                         m_hDaySplitThreadPen;
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

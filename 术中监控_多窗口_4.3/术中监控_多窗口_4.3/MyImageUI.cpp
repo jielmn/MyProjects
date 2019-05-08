@@ -10,6 +10,7 @@ CMyImageUI::CMyImageUI() {
 	m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
 	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0x02, 0xA5, 0xF1));
 	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0xFC, 0x23, 0x5C));
+	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -18,6 +19,7 @@ CMyImageUI::~CMyImageUI() {
 	DeleteObject(m_hCommonBrush);
 	DeleteObject(m_hLowTempAlarmPen);
 	DeleteObject(m_hHighTempAlarmPen);
+	DeleteObject(m_hDaySplitThreadPen);
 }
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -80,6 +82,16 @@ DWORD   CMyImageUI::GetGridIndex() {
 DWORD   CMyImageUI::GetReaderIndex() {
 	CGridUI * pParent = (CGridUI *)GetGrid();
 	return pParent->GetReaderIndex();
+}
+
+const   std::vector<TempItem * > & CMyImageUI::GetTempData(DWORD j) {
+	CGridUI * pParent = (CGridUI *)GetGrid();
+	return pParent->GetTempData(j);
+}
+
+CModeButton::Mode  CMyImageUI::GetMode() {
+	CGridUI * pParent = (CGridUI *)GetGrid();
+	return pParent->GetMode();
 }
 
 int   CMyImageUI::GetCelsiusHeight(int height, int nCelsiusCount) {
@@ -182,6 +194,107 @@ void   CMyImageUI::DrawWarning( HDC hDC,DWORD i, DWORD j, int nMaxTemp, int nHei
 	::TextOut(hDC, rectScale.right + 5, nMaxY + nDiffY + (-20), strWarningHigh, strWarningHigh.GetLength());
 }
 
+time_t  CMyImageUI::GetFirstTime(DWORD i, DWORD j, CModeButton::Mode mode) {
+	time_t  tTime = 0x7FFFFFFF;
+	BOOL    bFind = FALSE;
+
+	if (j > 0) {
+		// 多接收器模式
+		if (mode == CModeButton::Mode_Multiple) {
+			for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+				const  std::vector<TempItem * > & vTemp = GetTempData(k+1);
+				if (vTemp.size() > 0) {
+					if (!bFind) {
+						tTime = vTemp[0]->m_time;
+						bFind = TRUE;
+					}
+					else if (vTemp[0]->m_time < tTime) {
+						tTime = vTemp[0]->m_time;
+					}
+				}
+			}
+		}
+		else if (mode == CModeButton::Mode_Single ) {
+			assert(j == 1);
+			const  std::vector<TempItem * > & vTemp = GetTempData(1);
+			if (vTemp.size() > 0) {
+				tTime = vTemp[0]->m_time;
+				bFind = TRUE;
+			}
+		}
+		else {
+			assert(0);
+		}		
+	}
+	// j == 0，手持读卡器模式
+	else {
+		assert(mode == CModeButton::Mode_Hand);
+		const  std::vector<TempItem * > & vTemp = GetTempData(0);
+		if (vTemp.size() > 0) {
+			tTime = vTemp[0]->m_time;
+			bFind = TRUE;
+		}
+	}
+	
+	if (bFind) {
+		return tTime;
+	}
+	else {
+		return -1;
+	}
+}
+
+// 7日视图有几天数据
+int   CMyImageUI::GetDayCounts(DWORD i, DWORD j, CModeButton::Mode mode) {
+	time_t  first_time = GetFirstTime(i,j,mode);
+	if (-1 == first_time) {
+		return 1;
+	}
+
+	time_t  today_zero_time = GetTodayZeroTime();
+	if (first_time >= today_zero_time) {
+		return 1;
+	}
+
+	// 一周前的开始位置
+	time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	// 如果开始时间比一周前还早
+	if (first_time <= tWeekBegin) {
+		return 7;
+	}
+
+	return (int)(today_zero_time - first_time - 1) / (3600 * 24) + 1 + 1;
+}
+
+// 画日子分割线
+void   CMyImageUI::DrawDaySplit( HDC hDC, int nDayCounts, const RECT & rectScale, int nDayWidth, int nMaxY, 
+	                             int nCelsiusCnt, int nHeightPerCelsius, time_t  tFirstDayZeroTime) {
+	::SelectObject(hDC, m_hDaySplitThreadPen);
+	for (int i = 0; i < nDayCounts - 1; i++) {
+		::MoveToEx(hDC, rectScale.right + nDayWidth * (i + 1), rectScale.top, 0);
+		::LineTo(hDC, rectScale.right + nDayWidth * (i + 1), rectScale.bottom );
+	}
+
+	int nWeekDayIndex = GetWeekDay(tFirstDayZeroTime);
+
+	RECT  tmpRect;
+	char  szDate[256];
+	CDuiString strText;
+
+	for (int i = 0; i < nDayCounts; i++) {
+		tmpRect.left   = rectScale.right + nDayWidth * i;
+		tmpRect.right  = tmpRect.left + nDayWidth;
+		tmpRect.top    = nMaxY + nHeightPerCelsius * nCelsiusCnt;
+		tmpRect.bottom = rectScale.bottom;
+
+		time_t  t = tFirstDayZeroTime + 3600 * 24 * i;
+		Date2String(szDate, sizeof(szDate), &t);
+		strText.Format("%s %s", szDate, GetWeekDayName((nWeekDayIndex + i) % 7));
+		::DrawText(hDC, strText, strText.GetLength(), &tmpRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	}
+}
+
 
 void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	DuiLib::CDuiString strText;
@@ -199,6 +312,7 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 
 	DWORD  i = GetGridIndex();
 	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
 	 
 	// 显示的最低温度和最高温度
 	int  nMinTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
@@ -233,6 +347,17 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 
 	// 画报警线
 	DrawWarning( hDC,i,j,nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width );
+
+	// 计算温度曲线跨越几个日子
+	int  nDayCounts = GetDayCounts(i,j,mode);
+	assert(nDayCounts > 0);
+	int  nDayWidth = (width - SCALE_RECT_WIDTH) / nDayCounts;
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	time_t   tFirstDayZeroTime = tTodayZeroTime - 3600 * 24 * (nDayCounts - 1);
+
+	// 画日子的分割线
+	DrawDaySplit(hDC, nDayCounts, rectScale, nDayWidth, nMaxY, nCelsiusCount, nHeightPerCelsius, tFirstDayZeroTime);
+	
 }
 
 void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
