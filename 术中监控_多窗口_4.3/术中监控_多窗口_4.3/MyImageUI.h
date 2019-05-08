@@ -54,6 +54,8 @@ private:
 	void    DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
 	// 双击事件
 	void    OnDbClick();
+	// 温度数据个数
+	DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
 
 private:
 	enum   E_STATE {

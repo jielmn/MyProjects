@@ -524,26 +524,43 @@ void  CMyImageUI::OnDbClick() {
 	CModeButton::Mode mode = GetMode();
 
 	// 查看有无数据
-	int nPointsCnt = 0;
-	if (mode == CModeButton::Mode_Hand) {
-		const std::vector<TempItem * > & v = GetTempData(0);
-		nPointsCnt = v.size();
-	}
-	else if (mode == CModeButton::Mode_Single) {
-		const std::vector<TempItem * > & v = GetTempData(1);
-		nPointsCnt = v.size();
-	}
-	else {
-		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
-			const std::vector<TempItem * > & v = GetTempData(k + 1);
-			nPointsCnt += v.size();
-		}
-	}
-
+	int nPointsCnt = GetTempCount(i,j,mode);
+	
 	// 如果没有数据就不重绘了 
 	if (0 == nPointsCnt) {
 		return;
 	}
+
+
+	// 如果是7日视图
+	if (m_state == STATE_7_DAYS) {
+		// 检查点击了那一天
+	}
+	else {
+
+	}
+
+	MyInvalidate();
+}
+
+// 温度数据个数
+DWORD   CMyImageUI::GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode) {
+	DWORD dwPointsCnt = 0;
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		dwPointsCnt = v.size();
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		dwPointsCnt = v.size();
+	}
+	else {
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			dwPointsCnt += v.size();
+		}
+	}
+	return dwPointsCnt;
 }
 
 
