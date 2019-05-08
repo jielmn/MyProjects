@@ -52,6 +52,8 @@ private:
 		                  BOOL  bDrawPoints, const  std::vector<TempItem * > & vTempData, 
 		                  Pen * pen, SolidBrush * brush);
 	void    DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
+	// Ë«»÷ÊÂ¼þ
+	void    OnDbClick();
 
 private:
 	enum   E_STATE {

@@ -46,6 +46,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 }
 
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if ( event.Type == UIEVENT_DBLCLICK) {
+		OnDbClick();
+	}
 	CControlUI::DoEvent(event);
 }
 
@@ -514,6 +517,34 @@ void CMyImageUI::MyInvalidate() {
 	Invalidate();
 }
 
+// 双击事件
+void  CMyImageUI::OnDbClick() {
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 查看有无数据
+	int nPointsCnt = 0;
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		nPointsCnt = v.size();
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		nPointsCnt = v.size();
+	}
+	else {
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			nPointsCnt += v.size();
+		}
+	}
+
+	// 如果没有数据就不重绘了 
+	if (0 == nPointsCnt) {
+		return;
+	}
+}
 
 
 
