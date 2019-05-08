@@ -292,6 +292,8 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 		SetCurReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm);
 		UpdateElapsed();
 	}
+
+	m_cstImg->MyInvalidate();
 }
 
 void CGridUI::SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
@@ -349,7 +351,7 @@ void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
 	m_cstImgLabel->SetText(m_readers[dwSelected]->m_lblTemp->GetText());
 	m_cstImgLabel->SetTextColor(m_readers[dwSelected]->m_lblTemp->GetTextColor());
 
-	m_cstImg->Invalidate();
+	m_cstImg->MyInvalidate();
 }
 
 // ÉèÖÃÎÂ¶È×ÖÌå

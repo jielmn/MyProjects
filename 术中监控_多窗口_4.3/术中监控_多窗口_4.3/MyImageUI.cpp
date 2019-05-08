@@ -510,6 +510,11 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 
 }
 
+void CMyImageUI::MyInvalidate() {
+	Invalidate();
+}
+
+
 
 
 
