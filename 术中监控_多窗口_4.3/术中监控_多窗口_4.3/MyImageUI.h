@@ -66,6 +66,7 @@ private:
 	};
 
 	E_STATE                      m_state;                 // 7days or single day
+	int                          m_nSingleDayIndex;       // 单日视图，第几天
 	HPEN                         m_hCommonThreadPen;
 	HPEN                         m_hBrighterThreadPen;
 	HBRUSH                       m_hCommonBrush;

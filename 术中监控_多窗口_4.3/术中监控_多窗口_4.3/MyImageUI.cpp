@@ -4,6 +4,7 @@
 CMyImageUI::CMyImageUI() {
 	// 初始状态为显示7日曲线
 	m_state = STATE_7_DAYS;
+	m_nSingleDayIndex = 0;
 
 	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
 	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
@@ -510,6 +511,59 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 }
 
 void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CDuiString strText;
+
+	// GDI+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	// self rectangle and width, height
+	RECT rect = GetPos();
+	int  width = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
+	int  nMaxTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 采集间隔(单位：秒)
+	int  nCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval);
+
+	// 画水平刻度线
+	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
+
+	// 画边框
+	DrawBorder(hDC, rectScale, width);
+
+	// 画温度曲线
+
+	// 画刻度值
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+
+	// 画报警线
+	DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+
 
 }
 
@@ -535,10 +589,12 @@ void  CMyImageUI::OnDbClick() {
 	// 如果是7日视图
 	if (m_state == STATE_7_DAYS) {
 		// 检查点击了那一天
-		GetClickDayIndex(i, j, mode);
+		m_nSingleDayIndex = GetClickDayIndex(i, j, mode);
+		assert(m_nSingleDayIndex >= -6 && m_nSingleDayIndex <= 0);
+		m_state = STATE_SINGLE_DAY;
 	}
 	else {
-
+		m_state = STATE_7_DAYS;
 	}
 
 	MyInvalidate();
@@ -587,7 +643,7 @@ int  CMyImageUI::GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode) {
 	int  nOffsetX    = cursor_point.x - rectScale.right;
 
 	if (nOffsetX < 0 || nOffsetX > nDayCounts * nDayWidth)
-		return -1;
+		return - (nDayCounts - 1);
 
 	int k = 0;
 	for (k = 0; k < nDayCounts; k++) {
@@ -595,7 +651,7 @@ int  CMyImageUI::GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode) {
 			break;
 		}
 	}
-	return k;
+	return k - (nDayCounts - 1);
 }
 
 
