@@ -333,7 +333,7 @@ void    CMyImageUI::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSec
 	}
 }
 
-// 画折线图 范围[tFirstTime, tLastTime)，只画单个vector
+// 画折线图 范围[tFirstTime, tLastTime]，只画单个vector
 void    CMyImageUI::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
 	int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
 	BOOL  bDrawPoints, const  std::vector<TempItem * > & vTempData, Pen * pen, SolidBrush * brush) {
@@ -363,7 +363,7 @@ void    CMyImageUI::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSec
 		// 如果最后时间有值
 		if (tLastTime > 0) {
 			// 如果超出范围
-			if ( pItem->m_time >= tLastTime ) {
+			if ( pItem->m_time > tLastTime ) {
 				break;
 			}
 		}
@@ -510,6 +510,76 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	
 }
 
+// 画single day折线图
+void    CMyImageUI::DrawSingleDayLine(DWORD i, DWORD j, CModeButton::Mode mode) {
+	// 查看有无数据
+	int nPointsCnt = GetTempCount(i, j, mode);
+
+	// 如果没有数据就不重绘了 
+	if (0 == nPointsCnt) {
+		return;
+	}
+
+	time_t  tFirstTime = 0, tLastTime = 0;
+	GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+}
+
+// 获得single day的起始时间和结束时间
+void  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode) {
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	start = tTodayZeroTime + 3600 * 24 * m_nSingleDayIndex;
+	end   = tTodayZeroTime + 3600 * 24 - 1;
+
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		GetTimeRange(v, start, end);
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		GetTimeRange(v, start, end);
+	}
+	else {
+		time_t tmp_s = start;
+		time_t tmp_e = end;
+
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			time_t t1 = start, t2 = end;
+			GetTimeRange(v, t1, t2);
+			if (t1 < tmp_s) {
+				tmp_s = t1;
+			}
+			if (t2 > tmp_e) {
+				tmp_e = t2;
+			}
+		}
+
+		start = tmp_s;
+		end = tmp_e;
+	}
+}
+
+void  CMyImageUI::GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end) {
+	std::vector<TempItem * >::const_iterator it;
+	std::vector<TempItem * >::const_reverse_iterator itr;
+
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem * pItem = *it;
+		if (pItem->m_time >= start) {
+			start = pItem->m_time;
+			break;
+		}
+	}
+
+	for (itr = v.rbegin(); itr != v.rend(); ++itr) {
+		TempItem * pItem = *itr;
+		if (pItem->m_time <= end) {
+			end = pItem->m_time;
+			break;
+		}
+	}
+}
+
 void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	DuiLib::CDuiString strText;
 
@@ -557,6 +627,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	DrawBorder(hDC, rectScale, width);
 
 	// 画温度曲线
+	DrawSingleDayLine(i,j,mode);
 
 	// 画刻度值
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
