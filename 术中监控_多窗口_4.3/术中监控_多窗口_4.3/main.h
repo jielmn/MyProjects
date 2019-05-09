@@ -63,7 +63,7 @@ private:
 	// 上一页
 	void   PrevPage();
 	// 双击事件
-	void   OnDbClick();
+	void   OnDbClick(BOOL & bHandled);
 	// 移动格子，调整顺序
 	void   MoveGrid(const POINT & pt);
 	// 停止移动格子，确定最终位置

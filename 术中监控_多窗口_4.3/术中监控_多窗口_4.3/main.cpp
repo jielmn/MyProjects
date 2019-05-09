@@ -68,6 +68,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 
 void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+	g_data.m_hWnd = GetHWND();
 
 	/*************  »ñÈ¡¿Ø¼þ *****************/
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(TABS_ID));
@@ -158,7 +159,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_LBUTTONDBLCLK) {
-		OnDbClick();
+		BOOL bHandled = FALSE;
+		OnDbClick(bHandled);
+		if (bHandled)
+			return 0;
 	}
 	else if (uMsg == WM_TIMER) {
 		if (wParam == TIMER_DRAG_DROP_GRID) {
@@ -598,9 +602,10 @@ void   CDuiFrameWnd::PrevPage() {
 	RefreshGridsPage();
 }
 
-void  CDuiFrameWnd::OnDbClick() {
+void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 	POINT point;
 	CDuiString strName;
+	bHandled = FALSE;
 
 	GetCursorPos(&point);
 	::ScreenToClient(m_hWnd, &point);
@@ -647,6 +652,8 @@ void  CDuiFrameWnd::OnDbClick() {
 
 			RefreshGridsPage();
 			RefreshGridsSize();
+
+			bHandled = TRUE;
 			break;
 		}
 		pFindControl = pFindControl->GetParent();

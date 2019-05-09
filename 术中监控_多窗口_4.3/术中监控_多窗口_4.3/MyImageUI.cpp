@@ -535,6 +535,7 @@ void  CMyImageUI::OnDbClick() {
 	// 如果是7日视图
 	if (m_state == STATE_7_DAYS) {
 		// 检查点击了那一天
+		GetClickDayIndex(i, j, mode);
 	}
 	else {
 
@@ -561,6 +562,40 @@ DWORD   CMyImageUI::GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode) {
 		}
 	}
 	return dwPointsCnt;
+}
+
+// 计算双击了第几天
+int  CMyImageUI::GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode) {
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	RECT rect       = GetPos();
+	int  width      = GetMyWidth();
+	int  height     = rect.bottom - rect.top;
+	int  nScrollX   = GetMyScrollX();
+	int  nDayCounts = GetDayCounts(i, j, mode);
+	int  nDayWidth  = (width - SCALE_RECT_WIDTH) / nDayCounts;
+
+	RECT rectScale;
+	rectScale.left   = rect.left + nScrollX;
+	rectScale.top    = rect.top;
+	rectScale.right  = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 偏移量
+	int  nOffsetX    = cursor_point.x - rectScale.right;
+
+	if (nOffsetX < 0 || nOffsetX > nDayCounts * nDayWidth)
+		return -1;
+
+	int k = 0;
+	for (k = 0; k < nDayCounts; k++) {
+		if ( nOffsetX < nDayWidth * (k + 1) ) {
+			break;
+		}
+	}
+	return k;
 }
 
 

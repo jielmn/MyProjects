@@ -56,6 +56,8 @@ private:
 	void    OnDbClick();
 	// 温度数据个数
 	DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
+	// 计算双击了第几天
+	int     GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode);
 
 private:
 	enum   E_STATE {
