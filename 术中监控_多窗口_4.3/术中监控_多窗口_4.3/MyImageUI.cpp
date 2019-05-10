@@ -798,13 +798,18 @@ void   CMyImageUI::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 	MyInvalidate();
 }
 
+// Îªlabel×÷»­
+void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect) {
+
+}
+
 
 
 
 
 
 CImageLabelUI::CImageLabelUI() {
-
+	m_image = 0;
 }
 
 CImageLabelUI::~CImageLabelUI() {
@@ -813,6 +818,20 @@ CImageLabelUI::~CImageLabelUI() {
  
 bool CImageLabelUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CLabelUI::DoPaint(hDC, rcPaint, pStopControl);
+
+	if (0 == m_image) {
+		return true;
+	}
+
+	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
+	int width = pParent->GetWidth();
+	int height = pParent->GetHeight();
+	RECT r = this->GetPos();
+
+	SetBkMode(hDC, TRANSPARENT);
+
+	m_image->PaintForLabelUI(hDC, width, height, r);
+
 	return true;
 }
 

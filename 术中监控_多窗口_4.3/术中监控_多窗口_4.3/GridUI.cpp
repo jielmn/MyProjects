@@ -103,6 +103,7 @@ void CGridUI::DoInit() {
 	m_lblElapsed = static_cast<CImageLabelUI *>(m_pManager->FindControl(LBL_ELAPSED));
 	m_lblElapsed->SetText("");
 	m_cstImg = static_cast<CMyImageUI *>(m_pManager->FindControl(CST_IMAGE));
+	m_cstImgLabel->SetMyImage(m_cstImg);
 
 	OnModeChanged();
 

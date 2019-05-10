@@ -13,6 +13,8 @@ public:
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
 	void MyInvalidate();
+	// Îªlabel×÷»­
+	void   PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect);
 
 private:
 	void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -97,4 +99,11 @@ public:
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
+
+	void  SetMyImage(CMyImageUI * img) {
+		m_image = img;
+	}
+
+private:
+	CMyImageUI  *   m_image;
 };
