@@ -12,6 +12,8 @@ CMyImageUI::CMyImageUI() {
 	m_hLowTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0x02, 0xA5, 0xF1));
 	m_hHighTempAlarmPen = ::CreatePen(PS_DASH, 1, RGB(0xFC, 0x23, 0x5C));
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
+	m_fSecondsPerPixel = 0.0f;
+	m_bSetSecondsPerPixel = FALSE;
 
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
 		m_temperature_pen[i] = new Pen(Gdiplus::Color(g_ReaderIndicator[i]), 1.0);
@@ -49,6 +51,9 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 	if ( event.Type == UIEVENT_DBLCLICK) {
 		OnDbClick();
+	}
+	else if (event.Type == UIEVENT_SCROLLWHEEL) {
+		OnMyMouseWheel(event.wParam, event.lParam);
 	}
 	CControlUI::DoEvent(event);
 }
@@ -645,7 +650,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	POINT  top_left;
 	top_left.x = rect.left + SCALE_RECT_WIDTH;
 	top_left.y = nMaxY;
-	DrawSingleDayLine( 1.0f, nMaxTemp, nHeightPerCelsius, top_left, graphics,TRUE, i,j,mode);
+	DrawSingleDayLine(m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, graphics,TRUE, i,j,mode);
 
 	// »­¿Ì¶ÈÖµ
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
@@ -681,6 +686,12 @@ void  CMyImageUI::OnDbClick() {
 		m_nSingleDayIndex = GetClickDayIndex(i, j, mode);
 		assert(m_nSingleDayIndex >= -6 && m_nSingleDayIndex <= 0);
 		m_state = STATE_SINGLE_DAY;
+
+		time_t  tFirstTime = 0, tLastTime = 0;
+		GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+		int  width = GetMyWidth();
+		m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (width - SCALE_RECT_WIDTH);
+		m_bSetSecondsPerPixel = TRUE;
 	}
 	else {
 		m_state = STATE_7_DAYS;
@@ -741,6 +752,25 @@ int  CMyImageUI::GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode) {
 		}
 	}
 	return k - (nDayCounts - 1);
+}
+
+// ÊóÂÖ»¬¶¯
+void   CMyImageUI::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
+	if (!m_bSetSecondsPerPixel)
+		return;
+
+	int nDirectory = (int)wParam;
+	if (nDirectory > 0) {
+		if (m_fSecondsPerPixel < 200.0f) {
+			m_fSecondsPerPixel *= 1.2f;
+		}
+	}
+	else {
+		if (m_fSecondsPerPixel > 1.2f) {
+			m_fSecondsPerPixel /= 1.2f;
+		}
+	}
+	MyInvalidate();
 }
 
 

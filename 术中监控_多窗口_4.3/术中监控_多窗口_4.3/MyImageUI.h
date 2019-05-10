@@ -65,6 +65,8 @@ private:
 	// 获得single day的起始时间和结束时间
 	void    GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode);
 	void    GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end);
+	// 鼠轮滑动
+	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 
 private:
 	enum   E_STATE {
@@ -82,6 +84,8 @@ private:
 	HPEN                         m_hDaySplitThreadPen;
 	Pen *                        m_temperature_pen[MAX_READERS_PER_GRID];
 	SolidBrush *                 m_temperature_brush[MAX_READERS_PER_GRID];
+	float                        m_fSecondsPerPixel;
+	BOOL                         m_bSetSecondsPerPixel;
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI
