@@ -414,6 +414,10 @@ void   CBusiness::RestartLaunch() {
 
 // 获取温度
 void  CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
+	if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
+		return;
+	}
+
 	if (0 == dwDelay) {
 		g_data.m_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
 	}
@@ -475,6 +479,12 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 		while (TRUE) {
 			LmnSleep(200);			
 			m_launch.ReadComData();
+
+			// 如果断开
+			if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
+				m_sigTrySurReader.emit(wBed, FALSE);
+				return;
+			}
 
 			// 如果拿到数据
 			if ( m_bSurReaderTemp[i][j] ) {
