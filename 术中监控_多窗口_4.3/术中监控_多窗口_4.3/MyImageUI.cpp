@@ -544,19 +544,29 @@ void  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, D
 		GetTimeRange(v, start, end);
 	}
 	else {
-		time_t tmp_s = start;
-		time_t tmp_e = end;
+		time_t tmp_s = 0;
+		time_t tmp_e = 0;
+		BOOL bFirst = TRUE;
 
 		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
 			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			if ( v.size() == 0 )
+				continue;
+
 			time_t t1 = start, t2 = end;
 			GetTimeRange(v, t1, t2);
-			if (t1 < tmp_s) {
+			if ( bFirst ) {
 				tmp_s = t1;
-			}
-			if (t2 > tmp_e) {
 				tmp_e = t2;
 			}
+			else {
+				if (t1 < tmp_s) {
+					tmp_s = t1;
+				}
+				if (t2 > tmp_e) {
+					tmp_e = t2;
+				}
+			}			
 		}
 
 		start = tmp_s;
@@ -635,7 +645,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	POINT  top_left;
 	top_left.x = rect.left + SCALE_RECT_WIDTH;
 	top_left.y = nMaxY;
-	DrawSingleDayLine( 20.0f, nMaxTemp, nHeightPerCelsius, top_left, graphics,TRUE, i,j,mode);
+	DrawSingleDayLine( 1.0f, nMaxTemp, nHeightPerCelsius, top_left, graphics,TRUE, i,j,mode);
 
 	// »­¿Ì¶ÈÖµ
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
