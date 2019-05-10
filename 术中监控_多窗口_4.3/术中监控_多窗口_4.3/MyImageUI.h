@@ -59,7 +59,9 @@ private:
 	// 计算双击了第几天
 	int     GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 画single day折线图
-	void    DrawSingleDayLine(DWORD i, DWORD j, CModeButton::Mode mode);
+	void    DrawSingleDayLine( float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
+		                       POINT  tTopLeft, Graphics & graphics, BOOL  bDrawPoints,
+		                       DWORD i, DWORD j, CModeButton::Mode mode );
 	// 获得single day的起始时间和结束时间
 	void    GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode);
 	void    GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end);

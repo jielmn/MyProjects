@@ -511,7 +511,9 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 }
 
 // 画single day折线图
-void    CMyImageUI::DrawSingleDayLine(DWORD i, DWORD j, CModeButton::Mode mode) {
+void    CMyImageUI::DrawSingleDayLine( float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius, 
+	                                   POINT  tTopLeft, Graphics & graphics, BOOL  bDrawPoints, 
+	                                   DWORD i, DWORD j, CModeButton::Mode mode ) {
 	// 查看有无数据
 	int nPointsCnt = GetTempCount(i, j, mode);
 
@@ -522,6 +524,9 @@ void    CMyImageUI::DrawSingleDayLine(DWORD i, DWORD j, CModeButton::Mode mode) 
 
 	time_t  tFirstTime = 0, tLastTime = 0;
 	GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+
+	DrawPolyline( tFirstTime, tLastTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+		tTopLeft, graphics, TRUE, i, j, mode );
 }
 
 // 获得single day的起始时间和结束时间
@@ -627,7 +632,10 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	DrawBorder(hDC, rectScale, width);
 
 	// 画温度曲线
-	DrawSingleDayLine(i,j,mode);
+	POINT  top_left;
+	top_left.x = rect.left + SCALE_RECT_WIDTH;
+	top_left.y = nMaxY;
+	DrawSingleDayLine( 20.0f, nMaxTemp, nHeightPerCelsius, top_left, graphics,TRUE, i,j,mode);
 
 	// 画刻度值
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
