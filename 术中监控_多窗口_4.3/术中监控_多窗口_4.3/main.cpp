@@ -957,8 +957,8 @@ void   CDuiFrameWnd::OnQueryTempRet(WPARAM wParam, LPARAM  lParam) {
 	WORD   wBedNo = (WORD)(pParam[1]);
 	std::vector<TempItem*> * pvRet = (std::vector<TempItem*> *)pParam[2];
 
-	DWORD  i = wBedNo / MAX_READERS_PER_GRID;
-	DWORD  j = wBedNo % MAX_READERS_PER_GRID;
+	DWORD  i = (wBedNo - 1) / MAX_READERS_PER_GRID;
+	DWORD  j = (wBedNo - 1) % MAX_READERS_PER_GRID;
 	assert(i < MAX_GRID_COUNT);
 
 	m_pGrids[i]->OnQueryTempRet( j, pTagId, *pvRet );

@@ -266,7 +266,7 @@ void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
 	// 如果是新的TagID，则请求历史记录
 	if ( 0 != strcmp(m_aLastTemp[j].m_szTagId, item.m_szTagId) ) {
 		DWORD i = GetTag();
-		WORD  wBed = (WORD)(i * MAX_READERS_PER_GRID + j);
+		WORD  wBed = (WORD)(i * MAX_READERS_PER_GRID + j + 1);
 		CBusiness::GetInstance()->QueryTempByTagAsyn(item.m_szTagId, wBed);
 		return;
 	}

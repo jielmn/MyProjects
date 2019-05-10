@@ -482,7 +482,7 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 
 			// Èç¹û¶Ï¿ª
 			if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
-				m_sigTrySurReader.emit(wBed, FALSE);
+				m_sigTrySurReader.emit(wBed, FALSE);				
 				return;
 			}
 
@@ -555,6 +555,12 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 	else {
 		g_data.m_thrd_launch->DeleteMessages();
 		memset(g_data.m_bSurReaderConnected, 0, sizeof(g_data.m_bSurReaderConnected));
+		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
+			for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+				WORD  wBed = (WORD)(i*MAX_GRID_COUNT + j+1);
+				m_sigSurReaderStatus.emit(wBed, FALSE);
+			}
+		}
 	}
 }
 
