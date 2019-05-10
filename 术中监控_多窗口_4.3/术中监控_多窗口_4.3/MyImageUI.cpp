@@ -163,6 +163,13 @@ void  CMyImageUI::DrawScale( HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, in
 	::SetTextColor(hDC, RGB(255, 255, 255));
 	::Rectangle(hDC, rectScale.left, rectScale.top, rectScale.right, rectScale.bottom);
 
+	RECT r = rectScale;
+	r.left++;
+	r.right--;
+	r.top++;
+	r.bottom--;
+	::FillRect(hDC, &r, m_hCommonBrush);
+
 	for (int i = 0; i < nCelsiusCnt + 1; i++) {
 		if (nVInterval >= BRIGHT_DARK_INTERVAL) {
 			int  nTop = nMaxY + i * nHeightPerCelsius;
@@ -662,6 +669,29 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 }
 
 void CMyImageUI::MyInvalidate() {
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	if ( m_state == STATE_SINGLE_DAY ) {
+		time_t  tFirstTime = 0, tLastTime = 0;
+		GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+		int  width = GetMyWidth();
+
+		if ( !m_bSetSecondsPerPixel ) {
+			m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (width - SCALE_RECT_WIDTH);
+			m_bSetSecondsPerPixel = TRUE;
+		}
+		else {
+			width = (int)((tLastTime - tFirstTime) / m_fSecondsPerPixel) + SCALE_RECT_WIDTH;
+		}
+		
+		this->SetMinWidth(width);
+	}
+	else {
+		int  width = GetMyWidth();
+		this->SetMinWidth(width);
+	}
 	Invalidate();
 }
 
@@ -686,12 +716,7 @@ void  CMyImageUI::OnDbClick() {
 		m_nSingleDayIndex = GetClickDayIndex(i, j, mode);
 		assert(m_nSingleDayIndex >= -6 && m_nSingleDayIndex <= 0);
 		m_state = STATE_SINGLE_DAY;
-
-		time_t  tFirstTime = 0, tLastTime = 0;
-		GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
-		int  width = GetMyWidth();
-		m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (width - SCALE_RECT_WIDTH);
-		m_bSetSecondsPerPixel = TRUE;
+		m_bSetSecondsPerPixel = FALSE;
 	}
 	else {
 		m_state = STATE_7_DAYS;
