@@ -67,6 +67,9 @@ private:
 	BOOL    GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end);
 	// 鼠轮滑动
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
+	// 得到最大和最小显示温度
+	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, DWORD i, DWORD j, CModeButton::Mode mode);
+	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirst, const std::vector<TempItem * > & v );
 
 private:
 	enum   E_STATE {

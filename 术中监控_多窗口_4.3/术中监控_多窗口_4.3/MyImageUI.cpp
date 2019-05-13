@@ -469,8 +469,10 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	CModeButton::Mode mode = GetMode();
 	  
 	// 显示的最低温度和最高温度
-	int  nMinTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
-	int  nMaxTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
+	//int  nMinTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
+	//int  nMaxTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
 	// 摄氏度个数
 	int  nCelsiusCount     = nMaxTemp - nMinTemp;
 	// 每个摄氏度的高度
@@ -690,8 +692,10 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	CModeButton::Mode mode = GetMode();
 
 	// 显示的最低温度和最高温度
-	int  nMinTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
-	int  nMaxTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
+	//int  nMinTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
+	//int  nMaxTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
 	// 摄氏度个数
 	int  nCelsiusCount = nMaxTemp - nMinTemp;
 	// 每个摄氏度的高度
@@ -888,6 +892,65 @@ void   CMyImageUI::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 		m_fSecondsPerPixel = MAX_SECONDS_PER_PIXEL;
 	}
 	MyInvalidate();
+}
+
+// 得到最大和最小显示温度
+void   CMyImageUI::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, DWORD i, DWORD j, CModeButton::Mode mode) {
+	nMinTemp = 3400;
+	nMaxTemp = 3900;
+	BOOL bFirst = TRUE;
+
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		GetMaxMinShowTemp(nMinTemp, nMaxTemp,bFirst, v);
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		GetMaxMinShowTemp(nMinTemp, nMaxTemp, bFirst, v);
+	}
+	else {
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			GetMaxMinShowTemp(nMinTemp, nMaxTemp, bFirst, v);
+		}
+	}
+
+	// 最大和最小显示温度必须为整数
+	// min: 2100~2199 ==> 2100
+	// max: 3800 ==> 3800, 3801~3899 ==> 3900
+	nMinTemp = nMinTemp / 100;
+	int nReminder = nMaxTemp % 100;
+	if ( 0 != nReminder ) {
+		nMaxTemp = (nMaxTemp / 100 + 1);
+	}
+	else {
+		nMaxTemp /= 100;
+	}
+
+	if (nMinTemp == nMaxTemp) {
+		nMaxTemp = nMinTemp + 1;
+	}
+
+}
+
+void  CMyImageUI::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirst, const std::vector<TempItem * > & v) {
+	std::vector<TempItem * >::const_iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem * pItem = *it;
+		if ( bFirst ) {
+			nMaxTemp = pItem->m_dwTemp;
+			nMinTemp = pItem->m_dwTemp;
+			bFirst = FALSE;
+		}
+		else {
+			if ((int)pItem->m_dwTemp > nMaxTemp) {
+				nMaxTemp = pItem->m_dwTemp;
+			}
+			else if ((int)pItem->m_dwTemp < nMinTemp) {
+				nMinTemp = pItem->m_dwTemp;
+			}
+		}		
+	}
 }
 
 // 为label作画
