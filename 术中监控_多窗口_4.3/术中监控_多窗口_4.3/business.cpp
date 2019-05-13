@@ -557,7 +557,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 		memset(g_data.m_bSurReaderConnected, 0, sizeof(g_data.m_bSurReaderConnected));
 		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 			for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
-				WORD  wBed = (WORD)(i*MAX_GRID_COUNT + j+1);
+				WORD  wBed = (WORD)(i*MAX_READERS_PER_GRID + j+1);
 				m_sigSurReaderStatus.emit(wBed, FALSE);
 			}
 		}

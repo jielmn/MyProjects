@@ -6,8 +6,8 @@
   手持测温设置 ..............................        3项
 	  2
   床位
-      床位1         ..............................    4项
-	      3
+      床位1         ..............................    2项
+	      1
 */
 
 
@@ -162,18 +162,18 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	m_tree->AddNode("采样间隔", pSubTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 显示最低温度
-	pEdit = new CEditUI;
-	strText.Format("%lu", m_data.m_GridCfg[dwIndex].m_dwMinTemp);
-	pEdit->SetText(strText);
-	pEdit->SetNumberOnly(true);
-	m_tree->AddNode("显示的最低温度(℃)", pSubTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
+	//pEdit = new CEditUI;
+	//strText.Format("%lu", m_data.m_GridCfg[dwIndex].m_dwMinTemp);
+	//pEdit->SetText(strText);
+	//pEdit->SetNumberOnly(true);
+	//m_tree->AddNode("显示的最低温度(℃)", pSubTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
 
 	// 显示最高温度
-	pEdit = new CEditUI;
-	strText.Format("%lu", m_data.m_GridCfg[dwIndex].m_dwMaxTemp);
-	pEdit->SetText(strText);
-	pEdit->SetNumberOnly(true);
-	m_tree->AddNode("显示的最高温度(℃)", pSubTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+	//pEdit = new CEditUI;
+	//strText.Format("%lu", m_data.m_GridCfg[dwIndex].m_dwMaxTemp);
+	//pEdit->SetText(strText);
+	//pEdit->SetNumberOnly(true);
+	//m_tree->AddNode("显示的最高温度(℃)", pSubTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
 	m_tree->ExpandNode(pSubTitleNode, false);	
 }
@@ -270,7 +270,7 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	const  DWORD  ITEMS_COUNT_PER_READER = 0;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 13 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+4) * nIndex;
+	int  nCfgRowIndex = 13 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+2) * nIndex;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 
@@ -280,31 +280,31 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	nCfgRowIndex++;
 
 	// 最低显示可读
-	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_GridCfg[nIndex].m_dwMinTemp);
-	nCfgRowIndex++;
-	if (m_data.m_GridCfg[nIndex].m_dwMinTemp < MIN_TEMP_IN_SHOW) {
-		strText.Format("床位%d，最低显示温度必须大于等于%lu℃", nIndex + 1, MIN_TEMP_IN_SHOW);
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
+	//bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	//sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_GridCfg[nIndex].m_dwMinTemp);
+	//nCfgRowIndex++;
+	//if (m_data.m_GridCfg[nIndex].m_dwMinTemp < MIN_TEMP_IN_SHOW) {
+	//	strText.Format("床位%d，最低显示温度必须大于等于%lu℃", nIndex + 1, MIN_TEMP_IN_SHOW);
+	//	::MessageBox(this->GetHWND(), strText, "设置", 0);
+	//	return FALSE;
+	//}
 
 
 	// 最高显示可读
-	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_GridCfg[nIndex].m_dwMaxTemp);
-	nCfgRowIndex++;
-	if (m_data.m_GridCfg[nIndex].m_dwMinTemp > MAX_TEMP_IN_SHOW) {
-		strText.Format("床位%d，最高显示温度必须小于等于%lu℃", nIndex + 1, MAX_TEMP_IN_SHOW);
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
+	//bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
+	//sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_GridCfg[nIndex].m_dwMaxTemp);
+	//nCfgRowIndex++;
+	//if (m_data.m_GridCfg[nIndex].m_dwMinTemp > MAX_TEMP_IN_SHOW) {
+	//	strText.Format("床位%d，最高显示温度必须小于等于%lu℃", nIndex + 1, MAX_TEMP_IN_SHOW);
+	//	::MessageBox(this->GetHWND(), strText, "设置", 0);
+	//	return FALSE;
+	//}
 
-	if ( m_data.m_GridCfg[nIndex].m_dwMaxTemp <= m_data.m_GridCfg[nIndex].m_dwMinTemp ) {
-		strText.Format("床位%d，最高显示温度必须大于最低显示温度", nIndex + 1);
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
+	//if ( m_data.m_GridCfg[nIndex].m_dwMaxTemp <= m_data.m_GridCfg[nIndex].m_dwMinTemp ) {
+	//	strText.Format("床位%d，最高显示温度必须大于最低显示温度", nIndex + 1);
+	//	::MessageBox(this->GetHWND(), strText, "设置", 0);
+	//	return FALSE;
+	//}
 
 	return TRUE;
 }
@@ -340,7 +340,7 @@ BOOL    CSettingDlg::GetHandReaderConfig() {
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
 	double dNumber = 0.0;
-	int  nCfgRowIndex = 9;
+	int  nCfgRowIndex = 9;  
 
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
 	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_dwHandReaderMinTemp);
@@ -425,7 +425,7 @@ void   CSettingDlg::OnGridsChanged() {
 		int nCnt = m_tree->GetCount();
 		DWORD  dwDiff = m_data.m_dwLayoutGridsCnt - dwNumber;
 		for ( DWORD i = 0; i < dwDiff; i++ ) {
-			m_tree->RemoveAt( nCnt - 4 * dwDiff );
+			m_tree->RemoveAt( nCnt - 2 * dwDiff );
 		}
 	}
 	m_data.m_dwLayoutGridsCnt = dwNumber;
