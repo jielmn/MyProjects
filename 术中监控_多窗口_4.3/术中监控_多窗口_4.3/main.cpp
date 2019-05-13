@@ -785,14 +785,24 @@ void  CDuiFrameWnd::SaveGrid(DWORD  i) {
 	dwValue = 0;
 	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval, &dwValue);
 	
+	//strText.Format("%s %lu", CFG_GRID_MIN_TEMP, i + 1);
+	//dwValue = DEFAULT_MIN_TEMP_IN_SHOW;
+	//g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, &dwValue);
 
-	strText.Format("%s %lu", CFG_GRID_MIN_TEMP, i + 1);
-	dwValue = DEFAULT_MIN_TEMP_IN_SHOW;
-	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp, &dwValue);
+	//strText.Format("%s %lu", CFG_GRID_MAX_TEMP, i + 1);
+	//dwValue = DEFAULT_MAX_TEMP_IN_SHOW;
+	//g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, &dwValue);
 
-	strText.Format("%s %lu", CFG_GRID_MAX_TEMP, i + 1);
-	dwValue = DEFAULT_MAX_TEMP_IN_SHOW;
-	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp, &dwValue);
+	for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+		strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
+		dwValue = DEFAULT_LOW_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm, &dwValue);
+
+		strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
+		dwValue = DEFAULT_HIGH_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
+	}
+	
 }
 
 // É¾³ý¸ñ×ÓÅäÖÃ

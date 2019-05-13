@@ -6,8 +6,8 @@
   手持测温设置 ..............................        3项
 	  2
   床位
-      床位1         ..............................    2项
-	      1
+      床位1         ..............................    20 项
+	      1 + 3 * 6
 */
 
 
@@ -175,6 +175,24 @@ void  CSettingDlg::InitGridCfg(CMyTreeCfgUI::Node* pTitleNode, DWORD dwIndex) {
 	//pEdit->SetNumberOnly(true);
 	//m_tree->AddNode("显示的最高温度(℃)", pSubTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
+	for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+		CMyTreeCfgUI::Node* pReaderTitleNode = NULL;
+		strText.Format( "读卡器%c", (char)('A'+j) );
+		pReaderTitleNode = m_tree->AddNode(strText, pSubTitleNode, 0, 0, 3, 0xFF666666);
+
+		pEdit = new CEditUI;
+		strText.Format("%.2f", m_data.m_GridCfg[dwIndex].m_ReaderCfg[j].m_dwHighTempAlarm / 100.0 );
+		pEdit->SetText(strText);
+		m_tree->AddNode("高温报警(℃)", pReaderTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382 );
+
+		pEdit = new CEditUI;
+		strText.Format("%.2f", m_data.m_GridCfg[dwIndex].m_ReaderCfg[j].m_dwLowTempAlarm / 100.0);
+		pEdit->SetText(strText);
+		m_tree->AddNode("低温报警(℃)", pReaderTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+
+		m_tree->ExpandNode(pReaderTitleNode, false);
+	}
+
 	m_tree->ExpandNode(pSubTitleNode, false);	
 }
 
@@ -268,7 +286,7 @@ BOOL  CSettingDlg::GetCommonConfig() {
 BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
-	const  DWORD  ITEMS_COUNT_PER_READER = 0;
+	const  DWORD  ITEMS_COUNT_PER_READER = 3;
 	bool bGetCfg = false;
 	int  nCfgRowIndex = 13 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+2) * nIndex;
 	int  nNumber = 0;
@@ -305,6 +323,30 @@ BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	//	::MessageBox(this->GetHWND(), strText, "设置", 0);
 	//	return FALSE;
 	//}
+
+	for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + j * 3 + 1, cfgValue);
+		sscanf_s(cfgValue.m_strEdit, "%lf", &dNumber);
+		int nHigh = (int)(dNumber * 100);
+
+		bGetCfg = m_tree->GetConfigValue(nCfgRowIndex + j * 3 + 2, cfgValue);
+		sscanf_s(cfgValue.m_strEdit, "%lf", &dNumber);
+		int nLow = (int)(dNumber * 100);
+
+		if ( nLow >= nHigh ) {
+			strText.Format("床位%d读卡器%c，高温报警必须大于低温报警", nIndex + 1, (char)('A'+j));
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+		else if (nLow < 0 || nHigh < 0) {
+			strText.Format("床位%d读卡器%c，高温报警和低温报警必须为正数", nIndex + 1, (char)('A' + j));
+			::MessageBox(this->GetHWND(), strText, "设置", 0);
+			return FALSE;
+		}
+
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[j].m_dwHighTempAlarm = nHigh;
+		m_data.m_GridCfg[nIndex].m_ReaderCfg[j].m_dwLowTempAlarm = nLow;
+	}
 
 	return TRUE;
 }
@@ -425,7 +467,7 @@ void   CSettingDlg::OnGridsChanged() {
 		int nCnt = m_tree->GetCount();
 		DWORD  dwDiff = m_data.m_dwLayoutGridsCnt - dwNumber;
 		for ( DWORD i = 0; i < dwDiff; i++ ) {
-			m_tree->RemoveAt( nCnt - 2 * dwDiff );
+			m_tree->RemoveAt( nCnt - 20 * dwDiff );
 		}
 	}
 	m_data.m_dwLayoutGridsCnt = dwNumber;

@@ -67,7 +67,7 @@ DWORD  GetRandTemp(BYTE  byBed) {
 	}
 	else {
 		DWORD c = GetRand(1, 100);
-		DWORD d = GetRand(1, 100);
+		DWORD d = GetRand(1, 30);
 
 		if (c <= 50) {
 			g_Temp[byBed] += d;
