@@ -70,6 +70,10 @@ private:
 	// 得到最大和最小显示温度
 	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, DWORD i, DWORD j, CModeButton::Mode mode);
 	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirst, const std::vector<TempItem * > & v );
+	// 画十字线
+	void   DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cursor_point,
+		                  time_t tFirstTime, float fSecondsPerPixel, int nHeightPerCelsius,
+		                  int nMaxY, int nMaxTemp);
 
 private:
 	enum   E_STATE {

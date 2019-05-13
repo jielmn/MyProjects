@@ -295,6 +295,7 @@ extern char * GetDefaultGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt
 extern char * GetGridOrder(char * buf, DWORD  dwBufLen, DWORD  dwGridsCnt, DWORD * pOrder);
 void   ResetGridOrder();
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Time2String_hm(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
 // 今天的零点时间

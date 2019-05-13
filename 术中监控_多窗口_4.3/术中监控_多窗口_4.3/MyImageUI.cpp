@@ -58,6 +58,10 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 	else if (event.Type == UIEVENT_SCROLLWHEEL) {
 		OnMyMouseWheel(event.wParam, event.lParam);
 	}
+	else if (event.Type == UIEVENT_MOUSEMOVE) {
+		if (g_data.m_CfgData.m_bCrossAnchor)
+			this->Invalidate();
+	}
 	CControlUI::DoEvent(event);
 }
 
@@ -525,7 +529,22 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 			top_left, graphics, TRUE, i,j,mode);
 	}
 	
+	// 鼠标位置
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	// 有效矩形
+	RECT rValid;
+	rValid.left   = rectScale.right;
+	rValid.right  = rectScale.left + width - 1;
+	rValid.top    = rectScale.top;
+	rValid.bottom = rectScale.bottom;
+
 	// 画十字线
+	if (nDayWidth > 0) {
+		DrawCrossLine(hDC, rValid, cursor_point, tFirstDayZeroTime, fSecondsPerPixel, nHeightPerCelsius, nMaxY, nMaxTemp);
+	}		
 }
 
 // 获得single day的起始时间和结束时间
@@ -721,6 +740,12 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	// 画边框
 	DrawBorder(hDC, rectScale, width);
 
+	// 画刻度值
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+
+	// 画报警线
+	DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+
 	// 查看有无数据
 	int nPointsCnt = GetTempCount(i, j, mode);
 	// 如果没有数据就不重绘了 
@@ -743,14 +768,6 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
 		}		
 	}
-
-	// 画刻度值
-	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
-
-	// 画报警线
-	DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
-
-
 }
 
 void CMyImageUI::MyInvalidate() {
@@ -950,6 +967,40 @@ void  CMyImageUI::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirs
 				nMinTemp = pItem->m_dwTemp;
 			}
 		}		
+	}
+}
+
+// 画十字线
+void   CMyImageUI::DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cursor_point, 
+	                              time_t tFirstTime, float fSecondsPerPixel, int nHeightPerCelsius, 
+	                              int nMaxY, int nMaxTemp ) {
+	CDuiString strText;
+
+	// 如果满足画十字线的要求
+	if ( g_data.m_CfgData.m_bCrossAnchor && ::PtInRect(&rValid, cursor_point)) {
+
+		::SelectObject(hDC, m_hCommonThreadPen);
+		::MoveToEx(hDC, cursor_point.x, rValid.top, 0);
+		::LineTo(hDC, cursor_point.x, rValid.bottom);
+		::MoveToEx(hDC, rValid.left, cursor_point.y, 0);
+		::LineTo(hDC, rValid.right, cursor_point.y);
+
+		float  cursot_temp = nMaxTemp + (float)( nMaxY - cursor_point.y ) / nHeightPerCelsius;
+		time_t cursor_time = (time_t)((float)(cursor_point.x - rValid.left) * fSecondsPerPixel) + tFirstTime;
+		
+		char szTime[256];
+		if ( m_state == STATE_7_DAYS )
+			Time2String_hm(szTime, sizeof(szTime), &cursor_time);
+		else
+			Time2String(szTime, sizeof(szTime), &cursor_time);
+
+		strText.Format("%.2f℃,%s", cursot_temp, szTime);
+		
+		// 判断是在左边，还是右边
+		if (rValid.right - cursor_point.x >= 120)
+			::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		else
+			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
 	}
 }
 

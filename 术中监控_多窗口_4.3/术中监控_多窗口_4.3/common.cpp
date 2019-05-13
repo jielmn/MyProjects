@@ -157,6 +157,14 @@ char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	return szDest;
 }
 
+char * Time2String_hm(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%02d:%02d", tmp.tm_hour, tmp.tm_min);
+	return szDest;
+}
+
 char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
 	localtime_s(&tmp, t);
