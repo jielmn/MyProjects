@@ -1,6 +1,9 @@
 #include "MyImageUI.h"
 #include "GridUI.h"
 
+#define  MAX_SECONDS_PER_PIXEL               200.0f
+#define  MIN_SECONDS_PER_PIXEL               1.0f
+
 CMyImageUI::CMyImageUI() {
 	// 初始状态为显示7日曲线
 	m_state = STATE_7_DAYS;
@@ -524,18 +527,21 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 }
 
 // 获得single day的起始时间和结束时间
-void  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode) {
+BOOL  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode) {
 	time_t   tTodayZeroTime = GetTodayZeroTime();
 	start = tTodayZeroTime + 3600 * 24 * m_nSingleDayIndex;
 	end   = start + 3600 * 24 - 1;
+	BOOL  bRet = FALSE;
 
 	if (mode == CModeButton::Mode_Hand) {
 		const std::vector<TempItem * > & v = GetTempData(0);
-		GetTimeRange(v, start, end);
+		bRet = GetTimeRange(v, start, end);
+		return bRet;
 	}
 	else if (mode == CModeButton::Mode_Single) {
 		const std::vector<TempItem * > & v = GetTempData(1);
-		GetTimeRange(v, start, end);
+		bRet = GetTimeRange(v, start, end);
+		return bRet;
 	}
 	else {
 		time_t tmp_s = 0;
@@ -548,10 +554,16 @@ void  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, D
 				continue;
 
 			time_t t1 = start, t2 = end;
-			GetTimeRange(v, t1, t2);
+			BOOL b = GetTimeRange(v, t1, t2);
+			if ( !b ) {
+				continue;
+			}
+
+			bRet = TRUE;
 			if ( bFirst ) {
 				tmp_s = t1;
 				tmp_e = t2;
+				bFirst = FALSE;
 			}
 			else {
 				if (t1 < tmp_s) {
@@ -563,36 +575,100 @@ void  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, D
 			}			
 		}
 
-		start = tmp_s;
-		end = tmp_e;
+		if (bRet) {
+			start = tmp_s;
+			end = tmp_e;
+		}
+
+		return bRet;
 	}
 }
 
-void  CMyImageUI::GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end) {
+BOOL  CMyImageUI::GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end) {
 	std::vector<TempItem * >::const_iterator it;
 	std::vector<TempItem * >::const_reverse_iterator itr;
 
 	for (it = v.begin(); it != v.end(); ++it) {
 		TempItem * pItem = *it;
+		// 如果比最大的time还大
+		if ( pItem->m_time > end ) {
+			return FALSE;
+		}
 		if (pItem->m_time >= start) {
 			start = pItem->m_time;
 			break;
 		}
 	}
 
+	// 没有找到一个属于[start,end]范围内的点
+	if (it == v.end()) {
+		return FALSE;
+	}
+
 	for (itr = v.rbegin(); itr != v.rend(); ++itr) {
 		TempItem * pItem = *itr;
+		if (pItem->m_time < start) {
+			return FALSE;
+		}
 		if (pItem->m_time <= end) {
 			end = pItem->m_time;
 			break;
 		}
 	}
+
+	if ( itr == v.rend() ) {
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 // 画时间文本
 void    CMyImageUI::DrawTimeText( HDC hDC, time_t  tFirstTime , time_t tLastTime, 
 	                              float fSecondsPerPixel, POINT  top_left ) {
+	char szTime[256];
+	::SetTextColor(hDC, RGB(255, 255, 255));
+	const int OFFSET_Y = 5;
+	const int TIME_TEXT_INTERVAL = 80;
+	const int TIME_TEXT_WIDTH = 60;
+	BOOL  bFirst = TRUE;
 
+	int  remainder = tFirstTime % 60;
+	time_t  time_point = tFirstTime + (60 - remainder);
+	int  time_width = (int)( (time_point - tFirstTime) / fSecondsPerPixel );
+	// 如果宽度足够大，开始画text
+	if (time_width >= TIME_TEXT_INTERVAL / 2) {
+		Time2String(szTime, sizeof(szTime), &time_point);
+		::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+		bFirst = FALSE;
+	}
+	
+	
+	int last_time_width = time_width;
+	time_point += 60;	
+	while (time_point <= tLastTime) {
+		time_width = (int)((time_point - tFirstTime) / fSecondsPerPixel);
+		if (bFirst) {
+			// 如果宽度足够大，开始画text
+			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL / 2) {
+				Time2String(szTime, sizeof(szTime), &time_point);
+				::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				last_time_width = time_width;
+				bFirst = FALSE;
+			}
+		}
+		else {
+			// 如果宽度足够大，开始画text
+			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL ) {
+				Time2String(szTime, sizeof(szTime), &time_point);
+				::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				last_time_width = time_width;
+			}
+		}
+		
+
+		time_point += 60;
+	}
 }
 
 void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -651,14 +727,17 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 		top_left.y = nMaxY;
 
 		time_t  tFirstTime = 0, tLastTime = 0;
-		GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+		BOOL bRet = GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
 
-		DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
-			top_left, graphics, TRUE, i, j, mode);
+		// 如果有点可以画
+		if (bRet) {
+			DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+				top_left, graphics, TRUE, i, j, mode);
 
-		top_left.y += nHeightPerCelsius * nCelsiusCount;
-		// 画时间文本
-		DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
+			top_left.y += nHeightPerCelsius * nCelsiusCount;
+			// 画时间文本
+			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
+		}		
 	}
 
 	// 画刻度值
@@ -677,12 +756,20 @@ void CMyImageUI::MyInvalidate() {
 
 	if ( m_state == STATE_SINGLE_DAY ) {
 		time_t  tFirstTime = 0, tLastTime = 0;
-		GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+		BOOL bRet = GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
 		int  width = GetMyWidth();
 
 		if ( !m_bSetSecondsPerPixel ) {
-			m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (width - SCALE_RECT_WIDTH);
-			m_bSetSecondsPerPixel = TRUE;
+			if (bRet) {
+				m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (width - SCALE_RECT_WIDTH);
+				if (m_fSecondsPerPixel < MIN_SECONDS_PER_PIXEL) {
+					m_fSecondsPerPixel = MIN_SECONDS_PER_PIXEL;
+				}
+				else if (m_fSecondsPerPixel > MAX_SECONDS_PER_PIXEL) {
+					m_fSecondsPerPixel = MAX_SECONDS_PER_PIXEL;
+				}
+				m_bSetSecondsPerPixel = TRUE;
+			}			
 		}
 		else {
 			width = (int)((tLastTime - tFirstTime) / m_fSecondsPerPixel) + SCALE_RECT_WIDTH;
@@ -788,14 +875,17 @@ void   CMyImageUI::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
 
 	int nDirectory = (int)wParam;
 	if (nDirectory > 0) {
-		if (m_fSecondsPerPixel < 200.0f) {
-			m_fSecondsPerPixel *= 1.2f;
-		}
+		m_fSecondsPerPixel *= 1.2f;
 	}
 	else {
-		if (m_fSecondsPerPixel > 1.2f) {
-			m_fSecondsPerPixel /= 1.2f;
-		}
+		m_fSecondsPerPixel /= 1.2f;
+	}
+
+	if ( m_fSecondsPerPixel < MIN_SECONDS_PER_PIXEL) {
+		m_fSecondsPerPixel = MIN_SECONDS_PER_PIXEL;
+	}
+	else if (m_fSecondsPerPixel > MAX_SECONDS_PER_PIXEL) {
+		m_fSecondsPerPixel = MAX_SECONDS_PER_PIXEL;
 	}
 	MyInvalidate();
 }
