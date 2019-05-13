@@ -59,8 +59,11 @@ DWORD  GetRandTemp(BYTE  byBed) {
 	if (byBed > 0)
 		a = (byBed - 1) / 6;
 
+	int m = 2000 + a * 100;
+	int n = m + 600;
+
 	if (0 == g_Temp[byBed]) {
-		g_Temp[byBed] = GetRand(3000, 3600);
+		g_Temp[byBed] = GetRand(m, n);
 	}
 	else {
 		DWORD c = GetRand(1, 100);
@@ -73,10 +76,10 @@ DWORD  GetRandTemp(BYTE  byBed) {
 			g_Temp[byBed] -= d;
 		}
 
-		if (g_Temp[byBed] < 2800)
-			g_Temp[byBed] = 2800;
-		else if (g_Temp[byBed] > 4100)
-			g_Temp[byBed] = 4100;
+		if (g_Temp[byBed] < (DWORD)m)
+			g_Temp[byBed] = m;
+		else if (g_Temp[byBed] > (DWORD)n)
+			g_Temp[byBed] = n;
 	}
 	
 	//g_Temp[byBed] = GetRand(3000 + a * 100, 3100  + a * 100);
