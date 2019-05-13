@@ -766,8 +766,23 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 			top_left.y += nHeightPerCelsius * nCelsiusCount;
 			// 画时间文本
 			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
+
+			// 鼠标位置
+			POINT cursor_point;
+			GetCursorPos(&cursor_point);
+			::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+			// 有效矩形
+			RECT rValid;
+			rValid.left = rectScale.right;
+			rValid.right = rectScale.left + width - 1;
+			rValid.top = rectScale.top;
+			rValid.bottom = rectScale.bottom;
+
+			// 画十字线
+			DrawCrossLine(hDC, rValid, cursor_point, tFirstTime, m_fSecondsPerPixel, nHeightPerCelsius, nMaxY, nMaxTemp);
 		}		
-	}
+	}	
 }
 
 void CMyImageUI::MyInvalidate() {
