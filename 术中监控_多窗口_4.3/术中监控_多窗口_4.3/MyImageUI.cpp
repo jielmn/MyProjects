@@ -1021,7 +1021,73 @@ void   CMyImageUI::DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cu
 
 // 为label作画
 void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect) {
+	DuiLib::CDuiString strText;
 
+	// GDI+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	// 水平滑动条位置
+	int  nScrollX = 0;
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left   = rect.left + nScrollX;
+	rectScale.top    = rect.top;
+	rectScale.right  = rectScale.left;
+	rectScale.bottom = rect.bottom;
+
+	// 采集间隔(单位：秒)
+	int  nCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval);
+
+	// 画水平刻度线
+	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
+
+	// 画边框
+	//DrawBorder(hDC, rectScale, width);
+
+	// 画刻度值
+	//DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+
+	// 画报警线
+	//DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+
+	// 计算温度曲线跨越几个日子
+	int  nDayCounts = GetDayCounts(i, j, mode);
+	assert(nDayCounts > 0);
+	int  nDayWidth = (width - SCALE_RECT_WIDTH) / nDayCounts;
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	time_t   tFirstDayZeroTime = tTodayZeroTime - 3600 * 24 * (nDayCounts - 1);
+
+	// 画日子的分割线
+	//DrawDaySplit(hDC, nDayCounts, rectScale, nDayWidth, nMaxY, nCelsiusCount, nHeightPerCelsius, tFirstDayZeroTime);
+
+	float fSecondsPerPixel = 0.0f;
+	// 画折线
+	if (nDayWidth > 0) {
+		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		POINT  top_left;
+		top_left.x = rectScale.right;
+		top_left.y = nMaxY;
+		DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+			top_left, graphics, TRUE, i, j, mode);
+	}
 }
 
 
@@ -1045,9 +1111,9 @@ bool CImageLabelUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopContr
 	}
 
 	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
-	int width = pParent->GetWidth();
+	int width  = pParent->GetWidth();
 	int height = pParent->GetHeight();
-	RECT r = this->GetPos();
+	RECT     r = this->GetPos();
 
 	SetBkMode(hDC, TRANSPARENT);
 
