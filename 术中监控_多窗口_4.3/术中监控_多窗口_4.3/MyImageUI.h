@@ -54,16 +54,14 @@ private:
 		                  BOOL  bDrawPoints, const  std::vector<TempItem * > & vTempData, 
 		                  Pen * pen, SolidBrush * brush);
 	void    DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
+	// 画时间文本
+	void    DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime, float fSecondsPerPixel, POINT  top_left);
 	// 双击事件
 	void    OnDbClick();
 	// 温度数据个数
 	DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 计算双击了第几天
 	int     GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode);
-	// 画single day折线图
-	void    DrawSingleDayLine( float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
-		                       POINT  tTopLeft, Graphics & graphics, BOOL  bDrawPoints,
-		                       DWORD i, DWORD j, CModeButton::Mode mode );
 	// 获得single day的起始时间和结束时间
 	void    GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode);
 	void    GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end);

@@ -520,32 +520,14 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 			top_left, graphics, TRUE, i,j,mode);
 	}
 	
-}
-
-// 画single day折线图
-void    CMyImageUI::DrawSingleDayLine( float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius, 
-	                                   POINT  tTopLeft, Graphics & graphics, BOOL  bDrawPoints, 
-	                                   DWORD i, DWORD j, CModeButton::Mode mode ) {
-	// 查看有无数据
-	int nPointsCnt = GetTempCount(i, j, mode);
-
-	// 如果没有数据就不重绘了 
-	if (0 == nPointsCnt) {
-		return;
-	}
-
-	time_t  tFirstTime = 0, tLastTime = 0;
-	GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
-
-	DrawPolyline( tFirstTime, tLastTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
-		tTopLeft, graphics, TRUE, i, j, mode );
+	// 画十字线
 }
 
 // 获得single day的起始时间和结束时间
 void  CMyImageUI::GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode) {
 	time_t   tTodayZeroTime = GetTodayZeroTime();
 	start = tTodayZeroTime + 3600 * 24 * m_nSingleDayIndex;
-	end   = tTodayZeroTime + 3600 * 24 - 1;
+	end   = start + 3600 * 24 - 1;
 
 	if (mode == CModeButton::Mode_Hand) {
 		const std::vector<TempItem * > & v = GetTempData(0);
@@ -607,6 +589,12 @@ void  CMyImageUI::GetTimeRange(const std::vector<TempItem * > & v, time_t & star
 	}
 }
 
+// 画时间文本
+void    CMyImageUI::DrawTimeText( HDC hDC, time_t  tFirstTime , time_t tLastTime, 
+	                              float fSecondsPerPixel, POINT  top_left ) {
+
+}
+
 void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	DuiLib::CDuiString strText;
 
@@ -653,11 +641,25 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	// 画边框
 	DrawBorder(hDC, rectScale, width);
 
-	// 画温度曲线
-	POINT  top_left;
-	top_left.x = rect.left + SCALE_RECT_WIDTH;
-	top_left.y = nMaxY;
-	DrawSingleDayLine(m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, graphics,TRUE, i,j,mode);
+	// 查看有无数据
+	int nPointsCnt = GetTempCount(i, j, mode);
+	// 如果没有数据就不重绘了 
+	if ( nPointsCnt > 0 ) {
+		// 画温度曲线
+		POINT  top_left;
+		top_left.x = rect.left + SCALE_RECT_WIDTH;
+		top_left.y = nMaxY;
+
+		time_t  tFirstTime = 0, tLastTime = 0;
+		GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+
+		DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+			top_left, graphics, TRUE, i, j, mode);
+
+		top_left.y += nHeightPerCelsius * nCelsiusCount;
+		// 画时间文本
+		DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
+	}
 
 	// 画刻度值
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
