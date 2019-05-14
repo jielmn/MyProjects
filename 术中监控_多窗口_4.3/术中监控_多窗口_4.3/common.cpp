@@ -409,6 +409,33 @@ void  SaveReaderName(DWORD i, DWORD j) {
 	g_data.m_cfg->Save();
 }
 
+void  SaveAlarmTemp(DWORD i, DWORD j, int m) {
+	CDuiString strText;
+	CModeButton::Mode  mode = (CModeButton::Mode)m;
+	DWORD dwValue = 0;
+
+	if ( mode == CModeButton::Mode_Hand ) {
+		strText.Format("%s %lu", CFG_HAND_READER_LOW_TEMP_ALARM, i + 1);
+		dwValue = DEFAULT_LOW_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwLowTempAlarm, &dwValue);
+
+		strText.Format("%s %lu", CFG_HAND_READER_HIGH_TEMP_ALARM, i + 1);
+		dwValue = DEFAULT_HIGH_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwHighTempAlarm, &dwValue);
+	}
+	else {
+		strText.Format("%s %lu %lu", CFG_LOW_TEMP_ALARM, i + 1, j + 1);
+		dwValue = DEFAULT_LOW_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm, &dwValue);
+
+		strText.Format("%s %lu %lu", CFG_HIGH_TEMP_ALARM, i + 1, j + 1);
+		dwValue = DEFAULT_HIGH_TEMP_ALARM;
+		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
+	}
+
+	g_data.m_cfg->Save();
+}
+
 char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DWORD dwDataLen) {
 	if (0 == szTagId || 0 == dwTagIdLen) {
 		return 0;

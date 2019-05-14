@@ -805,7 +805,14 @@ void  CDuiFrameWnd::SaveGrid(DWORD  i) {
 		dwValue = DEFAULT_HIGH_TEMP_ALARM;
 		g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm, &dwValue);
 	}
+
+	strText.Format("%s %lu", CFG_HAND_READER_LOW_TEMP_ALARM, i + 1);
+	dwValue = DEFAULT_LOW_TEMP_ALARM;
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwLowTempAlarm, &dwValue);
 	
+	strText.Format("%s %lu", CFG_HAND_READER_HIGH_TEMP_ALARM, i + 1);
+	dwValue = DEFAULT_HIGH_TEMP_ALARM;
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwHighTempAlarm, &dwValue);	
 }
 
 // и╬ЁЩ╦ЯвсеДжц

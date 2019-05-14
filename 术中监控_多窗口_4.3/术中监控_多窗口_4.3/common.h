@@ -311,6 +311,7 @@ extern BOOL  CheckComPortExist(int nCheckComPort);
 extern DWORD GetCollectInterval(DWORD dwIndex);
 extern void  SaveReaderSwitch(DWORD i, DWORD j);
 extern void  SaveReaderName(DWORD i, DWORD j);
+extern void  SaveAlarmTemp(DWORD i, DWORD j, int mode);
 extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DWORD dwDataLen);
 extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData, DWORD dwDataLen);
 extern int  GetWeekDay(time_t t);

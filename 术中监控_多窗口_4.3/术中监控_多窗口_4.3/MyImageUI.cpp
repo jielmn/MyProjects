@@ -1286,7 +1286,8 @@ void  CMyImageUI::EndDragDrop(const POINT & pt) {
 		}
 		else {
 			g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j - 1].m_dwLowTempAlarm = dwAlarm;
-		}		
+		}
+		SaveAlarmTemp(i, j, mode);
 	}
 	else if ( m_DragDropObj == DragDrop_HighAlarm ) {
 		if (mode == CModeButton::Mode_Hand) {
@@ -1295,7 +1296,8 @@ void  CMyImageUI::EndDragDrop(const POINT & pt) {
 		else {
 			g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j - 1].m_dwHighTempAlarm = dwAlarm;
 		}
-	}
+		SaveAlarmTemp(i, j - 1, mode);
+	}	
 
 	g_data.m_DragDropCtl->SetVisible(false);
 	m_bDragDrop = FALSE;
