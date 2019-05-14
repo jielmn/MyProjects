@@ -74,6 +74,14 @@ private:
 	void   DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cursor_point,
 		                  time_t tFirstTime, float fSecondsPerPixel, int nHeightPerCelsius,
 		                  int nMaxY, int nMaxTemp);
+	// 拖放操作开始
+	void  BeginDragDrop();
+	// 检查鼠标是否需要改变指针
+	void  CheckCursor(const POINT & pt);
+	// 正在拖放操作
+	void  DragDropIng(const POINT & pt);
+	// 结束拖放操作
+	void  EndDragDrop(const POINT & pt);
 
 private:
 	enum   E_STATE {
@@ -93,6 +101,17 @@ private:
 	SolidBrush *                 m_temperature_brush[MAX_READERS_PER_GRID];
 	float                        m_fSecondsPerPixel;
 	BOOL                         m_bSetSecondsPerPixel;
+
+	/***** 拖放操作 ****/
+	enum DragDropObj {
+		DragDrop_None = 0,
+		DragDrop_LowAlarm,
+		DragDrop_HighAlarm
+	};
+
+	BOOL                  m_bDragDrop;                 // 是否开始拖放操作
+	DragDropObj           m_DragDropObj;               // 拖放操作开始后，拖放的对象
+	DragDropObj           m_CursorObj;                 // 拖放操作开始前，鼠标滑动时经过的对象
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

@@ -22,6 +22,10 @@ CMyImageUI::CMyImageUI() {
 		m_temperature_pen[i] = new Pen(Gdiplus::Color(g_ReaderIndicator[i]), 1.0);
 		m_temperature_brush[i] = new SolidBrush(Gdiplus::Color(g_ReaderIndicator[i]));
 	}
+
+	m_bDragDrop = FALSE;
+	m_DragDropObj = DragDrop_None;
+	m_CursorObj = DragDrop_None;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -59,8 +63,30 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 		OnMyMouseWheel(event.wParam, event.lParam);
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
+		// 如果没有开始拖放操作
+		if ( !m_bDragDrop ) {
+			// 检查鼠标位置，在高温、低温报警附近时，改变鼠标状态
+			CheckCursor(event.ptMouse);
+		}
+		// 如果开始了鼠标拖放操作
+		else {
+			DragDropIng(event.ptMouse);
+		}
+
 		if (g_data.m_CfgData.m_bCrossAnchor)
 			this->Invalidate();
+	}
+	else if (event.Type == UIEVENT_BUTTONDOWN) {
+		// 如果鼠标变为可拖动状态
+		if ( m_CursorObj != DragDrop_None ) {
+			BeginDragDrop();
+		}
+	}
+	else if (event.Type == UIEVENT_BUTTONUP) {
+		// 如果正在拖放操作
+		if ( m_bDragDrop ) {
+			EndDragDrop(event.ptMouse);
+		}
 	}
 	CControlUI::DoEvent(event);
 }
@@ -473,8 +499,6 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	CModeButton::Mode mode = GetMode();
 	  
 	// 显示的最低温度和最高温度
-	//int  nMinTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
-	//int  nMaxTemp          = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
 	int  nMinTemp, nMaxTemp;
 	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
 	// 摄氏度个数
@@ -492,9 +516,6 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	rectScale.top    = rect.top;
 	rectScale.right  = rectScale.left + SCALE_RECT_WIDTH;
 	rectScale.bottom = rect.bottom;
-
-	// 采集间隔(单位：秒)
-	int  nCollectInterval = GetCollectInterval( g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval );
 
 	// 画水平刻度线
 	DrawScaleLine(hDC,nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
@@ -711,8 +732,6 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	CModeButton::Mode mode = GetMode();
 
 	// 显示的最低温度和最高温度
-	//int  nMinTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMinTemp;
-	//int  nMaxTemp = g_data.m_CfgData.m_GridCfg[i].m_dwMaxTemp;
 	int  nMinTemp, nMaxTemp;
 	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
 	// 摄氏度个数
@@ -730,9 +749,6 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	rectScale.top = rect.top;
 	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
 	rectScale.bottom = rect.bottom;
-
-	// 采集间隔(单位：秒)
-	int  nCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval);
 
 	// 画水平刻度线
 	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
@@ -1053,9 +1069,6 @@ void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & 
 	rectScale.right  = rectScale.left;
 	rectScale.bottom = rect.bottom;
 
-	// 采集间隔(单位：秒)
-	int  nCollectInterval = GetCollectInterval(g_data.m_CfgData.m_GridCfg[i].m_dwCollectInterval);
-
 	// 画水平刻度线
 	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
 
@@ -1090,6 +1103,207 @@ void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & 
 	}
 }
 
+// 开始拖放操作
+void  CMyImageUI::BeginDragDrop() {
+	m_bDragDrop = TRUE;
+	m_DragDropObj = m_CursorObj;
+	SetCursor(g_data.m_hCursor);
+	m_CursorObj = DragDrop_None;
+}
+
+// 检查鼠标是否需要改变指针
+void  CMyImageUI::CheckCursor(const POINT & pt) {
+
+	// self rectangle and width, height
+	RECT rect = GetPos();
+	int  width = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 高温、低温报警线的y坐标
+	int  nY = 0;
+	DWORD  dwLowAlarmTemp = 0;
+	DWORD  dwHighAlarmTemp = 0;
+
+	if ( mode == CModeButton::Mode_Hand ) {
+		dwLowAlarmTemp  = g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwLowTempAlarm;
+		dwHighAlarmTemp = g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwHighTempAlarm;
+	}
+	else {
+		dwLowAlarmTemp = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j - 1].m_dwLowTempAlarm;
+		dwHighAlarmTemp = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j - 1].m_dwHighTempAlarm;
+	}
+
+	// 低温的y值
+	nY = (int)((nMaxTemp - dwLowAlarmTemp / 100.0) * nHeightPerCelsius) + nMaxY;
+	int nMargin = 3;
+
+	RECT  r;
+	r.left   = rectScale.right;
+	r.right  = rectScale.left + width;
+	r.top    = nY - nMargin;
+	r.bottom = nY + nMargin;
+
+	// 如果鼠标在低温矩形内
+	if ( PtInRect(&r, pt) ) {
+		m_CursorObj = DragDrop_LowAlarm;
+		SetCursor(g_data.m_hCursor);
+		this->Invalidate();
+	}
+	else {
+		nY = (int)((nMaxTemp - dwHighAlarmTemp / 100.0) * nHeightPerCelsius) + nMaxY;
+		r.top = nY - nMargin;
+		r.bottom = nY + nMargin;
+		if (PtInRect(&r, pt)) {
+			m_CursorObj = DragDrop_HighAlarm;
+			SetCursor(g_data.m_hCursor);
+			this->Invalidate();
+		}
+		else {
+			m_CursorObj = DragDrop_None;
+		}
+	}
+	
+	//DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+}
+
+// 正在拖放操作
+void  CMyImageUI::DragDropIng(const POINT & pt) {
+	if ( !g_data.m_DragDropCtl->IsVisible() ) {
+		g_data.m_DragDropCtl->SetVisible(true);
+	}
+
+	// self rectangle and width, height
+	RECT rect = GetPos();
+	int  width = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	RECT r;
+	r.left   = rectScale.right;
+	r.right  = rectScale.left + width;
+	r.top    = pt.y - 4;
+	r.bottom = r.top + 4 * 2;
+
+	if (r.top < rectScale.top) {
+		r.top = rectScale.top;
+		r.bottom = r.top + 4 * 2;
+	}
+	else if (r.bottom > rectScale.bottom) {
+		r.bottom = rectScale.bottom;
+		r.top = r.bottom - 4 * 2;
+	}
+
+	g_data.m_DragDropCtl->SetPos(r);
+	SetCursor(g_data.m_hCursor);
+}
+
+// 结束拖放操作
+void  CMyImageUI::EndDragDrop(const POINT & pt) {
+	// self rectangle and width, height
+	RECT rect = GetPos();
+	int  width = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 计算新的高温、低温报警
+	DWORD  dwAlarm = (DWORD)( ( nMaxTemp + (double)(nMaxY - pt.y) / nHeightPerCelsius ) * 100.0 );
+	if ( m_DragDropObj == DragDrop_LowAlarm ) {
+		if ( mode == CModeButton::Mode_Hand ) {
+			g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwLowTempAlarm = dwAlarm;
+		}
+		else {
+			g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j - 1].m_dwLowTempAlarm = dwAlarm;
+		}		
+	}
+	else if ( m_DragDropObj == DragDrop_HighAlarm ) {
+		if (mode == CModeButton::Mode_Hand) {
+			g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwHighTempAlarm = dwAlarm;
+		}
+		else {
+			g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j - 1].m_dwHighTempAlarm = dwAlarm;
+		}
+	}
+
+	g_data.m_DragDropCtl->SetVisible(false);
+	m_bDragDrop = FALSE;
+	m_DragDropObj = DragDrop_None;
+	m_CursorObj = DragDrop_None;
+
+	this->Invalidate();
+}
 
 
 

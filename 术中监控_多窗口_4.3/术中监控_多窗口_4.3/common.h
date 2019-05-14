@@ -88,6 +88,7 @@ using namespace DuiLib;
 #define   LBL_READER_ID           "lblReaderId"
 #define   LBL_TAG_ID              "lblTagId"
 #define   CST_IMAGE               "cstMyImage"
+#define   DRAG_DROP_CTL           "dragdrop"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"
@@ -220,6 +221,8 @@ public:
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
 	BOOL                      m_bClosing;              // 应用程序是否正在退出
 	HWND                      m_hWnd;
+	HCURSOR                   m_hCursor;
+	CControlUI *              m_DragDropCtl;
 
 	// 术中读卡器是否连接上
 	BOOL                      m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
@@ -233,6 +236,8 @@ public:
 		m_thrd_work   = 0;
 		m_bClosing = FALSE;	
 		m_hWnd = 0;
+		m_hCursor = 0;
+		m_DragDropCtl = 0;
 		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
 	}
 };

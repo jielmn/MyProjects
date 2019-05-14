@@ -69,6 +69,7 @@ void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 	g_data.m_hWnd = GetHWND();
+	g_data.m_hCursor = LoadCursor(NULL, IDC_SIZENS);
 
 	/*************  获取控件 *****************/
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(TABS_ID));
@@ -93,6 +94,8 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pGrids[i]->SetMode( (CModeButton::Mode)g_data.m_CfgData.m_GridCfg[i].m_dwGridMode );
 		m_layMain->Add(m_pGrids[i]);
 	}
+
+	g_data.m_DragDropCtl = m_PaintManager.FindControl(DRAG_DROP_CTL); 
 	/*************  end 获取控件 *****************/
 
 	RefreshGridsPage();
