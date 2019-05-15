@@ -96,6 +96,7 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 	g_data.m_DragDropCtl = m_PaintManager.FindControl(DRAG_DROP_CTL); 
+	g_data.m_edRemark    = static_cast<CEditUI *>( m_PaintManager.FindControl(EDIT_REMARK) );
 	/*************  end »ñÈ¡¿Ø¼þ *****************/
 
 	RefreshGridsPage();
@@ -156,6 +157,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "about") {
 		OnAbout();
+	}
+	else if (msg.sType == "killfocus") {
+		if (name == EDIT_REMARK) {
+			::OnEdtRemarkKillFocus();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }

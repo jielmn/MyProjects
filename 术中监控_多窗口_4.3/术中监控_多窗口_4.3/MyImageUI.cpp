@@ -26,6 +26,7 @@ CMyImageUI::CMyImageUI() {
 	m_bDragDrop = FALSE;
 	m_DragDropObj = DragDrop_None;
 	m_CursorObj = DragDrop_None;
+	m_dwRemarkingIndex = 0;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -80,6 +81,9 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 		// 如果鼠标变为可拖动状态
 		if ( m_CursorObj != DragDrop_None ) {
 			BeginDragDrop();
+		}
+		else {
+			CheckRemark(event.ptMouse);
 		}
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
@@ -194,6 +198,7 @@ void  CMyImageUI::DrawScale( HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, in
 	CDuiString strText;
 	int nVInterval = BRIGHT_DARK_INTERVAL;
 	::SetTextColor(hDC, RGB(255, 255, 255));
+	::SelectObject(hDC, m_hCommonThreadPen);
 	::Rectangle(hDC, rectScale.left, rectScale.top, rectScale.right, rectScale.bottom);
 
 	RECT r = rectScale;
@@ -240,6 +245,7 @@ void   CMyImageUI::DrawWarning( HDC hDC,DWORD i, DWORD j, int nMaxTemp, int nHei
 
 	int nDiffY = 0;
 
+	::SetTextColor(hDC, RGB(255, 255, 255));
 	nDiffY = (int)((nMaxTemp * 100.0 - (double)nLowAlarm) / 100.0 * nHeightPerCelsius);
 	::SelectObject(hDC, m_hLowTempAlarmPen);
 	::MoveToEx(hDC, rectScale.right, nMaxY + nDiffY, 0);
@@ -754,10 +760,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
 
 	// 画边框
-	DrawBorder(hDC, rectScale, width);
-
-	// 画刻度值
-	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+	DrawBorder(hDC, rectScale, width);	
 
 	// 画报警线
 	DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
@@ -799,6 +802,9 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 			DrawCrossLine(hDC, rValid, cursor_point, tFirstTime, m_fSecondsPerPixel, nHeightPerCelsius, nMaxY, nMaxTemp);
 		}		
 	}	
+
+	// 画刻度值
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
 }
 
 void CMyImageUI::MyInvalidate() {
@@ -1307,6 +1313,188 @@ void  CMyImageUI::EndDragDrop(const POINT & pt) {
 	this->Invalidate();
 }
 
+// 检查是否点击了注释
+void  CMyImageUI::CheckRemark(const POINT & pt) {
+	if (m_state == STATE_7_DAYS) {
+		return;
+	}
+
+	if (!m_bSetSecondsPerPixel) {
+		return;
+	}
+
+	if (m_fSecondsPerPixel > 6.0f) {
+		return;
+	}
+
+	// self rectangle and width, height
+	RECT rect   = GetPos();
+	int  width  = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 查看有无数据
+	int nPointsCnt = GetTempCount(i, j, mode);
+	// 如果没有数据，返回
+	if (nPointsCnt <= 0) {
+		return;
+	}
+
+	time_t  tFirstTime = 0, tLastTime = 0;
+	BOOL bRet = GetSingleDayTimeRange(tFirstTime, tLastTime, i, j, mode);
+	if (!bRet) {
+		return;
+	}
+
+	// 有效矩形
+	RECT rValid;
+	rValid.left   = rectScale.right;
+	rValid.right  = rectScale.left + width - 1;
+	rValid.top    = rectScale.top;
+	rValid.bottom = rectScale.bottom;
+
+	// 如果超出了曲线范围
+	if ( !PtInRect(&rValid, pt) ) {
+		return;
+	}
+
+	POINT  top_left;
+	top_left.x = rect.left + SCALE_RECT_WIDTH;
+	top_left.y = nMaxY;
+
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		CheckRemark(pt, v, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		CheckRemark(pt, v, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+	}
+	else {
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			bRet = CheckRemark(pt, v, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+			if ( bRet ) {
+				break;
+			}
+		}
+	}
+}
+
+BOOL  CMyImageUI::CheckRemark( const POINT & pt, const std::vector<TempItem * > & v,
+	                           time_t tFirstTime, float fSecondsPerPixel,
+	                           int nMaxTemp, int nHeightPerCelsius, POINT  top_left ) {
+
+	std::vector<TempItem * >::const_iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem * pItem = *it;
+
+		int nX = (int)((pItem->m_time - tFirstTime) / fSecondsPerPixel + top_left.x);
+		// 后面的不用检查了
+		if ( nX > pt.x + 3 ) {
+			break;
+		}
+		
+		if (nX < pt.x - 3) {
+			continue;
+		}
+
+		int nY = (int)((nMaxTemp - pItem->m_dwTemp / 100.0) * nHeightPerCelsius + top_left.y);
+		if (nY >= pt.y - 3 && nY <= pt.y + 3) {
+
+			// 如果之前在编辑状态
+			if ( g_data.m_edRemark->IsVisible()) {
+				::OnEdtRemarkKillFocus();
+			}
+
+			m_dwRemarkingIndex = pItem->m_dwDbId;
+
+			RECT rectRemark;
+			rectRemark.left   = nX - EDT_REMARK_WIDTH / 2;
+			rectRemark.top    = nY - EDT_REMARK_HEIGHT / 2;
+			rectRemark.right  = rectRemark.left + EDT_REMARK_WIDTH;
+			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+			g_data.m_edRemark->SetTag((UINT_PTR)this);
+			g_data.m_edRemark->SetPos(rectRemark);
+			g_data.m_edRemark->SetText(pItem->m_szRemark);
+			g_data.m_edRemark->SetVisible(true);
+			g_data.m_edRemark->SetFocus();
+
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+void  CMyImageUI::SetRemark(DuiLib::CDuiString & strRemark) {
+
+	// (但是有可能数据库量足够大，循环了一番)
+	if (m_dwRemarkingIndex == 0) {
+		return;
+	}
+
+	DWORD  i = GetGridIndex();
+	DWORD  j = GetReaderIndex();
+	CModeButton::Mode mode = GetMode();
+
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		SetRemark(v, m_dwRemarkingIndex, strRemark);
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		SetRemark(v, m_dwRemarkingIndex, strRemark);
+	}
+	else {
+		BOOL bRet = FALSE;
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			bRet = SetRemark(v, m_dwRemarkingIndex, strRemark);
+			if (bRet) {
+				break;
+			}
+		}
+	}
+}
+
+// 设置注释
+BOOL  CMyImageUI::SetRemark(const std::vector<TempItem * > & v, DWORD  dwDbId, DuiLib::CDuiString & strRemark) {
+	std::vector<TempItem * >::const_iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem * pItem = *it;
+		if (pItem->m_dwDbId == dwDbId) {
+			STRNCPY(pItem->m_szRemark, strRemark, MAX_REMARK_LENGTH);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
 
 
 

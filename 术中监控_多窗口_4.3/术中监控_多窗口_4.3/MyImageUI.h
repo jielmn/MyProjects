@@ -15,6 +15,7 @@ public:
 	void MyInvalidate();
 	// 为label作画
 	void   PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect);
+	void   SetRemark(DuiLib::CDuiString & strRemark);	
 
 private:
 	void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -82,6 +83,13 @@ private:
 	void  DragDropIng(const POINT & pt);
 	// 结束拖放操作
 	void  EndDragDrop(const POINT & pt);
+	// 检查是否点击了注释
+	void  CheckRemark(const POINT & pt);
+	BOOL  CheckRemark( const POINT & pt, const std::vector<TempItem * > & v, 
+		               time_t tFirstTime, float fSecondsPerPixel,
+		               int    nMaxTemp,   int nHeightPerCelsius, POINT  top_left );
+	// 设置注释
+	BOOL  SetRemark( const std::vector<TempItem * > & v, DWORD  dwDbId, DuiLib::CDuiString & strRemark );
 
 private:
 	enum   E_STATE {
@@ -112,6 +120,7 @@ private:
 	BOOL                  m_bDragDrop;                 // 是否开始拖放操作
 	DragDropObj           m_DragDropObj;               // 拖放操作开始后，拖放的对象
 	DragDropObj           m_CursorObj;                 // 拖放操作开始前，鼠标滑动时经过的对象
+	DWORD                 m_dwRemarkingIndex;          // 正在编辑的点
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

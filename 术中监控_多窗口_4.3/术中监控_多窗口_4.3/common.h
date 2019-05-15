@@ -41,6 +41,8 @@ using namespace DuiLib;
 #define   MIN_MYIMAGE_VMARGIN         40
 #define   SCALE_RECT_WIDTH            50          // 刻度区域的宽度
 #define   BRIGHT_DARK_INTERVAL        30          // 明暗刻度的间隔
+#define   EDT_REMARK_WIDTH            200
+#define   EDT_REMARK_HEIGHT           30
 
 #define   VERSION                     "3.0.1"
 
@@ -89,6 +91,7 @@ using namespace DuiLib;
 #define   LBL_TAG_ID              "lblTagId"
 #define   CST_IMAGE               "cstMyImage"
 #define   DRAG_DROP_CTL           "dragdrop"
+#define   EDIT_REMARK             "edRemark"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"
@@ -223,6 +226,7 @@ public:
 	HWND                      m_hWnd;
 	HCURSOR                   m_hCursor;
 	CControlUI *              m_DragDropCtl;
+	DuiLib::CEditUI *         m_edRemark;
 
 	// 术中读卡器是否连接上
 	BOOL                      m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
@@ -238,6 +242,7 @@ public:
 		m_hWnd = 0;
 		m_hCursor = 0;
 		m_DragDropCtl = 0;
+		m_edRemark = 0;
 		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
 	}
 };
@@ -316,6 +321,7 @@ extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DW
 extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData, DWORD dwDataLen);
 extern int  GetWeekDay(time_t t);
 extern const char * GetWeekDayName(int nWeekIndex);
+extern void  OnEdtRemarkKillFocus();
 
 // templates
 template <class T>

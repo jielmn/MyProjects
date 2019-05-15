@@ -512,3 +512,20 @@ const char * GetWeekDayName(int nWeekIndex) {
 	}
 	return "";
 }
+
+void  OnEdtRemarkKillFocus( ) {
+	DuiLib::CDuiString  strRemark = g_data.m_edRemark->GetText();
+	bool bVisible = g_data.m_edRemark->IsVisible();
+
+	// 如果是由于g_edRemark->SetVisible(false);导致的又一次堆栈调用，则跳过
+	if (!bVisible) {
+		return;
+	}
+
+	g_data.m_edRemark->SetText("");
+	g_data.m_edRemark->SetVisible(false);
+
+	CMyImageUI * pImage = (CMyImageUI *)g_data.m_edRemark->GetTag();
+	assert(pImage);
+	pImage->SetRemark(strRemark);
+}
