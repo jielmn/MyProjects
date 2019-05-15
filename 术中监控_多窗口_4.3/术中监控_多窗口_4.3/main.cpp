@@ -774,7 +774,7 @@ void  CDuiFrameWnd::OnSetting() {
 	}
 
 	g_data.m_cfg->Save();
-
+	::InvalidateRect(GetHWND(), 0, TRUE);
 	delete pSettingDlg;
 }
 
