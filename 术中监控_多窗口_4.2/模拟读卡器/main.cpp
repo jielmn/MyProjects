@@ -136,7 +136,8 @@ void MyMessageHandler::OnMessage(DWORD dwMessageId, const LmnToolkits::MessageDa
 			// ÎÂ¶È
 			else if ( byData[5] == 0x02 ) {
 				DWORD r = GetRand(1, 5);
-				if ( r > 1 ) {
+				//if ( r > 1 ) {
+				if ( TRUE ) {
 					memcpy(byData, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF", 29);
 					byData[3] = byBed;
 					byData[4] = byArea;
