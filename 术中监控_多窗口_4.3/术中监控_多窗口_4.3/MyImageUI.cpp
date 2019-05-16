@@ -1,5 +1,6 @@
 #include "MyImageUI.h"
 #include "GridUI.h"
+#include "business.h"
 
 #define  MAX_SECONDS_PER_PIXEL               200.0f
 #define  MIN_SECONDS_PER_PIXEL               1.0f
@@ -551,6 +552,13 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	// 画日子的分割线
 	DrawDaySplit(hDC, nDayCounts, rectScale, nDayWidth, nMaxY, nCelsiusCount, nHeightPerCelsius, tFirstDayZeroTime);
 	
+	// 有效矩形
+	RECT rValid;
+	rValid.left = rectScale.right;
+	rValid.right = rectScale.left + width - 1;
+	rValid.top = rectScale.top;
+	rValid.bottom = rectScale.bottom;
+
 	float fSecondsPerPixel = 0.0f;
 	// 画折线
 	if (nDayWidth > 0) {
@@ -560,19 +568,15 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 		top_left.y = nMaxY;
 		DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, 
 			top_left, graphics, TRUE, i,j,mode);
+
+		// 画注释
+		DrawRemark(hDC, graphics, tFirstDayZeroTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, i, j, mode, rValid);
 	}
 	
 	// 鼠标位置
 	POINT cursor_point;
 	GetCursorPos(&cursor_point);
 	::ScreenToClient(g_data.m_hWnd, &cursor_point);
-
-	// 有效矩形
-	RECT rValid;
-	rValid.left   = rectScale.right;
-	rValid.right  = rectScale.left + width - 1;
-	rValid.top    = rectScale.top;
-	rValid.bottom = rectScale.bottom;
 
 	// 画十字线
 	if (nDayWidth > 0) {
@@ -1503,6 +1507,7 @@ BOOL  CMyImageUI::SetRemark(const std::vector<TempItem * > & v, DWORD  dwDbId, D
 		TempItem * pItem = *it;
 		if (pItem->m_dwDbId == dwDbId) {
 			STRNCPY(pItem->m_szRemark, strRemark, MAX_REMARK_LENGTH);
+			CBusiness::GetInstance()->SaveRemarkAsyn(pItem->m_dwDbId, pItem->m_szRemark);
 			return TRUE;
 		}
 	}

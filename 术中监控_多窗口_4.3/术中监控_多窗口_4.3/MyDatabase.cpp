@@ -173,3 +173,17 @@ void  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempIt
 	}
 	sqlite3_free_table(azResult);
 }
+
+// 保存注释
+void  CMySqliteDatabase::SaveRemark(const CSaveRemarkParam * pParam) {
+	char sql[8192];
+	char szRemark[256];
+	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
+
+	SNPRINTF( sql, sizeof(sql), "UPDATE %s set remark='%s' where id=%lu", TEMP_TABLE, szRemark, pParam->m_dwDbId );
+	int ret = sqlite3_exec(m_db, sql, 0, 0, 0);
+	if (0 != ret) {
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "保存注释到数据库失败!\n");
+		return;
+	}
+}

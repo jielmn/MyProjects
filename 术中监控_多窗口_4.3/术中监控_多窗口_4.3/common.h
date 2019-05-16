@@ -148,6 +148,7 @@ using namespace DuiLib;
 #define MSG_GET_GRID_TEMP_MAX               1199
 #define MSG_SAVE_SUR_TEMP                   2000
 #define MSG_QUERY_TEMP_BY_TAG               2001
+#define MSG_SAVE_REMARK                     2002
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -298,6 +299,17 @@ class CGraphicsRoundRectPath : public GraphicsPath
 {
 public:
 	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
+};
+
+class CSaveRemarkParam : public LmnToolkits::MessageData {
+public:
+	CSaveRemarkParam(DWORD  dwDbId, const char * szRemark) {
+		m_dwDbId = dwDbId;
+		STRNCPY(m_szRemark, szRemark, MAX_REMARK_LENGTH);
+	}
+
+	DWORD       m_dwDbId;
+	char        m_szRemark[MAX_REMARK_LENGTH];
 };
 
 extern CGlobalData  g_data;

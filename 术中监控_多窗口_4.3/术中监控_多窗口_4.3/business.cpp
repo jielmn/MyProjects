@@ -634,6 +634,15 @@ void  CBusiness::QueryTempByTag(const CQueryTempByTagParam * pParam) {
 	m_sigQueyTemp.emit(pParam->m_szTagId, pParam->m_wBedNo, pvRet);
 }
 
+// 保存注释
+void  CBusiness::SaveRemarkAsyn(DWORD  dwDbId, const char * szRemark) {
+	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_REMARK, new CSaveRemarkParam(dwDbId, szRemark) );
+}
+
+void  CBusiness::SaveRemark(const CSaveRemarkParam * pParam) {
+	m_sqlite.SaveRemark(pParam);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -674,6 +683,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryTempByTagParam * pParam = (CQueryTempByTagParam *)pMessageData;
 		QueryTempByTag(pParam);
+	}
+	break;
+
+	case MSG_SAVE_REMARK:
+	{
+		CSaveRemarkParam * pParam = (CSaveRemarkParam *)pMessageData;
+		SaveRemark(pParam);
 	}
 	break;
 

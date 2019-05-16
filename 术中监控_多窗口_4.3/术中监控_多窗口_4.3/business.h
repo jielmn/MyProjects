@@ -52,6 +52,10 @@ public:
 	void  QueryTempByTagAsyn(const char * szTagId, WORD wBedNo);
 	void  QueryTempByTag(const CQueryTempByTagParam * pParam);
 
+	// ±£´æ×¢ÊÍ
+	void  SaveRemarkAsyn(DWORD  dwDbId, const char * szRemark);
+	void  SaveRemark(const CSaveRemarkParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

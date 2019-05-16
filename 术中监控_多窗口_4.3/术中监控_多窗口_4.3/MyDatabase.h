@@ -12,6 +12,8 @@ public:
 	void  SaveSurTemp(CSaveSurTempParam * pParam);
 	// 根据TagID查询温度数据
 	void  QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet);
+	// 保存注释
+	void  SaveRemark(const CSaveRemarkParam * pParam);
 
 private:
 	sqlite3 *                         m_db;
