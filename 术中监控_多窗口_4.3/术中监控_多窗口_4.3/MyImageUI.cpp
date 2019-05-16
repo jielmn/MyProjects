@@ -27,6 +27,9 @@ CMyImageUI::CMyImageUI() {
 	m_DragDropObj = DragDrop_None;
 	m_CursorObj = DragDrop_None;
 	m_dwRemarkingIndex = 0;
+
+	m_remark_pen = new Pen(Gdiplus::Color(0x803D5E49), 3.0);
+	m_remark_brush = new SolidBrush( Gdiplus::Color(0x803D5E49) );
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -41,6 +44,9 @@ CMyImageUI::~CMyImageUI() {
 		delete m_temperature_pen[i];
 		delete m_temperature_brush[i];
 	}
+
+	delete m_remark_pen;
+	delete m_remark_brush;
 }
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -735,7 +741,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 
 	DWORD  i = GetGridIndex();
 	DWORD  j = GetReaderIndex();
-	CModeButton::Mode mode = GetMode();
+	CModeButton::Mode mode = GetMode();	
 
 	// 显示的最低温度和最高温度
 	int  nMinTemp, nMaxTemp;
@@ -755,6 +761,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	rectScale.top = rect.top;
 	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
 	rectScale.bottom = rect.bottom;
+
 
 	// 画水平刻度线
 	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
@@ -785,6 +792,10 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 			top_left.y += nHeightPerCelsius * nCelsiusCount;
 			// 画时间文本
 			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
+
+			// 画注释
+			top_left.y = nMaxY;
+			DrawRemark(hDC, graphics, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, i,j, mode );
 
 			// 鼠标位置
 			POINT cursor_point;
@@ -1435,7 +1446,7 @@ BOOL  CMyImageUI::CheckRemark( const POINT & pt, const std::vector<TempItem * > 
 
 			RECT rectRemark;
 			rectRemark.left   = nX - EDT_REMARK_WIDTH / 2;
-			rectRemark.top    = nY - EDT_REMARK_HEIGHT / 2;
+			rectRemark.top    = nY - EDT_REMARK_HEIGHT - EDT_REMARK_Y_OFFSET;
 			rectRemark.right  = rectRemark.left + EDT_REMARK_WIDTH;
 			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
 			g_data.m_edRemark->SetTag((UINT_PTR)this);
@@ -1496,6 +1507,61 @@ BOOL  CMyImageUI::SetRemark(const std::vector<TempItem * > & v, DWORD  dwDbId, D
 	return FALSE;
 }
 
+// 画注释
+void  CMyImageUI::DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
+	                          int nMaxTemp, int nHeightPerCelsius, POINT  top_left, 
+	                          DWORD i, DWORD j, CModeButton::Mode mode ) {
+
+	::SetBkMode(hDC, TRANSPARENT);
+
+	if (mode == CModeButton::Mode_Hand) {
+		const std::vector<TempItem * > & v = GetTempData(0);
+		DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v);
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		const std::vector<TempItem * > & v = GetTempData(1);
+		DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v);
+	}
+	else {
+		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
+			const std::vector<TempItem * > & v = GetTempData(k + 1);
+			DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v);
+		}
+	}
+}
+
+void  CMyImageUI::DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
+	                          int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
+	                          const std::vector<TempItem * > & v ) {
+	int nX = 0;
+	int nY = 0;
+	CDuiString  strText;
+
+	std::vector<TempItem * >::const_iterator it;
+	for ( it = v.begin(); it != v.end(); ++it ) {
+		TempItem * pItem = *it;
+		if ( pItem->m_szRemark[0] == '\0') {
+			continue;
+		}
+
+		nX = (int)( (pItem->m_time - tFirstTime) / fSecondsPerPixel ) + top_left.x;
+		nY = (int)( (nMaxTemp - pItem->m_dwTemp / 100.0 ) * nHeightPerCelsius ) + top_left.y;
+
+		CGraphicsRoundRectPath  RoundRectPath;
+		RoundRectPath.AddRoundRect( nX - EDT_REMARK_WIDTH / 2, nY - EDT_REMARK_HEIGHT - EDT_REMARK_Y_OFFSET,
+			                        EDT_REMARK_WIDTH, EDT_REMARK_HEIGHT, 5, 5 );
+		g.DrawPath(m_remark_pen, &RoundRectPath);
+		g.FillPath(m_remark_brush, &RoundRectPath);
+
+		strText = pItem->m_szRemark;
+		RECT rectRemark;
+		rectRemark.left   = nX - EDT_REMARK_WIDTH / 2;
+		rectRemark.top    = nY - EDT_REMARK_HEIGHT - EDT_REMARK_Y_OFFSET;
+		rectRemark.right  = rectRemark.left + EDT_REMARK_WIDTH;
+		rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+		::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+	}
+}
 
 
 

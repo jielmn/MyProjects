@@ -90,6 +90,13 @@ private:
 		               int    nMaxTemp,   int nHeightPerCelsius, POINT  top_left );
 	// 设置注释
 	BOOL  SetRemark( const std::vector<TempItem * > & v, DWORD  dwDbId, DuiLib::CDuiString & strRemark );
+	// 画注释
+	void  DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
+		              int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
+		              DWORD i, DWORD j, CModeButton::Mode mode );
+	void  DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
+		              int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
+		              const std::vector<TempItem * > & v );
 
 private:
 	enum   E_STATE {
@@ -121,6 +128,9 @@ private:
 	DragDropObj           m_DragDropObj;               // 拖放操作开始后，拖放的对象
 	DragDropObj           m_CursorObj;                 // 拖放操作开始前，鼠标滑动时经过的对象
 	DWORD                 m_dwRemarkingIndex;          // 正在编辑的点
+
+	Pen *                 m_remark_pen;
+	SolidBrush *          m_remark_brush;
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

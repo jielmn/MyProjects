@@ -43,6 +43,7 @@ using namespace DuiLib;
 #define   BRIGHT_DARK_INTERVAL        30          // 明暗刻度的间隔
 #define   EDT_REMARK_WIDTH            200
 #define   EDT_REMARK_HEIGHT           30
+#define   EDT_REMARK_Y_OFFSET         10
 
 #define   VERSION                     "3.0.1"
 
@@ -291,6 +292,12 @@ public:
 
 	char       m_szTagId[MAX_TAG_ID_LENGTH];
 	WORD       m_wBedNo;
+};
+
+class CGraphicsRoundRectPath : public GraphicsPath
+{
+public:
+	void AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY);
 };
 
 extern CGlobalData  g_data;
