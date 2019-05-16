@@ -55,7 +55,7 @@
 		
 		<HorizontalLayout inset="10,0,10,0">
 			<!-- 显示温度和温度曲线 -->
-			<ImageLabel  name="cstImgLblTemp"  text=""  textcolor="#FFCCCCCC" font="4" align="center"  />			
+			<ImageLabel  name="cstImgLblTemp"  text=""  textcolor="#FFCCCCCC" font="4" align="center" menu="true"  />			
 			
 			<VerticalLayout width="80">
 				<Control />

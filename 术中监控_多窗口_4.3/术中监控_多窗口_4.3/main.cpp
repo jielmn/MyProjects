@@ -163,6 +163,20 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			::OnEdtRemarkKillFocus();
 		}
 	}
+	else if (msg.sType == "menu") {
+		if (name == CST_IMG_LBL_TEMP) { 
+			OnImageMenu(msg.pSender->GetTag(), msg.ptMouse, msg.pSender);
+		}
+		else if (name == CST_IMAGE) {
+			OnImageMenu(msg.pSender->GetTag(), msg.ptMouse, msg.pSender);
+		}
+	}
+	else if ( msg.sType == "menu_export_excel" ) {
+		OnExportExcel(msg.wParam);
+	}
+	else if ( msg.sType == "menu_print_excel" ) {
+		OnPrintExcel(msg.wParam);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -993,6 +1007,25 @@ void   CDuiFrameWnd::OnQueryTempRet(WPARAM wParam, LPARAM  lParam) {
 	//ClearVector(*pvRet);
 	delete pvRet;
 	delete[] pParam;
+}
+
+// 右键弹出菜单
+void   CDuiFrameWnd::OnImageMenu(DWORD  dwGridIndex, const POINT & pt, CControlUI * pParent ) {
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_image.xml"), pParent, dwGridIndex, 0 );
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE); 
+}
+
+// 导出Excel
+void   CDuiFrameWnd::OnExportExcel(DWORD  dwIndex) {
+	assert(dwIndex < MAX_GRID_COUNT);
+	assert(dwIndex < g_data.m_CfgData.m_dwLayoutGridsCnt);
+}
+
+// 打印Excel图表
+void   CDuiFrameWnd::OnPrintExcel(DWORD  dwIndex) {
+	assert(dwIndex < MAX_GRID_COUNT);
+	assert(dwIndex < g_data.m_CfgData.m_dwLayoutGridsCnt);
 }
 
 

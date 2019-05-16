@@ -98,6 +98,12 @@ private:
 	void   On60SecondsTimer();
 	// 查询温度结果
 	void   OnQueryTempRet(WPARAM wParam, LPARAM  lParam);
+	// 右键弹出菜单
+	void   OnImageMenu(DWORD  dwGridIndex, const POINT & pt, CControlUI * pParent);
+	// 导出Excel
+	void   OnExportExcel(DWORD  dwIndex);
+	// 打印Excel图表
+	void   OnPrintExcel(DWORD  dwIndex);
 
 public:
 	// 接收器连接状态通知

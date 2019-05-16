@@ -100,9 +100,11 @@ void CGridUI::DoInit() {
 	m_layReaders->Add(m_hand_reader);	
 
 	m_cstImgLabel = static_cast<CImageLabelUI *>(m_pManager->FindControl(CST_IMG_LBL_TEMP));
+	m_cstImgLabel->SetTag(GetTag());
 	m_lblElapsed = static_cast<CImageLabelUI *>(m_pManager->FindControl(LBL_ELAPSED));
 	m_lblElapsed->SetText("");
 	m_cstImg = static_cast<CMyImageUI *>(m_pManager->FindControl(CST_IMAGE));
+	m_cstImg->SetTag(GetTag());
 	m_cstImgLabel->SetMyImage(m_cstImg);
 
 	OnModeChanged();

@@ -17,7 +17,7 @@ void CDuiMenu::Init(HWND hWndParent, POINT ptPos)
 void  CDuiMenu::Notify(DuiLib::TNotifyUI& msg) {
 	if (msg.sType == "itemclick") {
 		if (m_pOwner) {
-			m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), 0, 0, true);
+			m_pOwner->GetManager()->SendNotify(m_pOwner, msg.pSender->GetName(), m_dwParam0, m_dwParam1, true);
 			PostMessage(WM_CLOSE);
 		}
 		return;
