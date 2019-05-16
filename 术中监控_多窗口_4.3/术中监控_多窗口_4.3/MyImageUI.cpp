@@ -679,7 +679,7 @@ BOOL  CMyImageUI::GetTimeRange(const std::vector<TempItem * > & v, time_t & star
 
 // 画时间文本
 void    CMyImageUI::DrawTimeText( HDC hDC, time_t  tFirstTime , time_t tLastTime, 
-	                              float fSecondsPerPixel, POINT  top_left ) {
+	                              float fSecondsPerPixel, POINT  top_left, const RECT & rValid ) {
 	char szTime[256];
 	::SetTextColor(hDC, RGB(255, 255, 255));
 	const int OFFSET_Y = 5;
@@ -693,7 +693,8 @@ void    CMyImageUI::DrawTimeText( HDC hDC, time_t  tFirstTime , time_t tLastTime
 	// 如果宽度足够大，开始画text
 	if (time_width >= TIME_TEXT_INTERVAL / 2) {
 		Time2String(szTime, sizeof(szTime), &time_point);
-		::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+		//::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+		::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
 		bFirst = FALSE;
 	}
 	
@@ -706,7 +707,8 @@ void    CMyImageUI::DrawTimeText( HDC hDC, time_t  tFirstTime , time_t tLastTime
 			// 如果宽度足够大，开始画text
 			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL / 2) {
 				Time2String(szTime, sizeof(szTime), &time_point);
-				::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				//::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
 				last_time_width = time_width;
 				bFirst = FALSE;
 			}
@@ -715,7 +717,8 @@ void    CMyImageUI::DrawTimeText( HDC hDC, time_t  tFirstTime , time_t tLastTime
 			// 如果宽度足够大，开始画text
 			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL ) {
 				Time2String(szTime, sizeof(szTime), &time_point);
-				::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				//::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
 				last_time_width = time_width;
 			}
 		}
@@ -789,25 +792,25 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 			DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
 				top_left, graphics, TRUE, i, j, mode);
 
-			top_left.y += nHeightPerCelsius * nCelsiusCount;
-			// 画时间文本
-			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left);
-
-			// 画注释
-			top_left.y = nMaxY;
-			DrawRemark(hDC, graphics, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, i,j, mode );
-
-			// 鼠标位置
-			POINT cursor_point;
-			GetCursorPos(&cursor_point);
-			::ScreenToClient(g_data.m_hWnd, &cursor_point);
-
 			// 有效矩形
 			RECT rValid;
 			rValid.left = rectScale.right;
 			rValid.right = rectScale.left + width - 1;
 			rValid.top = rectScale.top;
 			rValid.bottom = rectScale.bottom;
+
+			top_left.y += nHeightPerCelsius * nCelsiusCount;
+			// 画时间文本
+			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left, rValid);			
+
+			// 画注释
+			top_left.y = nMaxY;
+			DrawRemark(hDC, graphics, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, i,j, mode, rValid);
+
+			// 鼠标位置
+			POINT cursor_point;
+			GetCursorPos(&cursor_point);
+			::ScreenToClient(g_data.m_hWnd, &cursor_point);			
 
 			// 画十字线
 			DrawCrossLine(hDC, rValid, cursor_point, tFirstTime, m_fSecondsPerPixel, nHeightPerCelsius, nMaxY, nMaxTemp);
@@ -1510,29 +1513,29 @@ BOOL  CMyImageUI::SetRemark(const std::vector<TempItem * > & v, DWORD  dwDbId, D
 // 画注释
 void  CMyImageUI::DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
 	                          int nMaxTemp, int nHeightPerCelsius, POINT  top_left, 
-	                          DWORD i, DWORD j, CModeButton::Mode mode ) {
+	                          DWORD i, DWORD j, CModeButton::Mode mode, const RECT & rValid) {
 
 	::SetBkMode(hDC, TRANSPARENT);
 
 	if (mode == CModeButton::Mode_Hand) {
 		const std::vector<TempItem * > & v = GetTempData(0);
-		DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v);
+		DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v, rValid);
 	}
 	else if (mode == CModeButton::Mode_Single) {
 		const std::vector<TempItem * > & v = GetTempData(1);
-		DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v);
+		DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v, rValid);
 	}
 	else {
 		for (DWORD k = 0; k < MAX_READERS_PER_GRID; k++) {
 			const std::vector<TempItem * > & v = GetTempData(k + 1);
-			DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v);
+			DrawRemark(hDC, g, tFirstTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, v, rValid);
 		}
 	}
 }
 
 void  CMyImageUI::DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
 	                          int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
-	                          const std::vector<TempItem * > & v ) {
+	                          const std::vector<TempItem * > & v, const RECT & rValid) {
 	int nX = 0;
 	int nY = 0;
 	CDuiString  strText;
@@ -1559,7 +1562,12 @@ void  CMyImageUI::DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fS
 		rectRemark.top    = nY - EDT_REMARK_HEIGHT - EDT_REMARK_Y_OFFSET;
 		rectRemark.right  = rectRemark.left + EDT_REMARK_WIDTH;
 		rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
-		::DrawText(hDC, strText, strText.GetLength(), &rectRemark, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+
+		RECT rCalc = rectRemark;
+		int h = ::DrawText(hDC, strText, strText.GetLength(), &rCalc, DT_CALCRECT );
+		int w = rCalc.right - rCalc.left; 
+		 
+		::ExtTextOut(hDC, rectRemark.left + EDT_REMARK_WIDTH / 2 - w / 2, rectRemark.top + EDT_REMARK_HEIGHT / 2 - h / 2, ETO_CLIPPED, &rValid, strText, strText.GetLength(), 0);
 	}
 }
 

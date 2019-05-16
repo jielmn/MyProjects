@@ -78,7 +78,7 @@
 			</TabLayout>
 
 			<Control name="dragdrop" float="true" pos="100,100,580,200" text="123" font="1" visible="false" bkcolor="#AA000000" /> 
-			<Edit    name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" visible="false" />
+			<Edit    name="edRemark" float="true" pos="100,100,200,150" text="123" font="1" visible="false" maxchar="24" />
 		</VerticalLayout>
 		
 		

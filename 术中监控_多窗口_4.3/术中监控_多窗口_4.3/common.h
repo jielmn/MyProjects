@@ -255,7 +255,7 @@ enum  ReaderStatus {
 
 #define  MAX_TAG_ID_LENGTH          20
 #define  MAX_READER_ID_LENGTH       20
-#define  MAX_REMARK_LENGTH          28
+#define  MAX_REMARK_LENGTH          26
 // 温度数据
 typedef struct  tagTempItem {
 	DWORD   m_dwDbId;                                        // 数据库的Id

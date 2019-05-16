@@ -56,7 +56,7 @@ private:
 		                  Pen * pen, SolidBrush * brush);
 	void    DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
 	// 画时间文本
-	void    DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime, float fSecondsPerPixel, POINT  top_left);
+	void    DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime, float fSecondsPerPixel, POINT  top_left, const RECT & rValid);
 	// 双击事件
 	void    OnDbClick();
 	// 温度数据个数
@@ -93,10 +93,10 @@ private:
 	// 画注释
 	void  DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
 		              int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
-		              DWORD i, DWORD j, CModeButton::Mode mode );
+		              DWORD i, DWORD j, CModeButton::Mode mode, const RECT & rValid );
 	void  DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fSecondsPerPixel,
 		              int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
-		              const std::vector<TempItem * > & v );
+		              const std::vector<TempItem * > & v, const RECT & rValid);
 
 private:
 	enum   E_STATE {
