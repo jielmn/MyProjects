@@ -385,6 +385,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigSurReaderStatus.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderStatusNotify);
 	m_sigSurReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderTempNotify);
 	m_sigQueyTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryTempRetNotify);	
+	m_sigHandReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnHandReaderTempNotify);
 	return;
 }
 
@@ -560,7 +561,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 }
 
 void  CBusiness::OnHandReaderTemp(const TempItem & item) {
-	
+	SaveHandeTempAsyn(item);
 }
 
 void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {

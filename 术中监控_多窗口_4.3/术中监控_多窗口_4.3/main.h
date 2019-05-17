@@ -104,6 +104,8 @@ private:
 	void   OnExportExcel(DWORD  dwIndex);
 	// 打印Excel图表
 	void   OnPrintExcel(DWORD  dwIndex);
+	// 手持读卡器温度
+	void   OnHandReaderTemp(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
@@ -116,6 +118,8 @@ public:
 	void   OnSurReaderTempNotify(WORD wBed, const TempItem & item);
 	// 查询到温度结果(根据TagId)
 	void   OnQueryTempRetNotify(const char *, WORD, std::vector<TempItem*> *);
+	// 手持读卡器的温度数据
+	void   OnHandReaderTempNotify(const TempItem & item);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

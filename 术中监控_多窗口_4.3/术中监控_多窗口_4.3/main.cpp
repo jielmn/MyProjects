@@ -213,6 +213,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_QUERY_TEMP_BY_TAG_ID_RET) {
 		OnQueryTempRet(wParam, lParam);
 	}
+	else if (uMsg == UM_HAND_READER_TEMP) {
+		OnHandReaderTemp(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1028,6 +1031,12 @@ void   CDuiFrameWnd::OnPrintExcel(DWORD  dwIndex) {
 	assert(dwIndex < g_data.m_CfgData.m_dwLayoutGridsCnt);
 }
 
+// 手持读卡器温度
+void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
+	TempItem * pItem = (TempItem*)wParam;
+	delete pItem;
+}
+
 
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
@@ -1063,6 +1072,13 @@ void   CDuiFrameWnd::OnQueryTempRetNotify(const char * szTagId, WORD wBed, std::
 	pParam[2] = (void *)pvRet;
 
 	::PostMessage(GetHWND(), UM_QUERY_TEMP_BY_TAG_ID_RET, (WPARAM)pParam, 0);
+}
+
+// 手持读卡器的温度数据
+void   CDuiFrameWnd::OnHandReaderTempNotify(const TempItem & item) {
+	TempItem * pItem = new TempItem;
+	memcpy(pItem, &item, sizeof(TempItem));
+	::PostMessage(GetHWND(), UM_HAND_READER_TEMP, (WPARAM)pItem, 0);
 }
                       
 

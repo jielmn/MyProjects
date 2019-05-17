@@ -157,6 +157,8 @@ using namespace DuiLib;
 #define UM_SUR_READER_STATUS                 (WM_USER+3)
 #define UM_SUR_READER_TEMP                   (WM_USER+4)
 #define UM_QUERY_TEMP_BY_TAG_ID_RET          (WM_USER+5)
+#define UM_HAND_READER_TEMP                  (WM_USER+6)
+
 
 
 // 创建duilib控件的回调
