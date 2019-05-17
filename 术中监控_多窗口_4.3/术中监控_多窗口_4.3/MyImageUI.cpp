@@ -560,10 +560,11 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	rValid.bottom = rectScale.bottom;
 
 	float fSecondsPerPixel = 0.0f;
+	POINT  top_left;
+
 	// 画折线
 	if (nDayWidth > 0) {
 		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
-		POINT  top_left;
 		top_left.x = rectScale.right;
 		top_left.y = nMaxY;
 		DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, 
@@ -580,7 +581,9 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 
 	// 画十字线
 	if (nDayWidth > 0) {
-		DrawCrossLine(hDC, rValid, cursor_point, tFirstDayZeroTime, fSecondsPerPixel, nHeightPerCelsius, nMaxY, nMaxTemp);
+		top_left.x = rect.left + SCALE_RECT_WIDTH;
+		top_left.y = nMaxY;
+		DrawCrossLine(hDC, rValid, cursor_point, tFirstDayZeroTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
 	}		
 }
 
@@ -817,7 +820,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 			::ScreenToClient(g_data.m_hWnd, &cursor_point);			
 
 			// 画十字线
-			DrawCrossLine(hDC, rValid, cursor_point, tFirstTime, m_fSecondsPerPixel, nHeightPerCelsius, nMaxY, nMaxTemp);
+			DrawCrossLine(hDC, rValid, cursor_point, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
 		}		
 	}	
 
@@ -1027,8 +1030,8 @@ void  CMyImageUI::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirs
 
 // 画十字线
 void   CMyImageUI::DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cursor_point, 
-	                              time_t tFirstTime, float fSecondsPerPixel, int nHeightPerCelsius, 
-	                              int nMaxY, int nMaxTemp ) {
+	                              time_t tFirstTime, float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius, 
+	                              POINT  top_left ) {
 	CDuiString strText;
 
 	// 如果满足画十字线的要求
@@ -1040,8 +1043,8 @@ void   CMyImageUI::DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cu
 		::MoveToEx(hDC, rValid.left, cursor_point.y, 0);
 		::LineTo(hDC, rValid.right, cursor_point.y);
 
-		float  cursot_temp = nMaxTemp + (float)( nMaxY - cursor_point.y ) / nHeightPerCelsius;
-		time_t cursor_time = (time_t)((float)(cursor_point.x - rValid.left) * fSecondsPerPixel) + tFirstTime;
+		float  cursot_temp = nMaxTemp + (float)( top_left.y - cursor_point.y ) / nHeightPerCelsius;
+		time_t cursor_time = (time_t)((float)(cursor_point.x - top_left.x) * fSecondsPerPixel) + tFirstTime;
 		
 		char szTime[256];
 		if ( m_state == STATE_7_DAYS )

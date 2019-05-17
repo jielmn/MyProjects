@@ -26,6 +26,10 @@ public:
 private:
 	void   CloseLaunch();
 	void   ProcSurReader(const BYTE * pData, DWORD dwDataLen);
+	// 清除结尾可能存在的"dd aa"
+	void   ProcTail();
+	// 处理手持读卡器数据
+	void   ProcHandeReader(const BYTE * pData, DWORD dwDataLen);
 
 private:
 	CDataBuf   m_recv_buf;

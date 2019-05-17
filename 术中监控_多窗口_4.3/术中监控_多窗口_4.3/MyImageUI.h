@@ -73,8 +73,8 @@ protected:
 	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirst, const std::vector<TempItem * > & v );
 	// 画十字线
 	void   DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cursor_point,
-		                  time_t tFirstTime, float fSecondsPerPixel, int nHeightPerCelsius,
-		                  int nMaxY, int nMaxTemp);
+		                  time_t tFirstTime, float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
+		                  POINT  top_left );
 	// 拖放操作开始
 	void  BeginDragDrop();
 	// 检查鼠标是否需要改变指针

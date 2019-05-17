@@ -92,7 +92,7 @@ int  CLaunch::QueryTemperature(BYTE byArea, WORD wBedID) {
 // 读取串口数据并处理数据
 int  CLaunch::ReadComData() {
 	// 如果串口没有打开
-	if (GetStatus() == CLmnSerialPort::CLOSE) {
+	if ( GetStatus() == CLmnSerialPort::CLOSE ) {
 		return 0;
 	}
 
@@ -143,10 +143,15 @@ int  CLaunch::ReadComData() {
 	if ( buf[1] == 0x1A ) {
 		m_recv_buf.Reform();
 		ProcSurReader(buf, SURGENCY_TEMP_DATA_LENGTH);
+		// 清除结尾可能存在的"dd aa"
+		ProcTail();
 	}
 	// 如果是手持温度数据
 	else if (buf[1] == 0x1E) {
-
+		// 如果没有足够数据
+		if ( m_recv_buf.GetDataLength() < HAND_TEMP_DATA_LENGTH - MIN_DATA_LENGTH ) {
+			return 0;
+		}
 	}
 	return 0;
 }
@@ -192,19 +197,26 @@ void  CLaunch::ProcSurReader(const BYTE * pData, DWORD dwDataLen) {
 	GetTagId(temp_item.m_szTagId, sizeof(temp_item.m_szTagId), pData + 16, 8);
 	GetSurReaderId(temp_item.m_szReaderId, sizeof(temp_item.m_szReaderId), pData + 5, 11);
 	m_sigReaderTemp.emit(wBedNo, temp_item);
+}
 
-	// 清除结尾可能存在的"dd aa"
+// 清除结尾可能存在的"dd aa"
+void  CLaunch::ProcTail() {
 	if (m_recv_buf.GetDataLength() >= 2) {
 		BYTE  buf[32];
 		m_recv_buf.Read(buf, 2);
 		// 如果是 dd aa结尾
-		if ( buf[0] == 0xDD && buf[1] == 0xAA ) {
+		if (buf[0] == 0xDD && buf[1] == 0xAA) {
 			m_recv_buf.Reform();
 		}
 		else {
 			m_recv_buf.ResetReadPos();
 		}
 	}
+}
+
+// 处理手持读卡器数据
+void   CLaunch::ProcHandeReader(const BYTE * pData, DWORD dwDataLen) {
+
 }
 
 BOOL  CLaunch::WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen) {
