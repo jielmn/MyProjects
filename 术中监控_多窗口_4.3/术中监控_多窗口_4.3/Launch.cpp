@@ -150,8 +150,17 @@ int  CLaunch::ReadComData() {
 	else if (buf[1] == 0x1E) {
 		// 如果没有足够数据
 		if ( m_recv_buf.GetDataLength() < HAND_TEMP_DATA_LENGTH - MIN_DATA_LENGTH ) {
+			m_recv_buf.ResetReadPos();
 			return 0;
 		}
+
+		// 读出完整的数据 
+		m_recv_buf.Read(buf + MIN_DATA_LENGTH, HAND_TEMP_DATA_LENGTH - MIN_DATA_LENGTH);
+		m_recv_buf.Reform();
+
+		ProcHandeReader(buf, HAND_TEMP_DATA_LENGTH);
+		// 清除结尾可能存在的"dd aa"
+		ProcTail();
 	}
 	return 0;
 }
@@ -216,7 +225,24 @@ void  CLaunch::ProcTail() {
 
 // 处理手持读卡器数据
 void   CLaunch::ProcHandeReader(const BYTE * pData, DWORD dwDataLen) {
+	char debug_buf[8192];
 
+	// 如果最后一个字节不是0xFF
+	if ( pData[dwDataLen-1] != 0xFF ) {
+		DebugStream( debug_buf, sizeof(debug_buf), pData, dwDataLen );
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
+		CloseLaunch();
+		return;
+	}
+
+	TempItem item;
+	memset(&item, 0, sizeof(item));
+
+	item.m_dwTemp = pData[16] * 100 + pData[17];
+	item.m_time = time(0);
+	GetTagId(item.m_szTagId, sizeof(item.m_szTagId), pData + 8, 8);
+	GetHandReaderId( item.m_szReaderId, sizeof(item.m_szReaderId), pData + 4);
+	m_sigHandReaderTemp.emit(item);
 }
 
 BOOL  CLaunch::WriteLaunch(const void * WriteBuf, DWORD & WriteDataLen) {

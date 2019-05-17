@@ -13,6 +13,7 @@ CBusiness *  CBusiness::GetInstance() {
 CBusiness::CBusiness() {
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
+	m_launch.m_sigHandReaderTemp.connect(this, &CBusiness::OnHandReaderTemp);
 }
 
 CBusiness::~CBusiness() {
@@ -556,6 +557,10 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 			}
 		}
 	}
+}
+
+void  CBusiness::OnHandReaderTemp(const TempItem & item) {
+	
 }
 
 void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {

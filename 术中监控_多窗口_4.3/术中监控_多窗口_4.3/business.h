@@ -43,6 +43,7 @@ public:
 	// 发射器相关的回调
 	void  OnStatus(CLmnSerialPort::PortStatus e);
 	void  OnReaderTemp(WORD wBed, const TempItem & item);
+	void  OnHandReaderTemp(const TempItem & item);
 
 	// 保存温度数据
 	void  SaveSurTempAsyn( WORD wBedNo, const TempItem & item);

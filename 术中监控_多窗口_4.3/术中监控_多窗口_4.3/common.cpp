@@ -567,3 +567,10 @@ void CGraphicsRoundRectPath::AddRoundRect(INT x, INT y, INT width, INT height, I
 	AddArc(x, y + height - elHei, elWid, elHei, 90, 90);
 	AddLine(x, y + cornerY, x, y + height - cornerY);
 }
+
+char *  GetHandReaderId( char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData ) {
+	assert( szReaderId && dwReaderIdLen > 6 );
+	DWORD  dwSn = (pData[0] << 24) | (pData[1] << 16) | (pData[2] << 8) | pData[3];
+	SNPRINTF(szReaderId, dwReaderIdLen, "%06lu", dwSn);
+	return szReaderId;
+}

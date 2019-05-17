@@ -341,6 +341,7 @@ extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE
 extern int  GetWeekDay(time_t t);
 extern const char * GetWeekDayName(int nWeekIndex);
 extern void  OnEdtRemarkKillFocus();
+char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);
 
 // templates
 template <class T>
