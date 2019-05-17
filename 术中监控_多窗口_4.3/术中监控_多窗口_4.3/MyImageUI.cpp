@@ -1612,3 +1612,36 @@ void CImageLabelUI::DoEvent(DuiLib::TEventUI& event) {
 LPCTSTR  CImageLabelUI::GetClass() const {
 	return "ImageLabel";
 }
+
+
+void CMyHandImage::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+
+}
+
+void CMyHandImage::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+
+}
+
+void  CMyHandImage::CheckCursor(const POINT & pt) {
+
+}
+
+// Ë«»÷ÊÂ¼þ
+void   CMyHandImage::OnDbClick() {
+
+}
+
+DWORD  CMyHandImage::GetGridIndex() {
+	assert(0);
+	return -1;
+}
+
+DWORD  CMyHandImage::GetReaderIndex() {
+	assert(0);
+	return -1;
+}
+
+CModeButton::Mode   CMyHandImage::GetMode() {
+	assert(0);
+	return (CModeButton::Mode)-1;
+}

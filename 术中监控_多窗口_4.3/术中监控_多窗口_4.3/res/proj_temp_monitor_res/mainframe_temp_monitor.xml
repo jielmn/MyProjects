@@ -24,6 +24,8 @@
 	<!-- reader tag 字体 -->
 	<Font id="11" name="宋体" size="15" bold="true" />
 	<Font id="12" name="宋体" size="60" bold="true" />
+	<!-- hande reader 字体 -->
+	<Font id="13" name="宋体" size="15" bold="true" />
 	
 	<!-- 格子显示的温度数据字体 -->
 	<Font id="20" name="微软雅黑" size="30"  bold="true" />

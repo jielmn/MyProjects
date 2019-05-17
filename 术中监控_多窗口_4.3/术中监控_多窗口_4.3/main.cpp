@@ -1066,8 +1066,8 @@ void   CDuiFrameWnd::OnQueryTempRetNotify(const char * szTagId, WORD wBed, std::
 }
                       
 
-
-
+ 
+                 
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }

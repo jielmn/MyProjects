@@ -17,16 +17,16 @@ public:
 	void   PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect);
 	void   SetRemark(DuiLib::CDuiString & strRemark);	
 
-private:
-	void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
-	void   DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+protected:
+	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	virtual void   DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	// 计算本控件的占位地方的宽度
 	int    GetMyWidth();
 	int    GetMyScrollX();
-	DWORD  GetGridIndex();
-	DWORD  GetReaderIndex();
+	virtual DWORD  GetGridIndex();
+	virtual DWORD  GetReaderIndex();
 	const  std::vector<TempItem * > & GetTempData(DWORD j);
-	CModeButton::Mode   GetMode();
+	virtual CModeButton::Mode   GetMode();
 	CControlUI * GetGrid();
 	int    GetCelsiusHeight(int height, int nCelsiusCount);
 	// 画水平刻度线
@@ -58,7 +58,7 @@ private:
 	// 画时间文本
 	void    DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime, float fSecondsPerPixel, POINT  top_left, const RECT & rValid);
 	// 双击事件
-	void    OnDbClick();
+	virtual void    OnDbClick();
 	// 温度数据个数
 	DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 计算双击了第几天
@@ -78,7 +78,7 @@ private:
 	// 拖放操作开始
 	void  BeginDragDrop();
 	// 检查鼠标是否需要改变指针
-	void  CheckCursor(const POINT & pt);
+	virtual void  CheckCursor(const POINT & pt);
 	// 正在拖放操作
 	void  DragDropIng(const POINT & pt);
 	// 结束拖放操作
@@ -98,7 +98,7 @@ private:
 		              int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
 		              const std::vector<TempItem * > & v, const RECT & rValid);
 
-private:
+protected:
 	enum   E_STATE {
 		STATE_7_DAYS = 0,
 		STATE_SINGLE_DAY
@@ -149,4 +149,21 @@ public:
 
 private:
 	CMyImageUI  *   m_image;
+};
+
+class CMyHandImage : public CMyImageUI {
+private:
+	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	virtual void   DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+
+	// 检查鼠标是否需要改变指针
+	virtual void  CheckCursor(const POINT & pt);
+	// 双击事件
+	virtual void    OnDbClick();
+
+	/***** 空起来 *****/
+	virtual DWORD  GetGridIndex();
+	virtual DWORD  GetReaderIndex();
+	virtual CModeButton::Mode   GetMode();	
+	/* end 空起来  */
 };
