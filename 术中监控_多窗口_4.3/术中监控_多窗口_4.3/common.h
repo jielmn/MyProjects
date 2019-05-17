@@ -149,6 +149,7 @@ using namespace DuiLib;
 #define MSG_SAVE_SUR_TEMP                   2000
 #define MSG_QUERY_TEMP_BY_TAG               2001
 #define MSG_SAVE_REMARK                     2002
+#define MSG_SAVE_HAND_TEMP                  2003
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -282,6 +283,15 @@ public:
 
 	TempItem       m_item;
 	WORD           m_wBedNo;
+};
+
+class CSaveHandTempParam : public LmnToolkits::MessageData {
+public:
+	CSaveHandTempParam(const TempItem & item) {
+		memcpy(&m_item, &item, sizeof(TempItem));
+	}
+
+	TempItem       m_item;
 };
 
 class CQueryTempByTagParam : public LmnToolkits::MessageData {

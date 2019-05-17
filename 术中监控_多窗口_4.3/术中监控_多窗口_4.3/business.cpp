@@ -623,6 +623,16 @@ void  CBusiness::SaveSurTemp(CSaveSurTempParam * pParam) {
 	m_sigSurReaderTemp.emit(pParam->m_wBedNo, pParam->m_item);
 }
 
+// 保存手持温度数据
+void  CBusiness::SaveHandeTempAsyn(const TempItem & item) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_TEMP, new CSaveHandTempParam(item));
+}
+
+void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
+	m_sqlite.SaveHandTemp(pParam);
+	m_sigHandReaderTemp.emit(pParam->m_item);
+}
+
 void  CBusiness::QueryTempByTagAsyn(const char * szTagId, WORD wBedNo) {
 	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_TAG, new CQueryTempByTagParam(szTagId, wBedNo));
 }
@@ -689,6 +699,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveRemarkParam * pParam = (CSaveRemarkParam *)pMessageData;
 		SaveRemark(pParam);
+	}
+	break;
+
+	case MSG_SAVE_HAND_TEMP:
+	{
+		CSaveHandTempParam * pParam = (CSaveHandTempParam *)pMessageData;
+		SaveHandTemp(pParam);
 	}
 	break;
 

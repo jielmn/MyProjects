@@ -142,6 +142,11 @@ void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
 	sqlite3_free_table(azResult);
 }
 
+// 保存手持温度数据
+void  CMySqliteDatabase::SaveHandTemp(CSaveHandTempParam * pParam) {
+
+}
+
 void  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet) {
 
 	time_t today_zero_time = GetTodayZeroTime();

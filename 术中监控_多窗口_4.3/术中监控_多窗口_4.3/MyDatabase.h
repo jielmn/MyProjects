@@ -10,6 +10,8 @@ public:
 	int DeinitDb();
 
 	void  SaveSurTemp(CSaveSurTempParam * pParam);
+	// 保存手持温度数据
+	void  SaveHandTemp(CSaveHandTempParam * pParam);
 	// 根据TagID查询温度数据
 	void  QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet);
 	// 保存注释

@@ -49,6 +49,10 @@ public:
 	void  SaveSurTempAsyn( WORD wBedNo, const TempItem & item);
 	void  SaveSurTemp(CSaveSurTempParam * pParam);
 
+	// 保存手持温度数据
+	void  SaveHandeTempAsyn(const TempItem & item);
+	void  SaveHandTemp(CSaveHandTempParam * pParam);
+
 	// 请求历史温度数据
 	void  QueryTempByTagAsyn(const char * szTagId, WORD wBedNo);
 	void  QueryTempByTag(const CQueryTempByTagParam * pParam);
@@ -80,6 +84,8 @@ private:
 	sigslot::signal2<WORD, const TempItem &>        m_sigSurReaderTemp;        // param: bed no, temperature
 	sigslot::signal3<const char *, WORD, std::vector<TempItem*> *> 
 		                                            m_sigQueyTemp;             // param: tag id, bed no, vector result
+	sigslot::signal1<const TempItem &>              m_sigHandReaderTemp;       // param: temperature
+
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	
 };
