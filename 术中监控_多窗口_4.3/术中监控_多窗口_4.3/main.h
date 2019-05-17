@@ -134,6 +134,7 @@ private:
 	CButtonUI *                                 m_btnNextPage;
 
 	CMyHandImage *                              m_cstHandImg;            // 手持读卡器的图
+	CVerticalLayoutUI *                         m_layTags;               // 手持读卡器的tag列表
 
 	/**** drag drop操作  ****/
 	int                                         m_nDgSourceIndex;         // drag drop 开始拖动的grid index

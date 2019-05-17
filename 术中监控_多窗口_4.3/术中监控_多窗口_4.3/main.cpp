@@ -44,6 +44,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_lblLaunchStatus = 0;
 
 	m_cstHandImg = 0;
+	m_layTags = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -97,6 +98,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_layMain->Add(m_pGrids[i]);
 	}
 	m_cstHandImg = static_cast<CMyHandImage *>(m_PaintManager.FindControl(CST_HAND_IMAGE));
+	m_layTags = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_TAGS));
 
 	g_data.m_DragDropCtl = m_PaintManager.FindControl(DRAG_DROP_CTL); 
 	g_data.m_edRemark    = static_cast<CEditUI *>( m_PaintManager.FindControl(EDIT_REMARK) );

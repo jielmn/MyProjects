@@ -95,6 +95,8 @@ using namespace DuiLib;
 #define   DRAG_DROP_CTL           "dragdrop"
 #define   EDIT_REMARK             "edRemark"
 #define   CST_HAND_IMAGE          "cstMyImageHand"
+#define   TAG_FILE_NAME           "tag.xml"
+#define   LAYOUT_TAGS             "layTags"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"
