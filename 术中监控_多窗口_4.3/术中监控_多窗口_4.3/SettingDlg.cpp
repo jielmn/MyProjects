@@ -403,17 +403,17 @@ void    CSettingDlg::InitHandReaderCfg() {
 
 	// 显示最低温度
 	pEdit = new CEditUI;
-	strText.Format("%lu", m_data.m_dwHandReaderMinTemp);
+	strText.Format("%.2f", m_data.m_dwHandReaderHighTempAlarm / 100.0 );
 	pEdit->SetText(strText);
 	pEdit->SetNumberOnly(true);
-	m_tree->AddNode("显示的最低温度(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+	m_tree->AddNode("高温报警(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 显示最高温度
 	pEdit = new CEditUI;
-	strText.Format("%lu", m_data.m_dwHandReaderMaxTemp);
+	strText.Format("%.2f", m_data.m_dwHandReaderLowTempAlarm / 100.0 );
 	pEdit->SetText(strText);
 	pEdit->SetNumberOnly(true);
-	m_tree->AddNode("显示的最高温度(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+	m_tree->AddNode("低温报警(℃)", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 }
 
 BOOL    CSettingDlg::GetHandReaderConfig() {
@@ -421,32 +421,26 @@ BOOL    CSettingDlg::GetHandReaderConfig() {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
 	bool bGetCfg = false;
-	double dNumber = 0.0;
+	double dMax = 0.0;
+	double dMin = 0.0;
 	int  nCfgRowIndex = 9;  
 
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_dwHandReaderMinTemp);
+	sscanf_s(cfgValue.m_strEdit, "%lf", &dMax );
 	nCfgRowIndex++;
-	if (m_data.m_dwHandReaderMinTemp < MIN_TEMP_IN_SHOW) {
-		strText.Format("手持测温，显示的最低温度必须大于等于%d℃",MIN_TEMP_IN_SHOW);
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
 
 	bGetCfg = m_tree->GetConfigValue(nCfgRowIndex, cfgValue);
-	sscanf_s(cfgValue.m_strEdit, "%lu", &m_data.m_dwHandReaderMaxTemp);
+	sscanf_s(cfgValue.m_strEdit, "%lf", &dMin );
 	nCfgRowIndex++;
-	if (m_data.m_dwHandReaderMaxTemp > MAX_TEMP_IN_SHOW) {
-		strText.Format("手持测温，显示的最高温度必须小于等于%d℃", MAX_TEMP_IN_SHOW);
+
+	if ( dMin >= dMax ) {
+		strText.Format("手持测温，低温报警必须大于高温报警");
 		::MessageBox(this->GetHWND(), strText, "设置", 0);
 		return FALSE;
 	}
 
-	if (m_data.m_dwHandReaderMaxTemp <= m_data.m_dwHandReaderMinTemp) {
-		strText.Format("手持测温，显示的最高温度必须大于显示的最低温度");
-		::MessageBox(this->GetHWND(), strText, "设置", 0);
-		return FALSE;
-	}
+	m_data.m_dwHandReaderHighTempAlarm = (DWORD)(dMax * 100.0);
+	m_data.m_dwHandReaderLowTempAlarm  = (DWORD)(dMin * 100.0);
 
 	return TRUE;
 }
