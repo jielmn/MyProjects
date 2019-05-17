@@ -12,6 +12,7 @@
 #include "DuiMenu.h"
 #include "AboutDlg.h"
 #include "SettingDlg.h"
+#include "TagUI.h"
 
 #define   TIMER_DRAG_DROP_GRID                   1001
 #define   INTERVAL_TIMER_DRAG_DROP_GRIDS         1500
@@ -1042,6 +1043,12 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	BOOL  bNewTag = FALSE;
 	m_cstHandImg->OnHandTemp(pItem, bNewTag);
+
+	if ( bNewTag ) {
+		CTagUI * pTagUI = new CTagUI;  
+		m_layTags->Add(pTagUI); 
+		pTagUI->SetFixedHeight(100);
+	}
 
 	// 已经保存在m_cstHandImg对象内
 	// delete pItem;

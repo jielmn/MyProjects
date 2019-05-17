@@ -12,6 +12,7 @@ private:
 	LPCTSTR GetClass() const;
 	void DoInit();
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+	void Notify(TNotifyUI& msg);
 
 private:
 	BOOL                                        m_bInited;

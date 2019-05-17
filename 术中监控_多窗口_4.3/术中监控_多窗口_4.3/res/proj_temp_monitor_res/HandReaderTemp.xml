@@ -17,6 +17,8 @@
 				<Option name="rdTimeOrder"  group="radio" text="时间排序" textcolor="#FFCCCCCC" normalimage="file='radio_normal.png' source='0,0,17,17' dest='0,0,17,17'" selectedimage="file='radio_selected.png' source='0,0,17,17' dest='0,0,17,17'" width="85" font="13" textpadding="20,0,0,0"  />
 			</HorizontalLayout>
 			
+			<HorizontalLayout height="10" />
+			
 			<VerticalLayout inset="0,0,0,0" name="layTags" hscrollbar="false" vscrollbar="true" sepheight="4" />
 		</VerticalLayout>
 		

@@ -22,7 +22,6 @@ void CTagUI::DoInit() {
 	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(TAG_FILE_NAME, (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
-		m_pManager->AddNotifier(this);
 	}
 	else {
 		this->RemoveAll();
@@ -32,7 +31,11 @@ void CTagUI::DoInit() {
 
 	m_bInited = TRUE;
 }
-
+  
 void CTagUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 	CContainerUI::SetAttribute(pstrName, pstrValue);
+}
+   
+void CTagUI::Notify(TNotifyUI& msg) {
+
 }
