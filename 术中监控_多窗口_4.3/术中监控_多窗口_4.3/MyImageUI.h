@@ -7,7 +7,7 @@ class CMyImageUI : public DuiLib::CControlUI
 {
 public:
 	CMyImageUI();
-	~CMyImageUI();
+	virtual ~CMyImageUI();
 
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
@@ -152,6 +152,11 @@ private:
 };
 
 class CMyHandImage : public CMyImageUI {
+public:
+	CMyHandImage();
+	~CMyHandImage();
+	void  OnHandTemp( TempItem * pTemp, BOOL & bNewTag );
+
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void   DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -166,4 +171,12 @@ private:
 	virtual DWORD  GetReaderIndex();
 	virtual CModeButton::Mode   GetMode();	
 	/* end 空起来  */
+
+	void Clear();
+private:
+	// 所有的手持读卡器的数据，按照tag id进行分类
+	//           tag id,   对应的数据集合
+	std::map<std::string, vector<TempItem *> *>        m_data;
+	// 当前显示的是哪个数据
+	std::string                                        m_cur_tag;
 };

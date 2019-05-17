@@ -1617,6 +1617,30 @@ LPCTSTR  CImageLabelUI::GetClass() const {
 }
 
 
+
+CMyHandImage::CMyHandImage() {
+
+}
+
+CMyHandImage::~CMyHandImage() {
+	Clear();
+}
+
+void CMyHandImage::Clear() {
+	std::map<std::string, vector<TempItem *> *>::iterator it;
+	for ( it = m_data.begin(); it != m_data.end(); ++it ) {
+		assert(it->second);
+		if (it->second == 0) {
+			continue;
+		}
+
+		ClearVector(*it->second);
+		delete it->second;
+	}
+
+	m_data.clear();
+}
+
 void CMyHandImage::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 
 }
@@ -1647,4 +1671,19 @@ DWORD  CMyHandImage::GetReaderIndex() {
 CModeButton::Mode   CMyHandImage::GetMode() {
 	assert(0);
 	return (CModeButton::Mode)-1;
+}
+
+void  CMyHandImage::OnHandTemp(TempItem * pTemp, BOOL & bNewTag) {
+	bNewTag = FALSE;
+	vector<TempItem *> * pVec = 0;
+
+	pVec = m_data[pTemp->m_szTagId];
+	// 如果没有集合点
+	if ( 0 == pVec ) {
+		pVec = new vector<TempItem *>;
+		m_data[pTemp->m_szTagId] = pVec;
+		bNewTag = TRUE;
+	}
+
+	pVec->push_back(pTemp);
 }

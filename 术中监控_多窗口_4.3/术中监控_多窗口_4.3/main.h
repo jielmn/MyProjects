@@ -133,6 +133,8 @@ private:
 	CButtonUI *                                 m_btnPrevPage;
 	CButtonUI *                                 m_btnNextPage;
 
+	CMyHandImage *                              m_cstHandImg;            // 手持读卡器的图
+
 	/**** drag drop操作  ****/
 	int                                         m_nDgSourceIndex;         // drag drop 开始拖动的grid index
 	int                                         m_nDgDestIndex;           // drag drop 拖动的目标grid index

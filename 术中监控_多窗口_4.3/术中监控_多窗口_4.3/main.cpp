@@ -42,6 +42,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 	m_lblBarTips = 0;
 	m_lblLaunchStatus = 0;
+
+	m_cstHandImg = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -94,6 +96,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pGrids[i]->SetMode( (CModeButton::Mode)g_data.m_CfgData.m_GridCfg[i].m_dwGridMode );
 		m_layMain->Add(m_pGrids[i]);
 	}
+	m_cstHandImg = static_cast<CMyHandImage *>(m_PaintManager.FindControl(CST_HAND_IMAGE));
 
 	g_data.m_DragDropCtl = m_PaintManager.FindControl(DRAG_DROP_CTL); 
 	g_data.m_edRemark    = static_cast<CEditUI *>( m_PaintManager.FindControl(EDIT_REMARK) );
@@ -1034,7 +1037,12 @@ void   CDuiFrameWnd::OnPrintExcel(DWORD  dwIndex) {
 // 手持读卡器温度
 void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	TempItem * pItem = (TempItem*)wParam;
-	delete pItem;
+
+	BOOL  bNewTag = FALSE;
+	m_cstHandImg->OnHandTemp(pItem, bNewTag);
+
+	// 已经保存在m_cstHandImg对象内
+	// delete pItem;
 }
 
 

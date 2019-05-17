@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <assert.h>
 #include <time.h>
@@ -93,6 +94,7 @@ using namespace DuiLib;
 #define   CST_IMAGE               "cstMyImage"
 #define   DRAG_DROP_CTL           "dragdrop"
 #define   EDIT_REMARK             "edRemark"
+#define   CST_HAND_IMAGE          "cstMyImageHand"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"
