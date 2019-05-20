@@ -12,23 +12,23 @@
 			</VerticalLayout>		
 			
 			<Control width="10" />
-			<Label name="lblHandTagTemp" text="--" textcolor="#FFFFFFFF" font="8" width="200" />
+			<Label name="lblHandTagTemp" text="--" textcolor="#FFCCCCCC" font="8" width="200" />
 			<Control width="10" />
-			<Label name="bindingGrid" text="未绑定窗格" textcolor="#FFFFFFFF" font="1" width="90" />
+			<Label name="lblBindingGrid" text="未绑定窗格" textcolor="#FFFFFFFF" font="1" width="90" />
 			<Control />	
 
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="30,0,0,0" height="25">
-			<Label text="读卡器SN" textcolor="#FF000000" font="1" width="80" />
-			<Label name="lblReaderSn" text="ER0040000001" textcolor="#FF000000" font="1" width="135" />
-			<Label text="Tag ID" textcolor="#FF000000" font="1" width="70" />
-			<Label name="lblHandTagId" text="e901020304050607" textcolor="#FF000000" font="1" width="160" />
+			<Label text="读卡器SN" textcolor="#FF000000" font="1" width="80" textcolor="#FFCCCCCC" />
+			<Label name="lblHandReaderId" text="ER0040000001" textcolor="#FF000000" font="1" width="135" textcolor="#FFCCCCCC" />
+			<Label text="Tag ID" textcolor="#FF000000" font="1" width="70" textcolor="#FFCCCCCC" />
+			<Label name="lblHandTagId" text="e901020304050607" textcolor="#FF000000" font="1" width="160" textcolor="#FFCCCCCC" />
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="30,0,0,0" height="25">
-			<Label text="时间" textcolor="#FF000000" font="1" width="80" />
-			<Label name="lblTempTime" text="" textcolor="#FF000000" font="1" width="180" />
+			<Label text="时间" textcolor="#FF000000" font="1" width="80" textcolor="#FFCCCCCC" />
+			<Label name="lblHandTempTime" text="" textcolor="#FF000000" font="1" width="180" textcolor="#FFCCCCCC" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

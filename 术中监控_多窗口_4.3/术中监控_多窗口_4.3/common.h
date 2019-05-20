@@ -97,6 +97,12 @@ using namespace DuiLib;
 #define   CST_HAND_IMAGE          "cstMyImageHand"
 #define   TAG_FILE_NAME           "tag.xml"
 #define   LAYOUT_TAGS             "layTags"
+#define   LBL_HAND_READER_ID      "lblHandReaderId"
+#define   LBL_HAND_TAG_ID         "lblHandTagId"
+#define   LBL_HAND_TEMP_TIME      "lblHandTempTime"
+#define   CST_HAND_P_NAME         "cstEdtBtnPName"
+#define   LBL_HAND_TEMP           "lblHandTagTemp"
+#define   LBL_HAND_BINDING        "lblBindingGrid"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"

@@ -1048,6 +1048,7 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		CTagUI * pTagUI = new CTagUI;  
 		m_layTags->Add(pTagUI); 
 		pTagUI->SetFixedHeight(100);
+		pTagUI->OnHandTemp(pItem); 
 	}
 
 	// 已经保存在m_cstHandImg对象内

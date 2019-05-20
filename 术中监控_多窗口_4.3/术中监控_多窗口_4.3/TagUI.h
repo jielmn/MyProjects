@@ -1,12 +1,14 @@
 #pragma once
 
 #include "common.h"
+#include "EditableButtonUI.h"
 
 class CTagUI : public CContainerUI, INotifyUI
 {
 public:
 	CTagUI();
 	~CTagUI();
+	void   OnHandTemp(const TempItem * pItem);
 
 private:
 	LPCTSTR GetClass() const;
@@ -17,4 +19,11 @@ private:
 private:
 	BOOL                                        m_bInited;
 	CDialogBuilderCallbackEx                    m_callback;
+
+	CLabelUI *                                  m_lblReaderId;
+	CLabelUI *                                  m_lblTagId;
+	CLabelUI *                                  m_lblTempTime;
+	CEditableButtonUI  *                        m_cstPatientName;
+	CLabelUI *                                  m_lblTemp;
+	CLabelUI *                                  m_lblBinding;                // 绑定到哪个窗格 
 };
