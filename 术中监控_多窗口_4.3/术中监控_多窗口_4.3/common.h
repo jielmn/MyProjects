@@ -45,6 +45,7 @@ using namespace DuiLib;
 #define   EDT_REMARK_WIDTH            200
 #define   EDT_REMARK_HEIGHT           30
 #define   EDT_REMARK_Y_OFFSET         10
+#define   TAG_UI_HEIGHT               110
 
 #define   VERSION                     "3.0.1"
 

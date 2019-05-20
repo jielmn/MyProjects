@@ -46,9 +46,9 @@ void CTagUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
    
 void CTagUI::Notify(TNotifyUI& msg) {
 
-}
-
-void  CTagUI::OnHandTemp(const TempItem * pItem) {
+} 
+  
+void  CTagUI::OnHandTemp(const TempItem * pItem, const char * szName) {
 	assert(m_bInited);
 	char  szTime[256];
 
@@ -57,4 +57,12 @@ void  CTagUI::OnHandTemp(const TempItem * pItem) {
 	DateTime2String(szTime, sizeof(szTime), &pItem->m_time);
 	m_lblTempTime->SetText(szTime);
 
+	CDuiString  strName = m_cstPatientName->GetText();
+	if ( 0 != strcmp(szName, strName) ) {
+		m_cstPatientName->SetText(szName);
+	}
+
+	CDuiString  strText;
+	strText.Format("%.2f", pItem->m_dwTemp / 100.0);
+	m_lblTemp->SetText(strText);
 }

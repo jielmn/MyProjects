@@ -1036,7 +1036,7 @@ void   CDuiFrameWnd::OnPrintExcel(DWORD  dwIndex) {
 	assert(dwIndex < MAX_GRID_COUNT);
 	assert(dwIndex < g_data.m_CfgData.m_dwLayoutGridsCnt);
 }
-
+ 
 // 手持读卡器温度
 void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	TempItem * pItem            = (TempItem*)wParam;
@@ -1047,11 +1047,20 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	BOOL  bNewTag = FALSE;
 	m_cstHandImg->OnHandTemp(pItem, bNewTag);
 
+	// 新Tag
 	if ( bNewTag ) {
 		CTagUI * pTagUI = new CTagUI;  
 		m_layTags->Add(pTagUI); 
-		pTagUI->SetFixedHeight(100);
-		pTagUI->OnHandTemp(pItem); 
+		pTagUI->SetFixedHeight(TAG_UI_HEIGHT);
+		pTagUI->OnHandTemp(pItem, tag_patient_name); 
+
+		m_tags_ui.insert( std::make_pair(pItem->m_szTagId, pTagUI) );
+	}
+	else {
+		CTagUI * pTagUI = m_tags_ui[pItem->m_szTagId];
+		assert(pTagUI);
+
+		pTagUI->OnHandTemp(pItem, tag_patient_name);
 	}
 
 	// 已经保存在m_cstHandImg对象内

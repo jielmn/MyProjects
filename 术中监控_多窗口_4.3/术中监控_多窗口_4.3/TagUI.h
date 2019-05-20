@@ -8,7 +8,7 @@ class CTagUI : public CContainerUI, INotifyUI
 public:
 	CTagUI();
 	~CTagUI();
-	void   OnHandTemp(const TempItem * pItem);
+	void   OnHandTemp(const TempItem * pItem,const char * szName);
 
 private:
 	LPCTSTR GetClass() const;

@@ -10,6 +10,7 @@ using namespace DuiLib;
 #include "GridUI.h"
 #include "DragDropUI.h"
 #include "Launch.h"
+#include "TagUI.h"
 
 class CDuiFrameWnd : public WindowImplBase , public sigslot::has_slots<>
 {
@@ -152,4 +153,6 @@ private:
 	CLabelUI *                                  m_lblBarTips;
 	CLabelUI *                                  m_lblLaunchStatus;
 	CLabelUI *                                  m_lblSurReaderTry;
+
+	std::map<std::string, CTagUI *>             m_tags_ui;
 };
