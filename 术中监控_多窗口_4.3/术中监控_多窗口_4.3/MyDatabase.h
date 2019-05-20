@@ -18,6 +18,8 @@ public:
 	void  SaveRemark(const CSaveRemarkParam * pParam);
 	// 根据TagID查询Tag的病人姓名
 	void  QueryTagPNameByTagId(const char * szTagId, char * szPName, DWORD  dwPNameLen);
+	// 保存最后的术中tag id
+	void SaveLastSurTagId(const CSaveLastSurTagId * pParam);
 
 private:
 	sqlite3 *                         m_db;

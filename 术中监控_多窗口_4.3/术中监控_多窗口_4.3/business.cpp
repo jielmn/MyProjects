@@ -708,6 +708,15 @@ void  CBusiness::CheckSqlite() {
 	CheckSqliteAsyn();
 }
 
+// 保存最后的术中TagID到床位号
+void  CBusiness::SaveLastSurTagIdAsyn(WORD wBedId, const char * szTagId) {
+	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_LAST_SUR_TAG_ID, new CSaveLastSurTagId(wBedId, szTagId) );
+}
+
+void  CBusiness::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
+	m_sqlite.SaveLastSurTagId(pParam);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -768,6 +777,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_CHECK_SQLITE:
 	{
 		CheckSqlite();
+	}
+	break;
+
+	case MSG_SAVE_LAST_SUR_TAG_ID:
+	{
+		CSaveLastSurTagId * pParam = (CSaveLastSurTagId *)pMessageData;
+		SaveLastSurTagId(pParam);
 	}
 	break;
 

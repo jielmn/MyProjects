@@ -71,6 +71,10 @@ public:
 	void  CheckSqliteAsyn();
 	void  CheckSqlite();
 
+	// 保存最后的术中TagID到床位号
+	void  SaveLastSurTagIdAsyn(WORD wBedId, const char * szTagId);
+	void  SaveLastSurTagId(const CSaveLastSurTagId * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

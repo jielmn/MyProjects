@@ -270,6 +270,7 @@ void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
 	if ( 0 != strcmp(m_aLastTemp[j].m_szTagId, item.m_szTagId) ) {
 		DWORD i = GetTag();
 		WORD  wBed = (WORD)(i * MAX_READERS_PER_GRID + j + 1);
+		CBusiness::GetInstance()->SaveLastSurTagIdAsyn(wBed, item.m_szTagId);
 		CBusiness::GetInstance()->QueryTempByTagAsyn(item.m_szTagId, wBed);
 		return;
 	}
@@ -416,7 +417,7 @@ void CGridUI::OnQueryTempRet(DWORD j, const char * szTagId, const std::vector<Te
 		ShowSurReaderTemp(j, m_aLastTemp[j]);
 	}
 	else {
-		assert(0);
+		//assert(0);
 	}
 	
 }

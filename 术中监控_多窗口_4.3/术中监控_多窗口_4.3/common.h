@@ -162,6 +162,7 @@ using namespace DuiLib;
 #define MSG_SAVE_REMARK                     2002
 #define MSG_SAVE_HAND_TEMP                  2003
 #define MSG_CHECK_SQLITE                    2004
+#define MSG_SAVE_LAST_SUR_TAG_ID            2005
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -334,6 +335,17 @@ public:
 
 	DWORD       m_dwDbId;
 	char        m_szRemark[MAX_REMARK_LENGTH];
+};
+
+class CSaveLastSurTagId : public LmnToolkits::MessageData {
+public:
+	CSaveLastSurTagId(WORD wBedId, const char * szTagId) {
+		m_wBedId = wBedId;
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+	}
+
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	WORD        m_wBedId;
 };
 
 extern CGlobalData  g_data;

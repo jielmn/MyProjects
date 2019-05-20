@@ -29,6 +29,13 @@
 	tag_id         CHAR(16)    NOT NULL
 */
 
+// 上一次的术中tag
+#define  LAST_SUR_TAGS                   "lastsurtags"
+/*
+    bed_id        int          NOT NULL        PRIMARY KEY
+	tag_id        CHAR(16)     NOT NULL
+*/
+
 CMySqliteDatabase::CMySqliteDatabase() {
 	m_db = 0;
 }
@@ -58,6 +65,11 @@ int CMySqliteDatabase::InitDb() {
 	CreateTable(GRID_BINDING_TABLE,
 		"grid_index     int         NOT NULL        PRIMARY KEY," \
 		"tag_id         CHAR(16)    NOT NULL" );
+
+	CreateTable(LAST_SUR_TAGS,
+		"bed_id        int          NOT NULL        PRIMARY KEY," \
+		"tag_id        CHAR(16)     NOT NULL");
+	
 
 	// 删除过时的旧数据
 	PruneOldData();
@@ -237,4 +249,40 @@ void  CMySqliteDatabase::QueryTagPNameByTagId(const char * szTagId, char * szPNa
 		szPName[0] = '\0';
 	}
 	sqlite3_free_table(azResult);
+}
+
+// 保存最后的术中tag id
+void CMySqliteDatabase::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
+
+	char szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where bed_id = %lu", LAST_SUR_TAGS, (DWORD)pParam->m_wBedId );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	// 如果有记录
+	if ( nrow > 0 ) {
+		SNPRINTF( szSql, sizeof(szSql), "INSERT INTO %s VALUES(%lu,'%s') ", 
+			      LAST_SUR_TAGS, (DWORD)pParam->m_wBedId, pParam->m_szTagId );
+		int ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+		if (0 != ret) {
+			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "更新最后的术中tagid失败!\n");
+			return;
+		}
+	}
+	// 没有记录 
+	else {
+		SNPRINTF( szSql, sizeof(szSql), "UPDATE %s set tag_id = '%s' WHERE bed_id = %lu ",
+			      LAST_SUR_TAGS, pParam->m_szTagId, (DWORD)pParam->m_wBedId );
+		int ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+		if (0 != ret) {
+			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "更新最后的术中tagid失败!\n");
+			return;
+		}
+	}
+	
 }
