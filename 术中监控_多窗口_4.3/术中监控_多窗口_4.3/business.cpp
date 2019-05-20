@@ -686,6 +686,25 @@ void  CBusiness::CheckSqliteAsyn() {
 }
 
 void  CBusiness::CheckSqlite() {
+	time_t now = time(0);
+	std::map<std::string, TagPName*>::iterator it;
+	for ( it = m_tag_patient_name.begin(); it != m_tag_patient_name.end();) {
+		TagPName* p = it->second;
+		if (p == 0) {
+			it = m_tag_patient_name.erase(it);
+			return;
+		}
+
+		// 如果过时
+		if ( now - p->m_time >= 10 ) {
+			delete p;
+			it = m_tag_patient_name.erase(it);
+			return;
+		}
+
+		++it;
+	}
+
 	CheckSqliteAsyn();
 }
 
