@@ -20,6 +20,8 @@ public:
 	void  QueryTagPNameByTagId(const char * szTagId, char * szPName, DWORD  dwPNameLen);
 	// 保存最后的术中tag id
 	void SaveLastSurTagId(const CSaveLastSurTagId * pParam);
+	// 获取最后一次的术中TagId
+	void GetAllLastSurTags(std::vector<LastSurTagItem *> & vLastSurTags);
 
 private:
 	sqlite3 *                         m_db;

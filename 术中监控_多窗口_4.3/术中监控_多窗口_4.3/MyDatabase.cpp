@@ -266,8 +266,8 @@ void CMySqliteDatabase::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 
 	// 如果有记录
 	if ( nrow > 0 ) {
-		SNPRINTF( szSql, sizeof(szSql), "INSERT INTO %s VALUES(%lu,'%s') ", 
-			      LAST_SUR_TAGS, (DWORD)pParam->m_wBedId, pParam->m_szTagId );
+		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set tag_id = '%s' WHERE bed_id = %lu ",
+			LAST_SUR_TAGS, pParam->m_szTagId, (DWORD)pParam->m_wBedId);
 		int ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
 		if (0 != ret) {
 			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "更新最后的术中tagid失败!\n");
@@ -276,8 +276,8 @@ void CMySqliteDatabase::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 	}
 	// 没有记录 
 	else {
-		SNPRINTF( szSql, sizeof(szSql), "UPDATE %s set tag_id = '%s' WHERE bed_id = %lu ",
-			      LAST_SUR_TAGS, pParam->m_szTagId, (DWORD)pParam->m_wBedId );
+		SNPRINTF(szSql, sizeof(szSql), "INSERT INTO %s VALUES(%lu,'%s') ",
+			LAST_SUR_TAGS, (DWORD)pParam->m_wBedId, pParam->m_szTagId);
 		int ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
 		if (0 != ret) {
 			g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "更新最后的术中tagid失败!\n");
@@ -285,4 +285,29 @@ void CMySqliteDatabase::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 		}
 	}
 	
+}
+
+// 获取最后一次的术中TagId
+void CMySqliteDatabase::GetAllLastSurTags(std::vector<LastSurTagItem *> & vRet) {
+	char szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s", LAST_SUR_TAGS);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		LastSurTagItem * pItem = new LastSurTagItem;
+		memset(pItem, 0, sizeof(LastSurTagItem));
+
+		DWORD  dwId;
+		sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &dwId);
+		pItem->m_wBedId = (WORD)dwId;
+
+		STRNCPY(pItem->m_szTagId, azResult[(i + 1)*ncolumn + 1], MAX_TAG_ID_LENGTH);
+
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
 }

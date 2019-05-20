@@ -724,6 +724,19 @@ void  CBusiness::PrepareAsyn() {
 }
 
 void  CBusiness::Prepare() {
+	std::vector<LastSurTagItem *> vLastSurTags;
+	m_sqlite.GetAllLastSurTags(vLastSurTags);
+
+	std::vector<LastSurTagItem *>::iterator it;
+	for ( it = vLastSurTags.begin(); it != vLastSurTags.end(); ++it ) {
+		LastSurTagItem * pItem = *it;
+
+		std::vector<TempItem*> * pvRet = new std::vector<TempItem*>;
+		m_sqlite.QueryTempByTag(pItem->m_szTagId, *pvRet);
+		m_sigQueyTemp.emit(pItem->m_szTagId, pItem->m_wBedId, pvRet);
+	}
+
+	ClearVector(vLastSurTags);
 	m_prepared.emit();
 }
 

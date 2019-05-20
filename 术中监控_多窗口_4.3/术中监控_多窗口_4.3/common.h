@@ -350,6 +350,11 @@ public:
 	WORD        m_wBedId;
 };
 
+typedef  struct  tagLastSurTagItem {
+	char    m_szTagId[MAX_TAG_ID_LENGTH];
+	WORD    m_wBedId;
+}LastSurTagItem;
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern DWORD g_ReaderIndicator[MAX_READERS_PER_GRID];
