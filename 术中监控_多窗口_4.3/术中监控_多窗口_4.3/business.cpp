@@ -401,6 +401,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigSurReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderTempNotify);
 	m_sigQueyTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryTempRetNotify);	
 	m_sigHandReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnHandReaderTempNotify);
+	m_prepared.connect(pMainWnd, &CDuiFrameWnd::OnPreparedNotify);
 	return;
 }
 
@@ -717,6 +718,15 @@ void  CBusiness::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 	m_sqlite.SaveLastSurTagId(pParam);
 }
 
+// 软件运行的时候，先从数据库获取上一次的有用信息
+void  CBusiness::PrepareAsyn() {
+	g_data.m_thrd_sqlite->PostMessage( this, MSG_PREPARE );
+}
+
+void  CBusiness::Prepare() {
+	m_prepared.emit();
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -784,6 +794,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveLastSurTagId * pParam = (CSaveLastSurTagId *)pMessageData;
 		SaveLastSurTagId(pParam);
+	}
+	break;
+
+	case MSG_PREPARE:
+	{
+		Prepare();
 	}
 	break;
 

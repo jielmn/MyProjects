@@ -75,6 +75,10 @@ public:
 	void  SaveLastSurTagIdAsyn(WORD wBedId, const char * szTagId);
 	void  SaveLastSurTagId(const CSaveLastSurTagId * pParam);
 
+	// 软件运行的时候，先从数据库获取上一次的有用信息
+	void  PrepareAsyn();
+	void  Prepare();	
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -99,6 +103,7 @@ private:
 	sigslot::signal3<const char *, WORD, std::vector<TempItem*> *> 
 		                                            m_sigQueyTemp;             // param: tag id, bed no, vector result
 	sigslot::signal2<const TempItem &, const char *>   m_sigHandReaderTemp;    // param: temperature, tag patient name
+	sigslot::signal0<>                              m_prepared;
 
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	

@@ -163,6 +163,7 @@ using namespace DuiLib;
 #define MSG_SAVE_HAND_TEMP                  2003
 #define MSG_CHECK_SQLITE                    2004
 #define MSG_SAVE_LAST_SUR_TAG_ID            2005
+#define MSG_PREPARE                         2006
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -171,6 +172,7 @@ using namespace DuiLib;
 #define UM_SUR_READER_TEMP                   (WM_USER+4)
 #define UM_QUERY_TEMP_BY_TAG_ID_RET          (WM_USER+5)
 #define UM_HAND_READER_TEMP                  (WM_USER+6)
+#define UM_PREPARED                          (WM_USER+7)
 
 
 

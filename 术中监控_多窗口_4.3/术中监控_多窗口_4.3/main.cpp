@@ -107,7 +107,9 @@ void  CDuiFrameWnd::InitWindow() {
 
 	RefreshGridsPage();
 
-	CheckDevice();
+	// 放在prepared后
+	//CheckDevice();
+	CBusiness::GetInstance()->PrepareAsyn();
 
 	/***** 启动定时器 ****/
 	SetTimer( GetHWND(), TIMER_60_SECONDS, INTERVAL_TIMER_60_SECONDS, 0 );
@@ -221,6 +223,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_HAND_READER_TEMP) {
 		OnHandReaderTemp(wParam, lParam);
+	}
+	else if (uMsg == UM_PREPARED) {
+		OnPrepared(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -1068,6 +1073,11 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	delete[] tag_patient_name;
 }
 
+// 数据库的相关数据查询完毕
+void   CDuiFrameWnd::OnPrepared(WPARAM wParam, LPARAM  lParam) {
+	CheckDevice();
+}
+
 
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
@@ -1115,6 +1125,11 @@ void   CDuiFrameWnd::OnHandReaderTempNotify(const TempItem & item, const char * 
 	STRNCPY(new_tag_patient_name, tag_patient_name, MAX_TAG_PNAME_LENGTH);
 
 	::PostMessage(GetHWND(), UM_HAND_READER_TEMP, (WPARAM)pItem, (LPARAM)new_tag_patient_name);
+}
+
+// 数据库需要的数据已经查询完毕
+void  CDuiFrameWnd::OnPreparedNotify() {
+	::PostMessage(GetHWND(), UM_PREPARED, 0, 0);
 }
                       
 
