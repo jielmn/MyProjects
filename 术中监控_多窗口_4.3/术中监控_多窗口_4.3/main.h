@@ -119,7 +119,7 @@ public:
 	// 查询到温度结果(根据TagId)
 	void   OnQueryTempRetNotify(const char *, WORD, std::vector<TempItem*> *);
 	// 手持读卡器的温度数据
-	void   OnHandReaderTempNotify(const TempItem & item);
+	void   OnHandReaderTempNotify(const TempItem & item, const char * tag_patient_name);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

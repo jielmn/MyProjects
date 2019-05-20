@@ -1,6 +1,9 @@
 #include "business.h"
 #include "main.h"
 
+#define   CHECK_SQLITE_INTERVAL_TIME       10000
+
+
 CBusiness * CBusiness::pInstance = 0;
 
 CBusiness *  CBusiness::GetInstance() {
@@ -34,6 +37,16 @@ void CBusiness::Clear() {
 	}
 
 	ClearVector(g_vArea);
+
+	std::map<std::string, TagPName*>::iterator it;
+	for (it = m_tag_patient_name.begin(); it != m_tag_patient_name.end(); ++it) {
+		if ( it->second == 0 ) {
+			continue;
+		}
+
+		delete it->second;
+	}
+	m_tag_patient_name.clear();
 }
 
 int CBusiness::Init() {
@@ -153,6 +166,8 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_work->Start();
 
+	// 开启定时检查tag patient name是否过期
+	CheckSqliteAsyn();
 	return 0;
 }
 
@@ -631,7 +646,19 @@ void  CBusiness::SaveHandeTempAsyn(const TempItem & item) {
 
 void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
 	m_sqlite.SaveHandTemp(pParam);
-	m_sigHandReaderTemp.emit(pParam->m_item);
+
+	TagPName * pPName = m_tag_patient_name[pParam->m_item.m_szTagId];
+
+	// 如果没有从数据库里查询过tag的病人名称，则查询一次
+	if ( 0 == pPName) {
+		pPName = new TagPName;
+		memset(pPName, 0, sizeof(TagPName));
+		m_sqlite.QueryTagPNameByTagId(pParam->m_item.m_szTagId, pPName->m_szPName, MAX_TAG_PNAME_LENGTH);
+		pPName->m_time = time(0);
+		m_tag_patient_name[pParam->m_item.m_szTagId] = pPName;
+	}
+
+	m_sigHandReaderTemp.emit(pParam->m_item, pPName->m_szPName);
 }
 
 void  CBusiness::QueryTempByTagAsyn(const char * szTagId, WORD wBedNo) {
@@ -651,6 +678,15 @@ void  CBusiness::SaveRemarkAsyn(DWORD  dwDbId, const char * szRemark) {
 
 void  CBusiness::SaveRemark(const CSaveRemarkParam * pParam) {
 	m_sqlite.SaveRemark(pParam);
+}
+
+// 定时检查tag patient name有没有过期(在sqlite线程里 )
+void  CBusiness::CheckSqliteAsyn() {
+	g_data.m_thrd_sqlite->PostDelayMessage( CHECK_SQLITE_INTERVAL_TIME, this, MSG_CHECK_SQLITE );
+}
+
+void  CBusiness::CheckSqlite() {
+	CheckSqliteAsyn();
 }
 
 
@@ -707,6 +743,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveHandTempParam * pParam = (CSaveHandTempParam *)pMessageData;
 		SaveHandTemp(pParam);
+	}
+	break;
+
+	case MSG_CHECK_SQLITE:
+	{
+		CheckSqlite();
 	}
 	break;
 

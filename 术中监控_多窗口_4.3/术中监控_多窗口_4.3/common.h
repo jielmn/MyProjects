@@ -160,6 +160,7 @@ using namespace DuiLib;
 #define MSG_QUERY_TEMP_BY_TAG               2001
 #define MSG_SAVE_REMARK                     2002
 #define MSG_SAVE_HAND_TEMP                  2003
+#define MSG_CHECK_SQLITE                    2004
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)

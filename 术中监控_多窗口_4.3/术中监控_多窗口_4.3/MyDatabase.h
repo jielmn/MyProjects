@@ -16,6 +16,8 @@ public:
 	void  QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet);
 	// 保存注释
 	void  SaveRemark(const CSaveRemarkParam * pParam);
+	// 根据TagID查询Tag的病人姓名
+	void  QueryTagPNameByTagId(const char * szTagId, char * szPName, DWORD  dwPNameLen);
 
 private:
 	sqlite3 *                         m_db;

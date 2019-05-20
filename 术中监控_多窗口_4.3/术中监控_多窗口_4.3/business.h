@@ -7,6 +7,12 @@
 #include "MyDatabase.h"
 #include "Launch.h"
 
+#define  MAX_TAG_PNAME_LENGTH  20
+typedef  struct  tagTagPName {
+	char    m_szPName[MAX_TAG_PNAME_LENGTH];
+	time_t  m_time;
+}TagPName;
+
 class CDuiFrameWnd;
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
@@ -61,6 +67,10 @@ public:
 	void  SaveRemarkAsyn(DWORD  dwDbId, const char * szRemark);
 	void  SaveRemark(const CSaveRemarkParam * pParam);
 
+	// 定时检查tag patient name有没有过期(在sqlite线程里 )
+	void  CheckSqliteAsyn();
+	void  CheckSqlite();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -84,10 +94,12 @@ private:
 	sigslot::signal2<WORD, const TempItem &>        m_sigSurReaderTemp;        // param: bed no, temperature
 	sigslot::signal3<const char *, WORD, std::vector<TempItem*> *> 
 		                                            m_sigQueyTemp;             // param: tag id, bed no, vector result
-	sigslot::signal1<const TempItem &>              m_sigHandReaderTemp;       // param: temperature
+	sigslot::signal2<const TempItem &, const char *>   m_sigHandReaderTemp;    // param: temperature, tag patient name
 
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	
+
+	std::map<std::string, TagPName*>                m_tag_patient_name;        // tag对应的病人名称 
 };
 
 

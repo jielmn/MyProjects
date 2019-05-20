@@ -1039,7 +1039,10 @@ void   CDuiFrameWnd::OnPrintExcel(DWORD  dwIndex) {
 
 // 手持读卡器温度
 void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
-	TempItem * pItem = (TempItem*)wParam;
+	TempItem * pItem            = (TempItem*)wParam;
+	char *     tag_patient_name = (char *)lParam;
+	assert(pItem);
+	assert(tag_patient_name);
 
 	BOOL  bNewTag = FALSE;
 	m_cstHandImg->OnHandTemp(pItem, bNewTag);
@@ -1053,6 +1056,7 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	// 已经保存在m_cstHandImg对象内
 	// delete pItem;
+	delete[] tag_patient_name;
 }
 
 
@@ -1093,10 +1097,15 @@ void   CDuiFrameWnd::OnQueryTempRetNotify(const char * szTagId, WORD wBed, std::
 }
 
 // 手持读卡器的温度数据
-void   CDuiFrameWnd::OnHandReaderTempNotify(const TempItem & item) {
+void   CDuiFrameWnd::OnHandReaderTempNotify(const TempItem & item, const char * tag_patient_name) {
 	TempItem * pItem = new TempItem;
 	memcpy(pItem, &item, sizeof(TempItem));
-	::PostMessage(GetHWND(), UM_HAND_READER_TEMP, (WPARAM)pItem, 0);
+
+	assert(tag_patient_name);
+	char * new_tag_patient_name = new char[MAX_TAG_PNAME_LENGTH];
+	STRNCPY(new_tag_patient_name, tag_patient_name, MAX_TAG_PNAME_LENGTH);
+
+	::PostMessage(GetHWND(), UM_HAND_READER_TEMP, (WPARAM)pItem, (LPARAM)new_tag_patient_name);
 }
                       
 
