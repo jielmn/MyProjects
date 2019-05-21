@@ -1107,12 +1107,14 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 	std::vector<HandTagResult *> * pvRet = (std::vector<HandTagResult *> *)wParam;
 	std::vector<HandTagResult *>::iterator it;
 
+	/**** »ØÊÕÄÚ´æ ****/
 	for ( it = pvRet->begin(); it != pvRet->end(); ++it) {
 		HandTagResult * pItem = *it;
 		if ( 0 == pItem->m_pVec )
 			continue;
 
 		ClearVector(*pItem->m_pVec);
+		delete pItem->m_pVec;
 	}
 	ClearVector(*pvRet);
 	delete pvRet;

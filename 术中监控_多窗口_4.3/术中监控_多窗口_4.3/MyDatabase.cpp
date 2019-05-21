@@ -314,5 +314,62 @@ void CMySqliteDatabase::GetAllLastSurTags(std::vector<LastSurTagItem *> & vRet) 
 
 // 获取所有的手持Tag温度数据
 void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vHandTagRet) {
+	time_t today_zero_time = GetTodayZeroTime();
+	// 一周前0点时分
+	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
 
+	char szSql[8192];
+	SNPRINTF( szSql, sizeof(szSql), "SELECT tag_id FROM %s WHERE time >= %lu AND type = 1 GROUP BY tag_id ORDER BY time DESC ",
+		      TEMP_TABLE, (DWORD)tWeekBegin );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	//char *szErrMsg = 0;         // 错误描述
+	DWORD  dwValue  = 0;
+
+
+	/*****  获取所有的手持tag id  *****/
+	int ret = sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		HandTagResult * pItem = new HandTagResult;
+		memset(pItem, 0, sizeof(HandTagResult));
+
+		STRNCPY(pItem->m_szTagId, azResult[(i + 1)*ncolumn + 0], MAX_TAG_ID_LENGTH);
+		vHandTagRet.push_back(pItem);
+
+		QueryTagPNameByTagId(pItem->m_szTagId, pItem->m_szTagPName, MAX_TAG_PNAME_LENGTH);
+	}
+	sqlite3_free_table(azResult);
+
+	/*****  获取所有的手持tag温度数据  *****/
+	std::vector<HandTagResult *>::iterator  it;
+	for ( it = vHandTagRet.begin(); it != vHandTagRet.end(); ++it ) {
+		HandTagResult * pItem = *it;
+
+		char szSql[8192];
+		SNPRINTF( szSql, sizeof(szSql), "SELECT * FROM %s WHERE time >= %lu AND tag_id='%s' ORDER BY time",
+			      TEMP_TABLE, (DWORD)tWeekBegin, pItem->m_szTagId );
+
+		nrow = 0;
+		ncolumn = 0;           // 查询结果集的行数、列数
+		azResult = 0;          // 二维数组存放结果
+		pItem->m_pVec = new vector<TempItem *>;
+
+		sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+		for (int i = 0; i < nrow; i++) {
+			TempItem * pSubItem = new TempItem;
+			memset(pSubItem, 0, sizeof(TempItem));
+
+			sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &pSubItem->m_dwDbId);
+			//strncpy_s(pItem->m_szTagId, azResult[(i + 1)*ncolumn + 1], sizeof(pSubItem->m_szTagId));
+			sscanf_s(azResult[(i + 1)*ncolumn + 2], "%lu", &pSubItem->m_dwTemp);
+			sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
+			pSubItem->m_time = (time_t)dwValue;
+			strncpy_s(pSubItem->m_szRemark, azResult[(i + 1)*ncolumn + 4], sizeof(pSubItem->m_szRemark));
+			strncpy_s(pSubItem->m_szReaderId, azResult[(i + 1)*ncolumn + 6], sizeof(pSubItem->m_szReaderId));
+
+			pItem->m_pVec->push_back(pSubItem);
+		}
+		sqlite3_free_table(azResult);
+	}
 }
