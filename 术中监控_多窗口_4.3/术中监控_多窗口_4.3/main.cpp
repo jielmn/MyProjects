@@ -103,6 +103,9 @@ void  CDuiFrameWnd::InitWindow() {
 
 	g_data.m_DragDropCtl = m_PaintManager.FindControl(DRAG_DROP_CTL); 
 	g_data.m_edRemark    = static_cast<CEditUI *>( m_PaintManager.FindControl(EDIT_REMARK) );
+
+	m_optDefaultSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_DEFAULT));
+	m_optTimeSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_TIME));
 	/*************  end 获取控件 *****************/
 
 	RefreshGridsPage();
@@ -1055,7 +1058,7 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	// 新Tag
 	if ( bNewTag ) {
 		CTagUI * pTagUI = new CTagUI;  
-		m_layTags->Add(pTagUI); 
+		m_layTags->AddAt(pTagUI,0); 
 		pTagUI->SetFixedHeight(TAG_UI_HEIGHT);
 		pTagUI->OnHandTemp(pItem, tag_patient_name); 
 
@@ -1064,8 +1067,18 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	else {
 		CTagUI * pTagUI = m_tags_ui[pItem->m_szTagId];
 		assert(pTagUI);
-
 		pTagUI->OnHandTemp(pItem, tag_patient_name);
+
+		// 是否时间排序
+		HandTagSortType eSortType = GetHandTagSortType();
+		if ( eSortType == HandTagSortType_Time ) {
+			CTagUI * pItem = (CTagUI *) m_layTags->GetItemAt(0);
+			// 如果不是第一位
+			if (pItem != pTagUI) {
+				m_layTags->Remove(pTagUI, true);
+				m_layTags->AddAt(pTagUI, 0);
+			}			
+		}
 	}
 
 	// 已经保存在m_cstHandImg对象内
@@ -1076,6 +1089,14 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 // 数据库的相关数据查询完毕
 void   CDuiFrameWnd::OnPrepared(WPARAM wParam, LPARAM  lParam) {
 	CheckDevice();
+}
+
+// 获得当前的手持Tag排序
+CDuiFrameWnd::HandTagSortType CDuiFrameWnd::GetHandTagSortType() {
+	if (m_optDefaultSort->IsSelected())
+		return HandTagSortType_Default;
+	else
+		return HandTagSortType_Time;
 }
 
 

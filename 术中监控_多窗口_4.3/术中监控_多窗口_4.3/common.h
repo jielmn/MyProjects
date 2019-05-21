@@ -104,6 +104,8 @@ using namespace DuiLib;
 #define   CST_HAND_P_NAME         "cstEdtBtnPName"
 #define   LBL_HAND_TEMP           "lblHandTagTemp"
 #define   LBL_HAND_BINDING        "lblBindingGrid"
+#define   OPT_DEFAULT             "rdDefaultOrder"
+#define   OPT_TIME                "rdTimeOrder"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"

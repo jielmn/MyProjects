@@ -53,6 +53,12 @@ public:
 	virtual LRESULT  OnMouseMove(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 
 private:
+	enum  HandTagSortType {
+		HandTagSortType_Default = 0,
+		HandTagSortType_Time
+	};
+
+private:
 	void   RemoveAllGrids();
 	// 更新grids一页(比如点击了"上一页", "下一页"，初始化等等)
 	void   RefreshGridsPage();
@@ -109,6 +115,8 @@ private:
 	void   OnHandReaderTemp(WPARAM wParam, LPARAM  lParam);
 	// 数据库的相关数据查询完毕
 	void   OnPrepared(WPARAM wParam, LPARAM  lParam);
+	// 获得当前的手持Tag排序
+	HandTagSortType GetHandTagSortType();
 
 public:
 	// 接收器连接状态通知
@@ -157,6 +165,10 @@ private:
 	CLabelUI *                                  m_lblBarTips;
 	CLabelUI *                                  m_lblLaunchStatus;
 	CLabelUI *                                  m_lblSurReaderTry;
+
+	/*手持Reader的排序*/
+	COptionUI *                                 m_optDefaultSort;
+	COptionUI *                                 m_optTimeSort;
 
 	std::map<std::string, CTagUI *>             m_tags_ui;
 };
