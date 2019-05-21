@@ -13,6 +13,7 @@ CReaderUI::CReaderUI(ReaderType e /*= Hand*/) : m_callback( m_pManager ) {
 	m_lblTemp = 0;
 	m_lblReaderId = 0;
 	m_lblTagId = 0;
+	m_bConnected = FALSE;
 }
 
 CReaderUI::~CReaderUI() {
@@ -148,6 +149,7 @@ DWORD CReaderUI::GetReaderIndex() {
 }
 
 void  CReaderUI::SetReaderStatus(BOOL bConnected) {
+	m_bConnected = bConnected;
 
 	if ( bConnected ) {
 		m_state->SetBkImage("");
@@ -157,6 +159,10 @@ void  CReaderUI::SetReaderStatus(BOOL bConnected) {
 	}
 }
 
+BOOL  CReaderUI::IsConnected() {
+	return m_bConnected;
+}
+
 // 显示断线状态下的上一次温度
 void  CReaderUI::SetDisconnectedTemp(DWORD dwTemp) {
 	if (dwTemp == 0)
@@ -164,6 +170,19 @@ void  CReaderUI::SetDisconnectedTemp(DWORD dwTemp) {
 
 	CDuiString  strText;
 	strText.Format("-/%.2f", dwTemp / 100.0);
+	m_lblTemp->SetText(strText);
+}
+
+// 显示温度(断线状态和非断线状态不一样)
+void  CReaderUI::SetTemp(DWORD dwTemp) {
+	if (dwTemp == 0)
+		return;
+
+	CDuiString  strText;
+	if ( !m_bConnected )
+		strText.Format("-/%.2f", dwTemp / 100.0);
+	else
+		strText.Format("%.2f", dwTemp / 100.0);
 	m_lblTemp->SetText(strText);
 }
 

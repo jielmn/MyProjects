@@ -293,33 +293,24 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {
-		SetCurReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm);
+		SetCurReaderTemp(m_readers[j]->m_lblTemp);
 		UpdateElapsed();
 	}
 
 	m_cstImg->MyInvalidate();
 }
 
-void CGridUI::SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
-	CDuiString  strText;
-	strText.Format("%.2f", dwTemp / 100.0);
-	m_cstImgLabel->SetText(strText);
-
-	if (dwTemp >= dwHighAlarm) {
-		m_cstImgLabel->SetTextColor(HIGH_TEMP_TEXT_COLOR);
-	}
-	else if (dwTemp <= dwLowAlarm) {
-		m_cstImgLabel->SetTextColor(LOW_TEMP_TEXT_COLOR);
-	}
-	else {
-		m_cstImgLabel->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
-	}
+void CGridUI::SetCurReaderTemp(CLabelUI * pReaderUI) {
+	assert(pReaderUI);	
+	m_cstImgLabel->SetText(pReaderUI->GetText());
+	m_cstImgLabel->SetTextColor(pReaderUI->GetTextColor());
 }
 
 void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
-	CDuiString  strText;
-	strText.Format("%.2f", dwTemp / 100.0);
-	m_readers[j]->m_lblTemp->SetText(strText);
+	//CDuiString  strText;
+	//strText.Format("%.2f", dwTemp / 100.0);
+	//m_readers[j]->m_lblTemp->SetText(strText);
+	m_readers[j]->SetTemp(dwTemp);
 
 	if (dwTemp >= dwHighAlarm) {
 		m_readers[j]->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);

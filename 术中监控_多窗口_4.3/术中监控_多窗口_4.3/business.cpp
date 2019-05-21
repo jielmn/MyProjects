@@ -724,6 +724,7 @@ void  CBusiness::PrepareAsyn() {
 }
 
 void  CBusiness::Prepare() {
+	/********************  查询术中上一次的温度数据  **********************/
 	std::vector<LastSurTagItem *> vLastSurTags;
 	m_sqlite.GetAllLastSurTags(vLastSurTags);
 
@@ -738,6 +739,7 @@ void  CBusiness::Prepare() {
 
 	ClearVector(vLastSurTags);
 	m_prepared.emit();
+	/******************** end  查询术中上一次的温度数据  **********************/
 }
 
 

@@ -51,7 +51,7 @@ private:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
 	void OnModeChanged();
-	void SetCurReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
+	void SetCurReaderTemp(CLabelUI * pReaderUI );
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
 	
 private:
