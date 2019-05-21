@@ -1701,4 +1701,46 @@ void  CMyHandImage::OnHandTempVec(vector<TempItem *> * pNew, const char * szTagI
 // 删除过时的数据
 void  CMyHandImage::PruneData() {
 
+	time_t today_zero_time = GetTodayZeroTime();
+	// 一周前0点时分
+	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	std::map<std::string, vector<TempItem *> *>::iterator it;
+	for ( it = m_data.begin(); it != m_data.end(); ) {
+		vector<TempItem *> * pVec = it->second;
+		if ( pVec == 0 ) {
+			it = m_data.erase(it);
+			continue;
+		}
+
+		if ( pVec->size() == 0 ) {
+			delete pVec;
+			it = m_data.erase(it);
+			continue;
+		}
+
+		PruneData(*pVec, tWeekBegin);
+
+		if (pVec->size() == 0) {
+			delete pVec;
+			it = m_data.erase(it);
+			continue;
+		}
+
+		++it;
+	}
+}
+
+void CMyHandImage::PruneData(std::vector<TempItem*> & v, time_t t) {
+	std::vector<TempItem * >::iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem* pItem = *it;
+		if (pItem->m_time < t) {
+			delete pItem;
+		}
+		else {
+			break;
+		}
+	}
+	v.erase(v.begin(), it);
 }

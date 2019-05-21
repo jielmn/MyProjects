@@ -176,6 +176,8 @@ private:
 	/* end 空起来  */
 
 	void Clear();
+	void PruneData(std::vector<TempItem*> & v, time_t t);
+
 private:
 	// 所有的手持读卡器的数据，按照tag id进行分类
 	//           tag id,   对应的数据集合
