@@ -175,6 +175,7 @@ using namespace DuiLib;
 #define UM_QUERY_TEMP_BY_TAG_ID_RET          (WM_USER+5)
 #define UM_HAND_READER_TEMP                  (WM_USER+6)
 #define UM_PREPARED                          (WM_USER+7)
+#define UM_ALL_HAND_TAG_TEMP_DATA            (WM_USER+8)
 
 
 
@@ -368,7 +369,8 @@ typedef  struct  tagHandTagResult {
 	vector<TempItem *> *      m_pVec;
 	char                      m_szTagId[MAX_TAG_ID_LENGTH];
 	char                      m_szTagPName[MAX_TAG_PNAME_LENGTH];
-};
+	int                       m_nBindingGridIndex;                     // 绑定格子号（包含A~F）
+}HandTagResult;
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

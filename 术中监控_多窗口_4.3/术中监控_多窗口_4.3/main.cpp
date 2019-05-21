@@ -230,6 +230,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_PREPARED) {
 		OnPrepared(wParam, lParam);
 	}
+	else if (uMsg == UM_ALL_HAND_TAG_TEMP_DATA) {
+		OnAllHandTagTempData(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1099,6 +1102,22 @@ CDuiFrameWnd::HandTagSortType CDuiFrameWnd::GetHandTagSortType() {
 		return HandTagSortType_Time;
 }
 
+// 获得所有手持Tag温度数据
+void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
+	std::vector<HandTagResult *> * pvRet = (std::vector<HandTagResult *> *)wParam;
+	std::vector<HandTagResult *>::iterator it;
+
+	for ( it = pvRet->begin(); it != pvRet->end(); ++it) {
+		HandTagResult * pItem = *it;
+		if ( 0 == pItem->m_pVec )
+			continue;
+
+		ClearVector(*pItem->m_pVec);
+	}
+	ClearVector(*pvRet);
+	delete pvRet;
+}
+
 
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
@@ -1151,6 +1170,11 @@ void   CDuiFrameWnd::OnHandReaderTempNotify(const TempItem & item, const char * 
 // 数据库需要的数据已经查询完毕
 void  CDuiFrameWnd::OnPreparedNotify() {
 	::PostMessage(GetHWND(), UM_PREPARED, 0, 0);
+}
+
+// 查询到的所有手持Tag温度数据
+void   CDuiFrameWnd::OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * pvRet) {
+	::PostMessage(GetHWND(), UM_ALL_HAND_TAG_TEMP_DATA, (WPARAM)pvRet, 0);
 }
                       
 

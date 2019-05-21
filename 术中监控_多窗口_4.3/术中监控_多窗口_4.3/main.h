@@ -117,6 +117,8 @@ private:
 	void   OnPrepared(WPARAM wParam, LPARAM  lParam);
 	// 获得当前的手持Tag排序
 	HandTagSortType GetHandTagSortType();
+	// 获得所有手持Tag温度数据
+	void   OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
@@ -132,7 +134,9 @@ public:
 	// 手持读卡器的温度数据
 	void   OnHandReaderTempNotify(const TempItem & item, const char * tag_patient_name);
 	// 数据库需要的数据已经查询完毕
-	void  OnPreparedNotify();
+	void   OnPreparedNotify();
+	// 查询到的所有手持Tag温度数据
+	void   OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * pvRet);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

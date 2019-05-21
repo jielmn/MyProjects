@@ -311,3 +311,8 @@ void CMySqliteDatabase::GetAllLastSurTags(std::vector<LastSurTagItem *> & vRet) 
 	}
 	sqlite3_free_table(azResult);
 }
+
+// 获取所有的手持Tag温度数据
+void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vHandTagRet) {
+
+}

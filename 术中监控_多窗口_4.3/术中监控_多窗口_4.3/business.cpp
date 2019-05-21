@@ -401,6 +401,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigSurReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnSurReaderTempNotify);
 	m_sigQueyTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryTempRetNotify);	
 	m_sigHandReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnHandReaderTempNotify);
+	m_sigAllHandTagTempData.connect(pMainWnd, &CDuiFrameWnd::OnAllHandTagTempDataNotify);
 	m_prepared.connect(pMainWnd, &CDuiFrameWnd::OnPreparedNotify);
 	return;
 }
@@ -737,12 +738,17 @@ void  CBusiness::Prepare() {
 		m_sigQueyTemp.emit(pItem->m_szTagId, pItem->m_wBedId, pvRet);
 	}
 
-	ClearVector(vLastSurTags);
-	m_prepared.emit();
+	ClearVector(vLastSurTags);	
 	/******************** end  查询术中上一次的温度数据  **********************/
 
 
+	/********************  查询手持温度数据  **********************/
+	std::vector<HandTagResult *> * pvHandTagRet = new std::vector<HandTagResult *>;
+	m_sqlite.GetAllHandTagTempData(*pvHandTagRet);
+	m_sigAllHandTagTempData.emit(pvHandTagRet);
+	/******************** end  查询手持温度数据  **********************/
 
+	m_prepared.emit();
 }
 
 

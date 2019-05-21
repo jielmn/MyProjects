@@ -99,6 +99,7 @@ private:
 	sigslot::signal3<const char *, WORD, std::vector<TempItem*> *> 
 		                                            m_sigQueyTemp;             // param: tag id, bed no, vector result
 	sigslot::signal2<const TempItem &, const char *>   m_sigHandReaderTemp;    // param: temperature, tag patient name
+	sigslot::signal1<std::vector<HandTagResult *> *>   m_sigAllHandTagTempData;  
 	sigslot::signal0<>                              m_prepared;
 
 	// 术中读卡器是否得到温度数据

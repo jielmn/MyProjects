@@ -22,6 +22,8 @@ public:
 	void SaveLastSurTagId(const CSaveLastSurTagId * pParam);
 	// 获取最后一次的术中TagId
 	void GetAllLastSurTags(std::vector<LastSurTagItem *> & vLastSurTags);
+	// 获取所有的手持Tag温度数据
+	void GetAllHandTagTempData(std::vector<HandTagResult *> & vHandTagRet);
 
 private:
 	sqlite3 *                         m_db;
