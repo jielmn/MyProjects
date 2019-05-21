@@ -156,6 +156,9 @@ public:
 	CMyHandImage();
 	~CMyHandImage();
 	void  OnHandTemp( TempItem * pTemp, BOOL & bNewTag );
+	void  OnHandTempVec(vector<TempItem *> * pVec, const char * szTagId );
+	// 删除过时的数据
+	void  PruneData();
 
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);

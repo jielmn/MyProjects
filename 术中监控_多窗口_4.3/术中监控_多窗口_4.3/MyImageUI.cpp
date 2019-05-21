@@ -1687,3 +1687,18 @@ void  CMyHandImage::OnHandTemp(TempItem * pTemp, BOOL & bNewTag) {
 
 	pVec->push_back(pTemp);
 }
+
+void  CMyHandImage::OnHandTempVec(vector<TempItem *> * pNew, const char * szTagId) {
+	assert(szTagId);
+
+	vector<TempItem *> * pVec = 0;
+	pVec = m_data[szTagId];
+	assert(pVec == 0);
+
+	m_data[szTagId] = pNew;
+}
+
+// 删除过时的数据
+void  CMyHandImage::PruneData() {
+
+}

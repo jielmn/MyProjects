@@ -361,7 +361,7 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 			memset(pSubItem, 0, sizeof(TempItem));
 
 			sscanf_s(azResult[(i + 1)*ncolumn + 0], "%lu", &pSubItem->m_dwDbId);
-			//strncpy_s(pItem->m_szTagId, azResult[(i + 1)*ncolumn + 1], sizeof(pSubItem->m_szTagId));
+			strncpy_s(pSubItem->m_szTagId, azResult[(i + 1)*ncolumn + 1], sizeof(pSubItem->m_szTagId));
 			sscanf_s(azResult[(i + 1)*ncolumn + 2], "%lu", &pSubItem->m_dwTemp);
 			sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
 			pSubItem->m_time = (time_t)dwValue;

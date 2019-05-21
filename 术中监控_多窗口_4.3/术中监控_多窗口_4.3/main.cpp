@@ -1007,6 +1007,8 @@ void   CDuiFrameWnd::On60SecondsTimer() {
 		m_pGrids[i]->UpdateElapsed();
 		m_pGrids[i]->PruneData();
 	}
+
+	m_cstHandImg->PruneData();
 }
 
 // 查询温度结果
@@ -1107,14 +1109,37 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 	std::vector<HandTagResult *> * pvRet = (std::vector<HandTagResult *> *)wParam;
 	std::vector<HandTagResult *>::iterator it;
 
+	assert( m_layTags->GetCount() == 0 );
+	assert(m_tags_ui.size() == 0);
+
+	for (it = pvRet->begin(); it != pvRet->end(); ++it) {
+		HandTagResult * pItem = *it;
+		// 没有数据
+		if (0 == pItem->m_pVec || pItem->m_pVec->size() == 0)
+			continue;
+
+		// 保存数据
+		m_cstHandImg->OnHandTempVec(pItem->m_pVec, pItem->m_szTagId);
+
+		CTagUI * pTagUI = new CTagUI;
+		m_layTags->Add(pTagUI);
+		pTagUI->SetFixedHeight(TAG_UI_HEIGHT);
+
+		TempItem * pSubItem = pItem->m_pVec->at(pItem->m_pVec->size() - 1);
+		pTagUI->OnHandTemp(pSubItem, pItem->m_szTagPName);
+
+		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
+	}
+
+
 	/**** 回收内存 ****/
 	for ( it = pvRet->begin(); it != pvRet->end(); ++it) {
 		HandTagResult * pItem = *it;
 		if ( 0 == pItem->m_pVec )
 			continue;
-
-		ClearVector(*pItem->m_pVec);
-		delete pItem->m_pVec;
+		// 已经保存在m_cstHandImg
+		//ClearVector(*pItem->m_pVec);
+		//delete pItem->m_pVec;
 	}
 	ClearVector(*pvRet);
 	delete pvRet;

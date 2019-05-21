@@ -175,6 +175,9 @@ BOOL  CReaderUI::IsConnected() {
 
 // 显示温度(断线状态和非断线状态不一样)
 void  CReaderUI::SetTemp(DWORD dwTemp) {
+	if (dwTemp == 0)
+		return;
+
 	CDuiString  strText;
 
 	if (m_type == Surgency) {
