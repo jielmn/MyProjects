@@ -19,7 +19,7 @@ public:
 	void  SetReaderStatus(BOOL bConnected);
 	BOOL  IsConnected();
 	// 显示断线状态下的上一次温度
-	void  SetDisconnectedTemp(DWORD dwTemp);
+	//void  SetDisconnectedTemp(DWORD dwTemp);
 	// 显示温度(断线状态和非断线状态不一样)
 	void  SetTemp(DWORD dwTemp);
 

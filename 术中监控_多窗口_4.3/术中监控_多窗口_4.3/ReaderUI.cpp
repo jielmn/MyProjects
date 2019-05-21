@@ -164,25 +164,29 @@ BOOL  CReaderUI::IsConnected() {
 }
 
 // 显示断线状态下的上一次温度
-void  CReaderUI::SetDisconnectedTemp(DWORD dwTemp) {
-	if (dwTemp == 0)
-		return;
-
-	CDuiString  strText;
-	strText.Format("-/%.2f", dwTemp / 100.0);
-	m_lblTemp->SetText(strText);
-}
+//void  CReaderUI::SetDisconnectedTemp(DWORD dwTemp) {
+//	if (dwTemp == 0)
+//		return;
+//
+//	CDuiString  strText;
+//	strText.Format("-/%.2f", dwTemp / 100.0);
+//	m_lblTemp->SetText(strText);
+//}
 
 // 显示温度(断线状态和非断线状态不一样)
 void  CReaderUI::SetTemp(DWORD dwTemp) {
-	if (dwTemp == 0)
-		return;
-
 	CDuiString  strText;
-	if ( !m_bConnected )
-		strText.Format("-/%.2f", dwTemp / 100.0);
-	else
+
+	if (m_type == Surgency) {
+		if (!m_bConnected)
+			strText.Format("-/%.2f", dwTemp / 100.0);
+		else
+			strText.Format("%.2f", dwTemp / 100.0);
+	}
+	else {
 		strText.Format("%.2f", dwTemp / 100.0);
+	}
+	
 	m_lblTemp->SetText(strText);
 }
 

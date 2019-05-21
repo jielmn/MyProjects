@@ -357,6 +357,19 @@ typedef  struct  tagLastSurTagItem {
 	WORD    m_wBedId;
 }LastSurTagItem;
 
+#define  MAX_TAG_PNAME_LENGTH  20
+typedef  struct  tagTagPName {
+	char    m_szPName[MAX_TAG_PNAME_LENGTH];
+	time_t  m_time;
+}TagPName;
+
+// 查询手持Tag的温度数据结果集合
+typedef  struct  tagHandTagResult {
+	vector<TempItem *> *      m_pVec;
+	char                      m_szTagId[MAX_TAG_ID_LENGTH];
+	char                      m_szTagPName[MAX_TAG_PNAME_LENGTH];
+};
+
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
 extern DWORD g_ReaderIndicator[MAX_READERS_PER_GRID];

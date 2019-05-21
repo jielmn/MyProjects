@@ -178,7 +178,7 @@ void CGridUI::OnModeChanged() {
 				m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 				g_data.m_bSurReaderConnected[dwIndex][i] = FALSE;
 				m_readers[i]->SetReaderStatus(FALSE);
-				m_readers[i]->SetDisconnectedTemp(m_aLastTemp[i].m_dwTemp);
+				m_readers[i]->SetTemp(m_aLastTemp[i].m_dwTemp);
 			}				
 			else
 				m_readers[i]->SetVisible(false);
@@ -208,7 +208,7 @@ void CGridUI::OnModeChanged() {
 			}
 			g_data.m_bSurReaderConnected[dwIndex][i] = FALSE;
 			m_readers[i]->SetReaderStatus(FALSE);
-			m_readers[i]->SetDisconnectedTemp(m_aLastTemp[i].m_dwTemp);
+			m_readers[i]->SetTemp(m_aLastTemp[i].m_dwTemp);
 			m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 		}
 		m_CurReaderState->SetVisible(true);
@@ -247,7 +247,7 @@ void  CGridUI::SetSurReaderStatus(DWORD j, BOOL bConnected) {
 	assert(m_dwSelSurReaderIndex >= 1);
 	m_readers[j]->SetReaderStatus(bConnected);
 	if ( !bConnected )
-		m_readers[j]->SetDisconnectedTemp(m_aLastTemp[j].m_dwTemp);
+		m_readers[j]->SetTemp(m_aLastTemp[j].m_dwTemp);
 
 	// 如果当前选中的Reader Index和数据的index一致
 	if (m_dwSelSurReaderIndex == j + 1) {

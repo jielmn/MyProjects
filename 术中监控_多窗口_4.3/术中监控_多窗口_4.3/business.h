@@ -7,11 +7,7 @@
 #include "MyDatabase.h"
 #include "Launch.h"
 
-#define  MAX_TAG_PNAME_LENGTH  20
-typedef  struct  tagTagPName {
-	char    m_szPName[MAX_TAG_PNAME_LENGTH];
-	time_t  m_time;
-}TagPName;
+
 
 class CDuiFrameWnd;
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
