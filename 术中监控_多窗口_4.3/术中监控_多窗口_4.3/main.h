@@ -139,6 +139,8 @@ public:
 	void   OnPreparedNotify();
 	// 查询到的所有手持Tag温度数据
 	void   OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * pvRet);
+	// 删除掉过时的手持Tag
+	void   OnHandTagErasedNotify(const char * szTagId);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

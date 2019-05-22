@@ -160,6 +160,9 @@ public:
 	// 删除过时的数据
 	void  PruneData();
 	void  SetCurTag(const char * szTagId);
+	CDuiString   GetCurTagId();
+
+	sigslot::signal1<const char *>              m_sigTagErased;
 
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);

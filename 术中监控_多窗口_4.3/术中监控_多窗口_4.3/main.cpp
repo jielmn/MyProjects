@@ -108,6 +108,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_optTimeSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_TIME));
 	/*************  end 获取控件 *****************/
 
+	m_cstHandImg->m_sigTagErased.connect(this, &CDuiFrameWnd::OnHandTagErasedNotify);
+
 	RefreshGridsPage();
 
 	// 放在prepared后
@@ -1012,6 +1014,23 @@ void   CDuiFrameWnd::On60SecondsTimer() {
 	}
 
 	m_cstHandImg->PruneData();
+
+	CDuiString  strCurHandTag = m_cstHandImg->GetCurTagId();
+	if ( strCurHandTag.GetLength() > 0 ) {
+		std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find((const char *)strCurHandTag);
+		// 如果该tag已经删除
+		if ( it == m_tags_ui.end() ) {
+			// 如果还有tag
+			if ( m_layTags->GetCount() > 0 ) {
+				CControlUI * pChildUI = m_layTags->GetItemAt(0);
+				OnHandTagSelected(pChildUI);
+			}
+			// 如果没有tag
+			else {
+				m_cstHandImg->SetCurTag("");
+			}
+		}
+	}
 }
 
 // 查询温度结果
@@ -1224,6 +1243,19 @@ void  CDuiFrameWnd::OnPreparedNotify() {
 // 查询到的所有手持Tag温度数据
 void   CDuiFrameWnd::OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * pvRet) {
 	::PostMessage(GetHWND(), UM_ALL_HAND_TAG_TEMP_DATA, (WPARAM)pvRet, 0);
+}
+
+// 删除掉过时的手持Tag
+void   CDuiFrameWnd::OnHandTagErasedNotify(const char * szTagId) {
+	CTagUI * pTag = m_tags_ui[szTagId];
+	if (pTag != 0) {
+		m_layTags->Remove(pTag);
+
+		std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find(szTagId);
+		if ( it != m_tags_ui.end() ) {
+			m_tags_ui.erase(it);
+		}
+	}
 }
                       
 

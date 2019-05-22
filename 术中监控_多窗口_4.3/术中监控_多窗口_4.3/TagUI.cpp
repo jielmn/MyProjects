@@ -6,7 +6,7 @@ CTagUI::CTagUI() : m_callback(m_pManager) {
 }
 
 CTagUI::~CTagUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 

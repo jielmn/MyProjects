@@ -2063,17 +2063,20 @@ void  CMyHandImage::PruneData() {
 	time_t today_zero_time = GetTodayZeroTime();
 	// 一周前0点时分
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
+	// time_t tWeekBegin = time(0) - 300;   // 测试
 
 	std::map<std::string, vector<TempItem *> *>::iterator it;
 	for ( it = m_data.begin(); it != m_data.end(); ) {
 		vector<TempItem *> * pVec = it->second;
 		if ( pVec == 0 ) {
+			m_sigTagErased.emit( it->first.c_str() );
 			it = m_data.erase(it);
 			continue;
 		}
 
 		if ( pVec->size() == 0 ) {
-			delete pVec;
+			m_sigTagErased.emit(it->first.c_str());
+			delete pVec;			
 			it = m_data.erase(it);
 			continue;
 		}
@@ -2081,7 +2084,8 @@ void  CMyHandImage::PruneData() {
 		PruneData(*pVec, tWeekBegin);
 
 		if (pVec->size() == 0) {
-			delete pVec;
+			m_sigTagErased.emit(it->first.c_str());
+			delete pVec;			
 			it = m_data.erase(it);
 			continue;
 		}
@@ -2109,4 +2113,8 @@ void  CMyHandImage::SetCurTag(const char * szTagId) {
 	m_cur_tag = szTagId;
 	m_state = CMyImageUI::STATE_7_DAYS;
 	this->Invalidate();
+}
+
+CDuiString   CMyHandImage::GetCurTagId() {
+	return m_cur_tag.c_str();
 }
