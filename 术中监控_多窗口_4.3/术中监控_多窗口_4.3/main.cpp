@@ -1131,6 +1131,10 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
 	}
 
+	if ( pvRet->size() > 0) {
+		m_cstHandImg->SetCurTag( pvRet->at(0)->m_szTagId );
+	}
+
 
 	/**** »ØÊÕÄÚ´æ ****/
 	for ( it = pvRet->begin(); it != pvRet->end(); ++it) {

@@ -69,8 +69,8 @@ protected:
 	// 鼠轮滑动
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 	// 得到最大和最小显示温度
-	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, DWORD i, DWORD j, CModeButton::Mode mode);
-	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirst, const std::vector<TempItem * > & v );
+	virtual void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, DWORD i, DWORD j, CModeButton::Mode mode);
+	virtual void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp, BOOL & bFirst, const std::vector<TempItem * > & v );
 	// 画十字线
 	void   DrawCrossLine( HDC hDC, const RECT & rValid, const POINT & cursor_point,
 		                  time_t tFirstTime, float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
@@ -159,6 +159,7 @@ public:
 	void  OnHandTempVec(vector<TempItem *> * pVec, const char * szTagId );
 	// 删除过时的数据
 	void  PruneData();
+	void  SetCurTag(const char * szTagId);
 
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -174,6 +175,9 @@ private:
 	virtual DWORD  GetReaderIndex();
 	virtual CModeButton::Mode   GetMode();	
 	/* end 空起来  */
+
+	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp);
+	int    GetDayCounts();
 
 	void Clear();
 	void PruneData(std::vector<TempItem*> & v, time_t t);

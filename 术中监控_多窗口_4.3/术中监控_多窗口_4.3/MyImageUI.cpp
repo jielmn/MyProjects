@@ -1629,7 +1629,7 @@ CMyHandImage::~CMyHandImage() {
 void CMyHandImage::Clear() {
 	std::map<std::string, vector<TempItem *> *>::iterator it;
 	for ( it = m_data.begin(); it != m_data.end(); ++it ) {
-		assert(it->second);
+		// assert(it->second);
 		if (it->second == 0) {
 			continue;
 		}
@@ -1642,8 +1642,161 @@ void CMyHandImage::Clear() {
 }
 
 void CMyHandImage::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CDuiString strText;
 
+	// GDI+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	// self rectangle and width, height
+	RECT rect   = GetPos();
+	int  width  = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp);
+
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 画水平刻度线
+	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
+
+	// 画边框
+	DrawBorder(hDC, rectScale, width);
+
+	// 画刻度值
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+
+	// 画报警线
+	//DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+
+	// 计算温度曲线跨越几个日子
+	int  nDayCounts = GetDayCounts();
+	assert(nDayCounts > 0);
+	int  nDayWidth = (width - SCALE_RECT_WIDTH) / nDayCounts;
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	time_t   tFirstDayZeroTime = tTodayZeroTime - 3600 * 24 * (nDayCounts - 1);
+
+	//// 画日子的分割线
+	DrawDaySplit(hDC, nDayCounts, rectScale, nDayWidth, nMaxY, nCelsiusCount, nHeightPerCelsius, tFirstDayZeroTime);
+
+	// 有效矩形
+	RECT rValid;
+	rValid.left = rectScale.right;
+	rValid.right = rectScale.left + width - 1;
+	rValid.top = rectScale.top;
+	rValid.bottom = rectScale.bottom;
+
+	float fSecondsPerPixel = 0.0f;
+	POINT  top_left;
+
+	// 画折线
+	if (nDayWidth > 0) {
+		fSecondsPerPixel = (3600 * 24.0f) / (float)nDayWidth;
+		top_left.x = rectScale.right;
+		top_left.y = nMaxY;
+
+		vector<TempItem *> * pVec = m_data[m_cur_tag];
+		if (pVec) {
+			DrawPolyline(tFirstDayZeroTime, -1, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+				top_left, graphics, TRUE, *pVec, m_temperature_pen[0], m_temperature_brush[0]);
+
+			// 画注释
+			DrawRemark(hDC, graphics, tFirstDayZeroTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, *pVec, rValid);
+		}		
+	}
+
+	// 鼠标位置
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	// 画十字线
+	if (nDayWidth > 0) {
+		top_left.x = rect.left + SCALE_RECT_WIDTH;
+		top_left.y = nMaxY;
+		DrawCrossLine(hDC, rValid, cursor_point, tFirstDayZeroTime, fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+	}
 }
+
+void  CMyHandImage::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp) {
+	nMinTemp = 3400;
+	nMaxTemp = 3900;
+	BOOL bFirst = TRUE;
+
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (0 == pVec) {
+		nMinTemp /= 100;
+		nMaxTemp /= 100;
+		return;
+	}
+
+	CMyImageUI::GetMaxMinShowTemp(nMinTemp, nMaxTemp, bFirst, *pVec);
+
+	// 最大和最小显示温度必须为整数
+	// min: 2100~2199 ==> 2100
+	// max: 3800 ==> 3800, 3801~3899 ==> 3900
+	nMinTemp = nMinTemp / 100;
+	int nReminder = nMaxTemp % 100;
+	if (0 != nReminder) {
+		nMaxTemp = (nMaxTemp / 100 + 1);
+	}
+	else {
+		nMaxTemp /= 100;
+	}
+
+	if (nMinTemp == nMaxTemp) {
+		nMaxTemp = nMinTemp + 1;
+	}
+}
+
+// 7日视图有几天数据
+int   CMyHandImage::GetDayCounts() {
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if ( 0 == pVec ) {
+		return 1;
+	}
+
+	if ( pVec->size() == 0 ) {
+		return 1;
+	}
+
+	time_t  first_time = pVec->at(0)->m_time;
+
+	time_t  today_zero_time = GetTodayZeroTime();
+	if (first_time >= today_zero_time) {
+		return 1;
+	}
+
+	// 一周前的开始位置
+	time_t  tWeekBegin = today_zero_time - 3600 * 24 * 6;
+
+	// 如果开始时间比一周前还早
+	if (first_time <= tWeekBegin) {
+		return 7;
+	}
+
+	return (int)(today_zero_time - first_time - 1) / (3600 * 24) + 1 + 1;
+}
+
+
 
 void CMyHandImage::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 
@@ -1743,4 +1896,10 @@ void CMyHandImage::PruneData(std::vector<TempItem*> & v, time_t t) {
 		}
 	}
 	v.erase(v.begin(), it);
+}
+
+void  CMyHandImage::SetCurTag(const char * szTagId) {
+	assert(szTagId);
+	m_cur_tag = szTagId;
+	this->Invalidate();
 }
