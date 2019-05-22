@@ -153,6 +153,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == _T("opn_reader")) {
 			m_tabs->SelectItem(TAB_INDEX_READER);                  
 		}
+		else if ( name == "rdTimeOrder" ) {
+			OnHandTagTimeOrder();
+		}
 	}
 	else if (msg.sType == "click") {
 		if ( name == BUTTON_NEXT_PAGE ) {
@@ -1184,6 +1187,35 @@ void  CDuiFrameWnd::OnHandTagSelected(CControlUI * pTagUI) {
 			pUI->SetBkColor(0);
 		}
 	}	
+}
+
+// 点击了按时间排序
+void  CDuiFrameWnd::OnHandTagTimeOrder() {
+	int nCnt = m_layTags->GetCount();
+	for ( int i = 0; i < nCnt; i++ ) {
+		m_layTags->RemoveAt(0, true);
+	}
+
+	std::map<std::string, CTagUI *>::iterator it;
+	for ( it = m_tags_ui.begin(); it != m_tags_ui.end(); ++it ) {
+		CTagUI * pTagUI = it->second;
+		assert(pTagUI);
+		OnHandTagTimeOrder(pTagUI);
+	}
+}
+
+void   CDuiFrameWnd::OnHandTagTimeOrder(CTagUI * pTagUI) {
+	int nCnt = m_layTags->GetCount();
+
+	int i = 0;
+	for ( i = 0; i < nCnt; i++ ) {
+		CTagUI * pItem = (CTagUI *)m_layTags->GetItemAt(i);
+		if ( pTagUI->m_item.m_time > pItem->m_item.m_time ) {
+			break;
+		}
+	}
+
+	m_layTags->AddAt(pTagUI, i);
 }
 
 

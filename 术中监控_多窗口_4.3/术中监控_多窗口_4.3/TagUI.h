@@ -29,5 +29,6 @@ private:
 	CLabelUI *                                  m_lblTemp;
 	CLabelUI *                                  m_lblBinding;                // 绑定到哪个窗格 
 
+public:
 	TempItem                                    m_item;
 };

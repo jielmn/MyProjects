@@ -121,6 +121,9 @@ private:
 	void   OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam);
 	// 选中了手持Tag
 	void   OnHandTagSelected(CControlUI * pTagUI);
+	// 点击了按时间排序
+	void   OnHandTagTimeOrder();
+	void   OnHandTagTimeOrder(CTagUI * pTagUI);
 
 public:
 	// 接收器连接状态通知
@@ -140,7 +143,7 @@ public:
 	// 查询到的所有手持Tag温度数据
 	void   OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * pvRet);
 	// 删除掉过时的手持Tag
-	void   OnHandTagErasedNotify(const char * szTagId);
+	void   OnHandTagErasedNotify(const char * szTagId);	
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;
