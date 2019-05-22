@@ -119,6 +119,8 @@ private:
 	HandTagSortType GetHandTagSortType();
 	// 获得所有手持Tag温度数据
 	void   OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam);
+	// 选中了手持Tag
+	void   OnHandTagSelected(CControlUI * pTagUI);
 
 public:
 	// 接收器连接状态通知

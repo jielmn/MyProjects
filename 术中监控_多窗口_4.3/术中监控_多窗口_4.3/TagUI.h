@@ -9,6 +9,8 @@ public:
 	CTagUI();
 	~CTagUI();
 	void   OnHandTemp(const TempItem * pItem,const char * szName);
+	void   DoEvent(DuiLib::TEventUI& event);
+	CDuiString GetTagId();
 
 private:
 	LPCTSTR GetClass() const;
@@ -26,4 +28,6 @@ private:
 	CEditableButtonUI  *                        m_cstPatientName;
 	CLabelUI *                                  m_lblTemp;
 	CLabelUI *                                  m_lblBinding;                // 绑定到哪个窗格 
+
+	TempItem                                    m_item;
 };

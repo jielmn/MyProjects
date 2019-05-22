@@ -188,6 +188,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if ( msg.sType == "menu_print_excel" ) {
 		OnPrintExcel(msg.wParam);
 	}
+	else if (msg.sType == "tag_selected") {
+		OnHandTagSelected(msg.pSender);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -1131,8 +1134,8 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
 	}
 
-	if ( pvRet->size() > 0) {
-		m_cstHandImg->SetCurTag( pvRet->at(0)->m_szTagId );
+	if ( m_layTags->GetCount() > 0 ) {
+		OnHandTagSelected(m_layTags->GetItemAt(0));
 	}
 
 
@@ -1147,6 +1150,21 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 	}
 	ClearVector(*pvRet);
 	delete pvRet;
+}
+
+// 选中了手持Tag
+void  CDuiFrameWnd::OnHandTagSelected(CControlUI * pTagUI) {	
+	int nCnt = m_layTags->GetCount();
+	for ( int i = 0; i < nCnt; i++ ) {
+		CTagUI* pUI = (CTagUI *)m_layTags->GetItemAt(i);
+		if ( pUI == pTagUI ) {
+			pUI->SetBkColor(0xFF555555);
+			m_cstHandImg->SetCurTag(pUI->GetTagId());
+		}
+		else {
+			pUI->SetBkColor(0);
+		}
+	}	
 }
 
 

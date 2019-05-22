@@ -2,6 +2,7 @@
 
 CTagUI::CTagUI() : m_callback(m_pManager) {
 	m_bInited = FALSE;
+	memset(&m_item, 0, sizeof(m_item));
 }
 
 CTagUI::~CTagUI() {
@@ -52,6 +53,8 @@ void  CTagUI::OnHandTemp(const TempItem * pItem, const char * szName) {
 	assert(m_bInited);
 	char  szTime[256];
 
+	memcpy(&m_item, pItem, sizeof(TempItem));
+
 	m_lblReaderId->SetText(pItem->m_szReaderId);
 	m_lblTagId->SetText(pItem->m_szTagId);
 	DateTime2String(szTime, sizeof(szTime), &pItem->m_time);
@@ -65,4 +68,16 @@ void  CTagUI::OnHandTemp(const TempItem * pItem, const char * szName) {
 	CDuiString  strText;
 	strText.Format("%.2f", pItem->m_dwTemp / 100.0);
 	m_lblTemp->SetText(strText);
+}
+
+void  CTagUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN) {		
+		m_pManager->SendNotify(this, "tag_selected");
+	}
+	CContainerUI::DoEvent(event);
+}
+
+CDuiString CTagUI::GetTagId() {
+	assert(m_bInited);
+	return m_lblTagId->GetText();
 }
