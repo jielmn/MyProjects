@@ -84,7 +84,7 @@ protected:
 	// 结束拖放操作
 	void  EndDragDrop(const POINT & pt);
 	// 检查是否点击了注释
-	void  CheckRemark(const POINT & pt);
+	virtual void  CheckRemark(const POINT & pt);
 	BOOL  CheckRemark( const POINT & pt, const std::vector<TempItem * > & v, 
 		               time_t tFirstTime, float fSecondsPerPixel,
 		               int    nMaxTemp,   int nHeightPerCelsius, POINT  top_left );
@@ -182,6 +182,7 @@ private:
 	void   MyInvalidate();
 	DWORD  GetTempCount();
 	BOOL   GetSingleDayTimeRange(time_t & start, time_t & end);
+	void   CheckRemark(const POINT & pt);
 
 	void Clear();
 	void PruneData(std::vector<TempItem*> & v, time_t t);

@@ -1981,6 +1981,10 @@ BOOL   CMyHandImage::GetSingleDayTimeRange(time_t & start, time_t & end) {
 	return bRet;
 }
 
+void   CMyHandImage::CheckRemark(const POINT & pt) {
+
+}
+
 void   CMyHandImage::MyInvalidate() {
 
 	if (m_state == STATE_SINGLE_DAY) {
