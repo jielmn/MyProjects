@@ -1798,7 +1798,95 @@ int   CMyHandImage::GetDayCounts() {
 
 
 void CMyHandImage::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	DuiLib::CDuiString strText;
 
+	// GDI+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	// self rectangle and width, height
+	RECT rect    = GetPos();
+	int  width   = GetMyWidth();
+	int  height  = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+
+	// 画水平刻度线
+	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
+
+	// 画边框
+	DrawBorder(hDC, rectScale, width);
+
+	// 画报警线
+	// DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+
+	// 查看有无数据
+	int nPointsCnt = GetTempCount();
+	// 如果没有数据就不重绘了 
+	if (nPointsCnt > 0) {
+		// 画温度曲线
+		POINT  top_left;
+		top_left.x = rect.left + SCALE_RECT_WIDTH;
+		top_left.y = nMaxY;
+
+		time_t  tFirstTime = 0, tLastTime = 0;
+		BOOL bRet = GetSingleDayTimeRange(tFirstTime, tLastTime);
+
+		// 如果有点可以画
+		if (bRet) {
+			vector<TempItem *> * pVec = m_data[m_cur_tag];
+			assert(pVec && pVec->size() > 0);
+
+			DrawPolyline(tFirstTime, tLastTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+				top_left, graphics, TRUE, *pVec, m_temperature_pen[0], m_temperature_brush[0]);
+
+			// 有效矩形
+			RECT rValid;
+			rValid.left = rectScale.right;
+			rValid.right = rectScale.left + width - 1;
+			rValid.top = rectScale.top;
+			rValid.bottom = rectScale.bottom;
+
+			top_left.y += nHeightPerCelsius * nCelsiusCount;
+			// 画时间文本
+			DrawTimeText(hDC, tFirstTime, tLastTime, m_fSecondsPerPixel, top_left, rValid);
+
+			// 画注释
+			top_left.y = nMaxY;
+			DrawRemark(hDC, graphics, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left, *pVec, rValid);
+
+			// 鼠标位置
+			POINT cursor_point;
+			GetCursorPos(&cursor_point);
+			::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+			// 画十字线
+			DrawCrossLine(hDC, rValid, cursor_point, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+		}
+	}
+
+	// 画刻度值
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
 }
 
 void  CMyHandImage::CheckCursor(const POINT & pt) {
@@ -1868,8 +1956,61 @@ int  CMyHandImage::GetClickDayIndex() {
 	return k - (nDayCounts - 1);
 }
 
+// 温度数据个数
+DWORD   CMyHandImage::GetTempCount() {
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (pVec != 0) {
+		return pVec->size();
+	}
+	else {
+		return 0;
+	}
+}
+
+BOOL   CMyHandImage::GetSingleDayTimeRange(time_t & start, time_t & end) {
+	time_t   tTodayZeroTime = GetTodayZeroTime();
+	start = tTodayZeroTime + 3600 * 24 * m_nSingleDayIndex;
+	end = start + 3600 * 24 - 1;
+	BOOL  bRet = FALSE;
+
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (pVec == 0) {
+		return FALSE;
+	}
+	bRet = GetTimeRange(*pVec, start, end);
+	return bRet;
+}
+
 void   CMyHandImage::MyInvalidate() {
 
+	if (m_state == STATE_SINGLE_DAY) {
+		time_t  tFirstTime = 0, tLastTime = 0;
+		BOOL bRet = GetSingleDayTimeRange(tFirstTime, tLastTime);
+		int  width = GetMyWidth();
+
+		if (!m_bSetSecondsPerPixel) {
+			if (bRet) {
+				m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (width - SCALE_RECT_WIDTH);
+				if (m_fSecondsPerPixel < MIN_SECONDS_PER_PIXEL) {
+					m_fSecondsPerPixel = MIN_SECONDS_PER_PIXEL;
+				}
+				else if (m_fSecondsPerPixel > MAX_SECONDS_PER_PIXEL) {
+					m_fSecondsPerPixel = MAX_SECONDS_PER_PIXEL;
+				}
+				m_bSetSecondsPerPixel = TRUE;
+			}
+		}
+		else {
+			width = (int)((tLastTime - tFirstTime) / m_fSecondsPerPixel) + SCALE_RECT_WIDTH;
+		}
+
+		this->SetMinWidth(width);
+	}
+	else {
+		int  width = GetMyWidth();
+		this->SetMinWidth(width);
+	}
+	Invalidate();
 }
 
 DWORD  CMyHandImage::GetGridIndex() {

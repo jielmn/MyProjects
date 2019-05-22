@@ -60,11 +60,11 @@ protected:
 	// 双击事件
 	virtual void    OnDbClick();
 	// 温度数据个数
-	DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
+	virtual DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 计算双击了第几天
 	virtual int     GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 获得single day的起始时间和结束时间
-	BOOL    GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode);
+	virtual BOOL    GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode);
 	BOOL    GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end);
 	// 鼠轮滑动
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
@@ -180,6 +180,8 @@ private:
 	int    GetDayCounts();
 	int    GetClickDayIndex();
 	void   MyInvalidate();
+	DWORD  GetTempCount();
+	BOOL   GetSingleDayTimeRange(time_t & start, time_t & end);
 
 	void Clear();
 	void PruneData(std::vector<TempItem*> & v, time_t t);
