@@ -12,7 +12,7 @@ public:
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
-	void MyInvalidate();
+	virtual void MyInvalidate();
 	// 为label作画
 	void   PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect);
 	void   SetRemark(DuiLib::CDuiString & strRemark);	
@@ -62,7 +62,7 @@ protected:
 	// 温度数据个数
 	DWORD   GetTempCount(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 计算双击了第几天
-	int     GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode);
+	virtual int     GetClickDayIndex(DWORD i, DWORD j, CModeButton::Mode mode);
 	// 获得single day的起始时间和结束时间
 	BOOL    GetSingleDayTimeRange(time_t & start, time_t & end, DWORD i, DWORD j, CModeButton::Mode mode);
 	BOOL    GetTimeRange(const std::vector<TempItem * > & v, time_t & start, time_t & end);
@@ -178,6 +178,8 @@ private:
 
 	void   GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp);
 	int    GetDayCounts();
+	int    GetClickDayIndex();
+	void   MyInvalidate();
 
 	void Clear();
 	void PruneData(std::vector<TempItem*> & v, time_t t);

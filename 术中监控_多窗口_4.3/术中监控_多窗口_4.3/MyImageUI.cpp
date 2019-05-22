@@ -873,10 +873,9 @@ void  CMyImageUI::OnDbClick() {
 	int nPointsCnt = GetTempCount(i,j,mode);
 	
 	// 如果没有数据就不重绘了 
-	if (0 == nPointsCnt) {
+	if (0 == nPointsCnt && m_state == STATE_7_DAYS) {
 		return;
 	}
-
 
 	// 如果是7日视图
 	if (m_state == STATE_7_DAYS) {
@@ -1808,6 +1807,68 @@ void  CMyHandImage::CheckCursor(const POINT & pt) {
 
 // 双击事件
 void   CMyHandImage::OnDbClick() {
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+
+	// 查看有无数据
+	int nPointsCnt = 0;
+	if ( pVec != 0 ) {
+		nPointsCnt = pVec->size();
+	}
+
+	// 如果没有数据就不重绘了 
+	if (0 == nPointsCnt && m_state == STATE_7_DAYS) {
+		return;
+	}
+
+	// 如果是7日视图
+	if (m_state == STATE_7_DAYS) {
+		// 检查点击了那一天
+		m_nSingleDayIndex = GetClickDayIndex();
+		assert(m_nSingleDayIndex >= -6 && m_nSingleDayIndex <= 0);
+		m_state = STATE_SINGLE_DAY;
+		m_bSetSecondsPerPixel = FALSE;
+	}
+	else {
+		m_state = STATE_7_DAYS;
+	}
+
+	MyInvalidate();
+}
+
+int  CMyHandImage::GetClickDayIndex() {
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+	RECT rect = GetPos();
+	int  width = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	int  nScrollX = GetMyScrollX();
+	int  nDayCounts = GetDayCounts();
+	int  nDayWidth = (width - SCALE_RECT_WIDTH) / nDayCounts;
+
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 偏移量
+	int  nOffsetX = cursor_point.x - rectScale.right;
+
+	if (nOffsetX < 0 || nOffsetX > nDayCounts * nDayWidth)
+		return -(nDayCounts - 1);
+
+	int k = 0;
+	for (k = 0; k < nDayCounts; k++) {
+		if (nOffsetX < nDayWidth * (k + 1)) {
+			break;
+		}
+	}
+	return k - (nDayCounts - 1);
+}
+
+void   CMyHandImage::MyInvalidate() {
 
 }
 
@@ -1901,5 +1962,6 @@ void CMyHandImage::PruneData(std::vector<TempItem*> & v, time_t t) {
 void  CMyHandImage::SetCurTag(const char * szTagId) {
 	assert(szTagId);
 	m_cur_tag = szTagId;
+	m_state = CMyImageUI::STATE_7_DAYS;
 	this->Invalidate();
 }
