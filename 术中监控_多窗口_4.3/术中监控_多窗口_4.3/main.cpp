@@ -270,36 +270,41 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 	// 保存原始点击的控件
 	CControlUI* pOriginalCtl = pCtl;
+	int nSelTab = m_tabs->GetCurSel();
 
-	// 如果是多格子状态
-	if (m_eGridStatus == GRID_STATUS_GRIDS) {
-		while (pCtl) {
-			if (pCtl->GetName() == GRID_NAME) {
-				// 如果不是点击修改名字按钮
-				if (0 != strcmp(pOriginalCtl->GetClass(), "Button") 
-					&& 0 != strcmp(pOriginalCtl->GetClass(), "ModeButton")) {
-					m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
-					m_nDgDestIndex = -1;
-					m_dwDgStartTick = LmnGetTickCount();
+	// 如果是第一Tab页
+	if ( nSelTab == TAB_INDEX_MONITOR ) {
+		// 如果是多格子状态
+		if (m_eGridStatus == GRID_STATUS_GRIDS) {
+			while (pCtl) {
+				if (pCtl->GetName() == GRID_NAME) {
+					// 如果不是点击修改名字按钮
+					if (0 != strcmp(pOriginalCtl->GetClass(), "Button")
+						&& 0 != strcmp(pOriginalCtl->GetClass(), "ModeButton")) {
+						m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
+						m_nDgDestIndex = -1;
+						m_dwDgStartTick = LmnGetTickCount();
+					}
+					break;
 				}
-				break;
+				pCtl = pCtl->GetParent();
 			}
-			pCtl = pCtl->GetParent();           
+		}
+		// 如果是最大化状态
+		else if (m_eGridStatus == GRID_STATUS_MAXIUM) {
+			while (pCtl) {
+				if (pCtl->GetName() == LAY_READER) {
+					CReaderUI * pReader = (CReaderUI *)pCtl;
+					DWORD i = pReader->GetGridIndex();
+					DWORD j = pReader->GetReaderIndex();
+					m_pGrids[i]->OnSurReaderSelected(j);
+					break;
+				}
+				pCtl = pCtl->GetParent();
+			}
 		}
 	}
-	// 如果是最大化状态
-	else if (m_eGridStatus == GRID_STATUS_MAXIUM) {
-		while (pCtl) {
-			if (pCtl->GetName() == LAY_READER) {
-				CReaderUI * pReader = (CReaderUI *)pCtl;
-				DWORD i = pReader->GetGridIndex();
-				DWORD j = pReader->GetReaderIndex();
-				m_pGrids[i]->OnSurReaderSelected(j);
-				break;
-			}
-			pCtl = pCtl->GetParent();
-		}
-	}
+	
 	
 	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
 }
