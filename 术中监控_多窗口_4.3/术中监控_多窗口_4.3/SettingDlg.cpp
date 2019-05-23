@@ -485,6 +485,8 @@ void   CSettingDlg::OnGridsChanged() {
 			memset( &m_data.m_GridCfg[dwIndex], 0, sizeof(GridCfg));
 			m_data.m_GridCfg[dwIndex].m_dwMinTemp = DEFAULT_MIN_TEMP_IN_SHOW;
 			m_data.m_GridCfg[dwIndex].m_dwMaxTemp = DEFAULT_MAX_TEMP_IN_SHOW;
+			m_data.m_GridCfg[dwIndex].m_HandReaderCfg.m_dwLowTempAlarm = DEFAULT_LOW_TEMP_ALARM;
+			m_data.m_GridCfg[dwIndex].m_HandReaderCfg.m_dwHighTempAlarm = DEFAULT_HIGH_TEMP_ALARM;
 			for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++ ) {
 				m_data.m_GridCfg[dwIndex].m_ReaderCfg[j].m_dwHighTempAlarm = DEFAULT_HIGH_TEMP_ALARM;
 				m_data.m_GridCfg[dwIndex].m_ReaderCfg[j].m_dwLowTempAlarm  = DEFAULT_LOW_TEMP_ALARM;
