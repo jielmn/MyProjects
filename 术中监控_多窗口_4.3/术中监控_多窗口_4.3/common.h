@@ -108,6 +108,7 @@ using namespace DuiLib;
 #define   OPT_DEFAULT             "rdDefaultOrder"
 #define   OPT_TIME                "rdTimeOrder"
 #define   HAND_TABS_ID            "layHand"
+#define   LAY_DRAGDROP_GRIDS      "layGridsView"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"

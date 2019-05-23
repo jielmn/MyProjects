@@ -49,6 +49,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_dragdrop_tag_dest_index = -1;
 	m_hand_tabs = 0;
 	m_dragdrop_tag_timetick = 0;
+	m_layDragDropGrids = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -112,6 +113,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_optTimeSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_TIME));
 
 	m_hand_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(HAND_TABS_ID));
+	m_layDragDropGrids = static_cast<CTileLayoutUI *>(m_PaintManager.FindControl(LAY_DRAGDROP_GRIDS));
 	/*************  end 获取控件 *****************/
 
 	m_cstHandImg->m_sigTagErased.connect(this, &CDuiFrameWnd::OnHandTagErasedNotify);
@@ -1268,6 +1270,8 @@ void   CDuiFrameWnd::MoveTagUI(const POINT & pt) {
 	if (!m_dragdropGrid->IsVisible()) {
 		m_dragdropGrid->SetVisible(true);
 		m_hand_tabs->SelectItem(1);
+
+		ResetDragdropGrids();		
 	}
 
 	int x = 100 / 2;
@@ -1295,6 +1299,81 @@ void   CDuiFrameWnd::StopMoveTagUI() {
 // Tag UI移动过程中，经过的格子要高亮
 void   CDuiFrameWnd::OnMoveTagUI(const POINT & pt) {
 
+}
+
+// 重新设置LayoutGrids视图
+void   CDuiFrameWnd::ResetDragdropGrids() {
+	assert(m_layDragDropGrids);
+
+	RECT rect   = m_hand_tabs->GetPos();
+	int  width  = rect.right - rect.left;
+	int  height = rect.bottom - rect.top;
+
+	m_layDragDropGrids->RemoveAll();
+
+	int  nColumns = 0;
+	int  nRows = 0;
+	GetDragDropGridsParams(nColumns, nRows);
+	assert(nColumns > 0 && nRows > 0);
+	m_layDragDropGrids->SetFixedColumns(nColumns);
+
+	SIZE s;
+	s.cx = (width - 1) / nColumns + 1;
+	s.cy = (height - 1) / nRows + 1;
+	m_layDragDropGrids->SetItemSize(s);
+
+	CDuiString  strText;
+	for (int i = 0; i < (int)g_data.m_CfgData.m_dwLayoutGridsCnt; i++) {
+		CLabelUI * pLabel = new CLabelUI;
+		strText.Format("%d", i + 1);
+		pLabel->SetText(strText);
+		pLabel->SetTextColor(0xFFFFFFFF);
+		pLabel->SetBorderColor(0xFFFFFFFF);
+		pLabel->SetBorderSize(1);
+		pLabel->SetAttribute("align", "center");
+		pLabel->SetFont(GetFontBySize(s));
+		m_layDragDropGrids->Add(pLabel);
+	}
+}
+
+// 获取DragdropGrids视图的行，列
+void  CDuiFrameWnd::GetDragDropGridsParams(int & nCol, int & nRow) {
+	for ( int i = 0; i < 8; i++ ) {
+		if ( (i + 1) * (i + 1) >= (int)g_data.m_CfgData.m_dwLayoutGridsCnt ) {
+			nCol = nRow = i + 1;
+			return;
+		}
+	}
+	nCol = nRow = 8;
+}
+
+// 根据Rect大小获取Label字体大小
+int  CDuiFrameWnd::GetFontBySize(const SIZE & s) {
+	
+	if (s.cx >= 950 && s.cy >= 425) {
+		return 27;
+	}
+	else if (s.cx >= 816 && s.cy >= 365) {
+		return 26;
+	}
+	else if (s.cx > 680 && s.cy > 304) {
+		return 25;
+	}
+	else if (s.cx > 572 && s.cy > 256) {
+		return 24;
+	}
+	else if (s.cx > 466 && s.cy > 208) {
+		return 23;
+	}
+	else if (s.cx > 350 && s.cy > 157) {
+		return 22;
+	}
+	else if (s.cx > 280 && s.cy > 125) {
+		return 21;
+	}
+	else {
+		return 20;
+	}
 }
 
 

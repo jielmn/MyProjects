@@ -130,6 +130,12 @@ private:
 	void   StopMoveTagUI();
 	// Tag UI移动过程中，经过的格子要高亮
 	void   OnMoveTagUI(const POINT & pt);
+	// 重新设置LayoutGrids视图
+	void   ResetDragdropGrids();
+	// 获取DragdropGrids视图的行，列
+	void   GetDragDropGridsParams(int & nCol, int & nRow );
+	// 根据Size大小获取Label字体大小
+	int    GetFontBySize(const SIZE & s);
 
 public:
 	// 接收器连接状态通知
@@ -186,7 +192,8 @@ private:
 	/*手持Reader的排序*/
 	COptionUI *                                 m_optDefaultSort;
 	COptionUI *                                 m_optTimeSort;
-	DuiLib::CTabLayoutUI *                      m_hand_tabs;       // 绑定tag的过程中用到
+	DuiLib::CTabLayoutUI *                      m_hand_tabs;            // 绑定tag的过程中用到
+	CTileLayoutUI *                             m_layDragDropGrids;     // 绑定tag的过程中用到
 
 	std::map<std::string, CTagUI *>             m_tags_ui;
 	CDuiString                                  m_dragdrop_tag;
