@@ -1300,7 +1300,52 @@ void   CDuiFrameWnd::StopMoveTagUI() {
 
 // Tag UI移动过程中，经过的格子要高亮
 void   CDuiFrameWnd::OnMoveTagUI(const POINT & pt) {
+	RECT rect   = m_hand_tabs->GetPos();
+	int  width  = rect.right - rect.left;
+	int  height = rect.bottom - rect.top;
 
+	int  nColumns = 0;
+	int  nRows = 0;
+	GetDragDropGridsParams(nColumns, nRows);
+	assert(nColumns > 0 && nRows > 0);
+
+	SIZE s = m_layDragDropGrids->GetItemSize();
+
+	if (pt.x <= rect.left || pt.x >= rect.right || pt.y <= rect.top || pt.y >= rect.bottom) {
+		for ( int i = 0; i < (int)g_data.m_CfgData.m_dwLayoutGridsCnt; i++ ) {
+			CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(i);
+			pChild->SetBorderColor(0xFFFFFFFF);
+			pChild->SetTextColor(0xFFFFFFFF);
+			pChild->SetBkColor(0xFF192431);
+		}
+		m_dragdrop_tag_dest_index = -1;
+	}
+
+	m_dragdrop_tag_dest_index = -1;
+	for (int i = 0; i < nColumns; i++) {
+		for (int j = 0; j < nRows; j++) {
+
+			int nIndex = j * nColumns + i;
+			// 在总Grids范围内
+			if ( nIndex < (int)g_data.m_CfgData.m_dwLayoutGridsCnt ) {
+				CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(nIndex);
+				// 在矩形范围内
+				if ((pt.x > rect.left + s.cx * i) && (pt.x < rect.left + s.cx * (i + 1))
+					&& (pt.y > rect.top + s.cy * j) && (pt.y < rect.top + s.cy * (j + 1))) {
+					pChild->SetBorderColor(0xFFCAF100);
+					pChild->SetTextColor(0xFF000000);
+					pChild->SetBkColor(0xFFCCCCCC);
+					m_dragdrop_tag_dest_index = nIndex;
+				}
+				else {
+					pChild->SetBorderColor(0xFFFFFFFF);
+					pChild->SetTextColor(0xFFFFFFFF);
+					pChild->SetBkColor(0xFF192431);
+				}
+			}
+
+		}
+	}
 }
 
 // 重新设置LayoutGrids视图
