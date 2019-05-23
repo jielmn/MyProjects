@@ -124,6 +124,12 @@ private:
 	// 点击了按时间排序
 	void   OnHandTagTimeOrder();
 	void   OnHandTagTimeOrder(CTagUI * pTagUI);
+	// 移动Tag UI，绑定窗格
+	void   MoveTagUI(const POINT & pt);
+	// 停止移动Tag UI，确定最终位置
+	void   StopMoveTagUI();
+	// Tag UI移动过程中，经过的格子要高亮
+	void   OnMoveTagUI(const POINT & pt);
 
 public:
 	// 接收器连接状态通知
@@ -180,6 +186,9 @@ private:
 	/*手持Reader的排序*/
 	COptionUI *                                 m_optDefaultSort;
 	COptionUI *                                 m_optTimeSort;
+	DuiLib::CTabLayoutUI *                      m_hand_tabs;       // 绑定tag的过程中用到
 
 	std::map<std::string, CTagUI *>             m_tags_ui;
+	CDuiString                                  m_dragdrop_tag;
+	int                                         m_dragdrop_tag_dest_index;
 };

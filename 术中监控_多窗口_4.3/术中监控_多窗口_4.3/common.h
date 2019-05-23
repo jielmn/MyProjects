@@ -107,6 +107,7 @@ using namespace DuiLib;
 #define   LBL_HAND_BINDING        "lblBindingGrid"
 #define   OPT_DEFAULT             "rdDefaultOrder"
 #define   OPT_TIME                "rdTimeOrder"
+#define   HAND_TABS_ID            "layHand"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"

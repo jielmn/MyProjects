@@ -46,6 +46,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 	m_cstHandImg = 0;
 	m_layTags = 0;
+	m_dragdrop_tag_dest_index = -1;
+	m_hand_tabs = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -107,6 +109,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_optDefaultSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_DEFAULT));
 	m_optTimeSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_TIME));
+
+	m_hand_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(HAND_TABS_ID));
 	/*************  end 获取控件 *****************/
 
 	m_cstHandImg->m_sigTagErased.connect(this, &CDuiFrameWnd::OnHandTagErasedNotify);
@@ -304,6 +308,19 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 			}
 		}
 	}
+	else if (nSelTab == TAB_INDEX_READER) {
+		while (pCtl) {
+			if ( 0 == strcmp( pCtl->GetClass(), "TagUI") ) {
+				// 不是点击了按钮
+				if ( 0 != strcmp( pOriginalCtl->GetClass(), "Button") ) {
+					CTagUI * pTagUI = (CTagUI *)pCtl;
+					m_dragdrop_tag = pTagUI->GetTagId();
+					m_dragdrop_tag_dest_index = -1;
+				}
+			}
+			pCtl = pCtl->GetParent();
+		}
+	}
 	
 	
 	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
@@ -312,6 +329,10 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (m_nDgSourceIndex >= 0) {
 		StopMoveGrid();
+	}
+	// 正在拖动tag ui
+	else if (m_dragdrop_tag.GetLength() > 0) {
+		StopMoveTagUI();
 	}
 	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
 }
@@ -327,6 +348,13 @@ LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
 		MoveGrid(pt);
+	}
+	// 正在拖动tag ui
+	else if (m_dragdrop_tag.GetLength() > 0) {
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		MoveTagUI(pt);
 	}
 	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
 }
@@ -1225,6 +1253,40 @@ void   CDuiFrameWnd::OnHandTagTimeOrder(CTagUI * pTagUI) {
 	}
 
 	m_layTags->AddAt(pTagUI, i);
+}
+
+// 移动Tag UI，绑定窗格
+void   CDuiFrameWnd::MoveTagUI(const POINT & pt) {
+	if (!m_dragdropGrid->IsVisible()) {
+		m_dragdropGrid->SetVisible(true);
+		m_hand_tabs->SelectItem(1);
+	}
+
+	int x = 100 / 2;
+	int y = 100 / 2;
+
+	RECT r;
+	r.left = pt.x - x;
+	r.right = r.left + x * 2;
+	r.top = pt.y - y;
+	r.bottom = r.top + y * 2;
+	m_dragdropGrid->SetPos(r);
+
+	// TagUI 高亮经过的格子
+	OnMoveTagUI(pt);
+}
+
+// 停止移动Tag UI，确定最终位置
+void   CDuiFrameWnd::StopMoveTagUI() {
+	m_dragdrop_tag = "";
+	m_dragdrop_tag_dest_index = -1;
+	m_hand_tabs->SelectItem(0);
+	m_dragdropGrid->SetVisible(false);
+}
+
+// Tag UI移动过程中，经过的格子要高亮
+void   CDuiFrameWnd::OnMoveTagUI(const POINT & pt) {
+
 }
 
 
