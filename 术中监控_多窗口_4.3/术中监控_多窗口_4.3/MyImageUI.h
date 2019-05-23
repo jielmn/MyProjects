@@ -15,7 +15,7 @@ public:
 	virtual void MyInvalidate();
 	// 为label作画
 	void   PaintForLabelUI(HDC hDC, int width, int height, const RECT & rect);
-	void   SetRemark(DuiLib::CDuiString & strRemark);	
+	virtual void   SetRemark(DuiLib::CDuiString & strRemark);	
 
 protected:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -85,7 +85,7 @@ protected:
 	void  EndDragDrop(const POINT & pt);
 	// 检查是否点击了注释
 	virtual void  CheckRemark(const POINT & pt);
-	BOOL  CheckRemark( const POINT & pt, const std::vector<TempItem * > & v, 
+	virtual BOOL  CheckRemark( const POINT & pt, const std::vector<TempItem * > & v, 
 		               time_t tFirstTime, float fSecondsPerPixel,
 		               int    nMaxTemp,   int nHeightPerCelsius, POINT  top_left );
 	// 设置注释
@@ -161,6 +161,7 @@ public:
 	void  PruneData();
 	void  SetCurTag(const char * szTagId);
 	CDuiString   GetCurTagId();
+	void   SetRemark(DuiLib::CDuiString & strRemark);
 
 	sigslot::signal1<const char *>              m_sigTagErased;
 
@@ -186,6 +187,9 @@ private:
 	DWORD  GetTempCount();
 	BOOL   GetSingleDayTimeRange(time_t & start, time_t & end);
 	void   CheckRemark(const POINT & pt);
+	BOOL   CheckRemark(const POINT & pt, const std::vector<TempItem * > & v,
+		time_t tFirstTime, float fSecondsPerPixel,
+		int    nMaxTemp, int nHeightPerCelsius, POINT  top_left);
 
 	void Clear();
 	void PruneData(std::vector<TempItem*> & v, time_t t);

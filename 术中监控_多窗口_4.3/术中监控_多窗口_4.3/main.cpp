@@ -103,6 +103,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	g_data.m_DragDropCtl = m_PaintManager.FindControl(DRAG_DROP_CTL); 
 	g_data.m_edRemark    = static_cast<CEditUI *>( m_PaintManager.FindControl(EDIT_REMARK) );
+	g_data.m_edHandRemark = static_cast<CEditUI *>(m_PaintManager.FindControl(EDIT_HAND_REMARK)); 
 
 	m_optDefaultSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_DEFAULT));
 	m_optTimeSort = static_cast<COptionUI *>(m_PaintManager.FindControl(OPT_TIME));
@@ -177,6 +178,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "killfocus") {
 		if (name == EDIT_REMARK) {
 			::OnEdtRemarkKillFocus();
+		}
+		else if (name == EDIT_HAND_REMARK) {
+			::OnEdtHandRemarkKillFocus();
 		}
 	}
 	else if (msg.sType == "menu") {

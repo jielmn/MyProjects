@@ -533,6 +533,22 @@ void  OnEdtRemarkKillFocus( ) {
 	pImage->SetRemark(strRemark);
 }
 
+void  OnEdtHandRemarkKillFocus() {
+	DuiLib::CDuiString  strRemark = g_data.m_edHandRemark->GetText();
+	bool bVisible = g_data.m_edHandRemark->IsVisible();
+
+	if (!bVisible) {
+		return;
+	}
+
+	g_data.m_edHandRemark->SetText("");
+	g_data.m_edHandRemark->SetVisible(false);
+
+	CMyHandImage * pImage = (CMyHandImage *)g_data.m_edHandRemark->GetTag();
+	assert(pImage);
+	pImage->SetRemark(strRemark);
+}
+
 void CGraphicsRoundRectPath::AddRoundRect(INT x, INT y, INT width, INT height, INT cornerX, INT cornerY)
 {
 	INT elWid = 2 * cornerX;

@@ -95,6 +95,7 @@ using namespace DuiLib;
 #define   CST_IMAGE               "cstMyImage"
 #define   DRAG_DROP_CTL           "dragdrop"
 #define   EDIT_REMARK             "edRemark"
+#define   EDIT_HAND_REMARK        "edHandRemark"
 #define   CST_HAND_IMAGE          "cstMyImageHand"
 #define   TAG_FILE_NAME           "tag.xml"
 #define   LAYOUT_TAGS             "layTags"
@@ -250,6 +251,7 @@ public:
 	HCURSOR                   m_hCursor;
 	CControlUI *              m_DragDropCtl;
 	DuiLib::CEditUI *         m_edRemark;
+	DuiLib::CEditUI *         m_edHandRemark;
 
 	// 术中读卡器是否连接上
 	BOOL                      m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
@@ -266,6 +268,7 @@ public:
 		m_hCursor = 0;
 		m_DragDropCtl = 0;
 		m_edRemark = 0;
+		m_edHandRemark = 0;
 		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
 	}
 };
@@ -401,6 +404,7 @@ extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE
 extern int  GetWeekDay(time_t t);
 extern const char * GetWeekDayName(int nWeekIndex);
 extern void  OnEdtRemarkKillFocus();
+extern void  OnEdtHandRemarkKillFocus();
 char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);
 
 // templates

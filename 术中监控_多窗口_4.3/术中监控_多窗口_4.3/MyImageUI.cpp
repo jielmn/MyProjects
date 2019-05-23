@@ -1982,7 +1982,125 @@ BOOL   CMyHandImage::GetSingleDayTimeRange(time_t & start, time_t & end) {
 }
 
 void   CMyHandImage::CheckRemark(const POINT & pt) {
+	if (m_state == STATE_7_DAYS) {
+		return;
+	}
 
+	if (!m_bSetSecondsPerPixel) {
+		return;
+	}
+
+	if (m_fSecondsPerPixel > 6.0f) {
+		return;
+	}
+
+	// self rectangle and width, height
+	RECT rect   = GetPos();
+	int  width  = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp);
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left   = rect.left + nScrollX;
+	rectScale.top    = rect.top;
+	rectScale.right  = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 查看有无数据
+	int nPointsCnt = GetTempCount();
+	// 如果没有数据，返回
+	if (nPointsCnt <= 0) {
+		return;
+	}
+
+	time_t  tFirstTime = 0, tLastTime = 0;
+	BOOL bRet = GetSingleDayTimeRange(tFirstTime, tLastTime);
+	if (!bRet) {
+		return;
+	}
+
+	// 有效矩形
+	RECT rValid;
+	rValid.left   = rectScale.right;
+	rValid.right  = rectScale.left + width - 1;
+	rValid.top    = rectScale.top;
+	rValid.bottom = rectScale.bottom;
+
+	// 如果超出了曲线范围
+	if (!PtInRect(&rValid, pt)) {
+		return;
+	}
+
+	POINT  top_left;
+	top_left.x = rect.left + SCALE_RECT_WIDTH;
+	top_left.y = nMaxY;
+
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (pVec == 0) {
+		return;
+	}
+
+	CheckRemark(pt, *pVec, tFirstTime, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+}
+
+BOOL   CMyHandImage::CheckRemark(const POINT & pt, const std::vector<TempItem * > & v,
+	time_t tFirstTime, float fSecondsPerPixel,
+	int    nMaxTemp, int nHeightPerCelsius, POINT  top_left) {
+
+	std::vector<TempItem * >::const_iterator it;
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem * pItem = *it;
+
+		int nX = (int)((pItem->m_time - tFirstTime) / fSecondsPerPixel + top_left.x);
+		// 后面的不用检查了
+		if (nX > pt.x + 3) {
+			break;
+		}
+
+		if (nX < pt.x - 3) {
+			continue;
+		}
+
+		int nY = (int)((nMaxTemp - pItem->m_dwTemp / 100.0) * nHeightPerCelsius + top_left.y);
+		if (nY >= pt.y - 3 && nY <= pt.y + 3) {
+
+			// 如果之前在编辑状态
+			if (g_data.m_edHandRemark->IsVisible()) {
+				::OnEdtHandRemarkKillFocus();
+			}
+
+			m_dwRemarkingIndex = pItem->m_dwDbId;
+
+			RECT rectRemark;
+			rectRemark.left = nX - EDT_REMARK_WIDTH / 2;
+			rectRemark.top = nY - EDT_REMARK_HEIGHT - EDT_REMARK_Y_OFFSET;
+			rectRemark.right = rectRemark.left + EDT_REMARK_WIDTH;
+			rectRemark.bottom = rectRemark.top + EDT_REMARK_HEIGHT;
+			g_data.m_edHandRemark->SetTag((UINT_PTR)this);
+			g_data.m_edHandRemark->SetPos(rectRemark);
+			g_data.m_edHandRemark->SetText(pItem->m_szRemark);
+			g_data.m_edHandRemark->SetVisible(true);
+			g_data.m_edHandRemark->SetFocus();
+
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
 void   CMyHandImage::MyInvalidate() {
@@ -2117,4 +2235,18 @@ void  CMyHandImage::SetCurTag(const char * szTagId) {
 
 CDuiString   CMyHandImage::GetCurTagId() {
 	return m_cur_tag.c_str();
+}
+
+void  CMyHandImage::SetRemark(DuiLib::CDuiString & strRemark) {
+	// (但是有可能数据库量足够大，循环了一番)
+	if (m_dwRemarkingIndex == 0) {
+		return;
+	}
+
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (pVec == 0) {
+		return;
+	}
+
+	CMyImageUI::SetRemark(*pVec, m_dwRemarkingIndex, strRemark);
 }
