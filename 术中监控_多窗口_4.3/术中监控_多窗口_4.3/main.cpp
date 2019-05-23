@@ -597,6 +597,8 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 		for (DWORD i = dwFirstGridIndexCurPage; i < dwMaxGridIndex; i++) {
 			assert(g_data.m_CfgData.m_GridOrder[i] < g_data.m_CfgData.m_dwLayoutGridsCnt);
 			m_layMain->Add(m_pGrids[g_data.m_CfgData.m_GridOrder[i]]);
+			// m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetVisible(true);
+			m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetInternVisible(true);
 		}
 
 		// 如果需要多页显示
