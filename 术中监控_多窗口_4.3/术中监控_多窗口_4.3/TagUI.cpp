@@ -3,6 +3,7 @@
 CTagUI::CTagUI() : m_callback(m_pManager) {
 	m_bInited = FALSE;
 	memset(&m_item, 0, sizeof(m_item));
+	m_nBindingGridIndex = 0;
 }
 
 CTagUI::~CTagUI() {
@@ -80,4 +81,20 @@ void  CTagUI::DoEvent(DuiLib::TEventUI& event) {
 CDuiString CTagUI::GetTagId() {
 	assert(m_bInited);
 	return m_lblTagId->GetText();
+}
+
+void  CTagUI::SetBindingGridIndex(int nIndex) {
+	assert(m_bInited);
+	m_nBindingGridIndex = nIndex;
+
+	CDuiString strText;
+	if ( m_nBindingGridIndex > 0 ) {
+		strText.Format("°ó¶¨´²ºÅ%d", m_nBindingGridIndex);
+		m_lblBinding->SetText(strText);
+		m_lblBinding->SetTextColor(0xFFCAF100);
+	}
+	else {
+		m_lblBinding->SetText("Î´°ó¶¨´²Î»");
+		m_lblBinding->SetTextColor(0xFFCCCCCC);
+	}
 }

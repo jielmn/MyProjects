@@ -14,7 +14,7 @@
 			<Control width="10" />
 			<Label name="lblHandTagTemp" text="" textcolor="#FF4E8B20" font="15" width="200" />
 			<Control width="10" />
-			<Label name="lblBindingGrid" text="未绑定窗格" textcolor="#FFCCCCCC" font="14" width="90" />
+			<Label name="lblBindingGrid" text="未绑定床位" textcolor="#FFCCCCCC" font="14" width="90" />
 			<Control />	
 
 		</HorizontalLayout>

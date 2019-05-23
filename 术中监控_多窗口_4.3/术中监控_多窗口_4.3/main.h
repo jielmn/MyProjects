@@ -191,4 +191,5 @@ private:
 	std::map<std::string, CTagUI *>             m_tags_ui;
 	CDuiString                                  m_dragdrop_tag;
 	int                                         m_dragdrop_tag_dest_index;
+	DWORD                                       m_dragdrop_tag_timetick;
 };

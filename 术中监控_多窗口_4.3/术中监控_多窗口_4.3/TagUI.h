@@ -11,6 +11,7 @@ public:
 	void   OnHandTemp(const TempItem * pItem,const char * szName);
 	void   DoEvent(DuiLib::TEventUI& event);
 	CDuiString GetTagId();
+	void   SetBindingGridIndex(int nIndex);
 
 private:
 	LPCTSTR GetClass() const;
@@ -31,4 +32,5 @@ private:
 
 public:
 	TempItem                                    m_item;
+	int                                         m_nBindingGridIndex;
 };

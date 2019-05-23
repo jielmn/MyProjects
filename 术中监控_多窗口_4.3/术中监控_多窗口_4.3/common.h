@@ -373,7 +373,7 @@ typedef  struct  tagHandTagResult {
 	vector<TempItem *> *      m_pVec;
 	char                      m_szTagId[MAX_TAG_ID_LENGTH];
 	char                      m_szTagPName[MAX_TAG_PNAME_LENGTH];
-	int                       m_nBindingGridIndex;                     // 绑定格子号（包含A~F）
+	int                       m_nBindingGridIndex;                     // 绑定格子号1，2...64（不包含A~F）
 }HandTagResult;
 
 extern CGlobalData  g_data;

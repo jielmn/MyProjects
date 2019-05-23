@@ -48,6 +48,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_layTags = 0;
 	m_dragdrop_tag_dest_index = -1;
 	m_hand_tabs = 0;
+	m_dragdrop_tag_timetick = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -316,6 +317,7 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 					CTagUI * pTagUI = (CTagUI *)pCtl;
 					m_dragdrop_tag = pTagUI->GetTagId();
 					m_dragdrop_tag_dest_index = -1;
+					m_dragdrop_tag_timetick = LmnGetTickCount();
 				}
 			}
 			pCtl = pCtl->GetParent();
@@ -338,23 +340,28 @@ LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 }
 
 LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	POINT  pt;
+	DWORD  dwCurTick = 0;
+
 	if (m_nDgSourceIndex >= 0) {
-		DWORD dwCurTick = LmnGetTickCount();
+		dwCurTick = LmnGetTickCount();
 		if (dwCurTick - m_dwDgStartTick < DRAG_DROP_DELAY_TIME) {
 			return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
 		}
 
-		POINT pt;
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
 		MoveGrid(pt);
 	}
 	// 正在拖动tag ui
 	else if (m_dragdrop_tag.GetLength() > 0) {
-		POINT pt;
-		pt.x = LOWORD(lParam);
-		pt.y = HIWORD(lParam);
-		MoveTagUI(pt);
+		dwCurTick = LmnGetTickCount();
+		// 超过1秒
+		if ( dwCurTick - m_dragdrop_tag_timetick >= 100 ) {
+			pt.x = LOWORD(lParam);
+			pt.y = HIWORD(lParam);
+			MoveTagUI(pt);
+		}
 	}
 	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
 }
@@ -1189,6 +1196,7 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 
 		TempItem * pSubItem = pItem->m_pVec->at(pItem->m_pVec->size() - 1);
 		pTagUI->OnHandTemp(pSubItem, pItem->m_szTagPName);
+		pTagUI->m_nBindingGridIndex = pItem->m_nBindingGridIndex;
 
 		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
 	}
