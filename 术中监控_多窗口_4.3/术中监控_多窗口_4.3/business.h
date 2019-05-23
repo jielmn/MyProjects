@@ -75,6 +75,10 @@ public:
 	void  PrepareAsyn();
 	void  Prepare();	
 
+	// Tag°ó¶¨´°¸ñ
+	void  TagBindingGridAsyn(const char * szTagId, int nGridIndex);
+	void  TagBindingGrid();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

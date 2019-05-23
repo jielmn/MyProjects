@@ -724,6 +724,15 @@ void  CBusiness::PrepareAsyn() {
 	g_data.m_thrd_sqlite->PostMessage( this, MSG_PREPARE );
 }
 
+// Tag绑定窗格
+void  CBusiness::TagBindingGridAsyn(const char * szTagId, int nGridIndex) {
+
+}
+
+void  CBusiness::TagBindingGrid() {
+
+}
+
 void  CBusiness::Prepare() {
 	/********************  查询术中上一次的温度数据  **********************/
 	std::vector<LastSurTagItem *> vLastSurTags;

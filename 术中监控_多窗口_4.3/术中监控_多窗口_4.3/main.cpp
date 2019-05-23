@@ -1292,6 +1292,16 @@ void   CDuiFrameWnd::MoveTagUI(const POINT & pt) {
 
 // 停止移动Tag UI，确定最终位置
 void   CDuiFrameWnd::StopMoveTagUI() {
+	if ( m_dragdrop_tag_dest_index >= 0 ) {
+		std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find((const char *)m_dragdrop_tag);
+		if ( it != m_tags_ui.end() ) {
+			CTagUI * pTag = it->second;
+			assert( 0 == strcmp( pTag->m_item.m_szTagId, m_dragdrop_tag) );
+			// 等到答复后，再设置界面
+			CBusiness::GetInstance()->TagBindingGridAsyn(m_dragdrop_tag, m_dragdrop_tag_dest_index);
+		}
+	}
+
 	m_dragdrop_tag = "";
 	m_dragdrop_tag_dest_index = -1;
 	m_hand_tabs->SelectItem(0);
