@@ -725,24 +725,6 @@ void  CBusiness::PrepareAsyn() {
 	g_data.m_thrd_sqlite->PostMessage( this, MSG_PREPARE );
 }
 
-// Tag绑定窗格
-void  CBusiness::TagBindingGridAsyn(const char * szTagId, int nGridIndex) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_BINDING_TAG_GRID, new CBindingTagGrid(szTagId, nGridIndex));
-}
-
-void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
-	std::string old_tagid;
-	m_sqlite.TagBindingGrid(pParam, old_tagid);
-
-	TagBindingGridRet ret;
-	memset( &ret, 0, sizeof(TagBindingGridRet));
-	STRNCPY( ret.m_szTagId,    pParam->m_szTagId, MAX_TAG_ID_LENGTH);
-	STRNCPY( ret.m_szOldTagId, old_tagid.c_str(), MAX_TAG_ID_LENGTH);
-	ret.m_nGridIndex = pParam->m_nGridIndex;
-
-	m_sigBindingRet.emit(ret);
-}
-
 void  CBusiness::Prepare() {
 	/********************  查询术中上一次的温度数据  **********************/
 	std::vector<LastSurTagItem *> vLastSurTags;
@@ -768,6 +750,24 @@ void  CBusiness::Prepare() {
 	/******************** end  查询手持温度数据  **********************/
 
 	m_prepared.emit();
+}
+
+// Tag绑定窗格
+void  CBusiness::TagBindingGridAsyn(const char * szTagId, int nGridIndex) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_BINDING_TAG_GRID, new CBindingTagGrid(szTagId, nGridIndex));
+}
+
+void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
+	std::string old_tagid;
+	m_sqlite.TagBindingGrid(pParam, old_tagid);
+
+	TagBindingGridRet ret;
+	memset(&ret, 0, sizeof(TagBindingGridRet));
+	STRNCPY(ret.m_szTagId, pParam->m_szTagId, MAX_TAG_ID_LENGTH);
+	STRNCPY(ret.m_szOldTagId, old_tagid.c_str(), MAX_TAG_ID_LENGTH);
+	ret.m_nGridIndex = pParam->m_nGridIndex;
+
+	m_sigBindingRet.emit(ret);
 }
 
 
