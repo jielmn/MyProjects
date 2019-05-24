@@ -1595,10 +1595,10 @@ bool CImageLabelUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopContr
 		return true;
 	}
 
-	DuiLib::CVerticalLayoutUI * pParent = (DuiLib::CVerticalLayoutUI *)this->GetParent();
-	int width  = pParent->GetWidth();
-	int height = pParent->GetHeight();
 	RECT     r = this->GetPos();
+	int width  = GetWidth();
+	int height = GetHeight();
+	
 
 	SetBkMode(hDC, TRANSPARENT);
 

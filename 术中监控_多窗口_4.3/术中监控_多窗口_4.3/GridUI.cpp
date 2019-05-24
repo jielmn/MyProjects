@@ -258,12 +258,7 @@ void  CGridUI::SetSurReaderStatus(DWORD j, BOOL bConnected) {
 
 // 术中读卡器温度
 void  CGridUI::OnSurReaderTemp(DWORD j, const TempItem & item) {
-	// 如果是手持状态
-	if (m_cstModeBtn->GetMode() == CModeButton::Mode_Hand) {
-		return;
-	}
 
-	assert(m_dwSelSurReaderIndex >= 1);
 	assert(j < MAX_READERS_PER_GRID);
 
 	// 如果是新的TagID，则请求历史记录
@@ -298,6 +293,17 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 	}
 
 	m_cstImg->MyInvalidate();
+}
+
+// 手持读卡器温度
+void  CGridUI::OnHandReaderTemp(const TempItem & item) {
+
+	memcpy(&m_HandLastTemp, &item, sizeof(TempItem));
+	TempItem * pNewItem = new TempItem;
+	memcpy(pNewItem, &item, sizeof(TempItem));
+	m_vHandTemp.push_back(pNewItem);
+
+	ShowHandReaderTemp(item);
 }
 
 // 显示手持Tag温度

@@ -25,6 +25,8 @@ public:
 	void  ShowSurReaderTemp(DWORD j, const TempItem & item);
 	// 显示手持Tag温度
 	void  ShowHandReaderTemp(const TempItem & item);
+	// 手持读卡器温度
+	void  OnHandReaderTemp(const TempItem & item);
 
 	// 选中读卡器
 	void  OnSurReaderSelected(DWORD  dwSubIndex);

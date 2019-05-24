@@ -1139,9 +1139,11 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 	BOOL  bNewTag = FALSE;
 	m_cstHandImg->OnHandTemp(pItem, bNewTag);
 
+	CTagUI * pTagUI = 0;
+
 	// 新Tag
 	if ( bNewTag ) {
-		CTagUI * pTagUI = new CTagUI;  
+		pTagUI = new CTagUI;  
 		m_layTags->AddAt(pTagUI,0); 
 		pTagUI->SetFixedHeight(TAG_UI_HEIGHT);
 		pTagUI->OnHandTemp(pItem, tag_patient_name); 
@@ -1149,7 +1151,7 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		m_tags_ui.insert( std::make_pair(pItem->m_szTagId, pTagUI) );
 	}
 	else {
-		CTagUI * pTagUI = m_tags_ui[pItem->m_szTagId];
+		pTagUI = m_tags_ui[pItem->m_szTagId];
 		assert(pTagUI);
 		pTagUI->OnHandTemp(pItem, tag_patient_name);
 
@@ -1163,6 +1165,13 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 				m_layTags->AddAt(pTagUI, 0);
 			}			
 		}
+	}
+
+	// 如果绑定了床位号
+	int nBindingGridIndex = pTagUI->GetBindingGridIndex();
+	if ( nBindingGridIndex > 0 ) {
+		assert(nBindingGridIndex <= MAX_GRID_COUNT );
+		m_pGrids[nBindingGridIndex - 1]->OnHandReaderTemp(*pItem);
 	}
 
 	// 已经保存在m_cstHandImg对象内
