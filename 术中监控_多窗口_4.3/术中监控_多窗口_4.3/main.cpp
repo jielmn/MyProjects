@@ -252,6 +252,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_ALL_HAND_TAG_TEMP_DATA) {
 		OnAllHandTagTempData(wParam, lParam);
 	}
+	else if (uMsg == UM_BINDING_TAG_GRID_RET) {
+		OnTagBindingGridRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1433,6 +1436,13 @@ int  CDuiFrameWnd::GetFontBySize(const SIZE & s) {
 	}
 }
 
+// tag 绑定 grid index结果
+void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
+	TagBindingGridRet * pParam = (TagBindingGridRet*)wParam;
+
+	delete pParam;
+}
+
 
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
@@ -1503,6 +1513,13 @@ void   CDuiFrameWnd::OnHandTagErasedNotify(const char * szTagId) {
 			m_tags_ui.erase(it);
 		}
 	}
+}
+
+// 绑定结果的通知
+void   CDuiFrameWnd::OnBindingRetNotify(const TagBindingGridRet & item) {
+	TagBindingGridRet * pParam = new TagBindingGridRet;
+	memcpy( pParam, &item, sizeof(TagBindingGridRet) );
+	::PostMessage( GetHWND(), UM_BINDING_TAG_GRID_RET, (WPARAM)pParam, 0 );
 }
                       
 

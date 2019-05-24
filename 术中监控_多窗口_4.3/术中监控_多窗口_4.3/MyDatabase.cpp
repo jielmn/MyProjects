@@ -373,3 +373,37 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 		sqlite3_free_table(azResult);
 	}
 }
+
+// 保存Tag和窗格绑定
+void  CMySqliteDatabase::TagBindingGrid(const CBindingTagGrid * pParam, std::string & old_tagid) {
+	char sql[8192];
+	int  ret = 0;
+
+	// 先删除tag_id对应的grid index记录
+	SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE tag_id='%s' ", GRID_BINDING_TABLE, pParam->m_szTagId);
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM  %s WHERE grid_index=%d ", GRID_BINDING_TABLE, pParam->m_nGridIndex);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	// 如果存在
+	if (nrow > 0) {
+		char  szTagId[MAX_TAG_ID_LENGTH];
+		STRNCPY( szTagId, azResult[ncolumn + 1], MAX_TAG_ID_LENGTH );
+		old_tagid = szTagId;
+
+		SNPRINTF( sql, sizeof(sql), "UPDATE %s SET tag_id = '%s' WHERE grid_index = %d ", GRID_BINDING_TABLE,
+			pParam->m_szTagId, pParam->m_nGridIndex);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	// 不存在
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s values ( %d, '%s' ) ", GRID_BINDING_TABLE,
+			pParam->m_nGridIndex, pParam->m_szTagId);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+		old_tagid = "";
+	}
+	sqlite3_free_table(azResult);
+}

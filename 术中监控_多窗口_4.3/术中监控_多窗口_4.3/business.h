@@ -77,7 +77,7 @@ public:
 
 	// Tag绑定窗格
 	void  TagBindingGridAsyn(const char * szTagId, int nGridIndex);
-	void  TagBindingGrid();
+	void  TagBindingGrid(const CBindingTagGrid * pParam);
 
 private:
 	static CBusiness *  pInstance;
@@ -105,6 +105,7 @@ private:
 	sigslot::signal2<const TempItem &, const char *>   m_sigHandReaderTemp;    // param: temperature, tag patient name
 	sigslot::signal1<std::vector<HandTagResult *> *>   m_sigAllHandTagTempData;  
 	sigslot::signal0<>                              m_prepared;
+	sigslot::signal1<const TagBindingGridRet &>     m_sigBindingRet;
 
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	

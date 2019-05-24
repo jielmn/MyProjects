@@ -136,6 +136,8 @@ private:
 	void   GetDragDropGridsParams(int & nCol, int & nRow );
 	// 根据Size大小获取Label字体大小
 	int    GetFontBySize(const SIZE & s);
+	// tag 绑定 grid index结果
+	void   OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
@@ -156,6 +158,8 @@ public:
 	void   OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * pvRet);
 	// 删除掉过时的手持Tag
 	void   OnHandTagErasedNotify(const char * szTagId);	
+	// 绑定结果的通知
+	void   OnBindingRetNotify(const TagBindingGridRet & item);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

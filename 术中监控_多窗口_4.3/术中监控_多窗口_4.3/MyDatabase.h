@@ -24,6 +24,8 @@ public:
 	void GetAllLastSurTags(std::vector<LastSurTagItem *> & vLastSurTags);
 	// 获取所有的手持Tag温度数据
 	void GetAllHandTagTempData(std::vector<HandTagResult *> & vHandTagRet);
+	// 保存Tag和窗格绑定
+	void TagBindingGrid(const CBindingTagGrid * pParam, std::string & old_tagid);
 
 private:
 	sqlite3 *                         m_db;

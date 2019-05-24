@@ -403,6 +403,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigHandReaderTemp.connect(pMainWnd, &CDuiFrameWnd::OnHandReaderTempNotify);
 	m_sigAllHandTagTempData.connect(pMainWnd, &CDuiFrameWnd::OnAllHandTagTempDataNotify);
 	m_prepared.connect(pMainWnd, &CDuiFrameWnd::OnPreparedNotify);
+	m_sigBindingRet.connect(pMainWnd, &CDuiFrameWnd::OnBindingRetNotify);
 	return;
 }
 
@@ -726,11 +727,20 @@ void  CBusiness::PrepareAsyn() {
 
 // Tag°ó¶¨´°¸ñ
 void  CBusiness::TagBindingGridAsyn(const char * szTagId, int nGridIndex) {
-
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_BINDING_TAG_GRID, new CBindingTagGrid(szTagId, nGridIndex));
 }
 
-void  CBusiness::TagBindingGrid() {
+void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
+	std::string old_tagid;
+	m_sqlite.TagBindingGrid(pParam, old_tagid);
 
+	TagBindingGridRet ret;
+	memset( &ret, 0, sizeof(TagBindingGridRet));
+	STRNCPY( ret.m_szTagId,    pParam->m_szTagId, MAX_TAG_ID_LENGTH);
+	STRNCPY( ret.m_szOldTagId, old_tagid.c_str(), MAX_TAG_ID_LENGTH);
+	ret.m_nGridIndex = pParam->m_nGridIndex;
+
+	m_sigBindingRet.emit(ret);
 }
 
 void  CBusiness::Prepare() {
@@ -833,6 +843,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_PREPARE:
 	{
 		Prepare();
+	}
+	break;
+
+	case MSG_BINDING_TAG_GRID:
+	{
+		CBindingTagGrid * pParam = (CBindingTagGrid *)pMessageData;
+		TagBindingGrid(pParam);
 	}
 	break;
 

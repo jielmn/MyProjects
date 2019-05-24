@@ -169,6 +169,7 @@ using namespace DuiLib;
 #define MSG_CHECK_SQLITE                    2004
 #define MSG_SAVE_LAST_SUR_TAG_ID            2005
 #define MSG_PREPARE                         2006
+#define MSG_BINDING_TAG_GRID                2007
 
 // windows 消息
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -179,6 +180,7 @@ using namespace DuiLib;
 #define UM_HAND_READER_TEMP                  (WM_USER+6)
 #define UM_PREPARED                          (WM_USER+7)
 #define UM_ALL_HAND_TAG_TEMP_DATA            (WM_USER+8)
+#define UM_BINDING_TAG_GRID_RET              (WM_USER+9)
 
 
 
@@ -376,6 +378,23 @@ typedef  struct  tagHandTagResult {
 	char                      m_szTagPName[MAX_TAG_PNAME_LENGTH];
 	int                       m_nBindingGridIndex;                     // 绑定格子号1，2...64（不包含A~F）
 }HandTagResult;
+
+class CBindingTagGrid : public LmnToolkits::MessageData {
+public:
+	CBindingTagGrid(const char * szTagId, int nGridIndex) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+		m_nGridIndex = nGridIndex;
+	}
+
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	int         m_nGridIndex;
+};
+
+typedef struct tagTagBindingGridRet {
+	char       m_szTagId[MAX_TAG_ID_LENGTH];
+	int        m_nGridIndex;
+	char       m_szOldTagId[MAX_TAG_ID_LENGTH];
+}TagBindingGridRet;
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
