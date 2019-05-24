@@ -98,3 +98,8 @@ void  CTagUI::SetBindingGridIndex(int nIndex) {
 		m_lblBinding->SetTextColor(0xFFCCCCCC);
 	}
 }
+
+int  CTagUI::GetBindingGridIndex() {
+	assert(m_bInited);
+	return m_nBindingGridIndex;
+}

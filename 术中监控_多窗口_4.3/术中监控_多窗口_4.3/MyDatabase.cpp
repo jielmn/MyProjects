@@ -338,6 +338,7 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 		vHandTagRet.push_back(pItem);
 
 		QueryTagPNameByTagId(pItem->m_szTagId, pItem->m_szTagPName, MAX_TAG_PNAME_LENGTH);
+		pItem->m_nBindingGridIndex = QueryBindingGridIndexByTagId(pItem->m_szTagId);
 	}
 	sqlite3_free_table(azResult);
 
@@ -406,4 +407,24 @@ void  CMySqliteDatabase::TagBindingGrid(const CBindingTagGrid * pParam, std::str
 		old_tagid = "";
 	}
 	sqlite3_free_table(azResult);
+}
+
+// 根据TagID查询绑定的grid index(Return: 0 notfound, > 0 found)
+int  CMySqliteDatabase::QueryBindingGridIndexByTagId(const char * szTagId) {
+	assert(szTagId);
+
+	char szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where tag_id = '%s' ", GRID_BINDING_TABLE, szTagId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	if (nrow > 0) {
+		sscanf_s(azResult[ncolumn + 0], "%lu", &dwValue);
+	}
+	sqlite3_free_table(azResult);
+
+	return (int)dwValue;
 }

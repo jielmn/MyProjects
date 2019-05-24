@@ -1203,7 +1203,7 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 
 		TempItem * pSubItem = pItem->m_pVec->at(pItem->m_pVec->size() - 1);
 		pTagUI->OnHandTemp(pSubItem, pItem->m_szTagPName);
-		pTagUI->m_nBindingGridIndex = pItem->m_nBindingGridIndex;
+		pTagUI->SetBindingGridIndex(pItem->m_nBindingGridIndex);
 
 		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
 	}
@@ -1300,8 +1300,11 @@ void   CDuiFrameWnd::StopMoveTagUI() {
 		if ( it != m_tags_ui.end() ) {
 			CTagUI * pTag = it->second;
 			assert( 0 == strcmp( pTag->m_item.m_szTagId, m_dragdrop_tag) );
-			// 等到答复后，再设置界面
-			CBusiness::GetInstance()->TagBindingGridAsyn(m_dragdrop_tag, m_dragdrop_tag_dest_index);
+			// 如果绑定的grid index改变
+			if ( pTag->GetBindingGridIndex() != m_dragdrop_tag_dest_index + 1) {
+				// 等到答复后，再设置界面
+				CBusiness::GetInstance()->TagBindingGridAsyn(m_dragdrop_tag, m_dragdrop_tag_dest_index + 1);
+			}			
 		}
 	}
 
@@ -1439,6 +1442,19 @@ int  CDuiFrameWnd::GetFontBySize(const SIZE & s) {
 // tag 绑定 grid index结果
 void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 	TagBindingGridRet * pParam = (TagBindingGridRet*)wParam;
+
+	std::map<std::string, CTagUI *>::iterator it;
+	it = m_tags_ui.find(pParam->m_szTagId);
+	if ( it != m_tags_ui.end() ) {
+		CTagUI * pTagUI = it->second;
+		pTagUI->SetBindingGridIndex(pParam->m_nGridIndex);
+	}
+
+	it = m_tags_ui.find(pParam->m_szOldTagId);
+	if (it != m_tags_ui.end()) {
+		CTagUI * pTagUI = it->second;
+		pTagUI->SetBindingGridIndex(0);
+	}
 
 	delete pParam;
 }

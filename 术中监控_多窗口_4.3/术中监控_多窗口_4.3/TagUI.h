@@ -12,6 +12,7 @@ public:
 	void   DoEvent(DuiLib::TEventUI& event);
 	CDuiString GetTagId();
 	void   SetBindingGridIndex(int nIndex);
+	int    GetBindingGridIndex();
 
 private:
 	LPCTSTR GetClass() const;
