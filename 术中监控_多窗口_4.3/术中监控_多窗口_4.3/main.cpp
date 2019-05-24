@@ -1208,6 +1208,11 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 		pTagUI->OnHandTemp(pSubItem, pItem->m_szTagPName);
 		pTagUI->SetBindingGridIndex(pItem->m_nBindingGridIndex);
 
+		// 如果绑定了床位号
+		if (pItem->m_nBindingGridIndex > 0) {
+			CBusiness::GetInstance()->QueryTempByHandTagAsyn(pItem->m_szTagId, pItem->m_nBindingGridIndex);
+		}
+
 		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
 	}
 
