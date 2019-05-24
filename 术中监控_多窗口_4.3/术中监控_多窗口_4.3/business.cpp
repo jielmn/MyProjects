@@ -404,6 +404,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigAllHandTagTempData.connect(pMainWnd, &CDuiFrameWnd::OnAllHandTagTempDataNotify);
 	m_prepared.connect(pMainWnd, &CDuiFrameWnd::OnPreparedNotify);
 	m_sigBindingRet.connect(pMainWnd, &CDuiFrameWnd::OnBindingRetNotify);
+	m_sigQueyHandTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryHandTagRetNotify);
 	return;
 }
 
@@ -770,6 +771,18 @@ void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
 	m_sigBindingRet.emit(ret);
 }
 
+// 请求Hand Tag历史温度数据
+void  CBusiness::QueryTempByHandTagAsyn(const char * szTagId, int nGridIndex) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_HAND_TAG, 
+		new CQueryTempByHandTagParam(szTagId, nGridIndex));
+}
+
+void  CBusiness::QueryTempByHandTag(const CQueryTempByHandTagParam * pParam) {
+	std::vector<TempItem*> * pvRet = new std::vector<TempItem*>;
+	m_sqlite.QueryTempByTag(pParam->m_szTagId, *pvRet);
+	m_sigQueyHandTemp.emit(pParam->m_szTagId, pParam->m_nGridIndex, pvRet);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -850,6 +863,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CBindingTagGrid * pParam = (CBindingTagGrid *)pMessageData;
 		TagBindingGrid(pParam);
+	}
+	break;
+
+	case MSG_QUERY_TEMP_BY_HAND_TAG:
+	{
+		CQueryTempByHandTagParam * pParam = (CQueryTempByHandTagParam *)pMessageData;
+		QueryTempByHandTag(pParam);
 	}
 	break;
 

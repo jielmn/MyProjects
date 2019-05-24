@@ -300,6 +300,24 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 	m_cstImg->MyInvalidate();
 }
 
+// 显示手持Tag温度
+void CGridUI::ShowHandReaderTemp(const TempItem & item) {
+	DWORD  i = GetTag();
+	DWORD  dwHighAlarm = g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwHighTempAlarm;
+	DWORD  dwLowAlarm = g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwLowTempAlarm;
+	SetHandReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm);
+	m_hand_reader->m_lblReaderId->SetText(item.m_szReaderId);
+	m_hand_reader->m_lblTagId->SetText(item.m_szTagId);
+
+	// 如果当前选中的Reader Index和数据的index一致
+	if (m_dwSelSurReaderIndex == 0) {
+		SetCurReaderTemp(m_hand_reader->m_lblTemp);
+		UpdateElapsed();
+	}
+
+	m_cstImg->MyInvalidate();
+}
+
 void CGridUI::SetCurReaderTemp(CLabelUI * pReaderUI) {
 	assert(pReaderUI);	
 	m_cstImgLabel->SetText(pReaderUI->GetText());
@@ -320,6 +338,20 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 	}
 	else {
 		m_readers[j]->m_lblTemp->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
+	}
+}
+
+void CGridUI::SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
+	m_hand_reader->SetTemp(dwTemp);
+
+	if (dwTemp >= dwHighAlarm) {
+		m_hand_reader->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+	}
+	else if (dwTemp <= dwLowAlarm) {
+		m_hand_reader->m_lblTemp->SetTextColor(LOW_TEMP_TEXT_COLOR);
+	}
+	else {
+		m_hand_reader->m_lblTemp->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
 	}
 }
 
@@ -411,6 +443,23 @@ void CGridUI::OnQueryTempRet(DWORD j, const char * szTagId, const std::vector<Te
 		//assert(0);
 	}
 	
+}
+
+// 得到温度历史数据(手持Tag)
+void  CGridUI::OnQueryHandTempRet(const char * szTagId, const std::vector<TempItem*> & vRet) {
+	ClearVector(m_vHandTemp);
+	m_vHandTemp.insert(m_vHandTemp.begin(), vRet.begin(), vRet.end());
+
+	DWORD  dwCnt = vRet.size();
+	if (dwCnt > 0) {
+		TempItem* pLastItem = vRet[dwCnt - 1];
+		memcpy(&m_HandLastTemp, pLastItem, sizeof(TempItem));
+		STRNCPY(m_HandLastTemp.m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+		ShowHandReaderTemp(m_HandLastTemp);
+	}
+	else {
+		//assert(0);
+	}
 }
 
 // 一周前的数据删除

@@ -138,6 +138,8 @@ private:
 	int    GetFontBySize(const SIZE & s);
 	// tag 绑定 grid index结果
 	void   OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam);
+	// 查询温度结果(手持Tag温度数据)
+	void   OnQueryHandTempRet(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知
@@ -160,6 +162,8 @@ public:
 	void   OnHandTagErasedNotify(const char * szTagId);	
 	// 绑定结果的通知
 	void   OnBindingRetNotify(const TagBindingGridRet & item);
+	// 查询手持Tag结果通知
+	void   OnQueryHandTagRetNotify(const char *, int, std::vector<TempItem*> *);
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

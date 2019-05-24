@@ -23,6 +23,8 @@ public:
 	// 术中读卡器温度
 	void  OnSurReaderTemp(DWORD dwSubIndex, const TempItem & item);
 	void  ShowSurReaderTemp(DWORD j, const TempItem & item);
+	// 显示手持Tag温度
+	void  ShowHandReaderTemp(const TempItem & item);
 
 	// 选中读卡器
 	void  OnSurReaderSelected(DWORD  dwSubIndex);
@@ -35,6 +37,8 @@ public:
 
 	// 得到温度历史数据
 	void OnQueryTempRet(DWORD dwSubIndex, const char * szTagId, const std::vector<TempItem*> & vRet);
+	// 得到温度历史数据(手持Tag)
+	void OnQueryHandTempRet(const char * szTagId, const std::vector<TempItem*> & vRet);
 
 	// 一周前的数据删除
 	void PruneData();
@@ -53,6 +57,7 @@ private:
 	void OnModeChanged();
 	void SetCurReaderTemp(CLabelUI * pReaderUI );
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
+	void SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
 	
 private:
 	BOOL                                        m_bInited;

@@ -79,6 +79,10 @@ public:
 	void  TagBindingGridAsyn(const char * szTagId, int nGridIndex);
 	void  TagBindingGrid(const CBindingTagGrid * pParam);
 
+	// 请求Hand Tag历史温度数据
+	void  QueryTempByHandTagAsyn(const char * szTagId, int nGridIndex);
+	void  QueryTempByHandTag(const CQueryTempByHandTagParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -106,6 +110,8 @@ private:
 	sigslot::signal1<std::vector<HandTagResult *> *>   m_sigAllHandTagTempData;  
 	sigslot::signal0<>                              m_prepared;
 	sigslot::signal1<const TagBindingGridRet &>     m_sigBindingRet;
+	sigslot::signal3<const char *, int, std::vector<TempItem*> *>
+		                                            m_sigQueyHandTemp;         // param: tag id, grid index, vector result
 
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	

@@ -170,6 +170,7 @@ using namespace DuiLib;
 #define MSG_SAVE_LAST_SUR_TAG_ID            2005
 #define MSG_PREPARE                         2006
 #define MSG_BINDING_TAG_GRID                2007
+#define MSG_QUERY_TEMP_BY_HAND_TAG          2008
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -181,6 +182,7 @@ using namespace DuiLib;
 #define UM_PREPARED                          (WM_USER+7)
 #define UM_ALL_HAND_TAG_TEMP_DATA            (WM_USER+8)
 #define UM_BINDING_TAG_GRID_RET              (WM_USER+9)
+#define UM_QUERY_HAND_TEMP_BY_TAG_ID_RET     (WM_USER+10)
 
 
 
@@ -395,6 +397,17 @@ typedef struct tagTagBindingGridRet {
 	int        m_nGridIndex;
 	char       m_szOldTagId[MAX_TAG_ID_LENGTH];
 }TagBindingGridRet;
+
+class CQueryTempByHandTagParam : public LmnToolkits::MessageData {
+public:
+	CQueryTempByHandTagParam(const char * szTagId, int nGridIndex) {
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+		m_nGridIndex = nGridIndex;
+	}
+
+	char       m_szTagId[MAX_TAG_ID_LENGTH];
+	int        m_nGridIndex;
+};
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

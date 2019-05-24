@@ -255,6 +255,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_BINDING_TAG_GRID_RET) {
 		OnTagBindingGridRet(wParam, lParam);
 	}
+	else if (uMsg == UM_QUERY_HAND_TEMP_BY_TAG_ID_RET) {
+		OnQueryHandTempRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1456,7 +1459,27 @@ void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 		pTagUI->SetBindingGridIndex(0);
 	}
 
+	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);
+
 	delete pParam;
+}
+
+// 查询温度结果(手持Tag温度数据)
+void   CDuiFrameWnd::OnQueryHandTempRet(WPARAM wParam, LPARAM  lParam) {
+	void ** pParam = (void **)wParam;
+
+	char * pTagId     = (char *)pParam[0];
+	int    nGridIndex = (int)(pParam[1]);
+	std::vector<TempItem*> * pvRet = (std::vector<TempItem*> *)pParam[2];
+
+	assert(nGridIndex <= MAX_GRID_COUNT && nGridIndex >= 1 );
+
+	m_pGrids[nGridIndex-1]->OnQueryHandTempRet(pTagId, *pvRet);
+
+	delete[] pTagId;
+	// ClearVector(*pvRet);
+	delete pvRet;
+	delete[] pParam;
 }
 
 
@@ -1536,6 +1559,20 @@ void   CDuiFrameWnd::OnBindingRetNotify(const TagBindingGridRet & item) {
 	TagBindingGridRet * pParam = new TagBindingGridRet;
 	memcpy( pParam, &item, sizeof(TagBindingGridRet) );
 	::PostMessage( GetHWND(), UM_BINDING_TAG_GRID_RET, (WPARAM)pParam, 0 );
+}
+
+// 查询手持Tag结果通知
+void   CDuiFrameWnd::OnQueryHandTagRetNotify(const char * szTagId, int nGridIndex, std::vector<TempItem*> * pvRet) {
+	void ** pParam = new void *[3];
+
+	char * pTagId = new char[MAX_TAG_ID_LENGTH];
+	STRNCPY(pTagId, szTagId, MAX_TAG_ID_LENGTH);
+
+	pParam[0] = (void *)pTagId;
+	pParam[1] = (void *)nGridIndex;
+	pParam[2] = (void *)pvRet;
+
+	::PostMessage(GetHWND(), UM_QUERY_HAND_TEMP_BY_TAG_ID_RET, (WPARAM)pParam, 0);
 }
                       
 
