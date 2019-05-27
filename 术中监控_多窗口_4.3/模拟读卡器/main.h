@@ -1,11 +1,20 @@
 #pragma once
 
 #include "common.h"
+#include "LmnTemplates.h"
 
 #include "UIlib.h"
 using namespace DuiLib;
 
 #include "resource.h"
+
+class  CMyListData : public IListCallbackUI {
+public:
+	CRecycledItems<MyListItem, 10>      m_data;
+
+private:
+	LPCTSTR GetItemText(CControlUI* pControl, int iIndex, int iSubItem);
+};
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -37,4 +46,17 @@ public:
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+private:
+	void    OnBtnSurgery();
+	void    OnBtnHand();	
+
+private:
+	CLabelUI *                   m_lblStatus;
+	CButtonUI *                  m_btnSurgery;
+	CButtonUI *                  m_btnHand;
+	CListUI *                    m_lstReceive;
+	CListUI *                    m_lstSend;
+
+	CMyListData                  m_lstReceiveData;
+	CMyListData                  m_lstSendData;
 };
