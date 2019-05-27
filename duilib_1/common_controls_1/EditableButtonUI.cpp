@@ -17,7 +17,7 @@ CEditableButtonUI::CEditableButtonUI() {
 }
 
 CEditableButtonUI::~CEditableButtonUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 void CEditableButtonUI::DoInit() {

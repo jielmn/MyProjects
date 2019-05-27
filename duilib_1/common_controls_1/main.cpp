@@ -10,6 +10,9 @@
 #include "business.h"
 #include "resource.h"
 
+// 等待浏览器的时间是60秒
+#define  WAIT_BROWSER_TIME    60000
+
 CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, "MyControl")) {
 		return new CMyControlUI;
@@ -145,7 +148,7 @@ void CDuiFrameWnd::OnWndInit() {
 		DWORD dwSleep = 0;
 
 		while (0 == m_hWndBrowser) {
-			if (dwSleep >= 10000) {
+			if (dwSleep >= WAIT_BROWSER_TIME) {
 				break;
 			}
 			Sleep(100);
