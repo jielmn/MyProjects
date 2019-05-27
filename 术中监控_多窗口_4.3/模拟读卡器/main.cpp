@@ -11,7 +11,7 @@
 #include "resource.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
-
+	   
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {

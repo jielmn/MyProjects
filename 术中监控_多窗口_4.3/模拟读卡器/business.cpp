@@ -49,21 +49,21 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
-	g_data.m_thrd_db = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_db) {
+	g_data.m_thrd_launch = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_launch) {
 		return -1;
 	}
-	g_data.m_thrd_db->Start();
+	g_data.m_thrd_launch->Start();   
 
 	return 0;
 }
 
 int CBusiness::DeInit() {
 
-	if (g_data.m_thrd_db) {
-		g_data.m_thrd_db->Stop();
-		delete g_data.m_thrd_db;
-		g_data.m_thrd_db = 0;
+	if (g_data.m_thrd_launch) {
+		g_data.m_thrd_launch->Stop();
+		delete g_data.m_thrd_launch;
+		g_data.m_thrd_launch = 0;
 	}
 
 	Clear();

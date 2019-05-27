@@ -21,13 +21,13 @@ class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_launch;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_db = 0;
+		m_thrd_launch = 0;
 	}
 };
 
