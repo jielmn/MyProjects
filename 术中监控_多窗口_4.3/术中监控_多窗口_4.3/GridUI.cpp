@@ -293,6 +293,7 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 	}
 
 	m_cstImg->MyInvalidate();
+	m_cstImgLabel->Invalidate();
 }
 
 // ÊÖ³Ö¶Á¿¨Æ÷ÎÂ¶È
