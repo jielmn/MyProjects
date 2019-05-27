@@ -18,6 +18,7 @@
 
 #define   MSG_CONNECT_COM          1
 #define   MSG_READ_DATA            2
+#define   MSG_SEND_HAND_TEMP       3
 
 #define   UM_STATUS                (WM_USER+1)
 #define   UM_READ_DATA             (WM_USER+2)
@@ -31,6 +32,15 @@ typedef  struct  tagMyListItem {
 	DWORD       m_dwDataLen;
 	time_t      m_time;
 }MyListItem;
+
+class CSendHandTempParam : public LmnToolkits::MessageData {
+public:
+	CSendHandTempParam(DWORD dwIndex) {
+		m_dwIndex = dwIndex;
+	}
+
+	DWORD      m_dwIndex;
+};
 
 
 class  CGlobalData {

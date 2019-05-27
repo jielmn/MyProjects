@@ -196,6 +196,26 @@ void  CBusiness::ReadData() {
 	ReadDataAsyn(1000);
 }
 
+void CBusiness::SendHandTempAsyn(DWORD dwIndex) {
+	g_data.m_thrd_launch->PostMessage(this, MSG_SEND_HAND_TEMP,new CSendHandTempParam(dwIndex) );
+}
+
+void  CBusiness::SendHandTemp(const CSendHandTempParam * pParam) {
+	if ( m_serial_port.GetStatus() == CLmnSerialPort::CLOSE ) {
+		return;
+	}
+
+	//BYTE   bySend[128];
+	//DWORD  dwDataLen = 32;
+	//memcpy(bySend, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
+	//memcpy(bySend + 8,  "\x01\x00\x00\x00\x00\x00\x30\xe1", 8);
+	//memcpy(bySend + 22, "\x00\x00\x00\x00\x00\x00\x55\xe0", 8);
+
+	//DWORD dwTemp = GetRand(3200, 4080);
+	//bySend[16] = (BYTE)(dwTemp / 100);
+	//bySend[17] = (BYTE)(dwTemp % 100);
+	//m_serial_port.Write(bySend, dwDataLen);
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -210,6 +230,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_DATA:
 	{
 		ReadData();
+	}
+	break;
+
+	case MSG_SEND_HAND_TEMP:
+	{
+		CSendHandTempParam * pParam = (CSendHandTempParam *)pMessageData;
+		SendHandTemp(pParam);
 	}
 	break;
 

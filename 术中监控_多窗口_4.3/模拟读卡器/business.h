@@ -22,6 +22,9 @@ public:
 	void  ReadDataAsyn(DWORD  dwDelay = 0);
 	void  ReadData();
 
+	void  SendHandTempAsyn(DWORD dwIndex);
+	void  SendHandTemp(const CSendHandTempParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
