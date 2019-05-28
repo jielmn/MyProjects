@@ -1143,6 +1143,7 @@ void   CDuiFrameWnd::OnImageMenu(DWORD  dwGridIndex, const POINT & pt, CControlU
 void   CDuiFrameWnd::OnExportExcel(DWORD  dwIndex) {
 	assert(dwIndex < MAX_GRID_COUNT);
 	assert(dwIndex < g_data.m_CfgData.m_dwLayoutGridsCnt);
+	m_pGrids[dwIndex]->ExportExcel();
 }
 
 // ¥Ú”°ExcelÕº±Ì

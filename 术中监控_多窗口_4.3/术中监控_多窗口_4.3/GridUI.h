@@ -55,6 +55,9 @@ public:
 	void SetPatientName(const char * szName);
 	void SetPatientNameInHandMode(const char * szName);
 
+	// µ¼³öexcel
+	void  ExportExcel();
+
 private:
 	LPCTSTR GetClass() const;
 
