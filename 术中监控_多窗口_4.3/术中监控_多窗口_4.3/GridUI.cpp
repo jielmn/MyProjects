@@ -26,6 +26,8 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 
 	m_lblElapsed = 0;
 	m_cstImg = 0;
+	m_cstPatientName = 0;
+	m_cstPatientNameM = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -107,6 +109,9 @@ void CGridUI::DoInit() {
 	m_cstImg->SetTag(GetTag());
 	m_cstImgLabel->SetMyImage(m_cstImg);
 
+	m_cstPatientName = static_cast<CEditableButtonUI *>(m_pManager->FindControl(CST_PATIENT_NAME));
+	m_cstPatientNameM = static_cast<CEditableButtonUI *>(m_pManager->FindControl(CST_PATIENT_NAME_M));
+
 	OnModeChanged();
 
 	m_bInited = TRUE;
@@ -151,6 +156,14 @@ void CGridUI::Notify(TNotifyUI& msg) {
 	if (msg.sType == "ModeChanged") {
 		if (msg.pSender == m_cstModeBtn) {
 			OnModeChanged();
+		}
+	}
+	else if (msg.sType == "textchanged") {
+		if (msg.pSender == m_cstPatientName) {
+			OnPatientNameChanged(m_cstPatientName);
+		}
+		else if (msg.pSender == m_cstPatientNameM) {
+			OnPatientNameChanged(m_cstPatientNameM);
 		}
 	}
 }
@@ -554,4 +567,8 @@ void CGridUI::ResetData() {
 		m_readers[i]->m_lblReaderId->SetText("");
 		m_readers[i]->m_lblTemp->SetText("");
 	}
+}
+
+void CGridUI::OnPatientNameChanged(CEditableButtonUI * pSource) {
+	
 }

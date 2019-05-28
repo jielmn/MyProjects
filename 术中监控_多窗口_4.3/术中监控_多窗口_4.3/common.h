@@ -88,6 +88,8 @@ using namespace DuiLib;
 #define   CTR_CUR_READER_STATE    "CurReaderState"
 #define   LBL_PROC_TIPS           "lblProcessTips"
 #define   CST_IMG_LBL_TEMP        "cstImgLblTemp"
+#define   CST_PATIENT_NAME        "cstEdtBtnPatientName"
+#define   CST_PATIENT_NAME_M      "cstEdtBtnPatientNameM"
 #define   LBL_READER_TEMP         "lblReaderTemp"
 #define   LAY_READER              "layReader"
 #define   LBL_ELAPSED             "lblElapsed"

@@ -63,6 +63,7 @@ private:
 	void SetCurReaderTemp(CLabelUI * pReaderUI );
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
 	void SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
+	void OnPatientNameChanged(CEditableButtonUI * pSource);
 	
 private:
 	BOOL                                        m_bInited;
@@ -93,6 +94,8 @@ private:
 	CReaderUI *                                 m_readers[MAX_READERS_PER_GRID];             // 连续测温读卡器
 	CReaderUI *                                 m_hand_reader;                               // 非连续测温读卡器
 	
+	CEditableButtonUI *                         m_cstPatientName;
+	CEditableButtonUI *                         m_cstPatientNameM;
 
 private:
 	// 最后一次的温度数据
