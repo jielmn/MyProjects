@@ -171,6 +171,8 @@ using namespace DuiLib;
 #define MSG_PREPARE                         2006
 #define MSG_BINDING_TAG_GRID                2007
 #define MSG_QUERY_TEMP_BY_HAND_TAG          2008
+#define MSG_REMOVE_GRID_BINDING             2009
+
 
 // windows ÏûÏ¢
 #define UM_LAUNCH_STATUS                     (WM_USER+1)
@@ -406,6 +408,15 @@ public:
 	}
 
 	char       m_szTagId[MAX_TAG_ID_LENGTH];
+	int        m_nGridIndex;
+};
+
+class CRemoveGridBindingParam : public LmnToolkits::MessageData {
+public:
+	CRemoveGridBindingParam(int nGridIndex) {
+		m_nGridIndex = nGridIndex;
+	}
+
 	int        m_nGridIndex;
 };
 

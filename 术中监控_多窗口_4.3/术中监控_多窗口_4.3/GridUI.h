@@ -16,6 +16,7 @@ public:
 
 	// 双击后的视图切换
 	void  SwitchView();
+	void  SetView(int nTabIndex);
 
 	// 设置术中读卡器的连接状态
 	void  SetSurReaderStatus(DWORD dwSubIndex, BOOL bConnected);

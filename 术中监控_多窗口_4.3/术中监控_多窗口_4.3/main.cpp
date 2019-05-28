@@ -605,6 +605,7 @@ void   CDuiFrameWnd::RefreshGridsPage() {
 			m_layMain->Add(m_pGrids[g_data.m_CfgData.m_GridOrder[i]]);
 			// m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetVisible(true);
 			m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetInternVisible(true);
+			m_pGrids[g_data.m_CfgData.m_GridOrder[i]]->SetView(0);
 		}
 
 		// 如果需要多页显示
@@ -878,6 +879,21 @@ void  CDuiFrameWnd::OnSetting() {
 	g_data.m_cfg->Save();
 	::InvalidateRect(GetHWND(), 0, TRUE);
 	delete pSettingDlg;
+
+
+	// 多余的grid删除手持tag绑定
+	for ( DWORD i = g_data.m_CfgData.m_dwLayoutGridsCnt; i < oldData.m_dwLayoutGridsCnt; i++ ) {
+		CBusiness::GetInstance()->RemoveGridBindingAsyn(i+1);
+		// 界面上删除绑定
+		int nCnt = m_layTags->GetCount();
+		for (int j = 0; j < nCnt; j++) {
+			CTagUI * pTagUI =  (CTagUI *)m_layTags->GetItemAt(j);
+			if ( pTagUI->m_nBindingGridIndex == i + 1 ) {
+				pTagUI->SetBindingGridIndex(0);
+				break;
+			}
+		}
+	}
 }
 
 // 保存格子配置

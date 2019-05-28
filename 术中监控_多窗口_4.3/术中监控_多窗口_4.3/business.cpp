@@ -783,6 +783,16 @@ void  CBusiness::QueryTempByHandTag(const CQueryTempByHandTagParam * pParam) {
 	m_sigQueyHandTemp.emit(pParam->m_szTagId, pParam->m_nGridIndex, pvRet);
 }
 
+// 删除格子的手持Tag绑定
+void  CBusiness::RemoveGridBindingAsyn(int nGridIndex) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_REMOVE_GRID_BINDING,
+		new CRemoveGridBindingParam(nGridIndex));
+}
+
+void  CBusiness::RemoveGridBinding(const CRemoveGridBindingParam * pParam) {
+	m_sqlite.RemoveGridBinding(pParam);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -870,6 +880,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryTempByHandTagParam * pParam = (CQueryTempByHandTagParam *)pMessageData;
 		QueryTempByHandTag(pParam);
+	}
+	break;
+
+	case MSG_REMOVE_GRID_BINDING:
+	{
+		CRemoveGridBindingParam * pParam = (CRemoveGridBindingParam *)pMessageData;
+		RemoveGridBinding(pParam);
 	}
 	break;
 

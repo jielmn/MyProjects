@@ -428,3 +428,13 @@ int  CMySqliteDatabase::QueryBindingGridIndexByTagId(const char * szTagId) {
 
 	return (int)dwValue;
 }
+
+// 删除格子的手持Tag绑定
+void  CMySqliteDatabase::RemoveGridBinding(const CRemoveGridBindingParam * pParam) {
+	char sql[8192];
+	int  ret = 0;
+
+	// 先删除tag_id对应的grid index记录
+	SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE grid_index=%d ", GRID_BINDING_TABLE, pParam->m_nGridIndex);
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+}

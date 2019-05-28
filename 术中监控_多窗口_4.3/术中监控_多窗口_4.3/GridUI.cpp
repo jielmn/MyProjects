@@ -138,6 +138,15 @@ void  CGridUI::SwitchView() {
 	}
 }
 
+void  CGridUI::SetView(int nTabIndex) {
+	if (0 == nTabIndex) {
+		m_tabs->SelectItem(0);
+	}
+	else {
+		m_tabs->SelectItem(1);
+	}
+}
+
 void CGridUI::Notify(TNotifyUI& msg) {
 	if (msg.sType == "ModeChanged") {
 		if (msg.pSender == m_cstModeBtn) {

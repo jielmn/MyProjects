@@ -83,6 +83,10 @@ public:
 	void  QueryTempByHandTagAsyn(const char * szTagId, int nGridIndex);
 	void  QueryTempByHandTag(const CQueryTempByHandTagParam * pParam);
 
+	// 删除格子的手持Tag绑定
+	void  RemoveGridBindingAsyn(int nGridIndex);
+	void  RemoveGridBinding(const CRemoveGridBindingParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

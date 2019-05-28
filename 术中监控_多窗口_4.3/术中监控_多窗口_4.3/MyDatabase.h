@@ -26,6 +26,8 @@ public:
 	void GetAllHandTagTempData(std::vector<HandTagResult *> & vHandTagRet);
 	// 保存Tag和窗格绑定
 	void TagBindingGrid(const CBindingTagGrid * pParam, std::string & old_tagid);
+	// 删除格子的手持Tag绑定
+	void RemoveGridBinding(const CRemoveGridBindingParam * pParam);
 
 private:
 	sqlite3 *                         m_db;
