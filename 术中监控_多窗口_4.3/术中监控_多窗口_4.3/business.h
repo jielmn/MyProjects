@@ -94,6 +94,10 @@ public:
 	// 获取tag的patient id
 	char *  GetTagPName(const char * szTagId, char * szPName, DWORD dwPNameLen);
 
+	// 报警声
+	void  AlarmAsyn();
+	void  Alarm();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

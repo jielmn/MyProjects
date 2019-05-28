@@ -597,3 +597,10 @@ char *  GetHandReaderId( char * szReaderId, DWORD dwReaderIdLen, const BYTE * pD
 	SNPRINTF(szReaderId, dwReaderIdLen, "%06lu", dwSn);
 	return szReaderId;
 }
+
+time_t  GetTimeDiff(time_t t1, time_t t2) {
+	if (t1 > t2)
+		return t1 - t2;
+	else
+		return t2 - t1;
+}

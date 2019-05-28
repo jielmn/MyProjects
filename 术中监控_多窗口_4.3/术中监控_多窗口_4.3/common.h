@@ -178,6 +178,7 @@ using namespace DuiLib;
 #define MSG_QUERY_TEMP_BY_HAND_TAG          2008
 #define MSG_REMOVE_GRID_BINDING             2009
 #define MSG_SAVE_TAG_PNAME                  2010
+#define MSG_ALARM                           2011
 
 
 // windows ÏûÏ¢
@@ -471,6 +472,7 @@ extern void  OnEdtRemarkKillFocus();
 extern void  OnEdtHandRemarkKillFocus();
 char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);
 extern void  SavePatientName(DWORD i);
+extern time_t  GetTimeDiff(time_t t1, time_t t2);
 
 // templates
 template <class T>

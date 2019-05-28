@@ -333,7 +333,7 @@ void  CGridUI::ShowSurReaderTemp(DWORD j, const TempItem & item) {
 	DWORD  i = GetTag();
 	DWORD  dwHighAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwHighTempAlarm;
 	DWORD  dwLowAlarm = g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_dwLowTempAlarm;
-	SetReaderTemp(j, item.m_dwTemp, dwHighAlarm, dwLowAlarm);
+	SetReaderTemp(j, item.m_dwTemp, dwHighAlarm, dwLowAlarm, item.m_time);
 	m_readers[j]->m_lblReaderId->SetText(item.m_szReaderId);
 	m_readers[j]->m_lblTagId->SetText(item.m_szTagId);
 
@@ -363,7 +363,7 @@ void CGridUI::ShowHandReaderTemp(const TempItem & item) {
 	DWORD  i = GetTag();
 	DWORD  dwHighAlarm = g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwHighTempAlarm;
 	DWORD  dwLowAlarm = g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_dwLowTempAlarm;
-	SetHandReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm);
+	SetHandReaderTemp(item.m_dwTemp, dwHighAlarm, dwLowAlarm, item.m_time);
 	m_hand_reader->m_lblReaderId->SetText(item.m_szReaderId);
 	m_hand_reader->m_lblTagId->SetText(item.m_szTagId);
 
@@ -382,7 +382,7 @@ void CGridUI::SetCurReaderTemp(CLabelUI * pReaderUI) {
 	m_cstImgLabel->SetTextColor(pReaderUI->GetTextColor());
 }
 
-void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
+void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm, time_t t) {
 	//CDuiString  strText;
 	//strText.Format("%.2f", dwTemp / 100.0);
 	//m_readers[j]->m_lblTemp->SetText(strText);
@@ -390,23 +390,43 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 
 	if (dwTemp >= dwHighAlarm) {
 		m_readers[j]->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+
+		time_t now = time(0);
+		time_t diff_t = GetTimeDiff(t, now);
+		if ( diff_t <= 2)
+			CBusiness::GetInstance()->AlarmAsyn();
 	}
 	else if (dwTemp <= dwLowAlarm) {
 		m_readers[j]->m_lblTemp->SetTextColor(LOW_TEMP_TEXT_COLOR);
+
+		time_t now = time(0);
+		time_t diff_t = GetTimeDiff(t, now);
+		if (diff_t <= 2)
+			CBusiness::GetInstance()->AlarmAsyn();
 	}
 	else {
 		m_readers[j]->m_lblTemp->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
 	}
 }
 
-void CGridUI::SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm) {
+void CGridUI::SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm, time_t t) {
 	m_hand_reader->SetTemp(dwTemp);
 
 	if (dwTemp >= dwHighAlarm) {
 		m_hand_reader->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+
+		time_t now = time(0);
+		time_t diff_t = GetTimeDiff(t, now);
+		if (diff_t <= 2)
+			CBusiness::GetInstance()->AlarmAsyn();
 	}
 	else if (dwTemp <= dwLowAlarm) {
 		m_hand_reader->m_lblTemp->SetTextColor(LOW_TEMP_TEXT_COLOR);
+
+		time_t now = time(0);
+		time_t diff_t = GetTimeDiff(t, now);
+		if (diff_t <= 2)
+			CBusiness::GetInstance()->AlarmAsyn();
 	}
 	else {
 		m_hand_reader->m_lblTemp->SetTextColor(NORMAL_TEMP_TEXT_COLOR);

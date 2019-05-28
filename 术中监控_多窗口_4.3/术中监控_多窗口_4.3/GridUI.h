@@ -63,8 +63,8 @@ private:
 	void Notify(TNotifyUI& msg);
 	void OnModeChanged(int nSource);
 	void SetCurReaderTemp(CLabelUI * pReaderUI );
-	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
-	void SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);
+	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm, time_t t);
+	void SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm, time_t t);
 	void OnPatientNameChanged(CEditableButtonUI * pSource);
 	
 private:

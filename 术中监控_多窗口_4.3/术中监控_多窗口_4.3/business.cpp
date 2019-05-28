@@ -1,5 +1,6 @@
 #include "business.h"
 #include "main.h"
+#include "resource.h"
 
 #define   CHECK_SQLITE_INTERVAL_TIME       60000
 
@@ -636,6 +637,7 @@ void  CBusiness::PrintStatus() {
 		JTelSvrPrint("launch com port = com%d", m_launch.GetPort());
 	}
 	JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
+	JTelSvrPrint("work messages count: %lu", g_data.m_thrd_work->GetMessagesCount());
 }
 
 // 保存温度数据
@@ -858,6 +860,21 @@ char *  CBusiness::GetTagPName(const char * szTagId, char * szPName, DWORD dwPNa
 	return szPName;
 }
 
+// 报警声
+void  CBusiness::AlarmAsyn() {
+	g_data.m_thrd_work->PostMessage(this, MSG_ALARM, 0, TRUE);
+}
+
+void  CBusiness::Alarm() {
+	// 如果关闭报警开关
+	if (g_data.m_CfgData.m_bAlarmVoiceOff) {
+		return;
+	}
+
+	PlaySound((LPCTSTR)IDR_WAVE1, GetModuleHandle(0), SND_RESOURCE | SND_ASYNC);
+	LmnSleep(1500);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -959,6 +976,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveTagPNameParam * pParam = (CSaveTagPNameParam *)pMessageData;
 		SaveTagPName(pParam);
+	}
+	break;
+
+	case MSG_ALARM:
+	{
+		Alarm();
 	}
 	break;
 
