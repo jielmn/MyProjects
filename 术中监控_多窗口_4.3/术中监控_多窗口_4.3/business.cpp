@@ -1,7 +1,7 @@
 #include "business.h"
 #include "main.h"
 
-#define   CHECK_SQLITE_INTERVAL_TIME       10000
+#define   CHECK_SQLITE_INTERVAL_TIME       60000
 
 
 CBusiness * CBusiness::pInstance = 0;
@@ -661,6 +661,9 @@ void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
 		pPName->m_time = time(0);
 		m_tag_patient_name[pParam->m_item.m_szTagId] = pPName;
 	}
+	else {
+		pPName->m_time = time(0);
+	}
 
 	m_sigHandReaderTemp.emit(pParam->m_item, pPName->m_szPName);
 }
@@ -699,8 +702,8 @@ void  CBusiness::CheckSqlite() {
 			return;
 		}
 
-		// 如果过时
-		if ( now - p->m_time >= 10 ) {
+		// 如果过时(超过1个星期)
+		if ( now - p->m_time >= TAG_PNAME_OVERTIME ) {
 			delete p;
 			it = m_tag_patient_name.erase(it);
 			return;
