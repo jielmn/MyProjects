@@ -3,12 +3,15 @@
 /*
   通用设置         ............................      8项
       7
-  手持测温设置 ..............................        3项
-	  2
+  //手持测温设置 ..............................        3项
+  // 2
   床位
       床位1         ..............................    23 项
 	      1 + 3 + 3 * 6
 */
+
+#define   SUBITEMS_COUNT_PER_BED                   23
+#define   COMMON_AND_HAND_ITEMS_COUNT              8
 
 
 CSettingDlg::CSettingDlg() {
@@ -37,7 +40,7 @@ void   CSettingDlg::InitWindow() {
 
 	InitCommonCfg();
 
-	InitHandReaderCfg();
+	// InitHandReaderCfg();
 
 	DuiLib::CDuiString  strText;
 	strText.Format("床位");
@@ -222,9 +225,9 @@ void  CSettingDlg::OnBtnOk(DuiLib::TNotifyUI& msg) {
 		return;
 	}
 
-	if (!GetHandReaderConfig()) {
-		return;
-	}
+	//if (!GetHandReaderConfig()) {
+	//	return;
+	//}
 
 	for (int i = 0; i < (int)m_data.m_dwLayoutGridsCnt; i++) {
 		if ( !GetGridConfig(i) ) {
@@ -304,9 +307,9 @@ BOOL  CSettingDlg::GetCommonConfig() {
 BOOL  CSettingDlg::GetGridConfig(int nIndex) {
 	CDuiString  strText;
 	CMyTreeCfgUI::ConfigValue  cfgValue;
-	const  DWORD  ITEMS_COUNT_PER_READER = 3;
+	// const  DWORD  ITEMS_COUNT_PER_READER = 3;
 	bool bGetCfg = false;
-	int  nCfgRowIndex = 13 + ((ITEMS_COUNT_PER_READER * MAX_READERS_PER_GRID)+5) * nIndex;
+	int  nCfgRowIndex = COMMON_AND_HAND_ITEMS_COUNT + SUBITEMS_COUNT_PER_BED * nIndex + 2;
 	int  nNumber = 0;
 	double dNumber = 0.0;
 
@@ -503,7 +506,7 @@ void   CSettingDlg::OnGridsChanged() {
 		int nCnt = m_tree->GetCount();
 		DWORD  dwDiff = m_data.m_dwLayoutGridsCnt - dwNumber;
 		for ( DWORD i = 0; i < dwDiff; i++ ) {
-			m_tree->RemoveAt( nCnt - 23 * dwDiff );
+			m_tree->RemoveAt( nCnt - SUBITEMS_COUNT_PER_BED * dwDiff );
 		}
 	}
 	m_data.m_dwLayoutGridsCnt = dwNumber;
