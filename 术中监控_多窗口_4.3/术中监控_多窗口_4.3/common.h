@@ -173,6 +173,7 @@ using namespace DuiLib;
 #define MSG_BINDING_TAG_GRID                2007
 #define MSG_QUERY_TEMP_BY_HAND_TAG          2008
 #define MSG_REMOVE_GRID_BINDING             2009
+#define MSG_SAVE_TAG_PNAME                  2010
 
 
 // windows ÏûÏ¢
@@ -420,6 +421,18 @@ public:
 
 	int        m_nGridIndex;
 };
+
+class CSaveTagPNameParam : public LmnToolkits::MessageData {
+public:
+	CSaveTagPNameParam(const char * szTagId, const char * szPName) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+		STRNCPY(m_szPName, szPName, MAX_TAG_PNAME_LENGTH);
+	}
+
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	char        m_szPName[MAX_TAG_PNAME_LENGTH];
+};
+
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

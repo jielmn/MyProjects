@@ -28,6 +28,8 @@ public:
 	void TagBindingGrid(const CBindingTagGrid * pParam, std::string & old_tagid);
 	// 删除格子的手持Tag绑定
 	void RemoveGridBinding(const CRemoveGridBindingParam * pParam);
+	// 保存Tag的patient name
+	void SaveTagPName(const CSaveTagPNameParam * pParam);
 
 private:
 	sqlite3 *                         m_db;

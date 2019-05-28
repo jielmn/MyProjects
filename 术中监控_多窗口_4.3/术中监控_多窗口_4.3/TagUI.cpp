@@ -1,4 +1,5 @@
 #include "TagUI.h"
+#include "business.h"
 
 CTagUI::CTagUI() : m_callback(m_pManager) {
 	m_bInited = FALSE;
@@ -47,7 +48,11 @@ void CTagUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 }
    
 void CTagUI::Notify(TNotifyUI& msg) {
-
+	if (msg.sType == "textchanged") {
+		if (msg.pSender == m_cstPatientName) {
+			OnTagNameChanged();
+		}
+	}
 } 
   
 void  CTagUI::OnHandTemp(const TempItem * pItem, const char * szName) {
@@ -102,4 +107,10 @@ void  CTagUI::SetBindingGridIndex(int nIndex) {
 int  CTagUI::GetBindingGridIndex() {
 	assert(m_bInited);
 	return m_nBindingGridIndex;
+}
+
+void CTagUI::OnTagNameChanged() {
+	assert(m_item.m_szTagId[0] != '\0');
+	CDuiString strName = m_cstPatientName->GetText();
+	CBusiness::GetInstance()->SaveTagPNameAsyn(m_item.m_szTagId, strName);
 }

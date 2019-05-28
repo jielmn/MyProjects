@@ -87,6 +87,10 @@ public:
 	void  RemoveGridBindingAsyn(int nGridIndex);
 	void  RemoveGridBinding(const CRemoveGridBindingParam * pParam);
 
+	// ±£´ætagµÄpatient name
+	void  SaveTagPNameAsyn(const char * szTagId, const char * szPName);
+	void  SaveTagPName(const CSaveTagPNameParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

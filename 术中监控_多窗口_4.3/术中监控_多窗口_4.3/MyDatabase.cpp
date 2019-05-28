@@ -438,3 +438,32 @@ void  CMySqliteDatabase::RemoveGridBinding(const CRemoveGridBindingParam * pPara
 	SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE grid_index=%d ", GRID_BINDING_TABLE, pParam->m_nGridIndex);
 	sqlite3_exec(m_db, sql, 0, 0, 0);
 }
+
+// 保存Tag的patient name
+void  CMySqliteDatabase::SaveTagPName(const CSaveTagPNameParam * pParam) {
+	char sql[8192];
+	char szName[256];
+	int  ret = 0;
+	time_t now = time(0);
+
+	StrReplaceAll(szName, sizeof(szName), pParam->m_szPName, "'", "''");
+
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", TAGS_TABLE, pParam->m_szTagId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	// 如果存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s SET patient_name = '%s', time=%lu WHERE tag_id = '%s' ", 
+			TAGS_TABLE, szName, (DWORD)now, pParam->m_szTagId );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	// 不存在
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s values ( '%s', '%s', %lu ) ", TAGS_TABLE,
+			pParam->m_szTagId, szName, (DWORD)now );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	sqlite3_free_table(azResult);
+}

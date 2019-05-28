@@ -796,6 +796,28 @@ void  CBusiness::RemoveGridBinding(const CRemoveGridBindingParam * pParam) {
 	m_sqlite.RemoveGridBinding(pParam);
 }
 
+// 保存tag的patient name
+void  CBusiness::SaveTagPNameAsyn(const char * szTagId, const char * szPName) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_TAG_PNAME,
+		                 new CSaveTagPNameParam(szTagId, szPName));
+}
+
+void  CBusiness::SaveTagPName(const CSaveTagPNameParam * pParam) {
+	m_sqlite.SaveTagPName(pParam);
+
+	TagPName* p = m_tag_patient_name[pParam->m_szTagId];
+	if ( 0 == p ) {
+		p = new TagPName;
+		STRNCPY(p->m_szPName, pParam->m_szPName, MAX_TAG_PNAME_LENGTH);
+		p->m_time = time(0);
+		m_tag_patient_name[pParam->m_szTagId] = p;
+	}
+	else {
+		STRNCPY(p->m_szPName, pParam->m_szPName, MAX_TAG_PNAME_LENGTH);
+		p->m_time = time(0);
+	}
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -890,6 +912,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CRemoveGridBindingParam * pParam = (CRemoveGridBindingParam *)pMessageData;
 		RemoveGridBinding(pParam);
+	}
+	break;
+
+	case MSG_SAVE_TAG_PNAME:
+	{
+		CSaveTagPNameParam * pParam = (CSaveTagPNameParam *)pMessageData;
+		SaveTagPName(pParam);
 	}
 	break;
 

@@ -19,6 +19,7 @@ private:
 	void DoInit();
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
+	void OnTagNameChanged();
 
 private:
 	BOOL                                        m_bInited;
