@@ -244,6 +244,10 @@ void  CGridUI::SetMode(CModeButton::Mode e) {
 	CDuiString strText;
 	strText.Format("%lu", (DWORD)e);
 	this->SetAttribute("GridMode", strText);
+
+	if ( m_bInited ) {
+		m_cstModeBtn->SetMode(e);
+	}
 }
 
 // 设置术中读卡器的连接状态
@@ -521,4 +525,33 @@ const std::vector<TempItem * > & CGridUI::GetTempData(DWORD dwReaderIndex) const
 
 CModeButton::Mode  CGridUI::GetMode() const {
 	return m_cstModeBtn->GetMode();
+}
+
+void CGridUI::ResetData() {
+	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+		ClearVector(m_vTemp[i]);
+	}
+	ClearVector(m_vHandTemp);
+
+	memset(m_aLastTemp, 0, sizeof(m_aLastTemp));
+	memset(&m_HandLastTemp, 0, sizeof(m_HandLastTemp));
+	m_dwSelSurReaderIndex = 0;
+
+	SetMode(CModeButton::Mode_Hand);
+
+	m_tabs->SelectItem(0);
+	m_lblReaderNo->SetText("");
+	m_CurReaderState->SetBkImage("");
+	m_lblElapsed->SetText("");
+	m_cstImgLabel->SetText("");
+
+	m_hand_reader->m_lblTagId->SetText("");
+	m_hand_reader->m_lblReaderId->SetText("");
+	m_hand_reader->m_lblTemp->SetText("");
+
+	for ( int i = 0; i < MAX_READERS_PER_GRID; i++ ) {
+		m_readers[i]->m_lblTagId->SetText("");
+		m_readers[i]->m_lblReaderId->SetText("");
+		m_readers[i]->m_lblTemp->SetText("");
+	}
 }

@@ -51,6 +51,8 @@ public:
 	const std::vector<TempItem * > & GetTempData(DWORD dwReaderIndex) const;
 	CModeButton::Mode  GetMode() const;
 
+	void ResetData();
+
 private:
 	LPCTSTR GetClass() const;
 

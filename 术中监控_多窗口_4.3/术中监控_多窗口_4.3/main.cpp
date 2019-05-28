@@ -848,6 +848,11 @@ void  CDuiFrameWnd::OnSetting() {
 	if ( oldData.m_dwLayoutGridsCnt != g_data.m_CfgData.m_dwLayoutGridsCnt ) {
 		g_data.m_cfg->RemoveConfig(CFG_GRIDS_ORDER);
 
+		// 多余的格子的数据要删除
+		for (DWORD i = oldData.m_dwLayoutGridsCnt; i < g_data.m_CfgData.m_dwLayoutGridsCnt; i++) {
+			m_pGrids[i]->ResetData();
+		}
+
 		m_dwCurSelGridIndex = 0;
 		m_eGridStatus = GRID_STATUS_GRIDS;
 		ResetGridOrder();
