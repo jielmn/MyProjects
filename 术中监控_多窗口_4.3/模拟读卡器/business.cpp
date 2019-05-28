@@ -205,16 +205,46 @@ void  CBusiness::SendHandTemp(const CSendHandTempParam * pParam) {
 		return;
 	}
 
-	//BYTE   bySend[128];
-	//DWORD  dwDataLen = 32;
-	//memcpy(bySend, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
-	//memcpy(bySend + 8,  "\x01\x00\x00\x00\x00\x00\x30\xe1", 8);
-	//memcpy(bySend + 22, "\x00\x00\x00\x00\x00\x00\x55\xe0", 8);
+	BYTE   byIndex = (BYTE)pParam->m_dwIndex;
+	BYTE   bySend[128];
+	DWORD  dwDataLen = 32;
+	memcpy(bySend, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
+	memcpy(bySend + 8,  "\x01\x00\x00\x00\x00\x00\x30\xe1", 8);
+	bySend[8] += byIndex;
 
-	//DWORD dwTemp = GetRand(3200, 4080);
-	//bySend[16] = (BYTE)(dwTemp / 100);
-	//bySend[17] = (BYTE)(dwTemp % 100);
-	//m_serial_port.Write(bySend, dwDataLen);
+	memcpy(bySend + 22, "\x00\x00\x00\x00\x00\x00\x55\xe0", 8);
+	bySend[22] += byIndex;
+
+	// 如果未初始化温度
+	if (m_arrHandTemp[byIndex] == 0) {
+		m_arrHandTemp[byIndex] = GetRand(3200, 4080);
+	}
+	// 已经初始化温度
+	else {
+		DWORD a = GetRand(1, 100);
+		DWORD b = GetRand(0, 20);
+		if (a > 50) {
+			m_arrHandTemp[byIndex] += b;
+		}
+		else {
+			m_arrHandTemp[byIndex] -= b;
+		}
+
+		if (m_arrHandTemp[byIndex] > 4080) {
+			m_arrHandTemp[byIndex] = 4080;
+		}
+		else if (m_arrHandTemp[byIndex] < 3200) {
+			m_arrHandTemp[byIndex] = 3200;
+		}
+	}
+	DWORD dwTemp = m_arrHandTemp[byIndex];
+	bySend[16] = (BYTE)(dwTemp / 100);
+	bySend[17] = (BYTE)(dwTemp % 100);
+	m_serial_port.Write(bySend, dwDataLen);
+
+	BYTE * pNewData = new BYTE[dwDataLen];
+	memcpy(pNewData, bySend, dwDataLen);
+	::PostMessage(g_data.m_hWnd, UM_SEND_DATA, (WPARAM)pNewData, dwDataLen);
 }
 
 // 消息处理

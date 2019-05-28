@@ -11,10 +11,9 @@
 #include "resource.h"
 #include <time.h>
 
-#define  HAND_TAG_COUNT    10
-static  DWORD  s_HandDelay[HAND_TAG_COUNT] = { 10000, 11000, 12000, 13000, 14000,
+static  DWORD  s_HandDelay[MAX_HAND_TAG_COUNT] = { 10000, 11000, 12000, 13000, 14000,
                                               15000, 16000, 17000, 18000, 19000 };
-static  DWORD  s_HandTick[HAND_TAG_COUNT] = { 0 };
+static  DWORD  s_HandTick[MAX_HAND_TAG_COUNT] = { 0 };
 
 LPCTSTR  CMyListData::GetItemText( CControlUI* pControl, int iIndex, int iSubItem ) {
 	char szBuf[256];
@@ -65,7 +64,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lstReceive->SetTextCallback(&m_lstReceiveData);
 	m_lstSend->SetTextCallback(&m_lstSendData);
 
-	for (int i = 0; i < HAND_TAG_COUNT; i++) {
+	for (int i = 0; i < MAX_HAND_TAG_COUNT; i++) {
 		//s_HandTick[i] = LmnGetTickCount();
 		s_HandTick[i] = 0;
 	}
@@ -143,16 +142,17 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_TIMER) {
 		if (wParam == 1) {
-			DWORD  dwCurTick = LmnGetTickCount();
-			for ( int i = 0; i < HAND_TAG_COUNT; i++ ) {
-				DWORD  dwElapsed = dwCurTick - s_HandTick[i];
-				// 如果时间到
-				if ( dwElapsed >= s_HandDelay[i] ) {
-
-
-					s_HandTick[i] = dwCurTick;
+			if (g_data.m_bHand) {
+				DWORD  dwCurTick = LmnGetTickCount();
+				for (int i = 0; i < MAX_HAND_TAG_COUNT; i++) {
+					DWORD  dwElapsed = dwCurTick - s_HandTick[i];
+					// 如果时间到
+					if (dwElapsed >= s_HandDelay[i]) {
+						CBusiness::GetInstance()->SendHandTempAsyn(i);
+						s_HandTick[i] = dwCurTick;
+					}
 				}
-			}
+			}			
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);

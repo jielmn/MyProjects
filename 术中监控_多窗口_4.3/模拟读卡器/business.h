@@ -37,6 +37,7 @@ private:
 	CLmnSerialPort          m_serial_port;
 	CDataBuf                m_buf;
 	DWORD                   m_arrTemp[MAX_GRID * MAX_READERS_PER_GRID];
+	DWORD                   m_arrHandTemp[MAX_HAND_TAG_COUNT];
 };
 
 

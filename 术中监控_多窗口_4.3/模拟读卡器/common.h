@@ -26,6 +26,7 @@
 
 #define   MAX_READERS_PER_GRID      6
 #define   MAX_GRID                  64
+#define   MAX_HAND_TAG_COUNT        10
 
 typedef  struct  tagMyListItem {
 	BYTE        m_data[128];
