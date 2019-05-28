@@ -112,7 +112,7 @@ void CGridUI::DoInit() {
 	m_cstPatientName = static_cast<CEditableButtonUI *>(m_pManager->FindControl(CST_PATIENT_NAME));
 	m_cstPatientNameM = static_cast<CEditableButtonUI *>(m_pManager->FindControl(CST_PATIENT_NAME_M));
 
-	OnModeChanged();
+	OnModeChanged(0);
 
 	m_bInited = TRUE;
 }
@@ -155,7 +155,7 @@ void  CGridUI::SetView(int nTabIndex) {
 void CGridUI::Notify(TNotifyUI& msg) {
 	if (msg.sType == "ModeChanged") {
 		if (msg.pSender == m_cstModeBtn) {
-			OnModeChanged();
+			OnModeChanged(1);
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -168,8 +168,9 @@ void CGridUI::Notify(TNotifyUI& msg) {
 	}
 }
 
-void CGridUI::OnModeChanged() {
+void CGridUI::OnModeChanged(int nSource) {
 	DWORD  dwIndex = GetTag();
+	char szPName[MAX_TAG_PNAME_LENGTH] = {0};
 
 	switch (m_cstModeBtn->GetMode())
 	{
@@ -187,6 +188,14 @@ void CGridUI::OnModeChanged() {
 
 		m_cstImgLabel->SetText(m_hand_reader->m_lblTemp->GetText());
 		m_cstImgLabel->SetTextColor(m_hand_reader->m_lblTemp->GetTextColor());
+
+		if ( nSource != 0 ) {
+			m_cstPatientName->SetText(CBusiness::GetInstance()->GetTagPName(m_HandLastTemp.m_szTagId, szPName, sizeof(szPName)) );
+			m_cstPatientNameM->SetText(m_cstPatientName->GetText());
+		}
+
+		m_cstPatientName->SetEnabled(false);
+		m_cstPatientNameM->SetEnabled(false);
 	}
 	break;
 
@@ -208,6 +217,14 @@ void CGridUI::OnModeChanged() {
 		m_CurReaderState->SetVisible(true);
 		
 		OnSurReaderSelected(0);
+
+		if (nSource != 0) {
+			m_cstPatientName->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_szPatientName);
+			m_cstPatientNameM->SetText(m_cstPatientName->GetText());
+		}
+
+		m_cstPatientName->SetEnabled(true);
+		m_cstPatientNameM->SetEnabled(true);
 	}
 	break;
 
@@ -238,6 +255,14 @@ void CGridUI::OnModeChanged() {
 		if (nSel < 0)
 			nSel = 0;
 		OnSurReaderSelected(nSel);
+
+		if (nSource != 0) {
+			m_cstPatientName->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_szPatientName);
+			m_cstPatientNameM->SetText(m_cstPatientName->GetText());
+		}
+
+		m_cstPatientName->SetEnabled(true);
+		m_cstPatientNameM->SetEnabled(true);
 	}
 	break;
 
@@ -587,4 +612,12 @@ void CGridUI::SetPatientName(const char * szName) {
 	assert(m_bInited);
 	m_cstPatientName->SetText(szName);
 	m_cstPatientNameM->SetText(szName);
+}
+
+void CGridUI::SetPatientNameInHandMode(const char * szName) {
+	assert(m_bInited);
+	if (m_cstModeBtn->GetMode() == CModeButton::Mode_Hand) {
+		m_cstPatientName->SetText(szName);
+		m_cstPatientNameM->SetText(szName);
+	}	
 }

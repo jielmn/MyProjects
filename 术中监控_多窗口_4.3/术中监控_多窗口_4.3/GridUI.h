@@ -53,6 +53,7 @@ public:
 
 	void ResetData();
 	void SetPatientName(const char * szName);
+	void SetPatientNameInHandMode(const char * szName);
 
 private:
 	LPCTSTR GetClass() const;
@@ -60,7 +61,7 @@ private:
 	void DoInit();
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
 	void Notify(TNotifyUI& msg);
-	void OnModeChanged();
+	void OnModeChanged(int nSource);
 	void SetCurReaderTemp(CLabelUI * pReaderUI );
 	void SetReaderTemp( DWORD dwSubIndex, DWORD  dwTemp,DWORD dwHighAlarm,DWORD dwLowAlarm);
 	void SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm);

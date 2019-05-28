@@ -91,6 +91,9 @@ public:
 	void  SaveTagPNameAsyn(const char * szTagId, const char * szPName);
 	void  SaveTagPName(const CSaveTagPNameParam * pParam);
 
+	// 获取tag的patient id
+	char *  GetTagPName(const char * szTagId, char * szPName, DWORD dwPNameLen);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -124,6 +127,7 @@ private:
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	
 
+	LmnLockType                                     m_lock;
 	std::map<std::string, TagPName*>                m_tag_patient_name;        // tag对应的病人名称 
 };
 

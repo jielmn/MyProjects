@@ -14,6 +14,7 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() {
+	LmnInitLock(&m_lock);
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
 	m_launch.m_sigHandReaderTemp.connect(this, &CBusiness::OnHandReaderTemp);
@@ -21,6 +22,7 @@ CBusiness::CBusiness() {
 
 CBusiness::~CBusiness() {
 	Clear();
+	LmnDeinitLock(&m_lock);
 }
 
 void CBusiness::Clear() {
@@ -654,6 +656,7 @@ void  CBusiness::SaveHandeTempAsyn(const TempItem & item) {
 void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
 	m_sqlite.SaveHandTemp(pParam);
 
+	CFuncLock cLock(&m_lock);
 	TagPName * pPName = m_tag_patient_name[pParam->m_item.m_szTagId];
 
 	// 如果没有从数据库里查询过tag的病人名称，则查询一次
@@ -698,6 +701,7 @@ void  CBusiness::CheckSqliteAsyn() {
 void  CBusiness::CheckSqlite() {
 	time_t now = time(0);
 	std::map<std::string, TagPName*>::iterator it;
+	CFuncLock cLock(&m_lock);
 	for ( it = m_tag_patient_name.begin(); it != m_tag_patient_name.end();) {
 		TagPName* p = it->second;
 		if (p == 0) {
@@ -754,6 +758,19 @@ void  CBusiness::Prepare() {
 	std::vector<HandTagResult *> * pvHandTagRet = new std::vector<HandTagResult *>;
 	m_sqlite.GetAllHandTagTempData(*pvHandTagRet);
 	m_sigAllHandTagTempData.emit(pvHandTagRet);
+	time_t now = time(0);
+
+	CFuncLock cLock(&m_lock);	
+	std::vector<HandTagResult *>::iterator ix;
+	for ( ix = pvHandTagRet->begin(); ix != pvHandTagRet->end(); ++ix ) {
+		HandTagResult * p = *ix;
+		if ( p->m_szTagId[0] != '\0' && p->m_szTagPName[0] != '\0' ) {
+			TagPName* pTagName = new TagPName;
+			STRNCPY(pTagName->m_szPName, p->m_szTagPName, MAX_TAG_PNAME_LENGTH);
+			pTagName->m_time = now;
+			m_tag_patient_name[p->m_szTagId] = pTagName;
+		}
+	}
 	/******************** end  查询手持温度数据  **********************/
 
 	m_prepared.emit();
@@ -808,6 +825,7 @@ void  CBusiness::SaveTagPNameAsyn(const char * szTagId, const char * szPName) {
 void  CBusiness::SaveTagPName(const CSaveTagPNameParam * pParam) {
 	m_sqlite.SaveTagPName(pParam);
 
+	CFuncLock cLock(&m_lock);
 	TagPName* p = m_tag_patient_name[pParam->m_szTagId];
 	if ( 0 == p ) {
 		p = new TagPName;
@@ -819,6 +837,25 @@ void  CBusiness::SaveTagPName(const CSaveTagPNameParam * pParam) {
 		STRNCPY(p->m_szPName, pParam->m_szPName, MAX_TAG_PNAME_LENGTH);
 		p->m_time = time(0);
 	}
+}
+
+// 获取tag的patient id
+char *  CBusiness::GetTagPName(const char * szTagId, char * szPName, DWORD dwPNameLen) {
+	CFuncLock cLock(&m_lock);
+	if ( szTagId == 0 || szTagId[0] == '\0' ) {
+		szPName[0] = '\0';
+		return szPName;
+	}
+
+	std::map<std::string, TagPName*>::iterator it =  m_tag_patient_name.find(szTagId);
+	if ( it == m_tag_patient_name.end() ) {
+		szPName[0] = '\0';
+		return szPName;
+	}
+
+	TagPName* p = it->second;
+	STRNCPY(szPName, p->m_szPName, dwPNameLen);
+	return szPName;
 }
 
 
