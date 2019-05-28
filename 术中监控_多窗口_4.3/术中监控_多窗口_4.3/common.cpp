@@ -412,6 +412,13 @@ void  SaveReaderName(DWORD i, DWORD j) {
 	g_data.m_cfg->Save();
 }
 
+void  SavePatientName(DWORD i) {
+	CDuiString  strText;
+	strText.Format("%s %lu", CFG_PATIENT_NAME, i + 1);
+	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szPatientName, 0);
+	g_data.m_cfg->Save();
+}
+
 void  SaveAlarmTemp(DWORD i, DWORD j, int m) {
 	CDuiString strText;
 	CModeButton::Mode  mode = (CModeButton::Mode)m;

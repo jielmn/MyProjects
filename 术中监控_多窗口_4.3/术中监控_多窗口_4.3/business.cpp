@@ -364,6 +364,9 @@ void CBusiness::GetGridsCfg() {
 
 		strText.Format("%s %lu", CFG_HAND_READER_NAME, i + 1);
 		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_HandReaderCfg.m_szReaderName, MAX_READER_NAME_LENGTH, g_BodyPart);
+
+		strText.Format("%s %lu", CFG_PATIENT_NAME, i + 1);
+		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szPatientName, MAX_TAG_PNAME_LENGTH, 0);
 	}
 }
 

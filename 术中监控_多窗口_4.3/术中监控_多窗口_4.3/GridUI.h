@@ -52,6 +52,7 @@ public:
 	CModeButton::Mode  GetMode() const;
 
 	void ResetData();
+	void SetPatientName(const char * szName);
 
 private:
 	LPCTSTR GetClass() const;

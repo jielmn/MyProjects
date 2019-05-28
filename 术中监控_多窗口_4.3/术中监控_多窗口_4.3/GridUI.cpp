@@ -570,5 +570,21 @@ void CGridUI::ResetData() {
 }
 
 void CGridUI::OnPatientNameChanged(CEditableButtonUI * pSource) {
-	
+	DWORD  i = GetTag();
+	CDuiString  strPatientName = pSource->GetText();
+	STRNCPY(g_data.m_CfgData.m_GridCfg[i].m_szPatientName, strPatientName, MAX_TAG_PNAME_LENGTH);
+	SavePatientName(i);
+
+	if ( pSource == m_cstPatientName ) {
+		m_cstPatientNameM->SetText(strPatientName);
+	}
+	else {
+		m_cstPatientName->SetText(strPatientName);
+	}	
+}
+
+void CGridUI::SetPatientName(const char * szName) {
+	assert(m_bInited);
+	m_cstPatientName->SetText(szName);
+	m_cstPatientNameM->SetText(szName);
 }

@@ -101,6 +101,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_pGrids[i]->SetBedNo(i + 1);
 		m_pGrids[i]->SetMode( (CModeButton::Mode)g_data.m_CfgData.m_GridCfg[i].m_dwGridMode );
 		m_layMain->Add(m_pGrids[i]);
+		m_pGrids[i]->SetPatientName(g_data.m_CfgData.m_GridCfg[i].m_szPatientName);
 	}
 	m_cstHandImg = static_cast<CMyHandImage *>(m_PaintManager.FindControl(CST_HAND_IMAGE));
 	m_layTags = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl(LAYOUT_TAGS));

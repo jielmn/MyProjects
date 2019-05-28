@@ -47,6 +47,7 @@ using namespace DuiLib;
 #define   EDT_REMARK_Y_OFFSET         10
 #define   TAG_UI_HEIGHT               110
 #define   TAG_PNAME_OVERTIME          604800     // 单位：秒 
+#define   MAX_TAG_PNAME_LENGTH        20
 
 #define   VERSION                     "3.0.1"
 
@@ -157,6 +158,7 @@ using namespace DuiLib;
 #define   CFG_HAND_READER_LOW_TEMP_ALARM    "hand reader low temperature alarm"
 #define   CFG_HAND_READER_HIGH_TEMP_ALARM   "hand reader high temperature alarm"
 #define   CFG_HAND_READER_NAME              "hand reader name"
+#define   CFG_PATIENT_NAME                  "patient name"
 
 // thread消息
 #define MSG_CHECK_LAUNCH_STATUS             1001
@@ -230,6 +232,7 @@ typedef struct tagGridCfg
 	DWORD       m_dwGridMode;                           // 手持0，单点连续1，多点连续2
 	ReaderCfg   m_ReaderCfg[MAX_READERS_PER_GRID];      // 术中Reader配置
 	ReaderCfg   m_HandReaderCfg;                        // 手持Reader配置
+	char        m_szPatientName[MAX_TAG_PNAME_LENGTH];  // 病人姓名
 }GridCfg;
 
 typedef struct tagCfgData {
@@ -373,7 +376,7 @@ typedef  struct  tagLastSurTagItem {
 	WORD    m_wBedId;
 }LastSurTagItem;
 
-#define  MAX_TAG_PNAME_LENGTH  20
+
 typedef  struct  tagTagPName {
 	char    m_szPName[MAX_TAG_PNAME_LENGTH];
 	time_t  m_time;
@@ -467,6 +470,7 @@ extern const char * GetWeekDayName(int nWeekIndex);
 extern void  OnEdtRemarkKillFocus();
 extern void  OnEdtHandRemarkKillFocus();
 char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);
+extern void  SavePatientName(DWORD i);
 
 // templates
 template <class T>
