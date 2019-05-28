@@ -58,6 +58,9 @@ public:
 	// 导出excel
 	void  ExportExcel();
 
+	// 打印excel表格
+	void  PrintExcel();
+
 private:
 	LPCTSTR GetClass() const;
 

@@ -1150,6 +1150,7 @@ void   CDuiFrameWnd::OnExportExcel(DWORD  dwIndex) {
 void   CDuiFrameWnd::OnPrintExcel(DWORD  dwIndex) {
 	assert(dwIndex < MAX_GRID_COUNT);
 	assert(dwIndex < g_data.m_CfgData.m_dwLayoutGridsCnt);
+	m_pGrids[dwIndex]->PrintExcel();
 }
  
 // ÊÖ³Ö¶Á¿¨Æ÷ÎÂ¶È
