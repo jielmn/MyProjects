@@ -406,7 +406,13 @@ int CBusiness::DeInit() {
 	}
 
 	if (g_data.m_thrd_excel) {
-		g_data.m_thrd_excel->Stop();
+		// post save 消息
+		SaveExcelAsyn();
+		// post quit 消息
+		g_data.m_thrd_excel->PostMessage(this, LmnToolkits::Thread::MESSAGE_ID_CLOSE_THREAD);
+		// NOT SET stop flag
+		g_data.m_thrd_excel->Stop( FALSE );
+
 		delete g_data.m_thrd_excel;
 		g_data.m_thrd_excel = 0;
 	}

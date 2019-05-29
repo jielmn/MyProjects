@@ -1605,15 +1605,15 @@ void   CDuiFrameWnd::OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * p
 // 删除掉过时的手持Tag
 void   CDuiFrameWnd::OnHandTagErasedNotify(const char * szTagId) {
 	assert(szTagId);
-	assert(szTagId[0] != '\0');
 
-	CTagUI * pTag = m_tags_ui[szTagId];
-	if (pTag != 0) {
-		m_layTags->Remove(pTag);
+	std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find(szTagId);
+	// 如果找到了
+	if (it != m_tags_ui.end()) {
+		CTagUI * pTagUI = it->second;
+		m_tags_ui.erase(it);
 
-		std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find(szTagId);
-		if ( it != m_tags_ui.end() ) {
-			m_tags_ui.erase(it);
+		if (pTagUI) {
+			m_layTags->Remove(pTagUI);
 		}
 	}
 }
