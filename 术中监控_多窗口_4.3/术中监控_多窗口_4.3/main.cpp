@@ -50,6 +50,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_hand_tabs = 0;
 	m_dragdrop_tag_timetick = 0;
 	m_layDragDropGrids = 0;
+
+	m_LastSaveExcelTime = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -1110,6 +1112,21 @@ void   CDuiFrameWnd::On60SecondsTimer() {
 			}
 		}
 	}
+
+	/*********** 定时保存excel *************/
+	time_t now = time(0);
+	struct tm  tmp;
+	localtime_s(&tmp, &now);
+
+	if ((tmp.tm_hour == 8 || tmp.tm_hour == 12 || tmp.tm_hour == 18 || tmp.tm_hour == 0)
+		&& (tmp.tm_min >= 0 && tmp.tm_min <= 1)) {		
+		// 两次间隔时间最少30分钟
+		if (now - m_LastSaveExcelTime >= 1800) {
+			// 保存
+			CBusiness::GetInstance()->SaveExcelAsyn();
+			m_LastSaveExcelTime = now;
+		}
+	}
 }
 
 // 查询温度结果
@@ -1165,6 +1182,7 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 	CTagUI * pTagUI = 0;
 
+	assert(pItem->m_szTagId[0] != '\0');
 	// 新Tag
 	if ( bNewTag ) {
 		pTagUI = new CTagUI;  
@@ -1174,7 +1192,7 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 		m_tags_ui.insert( std::make_pair(pItem->m_szTagId, pTagUI) );
 	}
-	else {
+	else {		
 		pTagUI = m_tags_ui[pItem->m_szTagId];
 		assert(pTagUI);
 		pTagUI->OnHandTemp(pItem, tag_patient_name);
@@ -1248,6 +1266,7 @@ void   CDuiFrameWnd::OnAllHandTagTempData(WPARAM wParam, LPARAM  lParam) {
 			m_pGrids[pItem->m_nBindingGridIndex - 1]->SetPatientNameInHandMode(pItem->m_szTagPName);
 		}
 
+		assert(pItem->m_szTagId[0] != '\0');
 		m_tags_ui.insert(std::make_pair(pItem->m_szTagId, pTagUI));
 	}
 
@@ -1490,13 +1509,15 @@ void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 	it = m_tags_ui.find(pParam->m_szTagId);
 	if ( it != m_tags_ui.end() ) {
 		CTagUI * pTagUI = it->second;
-		pTagUI->SetBindingGridIndex(pParam->m_nGridIndex);
+		if ( pTagUI )
+			pTagUI->SetBindingGridIndex(pParam->m_nGridIndex);
 	}
 
 	it = m_tags_ui.find(pParam->m_szOldTagId);
 	if (it != m_tags_ui.end()) {
 		CTagUI * pTagUI = it->second;
-		pTagUI->SetBindingGridIndex(0);
+		if ( pTagUI )
+			pTagUI->SetBindingGridIndex(0);
 	}
 
 	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);
@@ -1583,6 +1604,9 @@ void   CDuiFrameWnd::OnAllHandTagTempDataNotify(std::vector<HandTagResult *> * p
 
 // 删除掉过时的手持Tag
 void   CDuiFrameWnd::OnHandTagErasedNotify(const char * szTagId) {
+	assert(szTagId);
+	assert(szTagId[0] != '\0');
+
 	CTagUI * pTag = m_tags_ui[szTagId];
 	if (pTag != 0) {
 		m_layTags->Remove(pTag);

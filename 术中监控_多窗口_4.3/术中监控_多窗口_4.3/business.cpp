@@ -666,6 +666,10 @@ void  CBusiness::SaveSurTempAsyn(WORD wBedNo, const TempItem & item) {
 void  CBusiness::SaveSurTemp(CSaveSurTempParam * pParam) {
 	m_sqlite.SaveSurTemp(pParam);
 	m_sigSurReaderTemp.emit(pParam->m_wBedNo, pParam->m_item);
+
+	DWORD  i = (pParam->m_wBedNo - 1) / MAX_READERS_PER_GRID;
+	DWORD  j = (pParam->m_wBedNo - 1) % MAX_READERS_PER_GRID;
+	WriteTemp2ExcelAsyn(i, j+1, &pParam->m_item, g_data.m_CfgData.m_GridCfg[i].m_szPatientName);
 }
 
 // 保存手持温度数据
@@ -679,12 +683,13 @@ void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
 	CFuncLock cLock(&m_lock);
 	TagPName * pPName = m_tag_patient_name[pParam->m_item.m_szTagId];
 
-	// 如果没有从数据库里查询过tag的病人名称，则查询一次
+	// 如果没有，则查询一次，获取相关值
 	if ( 0 == pPName) {
 		pPName = new TagPName;
 		memset(pPName, 0, sizeof(TagPName));
 		m_sqlite.QueryTagPNameByTagId(pParam->m_item.m_szTagId, pPName->m_szPName, MAX_TAG_PNAME_LENGTH);
 		pPName->m_time = time(0);
+		pPName->m_nParam0 = m_sqlite.QueryBindingIndexByTag(pParam->m_item.m_szTagId);
 		m_tag_patient_name[pParam->m_item.m_szTagId] = pPName;
 	}
 	else {
@@ -692,6 +697,10 @@ void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
 	}
 
 	m_sigHandReaderTemp.emit(pParam->m_item, pPName->m_szPName);
+
+	if ( pPName->m_nParam0 > 0 ) {
+		WriteTemp2ExcelAsyn( pPName->m_nParam0 - 1, 0, &pParam->m_item, pPName->m_szPName);
+	}	
 }
 
 void  CBusiness::QueryTempByTagAsyn(const char * szTagId, WORD wBedNo) {
@@ -729,7 +738,7 @@ void  CBusiness::CheckSqlite() {
 			return;
 		}
 
-		// 如果过时(超过1个星期)
+		// 如果过时
 		if ( now - p->m_time >= TAG_PNAME_OVERTIME ) {
 			delete p;
 			it = m_tag_patient_name.erase(it);
@@ -784,10 +793,12 @@ void  CBusiness::Prepare() {
 	std::vector<HandTagResult *>::iterator ix;
 	for ( ix = pvHandTagRet->begin(); ix != pvHandTagRet->end(); ++ix ) {
 		HandTagResult * p = *ix;
-		if ( p->m_szTagId[0] != '\0' && p->m_szTagPName[0] != '\0' ) {
+
+		if ( p->m_szTagId[0] != '\0') {
 			TagPName* pTagName = new TagPName;
 			STRNCPY(pTagName->m_szPName, p->m_szTagPName, MAX_TAG_PNAME_LENGTH);
 			pTagName->m_time = now;
+			pTagName->m_nParam0 = p->m_nBindingGridIndex;
 			m_tag_patient_name[p->m_szTagId] = pTagName;
 		}
 	}
@@ -851,6 +862,7 @@ void  CBusiness::SaveTagPName(const CSaveTagPNameParam * pParam) {
 		p = new TagPName;
 		STRNCPY(p->m_szPName, pParam->m_szPName, MAX_TAG_PNAME_LENGTH);
 		p->m_time = time(0);
+		p->m_nParam0 = m_sqlite.QueryBindingIndexByTag(pParam->m_szTagId);
 		m_tag_patient_name[pParam->m_szTagId] = p;
 	}
 	else {
@@ -895,7 +907,7 @@ void  CBusiness::Alarm() {
 
 // 保存excel
 void  CBusiness::SaveExcelAsyn() {
-
+	g_data.m_thrd_excel->PostMessage(this, MSG_SAVE_EXCEL);
 }
 
 void  CBusiness::SaveExcel() {
@@ -904,10 +916,12 @@ void  CBusiness::SaveExcel() {
 
 // 写温度数据到excel
 void  CBusiness::WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName) {
-
+	assert(pTemp);
+	g_data.m_thrd_excel->PostMessage( this, MSG_WRITE_TEMP_2_EXCEL, 
+		new CWriteTemp2ExcelParam(i, j, pTemp, szPName) );
 }
 
-void  CBusiness::WriteTemp2Excel() {
+void  CBusiness::WriteTemp2Excel(const CWriteTemp2ExcelParam * pParam) {
 
 }
 
@@ -1018,6 +1032,19 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_ALARM:
 	{
 		Alarm();
+	}
+	break;
+
+	case MSG_WRITE_TEMP_2_EXCEL:
+	{
+		CWriteTemp2ExcelParam * pParam = (CWriteTemp2ExcelParam *)pMessageData;
+		WriteTemp2Excel(pParam);
+	}
+	break;
+
+	case MSG_SAVE_EXCEL:
+	{
+		SaveExcel();
 	}
 	break;
 

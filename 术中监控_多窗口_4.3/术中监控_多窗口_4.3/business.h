@@ -142,13 +142,15 @@ private:
 	char              m_excel_tag_id[MAX_GRID_COUNT][MAX_READERS_PER_GRID+1][MAX_TAG_ID_LENGTH];
 	char              m_excel_patient_name[MAX_GRID_COUNT][MAX_READERS_PER_GRID + 1][MAX_TAG_PNAME_LENGTH];
 
+
+public:
 	// 保存excel
 	void  SaveExcelAsyn();
 	void  SaveExcel();
 
-	// 写温度数据到excel
+	// 写温度数据到excel( i: grid index, j: 0 hand,1~6 surgery )
 	void  WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName);
-	void  WriteTemp2Excel();
+	void  WriteTemp2Excel(const CWriteTemp2ExcelParam * pParam);
 };
 
 

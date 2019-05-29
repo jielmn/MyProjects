@@ -46,7 +46,7 @@ using namespace DuiLib;
 #define   EDT_REMARK_HEIGHT           30
 #define   EDT_REMARK_Y_OFFSET         10
 #define   TAG_UI_HEIGHT               110
-#define   TAG_PNAME_OVERTIME          604800     // 单位：秒 
+#define   TAG_PNAME_OVERTIME          10     // 单位：秒 
 #define   MAX_TAG_PNAME_LENGTH        20
 
 #define   VERSION                     "3.0.1"
@@ -179,6 +179,8 @@ using namespace DuiLib;
 #define MSG_REMOVE_GRID_BINDING             2009
 #define MSG_SAVE_TAG_PNAME                  2010
 #define MSG_ALARM                           2011
+#define MSG_WRITE_TEMP_2_EXCEL              2012
+#define MSG_SAVE_EXCEL                      2013
 
 
 // windows 消息
@@ -383,6 +385,7 @@ typedef  struct  tagLastSurTagItem {
 typedef  struct  tagTagPName {
 	char    m_szPName[MAX_TAG_PNAME_LENGTH];
 	time_t  m_time;
+	int     m_nParam0;       // 用于保存额外信息(绑定的grid index，从1开始,0为没有绑定)
 }TagPName;
 
 // 查询手持Tag的温度数据结果集合
@@ -439,6 +442,25 @@ public:
 
 	char        m_szTagId[MAX_TAG_ID_LENGTH];
 	char        m_szPName[MAX_TAG_PNAME_LENGTH];
+};
+
+class CWriteTemp2ExcelParam : public LmnToolkits::MessageData {
+public:
+	CWriteTemp2ExcelParam(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName) {
+		STRNCPY(m_szTagId, pTemp->m_szTagId, MAX_TAG_ID_LENGTH);
+		STRNCPY(m_szPName, szPName,          MAX_TAG_PNAME_LENGTH);
+		m_dwTemp = pTemp->m_dwTemp;
+		m_time = pTemp->m_time;
+		m_i = i;
+		m_j = j;
+	}
+
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	char        m_szPName[MAX_TAG_PNAME_LENGTH];
+	DWORD       m_dwTemp;
+	time_t      m_time;
+	DWORD       m_i;
+	DWORD       m_j;
 };
 
 

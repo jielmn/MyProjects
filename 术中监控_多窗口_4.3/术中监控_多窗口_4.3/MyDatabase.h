@@ -30,6 +30,8 @@ public:
 	void RemoveGridBinding(const CRemoveGridBindingParam * pParam);
 	// 保存Tag的patient name
 	void SaveTagPName(const CSaveTagPNameParam * pParam);
+	// 查询tag绑定的grid index
+	int  QueryBindingIndexByTag(const char * szTagId);
 
 private:
 	sqlite3 *                         m_db;

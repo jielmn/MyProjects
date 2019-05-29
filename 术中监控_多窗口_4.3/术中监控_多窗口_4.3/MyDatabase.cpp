@@ -467,3 +467,25 @@ void  CMySqliteDatabase::SaveTagPName(const CSaveTagPNameParam * pParam) {
 	}
 	sqlite3_free_table(azResult);
 }
+
+// 查询tag绑定的grid index
+int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
+	assert(szTagId);
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", GRID_BINDING_TABLE, szTagId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+
+	// 如果存在
+	if (nrow > 0) {
+		sscanf_s(azResult[ncolumn], "%lu", &dwValue);
+	}
+	sqlite3_free_table(azResult);
+
+	return dwValue;
+}

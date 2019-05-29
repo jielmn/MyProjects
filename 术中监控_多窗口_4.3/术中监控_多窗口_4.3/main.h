@@ -207,4 +207,7 @@ private:
 	CDuiString                                  m_dragdrop_tag;
 	int                                         m_dragdrop_tag_dest_index;
 	DWORD                                       m_dragdrop_tag_timetick;
+
+	// ¶¨Ê±±£´æexcel
+	time_t                                      m_LastSaveExcelTime;
 };
