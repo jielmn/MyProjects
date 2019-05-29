@@ -10,12 +10,9 @@ void   CAboutDlg::Notify(DuiLib::TNotifyUI& msg) {
 
 void   CAboutDlg::InitWindow() {
 	CDuiString  strText;
-	char buf[256];
-	time_t now = time(0);
-	DateTime2String(buf, sizeof(buf), &now );
 
 	m_lblVersion = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(LBL_VERSION));
-	strText.Format("°æ±¾ºÅ£º%s(%s)", VERSION, buf);
+	strText.Format("°æ±¾ºÅ£º%s(%s)", VERSION, COMPILE_TIME);
 	m_lblVersion->SetText(strText);
 
 	DuiLib::WindowImplBase::InitWindow(); 
