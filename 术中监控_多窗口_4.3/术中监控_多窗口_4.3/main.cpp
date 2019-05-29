@@ -1118,6 +1118,9 @@ void   CDuiFrameWnd::On60SecondsTimer() {
 	struct tm  tmp;
 	localtime_s(&tmp, &now);
 
+	// CBusiness::GetInstance()->SaveExcelAsyn();   用于调试用
+
+	// 实际用法
 	if ((tmp.tm_hour == 8 || tmp.tm_hour == 12 || tmp.tm_hour == 18 || tmp.tm_hour == 0)
 		&& (tmp.tm_min >= 0 && tmp.tm_min <= 1)) {		
 		// 两次间隔时间最少30分钟
@@ -1126,7 +1129,7 @@ void   CDuiFrameWnd::On60SecondsTimer() {
 			CBusiness::GetInstance()->SaveExcelAsyn();
 			m_LastSaveExcelTime = now;
 		}
-	}
+	}	
 }
 
 // 查询温度结果

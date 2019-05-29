@@ -46,7 +46,11 @@ using namespace DuiLib;
 #define   EDT_REMARK_HEIGHT           30
 #define   EDT_REMARK_Y_OFFSET         10
 #define   TAG_UI_HEIGHT               110
-#define   TAG_PNAME_OVERTIME          10     // 单位：秒 
+#ifdef _DEBUG
+#define   TAG_PNAME_OVERTIME          10       // 单位：秒 
+#else
+#define   TAG_PNAME_OVERTIME          3600     // 单位：秒 
+#endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
 #define   VERSION                     "3.0.1"
@@ -181,6 +185,7 @@ using namespace DuiLib;
 #define MSG_ALARM                           2011
 #define MSG_WRITE_TEMP_2_EXCEL              2012
 #define MSG_SAVE_EXCEL                      2013
+#define MSG_INIT_EXCEL                      2014
 
 
 // windows 消息

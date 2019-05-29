@@ -1,6 +1,7 @@
 #include "business.h"
 #include "main.h"
 #include "resource.h"
+#include "LmnFile.h"
 
 #define   CHECK_SQLITE_INTERVAL_TIME       60000
 
@@ -180,6 +181,7 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_data.m_thrd_excel->Start();
+	InitThreadExcelAsyn();
 
 	// 开启定时检查tag patient name是否过期
 	CheckSqliteAsyn();
@@ -928,6 +930,37 @@ void  CBusiness::SaveExcelAsyn() {
 
 void  CBusiness::SaveExcel() {
 
+	if (0 == m_excel) {
+		return;
+	}
+
+	char szPath[256];
+	GetModuleFileName(0, szPath, sizeof(szPath));
+	const char * pStr = strrchr(szPath, '\\');
+	assert(pStr);
+	DWORD  dwTemp = pStr - szPath;
+	szPath[dwTemp] = '\0';
+
+	const char * szFolder = "auto_save_excel";
+	char buf[256];
+	SNPRINTF(buf, sizeof(buf), "%s\\%s", szPath, szFolder);
+	LmnCreateFolder(buf);
+
+	time_t t = time(0);
+	struct tm  tmp;
+	localtime_s(&tmp, &t);
+
+	char szFileName[256];
+	SNPRINTF(szFileName, sizeof(szFileName), "%s\\%04d%02d%02d%02d%02d%02d.xlsx",
+		buf, tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday, tmp.tm_hour, tmp.tm_min, tmp.tm_sec);
+	m_excel->SaveAs(szFileName);
+	m_excel->Quit();
+
+	delete m_excel;
+	m_excel = 0;
+	memset(m_excel_row, 0, sizeof(m_excel_row));
+	memset(m_excel_tag_id, 0, sizeof(m_excel_tag_id));
+	memset(m_excel_patient_name, 0, sizeof(m_excel_patient_name));
 }
 
 // 写温度数据到excel
@@ -949,7 +982,78 @@ void  CBusiness::WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, 
 }
 
 void  CBusiness::WriteTemp2Excel(const CWriteTemp2ExcelParam * pParam) {
+	DWORD  dwIndex    = pParam->m_i;
+	DWORD  dwSubIndex = pParam->m_j;
 
+	if (0 == m_excel) {
+		m_excel = new CExcelEx;
+	}
+
+	int n = m_excel->GetSheetCount();
+	if (n <= (int)dwIndex) {
+		for (int i = n; i <= (int)dwIndex; i++) {
+			m_excel->AddSheet();
+		}
+	}
+
+	BOOL  bTagOrNameChanged = FALSE;
+
+	// 如果tag不相等
+	if ( 0 != strcmp(m_excel_tag_id[dwIndex][dwSubIndex], pParam->m_szTagId) ) {
+		bTagOrNameChanged = TRUE;
+		STRNCPY( m_excel_tag_id[dwIndex][dwSubIndex], pParam->m_szTagId, 
+			     sizeof(m_excel_tag_id[dwIndex][dwSubIndex]) );
+	}
+
+	// 如果patient name不相等
+	if ( 0 != strcmp(m_excel_patient_name[dwIndex][dwSubIndex], pParam->m_szPName) ) {
+		bTagOrNameChanged = TRUE;
+		STRNCPY( m_excel_patient_name[dwIndex][dwSubIndex], pParam->m_szPName, 
+			     sizeof(m_excel_patient_name[dwIndex][dwSubIndex]) );
+	}
+
+	int nCol = dwSubIndex * 3;
+	// 如果tag或者姓名改变
+	if (bTagOrNameChanged) {
+
+		// 空一行
+		if (m_excel_row[dwIndex][dwSubIndex] > 0) {
+			m_excel_row[dwIndex][dwSubIndex]++;
+		}
+
+		m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol, "tag id");
+		m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol + 1, pParam->m_szTagId);
+		m_excel_row[dwIndex][dwSubIndex]++;
+
+		m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol, "病人姓名");
+		m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol + 1, pParam->m_szPName);
+		m_excel_row[dwIndex][dwSubIndex]++;
+
+		m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol, "时间");
+		m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol + 1, "温度");
+		m_excel_row[dwIndex][dwSubIndex]++;
+	}
+
+	char szTime[256];
+	DateTime2String(szTime, sizeof(szTime), &pParam->m_time);
+
+	char szTemp[256];
+	SNPRINTF(szTemp, sizeof(szTemp), "%.2f", pParam->m_dwTemp / 100.0);
+
+	// 写温度
+	m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol, szTime);
+	m_excel->WriteGridEx(dwIndex + 1, m_excel_row[dwIndex][dwSubIndex], nCol + 1, szTemp);
+	m_excel_row[dwIndex][dwSubIndex]++;
+
+}
+
+// 初始化excel线程(CoInitialize)
+void  CBusiness::InitThreadExcelAsyn() {
+	g_data.m_thrd_excel->PostMessage(this, MSG_INIT_EXCEL);
+}
+
+void  CBusiness::InitThreadExcel() {
+	CoInitialize(NULL);
 }
 
 
@@ -1072,6 +1176,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_SAVE_EXCEL:
 	{
 		SaveExcel();
+	}
+	break;
+
+	case MSG_INIT_EXCEL:
+	{
+		InitThreadExcel();
 	}
 	break;
 

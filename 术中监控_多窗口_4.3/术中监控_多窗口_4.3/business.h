@@ -151,6 +151,10 @@ public:
 	// 写温度数据到excel( i: grid index, j: 0 hand,1~6 surgery )
 	void  WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName);
 	void  WriteTemp2Excel(const CWriteTemp2ExcelParam * pParam);
+
+	// 初始化excel线程(CoInitialize)
+	void  InitThreadExcelAsyn();
+	void  InitThreadExcel();
 };
 
 
