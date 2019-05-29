@@ -913,6 +913,16 @@ void  CBusiness::Alarm() {
 
 // 保存excel
 void  CBusiness::SaveExcelAsyn() {
+	// 如果不支持excel
+	if (!m_bExcelSupport) {
+		return;
+	}
+
+	// 如果没有打开自动保存excel开关 
+	if (!g_data.m_CfgData.m_bAutoSaveExcel) {
+		return;
+	}
+
 	g_data.m_thrd_excel->PostMessage(this, MSG_SAVE_EXCEL);
 }
 
@@ -923,6 +933,17 @@ void  CBusiness::SaveExcel() {
 // 写温度数据到excel
 void  CBusiness::WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName) {
 	assert(pTemp);
+
+	// 如果不支持excel
+	if (!m_bExcelSupport) {
+		return;
+	}
+
+	// 如果没有打开自动保存excel开关 
+	if (!g_data.m_CfgData.m_bAutoSaveExcel) {
+		return;
+	}
+
 	g_data.m_thrd_excel->PostMessage( this, MSG_WRITE_TEMP_2_EXCEL, 
 		new CWriteTemp2ExcelParam(i, j, pTemp, szPName) );
 }
