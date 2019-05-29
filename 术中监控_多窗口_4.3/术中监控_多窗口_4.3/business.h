@@ -6,7 +6,7 @@
 #include "sigslot.h"
 #include "MyDatabase.h"
 #include "Launch.h"
-
+#include "LmnExcel.h"
 
 
 class CDuiFrameWnd;
@@ -133,6 +133,22 @@ private:
 
 	LmnLockType                                     m_lock;
 	std::map<std::string, TagPName*>                m_tag_patient_name;        // tag对应的病人名称 
+
+private:
+	/********* 自动保存excel相关 *********/
+	BOOL              m_bExcelSupport;
+	CExcelEx *        m_excel;
+	int               m_excel_row[MAX_GRID_COUNT][MAX_READERS_PER_GRID+1];
+	char              m_excel_tag_id[MAX_GRID_COUNT][MAX_READERS_PER_GRID+1][MAX_TAG_ID_LENGTH];
+	char              m_excel_patient_name[MAX_GRID_COUNT][MAX_READERS_PER_GRID + 1][MAX_TAG_PNAME_LENGTH];
+
+	// 保存excel
+	void  SaveExcelAsyn();
+	void  SaveExcel();
+
+	// 写温度数据到excel
+	void  WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName);
+	void  WriteTemp2Excel();
 };
 
 

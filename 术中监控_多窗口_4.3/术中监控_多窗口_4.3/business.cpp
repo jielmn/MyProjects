@@ -19,6 +19,12 @@ CBusiness::CBusiness() {
 	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
 	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
 	m_launch.m_sigHandReaderTemp.connect(this, &CBusiness::OnHandReaderTemp);
+
+	m_bExcelSupport = CExcelEx::IfExcelInstalled();;
+	m_excel = 0;
+	memset( m_excel_row,         0,  sizeof(m_excel_row) );
+	memset( m_excel_tag_id,       0, sizeof(m_excel_tag_id) );
+	memset( m_excel_patient_name, 0, sizeof(m_excel_patient_name) );
 }
 
 CBusiness::~CBusiness() {
@@ -168,6 +174,12 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_data.m_thrd_work->Start();
+
+	g_data.m_thrd_excel = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_excel) {
+		return -1;
+	}
+	g_data.m_thrd_excel->Start();
 
 	// 开启定时检查tag patient name是否过期
 	CheckSqliteAsyn();
@@ -391,6 +403,12 @@ int CBusiness::DeInit() {
 		g_data.m_thrd_work->Stop();
 		delete g_data.m_thrd_work;
 		g_data.m_thrd_work = 0;
+	}
+
+	if (g_data.m_thrd_excel) {
+		g_data.m_thrd_excel->Stop();
+		delete g_data.m_thrd_excel;
+		g_data.m_thrd_excel = 0;
 	}
 
 	Clear();
@@ -873,6 +891,24 @@ void  CBusiness::Alarm() {
 
 	PlaySound((LPCTSTR)IDR_WAVE1, GetModuleHandle(0), SND_RESOURCE | SND_ASYNC);
 	LmnSleep(1500);
+}
+
+// 保存excel
+void  CBusiness::SaveExcelAsyn() {
+
+}
+
+void  CBusiness::SaveExcel() {
+
+}
+
+// 写温度数据到excel
+void  CBusiness::WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, const char * szPName) {
+
+}
+
+void  CBusiness::WriteTemp2Excel() {
+
 }
 
 
