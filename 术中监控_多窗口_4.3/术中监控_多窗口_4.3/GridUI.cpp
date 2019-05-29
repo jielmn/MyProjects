@@ -872,7 +872,7 @@ void  CGridUI::PrintExcel() {
 		for (it = vTempData.begin(), j = 0; it != vTempData.end(); it++, j++) {
 			TempItem * pItem = *it;
 
-			Time2String(szTime, sizeof(szTime), &pItem->m_time);
+			DateTime2String(szTime, sizeof(szTime), &pItem->m_time);
 			excel.WriteGrid(j, i * 2, szTime);
 
 			char szTemperature[8];
@@ -898,6 +898,12 @@ void  CGridUI::PrintExcel() {
 	else if (dwMin > 2200) {
 		dMin = 22.0;
 	}
-	excel.PrintChartWithMultiSeries(s, MAX_READERS_PER_GRID, strFilename, 0, 0, TRUE, &dMin);
+	
+	int ret = excel.PrintChartWithMultiSeries(s, MAX_READERS_PER_GRID, strFilename, 0, 0, TRUE, &dMin);
 	excel.Quit();
+
+	if (0 != ret) {
+		strText.Format("打印excel图表失败");
+		::MessageBox(g_data.m_hWnd, strText, "打印excel图表", 0);
+	}
 }
