@@ -656,12 +656,22 @@ void  CGridUI::ExportExcel() {
 		return;
 	}
 
-	DWORD  dwDataCnt = 0;
-	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		dwDataCnt += m_vTemp[i].size();
-	}
-	dwDataCnt += m_vHandTemp.size();
+	CModeButton::Mode mode = m_cstModeBtn->GetMode();
 
+	DWORD  dwDataCnt = 0;
+	if (mode == CModeButton::Mode_Multiple) {
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			dwDataCnt += m_vTemp[i].size();
+		}
+		dwDataCnt += m_vHandTemp.size();
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		dwDataCnt += m_vTemp[0].size();
+	}
+	else {
+		dwDataCnt += m_vHandTemp.size();
+	}
+	
 	if (dwDataCnt == 0) {
 		strText.Format("没有温度数据，放弃保存excel");
 		::MessageBox(g_data.m_hWnd, strText, "导出excel", 0);
@@ -722,9 +732,48 @@ void  CGridUI::ExportExcel() {
 	std::vector<const char *>::iterator  ix;
 
 	// 术中数据
-	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		vector<TempItem *> & vTempData = m_vTemp[i];
-		for (it = vTempData.begin(); it != vTempData.end(); it++) {
+	if ( mode != CModeButton::Mode_Hand ) {
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			if ( mode == CModeButton::Mode_Single && i > 0 ) {
+				break;
+			}
+
+			vector<TempItem *> & vTempData = m_vTemp[i];
+			for (it = vTempData.begin(); it != vTempData.end(); it++) {
+				TempItem * pItem = *it;
+
+				char * p = new char[32];
+				DateTime2String(p, 32, &pItem->m_time);
+				vValues.push_back(p);
+
+				p = new char[8];
+				SNPRINTF(p, 8, "%.2f", pItem->m_dwTemp / 100.0);
+				vValues.push_back(p);
+
+				if (pItem->m_szRemark[0] != 0) {
+					p = new char[MAX_REMARK_LENGTH];
+					STRNCPY(p, pItem->m_szRemark, MAX_REMARK_LENGTH);
+					vValues.push_back(p);
+				}
+				else {
+					vValues.push_back(0);
+				}
+			}
+
+			excel.WriteRange(3, 0 + (i + 1) * 4, vTempData.size() + 3 - 1, 2 + (i + 1) * 4, vValues);
+
+			for (ix = vValues.begin(); ix != vValues.end(); ++ix) {
+				if (*ix != 0) {
+					delete[] * ix;
+				}
+			}
+			vValues.clear();
+		}
+	}
+	else {
+
+		// 手持数据
+		for (it = m_vHandTemp.begin(); it != m_vHandTemp.end(); it++) {
 			TempItem * pItem = *it;
 
 			char * p = new char[32];
@@ -744,47 +793,17 @@ void  CGridUI::ExportExcel() {
 				vValues.push_back(0);
 			}
 		}
-
-		excel.WriteRange(3, 0 + (i + 1) * 4, vTempData.size() + 3 - 1, 2 + (i+1) * 4, vValues);
-
+		excel.WriteRange(3, 0, m_vHandTemp.size() + 3 - 1, 2, vValues);
 		for (ix = vValues.begin(); ix != vValues.end(); ++ix) {
 			if (*ix != 0) {
 				delete[] * ix;
 			}
 		}
 		vValues.clear();
+		// end of 手持数据
+
 	}
-
-	// 手持数据
-	for (it = m_vHandTemp.begin(); it != m_vHandTemp.end(); it++) {
-		TempItem * pItem = *it;
-
-		char * p = new char[32];
-		DateTime2String(p, 32, &pItem->m_time);
-		vValues.push_back(p);
-
-		p = new char[8];
-		SNPRINTF(p, 8, "%.2f", pItem->m_dwTemp / 100.0);
-		vValues.push_back(p);
-
-		if (pItem->m_szRemark[0] != 0) {
-			p = new char[MAX_REMARK_LENGTH];
-			STRNCPY(p, pItem->m_szRemark, MAX_REMARK_LENGTH);
-			vValues.push_back(p);
-		}
-		else {
-			vValues.push_back(0);
-		}
-	}
-	excel.WriteRange(3, 0, m_vHandTemp.size() + 3 - 1, 2, vValues);
-	for (ix = vValues.begin(); ix != vValues.end(); ++ix) {
-		if (*ix != 0) {
-			delete[] * ix;
-		}
-	}
-	vValues.clear();
-	// end of 手持数据
-
+	
 
 	char buf[8192];
 	if (1 == ofn.nFilterIndex) {
@@ -819,12 +838,22 @@ void  CGridUI::PrintExcel() {
 	CDuiString strPatientName = m_cstPatientName->GetText();
 	STRNCPY(szPatientName, strPatientName, sizeof(szPatientName));
 
-	DWORD  dwDataCnt = 0;
-	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		dwDataCnt += m_vTemp[i].size();
-	}
-	dwDataCnt += m_vHandTemp.size();
+	CModeButton::Mode mode = m_cstModeBtn->GetMode();
 
+	DWORD  dwDataCnt = 0;
+	if (mode == CModeButton::Mode_Multiple) {
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			dwDataCnt += m_vTemp[i].size();
+		}
+		dwDataCnt += m_vHandTemp.size();
+	}
+	else if (mode == CModeButton::Mode_Single) {
+		dwDataCnt += m_vTemp[0].size();
+	}
+	else {
+		dwDataCnt += m_vHandTemp.size();
+	}
+	
 	if (dwDataCnt == 0) {
 		strText.Format("没有温度数据，放弃打印excel图表");
 		::MessageBox(g_data.m_hWnd, strText, "打印excel图表", 0);
@@ -841,18 +870,68 @@ void  CGridUI::PrintExcel() {
 	vector<TempItem *>::iterator it;
 	CExcelEx::Series s[MAX_READERS_PER_GRID] = { 0 };
 	DWORD  dwMin = 3500;
-
 	for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
-		vector<TempItem *> & vTempData = m_vTemp[i];
-		if (vTempData.size() == 0) {
-			s[i].bEmpty = TRUE;
-			continue;
+		s[i].bEmpty = TRUE;
+	}
+
+	// 如果是单点或多点
+	if (mode != CModeButton::Mode_Hand) {
+		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+			if ( mode == CModeButton::Mode_Single && i > 0 ) {
+				break;
+			}
+
+			vector<TempItem *> & vTempData = m_vTemp[i];
+			if (vTempData.size() == 0) {
+				s[i].bEmpty = TRUE;
+				continue;
+			}
+
+			char szReaderName[64] = { 0 };
+			CDuiString strBodyPart = m_readers[i]->m_cstBodyPart->GetText();
+			if (strBodyPart.GetLength() > 0) {
+				STRNCPY(szReaderName, strBodyPart, sizeof(szReaderName));
+			}
+			else {
+				szReaderName[0] = (char)('A' + i);
+			}
+
+			s[i].bEmpty = FALSE;
+			s[i].dwStartRowIndex = 0;
+			s[i].dwStartColIndex = i * 2;
+			s[i].dwEndRowIndex = vTempData.size() - 1;
+			STRNCPY(s[i].szName, szReaderName, sizeof(s[i].szName));
+
+			if (vTempData.size() > 100) {
+				s[i].dwStartRowIndex = vTempData.size() - 100;
+			}
+
+			DWORD j = 0;
+			for (it = vTempData.begin(), j = 0; it != vTempData.end(); it++, j++) {
+				TempItem * pItem = *it;
+
+				DateTime2String(szTime, sizeof(szTime), &pItem->m_time);
+				excel.WriteGrid(j, i * 2, szTime);
+
+				char szTemperature[8];
+				SNPRINTF(szTemperature, 8, "%.2f", pItem->m_dwTemp / 100.0);
+				excel.WriteGrid(j, i * 2 + 1, szTemperature);
+
+				if (pItem->m_dwTemp < dwMin) {
+					dwMin = pItem->m_dwTemp;
+				}
+			}
 		}
+	}
+	// 如果是手持
+	else {
+		DWORD i = 0;
+		vector<TempItem *> & vTempData = m_vHandTemp;
 
 		char szReaderName[64] = { 0 };
 		CDuiString strBodyPart = m_readers[i]->m_cstBodyPart->GetText();
-		if ( strBodyPart.GetLength() > 0 ) {
-			STRNCPY( szReaderName, strBodyPart, sizeof(szReaderName) );
+		if (strBodyPart.GetLength() > 0) {
+			STRNCPY(szReaderName, strBodyPart, sizeof(szReaderName));
 		}
 		else {
 			szReaderName[0] = (char)('A' + i);
@@ -884,6 +963,7 @@ void  CGridUI::PrintExcel() {
 			}
 		}
 	}
+	
 
 	double dMin = 0.0;
 	if (dwMin >= 3500) {
