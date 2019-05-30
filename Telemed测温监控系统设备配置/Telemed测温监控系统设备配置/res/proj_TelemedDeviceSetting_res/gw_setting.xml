@@ -4,8 +4,8 @@
 	
 		<VerticalLayout height="160" inset="10,25,10,5">
 			<Label text="注意事项：" font="2" textcolor="#FF386382" />
-			<Label text="1. Reader和电脑用USB线连接" font="2" textcolor="#FF386382" />
-			<Label text="2. 设置成功的标志是听到Reader嘀的一声响" font="2" textcolor="#FFFF0000" />
+			<Label text="1. 多模基站和电脑用USB线连接" font="2" textcolor="#FF386382" />
+			<Label text="2. 设置成功的标志是听到多模基站嘀的一声响" font="2" textcolor="#FFFF0000" />
 			<Label text="3. 断电重启，配置才生效" font="2" textcolor="#FF386382" />
 		</VerticalLayout>
 		

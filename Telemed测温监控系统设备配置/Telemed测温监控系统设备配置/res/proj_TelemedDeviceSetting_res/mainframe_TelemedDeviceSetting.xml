@@ -30,10 +30,10 @@
 			
 			<!-- 客户区 -->
 			<HorizontalLayout height="85" inset="8,5,0,0">
-				<Option width="100" height="80" name="opn_reader_setting" text="手持读卡器" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true"/>
-				<Option width="100" height="80" name="opn_reader_setting_1" text="连续读卡器" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader_1.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" />
+				<Option width="100" height="80" name="opn_area_setting"   text="病区配置" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='area.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" selected="true" />
 				<Option width="100" height="80" name="opn_gw_setting"   text="多模基站" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='gw.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
-				<Option width="100" height="80" name="opn_area_setting"   text="病区配置" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='area.png' dest='23,5,78,60'" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar"/>
+				<Option width="100" height="80" name="opn_reader_setting" text="手持读卡器" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" />
+				<Option width="100" height="80" name="opn_reader_setting_1" text="连续读卡器" textcolor="#FF386382" font="1" textpadding="0,60,0,2" foreimage="file='reader_1.png' dest='23,5,78,60' " normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" group="quickbar" />
 			</HorizontalLayout>
 			
 			<HorizontalLayout height="10" /> 
@@ -42,13 +42,9 @@
 			<!--Tab区-->		
 			<HorizontalLayout bkcolor="#FFFFFFFF" >
 				<TabLayout name="switch">
-				
-					<HorizontalLayout>
-						<reader_setting />
-					</HorizontalLayout>
 					
 					<HorizontalLayout>
-						<reader_setting_1 />
+						<area_setting />
 					</HorizontalLayout>
 					
 					<HorizontalLayout>
@@ -56,7 +52,11 @@
 					</HorizontalLayout>
 					
 					<HorizontalLayout>
-						<area_setting />
+						<reader_setting />
+					</HorizontalLayout>
+					
+					<HorizontalLayout>
+						<reader_setting_1 />
 					</HorizontalLayout>
 					
 				</TabLayout>				

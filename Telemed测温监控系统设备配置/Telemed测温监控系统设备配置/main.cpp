@@ -176,16 +176,16 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == _T("selectchanged"))
 	{
 		if (name == _T("opn_reader_setting")) {
-			m_tabs->SelectItem(0);
+			m_tabs->SelectItem(2);
 		} 
 		else if (name == _T("opn_reader_setting_1")) {
-			m_tabs->SelectItem(1);
+			m_tabs->SelectItem(3);
 		}
 		else if (name == _T("opn_gw_setting")) {
-			m_tabs->SelectItem(2);
+			m_tabs->SelectItem(1);
 		}
 		else if (name == _T("opn_area_setting")) {
-			m_tabs->SelectItem(3);
+			m_tabs->SelectItem(0);
 		}
 	}
 	else if (msg.sType == "click") {
