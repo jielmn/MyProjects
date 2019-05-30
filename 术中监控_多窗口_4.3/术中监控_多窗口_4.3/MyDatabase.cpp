@@ -74,6 +74,12 @@ int CMySqliteDatabase::InitDb() {
 	// 删除过时的旧数据
 	PruneOldData();
 
+	// 删除超出的绑定
+	char sql[8192];
+	SNPRINTF( sql, sizeof(sql), "DELETE FROM %s WHERE grid_index > %lu ", GRID_BINDING_TABLE, 
+		      g_data.m_CfgData.m_dwLayoutGridsCnt );
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
 	return 0;
 }
 
