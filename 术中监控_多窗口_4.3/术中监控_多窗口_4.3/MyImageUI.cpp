@@ -2367,6 +2367,89 @@ void  CMyHandImage::ExportExcel(const char * szPatientName) {
 }
 
 // 打印excel表格
-void  CMyHandImage::PrintExcel() {
+void  CMyHandImage::PrintExcel(const char * szPatientName) {
+	CDuiString strText;
 
+	if (!CExcelEx::IfExcelInstalled()) {
+		::MessageBox(g_data.m_hWnd, "没有检测到系统安装了excel", "打印excel图表", 0);
+		return;
+	}
+
+	DWORD  dwDataCnt = 0;
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (pVec) {
+		dwDataCnt += pVec->size();
+	}
+
+	// 检查有无数据
+	if (dwDataCnt == 0) {
+		strText.Format("没有温度数据，放弃打印excel图表");
+		::MessageBox(g_data.m_hWnd, strText, "打印excel图表", 0);
+		return;
+	}
+
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+	char szTime[256];
+	time_t now = time(0);
+	Date2String(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s %s", szPatientName, szTime);
+
+	CExcelEx  excel;
+	vector<TempItem *>::iterator it;
+	CExcelEx::Series s[1] = { 0 };
+	DWORD  dwMin = 3500;
+	DWORD i = 0;
+	vector<TempItem *> & vTempData = *pVec;
+
+	char szReaderName[64] = { 0 };
+	STRNCPY(szReaderName, "手持测温", sizeof(szReaderName));
+
+	s[i].bEmpty = FALSE;
+	s[i].dwStartRowIndex = 0;
+	s[i].dwStartColIndex = i * 2;
+	s[i].dwEndRowIndex = vTempData.size() - 1;
+	STRNCPY(s[i].szName, szReaderName, sizeof(s[i].szName));
+
+	if (vTempData.size() > 100) {
+		s[i].dwStartRowIndex = vTempData.size() - 100;
+	}
+
+	DWORD j = 0;
+	for (it = vTempData.begin(), j = 0; it != vTempData.end(); it++, j++) {
+		TempItem * pItem = *it;
+
+		DateTime2String(szTime, sizeof(szTime), &pItem->m_time);
+		excel.WriteGrid(j, i * 2, szTime);
+
+		char szTemperature[8];
+		SNPRINTF(szTemperature, 8, "%.2f", pItem->m_dwTemp / 100.0);
+		excel.WriteGrid(j, i * 2 + 1, szTemperature);
+
+		if (pItem->m_dwTemp < dwMin) {
+			dwMin = pItem->m_dwTemp;
+		}
+	}
+
+
+	double dMin = 0.0;
+	if (dwMin >= 3500) {
+		dMin = 34.0;
+	}
+	else if (dwMin > 3000) {
+		dMin = 30.0;
+	}
+	else if (dwMin > 2600) {
+		dMin = 26.0;
+	}
+	else if (dwMin > 2200) {
+		dMin = 22.0;
+	}
+
+	int ret = excel.PrintChartWithMultiSeries(s, 1, strFilename, 0, 0, TRUE, &dMin);
+	excel.Quit();
+
+	if (0 != ret) {
+		strText.Format("打印excel图表失败");
+		::MessageBox(g_data.m_hWnd, strText, "打印excel图表", 0);
+	}
 }

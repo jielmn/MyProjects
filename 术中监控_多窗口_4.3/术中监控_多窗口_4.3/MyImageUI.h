@@ -169,7 +169,7 @@ public:
 	void  ExportExcel(const char * szPatientName);
 
 	// ¥Ú”°excel±Ì∏Ò
-	void  PrintExcel();
+	void  PrintExcel(const char * szPatientName);
 
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);

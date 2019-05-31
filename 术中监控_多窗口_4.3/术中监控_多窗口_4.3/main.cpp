@@ -1595,7 +1595,15 @@ void   CDuiFrameWnd::OnHanxExportExcel() {
 
 // ´òÓ¡ExcelÍ¼±í
 void   CDuiFrameWnd::OnHandPrintExcel() {
-	m_cstHandImg->PrintExcel();
+	CDuiString strTagId = m_cstHandImg->GetCurTagId();
+	std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find((const char *)strTagId);
+	if (it != m_tags_ui.end()) {
+		CTagUI * pTagUI = it->second;
+		if (pTagUI) {
+			CDuiString strPName = pTagUI->GetPTagName();
+			m_cstHandImg->PrintExcel(strPName);
+		}
+	}
 }
 
 
