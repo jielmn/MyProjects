@@ -261,6 +261,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_QUERY_HAND_TEMP_BY_TAG_ID_RET) {
 		OnQueryHandTempRet(wParam, lParam);
 	}
+	else if ( uMsg == UM_TAG_NAME_CHANGED ) {
+		OnTagNameChanged( wParam, lParam );
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1512,8 +1515,12 @@ void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 	it = m_tags_ui.find(pParam->m_szTagId);
 	if ( it != m_tags_ui.end() ) {
 		CTagUI * pTagUI = it->second;
-		if ( pTagUI )
+		if (pTagUI) {
 			pTagUI->SetBindingGridIndex(pParam->m_nGridIndex);
+			assert(pParam->m_nGridIndex > 0);
+			CDuiString  strPName = pTagUI->GetPTagName();
+			m_pGrids[pParam->m_nGridIndex - 1]->SetPatientNameInHandMode(strPName);
+		}			
 	}
 
 	it = m_tags_ui.find(pParam->m_szOldTagId);
@@ -1523,7 +1530,7 @@ void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 			pTagUI->SetBindingGridIndex(0);
 	}
 
-	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);
+	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);	
 
 	delete pParam;
 }
@@ -1544,6 +1551,16 @@ void   CDuiFrameWnd::OnQueryHandTempRet(WPARAM wParam, LPARAM  lParam) {
 	// ClearVector(*pvRet);
 	delete pvRet;
 	delete[] pParam;
+}
+
+// tag name changed
+void   CDuiFrameWnd::OnTagNameChanged( WPARAM wParam, LPARAM  lParam ) {
+	CTagUI * pTagUI = (CTagUI *)wParam;
+	assert(pTagUI);
+	assert(pTagUI->m_nBindingGridIndex > 0);
+
+	CDuiString  strName = pTagUI->GetPTagName();
+	m_pGrids[pTagUI->m_nBindingGridIndex-1]->SetPatientNameInHandMode(strName);
 }
 
 

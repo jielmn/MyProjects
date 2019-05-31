@@ -13,6 +13,7 @@ public:
 	CDuiString GetTagId();
 	void   SetBindingGridIndex(int nIndex);
 	int    GetBindingGridIndex();
+	CDuiString GetPTagName();
 
 private:
 	LPCTSTR GetClass() const;

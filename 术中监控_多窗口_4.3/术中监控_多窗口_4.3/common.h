@@ -54,7 +54,7 @@ using namespace DuiLib;
 #define   MAX_TAG_PNAME_LENGTH        20
 
 #define   VERSION                     "2.1.0"
-#define   COMPILE_TIME                "2019-05-29"
+#define   COMPILE_TIME                "2019-05-31 10:32"
 
 // ¿Ø¼þid
 #define   TABS_ID                  "switch"
@@ -200,6 +200,7 @@ using namespace DuiLib;
 #define UM_ALL_HAND_TAG_TEMP_DATA            (WM_USER+8)
 #define UM_BINDING_TAG_GRID_RET              (WM_USER+9)
 #define UM_QUERY_HAND_TEMP_BY_TAG_ID_RET     (WM_USER+10)
+#define UM_TAG_NAME_CHANGED                  (WM_USER+11)
 
 
 

@@ -140,6 +140,8 @@ private:
 	void   OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam);
 	// 查询温度结果(手持Tag温度数据)
 	void   OnQueryHandTempRet(WPARAM wParam, LPARAM  lParam);
+	// tag name changed
+	void   OnTagNameChanged(WPARAM wParam, LPARAM  lParam);
 
 public:
 	// 接收器连接状态通知

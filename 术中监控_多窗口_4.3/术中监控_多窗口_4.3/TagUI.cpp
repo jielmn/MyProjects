@@ -113,4 +113,11 @@ void CTagUI::OnTagNameChanged() {
 	assert(m_item.m_szTagId[0] != '\0');
 	CDuiString strName = m_cstPatientName->GetText();
 	CBusiness::GetInstance()->SaveTagPNameAsyn(m_item.m_szTagId, strName);
+	if ( m_nBindingGridIndex > 0 )
+		::SendMessage( g_data.m_hWnd, UM_TAG_NAME_CHANGED, (WPARAM)this, 0 );
+}
+
+CDuiString CTagUI::GetPTagName() {
+	assert(m_bInited);
+	return m_cstPatientName->GetText();
 }
