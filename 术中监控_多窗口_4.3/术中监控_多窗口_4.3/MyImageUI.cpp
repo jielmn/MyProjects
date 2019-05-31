@@ -2250,3 +2250,123 @@ void  CMyHandImage::SetRemark(DuiLib::CDuiString & strRemark) {
 
 	CMyImageUI::SetRemark(*pVec, m_dwRemarkingIndex, strRemark);
 }
+
+// 导出excel
+void  CMyHandImage::ExportExcel(const char * szPatientName) {
+	CDuiString strText;
+
+	if (!CExcel::IfExcelInstalled()) {
+		::MessageBox(g_data.m_hWnd, "没有检测到系统安装了excel", "导出excel", 0);
+		return;
+	}
+
+	DWORD  dwDataCnt = 0;
+	vector<TempItem *> * pVec = m_data[m_cur_tag];
+	if (pVec) {
+		dwDataCnt += pVec->size();
+	}
+
+	// 检查有无数据
+	if (dwDataCnt == 0) {
+		strText.Format("没有温度数据，放弃保存excel");
+		::MessageBox(g_data.m_hWnd, strText, "导出excel", 0);
+		return;
+	}
+
+	OPENFILENAME ofn = { 0 };
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+
+	char szTime[256];
+	time_t now = time(0);
+	DateTime2StringCn(szTime, sizeof(szTime), &now);
+	SNPRINTF(strFilename, sizeof(strFilename), "%s_%s", szPatientName, szTime);
+
+	ofn.lStructSize = sizeof(OPENFILENAME);//结构体大小  
+	ofn.hwndOwner = g_data.m_hWnd;//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
+	ofn.lpstrFilter = TEXT("Excel Flie(*.xls)\0*.xls\0Excel Flie(*.xlsx)\0*.xlsx\0\0");//设置过滤  
+	ofn.nFilterIndex = 1;//过滤器索引  
+	ofn.lpstrFile = strFilename;//接收返回的文件名，注意第一个字符需要为NULL  
+	ofn.nMaxFile = sizeof(strFilename);//缓冲区长度  
+	ofn.lpstrInitialDir = CPaintManagerUI::GetInstancePath();
+	ofn.lpstrTitle = TEXT("请选择一个文件");//使用系统默认标题留空即可  
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;//文件、目录必须存在，隐藏只读选项  
+	if (!GetSaveFileName(&ofn)) {
+		strText.Format("GetSaveFileName失败，放弃保存excel");
+		::MessageBox(g_data.m_hWnd, strText, "导出excel", 0);
+		return;
+	}
+
+	CExcel  excel;
+	excel.WriteGrid(0, 0, "姓名");
+	excel.WriteGrid(0, 1, szPatientName);
+
+	char tmp[64];
+	SNPRINTF(tmp, sizeof(tmp), "手持测量时间");
+	excel.WriteGrid(2, 0, tmp);
+
+	SNPRINTF(tmp, sizeof(tmp), "手持测量体温");
+	excel.WriteGrid(2, 1, tmp);
+
+	SNPRINTF(tmp, sizeof(tmp), "手持测量注释");
+	excel.WriteGrid(2, 2, tmp);
+
+	std::vector<const char *> vValues;
+	vector<TempItem *>::iterator it;
+	std::vector<const char *>::iterator  ix;
+
+	// 手持数据
+	for (it = pVec->begin(); it != pVec->end(); it++) {
+		TempItem * pItem = *it;
+
+		char * p = new char[32];
+		DateTime2String(p, 32, &pItem->m_time);
+		vValues.push_back(p);
+
+		p = new char[8];
+		SNPRINTF(p, 8, "%.2f", pItem->m_dwTemp / 100.0);
+		vValues.push_back(p);
+
+		if (pItem->m_szRemark[0] != 0) {
+			p = new char[MAX_REMARK_LENGTH];
+			STRNCPY(p, pItem->m_szRemark, MAX_REMARK_LENGTH);
+			vValues.push_back(p);
+		}
+		else {
+			vValues.push_back(0);
+		}
+	}
+
+	excel.WriteRange(3, 0, pVec->size() + 3 - 1, 2, vValues);
+	for (ix = vValues.begin(); ix != vValues.end(); ++ix) {
+		if (*ix != 0) {
+			delete[] * ix;
+		}
+	}
+	vValues.clear();
+	// end of 手持数据
+
+
+	char buf[8192];
+	if (1 == ofn.nFilterIndex) {
+		SNPRINTF(buf, size(buf), "%s.xls", strFilename);
+	}
+	else if (2 == ofn.nFilterIndex) {
+		SNPRINTF(buf, size(buf), "%s.xlsx", strFilename);
+	}
+	else {
+		SNPRINTF(buf, size(buf), "%s", strFilename);
+	}
+
+	int ret = excel.SaveAs(buf);
+	excel.Quit();
+
+	if (ret != 0) {
+		strText.Format("导出excel数据失败。请确保excel文件没有打开");
+		::MessageBox(g_data.m_hWnd, strText, "导出excel", 0);
+	}
+}
+
+// 打印excel表格
+void  CMyHandImage::PrintExcel() {
+
+}

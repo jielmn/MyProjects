@@ -698,9 +698,8 @@ void  CGridUI::ExportExcel() {
 	ofn.lpstrInitialDir = CPaintManagerUI::GetInstancePath();
 	ofn.lpstrTitle = TEXT("请选择一个文件");//使用系统默认标题留空即可  
 	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;//文件、目录必须存在，隐藏只读选项  
-	if (!GetSaveFileName(&ofn))
-	{
-		strText.Format("没有温度数据，放弃保存excel");
+	if (!GetSaveFileName(&ofn)) {
+		strText.Format("GetSaveFileName失败，放弃保存excel");
 		::MessageBox(g_data.m_hWnd, strText, "导出excel", 0);
 		return;
 	}

@@ -200,12 +200,21 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == CST_IMAGE) {
 			OnImageMenu(msg.pSender->GetTag(), msg.ptMouse, msg.pSender);
 		}
+		else if (name == "cstMyImageHand") {
+			OnHandImageMenu(msg.ptMouse, msg.pSender);
+		}
 	}
 	else if ( msg.sType == "menu_export_excel" ) {
 		OnExportExcel(msg.wParam);
 	}
 	else if ( msg.sType == "menu_print_excel" ) {
 		OnPrintExcel(msg.wParam);
+	}
+	else if (msg.sType == "menu_hand_export_excel") {
+		OnHanxExportExcel();
+	}
+	else if (msg.sType == "menu_hand_print_excel") {
+		OnHandPrintExcel();
 	}
 	else if (msg.sType == "tag_selected") {
 		OnHandTagSelected(msg.pSender);
@@ -1562,6 +1571,31 @@ void   CDuiFrameWnd::OnTagNameChanged( WPARAM wParam, LPARAM  lParam ) {
 
 	CDuiString  strName = pTagUI->GetPTagName();
 	m_pGrids[pTagUI->m_nBindingGridIndex-1]->SetPatientNameInHandMode(strName);
+}
+
+// 右键弹出菜单
+void   CDuiFrameWnd::OnHandImageMenu(const POINT & pt, CControlUI * pParent) {
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_hand_image.xml"), pParent);
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
+}
+
+// 导出Excel
+void   CDuiFrameWnd::OnHanxExportExcel() {
+	CDuiString strTagId = m_cstHandImg->GetCurTagId();
+	std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find( (const char *)strTagId );
+	if ( it != m_tags_ui.end() ) {
+		CTagUI * pTagUI = it->second;
+		if ( pTagUI ) {
+			CDuiString strPName = pTagUI->GetPTagName();
+			m_cstHandImg->ExportExcel(strPName);
+		}		
+	}	
+}
+
+// 打印Excel图表
+void   CDuiFrameWnd::OnHandPrintExcel() {
+	m_cstHandImg->PrintExcel();
 }
 
 

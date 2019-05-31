@@ -165,6 +165,12 @@ public:
 
 	sigslot::signal1<const char *>              m_sigTagErased;
 
+	// 导出excel
+	void  ExportExcel(const char * szPatientName);
+
+	// 打印excel表格
+	void  PrintExcel();
+
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void   DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);

@@ -142,6 +142,12 @@ private:
 	void   OnQueryHandTempRet(WPARAM wParam, LPARAM  lParam);
 	// tag name changed
 	void   OnTagNameChanged(WPARAM wParam, LPARAM  lParam);
+	// 右键弹出菜单
+	void   OnHandImageMenu(const POINT & pt, CControlUI * pParent);
+	// 导出Excel
+	void   OnHanxExportExcel();
+	// 打印Excel图表
+	void   OnHandPrintExcel();
 
 public:
 	// 接收器连接状态通知
