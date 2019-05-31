@@ -894,15 +894,16 @@ void  CDuiFrameWnd::OnSetting() {
 
 	// 多余的grid删除手持tag绑定
 	for ( DWORD i = g_data.m_CfgData.m_dwLayoutGridsCnt; i < oldData.m_dwLayoutGridsCnt; i++ ) {
-		CBusiness::GetInstance()->RemoveGridBindingAsyn(i+1);
-		// 界面上删除绑定
-		int nCnt = m_layTags->GetCount();
-		for (int j = 0; j < nCnt; j++) {
-			CTagUI * pTagUI =  (CTagUI *)m_layTags->GetItemAt(j);
-			if ( pTagUI->m_nBindingGridIndex == i + 1 ) {
-				pTagUI->SetBindingGridIndex(0);
-				break;
-			}
+		CBusiness::GetInstance()->RemoveGridBindingAsyn(i+1);		
+	}
+
+	// 界面上删除绑定
+	int nTagCnt = m_layTags->GetCount();
+	for (int i = 0; i < nTagCnt; i++) {
+		CTagUI * pTagUI = (CTagUI *)m_layTags->GetItemAt(i);
+		if ( pTagUI->m_nBindingGridIndex > (int)g_data.m_CfgData.m_dwLayoutGridsCnt ) {
+			pTagUI->SetBindingGridIndex(0);
+			break;
 		}
 	}
 }

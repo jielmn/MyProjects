@@ -613,6 +613,9 @@ void CGridUI::ResetData() {
 		m_readers[i]->m_lblReaderId->SetText("");
 		m_readers[i]->m_lblTemp->SetText("");
 	}
+
+	m_cstPatientName->SetText("");
+	m_cstPatientNameM->SetText("");
 }
 
 void CGridUI::OnPatientNameChanged(CEditableButtonUI * pSource) {
