@@ -546,7 +546,11 @@ void  CGridUI::PruneData() {
 	std::vector<TempItem * >::iterator it;
 	time_t today_zero_time = GetTodayZeroTime();
 	// 一周前0点时分
+#if TEST_MEMORY_LEAK_FLAG
+	time_t tWeekBegin = time(0) - 300;
+#else
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
+#endif
 
 	for ( DWORD i = 0; i < MAX_READERS_PER_GRID; i++ ) {
 		PruneData(m_vTemp[i], tWeekBegin);

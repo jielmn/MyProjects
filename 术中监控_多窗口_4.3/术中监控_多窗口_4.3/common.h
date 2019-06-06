@@ -25,6 +25,9 @@ using namespace DuiLib;
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 #define   GLOBAL_LOCK_NAME        PROJ_NAME
 
+#ifdef _DEBUG
+#define   TEST_MEMORY_LEAK_FLAG   1              // 测试随时间变化，内存消耗会不会增加
+#endif
 
 #define   MAX_GRID_COUNT           64             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点

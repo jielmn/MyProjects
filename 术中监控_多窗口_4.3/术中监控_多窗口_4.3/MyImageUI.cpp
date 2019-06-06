@@ -2180,8 +2180,11 @@ void  CMyHandImage::PruneData() {
 
 	time_t today_zero_time = GetTodayZeroTime();
 	// 一周前0点时分
+#if TEST_MEMORY_LEAK_FLAG
+	time_t tWeekBegin = time(0) - 300;
+#else
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
-	// time_t tWeekBegin = time(0) - 300;   // 测试
+#endif
 
 	std::map<std::string, vector<TempItem *> *>::iterator it;
 	for ( it = m_data.begin(); it != m_data.end(); ) {
