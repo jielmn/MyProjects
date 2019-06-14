@@ -38,7 +38,8 @@ using namespace DuiLib;
 #define   UM_SET_RECIEVER_AREA_RET     (WM_USER+5)
 #define   UM_SET_SURGENCY_READER_SN_RET (WM_USER+6)
 
-#define   RESTRICTED_FLAG       
+#define   RESTRICTED_FLAG     
+#define   REMOVE_11_CHANNEL_FLAG                  // 11信道不要，改为12信道
 
 class CSettingHandReaderParam : public LmnToolkits::MessageData {
 public:

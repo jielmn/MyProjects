@@ -86,11 +86,19 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 	for (int i = 1; i <= 91; i += 10 ) {
-		strText.Format("%d", i);
+		int k = i;
+
+#ifdef REMOVE_11_CHANNEL_FLAG
+		if ( k == 11 ) {
+			k = 12;
+		}
+#endif
+		strText.Format("%d", k);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
-		pElement->SetTag(i);
+		pElement->SetTag(k);
 		m_cmbHandReaderChannel->Add(pElement);
+
 	}
 #endif
 
@@ -478,8 +486,20 @@ void  CDuiFrameWnd::OnChannelAChanged() {
 	int nChannel = pCtl->GetTag();
 
 	CDuiString  strText;
+
+#ifdef REMOVE_11_CHANNEL_FLAG
+	if (nChannel + 10 == 11) {
+		strText.Format("%d", nChannel + 10 + 1);
+		m_edtChannel_b->SetText(strText);
+	}
+	else {
+		strText.Format("%d", nChannel + 10);
+		m_edtChannel_b->SetText(strText);
+	}	
+#else
 	strText.Format("%d", nChannel + 10);
 	m_edtChannel_b->SetText(strText);
+#endif
 
 	strText.Format("%d", nChannel + 20);
 	m_edtChannel_c->SetText(strText);
@@ -498,8 +518,22 @@ void  CDuiFrameWnd::OnSetReceiverChannel() {
 	assert(nSel >= 0);
 	pCtl = m_cmbChannel_a->GetItemAt(nSel);
 	BYTE byChannel_a = (BYTE)pCtl->GetTag();
+
+	CDuiString strText;
+	int nTmp = 0;
+
+#ifdef REMOVE_11_CHANNEL_FLAG
+	strText = m_edtChannel_b->GetText();
+	sscanf_s( strText, "%d", &nTmp );
+	BYTE byChannel_b = (BYTE)nTmp;
+
+	strText = m_edtChannel_c->GetText();
+	sscanf_s(strText, "%d", &nTmp);
+	BYTE byChannel_c = (BYTE)nTmp;
+#else
 	BYTE byChannel_b = byChannel_a + 10;
 	BYTE byChannel_c = byChannel_a + 20;
+#endif
 
 	CBusiness::GetInstance()->SetReceriverChannelAsyn( byChannel_a, byChannel_b, byChannel_c, nCom);
 	SetBusy();
