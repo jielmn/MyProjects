@@ -47,6 +47,7 @@ using namespace DuiLib;
 #define   DISCONNECTED_IMAGE          "disconnected.png"
 #define   MIN_MYIMAGE_VMARGIN         40
 #define   SCALE_RECT_WIDTH            50          // 刻度区域的宽度
+#define   LABEL_SCALE_RECT_WIDTH      40          // 刻度区域的宽度
 #define   BRIGHT_DARK_INTERVAL        30          // 明暗刻度的间隔
 #define   EDT_REMARK_WIDTH            200
 #define   EDT_REMARK_HEIGHT           30

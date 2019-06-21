@@ -201,19 +201,23 @@ void   CMyImageUI::DrawBorder(HDC hDC, const RECT & rectScale, int width) {
 
 // 画刻度值
 void  CMyImageUI::DrawScale( HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY, int nMaxTemp,
-	                         const RECT & rectScale, int width ) {
+	                         const RECT & rectScale, int width, BOOL bDrawRectangle /*= TRUE*/,
+	                         DWORD dwTextColor /*= RGB(255, 255, 255)*/ ) {
 	CDuiString strText;
 	int nVInterval = BRIGHT_DARK_INTERVAL;
-	::SetTextColor(hDC, RGB(255, 255, 255));
+	::SetTextColor(hDC, dwTextColor );
 	::SelectObject(hDC, m_hCommonThreadPen);
-	::Rectangle(hDC, rectScale.left, rectScale.top, rectScale.right, rectScale.bottom);
+
+	if (bDrawRectangle)
+		::Rectangle(hDC, rectScale.left, rectScale.top, rectScale.right, rectScale.bottom);
 
 	RECT r = rectScale;
 	r.left++;
 	r.right--;
 	r.top++;
 	r.bottom--;
-	::FillRect(hDC, &r, m_hCommonBrush);
+	if (bDrawRectangle)
+		::FillRect(hDC, &r, m_hCommonBrush);
 
 	for (int i = 0; i < nCelsiusCnt + 1; i++) {
 		if (nVInterval >= BRIGHT_DARK_INTERVAL) {
@@ -1092,7 +1096,7 @@ void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & 
 	RECT rectScale;
 	rectScale.left   = rect.left + nScrollX;
 	rectScale.top    = rect.top;
-	rectScale.right  = rectScale.left;
+	rectScale.right  = rectScale.left + LABEL_SCALE_RECT_WIDTH;
 	rectScale.bottom = rect.bottom;
 
 	// 画水平刻度线
@@ -1102,7 +1106,7 @@ void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & 
 	//DrawBorder(hDC, rectScale, width);
 
 	// 画刻度值
-	//DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width, FALSE, RGB(150,150,150));
 
 	// 画报警线
 	//DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);

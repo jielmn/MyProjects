@@ -36,7 +36,7 @@ protected:
 	void   DrawBorder(HDC hDC, const RECT & rectScale, int width);
 	// 画刻度值
 	void   DrawScale( HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY, int nMaxTemp,
-		              const RECT & rectScale, int width );
+		              const RECT & rectScale, int width, BOOL bDrawRectangle = TRUE, DWORD dwTextColor = RGB(255, 255, 255) );
 	// 画报警线
 	void   DrawWarning( HDC hDC, DWORD i, DWORD j, int nMaxTemp, int nHeightPerCelsius, int nMaxY,
 		                const RECT & rectScale, int width );
