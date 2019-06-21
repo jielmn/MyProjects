@@ -143,6 +143,11 @@ public:
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
 
+	// ÉèÖÃÍ¸Ã÷É«
+	void SetOpacityTextColor(DWORD  dwColor) {
+		SetTextColor( (dwColor & 0xFFFFFF) | (GRID_LABLE_TRANSPARENT_PARAM << 24) );
+	}
+
 	void  SetMyImage(CMyImageUI * img) {
 		m_image = img;
 	}

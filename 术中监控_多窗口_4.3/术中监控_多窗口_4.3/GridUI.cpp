@@ -104,7 +104,9 @@ void CGridUI::DoInit() {
 
 	m_cstImgLabel = static_cast<CImageLabelUI *>(m_pManager->FindControl(CST_IMG_LBL_TEMP));
 	m_cstImgLabel->SetTag(GetTag());
-	m_lblElapsed = static_cast<CImageLabelUI *>(m_pManager->FindControl(LBL_ELAPSED));
+	m_cstImgLabel->SetEnabledEffect(true);
+
+	m_lblElapsed = static_cast<CLabelUI *>(m_pManager->FindControl(LBL_ELAPSED));
 	m_lblElapsed->SetText("");
 	m_cstImg = static_cast<CMyImageUI *>(m_pManager->FindControl(CST_IMAGE));
 	m_cstImg->SetTag(GetTag());
@@ -188,7 +190,7 @@ void CGridUI::OnModeChanged(int nSource) {
 		m_dwSelSurReaderIndex = 0;
 
 		m_cstImgLabel->SetText(m_hand_reader->m_lblTemp->GetText());
-		m_cstImgLabel->SetTextColor(m_hand_reader->m_lblTemp->GetTextColor());
+		m_cstImgLabel->SetOpacityTextColor(m_hand_reader->m_lblTemp->GetTextColor());
 
 		if ( nSource != 0 ) {
 			m_cstPatientName->SetText(CBusiness::GetInstance()->GetTagPName(m_HandLastTemp.m_szTagId, szPName, sizeof(szPName)) );
@@ -380,7 +382,7 @@ void CGridUI::ShowHandReaderTemp(const TempItem & item) {
 void CGridUI::SetCurReaderTemp(CLabelUI * pReaderUI) {
 	assert(pReaderUI);	
 	m_cstImgLabel->SetText(pReaderUI->GetText());
-	m_cstImgLabel->SetTextColor(pReaderUI->GetTextColor());
+	m_cstImgLabel->SetOpacityTextColor(pReaderUI->GetTextColor());
 }
 
 void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm, time_t t) {
@@ -455,7 +457,7 @@ void CGridUI::OnSurReaderSelected(DWORD  dwSelected) {
 	m_CurReaderState->SetBkImage(m_readers[dwSelected]->m_state->GetBkImage());
 
 	m_cstImgLabel->SetText(m_readers[dwSelected]->m_lblTemp->GetText());
-	m_cstImgLabel->SetTextColor(m_readers[dwSelected]->m_lblTemp->GetTextColor());
+	m_cstImgLabel->SetOpacityTextColor(m_readers[dwSelected]->m_lblTemp->GetTextColor());
 
 	m_cstImg->MyInvalidate();
 }

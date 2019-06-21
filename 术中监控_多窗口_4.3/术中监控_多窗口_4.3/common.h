@@ -26,8 +26,11 @@ using namespace DuiLib;
 #define   GLOBAL_LOCK_NAME        PROJ_NAME
 
 #ifdef _DEBUG
-#define   TEST_MEMORY_LEAK_FLAG   1              // 测试随时间变化，内存消耗会不会增加
+#define   TEST_MEMORY_LEAK_FLAG   0              // 测试随时间变化，内存消耗会不会增加
 #endif
+
+// 窗格温度文字透明度
+#define   GRID_LABLE_TRANSPARENT_PARAM       0x80
 
 #define   MAX_GRID_COUNT           64             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
