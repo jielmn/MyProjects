@@ -18,7 +18,7 @@
 			<!-- 床号图片 -->
 			<VerticalLayout width="50" >
 				<Control />
-				<Control bkimage="bed.png" height="50" tooltip="床号" />
+				<Control name="bedImg" bkimage="bed.png" height="50" tooltip="床号" />
 				<Control />
 			</VerticalLayout>
 			
@@ -26,13 +26,14 @@
 			<Button  name="btnBed"  textpadding="4,0,4,0" textcolor="#FFCCCCCC" text="01" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="110" font="6" tooltip="床号" />
 			<!-- 第几个Reader标志位 -->
 			<Label  name="lblReaderNo" text="A"  textcolor="#FFCCCCCC" width="30" font="4" />
-			<Control width="30" />
+			
+			<Control name="sperate" width="30" />
 			
 			<!-- 病人姓名 -->
 			<VerticalLayout width="140" >
 				<Control />
 				<HorizontalLayout height="40">													
-					<Control bkimage="file='user.png' dest='0,3,40,36'"  width="40" tooltip="病人姓名" />
+					<Control name="patientImg" bkimage="file='user.png' dest='0,3,40,36'"  width="40" tooltip="病人姓名" />
 					<EditableButton name="cstEdtBtnPatientName" width="100" btncolor="#FFCCCCCC" btnfont="7" editfont="7" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
 				</HorizontalLayout>
 				<Control />

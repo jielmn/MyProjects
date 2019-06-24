@@ -81,6 +81,7 @@ using namespace DuiLib;
 #define   LBL_READER_NO           "lblReaderNo"
 #define   LAY_READERS             "layReaders"
 #define   GRID_TABS               "gridtabs"
+#define   GRID_HEAD_LAYOUT        "layGridHead"
 #define   DRAG_DROP_GRID          "DragDropGrid"
 #define   GRID_HILIGHT_BORDER_COLOR 0xFFCAF100
 #define   BTN_MENU                "menubtn"

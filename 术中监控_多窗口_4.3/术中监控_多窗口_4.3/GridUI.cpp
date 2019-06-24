@@ -29,6 +29,11 @@ CGridUI::CGridUI() :m_callback(m_pManager) {
 	m_cstImg = 0;
 	m_cstPatientName = 0;
 	m_cstPatientNameM = 0;
+
+	m_layHead = 0;
+	m_bedImg = 0;
+	m_patientImg = 0;
+	m_sperate = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -64,6 +69,11 @@ void CGridUI::DoInit() {
 	CDuiString  strText;
 
 	m_tabs = static_cast<DuiLib::CTabLayoutUI  *>(m_pManager->FindControl(GRID_TABS));
+
+	m_layHead = static_cast<DuiLib::CHorizontalLayoutUI  *>(m_pManager->FindControl(GRID_HEAD_LAYOUT));
+	m_bedImg = m_pManager->FindControl("bedImg");
+	m_patientImg = m_pManager->FindControl("patientImg");
+	m_sperate = m_pManager->FindControl("sperate");
 
 	m_btnBedNo = static_cast<DuiLib::CButtonUI *>(m_pManager->FindControl(BTN_BED_NO));
 	m_btnBedNoM = static_cast<DuiLib::CButtonUI *>(m_pManager->FindControl(BTN_BED_NO_M));
@@ -469,6 +479,7 @@ void CGridUI::SetFont(int index) {
 }
 
 void CGridUI::OnSizeChanged(const SIZE & s) {
+	
 	// 修改字体大小
 	if (s.cx >= 950 && s.cy >= 425) {
 		SetFont(27);
@@ -493,6 +504,50 @@ void CGridUI::OnSizeChanged(const SIZE & s) {
 	}
 	else {
 		SetFont(20);
+	}
+
+	if (s.cy >= 198) {
+		m_layHead->SetFixedHeight(74);	
+
+		m_cstModeBtn->GetParent()->SetFixedHeight(30);
+		m_cstModeBtn->GetParent()->GetParent()->SetFixedWidth(30);
+
+		m_bedImg->SetFixedHeight(50);
+		m_bedImg->GetParent()->SetFixedWidth(50);
+
+		m_btnBedNo->SetFixedWidth(110);
+		m_btnBedNo->SetFont(6);
+		m_lblReaderNo->SetFont(4);
+		m_lblReaderNo->SetFixedWidth(30);
+		m_sperate->SetFixedWidth(30);
+
+		m_patientImg->SetFixedWidth(40);
+		m_patientImg->GetParent()->SetFixedHeight(40);
+
+	}
+	else if (s.cy >= 168) {
+		m_layHead->SetFixedHeight(64);
+	}
+	else if (s.cy >= 138) {
+		m_layHead->SetFixedHeight(54);
+	}
+	else {
+		m_layHead->SetFixedHeight(44);
+
+		m_cstModeBtn->GetParent()->SetFixedHeight(20);
+		m_cstModeBtn->GetParent()->GetParent()->SetFixedWidth(20);
+
+		m_bedImg->SetFixedHeight(30);
+		m_bedImg->GetParent()->SetFixedWidth(30);
+
+		m_btnBedNo->SetFixedWidth(34);
+		m_btnBedNo->SetFont(52);
+		m_lblReaderNo->SetFont(62);
+		m_lblReaderNo->SetFixedWidth(15);
+		m_sperate->SetFixedWidth(10);
+
+		m_patientImg->SetFixedWidth(24);
+		m_patientImg->GetParent()->SetFixedHeight(24);
 	}
 }
 

@@ -106,6 +106,12 @@ private:
 	CEditableButtonUI *                         m_cstPatientName;
 	CEditableButtonUI *                         m_cstPatientNameM;
 
+	// grid UI
+	CHorizontalLayoutUI *                       m_layHead;
+	CControlUI *                                m_bedImg;
+	CControlUI *                                m_patientImg;
+	CControlUI *                                m_sperate;
+
 private:
 	// 最后一次的温度数据
 	TempItem              m_aLastTemp[MAX_READERS_PER_GRID];
