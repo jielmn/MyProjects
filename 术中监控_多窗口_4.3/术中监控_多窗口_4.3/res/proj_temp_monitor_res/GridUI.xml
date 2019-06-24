@@ -18,7 +18,7 @@
 			<!-- 床号图片 -->
 			<VerticalLayout width="40" >
 				<Control />
-				<Control bkimage="bed.png" height="30" tooltip="床号" />
+				<Control bkimage="bed.png" height="40" tooltip="床号" />
 				<Control />
 			</VerticalLayout>
 			
