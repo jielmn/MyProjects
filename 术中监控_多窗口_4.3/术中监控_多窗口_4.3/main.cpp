@@ -1057,46 +1057,8 @@ void   CDuiFrameWnd::OnSurReaderTemp(WPARAM wParam, LPARAM  lParam) {
 
 // 设置温度字体大小
 void   CDuiFrameWnd::OnGridSizeChanged(const SIZE & s) {
-	// 修改字体大小
-	if (s.cx >= 950 && s.cy >= 425) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(27);
-		}
-	}
-	else if (s.cx >= 816 && s.cy >= 365) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(26);
-		}
-	}
-	else if (s.cx > 680 && s.cy > 304) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(25);
-		}
-	}
-	else if (s.cx > 572 && s.cy > 256) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(24);
-		}
-	}
-	else if (s.cx > 466 && s.cy > 208) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(23);
-		}
-	}
-	else if (s.cx > 350 && s.cy > 157) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(22);
-		}
-	}
-	else if (s.cx > 280 && s.cy > 125) {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(21);
-		}
-	}
-	else {
-		for (int i = 0; i < MAX_GRID_COUNT; i++) {
-			m_pGrids[i]->SetFont(20);
-		}
+	for (int i = 0; i < MAX_GRID_COUNT; i++) {
+		m_pGrids[i]->OnSizeChanged(s);
 	}
 
 	if (s.cy >= 295) {

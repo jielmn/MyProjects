@@ -468,6 +468,34 @@ void CGridUI::SetFont(int index) {
 		m_cstImgLabel->SetFont(index);
 }
 
+void CGridUI::OnSizeChanged(const SIZE & s) {
+	// 修改字体大小
+	if (s.cx >= 950 && s.cy >= 425) {
+		SetFont(27);
+	}
+	else if (s.cx >= 816 && s.cy >= 365) {
+		SetFont(26);
+	}
+	else if (s.cx > 680 && s.cy > 304) {
+		SetFont(25);
+	}
+	else if (s.cx > 572 && s.cy > 256) {
+		SetFont(24);
+	}
+	else if (s.cx > 466 && s.cy > 208) {
+		SetFont(23);
+	}
+	else if (s.cx > 350 && s.cy > 157) {
+		SetFont(22);
+	}
+	else if (s.cx > 280 && s.cy > 125) {
+		SetFont(21);
+	}
+	else {
+		SetFont(20);
+	}
+}
+
 // 更新显示逝去的时间
 void CGridUI::UpdateElapsed() {
 	char buf[256];

@@ -34,6 +34,7 @@ public:
 
 	// 设置温度字体
 	void SetFont(int index);
+	void OnSizeChanged(const SIZE & s);
 
 	// 更新显示逝去的时间
 	void UpdateElapsed();
