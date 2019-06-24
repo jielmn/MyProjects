@@ -28,7 +28,7 @@ protected:
 	const  std::vector<TempItem * > & GetTempData(DWORD j);
 	virtual CModeButton::Mode   GetMode();
 	CControlUI * GetGrid();
-	int    GetCelsiusHeight(int height, int nCelsiusCount);
+	int    GetCelsiusHeight(int height, int nCelsiusCount,int nVMargin = MIN_MYIMAGE_VMARGIN);
 	// 画水平刻度线
 	void   DrawScaleLine( HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
 		                  const RECT & rectScale, const RECT & rect );

@@ -676,7 +676,7 @@ void   CDuiFrameWnd::RefreshGridsSize(int width, int height) {
 
 		s.cx = ( width - 1 ) / (int)g_data.m_CfgData.m_dwLayoutColumns + 1;
 		s.cy = ( height - 1 ) / (int)g_data.m_CfgData.m_dwLayoutRows + 1;
-		OnSetTempFont(s);
+		OnGridSizeChanged(s);
 		m_layMain->SetItemSize(s);
 	}
 	else {
@@ -1056,7 +1056,7 @@ void   CDuiFrameWnd::OnSurReaderTemp(WPARAM wParam, LPARAM  lParam) {
 }
 
 // 设置温度字体大小
-void   CDuiFrameWnd::OnSetTempFont(const SIZE & s) {
+void   CDuiFrameWnd::OnGridSizeChanged(const SIZE & s) {
 	// 修改字体大小
 	if (s.cx >= 950 && s.cy >= 425) {
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
@@ -1097,6 +1097,19 @@ void   CDuiFrameWnd::OnSetTempFont(const SIZE & s) {
 		for (int i = 0; i < MAX_GRID_COUNT; i++) {
 			m_pGrids[i]->SetFont(20);
 		}
+	}
+
+	if (s.cy >= 295) {
+		g_data.m_nVMargin = 40;
+	}
+	else if (s.cy >= 245) {
+		g_data.m_nVMargin = 30;
+	}
+	else if (s.cy >= 195) {
+		g_data.m_nVMargin = 20;
+	}
+	else{
+		g_data.m_nVMargin = 10;
 	}
 }
 

@@ -289,6 +289,9 @@ public:
 	// 术中读卡器是否连接上
 	BOOL                      m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
 
+	// 温度曲线的垂直margin
+	int                       m_nVMargin;
+
 public:
 	CGlobalData() {
 		m_log = 0;
@@ -304,6 +307,8 @@ public:
 		m_edRemark = 0;
 		m_edHandRemark = 0;
 		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
+
+		m_nVMargin = 0;
 	}
 };
 

@@ -157,10 +157,10 @@ CModeButton::Mode  CMyImageUI::GetMode() {
 	return pParent->GetMode();
 }
 
-int   CMyImageUI::GetCelsiusHeight(int height, int nCelsiusCount) {
+int   CMyImageUI::GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin /*= MIN_MYIMAGE_VMARGIN*/) {
 	int h        = height / nCelsiusCount;
 	int r        = height % nCelsiusCount;
-	int nVMargin = MIN_MYIMAGE_VMARGIN;
+	// int nVMargin = MIN_MYIMAGE_VMARGIN;
 
 	if ( nVMargin * 2 > r ) {
 		int nSpared = (nVMargin * 2 - r - 1) / nCelsiusCount + 1;
@@ -1086,7 +1086,7 @@ void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & 
 	// 摄氏度个数
 	int  nCelsiusCount = nMaxTemp - nMinTemp;
 	// 每个摄氏度的高度
-	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount, g_data.m_nVMargin );
 	// 垂直留白
 	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
 	// 最高温度的Y坐标系值
