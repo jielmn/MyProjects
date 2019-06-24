@@ -10,20 +10,20 @@
 				<Label text="窗格信息"  textcolor="#FFCCCCCC" width="200" font="8" />
 			</HorizontalLayout>
 			
-			<HorizontalLayout height="40"  inset="30,5,0,5" >
-				<Control bkimage="file='bed.png' dest='0,0,40,40'"  width="50" tooltip="床号" />
+			<HorizontalLayout height="60"  inset="30,5,0,5" >
+				<Control bkimage="file='bed.png' dest='0,0,50,50'"  width="50" tooltip="床号" />
 				<Button name="btnBedM" textpadding="4,0,4,0" textcolor="#FFCCCCCC" text="01" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="150" font="9" tooltip="床号" />
 			</HorizontalLayout>
 			
-			<HorizontalLayout height="40" inset="30,5,0,5" >
-				<Control bkimage="file='user.png' dest='0,7,30,32'"  width="50" tooltip="病人姓名" />
+			<HorizontalLayout height="50" inset="30,5,0,5" >
+				<Control bkimage="file='user.png' dest='0,7,40,40'"  width="50" tooltip="病人姓名" />
 				<EditableButton name="cstEdtBtnPatientNameM" width="150" btncolor="#FFCCCCCC" btnfont="9" editfont="9" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
 			</HorizontalLayout>			
 			
 			<HorizontalLayout height="70" inset="10,40,10,0" >
 				<Control bkimage="file='reader_info.png' dest='0,0,25,40'" width="30" />
 				<Control width="10" />
-				<Label text="读卡器信息"   textcolor="#FFCCCCCC" width="200" font="8" />
+				<Label text="连续测温读卡器信息"   textcolor="#FFCCCCCC" width="200" font="8" />
 			</HorizontalLayout>
 			
 			<VerticalLayout inset="0,0,0,0" name="layReaders" hscrollbar="false" vscrollbar="true" sepheight="4" />
