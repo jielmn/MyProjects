@@ -34,8 +34,8 @@ using namespace DuiLib;
 
 #define   MAX_GRID_COUNT           64             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
-#define   MAX_COLUMNS_COUNT        5              // 每个页面最大几列
-#define   MAX_ROWS_COUNT           5              // 每个页面最大几行
+#define   MAX_COLUMNS_COUNT        8              // 每个页面最大几列
+#define   MAX_ROWS_COUNT           8              // 每个页面最大几行
 #define   DRAG_DROP_DELAY_TIME     100            // drag drop操作的延时时间
 #define   DEF_GET_TEMPERATURE_DELAY    10000      // 术中读卡器默认10秒后再次读取温度
 #define   MAX_TIME_NEEDED_BY_SUR_TEMP  5000       // 一次获取术中读卡器温度的软件最大等待时间，如果超过，则认为超时失败(单位：毫秒)
