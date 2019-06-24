@@ -16,9 +16,9 @@
 			<Control />
 			
 			<!-- 床号图片 -->
-			<VerticalLayout width="40" >
+			<VerticalLayout width="50" >
 				<Control />
-				<Control bkimage="bed.png" height="40" tooltip="床号" />
+				<Control bkimage="bed.png" height="50" tooltip="床号" />
 				<Control />
 			</VerticalLayout>
 			
@@ -29,10 +29,10 @@
 			<Control width="30" />
 			
 			<!-- 病人姓名 -->
-			<VerticalLayout width="130" >
+			<VerticalLayout width="140" >
 				<Control />
-				<HorizontalLayout height="30">													
-					<Control bkimage="file='user.png' dest='0,2,30,27'"  width="30" tooltip="病人姓名" />
+				<HorizontalLayout height="40">													
+					<Control bkimage="file='user.png' dest='0,3,40,36'"  width="40" tooltip="病人姓名" />
 					<EditableButton name="cstEdtBtnPatientName" width="100" btncolor="#FFCCCCCC" btnfont="7" editfont="7" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
 				</HorizontalLayout>
 				<Control />
