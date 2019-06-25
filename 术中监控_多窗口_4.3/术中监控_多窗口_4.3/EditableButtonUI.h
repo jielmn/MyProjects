@@ -16,7 +16,11 @@ private:
 	}
 
 	void DoInit();
+
+public:
 	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+
+private:
 	void Notify(TNotifyUI& msg);
 	
 private:

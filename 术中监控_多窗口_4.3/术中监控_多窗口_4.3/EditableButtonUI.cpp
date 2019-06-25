@@ -63,9 +63,13 @@ void CEditableButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 	}
 	else if (0 == StrICmp(pstrName, "editfont")) {
 		sscanf(pstrValue, "%d", &m_nEdtFont);
+		if (m_edit)
+			m_edit->SetFont(m_nEdtFont);
 	}
 	else if (0 == StrICmp(pstrName, "btnfont")) {
 		sscanf(pstrValue, "%d", &m_nBtnFont);
+		if ( m_btn)
+			m_btn->SetFont(m_nBtnFont);
 	}
 	else if (0 == StrICmp(pstrName, "hotimage")) {
 		m_strHotImg = pstrValue;

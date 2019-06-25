@@ -524,12 +524,78 @@ void CGridUI::OnSizeChanged(const SIZE & s) {
 		m_patientImg->SetFixedWidth(40);
 		m_patientImg->GetParent()->SetFixedHeight(40);
 
+		m_cstPatientName->SetFixedWidth(100);
+		m_cstPatientName->SetAttribute("btnfont", "7");
+		m_cstPatientName->SetAttribute("editfont", "7");
+		m_cstPatientName->GetParent()->GetParent()->SetFixedWidth(140);
+
+		m_CurReaderState->SetFixedHeight(30);
+		m_CurReaderState->SetFixedWidth(30);
+		m_CurReaderState->GetParent()->SetFixedHeight(30);
+
+		m_lblElapsed->SetFont(5);
+		m_lblElapsed->GetParent()->SetFixedWidth(80);
+
 	}
 	else if (s.cy >= 168) {
 		m_layHead->SetFixedHeight(64);
+
+		m_cstModeBtn->GetParent()->SetFixedHeight(26);
+		m_cstModeBtn->GetParent()->GetParent()->SetFixedWidth(26);
+
+		m_bedImg->SetFixedHeight(42);
+		m_bedImg->GetParent()->SetFixedWidth(42);
+
+		m_btnBedNo->SetFixedWidth(82);
+		m_btnBedNo->SetFont(50);
+		m_lblReaderNo->SetFont(60);
+		m_lblReaderNo->SetFixedWidth(25);
+		m_sperate->SetFixedWidth(22);
+
+		m_patientImg->SetFixedWidth(34);
+		m_patientImg->GetParent()->SetFixedHeight(34);
+
+		m_cstPatientName->SetFixedWidth(82);
+		m_cstPatientName->SetAttribute("btnfont", "70");
+		m_cstPatientName->SetAttribute("editfont", "70");
+		m_cstPatientName->GetParent()->GetParent()->SetFixedWidth(116);
+
+		m_CurReaderState->SetFixedHeight(26);
+		m_CurReaderState->SetFixedWidth(26);
+		m_CurReaderState->GetParent()->SetFixedHeight(26);
+
+		m_lblElapsed->SetFont(80);
+		m_lblElapsed->GetParent()->SetFixedWidth(70);
 	}
 	else if (s.cy >= 138) {
 		m_layHead->SetFixedHeight(54);
+
+		m_cstModeBtn->GetParent()->SetFixedHeight(23);
+		m_cstModeBtn->GetParent()->GetParent()->SetFixedWidth(23);
+
+		m_bedImg->SetFixedHeight(36);
+		m_bedImg->GetParent()->SetFixedWidth(36);
+
+		m_btnBedNo->SetFixedWidth(58);
+		m_btnBedNo->SetFont(51);
+		m_lblReaderNo->SetFont(61);
+		m_lblReaderNo->SetFixedWidth(20);
+		m_sperate->SetFixedWidth(16);
+
+		m_patientImg->SetFixedWidth(29);
+		m_patientImg->GetParent()->SetFixedHeight(29);
+
+		m_cstPatientName->SetFixedWidth(66);
+		m_cstPatientName->SetAttribute("btnfont", "71");
+		m_cstPatientName->SetAttribute("editfont", "71");
+		m_cstPatientName->GetParent()->GetParent()->SetFixedWidth(95);
+
+		m_CurReaderState->SetFixedHeight(23);
+		m_CurReaderState->SetFixedWidth(23);
+		m_CurReaderState->GetParent()->SetFixedHeight(23);
+
+		m_lblElapsed->SetFont(81);
+		m_lblElapsed->GetParent()->SetFixedWidth(62);
 	}
 	else {
 		m_layHead->SetFixedHeight(44);
@@ -548,6 +614,18 @@ void CGridUI::OnSizeChanged(const SIZE & s) {
 
 		m_patientImg->SetFixedWidth(24);
 		m_patientImg->GetParent()->SetFixedHeight(24);
+
+		m_cstPatientName->SetFixedWidth(50);
+		m_cstPatientName->SetAttribute("btnfont", "72");
+		m_cstPatientName->SetAttribute("editfont", "72");
+		m_cstPatientName->GetParent()->GetParent()->SetFixedWidth(74);
+
+		m_CurReaderState->SetFixedHeight(20);
+		m_CurReaderState->SetFixedWidth(20);
+		m_CurReaderState->GetParent()->SetFixedHeight(20);
+
+		m_lblElapsed->SetFont(82);
+		m_lblElapsed->GetParent()->SetFixedWidth(54);
 	}
 }
 

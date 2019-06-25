@@ -30,7 +30,7 @@ using namespace DuiLib;
 #endif
 
 // 窗格温度文字透明度
-#define   GRID_LABLE_TRANSPARENT_PARAM       0x50
+#define   GRID_LABLE_TRANSPARENT_PARAM       0xCC
 
 #define   MAX_GRID_COUNT           64             // 最多几个格子
 #define   MAX_READERS_PER_GRID     6              // 每个格子最多几个测温点
