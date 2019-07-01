@@ -209,7 +209,7 @@ int  CBusiness::SetReceriverChannel(const CSetReceiverChannelParam * pParam) {
 	BYTE  byChannels[3] = { pParam->m_byChannelA, pParam->m_byChannelB, pParam->m_byChannelC };
 	int ret = 0;
 
-	for (int i = 0; i < 3; i++) {		
+	for (int i = 0; i < 2; i++) {		
 		dwWriteLen = 5;
 		//                          пе╣ю
 		memcpy(write_data, "\xCC\x01\x01\xDD\xAA", dwWriteLen);

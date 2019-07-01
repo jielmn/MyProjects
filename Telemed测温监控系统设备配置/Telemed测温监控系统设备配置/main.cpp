@@ -49,7 +49,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnReceiver_2 = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSetting_6"));
 	m_cmbChannel_a = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbChannel_a"));
 	m_edtChannel_b = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtChannel_b"));
-	m_edtChannel_c = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtChannel_c"));
+	//m_edtChannel_c = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edtChannel_c"));
 
 	// tab 4
 	m_lstArea = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstArea"));
@@ -136,7 +136,7 @@ void  CDuiFrameWnd::InitWindow() {
 		pItem->SetTag(pArea->dwAreaNo);
 	}
 
-	for (int i = 1; i <= 61; i += 30) {
+	for (int i = 1; i <= 81; i += 20) {
 		strText.Format("%d", i);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
@@ -501,8 +501,8 @@ void  CDuiFrameWnd::OnChannelAChanged() {
 	m_edtChannel_b->SetText(strText);
 #endif
 
-	strText.Format("%d", nChannel + 20);
-	m_edtChannel_c->SetText(strText);
+	//strText.Format("%d", nChannel + 20);
+	//m_edtChannel_c->SetText(strText);
 }
 
 void  CDuiFrameWnd::OnSetReceiverChannel() {
@@ -527,9 +527,10 @@ void  CDuiFrameWnd::OnSetReceiverChannel() {
 	sscanf_s( strText, "%d", &nTmp );
 	BYTE byChannel_b = (BYTE)nTmp;
 
-	strText = m_edtChannel_c->GetText();
-	sscanf_s(strText, "%d", &nTmp);
-	BYTE byChannel_c = (BYTE)nTmp;
+	//strText = m_edtChannel_c->GetText();
+	//sscanf_s(strText, "%d", &nTmp);
+	//BYTE byChannel_c = (BYTE)nTmp;
+	BYTE byChannel_c = 0;
 #else
 	BYTE byChannel_b = byChannel_a + 10;
 	BYTE byChannel_c = byChannel_a + 20;

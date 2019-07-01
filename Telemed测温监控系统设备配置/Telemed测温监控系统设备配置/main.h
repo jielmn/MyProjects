@@ -85,7 +85,7 @@ private:
 	DuiLib::CButtonUI *                 m_btnReceiver_2;
 	DuiLib::CComboUI *                  m_cmbChannel_a;
 	DuiLib::CEditUI *                   m_edtChannel_b;
-	DuiLib::CEditUI *                   m_edtChannel_c;
+	// DuiLib::CEditUI *                   m_edtChannel_c;
 	// tab 4
 	DuiLib::CListUI *                   m_lstArea;
 	// progress

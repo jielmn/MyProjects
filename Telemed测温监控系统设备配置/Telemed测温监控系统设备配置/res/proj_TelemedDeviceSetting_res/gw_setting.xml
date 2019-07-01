@@ -60,10 +60,12 @@
 						<Edit  name="edtChannel_b" font="3" textcolor="#FF386382" width="100" text="1" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
 					</HorizontalLayout>
 					
+					<!--
 					<HorizontalLayout height="40" inset="10,5,10,5">
 						<Label text="模块3信道" width="150" font="3" textcolor="#FF386382" />
 						<Edit  name="edtChannel_c" font="3" textcolor="#FF386382" width="100" text="1" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" />
 					</HorizontalLayout>
+					-->
 				</VerticalLayout>
 				
 				<VerticalLayout width="200" inset="25,0,25,0"  >
