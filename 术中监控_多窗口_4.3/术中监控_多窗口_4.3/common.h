@@ -29,6 +29,9 @@ using namespace DuiLib;
 #define   TEST_MEMORY_LEAK_FLAG   0              // 测试随时间变化，内存消耗会不会增加
 #endif
 
+#define  HANDLE_WRONG_FORMAT_1     1             // 主要针对连续测温，结束字符不是FF
+
+
 // 窗格温度文字透明度
 #define   GRID_LABLE_TRANSPARENT_PARAM       0xCC
 
@@ -60,8 +63,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "2.1.2"
-#define   COMPILE_TIME                "2019-06-25 11:06"
+#define   VERSION                     "2.1.3"
+#define   COMPILE_TIME                "2019-07-01 16:43"
 
 // 控件id
 #define   TABS_ID                  "switch"

@@ -175,8 +175,12 @@ void  CLaunch::ProcSurReader(const BYTE * pData, DWORD dwDataLen) {
 
 	if ( pData[28] != (BYTE)'\xFF' ) {
 		DebugStream( debug_buf, sizeof(debug_buf), pData, dwDataLen );
-		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
+#if HANDLE_WRONG_FORMAT_1
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(跳过，不处理)：\n%s\n", debug_buf);
+#else
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(断开串口)：\n%s\n", debug_buf);
 		CloseLaunch();
+#endif
 		return;
 	}
 
@@ -230,8 +234,12 @@ void   CLaunch::ProcHandeReader(const BYTE * pData, DWORD dwDataLen) {
 	// 如果最后一个字节不是0xFF
 	if ( pData[dwDataLen-1] != 0xFF ) {
 		DebugStream( debug_buf, sizeof(debug_buf), pData, dwDataLen );
-		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾：\n%s\n", debug_buf);
+#if HANDLE_WRONG_FORMAT_1
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(跳过，不处理)：\n%s\n", debug_buf);
+#else
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(断开串口)：\n%s\n", debug_buf);
 		CloseLaunch();
+#endif
 		return;
 	}
 
