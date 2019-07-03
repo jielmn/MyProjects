@@ -608,6 +608,9 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 				m_sigSurReaderStatus.emit(wBed, FALSE);
 			}
 		}
+
+		// ÖØÁ¬
+		g_data.m_thrd_launch->PostDelayMessage( 10000, this, MSG_RESTART_LAUNCH );
 	}
 }
 
