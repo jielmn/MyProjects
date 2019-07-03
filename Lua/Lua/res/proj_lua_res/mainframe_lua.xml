@@ -27,7 +27,7 @@
 			
 			<!-- 客户区 -->
 			<!-- 加法计算 -->
-			<VerticalLayout inset="10,0,10,0" >
+			<VerticalLayout inset="10,0,10,0" height="60" >
 				<HorizontalLayout height="30" >
 					<Label text="1.加法计算" textcolor="FF447AA1" width="80" />
 					<VerticalLayout>
@@ -45,6 +45,34 @@
 					<Edit name="edAddC" width="100" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC"  />
 					<Control width="30" />
 					<Label name="lblAddErrMsg" textcolor="#FFFF0000" text="错误消息" />
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			<VerticalLayout height="20" />
+			
+			<!-- 字节流 -->
+			<VerticalLayout inset="10,0,10,0" >
+				<HorizontalLayout height="30" >
+					<Label text="2.指定温度数据(整型)，返回字节流" textcolor="FF447AA1" width="220" />
+					<VerticalLayout>
+						<Control />
+						<Control name="tooltip_stream" width="16" height="16" bkimage="question.png" tooltip=""  />
+						<Control />
+					</VerticalLayout>					
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="30" inset="10,0,10,0" >					
+					<Label text="温度数据：" textcolor="#FF447AA1" width="80" />
+					<Edit  name="edTemp" width="100" />
+					<Control width="30" />
+					<Label name="lblTempErrMsg" textcolor="#FFFF0000" text="错误消息" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="10" />
+				
+				<HorizontalLayout height="30" inset="10,0,10,0" >					
+					<Label text="返回字节流：" textcolor="#FF447AA1" width="80" />					
+					<Edit name="edStream" width="600" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC"  />
 				</HorizontalLayout>
 			</VerticalLayout>
 			

@@ -42,7 +42,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblAddErr->SetText("");
 	m_tooltip_add = m_PaintManager.FindControl("tooltip_add");
 	strText.Format("lua code:\n----------------------\n%s", LUA_ADD_STRING);
-	m_tooltip_add->SetToolTip(strText); 
+	m_tooltip_add->SetToolTip(strText);              
 
 	WindowImplBase::InitWindow();
 }
