@@ -49,4 +49,5 @@ private:
 	CEditUI *                  m_edAddB;
 	CEditUI *                  m_edAddC;
 	CLabelUI *                 m_lblAddErr;
+	CControlUI *               m_tooltip_add;
 };

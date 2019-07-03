@@ -29,7 +29,12 @@
 			<!-- 加法计算 -->
 			<VerticalLayout inset="10,0,10,0" >
 				<HorizontalLayout height="30" >
-					<Label text="1.加法计算" textcolor="FF447AA1" />					
+					<Label text="1.加法计算" textcolor="FF447AA1" width="80" />
+					<VerticalLayout>
+						<Control />
+						<Control name="tooltip_add" width="16" height="16" bkimage="question.png" tooltip=""  />
+						<Control />
+					</VerticalLayout>					
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="30" inset="10,0,10,0" >					

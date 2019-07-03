@@ -9,6 +9,8 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+
+#define  LUA_ADD_STRING    "function add(a,b) \n  return a + b \nend"
          
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_L = 0;
@@ -23,10 +25,12 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
    
 void  CDuiFrameWnd::InitWindow() {
+	CDuiString strText;
+
 	m_L = init_lua();
 
 	int ret = 0;
-	ret = luaL_loadstring(m_L, "function add(a,b) return a + b end");
+	ret = luaL_loadstring(m_L, LUA_ADD_STRING);
 	assert(0 == ret);
 	ret = lua_pcall(m_L, 0, 0, 0);
 	assert(0 == ret);
@@ -36,6 +40,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edAddC = static_cast<CEditUI *>(m_PaintManager.FindControl("edAddC"));
 	m_lblAddErr = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblAddErrMsg"));
 	m_lblAddErr->SetText("");
+	m_tooltip_add = m_PaintManager.FindControl("tooltip_add");
+	strText.Format("lua code:\n----------------------\n%s", LUA_ADD_STRING);
+	m_tooltip_add->SetToolTip(strText); 
 
 	WindowImplBase::InitWindow();
 }
@@ -59,7 +66,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 }
 
 
-
+                
 void  CDuiFrameWnd::OnAdd() {
 	CDuiString  strText;
 	CDuiString  strTextA;
