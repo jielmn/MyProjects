@@ -10,7 +10,17 @@
 #include "business.h"
 #include "resource.h"
 
-#define  LUA_ADD_STRING    "function add(a,b) \n  return a + b \nend"
+#define  LUA_ADD_STRING		"function add(a,b) \n" \
+							"  return a + b \n" \
+							"end"
+
+#define  LUA_TEMP_STRING    "require(\"bit\") \n" \
+							"function temp(t) \n" \
+							"  local a = bit.band(bit.rshift(t, 8), 0xff) \n" \
+							"  local b = bit.band(t, 0xff) \n" \
+							"  local c = string.char(0, 0, 0, 0, a, b, 0, 0) \n" \
+							"  return c \n" \
+							"end" 
          
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_L = 0;
@@ -18,6 +28,10 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_edAddB = 0;
 	m_edAddC = 0;
 	m_lblAddErr = 0;
+	m_edTemp = 0;
+	m_edTempRet = 0;
+	m_tooltip_temp = 0;
+	m_lblTempErr = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -35,6 +49,11 @@ void  CDuiFrameWnd::InitWindow() {
 	ret = lua_pcall(m_L, 0, 0, 0);
 	assert(0 == ret);
 
+	ret = luaL_loadstring(m_L, LUA_TEMP_STRING);
+	assert(0 == ret);
+	ret = lua_pcall(m_L, 0, 0, 0);
+	assert(0 == ret);
+
 	m_edAddA = static_cast<CEditUI *>(m_PaintManager.FindControl("edAddA"));
 	m_edAddB = static_cast<CEditUI *>(m_PaintManager.FindControl("edAddB"));
 	m_edAddC = static_cast<CEditUI *>(m_PaintManager.FindControl("edAddC"));
@@ -42,7 +61,15 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblAddErr->SetText("");
 	m_tooltip_add = m_PaintManager.FindControl("tooltip_add");
 	strText.Format("lua code:\n----------------------\n%s", LUA_ADD_STRING);
-	m_tooltip_add->SetToolTip(strText);              
+	m_tooltip_add->SetToolTip(strText);   
+
+	m_edTemp = static_cast<CEditUI *>(m_PaintManager.FindControl("edTemp"));
+	m_edTempRet = static_cast<CEditUI *>(m_PaintManager.FindControl("edStream"));
+	m_tooltip_temp = m_PaintManager.FindControl("tooltip_stream");
+	strText.Format("lua code:\n----------------------\n%s", LUA_TEMP_STRING);
+	m_tooltip_temp->SetToolTip(strText);
+	m_lblTempErr = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblTempErrMsg"));
+	m_lblTempErr->SetText("");
 
 	WindowImplBase::InitWindow();
 }
@@ -56,6 +83,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if ( msg.sType == "textchanged" ) {
 		if ( name == "edAddA" || name == "edAddB" ) {
 			OnAdd();
+		}
+		else if ( name == "edTemp" ) {
+			OnTemp();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -113,6 +143,50 @@ void  CDuiFrameWnd::OnAdd() {
 	m_edAddC->SetText(strText);
 	m_lblAddErr->SetText("");
 
+}
+
+void CDuiFrameWnd::OnTemp() {
+	CDuiString  strText;
+	int nTemp = 0;
+	int ret = 0;
+
+	strText = m_edTemp->GetText();
+	if (strText.GetLength() == 0) {
+		m_lblTempErr->SetText("");
+		return;
+	}
+
+	ret = sscanf(strText, " %d", &nTemp);
+	if (1 != ret) {
+		m_lblTempErr->SetText("请输入一个温度值");
+		return;
+	}
+
+	/*lua 处理*/
+	lua_getglobal(m_L, "temp");
+	lua_pushinteger(m_L, nTemp);
+
+	ret = lua_pcall(m_L, 1, 1, 0);
+	if (0 != ret) {
+		m_lblTempErr->SetText("lua处理出错!");
+		lua_settop(m_L, 0);
+		return;
+	}
+
+	size_t len = 0;
+	CDuiString str;
+	strText = "";
+
+	const char * p = lua_tolstring(m_L, 1, &len);
+	for ( size_t i = 0; i < len; i++ ) {
+		str.Format("%02X ", p[i]);
+		strText += str;
+	}
+	m_edTempRet->SetText(strText);
+
+	lua_settop(m_L, 0);
+
+	int a = 100;
 }
 
 

@@ -40,6 +40,7 @@ public:
 
 private:
 	void  OnAdd();
+	void  OnTemp();
 
 
 private:
@@ -50,4 +51,9 @@ private:
 	CEditUI *                  m_edAddC;
 	CLabelUI *                 m_lblAddErr;
 	CControlUI *               m_tooltip_add;
+
+	CEditUI *                  m_edTemp;
+	CEditUI *                  m_edTempRet;
+	CLabelUI *                 m_lblTempErr;
+	CControlUI *               m_tooltip_temp;
 };
