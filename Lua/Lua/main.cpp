@@ -109,18 +109,21 @@ void  CDuiFrameWnd::OnAdd() {
 
 	if ( strTextA.GetLength() == 0 && strTextB.GetLength() == 0 ) {
 		m_edAddC->SetText("");
+		m_lblAddErr->SetText("");
 		return;
 	}
 
 	ret = sscanf(strTextA, " %d", &a);
 	if (1 != ret) {
 		m_lblAddErr->SetText("加数a不是数字!");
+		m_edAddC->SetText("");
 		return;
 	}
 
 	ret = sscanf(strTextB, " %d", &b);
 	if (1 != ret) {
 		m_lblAddErr->SetText("加数b不是数字!");
+		m_edAddC->SetText("");
 		return;
 	}
 
@@ -132,6 +135,7 @@ void  CDuiFrameWnd::OnAdd() {
 	ret = lua_pcall(m_L, 2, 1, 0);
 	if ( 0 != ret ) {
 		m_lblAddErr->SetText("lua处理出错!");
+		m_edAddC->SetText("");
 		lua_settop(m_L, 0);
 		return;
 	}
@@ -152,13 +156,15 @@ void CDuiFrameWnd::OnTemp() {
 
 	strText = m_edTemp->GetText();
 	if (strText.GetLength() == 0) {
+		m_edTempRet->SetText("");
 		m_lblTempErr->SetText("");
 		return;
 	}
 
 	ret = sscanf(strText, " %d", &nTemp);
 	if (1 != ret) {
-		m_lblTempErr->SetText("请输入一个温度值");
+		m_lblTempErr->SetText("请输入一个温度值(整数)");
+		m_edTempRet->SetText("");
 		return;
 	}
 
@@ -169,6 +175,7 @@ void CDuiFrameWnd::OnTemp() {
 	ret = lua_pcall(m_L, 1, 1, 0);
 	if (0 != ret) {
 		m_lblTempErr->SetText("lua处理出错!");
+		m_edTempRet->SetText("");
 		lua_settop(m_L, 0);
 		return;
 	}
@@ -179,14 +186,13 @@ void CDuiFrameWnd::OnTemp() {
 
 	const char * p = lua_tolstring(m_L, 1, &len);
 	for ( size_t i = 0; i < len; i++ ) {
-		str.Format("%02X ", p[i]);
+		str.Format("%02X ", (BYTE)p[i]);
 		strText += str;
 	}
 	m_edTempRet->SetText(strText);
+	m_lblTempErr->SetText("");
 
 	lua_settop(m_L, 0);
-
-	int a = 100;
 }
 
 
