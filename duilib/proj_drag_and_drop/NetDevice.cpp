@@ -5,6 +5,9 @@
 
 CNetDevice::CNetDevice()
 {
+	m_uButtonState = 0;
+	memset( &m_ptLastMouse, 0, sizeof(m_ptLastMouse));
+	memset(&m_rcNewPos, 0, sizeof(m_rcNewPos));
 }
 
 
@@ -20,7 +23,7 @@ LPVOID CNetDevice::GetInterface(LPCTSTR pstrName)
 	}
 	else
 	{
-		return CContainerUI::GetInterface(pstrName);
+		return CControlUI::GetInterface(pstrName);
 	}
 }
 
@@ -31,8 +34,13 @@ void CNetDevice::DoEvent(TEventUI& event)
 		if (::PtInRect(&m_rcItem, event.ptMouse))
 		{
 			m_uButtonState |= UISTATE_CAPTURED;
-			m_ptLastMouse = event.ptMouse;
-			m_rcNewPos = m_rcItem;
+			m_ptLastMouse  = event.ptMouse;
+			m_rcNewPos     = m_rcItem;
+
+			//CDuiString  strText;
+			//strText.Format("mouse down m_rcItem=(%d,%d,%d,%d), m_rcNewPos=(%d,%d,%d,%d) \n", m_rcItem.left, m_rcItem.right, m_rcItem.top, m_rcItem.bottom,
+			//	m_rcNewPos.left, m_rcNewPos.right, m_rcNewPos.top, m_rcNewPos.bottom);
+			//OutputDebugString(strText);
 
 			if (m_pManager)
 				m_pManager->AddPostPaint(this);
@@ -45,7 +53,26 @@ void CNetDevice::DoEvent(TEventUI& event)
 		{
 			m_uButtonState &= ~UISTATE_CAPTURED;
 
-			this->SetPos(m_rcNewPos);                   //这句是拖拽到目的地的关机，否则无法拖动到目的位置
+			CControlUI * pParent = this->GetParent();
+			if ( pParent ) {
+				RECT rcParent = pParent->GetPos();
+				RECT rcNewPos = m_rcNewPos;
+
+				rcNewPos.left   -= rcParent.left;
+				rcNewPos.right  -= rcParent.left;
+				rcNewPos.top    -= rcParent.top;
+				rcNewPos.bottom -= rcParent.top;
+
+				this->SetPos(rcNewPos);
+			}
+			else {
+				this->SetPos(m_rcNewPos);                   //这句是拖拽到目的地的关机，否则无法拖动到目的位置
+			}
+			
+			//CDuiString  strText;
+			//strText.Format("mouse up m_rcItem=(%d,%d,%d,%d), m_rcNewPos=(%d,%d,%d,%d) \n", m_rcItem.left, m_rcItem.right, m_rcItem.top, m_rcItem.bottom,
+			//	m_rcNewPos.left, m_rcNewPos.right, m_rcNewPos.top, m_rcNewPos.bottom);
+			//OutputDebugString(strText);
 
 			if (m_pManager)
 			{
@@ -81,7 +108,7 @@ void CNetDevice::DoEvent(TEventUI& event)
 			return;
 		}
 	}
-	CContainerUI::DoEvent(event);
+	CControlUI::DoEvent(event);
 }
 
 void CNetDevice::DoPostPaint(HDC hDC, const RECT& rcPaint)

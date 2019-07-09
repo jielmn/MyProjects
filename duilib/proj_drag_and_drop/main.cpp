@@ -33,9 +33,11 @@ void  CDuiFrameWnd::InitWindow() {
 			pCNetDevice->SetFixedXY(leftTop);           // 自定义控件在背景布局的起始位置
 			pCNetDevice->SetFixedWidth(80);
 			pCNetDevice->SetFixedHeight(80);
+			//pCNetDevice->SetBorderSize(1);
+			//pCNetDevice->SetBorderColor(0xFF000000);
 			pCNetDevice->SetAttribute(_T("bkimage"), _T("file='earth.png'"));
 
-
+			/*
 			CLabelUI *pUserNameLabel = new CLabelUI;     //自定义控件增加一个标签
 			if (pUserNameLabel != NULL)
 			{
@@ -47,6 +49,7 @@ void  CDuiFrameWnd::InitWindow() {
 				//pUserNameLabel->SetMouseEnabled(false);
 				pCNetDevice->Add(pUserNameLabel);
 			}
+			*/
 
 			pVLNet->Add(pCNetDevice);
 		}
