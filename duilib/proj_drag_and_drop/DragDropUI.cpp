@@ -1,9 +1,9 @@
 
 #include "common.h"
-#include "NetDevice.h"
+#include "DragDropUI.h"
 
 
-CNetDevice::CNetDevice()
+CDragDropUI::CDragDropUI()
 {
 	m_uButtonState = 0;
 	memset( &m_ptLastMouse, 0, sizeof(m_ptLastMouse));
@@ -11,15 +11,15 @@ CNetDevice::CNetDevice()
 }
 
 
-CNetDevice::~CNetDevice()
+CDragDropUI::~CDragDropUI()
 {
 }
 
-LPVOID CNetDevice::GetInterface(LPCTSTR pstrName)
+LPVOID CDragDropUI::GetInterface(LPCTSTR pstrName)
 {
-	if (_tcscmp(pstrName, _T("NetDeviceInfo")) == 0)
+	if (_tcscmp(pstrName, _T("DragDropUI")) == 0)
 	{
-		return static_cast<CNetDevice*>(this);
+		return static_cast<CDragDropUI*>(this);
 	}
 	else
 	{
@@ -27,7 +27,7 @@ LPVOID CNetDevice::GetInterface(LPCTSTR pstrName)
 	}
 }
 
-void CNetDevice::DoEvent(TEventUI& event)
+void CDragDropUI::DoEvent(TEventUI& event)
 {
 	if (event.Type == UIEVENT_BUTTONDOWN && IsEnabled())
 	{
@@ -111,7 +111,7 @@ void CNetDevice::DoEvent(TEventUI& event)
 	CControlUI::DoEvent(event);
 }
 
-void CNetDevice::DoPostPaint(HDC hDC, const RECT& rcPaint)
+void CDragDropUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
 {
 	if ((m_uButtonState & UISTATE_CAPTURED) != 0) {
 		CDuiRect rcParent = m_pParent->GetPos();

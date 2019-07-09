@@ -3,11 +3,11 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
-class CNetDevice : public CControlUI      //这里继承了CContainerUI，你也可以继承任意控件类如CButtonUI等，实现自定义控件
+class CDragDropUI : public CControlUI      //这里继承了CContainerUI，你也可以继承任意控件类如CButtonUI等，实现自定义控件
 {
 public:
-	CNetDevice();
-	~CNetDevice();
+	CDragDropUI();
+	~CDragDropUI();
 
 	LPVOID GetInterface(LPCTSTR pstrName);
 	void DoEvent(TEventUI& event);

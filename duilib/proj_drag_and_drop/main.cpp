@@ -9,7 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
-#include "NetDevice.h"
+#include "DragDropUI.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
 
@@ -25,7 +25,7 @@ void  CDuiFrameWnd::InitWindow() {
 	{
 		int _left = 205; 
 		int _top = 47;
-		CNetDevice *pCNetDevice = new CNetDevice();//创建自定义控件
+		CDragDropUI *pCNetDevice = new CDragDropUI();//创建自定义控件
 		if (NULL != pCNetDevice)
 		{
 			pCNetDevice->SetFloat();                     //一定要设置为绝对定位，否则不能拖动
