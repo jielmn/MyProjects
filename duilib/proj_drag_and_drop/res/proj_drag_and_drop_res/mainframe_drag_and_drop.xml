@@ -42,7 +42,19 @@
 						<Control />
 					</VerticalLayout>
 					
-					<VerticalLayout name="vlSchoolNet" bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" />
+					<VerticalLayout name="vlSchoolNet" bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" >
+						<HorizontalLayout />
+						
+						<HorizontalLayout>
+							<HorizontalLayout />
+							<HorizontalLayout name="layInvalid"  bkcolor="#FF666666" width="200" height="150"  >
+								<Label text="无效区域" align="center" font="1" />
+							</HorizontalLayout>
+							<HorizontalLayout />
+						</HorizontalLayout>
+						
+						<HorizontalLayout />
+					</VerticalLayout>
 					
 					<VerticalLayout width="80">
 						<Control />

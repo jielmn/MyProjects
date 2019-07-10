@@ -35,12 +35,7 @@ void CDragDropUI::DoEvent(TEventUI& event)
 		{
 			m_uButtonState |= UISTATE_CAPTURED;
 			m_ptLastMouse  = event.ptMouse;
-			m_rcNewPos     = m_rcItem;
-
-			//CDuiString  strText;
-			//strText.Format("mouse down m_rcItem=(%d,%d,%d,%d), m_rcNewPos=(%d,%d,%d,%d) \n", m_rcItem.left, m_rcItem.right, m_rcItem.top, m_rcItem.bottom,
-			//	m_rcNewPos.left, m_rcNewPos.right, m_rcNewPos.top, m_rcNewPos.bottom);
-			//OutputDebugString(strText);
+			m_rcNewPos     = m_rcItem;   
 
 			if (m_pManager)
 				m_pManager->AddPostPaint(this);
