@@ -93,7 +93,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Gdi32.lib;msimg32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\proj_drag_and_drop_res  ..\Debug\res\proj_drag_and_drop_res /dseiy</Command>

@@ -14,6 +14,10 @@ public:
 	void DoPostPaint(HDC hDC, const RECT& rcPaint);
 
 private:
+	// ºÏ≤ÈÕœ∑≈Œª÷√
+	BOOL CheckPos();
+
+private:
 	UINT m_uButtonState;
 	POINT m_ptLastMouse;
 	RECT m_rcNewPos;
