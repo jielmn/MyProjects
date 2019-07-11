@@ -28,12 +28,12 @@
 			
 			<!-- 客户区 -->
 			<VerticalLayout bkcolor="#FF666666" >
-				<HorizontalLayout height="80">
+				<HorizontalLayout height="120">
 					<Label text="无效区域" align="center" font="1" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout>
-					<VerticalLayout width="80">
+					<VerticalLayout width="120">
 						<Control />
 						<Label text="无" align="center" font="1" />
 						<Label text="效" align="center" font="1" />
@@ -56,7 +56,7 @@
 						<HorizontalLayout />
 					</VerticalLayout>
 					
-					<VerticalLayout width="80">
+					<VerticalLayout width="120">
 						<Control />
 						<Label text="无" align="center" font="1" />
 						<Label text="效" align="center" font="1" />
@@ -66,7 +66,7 @@
 					</VerticalLayout>
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="80">
+				<HorizontalLayout height="120">
 					<Label text="无效区域" align="center" font="1" />
 				</HorizontalLayout>
 			</VerticalLayout>

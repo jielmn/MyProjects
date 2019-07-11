@@ -1,18 +1,22 @@
 
 #include "common.h"
 #include "DragDropUI.h"
-
+#include "resource.h"
 
 CDragDropUI::CDragDropUI()
 {
 	m_uButtonState = 0;
 	memset( &m_ptLastMouse, 0, sizeof(m_ptLastMouse));
 	memset(&m_rcNewPos, 0, sizeof(m_rcNewPos));
+
+	m_forbit = CRenderEngine::LoadImage( IDB_PNG1,"png",0x00000000);
+	m_bCheckPos = TRUE; 
 }
 
 
 CDragDropUI::~CDragDropUI()
 {
+	CRenderEngine::FreeImage(m_forbit);
 }
 
 LPVOID CDragDropUI::GetInterface(LPCTSTR pstrName)
@@ -48,12 +52,13 @@ void CDragDropUI::DoEvent(TEventUI& event)
 		{
 			m_uButtonState &= ~UISTATE_CAPTURED;
 
-			BOOL bRet = CheckPos();
+			// 在窗体的notify消息处理处处理
+			m_pManager->SendNotify(this, "CheckPos", TRUE);
 			CDuiRect rcParent = m_pParent->GetPos();
 
 			// 新位置有效（没有超出父控件的范围）
-			if (bRet) {
-				RECT rcNewPos = m_rcNewPos;
+			if (m_bCheckPos) {
+				RECT rcNewPos    = m_rcNewPos;
 				rcNewPos.left   -= rcParent.left;
 				rcNewPos.right  -= rcParent.left;
 				rcNewPos.top    -= rcParent.top;
@@ -89,7 +94,10 @@ void CDragDropUI::DoEvent(TEventUI& event)
 			//将当前拖拽块的位置 和 当前拖拽块的前一时刻的位置，刷新  
 			CDuiRect rcInvalidate = m_rcNewPos;
 			m_rcNewPos = rcCurPos;
+
 			// CheckPos();
+			// 在窗体的notify消息处理处处理
+			m_pManager->SendNotify(this, "CheckPos");
 
 			rcInvalidate.Join(m_rcNewPos);
 			if (m_pManager) m_pManager->Invalidate(rcInvalidate);
@@ -114,6 +122,14 @@ void CDragDropUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
 		SelectObject(hComDC, hBmp);
 		::BitBlt(hComDC, 0, 0, width, height, hDC, m_rcItem.left, m_rcItem.top, SRCCOPY);
 
+		HDC  hForbit = 0;
+		// 显示禁止放下图标
+		if (!m_bCheckPos) {
+			hForbit = CreateCompatibleDC(hDC);
+			SelectObject(hForbit, m_forbit->hBitmap);
+			::BitBlt(hComDC, width-16, height-16, 16, 16, hForbit, 0, 0, SRCCOPY);
+		}			
+
 		BLENDFUNCTION bf;
 		bf.BlendOp = AC_SRC_OVER;
 		bf.BlendFlags = 0;
@@ -124,47 +140,8 @@ void CDragDropUI::DoPostPaint(HDC hDC, const RECT& rcPaint)
 
 		DeleteObject(hBmp);
 		DeleteDC(hComDC);
-	}
-}
-                 
-// 检查拖放位置
-BOOL CDragDropUI::CheckPos() {
-	int width = GetWidth();
-	int height = GetHeight();
-	CDuiRect rcParent = m_pParent->GetPos();
-	BOOL  bRet = TRUE;
-
-	if (m_rcNewPos.left < rcParent.left) {
-		// 左边完全出去
-		if ( m_rcNewPos.left + width <= rcParent.left ) {
-			bRet = FALSE;
+		if (!m_bCheckPos) {
+			DeleteDC(hForbit);
 		}
-		m_rcNewPos.left = rcParent.left;
 	}
-	else if (m_rcNewPos.right > rcParent.right) {
-		// 右边完全出去
-		if ( m_rcNewPos.right - rcParent.right >= width ) {
-			bRet = FALSE;
-		}
-		m_rcNewPos.left = rcParent.right - width;
-	}
-
-	if (m_rcNewPos.top < rcParent.top) {
-		// 上边完全出去
-		if (m_rcNewPos.top + height <= rcParent.top) {
-			bRet = FALSE;
-		}
-		m_rcNewPos.top = rcParent.top;
-	}
-	else if (m_rcNewPos.bottom > rcParent.bottom) {
-		// 下边完全出去
-		if (m_rcNewPos.bottom - rcParent.bottom >= height) {
-			bRet = FALSE;
-		}
-		m_rcNewPos.top = rcParent.bottom - height;
-	}
-
-	m_rcNewPos.right = m_rcNewPos.left + width;
-	m_rcNewPos.bottom = m_rcNewPos.top + height;
-	return bRet;
 }

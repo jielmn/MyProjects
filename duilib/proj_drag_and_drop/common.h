@@ -31,7 +31,7 @@ public:
 };
 
 extern CGlobalData  g_data;
-
+extern BOOL RectOverlap(const RECT & rA, const RECT & rB);
 
 // templates
 template <class T>

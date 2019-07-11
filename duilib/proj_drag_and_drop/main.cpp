@@ -36,24 +36,13 @@ void  CDuiFrameWnd::InitWindow() {
 			//pCNetDevice->SetBorderSize(1);
 			//pCNetDevice->SetBorderColor(0xFF000000);
 			pCNetDevice->SetAttribute(_T("bkimage"), _T("file='earth.png'"));
-
-			/*
-			CLabelUI *pUserNameLabel = new CLabelUI;     //自定义控件增加一个标签
-			if (pUserNameLabel != NULL)
-			{
-				pUserNameLabel->SetAttribute(_T("float"), _T("true"));
-				pUserNameLabel->SetAttribute(_T("pos"), _T("8,60,80,80"));
-				//pUserNameLabel->SetAttribute(_T("bkimage"), _T("SchoolNet/123.png"));
-				pUserNameLabel->SetText(_T("drag&drop"));
-				//pUserNameLabel->SetAttribute(_T("textcolor"), _T("#FF9FFF99"));
-				//pUserNameLabel->SetMouseEnabled(false);
-				pCNetDevice->Add(pUserNameLabel);
-			}
-			*/
+			pCNetDevice->SetName("dragdrop");
 
 			pVLNet->Add(pCNetDevice);
 		}
 	}
+
+	m_ForbidCtl = m_PaintManager.FindControl("layInvalid");
 	WindowImplBase::InitWindow();
 }
 
@@ -62,6 +51,10 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if ( msg.sType == "CheckPos" ) {
+		CDragDropUI * pDragDrop = (CDragDropUI *)msg.pSender;
+		pDragDrop->m_bCheckPos = CheckPos(pDragDrop, msg.wParam);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -69,6 +62,83 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
+BOOL CDuiFrameWnd::CheckPos(CDragDropUI * pDragDrop, BOOL bSetPos /*= TRUE*/) {
+	int width  = pDragDrop->GetWidth();
+	int height = pDragDrop->GetHeight();
+	CDuiRect rcParent = pDragDrop->GetParent()->GetPos();
+	BOOL  bRet = TRUE;
+
+	// 左边界、右边界
+	if (pDragDrop->m_rcNewPos.left < rcParent.left) {
+		// 左边完全出去
+		if (pDragDrop->m_rcNewPos.left + width <= rcParent.left) {
+			bRet = FALSE;
+		}
+		if (bSetPos)
+			pDragDrop->m_rcNewPos.left = rcParent.left;
+	}
+	else if (pDragDrop->m_rcNewPos.right > rcParent.right) {
+		// 右边完全出去
+		if (pDragDrop->m_rcNewPos.right - rcParent.right >= width) {
+			bRet = FALSE;
+		}
+		if (bSetPos)
+			pDragDrop->m_rcNewPos.left = rcParent.right - width;
+	}
+
+	// 上边界、下边界
+	if (pDragDrop->m_rcNewPos.top < rcParent.top) {
+		// 上边完全出去
+		if (pDragDrop->m_rcNewPos.top + height <= rcParent.top) {
+			bRet = FALSE;
+		}
+		if (bSetPos)
+			pDragDrop->m_rcNewPos.top = rcParent.top;
+	}
+	else if (pDragDrop->m_rcNewPos.bottom > rcParent.bottom) {
+		// 下边完全出去
+		if (pDragDrop->m_rcNewPos.bottom - rcParent.bottom >= height) {
+			bRet = FALSE;
+		}
+		if (bSetPos)
+			pDragDrop->m_rcNewPos.top = rcParent.bottom - height;
+	}
+
+	RECT rcForbit = m_ForbidCtl->GetPos();
+	if (pDragDrop->m_rcNewPos.left >= rcForbit.left && pDragDrop->m_rcNewPos.right <= rcForbit.right
+		&& pDragDrop->m_rcNewPos.top >= rcForbit.top && pDragDrop->m_rcNewPos.bottom <= rcForbit.bottom) {
+		bRet = FALSE;
+	} 
+
+	if ( pDragDrop->m_rcNewPos.left < rcForbit.left && rcForbit.left < pDragDrop->m_rcNewPos.right ) {
+		if (RectOverlap(pDragDrop->m_rcNewPos, rcForbit))
+			if (bSetPos)
+				pDragDrop->m_rcNewPos.left = rcForbit.left - width;		
+	}
+	else if (pDragDrop->m_rcNewPos.left < rcForbit.right && rcForbit.right < pDragDrop->m_rcNewPos.right ) {
+		if (RectOverlap(pDragDrop->m_rcNewPos, rcForbit))
+			if (bSetPos)
+				pDragDrop->m_rcNewPos.left = rcForbit.right;
+	}
+
+	if (pDragDrop->m_rcNewPos.top < rcForbit.top && rcForbit.top < pDragDrop->m_rcNewPos.bottom) {
+		if (RectOverlap(pDragDrop->m_rcNewPos, rcForbit))
+			if (bSetPos)
+				pDragDrop->m_rcNewPos.top = rcForbit.top - height;
+	}
+	else if (pDragDrop->m_rcNewPos.top < rcForbit.bottom && rcForbit.bottom < pDragDrop->m_rcNewPos.bottom ) {
+		if (RectOverlap(pDragDrop->m_rcNewPos, rcForbit))
+			if (bSetPos)
+				pDragDrop->m_rcNewPos.top = rcForbit.bottom;
+	}
+	
+
+	if (bSetPos) {
+		pDragDrop->m_rcNewPos.right = pDragDrop->m_rcNewPos.left + width;
+		pDragDrop->m_rcNewPos.bottom = pDragDrop->m_rcNewPos.top + height;
+	}
+	return bRet;
+}
 
 
 

@@ -5,6 +5,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "DragDropUI.h"
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -19,5 +21,11 @@ public:
 	virtual void    InitWindow();
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+private:
+	BOOL  CheckPos(CDragDropUI * pDragDrop, BOOL bSetPos = TRUE);
+
+private:
+	CControlUI *               m_ForbidCtl;
 
 };
