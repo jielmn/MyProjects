@@ -326,10 +326,18 @@ int  CBusiness::SetSurgencyReaderSn(const CSetHandReaderSnParam * pParam) {
 	}
 
 	memcpy(write_data, "\x66\x00\x00\x00\x00\x00\x05\xDD\xAA", dwWriteLen);
-	write_data[3] = (BYTE)((pParam->m_dwSn >> 24) & 0xFF);
-	write_data[4] = (BYTE)((pParam->m_dwSn >> 16) & 0xFF);
-	write_data[5] = (BYTE)((pParam->m_dwSn >> 8) & 0xFF);
-	write_data[6] = (BYTE)(pParam->m_dwSn & 0xFF);
+	//write_data[3] = (BYTE)((pParam->m_dwSn >> 24) & 0xFF);
+	//write_data[4] = (BYTE)((pParam->m_dwSn >> 16) & 0xFF);
+	//write_data[5] = (BYTE)((pParam->m_dwSn >> 8) & 0xFF);
+	//write_data[6] = (BYTE)(pParam->m_dwSn & 0xFF);
+
+	char szSn[32] = { 0 };
+	SNPRINTF(szSn, sizeof(szSn), "%06lu", pParam->m_dwSn);
+	memcpy(write_data + 1, szSn, 6);
+	for (int i = 0; i < 6; i++) {
+		write_data[i + 1] -= '0';
+	}
+
 	serial_port.Write(write_data, dwWriteLen);
 	LmnSleep(1000);
 
