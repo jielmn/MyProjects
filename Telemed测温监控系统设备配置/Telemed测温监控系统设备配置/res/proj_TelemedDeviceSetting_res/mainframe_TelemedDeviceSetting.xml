@@ -11,11 +11,11 @@
 		<VerticalLayout bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" inset="1,1,1,1" > <!-- 整个窗口的背景色 -->
 			<!-- 标题栏区 -->
 			<HorizontalLayout height="32" bkcolor="#FFCCE3F0" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
-				<HorizontalLayout inset="10,1,10,1" width="200" >
+				<HorizontalLayout inset="10,1,10,1" width="300" >
 					<Container width="61" height="27" bkimage="file='logo.png'" />
 					<VerticalLayout>
 						<Control />
-						<Text text="术中监控设备配置" textcolor="#FF447AA1" font="0" />
+						<Text text="术中监控设备配置(2019-7-12)" textcolor="#FF447AA1" font="0" />
 						<Control />
 					</VerticalLayout>
 				</HorizontalLayout>

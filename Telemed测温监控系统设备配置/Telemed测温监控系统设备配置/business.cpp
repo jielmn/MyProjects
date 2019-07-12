@@ -336,7 +336,7 @@ int  CBusiness::SetSurgencyReaderSn(const CSetHandReaderSnParam * pParam) {
 	memcpy(write_data + 1, szSn, 6);
 	for (int i = 0; i < 6; i++) {
 		write_data[i + 1] -= '0';
-	}
+	}    
 
 	serial_port.Write(write_data, dwWriteLen);
 	LmnSleep(1000);
