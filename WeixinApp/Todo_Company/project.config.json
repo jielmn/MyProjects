@@ -11,6 +11,8 @@
 	"libVersion": "1.7.2",
 	"appid": "wx7a3e83a343c2347e",
 	"projectname": "todolist_company",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
 	"condition": {
 		"search": {
 			"current": -1,
