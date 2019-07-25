@@ -29,86 +29,96 @@
 			</HorizontalLayout>
 			
 			<!-- 客户区 -->
-			<VerticalLayout inset="10,5,10,5" >
-				<HorizontalLayout height="30">
-					<Label text="1.gif动画" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<HorizontalLayout height="90" >
-					<GifAnim bkimage="bounding.gif" autoplay="true" visible="true" width="120" height="90" />
-					<Control width="20" />
-					<GifAnim bkimage="love.gif" autoplay="true" visible="true" width="120" height="90" />
-					<Control width="20" />
-					<GifAnim bkimage="loading.gif" autoplay="true" visible="true" width="90" height="90" />
-				</HorizontalLayout>		
-				
-				<HorizontalLayout height="20" />
-
-				<HorizontalLayout height="30">
-					<Label text="2.checkbox" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<HorizontalLayout height="16" >
-					<Option width="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" />
-					<Label text="选项1" width="40" />
-					<Control width="10" />
-					<Option width="15" height="15" normalimage="uncheck.png" selectedimage="check.png" selected="true" />
-					<Label text="选项2" width="40"  />
-				</HorizontalLayout>		
-				
-				<HorizontalLayout height="20" />
-
-				<HorizontalLayout height="30">
-					<Label text="3.button" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<HorizontalLayout height="30" >
-					<Button text="确定" font="1" textcolor="#FF386382"   width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
-					
-					<Control width="10" />
-					
-					<Button text="确定" textcolor="#FF386382"   width="100" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " />
-				</HorizontalLayout>	
-
-				
-				<HorizontalLayout height="20" />
-
-				<HorizontalLayout height="30">
-					<Label text="4.animation layout" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<AnimationTabLayout name="stepTabLayout" width="502" height="150">
-					<HorizontalLayout width="502" height="125">
-						<Button name="BtnOneClick" float="true" pos="177,15,0,0" width="153" height="47" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="oneclick.png" hotimage="file=&apos;oneclick.png&apos; fade=&apos;215&apos;" disabledimage="oneclick_dis.png" />						
-						
-						<Option name="OptAddToAuto" float="true" pos="12,82,0,0" width="16" height="16" selected="true" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="noselect.png" selectedimage="select.png" />
-						
-						<Option name="Optlicense" float="true" pos="12,102,0,0" width="16" height="16" selected="true" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="noselect.png" selectedimage="select.png" />
-						
-						<Label name="TextAuto" text="开机自启动" float="true" pos="36,82,0,0" width="100" height="18" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="2" />
-						<Label text="已阅读并同意" float="true" pos="36,102,0,0" width="85" height="18" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="2" />
-						<Button name="btnlicense" text="许可协议" float="true" pos="115,102,0,0" width="55" height="18" textcolor="#0050CEDD" disabledtextcolor="#FFA7A6AA" font="2" align="center" />
-					</HorizontalLayout>
-				    <HorizontalLayout width="502" height="125">
-						<Progress name="install" float="true" pos="41,68,0,0" width="422" height="10" bkimage="progressb.png" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" foreimage="progressf.png" min="0" max="100" value="50" hor="true" />
-						
-						<Label name="textProgress" float="true" pos="41,42,0,0" width="407" height="20" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="1" />
-						
-						<Button name="btnAgain" text="重来一遍" font="2" textcolor="#FF386382"   float="true" pos="230,82,0,0" width="60" height="30" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " visible="false" />
-						
-					</HorizontalLayout>
-				</AnimationTabLayout>
-				
-				<HorizontalLayout height="30">
-					<Label text="5.activeX - flash" textcolor="#FF447AA1" font="1" />
-				</HorizontalLayout>
-				
-				<HorizontalLayout width="538" height="373" bkimage="water_bg.jpg" >
-					<ActiveX name="ani_flash" clsid="{D27CDB6E-AE6D-11CF-96B8-444553540000}" mouse="true"/>
-				</HorizontalLayout>
-				
-			</VerticalLayout>
+			<HorizontalLayout>
 			
+				<VerticalLayout inset="10,5,10,5" width="600" >
+					<HorizontalLayout height="30">
+						<Label text="1.gif动画" textcolor="#FF447AA1" font="1" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout height="90" >
+						<GifAnim bkimage="bounding.gif" autoplay="true" visible="true" width="120" height="90" />
+						<Control width="20" />
+						<GifAnim bkimage="love.gif" autoplay="true" visible="true" width="120" height="90" />
+						<Control width="20" />
+						<GifAnim bkimage="loading.gif" autoplay="true" visible="true" width="90" height="90" />
+					</HorizontalLayout>		
+					
+					<HorizontalLayout height="20" />
+
+					<HorizontalLayout height="30">
+						<Label text="2.checkbox" textcolor="#FF447AA1" font="1" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout height="16" >
+						<Option width="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" />
+						<Label text="选项1" width="40" />
+						<Control width="10" />
+						<Option width="15" height="15" normalimage="uncheck.png" selectedimage="check.png" selected="true" />
+						<Label text="选项2" width="40"  />
+					</HorizontalLayout>		
+					
+					<HorizontalLayout height="20" />
+
+					<HorizontalLayout height="30">
+						<Label text="3.button" textcolor="#FF447AA1" font="1" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout height="30" >
+						<Button text="确定" font="1" textcolor="#FF386382"   width="100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+						
+						<Control width="10" />
+						
+						<Button text="确定" textcolor="#FF386382"   width="100" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " />
+					</HorizontalLayout>	
+
+					
+					<HorizontalLayout height="20" />
+
+					<HorizontalLayout height="30">
+						<Label text="4.animation layout" textcolor="#FF447AA1" font="1" />
+					</HorizontalLayout>
+					
+					<AnimationTabLayout name="stepTabLayout" width="502" height="150">
+						<HorizontalLayout width="502" height="125">
+							<Button name="BtnOneClick" float="true" pos="177,15,0,0" width="153" height="47" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="oneclick.png" hotimage="file=&apos;oneclick.png&apos; fade=&apos;215&apos;" disabledimage="oneclick_dis.png" />						
+							
+							<Option name="OptAddToAuto" float="true" pos="12,82,0,0" width="16" height="16" selected="true" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="noselect.png" selectedimage="select.png" />
+							
+							<Option name="Optlicense" float="true" pos="12,102,0,0" width="16" height="16" selected="true" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" normalimage="noselect.png" selectedimage="select.png" />
+							
+							<Label name="TextAuto" text="开机自启动" float="true" pos="36,82,0,0" width="100" height="18" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="2" />
+							<Label text="已阅读并同意" float="true" pos="36,102,0,0" width="85" height="18" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="2" />
+							<Button name="btnlicense" text="许可协议" float="true" pos="115,102,0,0" width="55" height="18" textcolor="#0050CEDD" disabledtextcolor="#FFA7A6AA" font="2" align="center" />
+						</HorizontalLayout>
+						<HorizontalLayout width="502" height="125">
+							<Progress name="install" float="true" pos="41,68,0,0" width="422" height="10" bkimage="progressb.png" textcolor="#FF000000" disabledtextcolor="#FFA7A6AA" align="center" foreimage="progressf.png" min="0" max="100" value="50" hor="true" />
+							
+							<Label name="textProgress" float="true" pos="41,42,0,0" width="407" height="20" textcolor="#00808080" disabledtextcolor="#FFA7A6AA" font="1" />
+							
+							<Button name="btnAgain" text="重来一遍" font="2" textcolor="#FF386382"   float="true" pos="230,82,0,0" width="60" height="30" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " visible="false" />
+							
+						</HorizontalLayout>
+					</AnimationTabLayout>
+					
+					<HorizontalLayout height="30">
+						<Label text="5.activeX - flash" textcolor="#FF447AA1" font="1" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout width="538" height="373" bkimage="water_bg.jpg" >
+						<ActiveX name="ani_flash" clsid="{D27CDB6E-AE6D-11CF-96B8-444553540000}" mouse="true"/>
+					</HorizontalLayout>					
+					
+				</VerticalLayout>
+				
+				
+				<VerticalLayout inset="10,5,10,5" >
+					<HorizontalLayout >
+						<ActiveX name="ActiveXDemo1" />
+					</HorizontalLayout>
+				</VerticalLayout>
+				
+			</HorizontalLayout>
 			
 			<!--Tab区-->		
 		</VerticalLayout>

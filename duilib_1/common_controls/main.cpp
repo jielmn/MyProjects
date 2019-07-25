@@ -10,7 +10,80 @@
 #include "business.h"
 #include "resource.h"
 #include "flash10a.tlh"
- 
+
+bool _stdcall CALLBACK NewWindow3t(VARIANT_BOOL* Cannel, BSTR url) {
+	*Cannel = TRUE;
+	return true;
+}
+
+typedef  bool (WINAPI * NewWindow3)(VARIANT_BOOL* Cannel, BSTR url);
+
+class CMyWebBrwoser2Event : public DWebBrowserEvents2
+{
+private:
+	NewWindow3 _sc;
+	IWebBrowser2* _pWebBrowser;
+public:
+	CMyWebBrwoser2Event(NewWindow3 n3, IWebBrowser2* pWebBrowser)
+		:_sc(n3), _pWebBrowser(pWebBrowser)
+	{
+	}
+public: // IDispatch methods
+	STDMETHOD(QueryInterface)(REFIID riid, void **ppvObject)
+	{
+		HRESULT hr = E_NOINTERFACE;
+		if (riid == __uuidof(IDispatch))
+		{
+			*ppvObject = (IDispatch*)this;
+			AddRef();
+			hr = S_OK;
+		}
+		else if (riid == __uuidof(DWebBrowserEvents2))
+		{
+			*ppvObject = (DWebBrowserEvents2*)this;
+			AddRef();
+			hr = S_OK;
+		}
+
+		return hr;
+	}
+	STDMETHODIMP_(ULONG) AddRef(void)
+	{
+		return 1;
+	};
+	STDMETHODIMP_(ULONG) Release(void)
+	{
+		return 1;
+	}
+	STDMETHOD(GetTypeInfoCount)(UINT*)
+	{
+		return E_NOTIMPL;
+	}
+	STDMETHOD(GetTypeInfo)(UINT, LCID, ITypeInfo**)
+	{
+		return E_NOTIMPL;
+	}
+
+	STDMETHOD(GetIDsOfNames)(REFIID, LPOLESTR *rgszNames, UINT, LCID, DISPID *rgDispId)
+	{
+		return E_NOTIMPL;
+	}
+
+	STDMETHOD(Invoke)(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS FAR* pDispParams, VARIANT FAR* pVarResult, EXCEPINFO FAR* pExcepInfo, unsigned int FAR* puArgErr)
+	{
+		HRESULT hr = S_OK;
+		if (dispIdMember == DISPID_NEWWINDOW3)
+		{
+			_sc((pDispParams->rgvarg[3].pboolVal), (pDispParams->rgvarg->bstrVal));
+			_pWebBrowser->Navigate(pDispParams->rgvarg->bstrVal, NULL, NULL, NULL, NULL);
+		}
+
+		return hr;
+	}
+};
+
+CMyWebBrwoser2Event*  events = 0;
+
 CDuiFrameWnd::CDuiFrameWnd() {
 
 }
@@ -25,7 +98,33 @@ void  CDuiFrameWnd::InitWindow() {
 	m_pStepTabLayout = static_cast<CAnimationTabLayoutUI*>(m_PaintManager.FindControl(_T("stepTabLayout")));
 	m_pInstallText = static_cast<CLabelUI*>(m_PaintManager.FindControl(_T("textProgress")));
 	m_pProgressBar = static_cast<CProgressUI*>(m_PaintManager.FindControl(_T("install")));
-	m_pAgainBtn = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("btnAgain")));	           
+	m_pAgainBtn = static_cast<CButtonUI*>(m_PaintManager.FindControl(_T("btnAgain")));	
+
+	CActiveXUI* pActiveXUI = static_cast<CActiveXUI*>(m_PaintManager.FindControl(_T("ActiveXDemo1")));
+	if (pActiveXUI)   
+	{
+		IWebBrowser2* pWebBrowser = NULL;
+
+		pActiveXUI->SetDelayCreate(false);              // 相当于界面设计器里的DelayCreate属性改为FALSE，在duilib自带的FlashDemo里可以看到此属性为TRUE             
+		pActiveXUI->CreateControl(CLSID_WebBrowser);    // 相当于界面设计器里的Clsid属性里填入{8856F961-340A-11D0-A96B-00C04FD705A2}，建议用CLSID_WebBrowser，如果想看相应的值，请见<ExDisp.h>
+		pActiveXUI->GetControl(IID_IWebBrowser2, (void**)&pWebBrowser);
+
+		if (pWebBrowser != NULL)
+		{
+			std::string gourl_ = "http://news.baidu.com/";
+			pWebBrowser->put_Silent(VARIANT_TRUE);
+			BSTR url = _bstr_t(gourl_.c_str());;
+			IConnectionPointContainer* pCPC = NULL;
+			IConnectionPoint* pCP = NULL;
+			pWebBrowser->QueryInterface(IID_IConnectionPointContainer, (void**)&pCPC);
+			pCPC->FindConnectionPoint(DIID_DWebBrowserEvents2, &pCP);
+			DWORD dwCookie = 0;
+			events = new CMyWebBrwoser2Event(NewWindow3t, pWebBrowser);
+			pCP->Advise((IUnknown*)(void*)events, &dwCookie);
+			pWebBrowser->Navigate(url, NULL, NULL, NULL, NULL);
+			pWebBrowser->Release();
+		}
+	}
 
 	WindowImplBase::InitWindow();   
 }
@@ -145,6 +244,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();
 
+	if (events)
+		delete events;
 	return 0;
 }
 
