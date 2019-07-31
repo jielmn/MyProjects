@@ -36,6 +36,7 @@ void CTestDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CTestDlg::OnBnClickedButton1)
 END_MESSAGE_MAP()
 
 
@@ -198,30 +199,30 @@ void CTestDlg::OnPaint()
 	}
 	else
 	{
-		//CDialogEx::OnPaint();
+		//CDialogEx::OnPaint(); 
 		CPaintDC dc(this);
 		//DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
 
 		SetBkMode(dc, TRANSPARENT);
 		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI);
 
-		CXml2ChartUI * p = m_XmlChartFile.FindChartUIByName("MainBlock");
-		if (p != 0) {
-			RECT r1 = p->GetAbsoluteRect();
-			int w = r1.right - r1.left;
-			int h = r1.bottom - r1.top;
+		//CXml2ChartUI * p = m_XmlChartFile.FindChartUIByName("MainBlock");
+		//if (p != 0) {
+		//	RECT r1 = p->GetAbsoluteRect();
+		//	int w = r1.right - r1.left;
+		//	int h = r1.bottom - r1.top;
 
-			int h1 = h / 40;
-			int w1 = w / 42;
+		//	int h1 = h / 40;
+		//	int w1 = w / 42;
 
-			RECT r2;
-			r2.left = r1.left;
-			r2.right = r2.left + w1;
-			r2.top = r1.top + h1 * 39;
-			r2.bottom = r1.bottom;
+		//	RECT r2;
+		//	r2.left = r1.left;
+		//	r2.right = r2.left + w1;
+		//	r2.top = r1.top + h1 * 39;
+		//	r2.bottom = r1.bottom;
 
-			::TextOut(dc.m_hDC, r2.left, r2.top, "1111", 4 );
-		}
+		//	::TextOut(dc.m_hDC, r2.left, r2.top, "1111", 4 );
+		//}
 	}
 }
 
@@ -232,3 +233,62 @@ HCURSOR CTestDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CTestDlg::OnMyPrint() {
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	//PrintDlg(&printInfo);
+	if (PrintDlg(&printInfo) == TRUE)
+	{
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+
+		CDC *pDC = CDC::FromHandle(printInfo.hDC);
+		pDC->SetMapMode(MM_ANISOTROPIC); //转换坐标映射方式
+
+		CSize size = CSize(760, 1044);
+
+		pDC->SetWindowExt(size);
+		pDC->SetViewportExt(pDC->GetDeviceCaps(HORZRES), pDC->GetDeviceCaps(VERTRES));
+
+		StartDoc(printInfo.hDC, &di);
+
+		for (int i = 0; i < 1; i++) {
+			StartPage(printInfo.hDC);
+			SetBkMode(printInfo.hDC, TRANSPARENT);
+			DrawXml2ChartUI(printInfo.hDC, m_XmlChartFile.m_ChartUI);
+			EndPage(printInfo.hDC);
+		}
+
+		EndDoc(printInfo.hDC);
+
+		// Delete DC when done.
+		DeleteDC(printInfo.hDC);
+
+		//OnOK();
+	}
+}
+
+
+
+void CTestDlg::OnBnClickedButton1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	OnMyPrint();
+}
