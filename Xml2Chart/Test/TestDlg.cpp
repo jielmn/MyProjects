@@ -201,6 +201,8 @@ void CTestDlg::OnPaint()
 		//CDialogEx::OnPaint();
 		CPaintDC dc(this);
 		//DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
+
+		SetBkMode(dc, TRANSPARENT);
 		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI);
 
 		CXml2ChartUI * p = m_XmlChartFile.FindChartUIByName("MainBlock");
