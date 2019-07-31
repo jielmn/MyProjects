@@ -1679,7 +1679,7 @@ void   CDuiFrameWnd::OnQueryHandTagRetNotify(const char * szTagId, int nGridInde
                       
 
  
-                 
+                
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }
