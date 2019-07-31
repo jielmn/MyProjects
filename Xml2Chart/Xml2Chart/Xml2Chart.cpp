@@ -676,7 +676,7 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 
 	nCount = pUI->GetSplitLineCount(TRUE);
 	for (int i = 0; i < nCount; i++) {
-		SplitPen splitPen = pUI->GetSplitLine(TRUE, i);
+		SplitPen splitPen = pUI->GetSplitLine(TRUE, nCount - i - 1 );
 		nAve = pUI->GetWidth() / splitPen.nSplitNum;
 		nMod = pUI->GetWidth() % splitPen.nSplitNum;
 
@@ -821,6 +821,23 @@ static RECT GetRect(const char * value) {
 	return rect;
 }
 
+static DWORD  GetTextColor_(const char * value) {
+	DWORD  dwValue = RGB(0,0,0);
+
+	if (0 == value)
+		return dwValue;
+
+	int ret = sscanf_s(value, "#%x", &dwValue);
+	if ( 0 == ret )
+		return dwValue;
+
+	BYTE r = LOBYTE(HIWORD(dwValue));
+	BYTE g = HIBYTE(LOWORD(dwValue));
+	BYTE b = LOBYTE(LOWORD(dwValue));
+
+	return RGB(r, g, b);
+}
+
 
 
 
@@ -957,6 +974,10 @@ void CXml2ChartFile::SetText(TiXmlElement* pEle, CXml2ChartUI * pUI) {
 			pUI->SetFont(it->second);
 		}
 	}
+
+	szAttr = pEle->Attribute("textcolor");
+	if (szAttr)
+		pUI->SetTextColor(GetTextColor_(szAttr));
 		
 }
 
