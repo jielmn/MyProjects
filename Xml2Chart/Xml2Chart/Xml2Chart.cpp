@@ -705,14 +705,15 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 		hOldFont = ::SelectObject(hDc, pUI->GetFont());
 	}
 
-	TEXTMETRIC tm;
-	GetTextMetrics(hDc, &tm);
 	
 	std::string strText = pUI->GetText();
-	int  nStrWidth = tm.tmAveCharWidth * strText.length();
-	int  nHeight   = tm.tmExternalLeading + tm.tmHeight;
 	int  nLeft = 0;
 	int  nTop  = 0;
+
+	RECT rcText;
+	::DrawText(hDc, strText.c_str(), strText.length(), &rcText, DT_CALCRECT);
+	int  nStrWidth = rcText.right - rcText.left;
+	int  nHeight   = rcText.bottom - rcText.top;
 
 	if (pUI->GetAlignType() == ALIGN_CENTER) {
 		nLeft = (pUI->GetWidth() - nStrWidth) / 2;
