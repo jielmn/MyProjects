@@ -700,6 +700,11 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 		}
 	}
 
+	HGDIOBJ  hOldFont = 0;
+	if (pUI->GetFont() != 0) {
+		hOldFont = ::SelectObject(hDc, pUI->GetFont());
+	}
+
 	TEXTMETRIC tm;
 	GetTextMetrics(hDc, &tm);
 	
@@ -721,11 +726,6 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 	}
 	else if (pUI->GetVAlignType() == VALIGN_BOTTOM) {
 		nTop = pUI->GetHeight() - nHeight;
-	}
-
-	HGDIOBJ  hOldFont = 0;
-	if (pUI->GetFont() != 0) {
-		hOldFont = ::SelectObject(hDc, pUI->GetFont());
 	}
 
 	COLORREF hOldColor = ::GetTextColor(hDc);
