@@ -52,6 +52,7 @@ public:
 		ConfigType_COMBO,
 		ConfigType_CHECKBOX,
 		ConfigType_FileBrowse,
+		ConfigType_DateTime,
 	};
 
 	class ConfigValue {
@@ -62,6 +63,7 @@ public:
 		int         m_nComboSel;
 		BOOL        m_bCheckbox;
 		ConfigType  m_eConfigType;
+		time_t      m_time;
 		UINT_PTR    m_tag;
 	};
 

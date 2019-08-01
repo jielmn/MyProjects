@@ -3,7 +3,16 @@
 #endif
 
 #include "main.h"
+#include <time.h>
 #pragma comment(lib,"User32.lib")
+
+static char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%02d-%02d-%02d", tmp.tm_year + 1900, tmp.tm_mon + 1, tmp.tm_mday);
+	return szDest;
+}
 
 // menu
 class CDuiMenu : public WindowImplBase
@@ -85,7 +94,7 @@ void CDuiFrameWnd::InitWindow() {
 		strText.Format("配置选项 %d", i + 1);
 		pGameNode = m_tree->AddNode(strText, pCategoryNode, (void *)(i + 1));
 
-		for (int j = 0; j < 4; j++) {
+		for (int j = 0; j < 5; j++) {
 			if (j == 0) {
 				strText.Format("SUB配置选项 %d-%d", i + 1, j + 1);
 			}
@@ -107,7 +116,7 @@ void CDuiFrameWnd::InitWindow() {
 				CFileBrowseUI * pFileBrowse = new CFileBrowseUI;
 				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pFileBrowse);
 			}
-			else {
+			else if ( j == 3 ) {
 				CComboUI * pCombo = new CComboUI;
 				CListLabelElementUI * pElement = new CListLabelElementUI;
 				pElement->SetText("123");
@@ -119,6 +128,10 @@ void CDuiFrameWnd::InitWindow() {
 				pCombo->SelectItem(0);
 
 				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pCombo, -1, 0xFF0000FF,1,0xFF0000FF);
+			}
+			else {
+				DuiLib::CDateTimeUI * pDate = new DuiLib::CDateTimeUI;
+				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pDate, -1, 0xFF000000, 1, 0xFFFF0000);
 			}
 		}
 	}
@@ -156,6 +169,11 @@ void   CDuiFrameWnd::Notify(TNotifyUI& msg) {
 				}
 				else if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_FileBrowse) {
 					strText.Format("UserData:%d,filebrowse:%s", (int)node->data()._pUserData, cfgValue.m_strEdit);
+				}
+				else if (cfgValue.m_eConfigType == CMyTreeCfgUI::ConfigType_DateTime) {
+					char szDate[256];
+					Date2String(szDate, sizeof(szDate), &cfgValue.m_time);
+					strText.Format("UserData:%d,DateTime:%s", (int)node->data()._pUserData, szDate);
 				}
 				else {
 					assert(FALSE);
