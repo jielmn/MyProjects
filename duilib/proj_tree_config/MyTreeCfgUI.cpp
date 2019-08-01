@@ -159,14 +159,20 @@ bool CMyTreeCfgUI::Remove(CControlUI* pControl, bool bDoNotDestroy /*= false*/)
 
 bool CMyTreeCfgUI::RemoveAt(int iIndex, bool bDoNotDestroy /*= false*/)
 {
-	CControlUI* pControl = GetItemAt(iIndex);
-	if (!pControl) return false;
-	if (_tcscmp(pControl->GetClass(), DUI_CTR_LISTLABELELEMENT) != 0) return false;
+	//CControlUI* pControl = GetItemAt(iIndex);
+	//if (!pControl) return false;
+	//if (_tcscmp(pControl->GetClass(), DUI_CTR_LISTLABELELEMENT) != 0) return false;
 
-	if (reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(DUI_CTR_LISTLABELELEMENT))->GetTag()) == NULL)
-		return CListUI::RemoveAt(iIndex, bDoNotDestroy);
-	else
-		return RemoveNode(reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(DUI_CTR_LISTLABELELEMENT))->GetTag()));
+	//if (reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(DUI_CTR_LISTLABELELEMENT))->GetTag()) == NULL)
+	//	return CListUI::RemoveAt(iIndex, bDoNotDestroy);
+	//else
+	//	return RemoveNode(reinterpret_cast<Node*>(static_cast<CListLabelElementUI*>(pControl->GetInterface(DUI_CTR_LISTLABELELEMENT))->GetTag()));
+
+	CControlUI* pControl = GetItemAt(iIndex);
+	if (0 == pControl) return true;
+	Node* node = (Node*)pControl->GetTag();
+	RemoveNode(node);
+	return true;
 }
 
 void CMyTreeCfgUI::RemoveAll()
@@ -346,6 +352,8 @@ bool CMyTreeCfgUI::RemoveNode(CMyTreeCfgUI::Node* node)
 void CMyTreeCfgUI::ExpandNode(CMyTreeCfgUI::Node* node, bool expand)
 {
 	if (!node || node == _root) return;
+	if (!node->has_children()) return;
+
 
 	if (node->data()._expand == expand) return;
 	node->data()._expand = expand;
