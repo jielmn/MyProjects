@@ -90,7 +90,7 @@ public:
 
 	Node* AddNode( LPCTSTR pTitleText, Node* parent = NULL, void * pUserData = 0, CControlUI * pConfig = NULL,
 		           DWORD dwTitleFontIndex = -1, DWORD dwTitleColor = 0xFF000000, DWORD  dwCfgFontIndex = -1,
-		           DWORD dwCfgColor=0xFF000000 );
+		           DWORD dwCfgColor=0xFF000000, DWORD dwItemHeight=0 );
 
 	bool RemoveNode(Node* node);
 

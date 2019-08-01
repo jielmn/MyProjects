@@ -106,7 +106,7 @@ void CDuiFrameWnd::InitWindow() {
 			if (j == 0) {
 				CEditUI * pEdit = new CEditUI;
 				pEdit->SetText("ÇëÊäÈë");
-				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pEdit,-1,0xFF000000,1,0xFFFF0000);
+				m_tree->AddNode(strText, pGameNode, (void *)((i + 1) * 10 + j), pEdit,-1,0xFF000000,1,0xFFFF0000, 60);
 			}
 			else if (j == 1) {
 				CCheckBoxUI * pCheckBox = new CCheckBoxUI;
