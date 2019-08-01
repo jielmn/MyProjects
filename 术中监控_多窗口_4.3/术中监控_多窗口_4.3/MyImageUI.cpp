@@ -52,6 +52,7 @@ CMyImageUI::~CMyImageUI() {
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+	//SET_CLIP_REGION_ON_PAINT(rcPaint);
 
 	if (m_state == STATE_7_DAYS) {
 		DoPaint_7Days(hDC, rcPaint, pStopControl);
