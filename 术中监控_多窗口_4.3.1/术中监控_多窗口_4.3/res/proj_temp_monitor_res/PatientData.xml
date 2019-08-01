@@ -23,6 +23,20 @@
         
         <!-- 客户区 -->		
 		<VerticalLayout  bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10" >
+			<HorizontalLayout height="30">
+				<Label text="时间范围" font="3" textcolor="#FF666666" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="30" inset="10,0,10,0">
+				<DateTime name="DateTime1" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF000000" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" />
+				<Control width="10" />
+				<Label text="-" width="40" /> 
+				<DateTime name="DateTime2" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
+				<Label text="(今天)" name="lblToday" font="2" textcolor="#FF386382" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="20" />
+			
 			<VerticalLayout vscrollbar="true" sepheight="4">
 				<MyTree name="CfgTree" header="hidden" menu="true"  /> 
 			</VerticalLayout>

@@ -100,13 +100,13 @@ void  CPatientDataDlg::InitData() {
 	CCheckBoxUI * pCheckBox = 0;
 	CDateTimeUI * pDateTime = 0;
 	CMyTreeCfgUI::Node* pSubTitleNode = NULL;
-
+	   
 
 	strText.Format("²¡ÈË·ÇÌåÎÂÊý¾Ý");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
 
-	// Âö²«
-	strText.Format("Âö²«");
+	// Âö²«  
+	strText.Format("Âö²«");        
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
 
 	
