@@ -1598,7 +1598,7 @@ void   CDuiFrameWnd::OnBtnPrint(TNotifyUI& msg) {
 		return;
 	}
 
-	delete pDlg;             
+	delete pDlg;            
 }
 
 

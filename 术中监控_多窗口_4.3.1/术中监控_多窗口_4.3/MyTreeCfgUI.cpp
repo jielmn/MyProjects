@@ -1,5 +1,5 @@
 #include "MyTreeCfgUI.h"
-
+#include <time.h>
 #pragma comment(lib,"Gdi32.lib")
 
 void CMyTreeCfgUI::Node::set_parent(CMyTreeCfgUI::Node* parent) {
@@ -250,6 +250,19 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			pCheckBox->SetAttribute("normalimage", "file='checkbox_unchecked.png' dest='0,2,16,18'");
 			pCheckBox->SetAttribute("selectedimage", "file='checkbox_checked.png' dest='0,2,16,18'");
 		}
+		else if (0 == strcmp(pConfig->GetClass(), DUI_CTR_FILEBROWSE)) {
+			CFileBrowseUI * pFileBrowse = (CFileBrowseUI *)pConfig;
+			pFileBrowse->SetAttribute("normalimage", "file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+			pFileBrowse->SetAttribute("hotimage", "file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+			pFileBrowse->SetAttribute("pushedimage", "file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+		}
+		else if (0 == strcmp(pConfig->GetClass(), DUI_CTR_DATETIME)) {
+			CDateTimeUI * pDateTime = (CDateTimeUI *)pConfig;
+			RECT r = { 5,0,5,0 };
+			pDateTime->SetTextPadding( r );
+			pDateTime->SetFont(dwCfgFontIndex);
+			pDateTime->SetTextColor(dwCfgColor);
+		}
 		else {
 			assert(0);
 		}
@@ -495,6 +508,24 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 	else if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_CHECKBOX) ) {
 		cfgValue.m_eConfigType = ConfigType_CHECKBOX;
 		cfgValue.m_bCheckbox = ((CCheckBoxUI*)pCtl)->IsSelected();
+		cfgValue.m_tag = pCtl->GetTag();
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_FILEBROWSE)) {
+		cfgValue.m_eConfigType = ConfigType_FileBrowse;
+		cfgValue.m_strEdit = ((CFileBrowseUI*)pCtl)->GetFileName();
+		cfgValue.m_tag = pCtl->GetTag();
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_DATETIME)) {
+		cfgValue.m_eConfigType = ConfigType_DateTime;
+		SYSTEMTIME t1 = ((CDateTimeUI*)pCtl)->GetTime();
+
+		struct tm t2;
+		memset(&t2, 0, sizeof(t2));
+		t2.tm_year = t1.wYear - 1900;
+		t2.tm_mon = t1.wMonth - 1;
+		t2.tm_mday = t1.wDay;
+		cfgValue.m_time = mktime(&t2);
+
 		cfgValue.m_tag = pCtl->GetTag();
 	}
 	else {

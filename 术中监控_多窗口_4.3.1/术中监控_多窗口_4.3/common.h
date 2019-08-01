@@ -132,6 +132,7 @@ using namespace DuiLib;
 #define   BTN_PRINT               "btnPrint"
 #define   PATIENT_DATA_FRAME_NAME  "DUIPatientDataFrame"
 #define   PATIENT_DATA_FILE       "PatientData.xml"
+#define   MYTREE_PATIENT_DATA_NAME    "CfgTree"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"
