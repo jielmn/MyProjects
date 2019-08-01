@@ -209,12 +209,19 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::GetRoot() { return _root; }
 
 CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/, 
 	             void * pUserData /*= 0*/, CControlUI * pConfig /*= NULL*/, DWORD dwTitleFontIndex /*= -1*/, 
-	DWORD dwTitleColor /*= 0xFF000000*/, DWORD  dwCfgFontIndex /*= -1*/, DWORD dwCfgColor /*= 0xFF000000*/)
+	DWORD dwTitleColor /*= 0xFF000000*/, DWORD  dwCfgFontIndex /*= -1*/, DWORD dwCfgColor /*= 0xFF000000*/, DWORD dwItemHeight /*= 0*/)
 {
 	if (!parent) parent = _root;
 
 	CListContainerElementUI* pListContainerElement = new CListContainerElementUI;
-	pListContainerElement->SetMinHeight(m_dwFixedItemHeight);
+	if (0 == dwItemHeight) {
+		pListContainerElement->SetMinHeight(m_dwFixedItemHeight);
+		//pListContainerElement->SetTag(m_dwFixedItemHeight);
+	}
+	else {
+		pListContainerElement->SetMinHeight(dwItemHeight);
+		//pListContainerElement->SetTag(dwItemHeight);
+	}
 
 	CHorizontalLayoutUI * pLayout = new CHorizontalLayoutUI;
 	pListContainerElement->Add(pLayout);
@@ -428,7 +435,9 @@ int   CMyTreeCfgUI::CalculateMinHeight() {
 	for (int i = 0; i < nCount; i++) {
 		Node* node = (Node*)this->GetItemAt(i)->GetTag();
 		if ( node->IsAllParentsExpanded() ) {
-			int nHeight = m_dwFixedItemHeight; // this->GetItemAt(i)->GetHeight();
+			//int nHeight = this->GetItemAt(i)->GetHeight();
+			//int nHeight = m_dwFixedItemHeight; 
+			int nHeight = node->data()._pListElement->GetMinHeight();
 			sum += nHeight;
 		}
 	}
