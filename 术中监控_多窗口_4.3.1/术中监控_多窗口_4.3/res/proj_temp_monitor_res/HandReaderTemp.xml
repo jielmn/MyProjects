@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<HorizontalLayout bkcolor="#FF43424C" inset="0,0,0,0" >
+	
+		<VerticalLayout width="500">
+			<HorizontalLayout height="40" inset="10,0,10,0" >
+				<Control bkimage="file='tag.png' dest='0,15,35,26'" width="35" />
+				<Control width="10" />
+				<Label text="所有Tag信息"   textcolor="#FFCCCCCC" width="200" font="8" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="37" inset="20,20,10,0" >
+				<Option name="rdDefaultOrder"  group="radio" text="默认排序" textcolor="#FFCCCCCC" normalimage="file='radio_normal.png' source='0,0,17,17' dest='0,0,17,17'" selectedimage="file='radio_selected.png' source='0,0,17,17' dest='0,0,17,17'" width="85" font="13" align="left" textpadding="20,0,0,0" selected="true" />
+				<Control width="5" />
+				
+				<Control width="20" />
+				<Option name="rdTimeOrder"  group="radio" text="时间排序" textcolor="#FFCCCCCC" normalimage="file='radio_normal.png' source='0,0,17,17' dest='0,0,17,17'" selectedimage="file='radio_selected.png' source='0,0,17,17' dest='0,0,17,17'" width="85" font="13" textpadding="20,0,0,0"  />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="10" />
+			
+			<VerticalLayout inset="0,0,0,0" name="layTags" hscrollbar="false" vscrollbar="true" sepheight="4" />
+		</VerticalLayout>
+		
+		<!-- 手持读卡器的温度曲线 或者 拖放的格子 -->
+		<TabLayout name="layHand">
+			<!-- 1 -->			
+			<VerticalLayout inset="10,0,10,10" bkcolor="#FF434248" >
+				<HorizontalLayout height="40">
+					<Control bkimage="beat.png" width="40" />
+					<Control width="10" />
+					<Label text="温度曲线" textcolor="#FFCCCCCC" width="150" font="8" />
+				</HorizontalLayout>
+			
+				<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
+					<MyHandImage name="cstMyImageHand" bordercolor="#FF666666" bordersize="1" bkcolor="#FF434248" menu="true" /> 
+				</VerticalLayout>
+			</VerticalLayout>
+			
+			<!-- 2 -->
+			<TileLayout bkcolor="#FF192431" inset="0,0,0,0" name="layGridsView" columns="2" />
+		</TabLayout>
+		
+	</HorizontalLayout>
+</Window>

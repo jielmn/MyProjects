@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	<VerticalLayout height="100" bordersize="1" bordercolor="#FFCCCCCC" >	
+		<HorizontalLayout height="70" inset="30,10,0,10" >	
+			<!-- A-F指示器 -->
+			<VerticalLayout width="20">
+				<Control />
+				<Label name="lblIndicator" text="A" textcolor="#FFCCCCCC" font="11"  />
+				<Control />
+			</VerticalLayout>
+			
+		    <!-- 颜色知识器 -->
+			<VerticalLayout width="30">
+				<Control />
+				<Control name="indicator" width="20" height="12" bkcolor="#FFFF0000" />
+				<Control />
+			</VerticalLayout>
+			
+			<!-- reader switch -->
+			<VerticalLayout width="30">
+				<Control />
+				<Option width="30" height="30" name="opn_reader_switch" normalimage="not_checked.png" selectedimage="checked.png" selected="true" />
+				<Control />
+			</VerticalLayout>
+			
+			<Control width="1" />
+			
+			<VerticalLayout width="105">
+				<Control />
+				<HorizontalLayout height="30">
+					<EditableButton name="cstEdtBtnBodyPart" width="105" btncolor="#FFCCCCCC" btnfont="11" editfont="11" hotimage="file='btn_hot.png' corner='2,8,2,2'" />
+				</HorizontalLayout>
+				<Control />
+			</VerticalLayout>		
+			
+			<Control width="10" />
+			<Label name="lblReaderTemp" text="34.56" textcolor="#FFCCCCCC" font="12" width="250" />
+			<Control />
+			
+			<VerticalLayout width="30">
+				<Control />
+				<Control name="ReaderState" bkimage="disconnected.png" width="30" height="30" />
+				<Control />
+			</VerticalLayout>		
+			
+			<Control width="20" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout inset="30,0,0,0">
+			<Label text="读卡器ID" textcolor="#FFCCCCCC" font="11" width="80" />
+			<Label name="lblReaderId" text="ER0040000001" textcolor="#FFCCCCCC" font="11" width="135" />
+			<Label text="Tag ID" textcolor="#FFCCCCCC" font="11" width="70" />
+			<Label name="lblTagId" text="e901020304050607" textcolor="#FFCCCCCC" font="11" width="160" />
+		</HorizontalLayout>
+	</VerticalLayout>
+</Window>
