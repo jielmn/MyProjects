@@ -24,7 +24,11 @@ private:
 	void  InitInfo();
 	void  InitData();
 	void  AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag);
+	void  OnPrintPreview();
+	void  OnReturn();
 
 private:
 	CMyTreeCfgUI  *             m_tree;
+	CTabLayoutUI *              m_switch;
+	CDateTimeUI *               m_end_date;
 };

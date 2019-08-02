@@ -134,6 +134,7 @@ using namespace DuiLib;
 #define   PATIENT_DATA_FILE       "PatientData.xml"
 #define   MYTREE_PATIENT_DATA_NAME    "CfgTree"
 #define   LAYOUT_SIX_GRIDS_NAME    "laySixGrids"
+#define   PATIENT_DATA_END_DATE    "DateTime2"
 
 // CONFIG
 #define   CFG_MAIN_LAYOUT_COLUMNS           "main layout columns"

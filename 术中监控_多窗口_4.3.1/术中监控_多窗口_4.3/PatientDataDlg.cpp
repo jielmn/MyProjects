@@ -3,11 +3,31 @@
 
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
+	m_switch = 0;
+	m_end_date = 0;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
+	CDuiString  name = msg.pSender->GetName();
+
 	if (msg.sType == "windowinit") {
 		OnMyInited();
+	}
+	else if (msg.sType == "click") {
+		if ( name == "btnPrintPreview" ) {
+			OnPrintPreview();
+		}
+		else if (name == "btnReturn") {
+			OnReturn();
+		}		
+	}
+	else if (msg.sType == "textchanged") {
+		if (name == PATIENT_DATA_END_DATE) {
+			SYSTEMTIME s = m_end_date->GetTime();
+			CDuiString strText;
+			strText.Format("%d-%d-%d\n", s.wYear, s.wMonth, s.wDay);
+			::OutputDebugString(strText);
+		} 
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -18,6 +38,9 @@ void   CPatientDataDlg::InitWindow() {
 
 void  CPatientDataDlg::OnMyInited() {
 	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl(MYTREE_PATIENT_DATA_NAME);
+	m_switch = (CTabLayoutUI *)m_PaintManager.FindControl("switch");
+	m_end_date = (CDateTimeUI *)m_PaintManager.FindControl(PATIENT_DATA_END_DATE);
+
 	InitInfo();
 	InitData();
 }
@@ -144,6 +167,14 @@ void  CPatientDataDlg::InitData() {
 	const char * item_title[7] = { "大便次数", "尿量(次) ml", "总入量 ml", "总出量 ml", "血压 kpa", "体重 kg", "过敏药物" };
 	for (int i = 0; i < 7; i++) {
 		pSevenGrids = new CSevenGridsUI;
-		m_tree->AddNode(item_title[i], pSubTitleNode, 0, pSevenGrids, 2, 0xFF386382, 2, 0xFF386382, 30);  
+		m_tree->AddNode(item_title[i], pSubTitleNode, 0, pSevenGrids, 2, 0xFF386382, 2, 0xFF386382, 30);    
 	}
+}
+
+void CPatientDataDlg::OnPrintPreview() {
+	m_switch->SelectItem(1);
+}
+
+void CPatientDataDlg::OnReturn() {
+	m_switch->SelectItem(0);      
 }

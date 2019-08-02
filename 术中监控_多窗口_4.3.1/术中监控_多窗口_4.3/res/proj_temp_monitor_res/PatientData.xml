@@ -23,34 +23,51 @@
         </HorizontalLayout>
         
         <!-- 客户区 -->		
-		<VerticalLayout  bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10" >
-			<HorizontalLayout height="30">
-				<Label text="时间范围" font="3" textcolor="#FF666666" />
-			</HorizontalLayout>
-			
-			<HorizontalLayout height="30" inset="10,0,10,0">
-				<DateTime name="DateTime1" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF000000" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" />
-				<Control width="10" />
-				<Label text="-" width="40" /> 
-				<DateTime name="DateTime2" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
-				<Label text="(今天)" name="lblToday" font="2" textcolor="#FF386382" />
-			</HorizontalLayout>
-			
-			<HorizontalLayout height="20" />
-			
-			<VerticalLayout vscrollbar="true" sepheight="4">
-				<MyTree name="CfgTree" header="hidden" menu="true"  /> 
+		<TabLayout name="switch">
+			<!-- 填表区 -->
+			<VerticalLayout  bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10" >
+				<HorizontalLayout height="30">
+					<Label text="时间范围" font="3" textcolor="#FF666666" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="30" inset="10,0,10,0">
+					<DateTime name="DateTime1" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF000000" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" />
+					<Control width="10" />
+					<Label text="-" width="40" /> 
+					<DateTime name="DateTime2" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
+					<Label text="(今天)" name="lblToday" font="2" textcolor="#FF386382" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="20" />
+				
+				<VerticalLayout vscrollbar="true" sepheight="4">
+					<MyTree name="CfgTree" header="hidden" menu="true"  /> 
+				</VerticalLayout>
+				
+				<HorizontalLayout height="20" />
+				<HorizontalLayout  height="40" inset="0,5,0,5" >
+					<Control />
+					<Button name="btnPrintPreview" text="打印预览" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Control />
+					<Button name="btnPrint" text="打印" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Control />
+				</HorizontalLayout>
 			</VerticalLayout>
 			
-			<HorizontalLayout height="20" />
-			<HorizontalLayout  height="40" inset="0,5,0,5" >
-				<Control />
-				<Button name="btnPrintPreview" text="打印预览" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
-				<Control />
-				<Button name="btnPrint" text="打印" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
-				<Control />
-			</HorizontalLayout>
-		</VerticalLayout>
+			<VerticalLayout>
+			
+				<HorizontalLayout  height="40" inset="0,5,0,5" >
+					<Control />
+					<Button name="btnReturn" text="返回" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Control width="20" />
+				</HorizontalLayout>
+				
+				<VerticalLayout bkcolor="#FFFFFFFF" vscrollbar="true" sepheight="4" >
+					<Control width="760" height="1044" bordercolor="#FF000000" bordersize="1" />
+				</VerticalLayout>
+				
+			</VerticalLayout>
+		</TabLayout>
 		
     </VerticalLayout>
 </Window>
