@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<VerticalLayout bordersize="1" bordercolor="#FF000000" name="laySixGrids" inset="1,1,1,1"  >
+		<HorizontalLayout name="top" >
+			<Label text="4" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
+			<Label text="8" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
+			<Label text="12" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
+			<Label text="4" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
+			<Label text="8" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
+			<Label text="12" align="center" font="4" textcolor="#FF000000" bordersize="0,0,0,0" bordercolor="#FF000000" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout name="bottom" >
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" />
+			<Edit bordersize="0,0,0,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" />
+		</HorizontalLayout>
+	</VerticalLayout>
+</Window>

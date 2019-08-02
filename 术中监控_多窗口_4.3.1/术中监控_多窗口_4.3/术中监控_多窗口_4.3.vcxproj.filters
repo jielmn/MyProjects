@@ -66,6 +66,9 @@
     <ClCompile Include="PatientDataDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SixGridsUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -120,6 +123,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="PatientDataDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SixGridsUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

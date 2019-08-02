@@ -271,7 +271,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			pDateTime->SetTextColor(dwCfgColor);
 		}
 		else {
-			assert(0);
+			//assert(0);
 		}
 	}
 	
@@ -304,6 +304,13 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			btn_expand->SetBkImage("collapse.png");
 			btn_expand->SetAttribute("padding", "0,5,4,5");
 			layout_parent->AddAt(btn_expand, 1);
+
+			// Ëõ¼õtitleµÄ¿í¶È
+			CControlUI * parent_title = layout_parent->GetItemAt(2);
+			int title_width = parent_title->GetFixedWidth();
+			if (title_width >= 20) {
+				parent_title->SetFixedWidth(title_width - 20);
+			}
 		}
 	}
 

@@ -20,6 +20,7 @@ public:
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
 
 private:
+	void  OnMyInited();
 	void  InitInfo();
 	void  InitData();
 	void  AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag);

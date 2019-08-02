@@ -1,20 +1,25 @@
 #include "PatientDataDlg.h"
-
+#include "SixGridsUI.h"
 
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
+	if (msg.sType == "windowinit") {
+		OnMyInited();
+	}
 	WindowImplBase::Notify(msg);
 }
 
 void   CPatientDataDlg::InitWindow() {
-	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl(MYTREE_PATIENT_DATA_NAME);
-	InitInfo(); 
-	InitData();
-
 	WindowImplBase::InitWindow();
+}
+
+void  CPatientDataDlg::OnMyInited() {
+	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl(MYTREE_PATIENT_DATA_NAME);
+	InitInfo();
+	InitData();
 }
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -100,14 +105,45 @@ void  CPatientDataDlg::InitData() {
 	CCheckBoxUI * pCheckBox = 0;
 	CDateTimeUI * pDateTime = 0;
 	CMyTreeCfgUI::Node* pSubTitleNode = NULL;
-	   
+	CMyTreeCfgUI::Node* pSubTitleNode_1 = NULL;
+	CSixGridsUI * pSixGrids = 0;
+	CSevenGridsUI * pSevenGrids = 0;
 
 	strText.Format("病人非体温数据");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
 
 	// 脉搏  
-	strText.Format("脉搏");        
-	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
+	strText.Format("脉搏");   
+	pSixGrids = new CSixGridsUI;
+	pSixGrids->SetMode(1);
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666); 
 
-	
+
+	for (int i = 0; i < 7; i++) {
+		pSixGrids = new CSixGridsUI;
+		m_tree->AddNode("1", pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30 );     
+	}
+
+	// 呼吸 
+	strText.Format("呼吸");
+	pSixGrids = new CSixGridsUI;
+	pSixGrids->SetMode(1);
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666);
+
+	for (int i = 0; i < 7; i++) {
+		pSixGrids = new CSixGridsUI;
+		m_tree->AddNode("1", pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30);
+	}
+	 
+	// 其他数据
+	strText.Format("其他数据");
+	pSevenGrids = new CSevenGridsUI;
+	pSevenGrids->SetMode(1);
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSevenGrids, 3, 0xFF666666);
+
+	const char * item_title[7] = { "大便次数", "尿量(次) ml", "总入量 ml", "总出量 ml", "血压 kpa", "体重 kg", "过敏药物" };
+	for (int i = 0; i < 7; i++) {
+		pSevenGrids = new CSevenGridsUI;
+		m_tree->AddNode(item_title[i], pSubTitleNode, 0, pSevenGrids, 2, 0xFF386382, 2, 0xFF386382, 30);  
+	}
 }
