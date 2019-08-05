@@ -27,6 +27,7 @@ private:
 	void  OnPrintPreview();
 	void  OnReturn();
 	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay = FALSE );
+	void OnFinalMessage(HWND hWnd);
 
 private:
 	CMyTreeCfgUI  *             m_tree;

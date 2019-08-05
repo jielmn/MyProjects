@@ -18,7 +18,10 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnReturn") {
 			OnReturn();
-		}		
+		}
+		else if (name == "btnPrint") {
+			this->PostMessage(WM_CLOSE);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -206,4 +209,8 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 			pDays[i] += "(½ñÌì)";         
 		}
 	}
+}
+
+void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
+	WindowImplBase::OnFinalMessage(hWnd);
 }
