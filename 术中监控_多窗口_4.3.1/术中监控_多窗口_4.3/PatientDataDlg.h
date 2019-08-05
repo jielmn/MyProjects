@@ -32,6 +32,8 @@ private:
 private:
 	CMyTreeCfgUI  *             m_tree;
 	CTabLayoutUI *              m_switch;
+	BOOL                        m_bPatientInfoExist;               // 病人基础信息在数据库里是否存在
+	BOOL                        m_bPatientDataExist[7];            // 病人非温度数据在数据库里是否存在
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

@@ -4,6 +4,12 @@
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 	m_switch = 0;
+
+	m_bPatientInfoExist = 0;
+	memset(m_bPatientDataExist, 0, sizeof(m_bPatientDataExist));
+
+	memset(m_szTagId, 0, sizeof(m_szTagId));
+	memset(m_szUIPName, 0, sizeof(m_szUIPName));
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {

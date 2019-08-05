@@ -36,6 +36,13 @@
 	tag_id        CHAR(16)     NOT NULL
 */
 
+// 病人基础信息(病人的id以Tag id计算)
+#define  PATIENT_INFO                   "patientinfo"
+
+// 病人的非温度数据
+#define  PATIENT_DATA                   "patientdata"
+
+
 CMySqliteDatabase::CMySqliteDatabase() {
 	m_db = 0;
 }
@@ -69,6 +76,41 @@ int CMySqliteDatabase::InitDb() {
 	CreateTable(LAST_SUR_TAGS,
 		"bed_id        int          NOT NULL        PRIMARY KEY," \
 		"tag_id        CHAR(16)     NOT NULL");
+
+	CreateTable(PATIENT_INFO, 
+		"tag_id        CHAR(16)    NOT NULL         PRIMARY KEY," \
+		"sex           int," \
+	    "age           int," \
+	    "outpatient_no varchar(20)," \
+	    "hospital_admission_no varchar(20), " \
+	    "in_hospital_date int," \
+	    "medical_department varchar(20), " \
+	    "ward varchar(20), " \
+	    "bed_no varchar(20), " \
+	    "surgery_date int" );
+
+	CreateTable(PATIENT_DATA, 
+		"tag_id      CHAR(16)     NOT NULL, " \
+	    "date        int          NOT NULL, " \
+	    "pulse_1     int, " \
+		"pulse_2     int, " \
+		"pulse_3     int, " \
+		"pulse_4     int, " \
+		"pulse_5     int, " \
+		"pulse_6     int, " \
+		"breath_1    int, " \
+		"breath_2    int, " \
+		"breath_3    int, " \
+		"breath_4    int, " \
+		"breath_5    int, " \
+		"breath_6    int, " \
+		"defecate    int, " \
+		"urine       int, " \
+		"total_income  int, " \
+		"total_output  int, " \
+		"blood_pressure int, " \
+		"weight int, " \
+		"irritability varchar(20), PRIMARY KEY(tag_id, date) ");
 	
 
 	// 删除过时的旧数据
