@@ -525,6 +525,7 @@ extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DW
 extern char *  GetSurReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData, DWORD dwDataLen);
 extern int  GetWeekDay(time_t t);
 extern const char * GetWeekDayName(int nWeekIndex);
+extern const char * GetWeekDayShortName(int nWeekIndex);
 extern void  OnEdtRemarkKillFocus();
 extern void  OnEdtHandRemarkKillFocus();
 char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);

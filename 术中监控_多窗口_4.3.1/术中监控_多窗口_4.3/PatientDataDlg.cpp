@@ -217,15 +217,23 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 	char buf[256];
 	time_t tZeroTime = GetAnyDayZeroTime(tLastTime);
 	time_t tTodayZeroTime = GetTodayZeroTime();
+	int nWeekDayIndex = GetWeekDay(tZeroTime);
+
 	for (int i = 0; i < 7; i++) {
 		time_t t = tZeroTime - (6-i) * 3600 * 24;
 		if (bMonthDay)
 			Date2String_md(buf, sizeof(buf), &t);
 		else
 			Date2String(buf, sizeof(buf), &t);
+
 		pDays[i] = buf;
 		if (t == tTodayZeroTime) {
 			pDays[i] += "(½ñÌì)";         
+		}
+		else {
+			pDays[i] += "(";
+			pDays[i] += GetWeekDayShortName( (nWeekDayIndex + 1 + i) % 7 );
+			pDays[i] += ")";
 		}
 	}
 }
