@@ -1,14 +1,14 @@
 #include "WaitingBarUI.h"
 
 
-CMyProgress::CMyProgress() : m_nPos(0) {
+CWaitingBarUI::CWaitingBarUI() : m_nPos(0) {
 	m_sForeImage = "progress_fore_1.png";
 	this->SetBkImage("file='progress_back.png' corner='5,5,5,5'");
 }
 
-CMyProgress::~CMyProgress() {}
+CWaitingBarUI::~CWaitingBarUI() {}
 
-void CMyProgress::DoEvent(TEventUI& event) {
+void CWaitingBarUI::DoEvent(TEventUI& event) {
 	if (event.Type == UIEVENT_TIMER && event.wParam == 10)
 	{
 		const int MARGIN = 3;
@@ -50,13 +50,13 @@ void CMyProgress::DoEvent(TEventUI& event) {
 	CProgressUI::DoEvent(event);
 }
 
-void CMyProgress::Stop() {
+void CWaitingBarUI::Stop() {
 	if (m_pManager) {
 		m_pManager->KillTimer(this, 10);
 	}
 }
 
-void CMyProgress::Start() {
+void CWaitingBarUI::Start() {
 	if (m_pManager) {
 		m_pManager->SetTimer(this, 10, 200);
 	}

@@ -22,7 +22,7 @@ public:
 		{
 			if (msg.pSender->GetName() == _T("btnHello"))
 			{
-				CMyProgress * pCtrl = (CMyProgress*)m_PaintManager.FindControl("btnHello1");
+				CWaitingBarUI * pCtrl = (CWaitingBarUI*)m_PaintManager.FindControl("btnHello1");
 				if (0 != pCtrl) {
 					pCtrl->SetVisible(!pCtrl->IsVisible());
 					if (pCtrl->IsVisible()) {
@@ -41,7 +41,7 @@ public:
 
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass) {
 		if (0 == _stricmp("MyProgress", pstrClass)) {
-			return new CMyProgress();
+			return new CWaitingBarUI();
 		}
 		return 0;
 	}

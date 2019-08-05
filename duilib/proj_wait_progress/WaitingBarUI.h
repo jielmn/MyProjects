@@ -3,11 +3,11 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
-class CMyProgress : public CProgressUI
+class CWaitingBarUI : public CProgressUI
 {
 public:
-	CMyProgress();
-	~CMyProgress();
+	CWaitingBarUI();
+	~CWaitingBarUI();
 
 	void DoEvent(TEventUI& event);
 	void Stop();
