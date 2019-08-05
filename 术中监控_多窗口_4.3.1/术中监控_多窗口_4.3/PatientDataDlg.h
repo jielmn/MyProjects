@@ -26,9 +26,9 @@ private:
 	void  AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag);
 	void  OnPrintPreview();
 	void  OnReturn();
+	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay = FALSE );
 
 private:
 	CMyTreeCfgUI  *             m_tree;
 	CTabLayoutUI *              m_switch;
-	CDateTimeUI *               m_end_date;
 };

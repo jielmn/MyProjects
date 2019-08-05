@@ -4,7 +4,6 @@
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 	m_switch = 0;
-	m_end_date = 0;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -21,14 +20,6 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			OnReturn();
 		}		
 	}
-	else if (msg.sType == "textchanged") {
-		if (name == PATIENT_DATA_END_DATE) {
-			SYSTEMTIME s = m_end_date->GetTime();
-			CDuiString strText;
-			strText.Format("%d-%d-%d\n", s.wYear, s.wMonth, s.wDay);
-			::OutputDebugString(strText);
-		} 
-	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -39,7 +30,6 @@ void   CPatientDataDlg::InitWindow() {
 void  CPatientDataDlg::OnMyInited() {
 	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl(MYTREE_PATIENT_DATA_NAME);
 	m_switch = (CTabLayoutUI *)m_PaintManager.FindControl("switch");
-	m_end_date = (CDateTimeUI *)m_PaintManager.FindControl(PATIENT_DATA_END_DATE);
 
 	InitInfo();
 	InitData();
@@ -60,6 +50,7 @@ void   CPatientDataDlg::InitInfo() {
 	DuiLib::CDuiString  strText;
 
 	CMyTreeCfgUI::Node* pTitleNode = NULL;
+	CMyTreeCfgUI::Node* pSubTitleNode = NULL;
 	CComboUI * pCombo = 0;
 	CListLabelElementUI * pElement = 0;
 	CEditUI * pEdit = 0;
@@ -109,6 +100,14 @@ void   CPatientDataDlg::InitInfo() {
 	// 床号
 	pEdit = new CEditUI;
 	m_tree->AddNode("床号", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+
+	// 手术
+	strText.Format("手术");
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
+	pCheckBox = new CCheckBoxUI;
+	m_tree->AddNode("是否手术", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
+	pDateTime = new DuiLib::CDateTimeUI;
+	m_tree->AddNode("手术日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 }
 
 void  CPatientDataDlg::AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag) {
@@ -131,6 +130,9 @@ void  CPatientDataDlg::InitData() {
 	CMyTreeCfgUI::Node* pSubTitleNode_1 = NULL;
 	CSixGridsUI * pSixGrids = 0;
 	CSevenGridsUI * pSevenGrids = 0;
+	CDuiString  week_days[7];
+
+	GetSevenDayStr(week_days, 7, time(0));
 
 	strText.Format("病人非体温数据");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
@@ -144,29 +146,33 @@ void  CPatientDataDlg::InitData() {
 
 	for (int i = 0; i < 7; i++) {
 		pSixGrids = new CSixGridsUI;
-		m_tree->AddNode("1", pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30 );     
+		m_tree->AddNode(week_days[i], pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30 );     
 	}
 
 	// 呼吸 
 	strText.Format("呼吸");
 	pSixGrids = new CSixGridsUI;
-	pSixGrids->SetMode(1);
+	pSixGrids->SetMode(1);	
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666);
 
 	for (int i = 0; i < 7; i++) {
 		pSixGrids = new CSixGridsUI;
-		m_tree->AddNode("1", pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30);
+		m_tree->AddNode(week_days[i], pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30);
 	}
 	 
 	// 其他数据
 	strText.Format("其他数据");
 	pSevenGrids = new CSevenGridsUI;
 	pSevenGrids->SetMode(1);
+	GetSevenDayStr(week_days, 7, time(0), TRUE);
+	pSevenGrids->SetWeekStr(week_days, 7);
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSevenGrids, 3, 0xFF666666);
 
 	const char * item_title[7] = { "大便次数", "尿量(次) ml", "总入量 ml", "总出量 ml", "血压 kpa", "体重 kg", "过敏药物" };
 	for (int i = 0; i < 7; i++) {
 		pSevenGrids = new CSevenGridsUI;
+		if (i == 6)
+			pSevenGrids->SetNumberOnly(FALSE); 
 		m_tree->AddNode(item_title[i], pSubTitleNode, 0, pSevenGrids, 2, 0xFF386382, 2, 0xFF386382, 30);    
 	}
 }
@@ -177,4 +183,26 @@ void CPatientDataDlg::OnPrintPreview() {
 
 void CPatientDataDlg::OnReturn() {
 	m_switch->SelectItem(0);      
+}
+
+void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay /*= FALSE*/) {
+	assert(dwSize >= 7);
+	if ( dwSize < 7 ) {
+		return;
+	}
+
+	char buf[256];
+	time_t tZeroTime = GetAnyDayZeroTime(tLastTime);
+	time_t tTodayZeroTime = GetTodayZeroTime();
+	for (int i = 0; i < 7; i++) {
+		time_t t = tZeroTime - (6-i) * 3600 * 24;
+		if (bMonthDay)
+			Date2String_md(buf, sizeof(buf), &t);
+		else
+			Date2String(buf, sizeof(buf), &t);
+		pDays[i] = buf;
+		if (t == tTodayZeroTime) {
+			pDays[i] += "(今天)";         
+		}
+	}
 }

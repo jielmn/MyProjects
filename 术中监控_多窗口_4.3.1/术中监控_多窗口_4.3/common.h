@@ -507,10 +507,13 @@ void   ResetGridOrder();
 extern char * Time2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Time2String_hm(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t);
+extern char * Date2String_md(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern char * DateTime2StringCn(char * szDest, DWORD dwDestSize, const time_t * t);
 // 今天的零点时间
 extern time_t  GetTodayZeroTime();
+// 任意时间的当天零点时间
+extern time_t  GetAnyDayZeroTime(time_t);
 extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
 extern BOOL  CheckComPortExist(int nCheckComPort);
 // 采集间隔时间

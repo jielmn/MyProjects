@@ -26,6 +26,7 @@
 		<TabLayout name="switch">
 			<!-- 填表区 -->
 			<VerticalLayout  bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10" >
+				<!--
 				<HorizontalLayout height="30">
 					<Label text="时间范围" font="3" textcolor="#FF666666" />
 				</HorizontalLayout>
@@ -39,6 +40,7 @@
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="20" />
+				-->
 				
 				<VerticalLayout vscrollbar="true" sepheight="4">
 					<MyTree name="CfgTree" header="hidden" menu="true"  /> 

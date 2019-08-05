@@ -176,6 +176,14 @@ char * Date2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	return szDest;
 }
 
+char * Date2String_md(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%02d-%02d", tmp.tm_mon + 1, tmp.tm_mday);
+	return szDest;
+}
+
 char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t) {
 	struct tm  tmp;
 	localtime_s(&tmp, t);
@@ -204,6 +212,18 @@ time_t  GetTodayZeroTime() {
 
 	struct tm tTmTime;
 	localtime_s(&tTmTime, &now);
+
+	tTmTime.tm_hour = 0;
+	tTmTime.tm_min = 0;
+	tTmTime.tm_sec = 0;
+
+	return mktime(&tTmTime);
+}
+
+// 任意时间的当天零点时间
+time_t  GetAnyDayZeroTime(time_t t) {
+	struct tm tTmTime;
+	localtime_s(&tTmTime, &t);
 
 	tTmTime.tm_hour = 0;
 	tTmTime.tm_min = 0;

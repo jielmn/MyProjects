@@ -54,9 +54,11 @@ void  CSixGridsUI::SetMode(int nMode) {
 
 CSevenGridsUI::CSevenGridsUI() {
 	memset(m_edits, 0, sizeof(m_edits));
+	memset(m_labels, 0, sizeof(m_labels));
 	m_top = 0;
 	m_bottom = 0;
 	m_nMode = 0;
+	m_bNumberOnly = TRUE;
 }
 
 CSevenGridsUI::~CSevenGridsUI() {
@@ -65,6 +67,20 @@ CSevenGridsUI::~CSevenGridsUI() {
 
 void  CSevenGridsUI::SetMode(int nMode) {
 	m_nMode = nMode;
+}
+
+void  CSevenGridsUI::SetNumberOnly(BOOL bOnly) {
+	m_bNumberOnly = bOnly;
+}
+
+void  CSevenGridsUI::SetWeekStr(CDuiString * pWeek, DWORD dwSize) {
+	assert(dwSize >= 7);
+	if (dwSize < 7)
+		return;
+
+	for (int i = 0; i < 7; i++) {
+		m_week_days[i] = pWeek[i];
+	}
 }
 
 LPCTSTR CSevenGridsUI::GetClass() const {
@@ -89,6 +105,20 @@ void  CSevenGridsUI::DoInit() {
 	}
 	else {
 		m_bottom->SetVisible(false);
+	}
+
+	CDuiString strText;
+	for (int i = 0; i < 7; i++) {
+		strText.Format("edt_%d", i + 1);
+		m_edits[i] = static_cast<DuiLib::CEditUI*>(m_pManager->FindControl(strText));		
+
+		if (!m_bNumberOnly) {
+			m_edits[i]->SetNumberOnly(false);
+		}
+
+		strText.Format("lbl_%d", i + 1);
+		m_labels[i] = static_cast<DuiLib::CLabelUI*>(m_pManager->FindControl(strText));
+		m_labels[i]->SetText(m_week_days[i]);
 	}
 }
 

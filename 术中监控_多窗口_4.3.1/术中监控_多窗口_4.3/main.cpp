@@ -180,7 +180,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnBtnMenu(msg);
 		}
 		else if (name == BTN_PRINT) {
-			OnBtnPrint(msg);
+			OnBtnPrint();
 		}
 	}
 	else if (msg.sType == "setting") {
@@ -212,7 +212,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		OnExportExcel(msg.wParam);
 	}
 	else if ( msg.sType == "menu_print_excel" ) {
-		OnPrintExcel(msg.wParam);
+		OnPrintExcel(msg.wParam); 
+	}
+	else if ( msg.sType == "menu_print_chart" ) {
+		OnBtnPrint();
 	}
 	else if (msg.sType == "menu_hand_export_excel") {
 		OnHanxExportExcel();
@@ -1586,7 +1589,7 @@ void   CDuiFrameWnd::OnHandPrintExcel() {
 }
 
 // 温度打印
-void   CDuiFrameWnd::OnBtnPrint(TNotifyUI& msg) {
+void   CDuiFrameWnd::OnBtnPrint() {
 	CPatientDataDlg * pDlg = new CPatientDataDlg;
 	pDlg->Create(this->m_hWnd, _T("打印体温单"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pDlg->CenterWindow();

@@ -12,13 +12,13 @@
 		</HorizontalLayout>
 		
 		<HorizontalLayout name="bottom" >
-			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
-			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
-			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
-			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
-			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
-			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
-			<Edit bordersize="0,0,0,0" bordercolor="#FF000000" align="center" font="2" numberonly="false" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_1"  />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_2" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_3" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_4" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_5" />
+			<Edit bordersize="0,0,1,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_6" />
+			<Edit bordersize="0,0,0,0" bordercolor="#FF000000" align="center" font="2" numberonly="true" name="edt_7" />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>

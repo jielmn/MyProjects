@@ -149,7 +149,7 @@ private:
 	// 打印Excel图表
 	void   OnHandPrintExcel();
 	// 温度打印
-	void   OnBtnPrint(TNotifyUI& msg);
+	void   OnBtnPrint();
 
 public:
 	// 接收器连接状态通知
