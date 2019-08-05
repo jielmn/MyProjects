@@ -271,7 +271,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			pDateTime->SetTextColor(dwCfgColor);
 		}
 		else {
-			assert(0);
+			//assert(0);
 		}
 	}
 	
@@ -305,7 +305,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			btn_expand->SetAttribute("padding", "0,5,4,5");
 			layout_parent->AddAt(btn_expand, 1);
 
-			 // 缩减title的宽度
+			// 缩减title的宽度
 			CControlUI * parent_title = layout_parent->GetItemAt(2);
 			int title_width = parent_title->GetFixedWidth();
 			if (title_width >= 20) {
@@ -543,6 +543,70 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 		cfgValue.m_time = mktime(&t2);
 
 		cfgValue.m_tag = pCtl->GetTag();
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
+bool CMyTreeCfgUI::SetConfigValue(int nIndex, const ConfigValue & cfgValue) {
+	if (nIndex < 0) {
+		return false;
+	}
+
+	int nCount = this->GetCount();
+	if (nIndex >= nCount) {
+		return false;
+	}
+
+	CListContainerElementUI * pContainer = (CListContainerElementUI *)this->GetItemAt(nIndex);
+	CHorizontalLayoutUI * pLayout = (CHorizontalLayoutUI *)pContainer->GetItemAt(0);
+
+	if (pLayout->GetCount() < 3) {
+		return false;
+	}
+
+	CControlUI * pCtl = pLayout->GetItemAt(2);
+	if (0 == strcmp(pCtl->GetClass(), DUI_CTR_EDIT)) {
+		pCtl->SetText(cfgValue.m_strEdit);
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_COMBO)) {
+		CComboUI * pCombo = (CComboUI*)pCtl;
+		pCombo->SelectItem(cfgValue.m_nComboSel, false, false);
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_CHECKBOX)) {
+		CCheckBoxUI * pCheckUI = (CCheckBoxUI *)pCtl;
+		if (cfgValue.m_bCheckbox)
+			pCheckUI->SetCheck(true, false);
+		else
+			pCheckUI->SetCheck(false, false);
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_FILEBROWSE)) {
+		CFileBrowseUI * pFileBrowser = (CFileBrowseUI *)pCtl;
+		pFileBrowser->SetFileName(cfgValue.m_strEdit);
+	}
+	else if (0 == strcmp(pCtl->GetClass(), DUI_CTR_DATETIME)) {
+		CDateTimeUI * pDateTime = (CDateTimeUI *)pCtl;
+
+		struct tm  tmp;
+		localtime_s(&tmp, &cfgValue.m_time);
+
+		SYSTEMTIME  st;
+		memset(&st, 0, sizeof(st));
+		st.wYear  = tmp.tm_year + 1900;
+		st.wMonth = tmp.tm_mon + 1;
+		st.wDay   = tmp.tm_mday;
+		st.wHour = tmp.tm_hour;
+		st.wMinute = tmp.tm_min;
+		st.wSecond = tmp.tm_sec;
+
+		pDateTime->SetTime(&st);
+
+		char buf[256];
+		snprintf(buf, sizeof(buf), "%04d-%02d-%02d", st.wYear, st.wMonth, st.wDay);
+		pDateTime->SetText(buf);
 	}
 	else {
 		return false;

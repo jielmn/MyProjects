@@ -103,6 +103,7 @@ public:
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 
 	bool GetConfigValue(int nIndex, ConfigValue & cfgValue);
+	bool SetConfigValue(int nIndex, const ConfigValue & cfgValue);
 
 	void OnExpandClick(CControlUI* pSender);
 
