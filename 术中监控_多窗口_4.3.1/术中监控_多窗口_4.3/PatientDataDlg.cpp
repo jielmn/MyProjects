@@ -132,7 +132,8 @@ void  CPatientDataDlg::InitData() {
 	CSevenGridsUI * pSevenGrids = 0;
 	CDuiString  week_days[7];
 
-	GetSevenDayStr(week_days, 7, time(0));
+	time_t now = time(0);
+	GetSevenDayStr(week_days, 7, now);
 
 	strText.Format("病人非体温数据");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
@@ -164,7 +165,7 @@ void  CPatientDataDlg::InitData() {
 	strText.Format("其他数据");
 	pSevenGrids = new CSevenGridsUI;
 	pSevenGrids->SetMode(1);
-	GetSevenDayStr(week_days, 7, time(0), TRUE);
+	GetSevenDayStr(week_days, 7, now, TRUE);
 	pSevenGrids->SetWeekStr(week_days, 7);
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSevenGrids, 3, 0xFF666666);
 
