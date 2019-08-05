@@ -542,8 +542,7 @@ int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
 void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet) {
 
 	char sql[8192];
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s a INNER JOIN %s b " 
-		"on a.tag_id = b.tag_id WHERE a.tag_id='%s' ", PATIENT_INFO, TAGS_TABLE, pParam->m_szTagId);
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", PATIENT_INFO, pParam->m_szTagId);
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
@@ -553,10 +552,7 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 
 	// 如果存在
 	if (nrow > 0) {
-		STRNCPY( pRet->m_szTagId, azResult[ncolumn + 0], MAX_TAG_ID_LENGTH );
-
 		int col = 1;
-		DWORD  dwValue = 0;
 
 		if ( azResult[ncolumn + col] )
 			sscanf_s( azResult[ncolumn + col], "%d", &pRet->m_sex );
@@ -594,9 +590,20 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 		if (azResult[ncolumn + col])
 			sscanf_s(azResult[ncolumn + col], "%lu", &dwValue);
 		pRet->m_surgery = dwValue;
-		col+=2;
+		col++;
+	}
+	sqlite3_free_table(azResult);
 
-		STRNCPY(pRet->m_szPName, azResult[ncolumn + col], MAX_TAG_PNAME_LENGTH);
+
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", TAGS_TABLE, pParam->m_szTagId);
+	nrow = ncolumn = 0;           // 查询结果集的行数、列数
+	azResult = 0;                 // 二维数组存放结果
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	// 如果存在
+	if (nrow > 0) {
+		STRNCPY(pRet->m_szTagId, azResult[ncolumn + 0], MAX_TAG_ID_LENGTH);
+		STRNCPY(pRet->m_szPName, azResult[ncolumn + 1], MAX_TAG_PNAME_LENGTH);
 	}
 	sqlite3_free_table(azResult);
 }

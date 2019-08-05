@@ -97,9 +97,11 @@ void   CPatientDataDlg::InitInfo() {
 
 	// 性别
 	pCombo = new CComboUI;
-	AddComboItem(pCombo, "男", 0);
-	AddComboItem(pCombo, "女", 1);
+	AddComboItem(pCombo, "(空)", 0);
+	AddComboItem(pCombo, "男", 1);
+	AddComboItem(pCombo, "女", 2);
 	pCombo->SelectItem(0);
+	pCombo->SetFixedWidth(60);
 	m_tree->AddNode("性别", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 年龄
@@ -116,8 +118,14 @@ void   CPatientDataDlg::InitInfo() {
 	m_tree->AddNode("住院号", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 入院日期
+	strText.Format("入院");
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
+	pCheckBox = new CCheckBoxUI;
+	pCheckBox->SetFixedWidth(20);
+	m_tree->AddNode("是否入院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
 	pDateTime = new DuiLib::CDateTimeUI;
-	m_tree->AddNode("入院日期", pTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382); 
+	pDateTime->SetFixedWidth(140);
+	m_tree->AddNode("入院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 科别
 	pEdit = new CEditUI;
@@ -135,8 +143,10 @@ void   CPatientDataDlg::InitInfo() {
 	strText.Format("手术");
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
 	pCheckBox = new CCheckBoxUI;
+	pCheckBox->SetFixedWidth(20);
 	m_tree->AddNode("是否手术", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
 	pDateTime = new DuiLib::CDateTimeUI;
+	pDateTime->SetFixedWidth(140);
 	m_tree->AddNode("手术日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 }
 
@@ -285,6 +295,60 @@ void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo) {
 void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	PatientInfo * pInfo = (PatientInfo *)wParam;
 	memcpy(&m_patient_info, pInfo, sizeof(PatientInfo));
+
+	if (m_patient_info.m_szPName[0] == '\0') {
+		STRNCPY(m_patient_info.m_szPName, m_szUIPName, MAX_TAG_PNAME_LENGTH);
+	}
+
+	CMyTreeCfgUI::ConfigValue   cfgValue;
+	int nRow = 1;
+
+	// 姓名
+	cfgValue.m_strEdit = m_patient_info.m_szPName;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 性别
+	cfgValue.m_nComboSel = m_patient_info.m_sex;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 年龄
+	if ( m_patient_info.m_age > 0 ) {
+		cfgValue.m_strEdit.Format("%d", m_patient_info.m_age);
+	}
+	else {
+		cfgValue.m_strEdit = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 门诊号
+	cfgValue.m_strEdit = m_patient_info.m_szOutpatientNo;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 住院号
+	cfgValue.m_strEdit = m_patient_info.m_szHospitalAdmissionNo;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow+=2;
+	
+	// 入院日期
+	if ( m_patient_info.m_in_hospital > 0 ) {
+		cfgValue.m_bCheckbox = TRUE;
+		m_tree->SetConfigValue(nRow, cfgValue);
+
+		cfgValue.m_time = m_patient_info.m_in_hospital;
+		m_tree->SetConfigValue(nRow+1, cfgValue);
+	}
+	else {
+		cfgValue.m_bCheckbox = FALSE;
+		m_tree->SetConfigValue(nRow, cfgValue);
+		m_tree->Invalidate();
+	}
+	nRow+=2;
+
+
 
 	delete pInfo;
 }
