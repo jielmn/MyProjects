@@ -64,6 +64,8 @@ public:
 
 	// 获得当前的TagID
 	CDuiString  GetCurTagId();
+	// 获得当前的病人姓名
+	CDuiString  GetCurPatientName();
 
 private:
 	LPCTSTR GetClass() const;

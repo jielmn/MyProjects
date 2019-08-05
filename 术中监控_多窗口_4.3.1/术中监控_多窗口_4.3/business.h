@@ -98,6 +98,14 @@ public:
 	void  AlarmAsyn();
 	void  Alarm();
 
+	// 获取病人的基础信息
+	void  QueryPatientInfoAsyn(const char * szTagId);
+	void  QueryPatientInfo(const CQueryPatientInfoParam * pParam);
+
+	// 获取某天的病人的非体温数据信息
+	void  QueryPatientDataAsyn(const char * szTagId, time_t tDay);
+	void  QueryPatientData();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -155,6 +163,9 @@ public:
 	// 初始化excel线程(CoInitialize)
 	void  InitThreadExcelAsyn();
 	void  InitThreadExcel();
+
+public:
+	sigslot::signal1<PatientInfo *>   m_sigPatientInfo;
 };
 
 

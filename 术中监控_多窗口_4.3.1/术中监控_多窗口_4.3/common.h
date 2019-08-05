@@ -204,6 +204,7 @@ using namespace DuiLib;
 #define MSG_WRITE_TEMP_2_EXCEL              2012
 #define MSG_SAVE_EXCEL                      2013
 #define MSG_INIT_EXCEL                      2014
+#define MSG_QUERY_PATIENT_INFO              2015
 
 
 // windows 消息
@@ -218,6 +219,7 @@ using namespace DuiLib;
 #define UM_BINDING_TAG_GRID_RET              (WM_USER+9)
 #define UM_QUERY_HAND_TEMP_BY_TAG_ID_RET     (WM_USER+10)
 #define UM_TAG_NAME_CHANGED                  (WM_USER+11)
+#define UM_PATIENT_INFO                      (WM_USER+12)
 
 
 
@@ -490,6 +492,55 @@ public:
 	time_t      m_time;
 	DWORD       m_i;
 	DWORD       m_j;
+};
+
+#define  MAX_OUTPATIENT_NO_LENGTH           20
+#define  MAX_HOSPITAL_ADMISSION_NO_LENGTH   20
+#define  MAX_MEDICAL_DEPARTMENT_LENGTH      20
+#define  MAX_WARD_LENGTH                    20
+#define  MAX_BED_NO_LENGTH                  20
+
+// 病人的基础信息
+typedef  struct  tagPatientInfo {
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	char        m_szPName[MAX_TAG_PNAME_LENGTH];
+
+	int         m_sex;
+	int         m_age;
+	char        m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
+	char        m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
+	time_t      m_in_hospital;
+	char        m_szMedicalDepartment[MAX_MEDICAL_DEPARTMENT_LENGTH];
+	char        m_szWard[MAX_WARD_LENGTH];
+	char        m_szBedNo[MAX_BED_NO_LENGTH];
+	time_t      m_surgery;
+}PatientInfo;
+
+#define  MAX_IRRITABILITY_LENGTH   20
+// 病人的非体温数据
+typedef  struct   tagPatientData {
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	time_t      m_date;
+
+	int         m_pulse[6];
+	int         m_breath[6];
+	int         m_defecate;
+	int         m_urine;
+	int         m_income;
+	int         m_output;
+	int         m_blood_pressure;
+	int         m_weight;
+	char        m_szIrritability[MAX_IRRITABILITY_LENGTH];
+}PatientData;
+
+
+class CQueryPatientInfoParam : public LmnToolkits::MessageData {
+public:
+	CQueryPatientInfoParam(const char * szTagId) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+	}
+
+	char         m_szTagId[MAX_TAG_ID_LENGTH];
 };
 
 

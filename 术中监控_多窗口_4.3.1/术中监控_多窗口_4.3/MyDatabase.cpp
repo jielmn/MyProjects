@@ -537,3 +537,66 @@ int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
 
 	return dwValue;
 }
+
+// 查询PatientInfo
+void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet) {
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s a INNER JOIN %s b " 
+		"on a.tag_id = b.tag_id WHERE a.tag_id='%s' ", PATIENT_INFO, TAGS_TABLE, pParam->m_szTagId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+
+	// 如果存在
+	if (nrow > 0) {
+		STRNCPY( pRet->m_szTagId, azResult[ncolumn + 0], MAX_TAG_ID_LENGTH );
+
+		int col = 1;
+		DWORD  dwValue = 0;
+
+		if ( azResult[ncolumn + col] )
+			sscanf_s( azResult[ncolumn + col], "%d", &pRet->m_sex );
+		col++;
+
+		if (azResult[ncolumn + col])
+			sscanf_s(azResult[ncolumn + col], "%d", &pRet->m_age);
+		col++;
+
+		if (azResult[ncolumn + col])
+			STRNCPY(pRet->m_szOutpatientNo, azResult[ncolumn + col], MAX_OUTPATIENT_NO_LENGTH);
+		col++;
+
+		if (azResult[ncolumn + col])
+			STRNCPY(pRet->m_szHospitalAdmissionNo, azResult[ncolumn + col], MAX_HOSPITAL_ADMISSION_NO_LENGTH);
+		col++;
+
+		if (azResult[ncolumn + col])
+			sscanf_s(azResult[ncolumn + col], "%lu", &dwValue);
+		pRet->m_in_hospital = dwValue;
+		col++;
+
+		if (azResult[ncolumn + col])
+			STRNCPY(pRet->m_szMedicalDepartment, azResult[ncolumn + col], MAX_MEDICAL_DEPARTMENT_LENGTH);
+		col++;
+
+		if (azResult[ncolumn + col])
+			STRNCPY(pRet->m_szWard, azResult[ncolumn + col], MAX_WARD_LENGTH);
+		col++;
+
+		if (azResult[ncolumn + col])
+			STRNCPY(pRet->m_szBedNo, azResult[ncolumn + col], MAX_BED_NO_LENGTH);
+		col++;
+
+		if (azResult[ncolumn + col])
+			sscanf_s(azResult[ncolumn + col], "%lu", &dwValue);
+		pRet->m_surgery = dwValue;
+		col+=2;
+
+		STRNCPY(pRet->m_szPName, azResult[ncolumn + col], MAX_TAG_PNAME_LENGTH);
+	}
+	sqlite3_free_table(azResult);
+}

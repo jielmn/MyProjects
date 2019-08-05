@@ -32,6 +32,8 @@ public:
 	void SaveTagPName(const CSaveTagPNameParam * pParam);
 	// 查询tag绑定的grid index
 	int  QueryBindingIndexByTag(const char * szTagId);
+	// 查询PatientInfo
+	void QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet);
 
 private:
 	sqlite3 *                         m_db;

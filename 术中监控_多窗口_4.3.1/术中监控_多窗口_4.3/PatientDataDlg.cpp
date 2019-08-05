@@ -6,14 +6,14 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 	m_switch = 0;
 
-	m_bPatientInfoExist = 0;
-	memset(m_bPatientDataExist, 0, sizeof(m_bPatientDataExist));
-
 	memset(m_szTagId, 0, sizeof(m_szTagId));
 	memset(m_szUIPName, 0, sizeof(m_szUIPName));
 
 	m_waiting_bar = 0;
 	m_bBusy = FALSE;
+
+	memset( &m_patient_info, 0, sizeof(m_patient_info) );
+	memset( m_patient_data,  0, sizeof(m_patient_data) );
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -51,11 +51,19 @@ void  CPatientDataDlg::OnMyInited() {
 	InitInfo();
 	InitData();
 
+	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
 	SetBusy(TRUE);
 }
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+}
+
+LRESULT CPatientDataDlg::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if ( uMsg == UM_PATIENT_INFO ) {
+		OnPatientInfoRet(wParam, lParam);
+	}
+	return WindowImplBase::HandleCustomMessage(uMsg, wParam, lParam, bHandled);
 }
 
 DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
@@ -265,4 +273,18 @@ void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
 	}
 	
 	m_bBusy = bBusy;
+}
+
+void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo) {
+	PatientInfo * pNewInfo = new PatientInfo;
+	memcpy(pNewInfo, pInfo, sizeof(PatientInfo));
+
+	::PostMessage(GetHWND(), UM_PATIENT_INFO, (WPARAM)pNewInfo, 0);
+}
+
+void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
+	PatientInfo * pInfo = (PatientInfo *)wParam;
+	memcpy(&m_patient_info, pInfo, sizeof(PatientInfo));
+
+	delete pInfo;
 }

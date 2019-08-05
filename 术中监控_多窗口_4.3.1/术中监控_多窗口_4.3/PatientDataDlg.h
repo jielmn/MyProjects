@@ -5,8 +5,9 @@
 #include "UIlib.h"
 #include "MyTreeCfgUI.h"
 #include "WaitingBarUI.h"
+#include "sigslot.h"
 
-class CPatientDataDlg : public DuiLib::WindowImplBase
+class CPatientDataDlg : public DuiLib::WindowImplBase, public sigslot::has_slots<>
 {
 public:
 	CPatientDataDlg();
@@ -19,6 +20,8 @@ public:
 	virtual void   InitWindow();
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+	void  OnPatientInfo(PatientInfo * pInfo);
+	virtual LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 private:
 	void  OnMyInited();
@@ -30,6 +33,7 @@ private:
 	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay = FALSE );
 	void  OnFinalMessage(HWND hWnd);
 	void  SetBusy(BOOL bBusy = TRUE);
+	void  OnPatientInfoRet(WPARAM wParam, LPARAM  lParam);
 
 private:
 	CMyTreeCfgUI  *             m_tree;
@@ -40,9 +44,8 @@ private:
 	CButtonUI *                 m_btnReturn;
 
 	BOOL                        m_bBusy;
-
-	BOOL                        m_bPatientInfoExist;               // 病人基础信息在数据库里是否存在
-	BOOL                        m_bPatientDataExist[7];            // 病人非温度数据在数据库里是否存在
+	PatientInfo                 m_patient_info;
+	PatientData                 m_patient_data[7];
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

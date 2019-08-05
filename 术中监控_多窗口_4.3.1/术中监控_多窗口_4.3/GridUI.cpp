@@ -1166,3 +1166,11 @@ CDuiString  CGridUI::GetCurTagId() {
 		return m_aLastTemp[m_dwSelSurReaderIndex - 1].m_szTagId;
 	}
 }
+
+// 获得当前的病人姓名
+CDuiString  CGridUI::GetCurPatientName() {
+	if (m_cstPatientName)
+		return m_cstPatientName->GetText();
+	else
+		return "";
+}

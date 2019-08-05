@@ -1059,6 +1059,29 @@ void  CBusiness::InitThreadExcel() {
 	CoInitialize(NULL);
 }
 
+// 获取病人的基础信息
+void  CBusiness::QueryPatientInfoAsyn(const char * szTagId) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_INFO,
+		new CQueryPatientInfoParam(szTagId) );
+}
+
+void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
+	PatientInfo tRet;
+	memset(&tRet, 0, sizeof(tRet));
+
+	m_sqlite.QueryPatientInfo(pParam, &tRet);
+	m_sigPatientInfo.emit(&tRet);
+}
+
+// 获取某天的病人的非体温数据信息
+void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tDay) {
+
+}
+
+void  CBusiness::QueryPatientData() {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1185,6 +1208,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_INIT_EXCEL:
 	{
 		InitThreadExcel();
+	}
+	break;
+
+	case MSG_QUERY_PATIENT_INFO:
+	{
+		CQueryPatientInfoParam * pParam = (CQueryPatientInfoParam *)pMessageData;
+		QueryPatientInfo(pParam);
 	}
 	break;
 

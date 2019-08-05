@@ -1596,7 +1596,14 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 		return;
 	}
 
+	CDuiString strPatientName = m_pGrids[dwIndex]->GetCurPatientName();
+
 	CPatientDataDlg * pDlg = new CPatientDataDlg;
+	CBusiness::GetInstance()->m_sigPatientInfo.connect(pDlg, &CPatientDataDlg::OnPatientInfo);
+
+	STRNCPY(pDlg->m_szTagId,   strTagId,       MAX_TAG_ID_LENGTH);
+	STRNCPY(pDlg->m_szUIPName, strPatientName, MAX_TAG_PNAME_LENGTH);
+
 	pDlg->Create(this->m_hWnd, _T("´òÓ¡ÌåÎÂµ¥"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pDlg->CenterWindow();
 	int ret = pDlg->ShowModal();
