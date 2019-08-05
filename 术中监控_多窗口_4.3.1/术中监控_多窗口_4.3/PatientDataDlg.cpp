@@ -1,6 +1,7 @@
 #include "PatientDataDlg.h"
 #include "SixGridsUI.h"
 
+
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 	m_switch = 0;
@@ -10,6 +11,9 @@ CPatientDataDlg::CPatientDataDlg() {
 
 	memset(m_szTagId, 0, sizeof(m_szTagId));
 	memset(m_szUIPName, 0, sizeof(m_szUIPName));
+
+	m_waiting_bar = 0;
+	m_bBusy = FALSE;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -39,9 +43,15 @@ void   CPatientDataDlg::InitWindow() {
 void  CPatientDataDlg::OnMyInited() {
 	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl(MYTREE_PATIENT_DATA_NAME);
 	m_switch = (CTabLayoutUI *)m_PaintManager.FindControl("switch");
+	m_waiting_bar = (CWaitingBarUI *)m_PaintManager.FindControl("waiting_bar");
+	m_btnPreview = (CButtonUI *)m_PaintManager.FindControl("btnPrintPreview");
+	m_btnPrint = (CButtonUI *)m_PaintManager.FindControl("btnPrint");
+	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
 
 	InitInfo();
 	InitData();
+
+	SetBusy(TRUE);
 }
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -51,6 +61,9 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, MYTREE_CLASS_NAME)) {
 		return new CMyTreeCfgUI(180);
+	}
+	else if (0 == strcmp(pstrClass, "WaitingBar")) {
+		return new CWaitingBarUI;
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
@@ -219,4 +232,29 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	WindowImplBase::OnFinalMessage(hWnd);
+}
+
+void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
+	if (m_bBusy == bBusy)
+		return;
+
+	if ( bBusy ) {
+		m_tree->SetMouseChildEnabled(false);
+		m_waiting_bar->SetVisible(true);
+		m_waiting_bar->Start();
+		m_btnPreview->SetEnabled(false);
+		m_btnPrint->SetEnabled(false);
+		m_btnReturn->SetEnabled(false);
+	}
+	else {
+		m_tree->SetMouseChildEnabled(true);
+		m_waiting_bar->Stop();
+		m_waiting_bar->SetVisible(false);		
+		m_btnPreview->SetEnabled(true);
+		m_btnPrint->SetEnabled(true);
+		m_btnReturn->SetEnabled(true);
+
+	}
+	
+	m_bBusy = bBusy;
 }

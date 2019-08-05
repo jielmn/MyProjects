@@ -4,6 +4,7 @@
 #include "business.h"
 #include "UIlib.h"
 #include "MyTreeCfgUI.h"
+#include "WaitingBarUI.h"
 
 class CPatientDataDlg : public DuiLib::WindowImplBase
 {
@@ -27,11 +28,19 @@ private:
 	void  OnPrintPreview();
 	void  OnReturn();
 	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay = FALSE );
-	void OnFinalMessage(HWND hWnd);
+	void  OnFinalMessage(HWND hWnd);
+	void  SetBusy(BOOL bBusy = TRUE);
 
 private:
 	CMyTreeCfgUI  *             m_tree;
 	CTabLayoutUI *              m_switch;
+	CWaitingBarUI *             m_waiting_bar;
+	CButtonUI *                 m_btnPreview;
+	CButtonUI *                 m_btnPrint;
+	CButtonUI *                 m_btnReturn;
+
+	BOOL                        m_bBusy;
+
 	BOOL                        m_bPatientInfoExist;               // 病人基础信息在数据库里是否存在
 	BOOL                        m_bPatientDataExist[7];            // 病人非温度数据在数据库里是否存在
 
