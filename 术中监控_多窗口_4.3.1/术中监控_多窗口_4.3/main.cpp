@@ -180,7 +180,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnBtnMenu(msg);
 		}
 		else if (name == BTN_PRINT) {
-			OnBtnPrint();
+			OnBtnPrint(g_data.m_CfgData.m_GridOrder[m_dwCurSelGridIndex]);
 		}
 	}
 	else if (msg.sType == "setting") {
@@ -215,7 +215,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		OnPrintExcel(msg.wParam); 
 	}
 	else if ( msg.sType == "menu_print_chart" ) {
-		OnBtnPrint();
+		OnBtnPrint(msg.wParam);
 	}
 	else if (msg.sType == "menu_hand_export_excel") {
 		OnHanxExportExcel();
@@ -1589,7 +1589,13 @@ void   CDuiFrameWnd::OnHandPrintExcel() {
 }
 
 // 温度打印
-void   CDuiFrameWnd::OnBtnPrint() {
+void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
+	CDuiString strTagId = m_pGrids[dwIndex]->GetCurTagId();
+	if ( strTagId.GetLength() == 0 ) {
+		::MessageBox(GetHWND(), "没有选中体温贴(tag)", "错误", 0);
+		return;
+	}
+
 	CPatientDataDlg * pDlg = new CPatientDataDlg;
 	pDlg->Create(this->m_hWnd, _T("打印体温单"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pDlg->CenterWindow();

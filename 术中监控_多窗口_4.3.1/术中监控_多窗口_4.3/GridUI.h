@@ -62,6 +62,9 @@ public:
 	// 打印excel表格
 	void  PrintExcel();
 
+	// 获得当前的TagID
+	CDuiString  GetCurTagId();
+
 private:
 	LPCTSTR GetClass() const;
 

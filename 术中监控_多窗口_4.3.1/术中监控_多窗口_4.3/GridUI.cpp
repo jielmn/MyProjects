@@ -1156,3 +1156,13 @@ void  CGridUI::PrintExcel() {
 		::MessageBox(g_data.m_hWnd, strText, "打印excel图表", 0);
 	}
 }
+
+// 获得当前的TagID
+CDuiString  CGridUI::GetCurTagId() {
+	if ( 0 == m_dwSelSurReaderIndex ) {
+		return m_HandLastTemp.m_szTagId;
+	}
+	else {
+		return m_aLastTemp[m_dwSelSurReaderIndex - 1].m_szTagId;
+	}
+}
