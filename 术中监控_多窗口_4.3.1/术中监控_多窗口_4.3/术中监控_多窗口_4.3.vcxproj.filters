@@ -159,4 +159,7 @@
       <Filter>资源文件</Filter>
     </Media>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="res\chart.xml" />
+  </ItemGroup>
 </Project>
