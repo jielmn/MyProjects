@@ -60,4 +60,7 @@
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="res\chart.xml" />
+  </ItemGroup>
 </Project>

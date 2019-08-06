@@ -1111,6 +1111,26 @@ void CXml2ChartFile::ReadXmlChartFile(TiXmlElement* pEleParent, CXml2ChartUI * p
 	}
 }
 
+CXml2ChartUI * CXml2ChartFile::ReadXmlChartStr(const char * szXml, DWORD  dwLength /*= 0*/) {
+	TiXmlDocument xmlDoc;
+
+	// 以'\0'结束
+	if (0 == dwLength) {
+		xmlDoc.Parse(szXml);
+	}
+	else {
+		char * pXml = new char[dwLength + 1];
+		memcpy(pXml, szXml, dwLength);
+		pXml[dwLength] = '\0';
+
+		xmlDoc.Parse(pXml);
+		delete[] pXml;
+	}
+
+	return ParseXml(xmlDoc);
+}
+
+
 CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 	if (0 == szFilePath) {
 		return 0;
@@ -1120,6 +1140,10 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 	if (!xmlDoc.LoadFile())           // 读取XML并检查是否读入正确  
 		return 0;
 
+	return ParseXml(xmlDoc);
+}
+
+CXml2ChartUI *  CXml2ChartFile::ParseXml(TiXmlDocument & xmlDoc) {
 	int  nWinWidth = 0;
 	int  nWinHeight = 0;
 	TiXmlElement* pElmRoot = NULL; // 根节点  
@@ -1136,13 +1160,13 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 	TiXmlElement* pElmChild = pElmRoot->FirstChildElement();
 	while (pElmChild) {
 		const char * szElmName = pElmChild->Value();
-		if ( 0 == szElmName) {
+		if (0 == szElmName) {
 			pElmChild = pElmChild->NextSiblingElement();
 			continue;
 		}
 
 		// 如果是font节点
-		if ( 0 == strcmp(szElmName, "Font") ) {
+		if (0 == strcmp(szElmName, "Font")) {
 			const char * sFontId = pElmChild->Attribute("id");
 			if (0 == sFontId) {
 				pElmChild = pElmChild->NextSiblingElement();
@@ -1204,7 +1228,7 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 			m_mapFonts.insert(std::make_pair(nFontId, hfont));
 		}
 		// 如果是Thread节点
-		else if (0 == strcmp(szElmName, "Thread") ) {
+		else if (0 == strcmp(szElmName, "Thread")) {
 			const char * sThreadId = pElmChild->Attribute("id");
 			if (0 == sThreadId) {
 				pElmChild = pElmChild->NextSiblingElement();
@@ -1243,7 +1267,7 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 		// 如果是布局节点
 		else {
 			BOOL  bVertical = FALSE;
-			if ( 0 == strcmp(szElmName, "VerticalLayout") ) {
+			if (0 == strcmp(szElmName, "VerticalLayout")) {
 				if (bFindLayout) {
 					pElmChild = pElmChild->NextSiblingElement();
 					continue;
@@ -1251,7 +1275,7 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 				bFindLayout = TRUE;
 				bVertical = TRUE;
 			}
-			else if ( 0 == strcmp(szElmName, "HorizontalLayout") ) {
+			else if (0 == strcmp(szElmName, "HorizontalLayout")) {
 				if (bFindLayout) {
 					pElmChild = pElmChild->NextSiblingElement();
 					continue;
@@ -1311,7 +1335,7 @@ CXml2ChartUI * CXml2ChartFile::ReadXmlChartFile(const char * szFilePath) {
 			SetBorder(pElmChild, m_ChartUI);
 			SetPadding(pElmChild, m_ChartUI);
 
-			ReadXmlChartFile( pElmChild, m_ChartUI );
+			ReadXmlChartFile(pElmChild, m_ChartUI);
 		}
 		pElmChild = pElmChild->NextSiblingElement();
 	}

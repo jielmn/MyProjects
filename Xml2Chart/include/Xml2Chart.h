@@ -198,6 +198,7 @@ public:
 	CXml2ChartFile();
 	~CXml2ChartFile();
 	CXml2ChartUI * ReadXmlChartFile(const char * szFilePath);
+	CXml2ChartUI * ReadXmlChartStr(const char * szXml, DWORD  dwLength = 0);
 	CXml2ChartUI *             m_ChartUI;
 
 	CXml2ChartUI * FindChartUIByName(const char * szName);
@@ -217,6 +218,8 @@ protected:
 	void SetText(TiXmlElement* pEle, CXml2ChartUI * pUI);
 
 	CXml2ChartUI *  FindChartUIByName(CXml2ChartUI * pUI, const char * szName);
+
+	CXml2ChartUI *  ParseXml(TiXmlDocument & xmlDoc);
 };
 
 

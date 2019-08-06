@@ -167,8 +167,24 @@ BOOL CTestDlg::OnInitDialog()
 
 #endif
 
-	m_XmlChartFile.ReadXmlChartFile("d:\\chart_1.xml");
-
+	//m_XmlChartFile.ReadXmlChartFile("d:\\chart_1.xml");
+	HRSRC hResource = ::FindResource(0, MAKEINTRESOURCE(IDR_XML1), "XML");
+	if (hResource != NULL)
+	{
+		// 加载资源
+		HGLOBAL hg = LoadResource(0, hResource);
+		if (hg != NULL)
+		{
+			// 锁定资源
+			LPVOID pData = LockResource(hg);
+			if (pData != NULL)
+			{
+				// 获取资源大小
+				DWORD dwSize = SizeofResource(0, hResource);
+				m_XmlChartFile.ReadXmlChartStr( (const char *)pData, dwSize);
+			}
+		}
+	}
 	
 	
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE

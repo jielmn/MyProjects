@@ -216,6 +216,9 @@
   <ItemGroup>
     <Image Include="res\Test.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="res\chart.xml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

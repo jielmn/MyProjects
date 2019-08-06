@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window width="760" height="1044" >
+	<Font   id="0" bold="true"  italic="false" facename="宋体" height="36" />
+	<Font   id="1" bold="false" italic="false" facename="宋体" height="14" />
+	<Font   id="2" bold="false" italic="false" facename="Times new Roman" height="10" />
+	<Thread id="5" width="2" color="#ff0000" />
+	<Thread id="6" width="1" color="#000000" />
+	<Thread id="7" width="1" color="#000000" />
+	<Thread id="8" width="2" color="#000000" />
+	
+	<!-- <VerticalLayout VSplit="num='3',pen='5'" HSplit="num='3',pen='6'" > -->
+	<VerticalLayout padding="40,40,40,40" >
+		<HorizontalLayout height="68">
+			<VerticalLayout width="250" />
+			<VerticalLayout width="10" />
+			<HorizontalLayout >
+				<Item text="体" font="0" valign="middle" />
+				<Item text="温" font="0" />
+				<Item text="记" font="0" />
+				<Item text="录" font="0" />
+			</HorizontalLayout>
+			<VerticalLayout width="10" />
+			<VerticalLayout width="250">
+				<HorizontalLayout />
+				<HorizontalLayout />
+				<HorizontalLayout>
+					<Item align="right" text="门诊号" font="1" />
+					<Item text="____________" font="1" />
+				</HorizontalLayout>
+				<HorizontalLayout>
+					<Item align="right" text="住院号" font="1" />
+					<Item text="____________" font="1" />
+				</HorizontalLayout>
+			</VerticalLayout>
+		</HorizontalLayout>
+		
+		<HorizontalLayout padding="15,5,15,5" height="30">
+			<Item text="姓名" font="1" width="40" />
+			<HorizontalLayout border="0,0,0,7" width="70" />
+			<Item text="性别" font="1" width="40" />
+			<HorizontalLayout border="0,0,0,7" width="20" />
+			<Item text="年龄" font="1" width="40" />			
+			<HorizontalLayout border="0,0,0,7" width="20" />
+			
+			<Item text="入院日期" font="1" width="80"/>
+			<Item text="" font="1" width="40" />
+			<Item text="年" font="1" width="20" />
+			<Item text="" font="1" width="20" />
+			<Item text="月" font="1" width="20" />
+			<Item text="" font="1" width="20" />
+			<Item text="日" font="1" width="20" />
+			
+			<Item text="" font="1" width="10"/>
+			<Item text="科别" font="1"/>
+			<Item text="" font="1" width="40" />
+			<Item text="病室" font="1"/>
+			<Item text="" font="1" width="40" />
+			<Item text="床号" font="1"/>
+			<Item text="" font="1" width="40" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout >
+			<VerticalLayout width="92" border="6,6,6,6" >
+				<VerticalLayout height="104" >
+					<Item text="日期"  font="1" border="6,6,6,6" height="20" />
+					<Item text="住院日数"  font="1" border="6,6,6,6" height="20" />
+					<VerticalLayout height="32" padding="5,2,5,2" border="6,6,6,6" >
+						<Item text="手术后" font="1" />
+						<Item text="日数" font="1" />
+					</VerticalLayout >					
+					<Item text="时间" font="1" height="32" border="6,6,6,6" />
+				</VerticalLayout>
+				
+				<!-- little square grid 12 -->
+				<HorizontalLayout>
+					<VerticalLayout border="6,6,6,6" >
+						<Item text="脉搏" font="1" height="28" />
+						<Item text="180" font="1" height="28" />
+						<VerticalLayout padding="0,21,0,0">
+							<Item text="160" font="1" />
+							<Item text="140" font="1" />
+							<Item text="120" font="1" />
+							<Item text="100" font="1" />
+							<Item text="80" font="1" />
+							<Item text="60" font="1" />
+							<Item text="40" font="1" />
+						</VerticalLayout>
+						<Item text="20" font="1" height="35" />
+					</VerticalLayout>
+					
+					<VerticalLayout>
+						<Item text="体温" font="1" height="28" />
+						<Item text="42℃" font="1" height="28" />
+						<VerticalLayout padding="0,21,0,0">
+							<Item text="41℃" font="1" />
+							<Item text="40℃" font="1" />
+							<Item text="39℃" font="1" />
+							<Item text="38℃" font="1" />
+							<Item text="37℃" font="1" />
+							<Item text="36℃" font="1" />
+							<Item text="35℃" font="1" />
+						</VerticalLayout>
+						<Item text="34℃" font="1" height="35" />
+					</VerticalLayout>
+				</HorizontalLayout>
+	
+				
+				<VerticalLayout HSplit="num='8',pen='6'" height="160" border="0,6,0,0" test=";;;">
+					<Item text="呼吸" font="1"/>
+					<Item text="大便次数" font="1"/>
+					<Item text="尿量(次) ml" font="1"/>
+					<Item text="总入量 ml" font="1"/>
+					<Item text="总出量 ml" font="1"/>					
+					<Item text="血压kpa" font="1"/>
+					<Item text="体重kg" font="1"/>
+					<Item text="过敏药物" font="1"/>
+				</VerticalLayout>			
+			</VerticalLayout>
+			
+			
+			
+			
+			
+			
+			
+			<VerticalLayout border="6,6,6,6" >
+				<VerticalLayout height="104" >
+					<HorizontalLayout border="6,6,6,6" height="20" VSplit="num='7',pen='5'" />
+					<HorizontalLayout border="6,6,6,6" height="20" VSplit="num='7',pen='5'" />
+					<HorizontalLayout border="6,6,6,6" height="32" VSplit="num='7',pen='5'" />
+					<HorizontalLayout border="6,6,6,6" height="32">
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="0,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="0,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,0,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="5,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="5,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,0,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="5,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="5,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,0,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="5,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="5,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,0,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="5,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="5,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,0,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="5,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="5,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,0,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+						<VerticalLayout>
+							<HorizontalLayout>
+								<Item text="上午" font="1" border="5,6,0,6" />
+								<Item text="下午" font="1" border="6,6,0,6" />
+							</HorizontalLayout>
+							<HorizontalLayout>
+								<Item text="4" font="2" border="5,6,6,6" textcolor="#FF0000" />
+								<Item text="8" font="2" border="6,6,6,6" />
+								<Item text="12" font="2" border="6,6,6,6" />
+								<Item text="4" font="2" border="6,6,6,6" />
+								<Item text="8" font="2" border="6,6,6,6" textcolor="#FF0000" />
+								<Item text="12" font="2" border="6,6,6,6" textcolor="#FF0000" />
+							</HorizontalLayout>
+						</VerticalLayout>
+						
+					</HorizontalLayout>
+				</VerticalLayout>
+				
+				<!-- little square grid 12 -->
+				<VerticalLayout VSplit1="num='42',pen='7'" VSplit="num='7',pen='5'" HSplit="num='43',pen='7'"  >
+					<VerticalLayout height="42" border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,5" />
+					<VerticalLayout border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,8" />
+					<VerticalLayout border="0,0,0,0" />
+				</VerticalLayout>
+	
+				
+				<VerticalLayout HSplit="num='8',pen='6'" height="160" border="0,6,0,0" test=";;;">
+					<HorizontalLayout VSplit1="num='42',pen='7'" VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+					<HorizontalLayout VSplit="num='7',pen='5'" />
+				</VerticalLayout>			
+			</VerticalLayout>
+			
+			
+	
+		</HorizontalLayout>
+		
+		
+
+		
+
+	</VerticalLayout>
+	
+	
+</Window>
