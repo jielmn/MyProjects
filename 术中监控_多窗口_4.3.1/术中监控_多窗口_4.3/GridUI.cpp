@@ -1174,3 +1174,11 @@ CDuiString  CGridUI::GetCurPatientName() {
 	else
 		return "";
 }
+
+// 设置当前的病人姓名
+void  CGridUI::SetCurPatientName(const char * szName) {
+	if (m_cstPatientName) {
+		m_cstPatientName->SetText(szName);
+		m_cstPatientNameM->SetText(szName);
+	}
+}

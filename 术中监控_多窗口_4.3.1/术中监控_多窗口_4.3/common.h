@@ -206,6 +206,7 @@ using namespace DuiLib;
 #define MSG_INIT_EXCEL                      2014
 #define MSG_QUERY_PATIENT_INFO              2015
 #define MSG_QUERY_PATIENT_DATA              2016
+#define MSG_SAVE_PATIENT_INFO               2017
 
 
 // windows ÏûÏ¢
@@ -556,6 +557,15 @@ public:
 
 	char         m_szTagId[MAX_TAG_ID_LENGTH];
 	time_t       m_tFirstDay;
+};
+
+class CSavePatientInfoParam : public LmnToolkits::MessageData {
+public:
+	CSavePatientInfoParam(const PatientInfo * pInfo) {
+		memcpy(&m_info, pInfo, sizeof(PatientInfo));
+	}
+
+	PatientInfo         m_info;
 };
 
 

@@ -1609,6 +1609,11 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 	pDlg->CenterWindow();
 	int ret = pDlg->ShowModal();
 
+	// 如果名字改变
+	if ( strPatientName != pDlg->m_szUIPName ) {
+		m_pGrids[dwIndex]->SetCurPatientName(pDlg->m_szUIPName);
+	}
+
 	// 如果不是click ok
 	if (0 != ret) {
 		delete pDlg;

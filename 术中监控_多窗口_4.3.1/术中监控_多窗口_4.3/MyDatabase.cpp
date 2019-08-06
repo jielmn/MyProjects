@@ -609,6 +609,55 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 	sqlite3_free_table(azResult);
 }
 
+// 保存info
+void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", 
+		PATIENT_INFO, pParam->m_info.m_szTagId );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	PatientInfo info;
+	memcpy(&info, &pParam->m_info, sizeof(PatientInfo));
+
+	StrReplaceAll( info.m_szOutpatientNo, MAX_OUTPATIENT_NO_LENGTH, 
+		           pParam->m_info.m_szOutpatientNo, "'", "''" );
+
+	StrReplaceAll(info.m_szHospitalAdmissionNo, MAX_HOSPITAL_ADMISSION_NO_LENGTH,
+		pParam->m_info.m_szHospitalAdmissionNo, "'", "''");
+
+	StrReplaceAll(info.m_szMedicalDepartment, MAX_MEDICAL_DEPARTMENT_LENGTH,
+		pParam->m_info.m_szMedicalDepartment, "'", "''");
+
+	StrReplaceAll(info.m_szWard, MAX_WARD_LENGTH, pParam->m_info.m_szWard, "'", "''");
+
+	StrReplaceAll(info.m_szBedNo, MAX_BED_NO_LENGTH, pParam->m_info.m_szBedNo, "'", "''");
+
+	// 如果存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set sex=%d, age=%d, outpatient_no='%s', "
+			"hospital_admission_no='%s', in_hospital_date=%lu, medical_department='%s', "
+			"ward='%s', bed_no='%s', surgery_date=%lu WHERE tag_id='%s' ", 
+			PATIENT_INFO, info.m_sex, info.m_age, info.m_szOutpatientNo, 
+			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, info.m_szMedicalDepartment,
+			info.m_szWard, info.m_szBedNo, (DWORD)info.m_surgery, info.m_szTagId );
+		sqlite3_exec(m_db, sql, 0, 0, 0);		
+	}
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %d, %d, '%s', '%s',"
+			"%lu, '%s', '%s', '%s', %lu ); ",
+			PATIENT_INFO, info.m_szTagId, info.m_sex, info.m_age, info.m_szOutpatientNo,
+			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, info.m_szMedicalDepartment,
+			info.m_szWard, info.m_szBedNo, (DWORD)info.m_surgery );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+}
+
 
 // 查询PatientData
 void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam, 

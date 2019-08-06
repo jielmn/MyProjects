@@ -418,25 +418,101 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	PatientData data[7];
 
 	GetPatientInfo(&info);
+	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+
+	// 保存姓名
+	if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
+		CBusiness::GetInstance()->SaveTagPNameAsyn(m_szTagId, info.m_szPName);
+	}
+
 	if ( IsPatientInfoChanged(&info) ) {
 		// 保存数据库
+		CBusiness::GetInstance()->SavePatientInfoAsyn(&info);
 	}
 
 	GetPatientData(data, 7);
-	if (IsPatientInfoChanged(data, 7)) {
-		// 保存数据库
-	}
 
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientInfoChanged( &data[i], i ) ) {
+			// 保存数据库
+		}
+	}
+	
+
+	STRNCPY( m_szUIPName, info.m_szPName, MAX_TAG_PNAME_LENGTH );
 	WindowImplBase::OnFinalMessage(hWnd);
 }
 
 // 病人info是否改变
 BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
+
+	if ( pInfo->m_sex != m_patient_info.m_sex )
+		return TRUE;
+
+	if (pInfo->m_age != m_patient_info.m_age)
+		return TRUE;
+
+	if ( 0 != strcmp(pInfo->m_szOutpatientNo, m_patient_info.m_szOutpatientNo) )
+		return TRUE;
+
+	if (0 != strcmp(pInfo->m_szHospitalAdmissionNo, m_patient_info.m_szHospitalAdmissionNo))
+		return TRUE;
+
+	if (0 != strcmp(pInfo->m_szMedicalDepartment, m_patient_info.m_szMedicalDepartment))
+		return TRUE;
+
+	if (0 != strcmp(pInfo->m_szWard, m_patient_info.m_szWard))
+		return TRUE;
+
+	if (0 != strcmp(pInfo->m_szBedNo, m_patient_info.m_szBedNo))
+		return TRUE;
+
+	if ( pInfo->m_in_hospital != m_patient_info.m_in_hospital )
+		return TRUE;
+
+	if ( pInfo->m_surgery != m_patient_info.m_surgery )
+		return TRUE;
+
 	return FALSE;
 }
 
 // 病人data是否改变
-BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientData * pData, DWORD dwSize) {
+BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientData * pData, int nIndex) {
+	assert(nIndex >= 0 && nIndex < 7);
+
+	for (int i = 0; i < 6; i++) {
+		if (pData->m_pulse[i] != m_patient_data[nIndex].m_pulse[i]) {
+			return TRUE;
+		}
+	}
+
+	for (int i = 0; i < 6; i++) {
+		if (pData->m_breath[i] != m_patient_data[nIndex].m_breath[i]) {
+			return TRUE;
+		}
+	}
+
+	if ( pData->m_defecate != m_patient_data[nIndex].m_defecate )
+		return TRUE;
+
+	if (pData->m_urine != m_patient_data[nIndex].m_urine )
+		return TRUE;
+
+	if (pData->m_income != m_patient_data[nIndex].m_income )
+		return TRUE;
+
+	if (pData->m_output != m_patient_data[nIndex].m_output )
+		return TRUE;
+
+	if (pData->m_blood_pressure != m_patient_data[nIndex].m_blood_pressure)
+		return TRUE;
+
+	if (pData->m_weight != m_patient_data[nIndex].m_weight)
+		return TRUE;
+
+	if ( 0 != strcmp( pData->m_szIrritability, m_patient_data[nIndex].m_szIrritability) )
+		return TRUE;
+
 	return FALSE;
 }
 

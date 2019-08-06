@@ -66,6 +66,8 @@ public:
 	CDuiString  GetCurTagId();
 	// 获得当前的病人姓名
 	CDuiString  GetCurPatientName();
+	// 设置当前的病人姓名
+	void SetCurPatientName(const char * szName);
 
 private:
 	LPCTSTR GetClass() const;

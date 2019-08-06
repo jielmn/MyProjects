@@ -1071,6 +1071,16 @@ void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
 	m_sigPatientInfo.emit(&tRet);
 }
 
+// 保存基本信息
+void  CBusiness::SavePatientInfoAsyn(const PatientInfo * pInfo) {
+	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_PATIENT_INFO,
+		new CSavePatientInfoParam(pInfo) );
+}
+
+void  CBusiness::SavePatientInfo(const CSavePatientInfoParam * pParam) {
+	m_sqlite.SavePatientInfo(pParam);
+}
+
 // 获取某天的病人的非体温数据信息
 void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay) {
 	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_DATA,
@@ -1223,6 +1233,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryPatientDataParam * pParam = (CQueryPatientDataParam *)pMessageData;
 		QueryPatientData(pParam);
+	}
+	break;
+
+	case MSG_SAVE_PATIENT_INFO:
+	{
+		CSavePatientInfoParam * pParam = (CSavePatientInfoParam *)pMessageData;
+		SavePatientInfo(pParam);
 	}
 	break;
 

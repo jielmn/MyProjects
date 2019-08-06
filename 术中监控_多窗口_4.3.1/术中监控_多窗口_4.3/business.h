@@ -101,6 +101,9 @@ public:
 	// 获取病人的基础信息
 	void  QueryPatientInfoAsyn(const char * szTagId);
 	void  QueryPatientInfo(const CQueryPatientInfoParam * pParam);
+	// 保存基本信息
+	void  SavePatientInfoAsyn(const PatientInfo * pInfo);
+	void  SavePatientInfo(const CSavePatientInfoParam * pParam);
 
 	// 获取某7天的病人的非体温数据信息
 	void  QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay);

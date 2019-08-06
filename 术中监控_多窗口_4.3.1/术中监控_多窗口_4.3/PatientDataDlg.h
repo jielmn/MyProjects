@@ -43,7 +43,7 @@ private:
 	// 病人info是否改变
 	BOOL  IsPatientInfoChanged(PatientInfo * pInfo);
 	// 病人data是否改变
-	BOOL  IsPatientInfoChanged(PatientData * pData, DWORD dwSize);
+	BOOL  IsPatientInfoChanged(PatientData * pData, int nIndex);
 
 private:
 	CMyTreeCfgUI  *             m_tree;
