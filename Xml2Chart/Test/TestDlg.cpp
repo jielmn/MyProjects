@@ -220,7 +220,7 @@ void CTestDlg::OnPaint()
 		//DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
 
 		SetBkMode(dc, TRANSPARENT);
-		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI);
+		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI, 100);
 
 		//CXml2ChartUI * p = m_XmlChartFile.FindChartUIByName("MainBlock");
 		//if (p != 0) {

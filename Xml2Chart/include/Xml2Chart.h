@@ -223,7 +223,7 @@ protected:
 };
 
 
-void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI);
+void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI, int nOffsetX = 0, int nOffsetY = 0);
 
 
 #endif

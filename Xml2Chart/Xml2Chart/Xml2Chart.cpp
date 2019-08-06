@@ -630,7 +630,7 @@ static void  SaveGdiPen(HGDIOBJ & hOldPen, HGDIOBJ hNewPen, HDC hDc ) {
 	}
 }
 
-void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
+void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI, int nOffsetX /*= 0*/, int nOffsetY /*= 0*/) {
 	if (pUI == 0) {
 		return;
 	}
@@ -648,26 +648,26 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 
 	if ( 0 != hPenLeft) {
 		SaveGdiPen(hOldPen, hPenLeft, hDc);
-		::MoveToEx(hDc, pUI->GetAbsoluteLeft(), pUI->GetAbsoluteTop(), 0);
-		::LineTo(hDc, pUI->GetAbsoluteLeft(), pUI->GetAbsoluteBottom());
+		::MoveToEx(hDc, pUI->GetAbsoluteLeft() + nOffsetX, pUI->GetAbsoluteTop() + nOffsetY, 0);
+		::LineTo(hDc, pUI->GetAbsoluteLeft() + nOffsetX, pUI->GetAbsoluteBottom() + nOffsetY);
 	}
 
 	if (0 != hPenRight) {
 		SaveGdiPen(hOldPen, hPenRight, hDc);
-		::MoveToEx(hDc, pUI->GetAbsoluteRight(), pUI->GetAbsoluteTop(), 0);
-		::LineTo(hDc, pUI->GetAbsoluteRight(), pUI->GetAbsoluteBottom());
+		::MoveToEx(hDc, pUI->GetAbsoluteRight() + nOffsetX, pUI->GetAbsoluteTop() + nOffsetY, 0);
+		::LineTo(hDc, pUI->GetAbsoluteRight() + nOffsetX, pUI->GetAbsoluteBottom() + nOffsetY);
 	}
 
 	if (0 != hPenTop ) {
 		SaveGdiPen(hOldPen, hPenTop, hDc);
-		::MoveToEx(hDc, pUI->GetAbsoluteLeft(), pUI->GetAbsoluteTop(), 0);
-		::LineTo(hDc, pUI->GetAbsoluteRight(), pUI->GetAbsoluteTop());
+		::MoveToEx(hDc, pUI->GetAbsoluteLeft() + nOffsetX, pUI->GetAbsoluteTop() + nOffsetY, 0);
+		::LineTo(hDc, pUI->GetAbsoluteRight() + nOffsetX, pUI->GetAbsoluteTop() + nOffsetY);
 	}
 
 	if (0 != hPenBottom) {
 		SaveGdiPen(hOldPen, hPenBottom, hDc);
-		::MoveToEx(hDc, pUI->GetAbsoluteLeft(), pUI->GetAbsoluteBottom(), 0);
-		::LineTo(hDc, pUI->GetAbsoluteRight(), pUI->GetAbsoluteBottom());
+		::MoveToEx(hDc, pUI->GetAbsoluteLeft() + nOffsetX, pUI->GetAbsoluteBottom() + nOffsetY, 0);
+		::LineTo(hDc, pUI->GetAbsoluteRight() + nOffsetX, pUI->GetAbsoluteBottom() + nOffsetY);
 	}
 
 	int nCount = 0;
@@ -682,8 +682,8 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 
 		SaveGdiPen(hOldPen, splitPen.HPen, hDc);
 		for (int j = 0; j < splitPen.nSplitNum - 1; j++) {
-			::MoveToEx(hDc, pUI->GetAbsoluteLeft() + (j + 1)*nAve, pUI->GetAbsoluteTop(), 0);			
-			::LineTo(hDc, pUI->GetAbsoluteLeft() + (j + 1)*nAve, pUI->GetAbsoluteBottom());
+			::MoveToEx(hDc, pUI->GetAbsoluteLeft() + (j + 1)*nAve + nOffsetX, pUI->GetAbsoluteTop() + nOffsetY, 0);
+			::LineTo(hDc, pUI->GetAbsoluteLeft() + (j + 1)*nAve + nOffsetX, pUI->GetAbsoluteBottom() + nOffsetY);
 		}
 	}
 
@@ -695,8 +695,8 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 
 		SaveGdiPen(hOldPen, splitPen.HPen, hDc);
 		for (int j = 0; j < splitPen.nSplitNum - 1; j++) {
-			::MoveToEx(hDc, pUI->GetAbsoluteLeft(), pUI->GetAbsoluteTop() + (j+1)*nAve, 0);
-			::LineTo(hDc, pUI->GetAbsoluteRight(), pUI->GetAbsoluteTop() + (j+1)*nAve );
+			::MoveToEx(hDc, pUI->GetAbsoluteLeft() + nOffsetX, pUI->GetAbsoluteTop() + (j+1)*nAve + nOffsetY, 0);
+			::LineTo(hDc, pUI->GetAbsoluteRight() + nOffsetX, pUI->GetAbsoluteTop() + (j+1)*nAve + nOffsetY );
 		}
 	}
 
@@ -732,7 +732,7 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 	COLORREF hOldColor = ::GetTextColor(hDc);
 	::SetTextColor(hDc, pUI->GetTextColor());
 
-	::TextOut(hDc, nLeft + pUI->GetAbsoluteLeft(), nTop + pUI->GetAbsoluteTop(), strText.c_str(), strText.length());
+	::TextOut(hDc, nLeft + pUI->GetAbsoluteLeft() + nOffsetX, nTop + pUI->GetAbsoluteTop() + nOffsetY, strText.c_str(), strText.length());
 
 	if (0 != hOldPen) {
 		::SelectObject(hDc, hOldPen);
@@ -748,7 +748,7 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI) {
 	int nChildrenCount = pUI->GetChildrenCount();
 	for (int i = 0; i < nChildrenCount; i++) {
 		CXml2ChartUI * pChild = pUI->GetChild(i);
-		DrawXml2ChartUI(hDc, pChild);
+		DrawXml2ChartUI(hDc, pChild, nOffsetX, nOffsetY);
 	}
 }
 
