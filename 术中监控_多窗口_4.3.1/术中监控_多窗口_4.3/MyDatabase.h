@@ -38,6 +38,8 @@ public:
 	void SavePatientInfo(const CSavePatientInfoParam * pParam);
 	// ≤È—ØPatientData
 	void QueryPatientData(const CQueryPatientDataParam * pParam, PatientData * pData, DWORD dwSize);
+	// ±£¥Êdata
+	void SavePatientData(const CSavePatientDataParam * pParam);
 
 private:
 	sqlite3 *                         m_db;

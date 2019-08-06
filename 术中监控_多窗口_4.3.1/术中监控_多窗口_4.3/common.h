@@ -207,6 +207,7 @@ using namespace DuiLib;
 #define MSG_QUERY_PATIENT_INFO              2015
 #define MSG_QUERY_PATIENT_DATA              2016
 #define MSG_SAVE_PATIENT_INFO               2017
+#define MSG_SAVE_PATIENT_DATA               2018
 
 
 // windows ÏûÏ¢
@@ -566,6 +567,15 @@ public:
 	}
 
 	PatientInfo         m_info;
+};
+
+class CSavePatientDataParam : public LmnToolkits::MessageData {
+public:
+	CSavePatientDataParam(const PatientData * pData) {
+		memcpy(&m_data, pData, sizeof(PatientData));
+	}
+
+	PatientData     m_data;
 };
 
 

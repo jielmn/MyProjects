@@ -39,6 +39,7 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 }
 
 void   CPatientDataDlg::InitWindow() {
+	m_tDate = time(0);
 	WindowImplBase::InitWindow();
 }
 
@@ -217,7 +218,7 @@ void  CPatientDataDlg::InitData() {
 	const char * item_title[7] = { "大便次数", "尿量(次) ml", "总入量 ml", "总出量 ml", "血压 kpa", "体重 kg", "过敏药物" };
 	for (int i = 0; i < 7; i++) {
 		pSevenGrids = new CSevenGridsUI;
-		if (i == 6)
+		if (i == 4 || i == 5 || i == 6)
 			pSevenGrids->SetNumberOnly(FALSE); 
 		m_tree->AddNode(item_title[i], pSubTitleNode, 0, pSevenGrids, 2, 0xFF386382, 2, 0xFF386382, 30);    
 	}
@@ -431,10 +432,14 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	}
 
 	GetPatientData(data, 7);
+	time_t  tFirstDay = m_tDate - 3600 * 24 * 6;
 
 	for (DWORD i = 0; i < 7; i++) {
 		if (IsPatientInfoChanged( &data[i], i ) ) {
+			STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
 			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
 		}
 	}
 	

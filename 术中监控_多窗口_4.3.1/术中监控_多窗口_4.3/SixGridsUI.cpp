@@ -156,7 +156,7 @@ void  CSevenGridsUI::DoInit() {
 
 		strText.Format("lbl_%d", i + 1);
 		m_labels[i] = static_cast<DuiLib::CLabelUI*>(m_pManager->FindControl(strText));
-		m_labels[i]->SetText(m_week_days[i]);
+		m_labels[i]->SetText(m_week_days[i]); 
 	}
 }
 

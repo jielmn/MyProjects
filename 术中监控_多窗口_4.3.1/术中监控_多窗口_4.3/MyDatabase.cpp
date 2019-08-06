@@ -794,3 +794,50 @@ void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam,
 		sqlite3_free_table(azResult);
 	}	
 }
+
+// 保存data
+void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
+	PatientData data;
+	memcpy(&data, &pParam->m_data, sizeof(PatientData));
+	data.m_date = GetAnyDayZeroTime(pParam->m_data.m_date); 
+
+	StrReplaceAll(data.m_szIrritability, MAX_IRRITABILITY_LENGTH, 
+		pParam->m_data.m_szIrritability, "'", "''"); 
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' AND date=%lu ",
+		PATIENT_DATA, data.m_szTagId, (DWORD)data.m_date );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);	
+
+	// 如果存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set pulse_1 = %d, pulse_2 = %d, pulse_3 = %d, " 
+			"pulse_4 = %d, pulse_5 = %d, pulse_6 = %d, breath_1 = %d, breath_2 = %d, " 
+			"breath_3 = %d, breath_4 = %d, breath_5 = %d, breath_6 = %d, defecate = %d, " 
+			"urine = %d, total_income = %d, total_output = %d, blood_pressure = %d, " 
+			"weight = %d, irritability = '%s' WHERE tag_id = '%s' AND date = %lu ",
+			PATIENT_DATA, data.m_pulse[0], data.m_pulse[1],
+			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
+			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
+			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
+			data.m_blood_pressure, data.m_weight, data.m_szIrritability, data.m_szTagId,
+			(DWORD)data.m_date );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %lu, %d, %d, %d, %d, %d, %d, "
+			"%d, %d, %d, %d, %d, %d,  %d, %d, %d, %d, %d, %d,  '%s' ); ",
+			PATIENT_DATA, data.m_szTagId, (DWORD)data.m_date, data.m_pulse[0], data.m_pulse[1],
+			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
+			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
+			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
+			data.m_blood_pressure, data.m_weight, data.m_szIrritability );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+}

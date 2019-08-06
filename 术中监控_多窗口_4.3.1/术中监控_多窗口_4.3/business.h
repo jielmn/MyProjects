@@ -108,6 +108,9 @@ public:
 	// 获取某7天的病人的非体温数据信息
 	void  QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay);
 	void  QueryPatientData(const CQueryPatientDataParam * pParam);
+	// 保存病人非温度数据
+	void  SavePatientDataAsyn(const PatientData * pData);
+	void  SavePatientData(const CSavePatientDataParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

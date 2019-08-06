@@ -2,12 +2,12 @@
 <Window>
 	<VerticalLayout bordersize="1" bordercolor="#FF000000" name="laySixGrids" inset="1,1,1,1"  >
 		<HorizontalLayout name="top" >
-			<Label text="4" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
-			<Label text="8" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
-			<Label text="12" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
-			<Label text="4" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
-			<Label text="8" align="center" font="4" textcolor="#FF000000" bordersize="0,0,1,0" bordercolor="#FF000000" />
-			<Label text="12" align="center" font="4" textcolor="#FF000000" bordersize="0,0,0,0" bordercolor="#FF000000" />
+			<Label text="4" align="center" font="4" textcolor="#FF0000FF" bordersize="0,0,1,0" bordercolor="#FF000000" bkcolor="#FFCCCCCC" />
+			<Label text="8" align="center" font="4" textcolor="#FF0000FF" bordersize="0,0,1,0" bordercolor="#FF000000" bkcolor="#FFCCCCCC" />
+			<Label text="12" align="center" font="4" textcolor="#FF0000FF" bordersize="0,0,1,0" bordercolor="#FF000000" bkcolor="#FFCCCCCC" />
+			<Label text="4" align="center" font="4" textcolor="#FF0000FF" bordersize="0,0,1,0" bordercolor="#FF000000" bkcolor="#FFCCCCCC" />
+			<Label text="8" align="center" font="4" textcolor="#FF0000FF" bordersize="0,0,1,0" bordercolor="#FF000000" bkcolor="#FFCCCCCC" />
+			<Label text="12" align="center" font="4" textcolor="#FF0000FF" bordersize="0,0,0,0" bordercolor="#FF000000" bkcolor="#FFCCCCCC" />
 		</HorizontalLayout>
 		
 		<HorizontalLayout name="bottom" >
