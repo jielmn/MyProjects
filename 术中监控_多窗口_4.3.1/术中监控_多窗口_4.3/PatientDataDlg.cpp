@@ -14,6 +14,8 @@ CPatientDataDlg::CPatientDataDlg() {
 
 	memset( &m_patient_info, 0, sizeof(m_patient_info) );
 	memset( m_patient_data,  0, sizeof(m_patient_data) );
+
+	m_tDate = time(0);
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -104,7 +106,7 @@ void   CPatientDataDlg::InitInfo() {
 	AddComboItem(pCombo, "男", 1);
 	AddComboItem(pCombo, "女", 2);
 	pCombo->SelectItem(0);
-	pCombo->SetFixedWidth(60);
+	pCombo->SetFixedWidth(120);
 	m_tree->AddNode("性别", pTitleNode, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 年龄
@@ -259,8 +261,183 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 	}
 }
 
+// 从界面获取填入的info
+void  CPatientDataDlg::GetPatientInfo(PatientInfo * pInfo) {
+	memset(pInfo, 0, sizeof(PatientInfo));
+
+	CMyTreeCfgUI::ConfigValue   cfgValue;
+	int nRow = 1;
+
+	// 姓名
+	m_tree->GetConfigValue(nRow, cfgValue);
+	STRNCPY(pInfo->m_szPName, cfgValue.m_strEdit, MAX_TAG_PNAME_LENGTH);
+	nRow++;
+
+	// 性别
+	m_tree->GetConfigValue(nRow, cfgValue);
+	pInfo->m_sex = cfgValue.m_nComboSel;
+	nRow++;
+
+	// 年龄
+	m_tree->GetConfigValue(nRow, cfgValue);
+	sscanf_s(cfgValue.m_strEdit, "%d", &pInfo->m_age);
+	nRow++;
+
+	// 门诊号
+	m_tree->GetConfigValue(nRow, cfgValue);
+	STRNCPY(pInfo->m_szOutpatientNo, cfgValue.m_strEdit, MAX_OUTPATIENT_NO_LENGTH);
+	nRow++;
+
+	// 住院号
+	m_tree->GetConfigValue(nRow, cfgValue);
+	STRNCPY(pInfo->m_szHospitalAdmissionNo, cfgValue.m_strEdit, MAX_HOSPITAL_ADMISSION_NO_LENGTH);
+	nRow += 2;
+
+	// 入院日期
+	m_tree->GetConfigValue(nRow, cfgValue);
+	if ( cfgValue.m_bCheckbox ) {
+		m_tree->GetConfigValue(nRow+1, cfgValue);
+		pInfo->m_in_hospital = cfgValue.m_time;
+	}
+	else {
+		pInfo->m_in_hospital = 0;
+	}
+	nRow += 2;
+
+	// 科室
+	m_tree->GetConfigValue(nRow, cfgValue);
+	STRNCPY(pInfo->m_szMedicalDepartment, cfgValue.m_strEdit, MAX_MEDICAL_DEPARTMENT_LENGTH);
+	nRow++;
+
+	// 病室
+	m_tree->GetConfigValue(nRow, cfgValue);
+	STRNCPY(pInfo->m_szWard, cfgValue.m_strEdit, MAX_WARD_LENGTH);
+	nRow++;
+
+	// 床号
+	m_tree->GetConfigValue(nRow, cfgValue);
+	STRNCPY(pInfo->m_szBedNo, cfgValue.m_strEdit, MAX_BED_NO_LENGTH);
+	nRow += 2;
+
+	// 手术
+	m_tree->GetConfigValue(nRow, cfgValue);
+	if (cfgValue.m_bCheckbox) {
+		m_tree->GetConfigValue(nRow + 1, cfgValue);
+		pInfo->m_surgery = cfgValue.m_time;
+	}
+	else {
+		pInfo->m_surgery = 0;
+	}
+	nRow += 2;
+}
+
+// 从界面获取填入的data
+void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
+	assert(dwSize >= 7);
+	memset(pData, 0, sizeof(PatientData) * 7);
+
+	CMyTreeCfgUI::ConfigValue   cfgValue;
+	int nRow = 17;
+
+	// 脉搏
+	for (int i = 0; i < 7; i++) {
+		m_tree->GetConfigValue(nRow, cfgValue);
+		for (int j = 0; j < 6; j++) {
+			sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_pulse[j]);
+		}		
+		nRow++;
+	}
+
+	// 呼吸
+	nRow++;
+	for (int i = 0; i < 7; i++) {
+		m_tree->GetConfigValue(nRow, cfgValue);
+		for (int j = 0; j < 6; j++) {
+			sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_breath[j]);
+		}
+		nRow++;
+	}
+
+	// 大便次数
+	nRow++;
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_defecate);
+	}
+	nRow++;
+
+	// 尿量
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_urine);
+	}
+	nRow++;
+
+	// 总入量
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_income);
+	}
+	nRow++;
+
+	// 总出量
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_output);
+	}
+	nRow++;
+
+	// 血压
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		float f = 0.0f;
+		sscanf_s(cfgValue.m_Values[i], "%f", &f);
+		pData[i].m_blood_pressure = (int)(f * 100);
+	}
+	nRow++;
+
+	// 体重
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		float f = 0.0f;
+		sscanf_s(cfgValue.m_Values[i], "%f", &f);
+		pData[i].m_weight = (int)(f * 100);
+	}
+	nRow++;
+
+	// 过敏药物
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY( pData[i].m_szIrritability, cfgValue.m_Values[i],MAX_IRRITABILITY_LENGTH );
+	}
+	nRow++;
+}
+
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
+	PatientInfo info;
+	PatientData data[7];
+
+	GetPatientInfo(&info);
+	if ( IsPatientInfoChanged(&info) ) {
+		// 保存数据库
+	}
+
+	GetPatientData(data, 7);
+	if (IsPatientInfoChanged(data, 7)) {
+		// 保存数据库
+	}
+
 	WindowImplBase::OnFinalMessage(hWnd);
+}
+
+// 病人info是否改变
+BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
+	return FALSE;
+}
+
+// 病人data是否改变
+BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientData * pData, DWORD dwSize) {
+	return FALSE;
 }
 
 void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
@@ -309,15 +486,13 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	memcpy(&m_patient_info, pInfo, sizeof(PatientInfo));
 	delete pInfo;
 
-	if (m_patient_info.m_szPName[0] == '\0') {
-		STRNCPY(m_patient_info.m_szPName, m_szUIPName, MAX_TAG_PNAME_LENGTH);
-	}
-
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 1;
 
 	// 姓名
 	cfgValue.m_strEdit = m_patient_info.m_szPName;
+	if (cfgValue.m_strEdit.GetLength() == 0)
+		cfgValue.m_strEdit = m_szUIPName;
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
@@ -391,8 +566,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	}
 	nRow += 2;	
 
-	time_t now = time(0);
-	time_t tFirstDay = now - 3600 * 24 * 6;
+	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
 	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
 }
 

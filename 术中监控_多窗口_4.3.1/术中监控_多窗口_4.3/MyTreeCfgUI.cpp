@@ -545,6 +545,18 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 
 		cfgValue.m_tag = pCtl->GetTag();
 	}
+	else if (0 == strcmp(pCtl->GetClass(), "SixGrids")) {
+		CSixGridsUI * pSix = (CSixGridsUI *)pCtl;
+		for (int i = 0; i < 6; i++) {
+			cfgValue.m_Values[i] = pSix->GetValues(i);
+		}
+	}
+	else if (0 == strcmp(pCtl->GetClass(), "SevenGrids") ) {
+		CSevenGridsUI * pSeven = (CSevenGridsUI *)pCtl;
+		for (int i = 0; i < 7; i++) {
+			cfgValue.m_Values[i] = pSeven->GetValues(i);
+		}
+	}
 	else {
 		return false;
 	}

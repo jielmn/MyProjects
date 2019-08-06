@@ -36,6 +36,14 @@ private:
 	void  SetBusy(BOOL bBusy = TRUE);
 	void  OnPatientInfoRet(WPARAM wParam, LPARAM  lParam);
 	void  OnPatientDataRet(WPARAM wParam, LPARAM  lParam);
+	// 从界面获取填入的info
+	void  GetPatientInfo(PatientInfo * pInfo);
+	// 从界面获取填入的data
+	void  GetPatientData(PatientData * pData, DWORD dwSize);
+	// 病人info是否改变
+	BOOL  IsPatientInfoChanged(PatientInfo * pInfo);
+	// 病人data是否改变
+	BOOL  IsPatientInfoChanged(PatientData * pData, DWORD dwSize);
 
 private:
 	CMyTreeCfgUI  *             m_tree;
@@ -48,6 +56,7 @@ private:
 	BOOL                        m_bBusy;
 	PatientInfo                 m_patient_info;
 	PatientData                 m_patient_data[7];
+	time_t                      m_tDate;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

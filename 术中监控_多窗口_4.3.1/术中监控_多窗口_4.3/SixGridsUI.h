@@ -8,6 +8,7 @@ public:
 	~CSixGridsUI();
 	void  SetMode(int nMode);
 	void  SetValues(int nIndex, const char * szValue);
+	CDuiString  GetValues(int nIndex);
 
 private:
 	LPCTSTR GetClass() const;
@@ -31,6 +32,7 @@ public:
 	void  SetNumberOnly(BOOL bOnly);
 	void  SetWeekStr(CDuiString * pWeek, DWORD dwSize);
 	void  SetValues(int nIndex,const char * szValue);
+	CDuiString  GetValues(int nIndex);
 
 private:
 	LPCTSTR GetClass() const;

@@ -60,6 +60,13 @@ void  CSixGridsUI::SetValues(int nIndex, const char * szValue) {
 	}
 }
 
+CDuiString  CSixGridsUI::GetValues(int nIndex) {
+	if (nIndex >= 0 && nIndex < 6) {
+		return m_edits[nIndex]->GetText();
+	}
+	return "";
+}
+
 
 
 
@@ -105,6 +112,13 @@ void  CSevenGridsUI::SetValues(int nIndex, const char * szValue) {
 		else
 			m_edits[nIndex]->SetText("");
 	}
+}
+
+CDuiString  CSevenGridsUI::GetValues(int nIndex) {
+	if (nIndex >= 0 && nIndex < 7) {
+		return m_edits[nIndex]->GetText();
+	}
+	return "";
 }
 
 LPCTSTR CSevenGridsUI::GetClass() const {
