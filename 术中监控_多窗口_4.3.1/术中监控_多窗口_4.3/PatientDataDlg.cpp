@@ -63,6 +63,9 @@ LRESULT CPatientDataDlg::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lP
 	if ( uMsg == UM_PATIENT_INFO ) {
 		OnPatientInfoRet(wParam, lParam);
 	}
+	else if (uMsg == UM_PATIENT_DATA) {
+		OnPatientDataRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleCustomMessage(uMsg, wParam, lParam, bHandled);
 }
 
@@ -266,16 +269,16 @@ void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
 
 	if ( bBusy ) {
 		m_tree->SetMouseChildEnabled(false);
-		m_waiting_bar->SetVisible(true);
-		m_waiting_bar->Start();
+		//m_waiting_bar->SetVisible(true);
+		//m_waiting_bar->Start();
 		m_btnPreview->SetEnabled(false);
 		m_btnPrint->SetEnabled(false);
 		m_btnReturn->SetEnabled(false);
 	}
 	else {
 		m_tree->SetMouseChildEnabled(true);
-		m_waiting_bar->Stop();
-		m_waiting_bar->SetVisible(false);		
+		//m_waiting_bar->Stop();
+		//m_waiting_bar->SetVisible(false);		
 		m_btnPreview->SetEnabled(true);
 		m_btnPrint->SetEnabled(true);
 		m_btnReturn->SetEnabled(true);
@@ -292,9 +295,19 @@ void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo) {
 	::PostMessage(GetHWND(), UM_PATIENT_INFO, (WPARAM)pNewInfo, 0);
 }
 
+void  CPatientDataDlg::OnPatientData(PatientData * pData, DWORD dwSize) {
+	assert(dwSize >= 7);
+
+	PatientData * pNewData = new PatientData[7];
+	memcpy(pNewData, pData, sizeof(PatientData) * 7);
+
+	::PostMessage(GetHWND(), UM_PATIENT_DATA, (WPARAM)pNewData, 0);
+}
+
 void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	PatientInfo * pInfo = (PatientInfo *)wParam;
 	memcpy(&m_patient_info, pInfo, sizeof(PatientInfo));
+	delete pInfo;
 
 	if (m_patient_info.m_szPName[0] == '\0') {
 		STRNCPY(m_patient_info.m_szPName, m_szUIPName, MAX_TAG_PNAME_LENGTH);
@@ -348,7 +361,142 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	}
 	nRow+=2;
 
+	// 科室
+	cfgValue.m_strEdit = m_patient_info.m_szMedicalDepartment;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
 
+	// 病室
+	cfgValue.m_strEdit = m_patient_info.m_szWard;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
 
-	delete pInfo;
+	// 床号
+	cfgValue.m_strEdit = m_patient_info.m_szBedNo;
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow += 2;
+
+	// 手术
+	if (m_patient_info.m_surgery > 0) {
+		cfgValue.m_bCheckbox = TRUE;
+		m_tree->SetConfigValue(nRow, cfgValue);
+
+		cfgValue.m_time = m_patient_info.m_surgery;
+		m_tree->SetConfigValue(nRow + 1, cfgValue);
+	}
+	else {
+		cfgValue.m_bCheckbox = FALSE;
+		m_tree->SetConfigValue(nRow, cfgValue);
+		m_tree->Invalidate();
+	}
+	nRow += 2;	
+
+	time_t now = time(0);
+	time_t tFirstDay = now - 3600 * 24 * 6;
+	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+}
+
+void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
+	PatientData * pData = (PatientData *)wParam;
+	memcpy(m_patient_data, pData, sizeof(PatientData) * 7);
+	delete[] pData;
+
+	CMyTreeCfgUI::ConfigValue   cfgValue;
+	int nRow = 17;
+
+	// 脉搏
+	for (int i = 0; i < 7; i++) {		
+		for (int j = 0; j < 6; j++) {
+			if (m_patient_data[i].m_pulse[j] > 0)
+				cfgValue.m_Values[j].Format("%d", m_patient_data[i].m_pulse[j]);
+			else
+				cfgValue.m_Values[j] = "";
+		}
+		m_tree->SetConfigValue(nRow, cfgValue);
+		nRow++;
+	}
+
+	// 呼吸
+	nRow++;
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			if (m_patient_data[i].m_breath[j] > 0)
+				cfgValue.m_Values[j].Format("%d", m_patient_data[i].m_breath[j]);
+			else
+				cfgValue.m_Values[j] = "";
+		}
+		m_tree->SetConfigValue(nRow, cfgValue);
+		nRow++;
+	}
+
+	// 大便次数
+	nRow++;
+	for (int i = 0; i < 7; i++) {
+		if (m_patient_data[i].m_defecate > 0)
+			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_defecate);
+		else
+			cfgValue.m_Values[i] = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 尿量
+	for (int i = 0; i < 7; i++) {
+		if (m_patient_data[i].m_urine > 0)
+			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_urine);
+		else
+			cfgValue.m_Values[i] = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 总入量
+	for (int i = 0; i < 7; i++) {
+		if (m_patient_data[i].m_income > 0)
+			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_income);
+		else
+			cfgValue.m_Values[i] = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 总出量
+	for (int i = 0; i < 7; i++) {
+		if (m_patient_data[i].m_output > 0)
+			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_output);
+		else
+			cfgValue.m_Values[i] = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 血压
+	for (int i = 0; i < 7; i++) {
+		if (m_patient_data[i].m_blood_pressure > 0)
+			cfgValue.m_Values[i].Format("%.1f", m_patient_data[i].m_blood_pressure/100.0);
+		else
+			cfgValue.m_Values[i] = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 体重
+	for (int i = 0; i < 7; i++) {
+		if (m_patient_data[i].m_weight > 0)
+			cfgValue.m_Values[i].Format("%.1f", m_patient_data[i].m_weight / 100.0);
+		else
+			cfgValue.m_Values[i] = "";
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+
+	// 过敏药物
+	for (int i = 0; i < 7; i++) {
+		cfgValue.m_Values[i] = m_patient_data[i].m_szIrritability;
+	}
+	m_tree->SetConfigValue(nRow, cfgValue);
+	nRow++;
+	
+
+	SetBusy(FALSE);
 }

@@ -1,5 +1,6 @@
 #include "MyTreeCfgUI.h"
 #include <time.h>
+#include "SixGridsUI.h"
 #pragma comment(lib,"Gdi32.lib")
 
 void CMyTreeCfgUI::Node::set_parent(CMyTreeCfgUI::Node* parent) {
@@ -607,6 +608,18 @@ bool CMyTreeCfgUI::SetConfigValue(int nIndex, const ConfigValue & cfgValue) {
 		char buf[256];
 		snprintf(buf, sizeof(buf), "%04d-%02d-%02d", st.wYear, st.wMonth, st.wDay);
 		pDateTime->SetText(buf);
+	}
+	else if (0 == strcmp(pCtl->GetClass(), "SixGrids")) {
+		CSixGridsUI * pSix = (CSixGridsUI *)pCtl;
+		for (int i = 0; i < 6; i++) {
+			pSix->SetValues(i, cfgValue.m_Values[i]);
+		}		
+	}
+	else if (0 == strcmp(pCtl->GetClass(), "SevenGrids")) {
+		CSevenGridsUI * pSeven = (CSevenGridsUI *)pCtl;
+		for (int i = 0; i < 7; i++) {
+			pSeven->SetValues(i, cfgValue.m_Values[i]);
+		}
 	}
 	else {
 		return false;

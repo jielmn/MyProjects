@@ -49,7 +49,7 @@
 				<HorizontalLayout height="20" />
 				
 				<HorizontalLayout height="20" >
-					<WaitingBar name="waiting_bar" height="20" />
+					<WaitingBar name="waiting_bar" height="20" visible="false" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout  height="40" inset="0,5,0,5" >

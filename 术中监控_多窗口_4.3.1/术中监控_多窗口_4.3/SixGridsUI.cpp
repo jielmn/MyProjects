@@ -35,6 +35,12 @@ void CSixGridsUI::DoInit() {
 	else {
 		m_bottom->SetVisible(false);
 	}
+
+	CDuiString strText;
+	for (int i = 0; i < 6; i++) {
+		strText.Format("edt_%d", i + 1);
+		m_edits[i] = static_cast<DuiLib::CEditUI*>(m_pManager->FindControl(strText));
+	}
 }
 
 void CSixGridsUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
@@ -42,7 +48,16 @@ void CSixGridsUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 }
 
 void  CSixGridsUI::SetMode(int nMode) {
-	m_nMode = nMode;
+	m_nMode = nMode; 
+}
+
+void  CSixGridsUI::SetValues(int nIndex, const char * szValue) {
+	if (nIndex >= 0 && nIndex < 6) {
+		if ( szValue)
+			m_edits[nIndex]->SetText(szValue);
+		else
+			m_edits[nIndex]->SetText("");
+	}
 }
 
 
@@ -80,6 +95,15 @@ void  CSevenGridsUI::SetWeekStr(CDuiString * pWeek, DWORD dwSize) {
 
 	for (int i = 0; i < 7; i++) {
 		m_week_days[i] = pWeek[i];
+	}
+}
+
+void  CSevenGridsUI::SetValues(int nIndex, const char * szValue) {
+	if (nIndex >= 0 && nIndex < 7) {
+		if (szValue)
+			m_edits[nIndex]->SetText(szValue);
+		else
+			m_edits[nIndex]->SetText("");
 	}
 }
 

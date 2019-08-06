@@ -1067,19 +1067,20 @@ void  CBusiness::QueryPatientInfoAsyn(const char * szTagId) {
 
 void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
 	PatientInfo tRet;
-	memset(&tRet, 0, sizeof(tRet));
-
 	m_sqlite.QueryPatientInfo(pParam, &tRet);
 	m_sigPatientInfo.emit(&tRet);
 }
 
 // 获取某天的病人的非体温数据信息
-void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tDay) {
-
+void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_DATA,
+		new CQueryPatientDataParam(szTagId, tFirstDay));
 }
 
-void  CBusiness::QueryPatientData() {
-
+void  CBusiness::QueryPatientData(const CQueryPatientDataParam * pParam) {
+	PatientData patient_data[7];
+	m_sqlite.QueryPatientData(pParam, patient_data, 7);
+	m_sigPatientData.emit(patient_data, 7);
 }
 
 
@@ -1215,6 +1216,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryPatientInfoParam * pParam = (CQueryPatientInfoParam *)pMessageData;
 		QueryPatientInfo(pParam);
+	}
+	break;
+
+	case MSG_QUERY_PATIENT_DATA:
+	{
+		CQueryPatientDataParam * pParam = (CQueryPatientDataParam *)pMessageData;
+		QueryPatientData(pParam);
 	}
 	break;
 

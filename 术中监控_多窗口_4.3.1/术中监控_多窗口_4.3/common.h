@@ -205,6 +205,7 @@ using namespace DuiLib;
 #define MSG_SAVE_EXCEL                      2013
 #define MSG_INIT_EXCEL                      2014
 #define MSG_QUERY_PATIENT_INFO              2015
+#define MSG_QUERY_PATIENT_DATA              2016
 
 
 // windows ÏûÏ¢
@@ -220,6 +221,7 @@ using namespace DuiLib;
 #define UM_QUERY_HAND_TEMP_BY_TAG_ID_RET     (WM_USER+10)
 #define UM_TAG_NAME_CHANGED                  (WM_USER+11)
 #define UM_PATIENT_INFO                      (WM_USER+12)
+#define UM_PATIENT_DATA                      (WM_USER+13)
 
 
 
@@ -523,7 +525,7 @@ typedef  struct   tagPatientData {
 	time_t      m_date;
 
 	int         m_pulse[6];
-	int         m_breath[6];
+	int         m_breath[6];	
 	int         m_defecate;
 	int         m_urine;
 	int         m_income;
@@ -531,6 +533,8 @@ typedef  struct   tagPatientData {
 	int         m_blood_pressure;
 	int         m_weight;
 	char        m_szIrritability[MAX_IRRITABILITY_LENGTH];
+
+	int         m_temp[6];
 }PatientData;
 
 
@@ -541,6 +545,17 @@ public:
 	}
 
 	char         m_szTagId[MAX_TAG_ID_LENGTH];
+};
+
+class CQueryPatientDataParam : public LmnToolkits::MessageData {
+public:
+	CQueryPatientDataParam(const char * szTagId, time_t tFirstDay) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+		m_tFirstDay = tFirstDay;
+	}
+
+	char         m_szTagId[MAX_TAG_ID_LENGTH];
+	time_t       m_tFirstDay;
 };
 
 

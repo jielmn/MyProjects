@@ -21,6 +21,7 @@ public:
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
 	void  OnPatientInfo(PatientInfo * pInfo);
+	void  OnPatientData(PatientData *, DWORD);
 	virtual LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 private:
@@ -34,6 +35,7 @@ private:
 	void  OnFinalMessage(HWND hWnd);
 	void  SetBusy(BOOL bBusy = TRUE);
 	void  OnPatientInfoRet(WPARAM wParam, LPARAM  lParam);
+	void  OnPatientDataRet(WPARAM wParam, LPARAM  lParam);
 
 private:
 	CMyTreeCfgUI  *             m_tree;

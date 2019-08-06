@@ -540,6 +540,7 @@ int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
 
 // 查询PatientInfo
 void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet) {
+	memset(pRet, 0, sizeof(PatientInfo));
 
 	char sql[8192];
 	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", PATIENT_INFO, pParam->m_szTagId);
@@ -606,4 +607,141 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 		STRNCPY(pRet->m_szPName, azResult[ncolumn + 1], MAX_TAG_PNAME_LENGTH);
 	}
 	sqlite3_free_table(azResult);
+}
+
+
+// 查询PatientData
+void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam, 
+	                   PatientData * pData, DWORD dwSize) {	
+	assert(dwSize >= 7);
+	memset(pData, 0, sizeof(PatientData) * 7);
+
+	time_t  tFirstZeroTime = GetAnyDayZeroTime(pParam->m_tFirstDay);
+
+	char sql[8192];
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	for ( int i = 0; i < 7; i++ ) {
+		time_t tDate = tFirstZeroTime + 3600 * 24 * i;
+
+		SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' AND date=%lu", 
+			PATIENT_DATA, pParam->m_szTagId, (DWORD)(tDate) );
+
+		nrow = ncolumn = 0;
+		azResult = 0;
+
+		sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+		// 如果存在
+		if (nrow > 0) {
+			int col = 2;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[0]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[1]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[2]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[3]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[4]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[5]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[0]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[1]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[2]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[3]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[4]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[5]);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_defecate);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_urine);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_income);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_output);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_blood_pressure);
+			col++;
+
+			if (azResult[ncolumn + col])
+				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_weight);
+			col++;
+
+			if (azResult[ncolumn + col])
+				STRNCPY(pData[i].m_szIrritability, azResult[ncolumn + col], MAX_IRRITABILITY_LENGTH);
+			col++;
+		}
+		sqlite3_free_table(azResult);
+
+
+		// 获取温度数据
+		SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' "
+			"AND time>=%lu and time<%lu", TEMP_TABLE, pParam->m_szTagId, 
+			(DWORD)(tDate), (DWORD)(tDate+3600*24) );
+
+		nrow = ncolumn = 0;
+		azResult = 0;
+
+		sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+		for (int j = 0; j < nrow; j++) {
+			DWORD dwTemp = 0;
+			DWORD dwTime = 0;
+
+			sscanf_s(azResult[(j + 1)*ncolumn + 2], "%lu", &dwTemp);
+			sscanf_s(azResult[(j + 1)*ncolumn + 3], "%lu", &dwTime);
+
+			DWORD dwTimeDiff = dwTime - (DWORD)tDate;
+			DWORD dwTimeZone = 0;
+			if (dwTimeDiff > 0) {
+				dwTimeZone = (dwTimeDiff - 1) / (3600 * 4);
+			}
+
+			assert(dwTimeZone < 6);
+			if (dwTimeZone < 6) {
+				pData[i].m_temp[dwTimeZone] = dwTemp;
+			}
+		}
+		sqlite3_free_table(azResult);
+	}	
 }

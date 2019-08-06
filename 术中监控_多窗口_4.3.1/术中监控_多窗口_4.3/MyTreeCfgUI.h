@@ -65,6 +65,7 @@ public:
 		ConfigType  m_eConfigType;
 		time_t      m_time;
 		UINT_PTR    m_tag;
+		CDuiString  m_Values[7];
 	};
 
 	CMyTreeCfgUI(DWORD  dwFixedLeft = 160);

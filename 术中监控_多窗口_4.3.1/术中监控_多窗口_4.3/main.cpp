@@ -1600,6 +1600,7 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 
 	CPatientDataDlg * pDlg = new CPatientDataDlg;
 	CBusiness::GetInstance()->m_sigPatientInfo.connect(pDlg, &CPatientDataDlg::OnPatientInfo);
+	CBusiness::GetInstance()->m_sigPatientData.connect(pDlg, &CPatientDataDlg::OnPatientData);
 
 	STRNCPY(pDlg->m_szTagId,   strTagId,       MAX_TAG_ID_LENGTH);
 	STRNCPY(pDlg->m_szUIPName, strPatientName, MAX_TAG_PNAME_LENGTH);

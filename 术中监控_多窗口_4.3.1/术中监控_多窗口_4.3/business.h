@@ -102,9 +102,9 @@ public:
 	void  QueryPatientInfoAsyn(const char * szTagId);
 	void  QueryPatientInfo(const CQueryPatientInfoParam * pParam);
 
-	// 获取某天的病人的非体温数据信息
-	void  QueryPatientDataAsyn(const char * szTagId, time_t tDay);
-	void  QueryPatientData();
+	// 获取某7天的病人的非体温数据信息
+	void  QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay);
+	void  QueryPatientData(const CQueryPatientDataParam * pParam);
 
 private:
 	static CBusiness *  pInstance;
@@ -166,6 +166,7 @@ public:
 
 public:
 	sigslot::signal1<PatientInfo *>   m_sigPatientInfo;
+	sigslot::signal2<PatientData *, DWORD>  m_sigPatientData;
 };
 
 

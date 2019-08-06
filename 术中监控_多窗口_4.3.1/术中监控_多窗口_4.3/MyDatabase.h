@@ -34,6 +34,8 @@ public:
 	int  QueryBindingIndexByTag(const char * szTagId);
 	// ≤È—ØPatientInfo
 	void QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet);
+	// ≤È—ØPatientData
+	void QueryPatientData(const CQueryPatientDataParam * pParam, PatientData * pData, DWORD dwSize);
 
 private:
 	sqlite3 *                         m_db;
