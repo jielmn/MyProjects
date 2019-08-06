@@ -91,11 +91,13 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4091;4996;4302</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\Xml2Chart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqliteD.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqliteD.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;Xml2ChartD.lib;tinyxml.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Xml2Chart\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\proj_temp_monitor_res  ..\Debug\res\proj_temp_monitor_res /dseiy</Command>
@@ -126,13 +128,15 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <DisableSpecificWarnings>4091;4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\Xml2Chart\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;Xml2Chart.lib;tinyxml.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Xml2Chart\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,6 +172,7 @@
     <ClCompile Include="MyImageUI.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
     <ClCompile Include="PatientDataDlg.cpp" />
+    <ClCompile Include="PatientDataPrintPreviewUI.cpp" />
     <ClCompile Include="ReaderUI.cpp" />
     <ClCompile Include="SettingDlg.cpp" />
     <ClCompile Include="SixGridsUI.cpp" />
@@ -189,6 +194,7 @@
     <ClInclude Include="MyImageUI.h" />
     <ClInclude Include="MyTreeCfgUI.h" />
     <ClInclude Include="PatientDataDlg.h" />
+    <ClInclude Include="PatientDataPrintPreviewUI.h" />
     <ClInclude Include="ReaderUI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SettingDlg.h" />

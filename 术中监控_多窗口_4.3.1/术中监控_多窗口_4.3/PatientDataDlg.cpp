@@ -16,6 +16,7 @@ CPatientDataDlg::CPatientDataDlg() {
 	memset( m_patient_data,  0, sizeof(m_patient_data) );
 
 	m_tDate = time(0);
+	m_preview = 0;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -50,6 +51,7 @@ void  CPatientDataDlg::OnMyInited() {
 	m_btnPreview = (CButtonUI *)m_PaintManager.FindControl("btnPrintPreview");
 	m_btnPrint = (CButtonUI *)m_PaintManager.FindControl("btnPrint");
 	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
+	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
 
 	InitInfo();
 	InitData();
@@ -78,6 +80,9 @@ DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(pstrClass, "WaitingBar")) {
 		return new CWaitingBarUI;
+	}
+	else if (0 == strcmp(pstrClass, "PatientDataPrintPreview")) {
+		return new CPatientDataPrintPreviewUI;
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }

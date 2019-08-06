@@ -69,7 +69,7 @@
 				</HorizontalLayout>
 				
 				<VerticalLayout bkcolor="#FFFFFFFF" vscrollbar="true" sepheight="4" >
-					<Control width="760" height="1044" bordercolor="#FF000000" bordersize="1" />
+					<PatientDataPrintPreview width="760" height="1044" bordercolor="#FF000000" bordersize="1" name="preview" />
 				</VerticalLayout>
 				
 			</VerticalLayout>

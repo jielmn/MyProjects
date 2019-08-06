@@ -6,6 +6,7 @@
 #include "MyTreeCfgUI.h"
 #include "WaitingBarUI.h"
 #include "sigslot.h"
+#include "PatientDataPrintPreviewUI.h"
 
 class CPatientDataDlg : public DuiLib::WindowImplBase, public sigslot::has_slots<>
 {
@@ -57,6 +58,8 @@ private:
 	PatientInfo                 m_patient_info;
 	PatientData                 m_patient_data[7];
 	time_t                      m_tDate;
+
+	CPatientDataPrintPreviewUI *  m_preview;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id
