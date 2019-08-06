@@ -652,3 +652,177 @@ time_t  GetTimeDiff(time_t t1, time_t t2) {
 	else
 		return t2 - t1;
 }
+
+const char * GetSexStr(int nSex) {
+	if (nSex == 1)
+		return "男";
+	else if (nSex == 2)
+		return "女";
+	else
+		return "";
+}
+
+char * PreviewNum(char * buf, DWORD dwSize, int nNum) {
+	assert(dwSize > 0);
+	assert(buf);
+
+	if (0 >= nNum)
+		buf[0] = '\0';
+	else
+		SNPRINTF(buf, dwSize, "%d", nNum);
+
+	return buf;
+}
+
+void GetDateStr(char * year, DWORD d1, char * month, DWORD d2, char * day, DWORD d3, time_t t) {
+	struct tm  tmp;
+	localtime_s(&tmp, &t);
+
+	SNPRINTF(year,  d1, "%04d", tmp.tm_year + 1900);
+	SNPRINTF(month, d2, "%02d", tmp.tm_mon + 1);
+	SNPRINTF(day,   d3, "%02d", tmp.tm_mday);
+}
+
+void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
+	                  PatientData * pData, DWORD dwSize, time_t tFirstDay) {
+	char buf[256];
+	char year[16];
+	char month[16];
+	char day[16];
+	CXml2ChartUI * pItem = 0;
+	CDuiString strText;
+
+	// 门诊号
+	pItem = xmlChart.FindChartUIByName("outpatient_no");
+	if (pItem) {
+		pItem->SetText(pInfo->m_szOutpatientNo);
+	}
+
+	// 住院号
+	pItem = xmlChart.FindChartUIByName("hospical_admission_no");
+	if (pItem) {
+		pItem->SetText(pInfo->m_szHospitalAdmissionNo);
+	}
+
+	// 姓名
+	pItem = xmlChart.FindChartUIByName("patient_name");
+	if (pItem) {
+		pItem->SetText(pInfo->m_szPName);
+	}
+
+	// 性别
+	pItem = xmlChart.FindChartUIByName("sex");
+	if (pItem) {
+		pItem->SetText(GetSexStr(pInfo->m_sex));
+	}
+
+	// 年龄
+	pItem = xmlChart.FindChartUIByName("age");
+	if (pItem) {
+		pItem->SetText(PreviewNum(buf, sizeof(buf), pInfo->m_age));
+	}
+
+	// 入院日期
+	if (pInfo->m_in_hospital > 0) {
+		GetDateStr(year, sizeof(year), month, sizeof(month), day, sizeof(day),
+			pInfo->m_in_hospital);
+		// 年
+		pItem = xmlChart.FindChartUIByName("in_date_y");
+		if (pItem) {
+			pItem->SetText(year);
+		}
+		// 月
+		pItem = xmlChart.FindChartUIByName("in_date_m");
+		if (pItem) {
+			pItem->SetText(month);
+		}
+		// 日
+		pItem = xmlChart.FindChartUIByName("in_date_d");
+		if (pItem) {
+			pItem->SetText(day);
+		}
+	}
+
+	// 科别
+	pItem = xmlChart.FindChartUIByName("medical_department");
+	if (pItem) {
+		pItem->SetText(pInfo->m_szMedicalDepartment);
+	}
+
+	// 病室
+	pItem = xmlChart.FindChartUIByName("ward");
+	if (pItem) {
+		pItem->SetText(pInfo->m_szWard);
+	}
+
+	// 床号
+	pItem = xmlChart.FindChartUIByName("bed_no");
+	if (pItem) {
+		pItem->SetText(pInfo->m_szBedNo);
+	}
+
+	// 日期 
+	for (int i = 0; i < 7; i++) {
+		strText.Format("date_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if ( pItem ) {
+			time_t t = tFirstDay + 3600 * 24 * i;
+			Date2String_md( buf, sizeof(buf), &t );
+			pItem->SetText(buf);
+		}
+	}
+
+	// 住院日数
+	if ( pInfo->m_in_hospital > 0 ) {
+		time_t t1 = GetAnyDayZeroTime(pInfo->m_in_hospital);
+		for  (int i = 0; i < 7; i++ ) {
+			time_t t2 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
+			if ( t2 >= t1) {
+				int nInDays = (int)(t2 - t1) / (3600 * 24);
+				strText.Format("in_date_%d", i + 1);
+				pItem = xmlChart.FindChartUIByName(strText);
+				if (pItem) {
+					strText.Format("%d", nInDays);
+					pItem->SetText((const char *)strText);
+				}
+			}
+		}
+	}
+
+	// 手术后日数
+	if (pInfo->m_surgery > 0) {
+		time_t t1 = GetAnyDayZeroTime(pInfo->m_surgery);
+		for (int i = 0; i < 7; i++) {
+			time_t t2 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
+			if (t2 >= t1) {
+				int nInDays = (int)(t2 - t1) / (3600 * 24); 
+				strText.Format("sur_date_%d", i + 1);
+				pItem = xmlChart.FindChartUIByName(strText);
+				if (pItem) {
+					strText.Format("%d", nInDays);
+					pItem->SetText((const char *)strText);
+				}
+			}
+		}
+	}
+
+	// 呼吸
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			strText.Format("breath_%d_%d", i + 1, j + 1);
+			pItem = xmlChart.FindChartUIByName(strText);
+			if (pItem) {
+				pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i].m_breath[j] ));
+			}
+		}
+	}
+
+	// 大便次数
+	for (int i = 0; i < 7; i++) {
+		strText.Format("defecate_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i].m_defecate));
+		}
+	}
+}

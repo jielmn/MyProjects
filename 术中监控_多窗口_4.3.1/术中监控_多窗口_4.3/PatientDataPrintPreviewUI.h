@@ -17,8 +17,7 @@ private:
 	CXml2ChartFile   m_XmlChartFile;
 
 public:
-	char                        m_szUIPName[MAX_TAG_PNAME_LENGTH];         // UI 传过来的name
 	PatientInfo                 m_patient_info;
 	PatientData                 m_patient_data[7];
-	time_t                      m_tFirstDate;
+	time_t                      m_tFirstDay;
 };

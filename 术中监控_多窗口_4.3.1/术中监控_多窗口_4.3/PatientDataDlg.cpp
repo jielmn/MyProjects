@@ -230,10 +230,17 @@ void  CPatientDataDlg::InitData() {
 }
 
 void CPatientDataDlg::OnPrintPreview() {
-	STRNCPY( m_preview->m_szUIPName, m_szUIPName, MAX_TAG_PNAME_LENGTH );
-	memcpy( &m_preview->m_patient_info, &m_patient_info, sizeof(PatientInfo));
-	memcpy( m_preview->m_patient_data, m_patient_data, sizeof(PatientData) * 7 );
-	m_preview->m_tFirstDate = m_tDate - 3600 * 24 * 6;
+	PatientInfo info;
+	PatientData data[7];
+
+	// 获取UI的填入信息
+	GetPatientInfo(&info);
+	GetPatientData(data, 7);
+
+	memcpy(&m_preview->m_patient_info, &info, sizeof(PatientInfo));
+	memcpy(m_preview->m_patient_data, data, sizeof(PatientData) * 7);
+	m_preview->m_tFirstDay = m_tDate - 3600 * 24 * 6;
+
 	m_preview->Invalidate();
 	m_switch->SelectItem(1);
 }

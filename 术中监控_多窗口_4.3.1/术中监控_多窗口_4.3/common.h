@@ -17,6 +17,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "Xml2Chart.h"
+
 #define   PROJ_NAME               "temp_monitor"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
@@ -617,6 +619,14 @@ extern void  OnEdtHandRemarkKillFocus();
 char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);
 extern void  SavePatientName(DWORD i);
 extern time_t  GetTimeDiff(time_t t1, time_t t2);
+extern const char * GetSexStr(int nSex);
+// 打印预览时显示数字(正数)
+extern char * PreviewNum(char * buf, DWORD dwSize, int nNum);
+extern void GetDateStr(char * year, DWORD d1, char * month, DWORD d2, 
+	                   char * day, DWORD d3, time_t t);
+
+void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
+	                  PatientData * pData, DWORD dwSize, time_t tFirstDay );
 
 // templates
 template <class T>
