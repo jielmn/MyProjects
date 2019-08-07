@@ -240,6 +240,9 @@ void CPatientDataDlg::OnPrintPreview() {
 	memcpy(&m_preview->m_patient_info, &info, sizeof(PatientInfo));
 	memcpy(m_preview->m_patient_data, data, sizeof(PatientData) * 7);
 	m_preview->m_tFirstDay = m_tDate - 3600 * 24 * 6;
+	for (int i = 0; i < 7; i++) {
+		memcpy(m_preview->m_patient_data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
+	}
 
 	m_preview->Invalidate();
 	m_switch->SelectItem(1);

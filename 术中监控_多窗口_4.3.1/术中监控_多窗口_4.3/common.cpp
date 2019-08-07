@@ -924,6 +924,9 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 			if (pData[i].m_breath[j] > 0) {
 				return i;
 			}
+			if (pData[i].m_temp[j] > 0) {
+				return i;
+			}
 		}
 
 		if (pData[i].m_defecate > 0)
@@ -945,7 +948,7 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 			return i;
 
 		if (pData[i].m_szIrritability[0] != '\0')
-			return i;
+			return i;		
 	}
 
 	return 6;
