@@ -943,7 +943,7 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 	return 6;
 }
 
-static int  GetPatientDataImagePoints( Gdiplus::Point * points, DWORD  dwSize, int w, int h,
+static int  GetPatientDataImagePoints( POINT * points, DWORD  dwSize, int w, int h,
 	                                   int nUnitsX, int nUnitsY, int nMaxY, 
 									   int nLeft, int nTop, int nOffsetX, int nOffsetY,
 	                                   PatientData * pData, DWORD dwDataSize, int nType = 0 ) {
@@ -960,8 +960,8 @@ static int  GetPatientDataImagePoints( Gdiplus::Point * points, DWORD  dwSize, i
 		if (nType == 0) {
 			for (int j = 0; j < 6; j++) {
 				if ( pData[i + nStartIndex].m_temp[j] >= 3400 && pData[i + nStartIndex].m_temp[j] <= 4200) {
-					points[cnt].X = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
-					points[cnt].Y = (int)((nMaxY - pData[i + nStartIndex].m_temp[j]) * y) + nTop + nOffsetY;
+					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
+					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_temp[j]) * y) + nTop + nOffsetY;
 					cnt++;
 				}
 			}			
@@ -970,8 +970,8 @@ static int  GetPatientDataImagePoints( Gdiplus::Point * points, DWORD  dwSize, i
 		else {
 			for (int j = 0; j < 6; j++) {
 				if (pData[i + nStartIndex].m_pulse[j] >= 20 && pData[i + nStartIndex].m_pulse[j] <= 192 ) {
-					points[cnt].X = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
-					points[cnt].Y = (int)((nMaxY - pData[i + nStartIndex].m_pulse[j]) * y) + nTop + nOffsetY;
+					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
+					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_pulse[j]) * y) + nTop + nOffsetY;
 					cnt++;
 				}
 			}
@@ -990,14 +990,12 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	if (0 == pMain)
 		return;
 
-	Graphics graphics(hDC);
-	graphics.SetSmoothingMode(SmoothingModeHighQuality);
-
-	Pen pen(Gdiplus::Color(0xFF0000FF), 1.0);
-	SolidBrush brush(Gdiplus::Color(0xFF0000FF));
-
-	Pen pen_1(Gdiplus::Color(0xFFFF0000), 1.0);
-	SolidBrush brush_1(Gdiplus::Color(0xFFFF0000));
+	HPEN   hOld_pen = 0;
+	HBRUSH hOld_brush = 0;
+	HPEN pen   = ::CreatePen(PS_SOLID, 1, RGB(0, 0, 0xFF));
+	HPEN pen_1 = ::CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
+	HPEN pen_2 = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
+	HBRUSH hBrush = ::CreateSolidBrush( RGB(0xFF, 0, 0));
 
 	int radius = 3;
 
@@ -1005,43 +1003,54 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	int w = r.right - r.left;
 	int h = r.bottom - r.top;
 
-	Gdiplus::Point points[6 * 7];
+	POINT points[6 * 7];
 	int cnt = 0;
 
 	// 计算体温曲线
 	cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 860, 4260, r.left, r.top,
 		                       nOffsetX, nOffsetY, pData, dwDataSize );	
-	graphics.DrawLines(&pen, points, cnt);
+	hOld_pen = (HPEN)::SelectObject(hDC, pen);
+	::Polyline(hDC, points, cnt);
 	
 	// 画体温点
+	::SelectObject(hDC, pen_2);
 	for (int i = 0; i < cnt; i++) {
-		Gdiplus::Point temp_points[2];
-		pen.SetWidth(2.0);
+		POINT temp_points[2];		
 
-		temp_points[0].X = points[i].X - radius;
-		temp_points[0].Y = points[i].Y - radius;
-		temp_points[1].X = points[i].X + radius;
-		temp_points[1].Y = points[i].Y + radius;
-		graphics.DrawLines(&pen, temp_points, 2);
+		temp_points[0].x = points[i].x - radius;
+		temp_points[0].y = points[i].y - radius;
+		temp_points[1].x = points[i].x + radius;
+		temp_points[1].y = points[i].y + radius;
+		::Polyline(hDC, temp_points, 2);
 
-		temp_points[0].X = points[i].X - radius;
-		temp_points[0].Y = points[i].Y + radius;
-		temp_points[1].X = points[i].X + radius;
-		temp_points[1].Y = points[i].Y - radius;
-		graphics.DrawLines(&pen, temp_points, 2);
-		
-		//graphics.FillEllipse(&brush, points[i].X - radius, points[i].Y - radius, 2*radius, 2*radius);
+		temp_points[0].x = points[i].x - radius;
+		temp_points[0].y = points[i].y + radius;
+		temp_points[1].x = points[i].x + radius;
+		temp_points[1].y = points[i].y - radius;
+		::Polyline(hDC, temp_points, 2);
 	}	
 
+	
 	// 计算脉搏曲线
 	cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 172, 192, r.left, r.top,
 		nOffsetX, nOffsetY, pData, dwDataSize, 1);
-	graphics.DrawLines(&pen_1, points, cnt);
+	::SelectObject(hDC, pen_1);
+	::Polyline(hDC, points, cnt);
 
 	// 画脉搏点
+	hOld_brush = (HBRUSH)::SelectObject(hDC, hBrush);
 	for (int i = 0; i < cnt; i++) {
-		graphics.FillEllipse(&brush_1, points[i].X - radius, points[i].Y - radius, 2 * radius, 2 * radius);
+		::Ellipse( hDC, points[i].x - radius, points[i].y - radius,
+			       points[i].x + radius, points[i].y + radius );
 	}
+
+	::SelectObject(hDC, hOld_pen);
+	::SelectObject(hDC, hOld_brush);
+
+	DeleteObject(pen);
+	DeleteObject(pen_1);
+	DeleteObject(pen_2);
+	DeleteObject(hBrush);
 }
 
 void LoadXmlChart(CXml2ChartFile & xmlChart) {

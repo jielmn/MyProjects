@@ -279,7 +279,7 @@ void  CPatientDataDlg::OnPrint() {
 	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
 	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
 	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
-	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC;
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC | PD_RETURNDEFAULT;
 	printInfo.nCopies = 1;
 	printInfo.nFromPage = 0xFFFF;
 	printInfo.nToPage = 0xFFFF;
