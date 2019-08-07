@@ -942,16 +942,103 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 	return 6;
 }
 
-void PrintXmlChart(HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY) {
+static int  GetPatientDataImagePoints( Gdiplus::Point * points, DWORD  dwSize, int w, int h,
+	                                   int nUnitsX, int nUnitsY, int nMaxY, 
+									   int nLeft, int nTop, int nOffsetX, int nOffsetY,
+	                                   PatientData * pData, DWORD dwDataSize, int nType = 0 ) {
+	assert(dwDataSize >= 7);
+	assert(dwSize >= 6 * 7);
+
+	float x = (float)w / (float)nUnitsX;
+	float y = (float)h / (float)nUnitsY;
+	int cnt = 0;
+	int nStartIndex = GetPatientDataStartIndex(pData, dwDataSize);
+
+	for ( int i = 0; i < 7 - nStartIndex; i++ ) {
+		// 温度
+		if (nType == 0) {
+			for (int j = 0; j < 6; j++) {
+				if ( pData[i + nStartIndex].m_temp[j] >= 3400 && pData[i + nStartIndex].m_temp[j] <= 4200) {
+					points[cnt].X = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
+					points[cnt].Y = (int)((nMaxY - pData[i + nStartIndex].m_temp[j]) * y) + nTop + nOffsetY;
+					cnt++;
+				}
+			}			
+		}
+		// 脉搏
+		else {
+			for (int j = 0; j < 6; j++) {
+				if (pData[i + nStartIndex].m_pulse[j] >= 20 && pData[i + nStartIndex].m_pulse[j] <= 192 ) {
+					points[cnt].X = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
+					points[cnt].Y = (int)((nMaxY - pData[i + nStartIndex].m_pulse[j]) * y) + nTop + nOffsetY;
+					cnt++;
+				}
+			}
+		}
+	}
+
+	return cnt;
+}
+
+void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
+	                PatientData * pData, DWORD dwDataSize ) {
 	SetBkMode(hDC, TRANSPARENT);
 	DrawXml2ChartUI(hDC, xmlChart.m_ChartUI, nOffsetX, nOffsetY);
 
 	CXml2ChartUI * pMain = xmlChart.FindChartUIByName("main");
+	if (0 == pMain)
+		return;
+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	Pen pen(Gdiplus::Color(0xFF0000FF), 1.0);
+	SolidBrush brush(Gdiplus::Color(0xFF0000FF));
+
+	Pen pen_1(Gdiplus::Color(0xFFFF0000), 1.0);
+	SolidBrush brush_1(Gdiplus::Color(0xFFFF0000));
+
+	int radius = 3;
+
 	RECT r = pMain->GetAbsoluteRect();
 	int w = r.right - r.left;
 	int h = r.bottom - r.top;
 
 	Gdiplus::Point points[6 * 7];
 	int cnt = 0;
-	//graphics.DrawLines(pen, points, cnt);
+
+	// 计算体温曲线
+	cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 860, 4260, r.left, r.top,
+		                       nOffsetX, nOffsetY, pData, dwDataSize );	
+	graphics.DrawLines(&pen, points, cnt);
+	
+	// 画体温点
+	for (int i = 0; i < cnt; i++) {
+		Gdiplus::Point temp_points[2];
+		pen.SetWidth(2.0);
+
+		temp_points[0].X = points[i].X - radius;
+		temp_points[0].Y = points[i].Y - radius;
+		temp_points[1].X = points[i].X + radius;
+		temp_points[1].Y = points[i].Y + radius;
+		graphics.DrawLines(&pen, temp_points, 2);
+
+		temp_points[0].X = points[i].X - radius;
+		temp_points[0].Y = points[i].Y + radius;
+		temp_points[1].X = points[i].X + radius;
+		temp_points[1].Y = points[i].Y - radius;
+		graphics.DrawLines(&pen, temp_points, 2);
+		
+		//graphics.FillEllipse(&brush, points[i].X - radius, points[i].Y - radius, 2*radius, 2*radius);
+	}	
+
+	// 计算脉搏曲线
+	cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 172, 192, r.left, r.top,
+		nOffsetX, nOffsetY, pData, dwDataSize, 1);
+	graphics.DrawLines(&pen_1, points, cnt);
+
+	// 画脉搏点
+	for (int i = 0; i < cnt; i++) {
+		graphics.FillEllipse(&brush_1, points[i].X - radius, points[i].Y - radius, 2 * radius, 2 * radius);
+	}
 }

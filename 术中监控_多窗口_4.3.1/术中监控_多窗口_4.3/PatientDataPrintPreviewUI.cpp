@@ -27,7 +27,7 @@ bool CPatientDataPrintPreviewUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlU
 
 	PrepareXmlChart(m_XmlChartFile, &m_patient_info, m_patient_data, 7, m_tFirstDay);
 
-	PrintXmlChart(hDC, m_XmlChartFile, m_rcItem.left, m_rcItem.top);  
+	PrintXmlChart(hDC, m_XmlChartFile, m_rcItem.left, m_rcItem.top, m_patient_data, 7);  
 
 	return true;
 }
