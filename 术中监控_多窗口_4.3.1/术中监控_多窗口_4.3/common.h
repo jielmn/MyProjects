@@ -65,8 +65,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "2.1.3"
-#define   COMPILE_TIME                "2019-07-03 15:08"
+#define   VERSION                     "2.1.4"
+#define   COMPILE_TIME                "2019-08-07 14:57"
 
 // ¿Ø¼þid
 #define   TABS_ID                  "switch"
