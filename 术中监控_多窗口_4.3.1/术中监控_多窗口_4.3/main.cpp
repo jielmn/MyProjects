@@ -124,6 +124,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	RefreshGridsPage();
 
+	m_hand_tabs->SelectItem(1);	
+
 	// 放在prepared后
 	//CheckDevice();
 	CBusiness::GetInstance()->PrepareAsyn();
@@ -290,6 +292,7 @@ LRESULT  CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 	DWORD dwHeight = HIWORD(lParam) - 30 - 1 * 2 - 32 - 85;
 	RefreshGridsSize(dwWidth, dwHeight);
 
+	ResetDragdropGrids(dwWidth - 500, dwHeight);
 	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
 }
 
@@ -1334,7 +1337,7 @@ void   CDuiFrameWnd::OnHandTagTimeOrder(CTagUI * pTagUI) {
 void   CDuiFrameWnd::MoveTagUI(const POINT & pt) {
 	if (!m_dragdropGrid->IsVisible()) {
 		m_dragdropGrid->SetVisible(true);
-		m_hand_tabs->SelectItem(1);
+		//m_hand_tabs->SelectItem(1);
 
 		ResetDragdropGrids();		
 	}
@@ -1370,7 +1373,7 @@ void   CDuiFrameWnd::StopMoveTagUI() {
 
 	m_dragdrop_tag = "";
 	m_dragdrop_tag_dest_index = -1;
-	m_hand_tabs->SelectItem(0);
+	//m_hand_tabs->SelectItem(0);
 	m_dragdropGrid->SetVisible(false);
 }
 
@@ -1425,12 +1428,15 @@ void   CDuiFrameWnd::OnMoveTagUI(const POINT & pt) {
 }
 
 // 重新设置LayoutGrids视图
-void   CDuiFrameWnd::ResetDragdropGrids() {
-	assert(m_layDragDropGrids);
+void   CDuiFrameWnd::ResetDragdropGrids(int width /*= 0*/, int height /*= 0*/) {
+	if (0 == m_layDragDropGrids)
+		return;
 
-	RECT rect   = m_hand_tabs->GetPos();
-	int  width  = rect.right - rect.left;
-	int  height = rect.bottom - rect.top;
+	if (0 == width || 0 == height) {
+		RECT rect = m_hand_tabs->GetPos();
+		width = rect.right - rect.left;
+		height = rect.bottom - rect.top;
+	}	
 
 	m_layDragDropGrids->RemoveAll();
 

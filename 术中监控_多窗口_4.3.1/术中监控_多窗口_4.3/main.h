@@ -131,7 +131,7 @@ private:
 	// Tag UI移动过程中，经过的格子要高亮
 	void   OnMoveTagUI(const POINT & pt);
 	// 重新设置LayoutGrids视图
-	void   ResetDragdropGrids();
+	void   ResetDragdropGrids(int w = 0, int h = 0);
 	// 获取DragdropGrids视图的行，列
 	void   GetDragDropGridsParams(int & nCol, int & nRow );
 	// 根据Size大小获取Label字体大小
