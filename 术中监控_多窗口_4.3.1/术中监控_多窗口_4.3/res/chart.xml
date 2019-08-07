@@ -352,12 +352,66 @@
 						<Item font="1" name="defecate_6" />
 						<Item font="1" name="defecate_7" />
 					</HorizontalLayout>
-					<HorizontalLayout VSplit="num='7',pen='5'" />
-					<HorizontalLayout VSplit="num='7',pen='5'" />
-					<HorizontalLayout VSplit="num='7',pen='5'" />
-					<HorizontalLayout VSplit="num='7',pen='5'" />
-					<HorizontalLayout VSplit="num='7',pen='5'" />
-					<HorizontalLayout VSplit="num='7',pen='5'" />
+					
+					<HorizontalLayout VSplit="num='7',pen='5'" >
+						<Item font="1" name="urine_1" />
+						<Item font="1" name="urine_2" />
+						<Item font="1" name="urine_3" />
+						<Item font="1" name="urine_4" />
+						<Item font="1" name="urine_5" />
+						<Item font="1" name="urine_6" />
+						<Item font="1" name="urine_7" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout VSplit="num='7',pen='5'" >
+						<Item font="1" name="income_1" />
+						<Item font="1" name="income_2" />
+						<Item font="1" name="income_3" />
+						<Item font="1" name="income_4" />
+						<Item font="1" name="income_5" />
+						<Item font="1" name="income_6" />
+						<Item font="1" name="income_7" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout VSplit="num='7',pen='5'" >
+						<Item font="1" name="output_1" />
+						<Item font="1" name="output_2" />
+						<Item font="1" name="output_3" />
+						<Item font="1" name="output_4" />
+						<Item font="1" name="output_5" />
+						<Item font="1" name="output_6" />
+						<Item font="1" name="output_7" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout VSplit="num='7',pen='5'" >
+						<Item font="1" name="blood_pressure_1" />
+						<Item font="1" name="blood_pressure_2" />
+						<Item font="1" name="blood_pressure_3" />
+						<Item font="1" name="blood_pressure_4" />
+						<Item font="1" name="blood_pressure_5" />
+						<Item font="1" name="blood_pressure_6" />
+						<Item font="1" name="blood_pressure_7" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout VSplit="num='7',pen='5'" >
+						<Item font="1" name="weight_1" />
+						<Item font="1" name="weight_2" />
+						<Item font="1" name="weight_3" />
+						<Item font="1" name="weight_4" />
+						<Item font="1" name="weight_5" />
+						<Item font="1" name="weight_6" />
+						<Item font="1" name="weight_7" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout VSplit="num='7',pen='5'" >
+						<Item font="1" name="irritability_1" />
+						<Item font="1" name="irritability_2" />
+						<Item font="1" name="irritability_3" />
+						<Item font="1" name="irritability_4" />
+						<Item font="1" name="irritability_5" />
+						<Item font="1" name="irritability_6" />
+						<Item font="1" name="irritability_7" />
+					</HorizontalLayout>
 				</VerticalLayout>			
 			</VerticalLayout>
 			

@@ -625,8 +625,9 @@ extern char * PreviewNum(char * buf, DWORD dwSize, int nNum);
 extern void GetDateStr(char * year, DWORD d1, char * month, DWORD d2, 
 	                   char * day, DWORD d3, time_t t);
 
-void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
-	                  PatientData * pData, DWORD dwSize, time_t tFirstDay );
+extern void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
+	                         PatientData * pData, DWORD dwSize, time_t tFirstDay );
+extern int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize);
 
 // templates
 template <class T>
