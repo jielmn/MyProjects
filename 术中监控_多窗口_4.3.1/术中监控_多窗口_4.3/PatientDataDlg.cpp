@@ -411,18 +411,14 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 	// 血压
 	m_tree->GetConfigValue(nRow, cfgValue);
 	for (int i = 0; i < 7; i++) {
-		float f = 0.0f;
-		sscanf_s(cfgValue.m_Values[i], "%f", &f);
-		pData[i].m_blood_pressure = (int)(f * 100);
+		STRNCPY(pData[i].m_szBloodPressure, cfgValue.m_Values[i], MAX_BLOOD_PRESSURE_LENGTH);		
 	}
 	nRow++;
 
 	// 体重
 	m_tree->GetConfigValue(nRow, cfgValue);
 	for (int i = 0; i < 7; i++) {
-		float f = 0.0f;
-		sscanf_s(cfgValue.m_Values[i], "%f", &f);
-		pData[i].m_weight = (int)(f * 100);
+		STRNCPY(pData[i].m_szWeight, cfgValue.m_Values[i], MAX_WEIGHT_LENGTH);		
 	}
 	nRow++;
 
@@ -529,10 +525,10 @@ BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientData * pData, int nIndex) {
 	if (pData->m_output != m_patient_data[nIndex].m_output )
 		return TRUE;
 
-	if (pData->m_blood_pressure != m_patient_data[nIndex].m_blood_pressure)
+	if ( 0 != strcmp(pData->m_szBloodPressure, m_patient_data[nIndex].m_szBloodPressure) )
 		return TRUE;
 
-	if (pData->m_weight != m_patient_data[nIndex].m_weight)
+	if ( 0 != strcmp(pData->m_szWeight,m_patient_data[nIndex].m_szWeight) )
 		return TRUE;
 
 	if ( 0 != strcmp( pData->m_szIrritability, m_patient_data[nIndex].m_szIrritability) )
@@ -747,20 +743,14 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 
 	// 血压
 	for (int i = 0; i < 7; i++) {
-		if (m_patient_data[i].m_blood_pressure > 0)
-			cfgValue.m_Values[i].Format("%.1f", m_patient_data[i].m_blood_pressure/100.0);
-		else
-			cfgValue.m_Values[i] = "";
+		cfgValue.m_Values[i] = m_patient_data[i].m_szBloodPressure;
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
 	// 体重
 	for (int i = 0; i < 7; i++) {
-		if (m_patient_data[i].m_weight > 0)
-			cfgValue.m_Values[i].Format("%.1f", m_patient_data[i].m_weight / 100.0);
-		else
-			cfgValue.m_Values[i] = "";
+		cfgValue.m_Values[i] = m_patient_data[i].m_szWeight;
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;

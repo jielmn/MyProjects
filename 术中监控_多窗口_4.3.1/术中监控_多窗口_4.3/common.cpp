@@ -879,13 +879,7 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		strText.Format("blood_pressure_%d", i + 1);
 		pItem = xmlChart.FindChartUIByName(strText);
 		if (pItem) {
-			if ( pData[i + nStartIndex].m_blood_pressure > 0 ) {
-				SNPRINTF(buf, sizeof(buf), "%.1f", pData[i + nStartIndex].m_blood_pressure / 100.0f);
-				pItem->SetText(buf);
-			}
-			else {
-				pItem->SetText("");
-			}
+			pItem->SetText(pData[i + nStartIndex].m_szBloodPressure);
 		}
 	}
 
@@ -894,13 +888,7 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		strText.Format("weight_%d", i + 1);
 		pItem = xmlChart.FindChartUIByName(strText);
 		if (pItem) {
-			if (pData[i + nStartIndex].m_weight > 0) {
-				SNPRINTF(buf, sizeof(buf), "%.1f", pData[i + nStartIndex].m_weight / 100.0f);
-				pItem->SetText(buf);
-			}
-			else {
-				pItem->SetText("");
-			}
+			pItem->SetText(pData[i + nStartIndex].m_szWeight);
 		}
 	}
 
@@ -941,10 +929,10 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 		if (pData[i].m_output > 0)
 			return i;
 
-		if (pData[i].m_blood_pressure > 0)
+		if (pData[i].m_szBloodPressure[0] != '\0')
 			return i;
 
-		if (pData[i].m_weight > 0)
+		if (pData[i].m_szWeight[0] != '\0')
 			return i;
 
 		if (pData[i].m_szIrritability[0] != '\0')
@@ -952,4 +940,18 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 	}
 
 	return 6;
+}
+
+void PrintXmlChart(HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY) {
+	SetBkMode(hDC, TRANSPARENT);
+	DrawXml2ChartUI(hDC, xmlChart.m_ChartUI, nOffsetX, nOffsetY);
+
+	CXml2ChartUI * pMain = xmlChart.FindChartUIByName("main");
+	RECT r = pMain->GetAbsoluteRect();
+	int w = r.right - r.left;
+	int h = r.bottom - r.top;
+
+	Gdiplus::Point points[6 * 7];
+	int cnt = 0;
+	//graphics.DrawLines(pen, points, cnt);
 }

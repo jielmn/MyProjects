@@ -522,6 +522,8 @@ typedef  struct  tagPatientInfo {
 	time_t      m_surgery;
 }PatientInfo;
 
+#define  MAX_BLOOD_PRESSURE_LENGTH 20
+#define  MAX_WEIGHT_LENGTH         20
 #define  MAX_IRRITABILITY_LENGTH   20
 // 病人的非体温数据
 typedef  struct   tagPatientData {
@@ -534,8 +536,8 @@ typedef  struct   tagPatientData {
 	int         m_urine;
 	int         m_income;
 	int         m_output;
-	int         m_blood_pressure;
-	int         m_weight;
+	char        m_szBloodPressure[MAX_BLOOD_PRESSURE_LENGTH];
+	char        m_szWeight[MAX_WEIGHT_LENGTH];
 	char        m_szIrritability[MAX_IRRITABILITY_LENGTH];
 
 	int         m_temp[6];
@@ -628,6 +630,7 @@ extern void GetDateStr(char * year, DWORD d1, char * month, DWORD d2,
 extern void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	                         PatientData * pData, DWORD dwSize, time_t tFirstDay );
 extern int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize);
+extern void PrintXmlChart(HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY);
 
 // templates
 template <class T>

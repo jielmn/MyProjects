@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window size="780,800" mininfo="800,600" caption="0,0,0,32" sizebox="0,0,0,0" roundcorner="5,5" defaultfontcolor="#FF386382" > <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
+<Window size="820,800" mininfo="800,600" caption="0,0,0,32" sizebox="0,0,0,0" roundcorner="5,5" defaultfontcolor="#FF386382" > <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
 	<Font id="0" name="宋体" size="12" bold="true" />
 	<Font id="1" name="宋体" size="13" bold="false" />
 	<Font id="2" name="宋体" size="15" bold="false" />
@@ -68,9 +68,11 @@
 					<Control width="20" />
 				</HorizontalLayout>
 				
-				<VerticalLayout bkcolor="#FFFFFFFF" vscrollbar="true" sepheight="4" >
+				<HorizontalLayout bkcolor="#FFFFFFFF" vscrollbar="true" sepheight="4" >
+					<Control />
 					<PatientDataPrintPreview width="760" height="1044" bordercolor="#FF000000" bordersize="1" name="preview" />
-				</VerticalLayout>
+					<Control />
+				</HorizontalLayout>
 				
 			</VerticalLayout>
 		</TabLayout>

@@ -278,7 +278,7 @@
 				</VerticalLayout>
 				
 				<!-- little square grid 12 -->
-				<VerticalLayout VSplit1="num='42',pen='7'" VSplit="num='7',pen='5'" HSplit="num='43',pen='7'"  >
+				<VerticalLayout VSplit1="num='42',pen='7'" VSplit="num='7',pen='5'" HSplit="num='43',pen='7'" name="main" >
 					<VerticalLayout height="42" border="0,0,0,8" />
 					<VerticalLayout border="0,0,0,8" />
 					<VerticalLayout border="0,0,0,8" />
