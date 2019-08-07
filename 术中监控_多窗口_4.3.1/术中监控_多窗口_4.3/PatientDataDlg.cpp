@@ -2,6 +2,9 @@
 #include "SixGridsUI.h"
 #include "resource.h"
 
+#define TIMER_REDRAW_PREVIEW      1001
+#define INTERVAL_REDRAW_PREVIEW   100
+
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 	m_switch = 0;
@@ -62,6 +65,12 @@ void  CPatientDataDlg::OnMyInited() {
 }
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (uMsg == WM_TIMER) {
+		if (wParam == TIMER_REDRAW_PREVIEW) {
+			m_preview->Invalidate();
+			KillTimer(GetHWND(), wParam);  
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -245,8 +254,8 @@ void CPatientDataDlg::OnPrintPreview() {
 		memcpy(m_preview->m_patient_data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
 	}
 
-	m_preview->Invalidate();
 	m_switch->SelectItem(1);
+	SetTimer(GetHWND(), TIMER_REDRAW_PREVIEW, INTERVAL_REDRAW_PREVIEW, 0);
 }
 
 void CPatientDataDlg::OnReturn() {
