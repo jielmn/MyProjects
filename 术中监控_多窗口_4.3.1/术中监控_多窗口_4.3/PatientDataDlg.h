@@ -32,6 +32,7 @@ private:
 	void  AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag);
 	void  OnPrintPreview();
 	void  OnReturn();
+	void  OnPrint();
 	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay = FALSE );
 	void  OnFinalMessage(HWND hWnd);
 	void  SetBusy(BOOL bBusy = TRUE);

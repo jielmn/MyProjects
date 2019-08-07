@@ -6,6 +6,7 @@
 #include "EditableButtonUI.h"
 #include "MyImageUI.h"
 #include "ModeButtonUI.h"
+#include "resource.h"
 
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
@@ -1040,5 +1041,23 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	// 画脉搏点
 	for (int i = 0; i < cnt; i++) {
 		graphics.FillEllipse(&brush_1, points[i].X - radius, points[i].Y - radius, 2 * radius, 2 * radius);
+	}
+}
+
+void LoadXmlChart(CXml2ChartFile & xmlChart) {
+
+	HRSRC hResource = ::FindResource(0, MAKEINTRESOURCE(IDR_XML1), "XML");
+	if (hResource != NULL) {
+		// 加载资源
+		HGLOBAL hg = LoadResource(0, hResource);
+		if (hg != NULL) {
+			// 锁定资源
+			LPVOID pData = LockResource(hg);
+			if (pData != NULL) {
+				// 获取资源大小
+				DWORD dwSize = SizeofResource(0, hResource);
+				xmlChart.ReadXmlChartStr((const char *)pData, dwSize);
+			}
+		}
 	}
 }

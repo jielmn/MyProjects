@@ -1,6 +1,6 @@
 #include "PatientDataDlg.h"
 #include "SixGridsUI.h"
-
+#include "resource.h"
 
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
@@ -33,6 +33,7 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			OnReturn();
 		}
 		else if (name == "btnPrint") {
+			OnPrint();
 			this->PostMessage(WM_CLOSE);
 		}
 	}
@@ -250,6 +251,75 @@ void CPatientDataDlg::OnPrintPreview() {
 
 void CPatientDataDlg::OnReturn() {
 	m_switch->SelectItem(0);      
+}
+
+void  CPatientDataDlg::OnPrint() {
+	PatientInfo info;
+	PatientData data[7];
+
+	// 获取UI的填入信息
+	GetPatientInfo(&info);
+	GetPatientData(data, 7);
+	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
+
+	for (int i = 0; i < 7; i++) {
+		memcpy(data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
+	}
+
+	CXml2ChartFile   xmlChart;
+	LoadXmlChart(xmlChart);
+
+
+	PRINTDLG printInfo;
+	ZeroMemory(&printInfo, sizeof(printInfo));  //清空该结构     
+	printInfo.lStructSize = sizeof(printInfo);
+	printInfo.hwndOwner = 0;
+	printInfo.hDevMode = 0;
+	printInfo.hDevNames = 0;
+	//这个是关键，PD_RETURNDC 如果不设这个标志，就拿不到hDC了      
+	//            PD_RETURNDEFAULT 这个就是得到默认打印机，不需要弹设置对话框     
+	//printInfo.Flags = PD_RETURNDC | PD_RETURNDEFAULT;   
+	printInfo.Flags = PD_USEDEVMODECOPIESANDCOLLATE | PD_RETURNDC;
+	printInfo.nCopies = 1;
+	printInfo.nFromPage = 0xFFFF;
+	printInfo.nToPage = 0xFFFF;
+	printInfo.nMinPage = 1;
+	printInfo.nMaxPage = 0xFFFF;
+
+	//调用API拿出默认打印机     
+	//PrintDlg(&printInfo);
+	if (PrintDlg(&printInfo) == TRUE)
+	{
+		DOCINFO di;
+		ZeroMemory(&di, sizeof(DOCINFO));
+		di.cbSize = sizeof(DOCINFO);
+		di.lpszDocName = _T("MyXPS");
+
+		::SetMapMode(printInfo.hDC, MM_ANISOTROPIC);
+
+		SIZE  size = { 760, 1044 };
+		::SetWindowExtEx(printInfo.hDC, size.cx, size.cy, 0);
+		size.cx = GetDeviceCaps(printInfo.hDC, HORZRES);
+		size.cy = GetDeviceCaps(printInfo.hDC, VERTRES);
+		::SetViewportExtEx(printInfo.hDC, size.cx, size.cy, 0);
+
+		StartDoc(printInfo.hDC, &di);
+
+		for (int i = 0; i < 1; i++) {
+			StartPage(printInfo.hDC);
+
+			//SetBkMode(printInfo.hDC, TRANSPARENT);
+			//DrawXml2ChartUI(printInfo.hDC, xmlChart.m_ChartUI);
+
+			PrepareXmlChart(xmlChart, &info, data, 7, tFirstDay);
+			PrintXmlChart(printInfo.hDC, xmlChart, 0, 0, data, 7);
+
+			EndPage(printInfo.hDC);
+		}
+
+		EndDoc(printInfo.hDC);
+		DeleteDC(printInfo.hDC);
+	}
 }
 
 void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay /*= FALSE*/) {

@@ -632,6 +632,7 @@ extern void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 extern int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize);
 extern void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
 	                       PatientData * pData, DWORD dwDataSize );
+extern void LoadXmlChart(CXml2ChartFile & xmlChart);
 
 // templates
 template <class T>
