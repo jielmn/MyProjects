@@ -216,7 +216,10 @@ private:
 	std::map<std::string, CTagUI *>             m_tags_ui;
 	CDuiString                                  m_dragdrop_tag;
 	int                                         m_dragdrop_tag_dest_index;
+	int                                         m_dragdrop_tag_cur_index;
 	DWORD                                       m_dragdrop_tag_timetick;
+
+	CDuiString                                  m_cur_selected_tag;     // 当前选中的手持读卡器Tag
 
 	// 定时保存excel
 	time_t                                      m_LastSaveExcelTime;

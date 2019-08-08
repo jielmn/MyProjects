@@ -48,6 +48,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_cstHandImg = 0;
 	m_layTags = 0;
 	m_dragdrop_tag_dest_index = -1;
+	m_dragdrop_tag_cur_index = -1;
 	m_hand_tabs = 0;
 	m_dragdrop_tag_timetick = 0;
 	m_layDragDropGrids = 0;
@@ -354,6 +355,7 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 					CTagUI * pTagUI = (CTagUI *)pCtl;
 					m_dragdrop_tag = pTagUI->GetTagId();
 					m_dragdrop_tag_dest_index = -1;
+					m_dragdrop_tag_cur_index = pTagUI->GetBindingGridIndex();
 					m_dragdrop_tag_timetick = LmnGetTickCount();
 				}
 			}
@@ -1301,11 +1303,28 @@ void  CDuiFrameWnd::OnHandTagSelected(CControlUI * pTagUI) {
 		if ( pUI == pTagUI ) {
 			pUI->SetBkColor(0xFF555555);
 			m_cstHandImg->SetCurTag(pUI->GetTagId());
+			m_cur_selected_tag = pUI->GetTagId();
 		}
 		else {
 			pUI->SetBkColor(0);
 		}
 	}	
+
+	CTagUI* pUI = (CTagUI *)pTagUI;
+	int cnt = m_layDragDropGrids->GetCount();
+	for (int i = 0; i < cnt; i++) {
+		CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(i);
+		if (i == pUI->m_nBindingGridIndex - 1) {
+			pChild->SetBorderColor(CUR_BINDING_GRID_BORDERCOLOR);
+			pChild->SetTextColor(CUR_BINDING_GRID_TEXTCOLOR);
+			pChild->SetBkColor(CUR_BINDING_GRID_BKCOLOR);
+		}
+		else {
+			pChild->SetBorderColor(UNBINDING_GRID_BORDERCOLOR);
+			pChild->SetTextColor(UNBINDING_GRID_TEXTCOLOR);
+			pChild->SetBkColor(UNBINDING_GRID_BKCOLOR);
+		}
+	}
 }
 
 // 点击了按时间排序
@@ -1392,38 +1411,39 @@ void   CDuiFrameWnd::OnMoveTagUI(const POINT & pt) {
 	GetDragDropGridsParams(nColumns, nRows);
 	assert(nColumns > 0 && nRows > 0);
 
-	SIZE s = m_layDragDropGrids->GetItemSize();
-
-	if (pt.x <= rect.left || pt.x >= rect.right || pt.y <= rect.top || pt.y >= rect.bottom) {
-		for ( int i = 0; i < (int)g_data.m_CfgData.m_dwLayoutGridsCnt; i++ ) {
-			CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(i);
-			pChild->SetBorderColor(0xFFFFFFFF);
-			pChild->SetTextColor(0xFFFFFFFF);
-			pChild->SetBkColor(0xFF192431);
-		}
-		m_dragdrop_tag_dest_index = -1;
-	}
+	SIZE s  = m_layDragDropGrids->GetItemSize();
+	int cnt = m_layDragDropGrids->GetCount();
 
 	m_dragdrop_tag_dest_index = -1;
 	for (int i = 0; i < nColumns; i++) {
 		for (int j = 0; j < nRows; j++) {
-
 			int nIndex = j * nColumns + i;
+
 			// 在总Grids范围内
-			if ( nIndex < (int)g_data.m_CfgData.m_dwLayoutGridsCnt ) {
+			if ( nIndex < cnt ) {
 				CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(nIndex);
 				// 在矩形范围内
 				if ((pt.x > rect.left + s.cx * i) && (pt.x < rect.left + s.cx * (i + 1))
 					&& (pt.y > rect.top + s.cy * j) && (pt.y < rect.top + s.cy * (j + 1))) {
-					pChild->SetBorderColor(0xFFCAF100);
-					pChild->SetTextColor(0xFF000000);
-					pChild->SetBkColor(0xFFCCCCCC);
+					pChild->SetBorderColor(HILIGHT_BINDING_GRID_BORDERCOLOR);
+					pChild->SetTextColor(HILIGHT_BINDING_GRID_TEXTCOLOR);
+					pChild->SetBkColor(HILIGHT_BINDING_GRID_BKCOLOR);
 					m_dragdrop_tag_dest_index = nIndex;
 				}
 				else {
-					pChild->SetBorderColor(0xFFFFFFFF);
-					pChild->SetTextColor(0xFFFFFFFF);
-					pChild->SetBkColor(0xFF192431);
+					// 如果不是当前绑定块
+					if (nIndex != m_dragdrop_tag_cur_index - 1) {
+						pChild->SetBorderColor(UNBINDING_GRID_BORDERCOLOR);
+						pChild->SetTextColor(UNBINDING_GRID_TEXTCOLOR);
+						pChild->SetBkColor(UNBINDING_GRID_BKCOLOR);
+					}
+					// 是当前绑定块
+					else {
+						pChild->SetBorderColor(CUR_BINDING_GRID_BORDERCOLOR);
+						pChild->SetTextColor(CUR_BINDING_GRID_TEXTCOLOR);
+						pChild->SetBkColor(CUR_BINDING_GRID_BKCOLOR);
+					}
+
 				}
 			}
 
@@ -1460,8 +1480,9 @@ void   CDuiFrameWnd::ResetDragdropGrids(int width /*= 0*/, int height /*= 0*/) {
 		CLabelUI * pLabel = new CLabelUI;
 		strText.Format("%d", i + 1);
 		pLabel->SetText(strText);
-		pLabel->SetTextColor(0xFFFFFFFF);
-		pLabel->SetBorderColor(0xFFFFFFFF);
+		pLabel->SetTextColor(UNBINDING_GRID_TEXTCOLOR);
+		pLabel->SetBorderColor(UNBINDING_GRID_BORDERCOLOR);
+		pLabel->SetBkColor(UNBINDING_GRID_BKCOLOR);
 		pLabel->SetBorderSize(1);
 		pLabel->SetAttribute("align", "center");
 		pLabel->SetFont(GetFontBySize(s));
@@ -1522,6 +1543,25 @@ void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 			assert(pParam->m_nGridIndex > 0);
 			CDuiString  strPName = pTagUI->GetPTagName();
 			m_pGrids[pParam->m_nGridIndex - 1]->SetPatientNameInHandMode(strPName);
+
+			// 如果当前选中的tag是修改绑定的tag
+			if (m_cur_selected_tag == pTagUI->GetTagId()) {
+				int cnt = m_layDragDropGrids->GetCount();
+				for (int i = 0; i < cnt; i++) {
+					CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(i);
+					if (i == pTagUI->m_nBindingGridIndex - 1) {
+						pChild->SetBorderColor(CUR_BINDING_GRID_BORDERCOLOR);
+						pChild->SetTextColor(CUR_BINDING_GRID_TEXTCOLOR);
+						pChild->SetBkColor(CUR_BINDING_GRID_BKCOLOR);
+					}
+					else {
+						pChild->SetBorderColor(UNBINDING_GRID_BORDERCOLOR);
+						pChild->SetTextColor(UNBINDING_GRID_TEXTCOLOR);
+						pChild->SetBkColor(UNBINDING_GRID_BKCOLOR);
+					}
+				}
+			}
+
 		}			
 	}
 
