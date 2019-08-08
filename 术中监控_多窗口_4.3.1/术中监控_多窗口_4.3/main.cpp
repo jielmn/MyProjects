@@ -292,7 +292,11 @@ LRESULT  CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 	DWORD dwHeight = HIWORD(lParam) - 30 - 1 * 2 - 32 - 85;
 	RefreshGridsSize(dwWidth, dwHeight);
 
+	// 以后可以用以下这种方式，添加控件OnSize回调函数
+	// m_Control->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMySize);
+	// 函数原型：bool OnMySize(void * pParam);
 	ResetDragdropGrids(dwWidth - 500, dwHeight);
+
 	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
 }
 
