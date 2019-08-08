@@ -424,18 +424,44 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 }
 
 // 保存Tag和窗格绑定
-void  CMySqliteDatabase::TagBindingGrid(const CBindingTagGrid * pParam, std::string & old_tagid) {
+void  CMySqliteDatabase::TagBindingGrid( const CBindingTagGrid * pParam, std::string & old_tagid,
+	                                     int & old_grid_index ) {
 	char sql[8192];
 	int  ret = 0;
 
-	// 先删除tag_id对应的grid index记录
-	SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE tag_id='%s' ", GRID_BINDING_TABLE, pParam->m_szTagId);
-	sqlite3_exec(m_db, sql, 0, 0, 0);
-
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM  %s WHERE grid_index=%d ", GRID_BINDING_TABLE, pParam->m_nGridIndex);
-
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
+
+	old_tagid = "";
+	old_grid_index = 0;
+
+	// 先删除tag_id对应的grid index记录
+	//SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE tag_id='%s' ", GRID_BINDING_TABLE, pParam->m_szTagId);
+	//sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", GRID_BINDING_TABLE, pParam->m_szTagId);
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+
+	// 如果该tag已经存在绑定
+	if ( nrow > 0 ) {
+		sscanf_s(azResult[ncolumn + 0], "%d", &old_grid_index);
+		// 一个Tag不能重新绑定同样的grid
+		assert(old_grid_index != pParam->m_nGridIndex);
+		if (old_grid_index == pParam->m_nGridIndex) {
+			return;
+		}
+
+		// 再删除该绑定记录
+		SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE tag_id='%s' ", GRID_BINDING_TABLE, pParam->m_szTagId);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+
+	sqlite3_free_table(azResult);
+	nrow = ncolumn = 0;
+	azResult = 0;
+
+
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM  %s WHERE grid_index=%d ", GRID_BINDING_TABLE, pParam->m_nGridIndex);
 	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
 	// 如果存在
 	if (nrow > 0) {

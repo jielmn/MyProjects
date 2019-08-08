@@ -449,6 +449,7 @@ typedef struct tagTagBindingGridRet {
 	char       m_szTagId[MAX_TAG_ID_LENGTH];
 	int        m_nGridIndex;
 	char       m_szOldTagId[MAX_TAG_ID_LENGTH];
+	int        m_nOldGridIndex;
 }TagBindingGridRet;
 
 class CQueryTempByHandTagParam : public LmnToolkits::MessageData {

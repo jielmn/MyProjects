@@ -1532,7 +1532,12 @@ void   CDuiFrameWnd::OnTagBindingGridRet(WPARAM wParam, LPARAM  lParam) {
 			pTagUI->SetBindingGridIndex(0);
 	}
 
-	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);	
+	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);
+
+	// 旧绑定窗格的图像和数据要清空
+	if (pParam->m_nOldGridIndex > 0 ) {
+		m_pGrids[pParam->m_nOldGridIndex - 1]->OnReleaseTagBinding();
+	}
 
 	delete pParam;
 }

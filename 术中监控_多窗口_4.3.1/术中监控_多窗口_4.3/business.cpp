@@ -825,13 +825,15 @@ void  CBusiness::TagBindingGridAsyn(const char * szTagId, int nGridIndex) {
 
 void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
 	std::string old_tagid;
-	m_sqlite.TagBindingGrid(pParam, old_tagid);
+	int old_grid_index = 0;
+	m_sqlite.TagBindingGrid(pParam, old_tagid, old_grid_index);
 
 	TagBindingGridRet ret;
 	memset(&ret, 0, sizeof(TagBindingGridRet));
 	STRNCPY(ret.m_szTagId, pParam->m_szTagId, MAX_TAG_ID_LENGTH);
 	STRNCPY(ret.m_szOldTagId, old_tagid.c_str(), MAX_TAG_ID_LENGTH);
 	ret.m_nGridIndex = pParam->m_nGridIndex;
+	ret.m_nOldGridIndex = old_grid_index;
 
 	m_sigBindingRet.emit(ret);
 }

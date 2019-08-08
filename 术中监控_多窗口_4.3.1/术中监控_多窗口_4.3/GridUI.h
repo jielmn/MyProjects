@@ -69,6 +69,9 @@ public:
 	// 设置当前的病人姓名
 	void SetCurPatientName(const char * szName);
 
+	// 当格子的绑定Tag被其他格子夺去
+	void OnReleaseTagBinding();
+
 private:
 	LPCTSTR GetClass() const;
 

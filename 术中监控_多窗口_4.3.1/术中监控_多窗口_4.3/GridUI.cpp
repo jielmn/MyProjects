@@ -1182,3 +1182,24 @@ void  CGridUI::SetCurPatientName(const char * szName) {
 		m_cstPatientNameM->SetText(szName);
 	}
 }
+
+// 当格子的绑定Tag被其他格子夺去
+void  CGridUI::OnReleaseTagBinding() {
+	// 清空手持Reader相关数据
+	ClearVector(m_vHandTemp);
+	memset(&m_HandLastTemp, 0, sizeof(m_HandLastTemp));	
+
+	m_hand_reader->m_lblTagId->SetText("");
+	m_hand_reader->m_lblReaderId->SetText("");
+	m_hand_reader->m_lblTemp->SetText("");
+
+	// 如果是手持模式
+	if (m_cstModeBtn->GetMode() == CModeButton::Mode_Hand) {
+		m_lblElapsed->SetText("");
+		m_cstImgLabel->SetText("");
+		m_cstPatientName->SetText("");
+		m_cstPatientNameM->SetText("");
+	}
+
+	this->Invalidate();
+}
