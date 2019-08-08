@@ -29,13 +29,24 @@ bool CPatientDataPrintPreviewUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlU
 	int h1 = (int)(m_nOriginalHeight * m_fZoom);
 	int w1 = (int)(h1 * m_fConstRatio);
 
-	PrintXmlChart(hMemDC, m_XmlChartFile, 0, 0, m_patient_data, 7);
-	StretchBlt( hDC, m_rcItem.left, m_rcItem.top, w1,   
-		           h1, hMemDC, 0, 0, w, h, SRCCOPY);     
+	PrintXmlChart(hMemDC, m_XmlChartFile, 0, 0, m_patient_data, 7); 
+
+	// µÚ¶þ¸ömem dc
+	HDC hMemDC_1 = CreateCompatibleDC(hDC);
+	HBITMAP hBitmap_1 = CreateCompatibleBitmap(hDC, w1, h1);
+	HBITMAP hOld_1 =  (HBITMAP)SelectObject(hMemDC_1, hBitmap_1);
+	StretchBlt(hMemDC_1, 0, 0, w1, h1, hMemDC, 0, 0, w, h, SRCCOPY); 
+
+	BitBlt(hDC, m_rcItem.left, m_rcItem.top, w1,
+		h1, hMemDC_1, 0, 0, SRCCOPY);
 
 	SelectBitmap(hMemDC, hOld);
 	DeleteObject(hBitmap);
 	DeleteDC(hMemDC);
+
+	SelectBitmap(hMemDC_1, hOld_1);
+	DeleteObject(hBitmap_1);
+	DeleteDC(hMemDC_1);
 
 	return true;
 }

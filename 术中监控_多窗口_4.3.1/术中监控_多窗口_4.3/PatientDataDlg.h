@@ -30,7 +30,6 @@ private:
 	void  InitInfo();
 	void  InitData();
 	void  AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag);
-	void  RedrawPreviewLater();
 	void  OnPrintPreview();
 	void  OnReturn();
 	void  OnPrint();

@@ -41,11 +41,9 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnZoomIn") {
 			m_preview->ZoomIn();
-			RedrawPreviewLater();
 		}
 		else if (name == "btnZoomOut") {
 			m_preview->ZoomOut();
-			RedrawPreviewLater(); 
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -247,10 +245,6 @@ void  CPatientDataDlg::InitData() {
 	}
 }
 
-void  CPatientDataDlg::RedrawPreviewLater() {
-	SetTimer(GetHWND(), TIMER_REDRAW_PREVIEW, INTERVAL_REDRAW_PREVIEW, 0);
-}
-
 void CPatientDataDlg::OnPrintPreview() {
 	PatientInfo info;
 	PatientData data[7];
@@ -267,7 +261,7 @@ void CPatientDataDlg::OnPrintPreview() {
 	}
 
 	m_switch->SelectItem(1);
-	RedrawPreviewLater();
+	m_preview->Invalidate();
 }
 
 void CPatientDataDlg::OnReturn() {
