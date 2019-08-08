@@ -33,6 +33,9 @@ protected:
 	CPen             m_pen2;
 
 	CXml2ChartFile   m_XmlChartFile;
+	int              m_nOriginalHeight;
+	float            m_fConstRatio;
+	float            m_fZoom;
 
 	void  OnMyPrint();
 
@@ -43,4 +46,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton2();
 };

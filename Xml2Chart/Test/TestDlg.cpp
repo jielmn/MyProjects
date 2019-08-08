@@ -6,6 +6,7 @@
 #include "Test.h"
 #include "TestDlg.h"
 #include "afxdialogex.h"
+#include "LmnString.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -21,6 +22,10 @@ CTestDlg::CTestDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	m_Xml2ChartUi = new CXml2ChartUI;
+
+	m_nOriginalHeight = 720;
+	m_fConstRatio = (float)XML_CHART_WIDTH / (float)XML_CHART_HEIGHT;
+	m_fZoom = 1.2f;
 }
 
 CTestDlg::~CTestDlg() {
@@ -37,6 +42,7 @@ BEGIN_MESSAGE_MAP(CTestDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON1, &CTestDlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CTestDlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -219,26 +225,47 @@ void CTestDlg::OnPaint()
 		CPaintDC dc(this);
 		//DrawXml2ChartUI(dc.m_hDC, m_Xml2ChartUi);
 
-		SetBkMode(dc, TRANSPARENT);
-		DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI, 100);
+		//SetBkMode(dc, TRANSPARENT);
+		//DrawXml2ChartUI(dc.m_hDC, m_XmlChartFile.m_ChartUI, 100);
 
-		//CXml2ChartUI * p = m_XmlChartFile.FindChartUIByName("MainBlock");
-		//if (p != 0) {
-		//	RECT r1 = p->GetAbsoluteRect();
-		//	int w = r1.right - r1.left;
-		//	int h = r1.bottom - r1.top;
+		PatientInfo                 info;
+		PatientData                 data[7];
+		time_t                      tFirstDay = time(0) - 3600 * 24 * 6;
+		memset(&info, 0, sizeof(info));
+		memset(data, 0, sizeof(data));
 
-		//	int h1 = h / 40;
-		//	int w1 = w / 42;
+		STRNCPY(info.m_szPName, "张三", 20);
+		info.m_age = 20;
+		info.m_in_hospital = time(0);
+		info.m_sex = 1;
+		info.m_surgery = time(0);
+		STRNCPY(info.m_szBedNo, "1122", 20);
 
-		//	RECT r2;
-		//	r2.left = r1.left;
-		//	r2.right = r2.left + w1;
-		//	r2.top = r1.top + h1 * 39;
-		//	r2.bottom = r1.bottom;
+		data[1].m_pulse[0] = 100;
+		data[1].m_pulse[1] = 110;
+		data[1].m_pulse[2] = 120;
+		data[1].m_pulse[3] = 113;
 
-		//	::TextOut(dc.m_hDC, r2.left, r2.top, "1111", 4 );
-		//}
+		PrepareXmlChart(m_XmlChartFile, &info, data, 7, tFirstDay);
+
+		int w = XML_CHART_WIDTH;
+		int h = XML_CHART_HEIGHT;
+		HDC hMemDC = CreateCompatibleDC(dc);
+		HBITMAP hBitmap = CreateCompatibleBitmap(dc, w, h);
+		HBITMAP hOld = (HBITMAP)SelectObject(hMemDC, hBitmap);
+		::Rectangle(hMemDC, 0, 0, w, h);
+
+		//PrintXmlChart(hDC, m_XmlChartFile, m_rcItem.left, m_rcItem.top, m_patient_data, 7); 
+		int h1 = (int)(m_nOriginalHeight * m_fZoom);
+		int w1 = (int)(h1 * m_fConstRatio);
+
+		PrintXmlChart(hMemDC, m_XmlChartFile, 0, 0, data, 7);
+		StretchBlt(dc, 0, 0, w1,
+			h1, hMemDC, 0, 0, w, h, SRCCOPY);
+
+		SelectObject(hMemDC, hOld);
+		DeleteObject(hBitmap);
+		DeleteDC(hMemDC);
 	}
 }
 
@@ -307,4 +334,11 @@ void CTestDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	OnMyPrint();
+}
+
+
+void CTestDlg::OnBnClickedButton2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	this->Invalidate();
 }
