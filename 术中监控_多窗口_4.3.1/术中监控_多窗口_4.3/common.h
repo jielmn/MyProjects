@@ -66,7 +66,7 @@ using namespace DuiLib;
 #define   MAX_TAG_PNAME_LENGTH        20
 
 #define   VERSION                     "2.1.4"
-#define   COMPILE_TIME                "2019-08-07 18:34"
+#define   COMPILE_TIME                "2019-08-08 09:32"
 
 // 控件id
 #define   TABS_ID                  "switch"
@@ -227,7 +227,8 @@ using namespace DuiLib;
 #define UM_PATIENT_INFO                      (WM_USER+12)
 #define UM_PATIENT_DATA                      (WM_USER+13)
 
-
+#define XML_CHART_WIDTH              760
+#define XML_CHART_HEIGHT             1044
 
 // 创建duilib控件的回调
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback

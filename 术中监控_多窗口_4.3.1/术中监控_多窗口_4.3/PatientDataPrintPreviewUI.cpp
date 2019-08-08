@@ -6,6 +6,10 @@ CPatientDataPrintPreviewUI::CPatientDataPrintPreviewUI() {
 	memset( m_patient_data,  0, sizeof(PatientData) * 7 );
 	m_tFirstDay = 0;
 
+	m_nOriginalHeight = 720;
+	m_fConstRatio = (float)XML_CHART_WIDTH / (float)XML_CHART_HEIGHT;
+	m_fZoom = 1.0f;
+
 	LoadXmlChart(m_XmlChartFile);
 }
 
@@ -14,17 +18,20 @@ bool CPatientDataPrintPreviewUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlU
 	//SET_CLIP_REGION_ON_PAINT(rcPaint);
 	PrepareXmlChart(m_XmlChartFile, &m_patient_info, m_patient_data, 7, m_tFirstDay);
 
-	int w = 760;
-	int h = 1044;
+	int w = XML_CHART_WIDTH;
+	int h = XML_CHART_HEIGHT;
 	HDC hMemDC = CreateCompatibleDC(hDC);
 	HBITMAP hBitmap  = CreateCompatibleBitmap(hDC, w, h); 
 	HBITMAP hOld = SelectBitmap(hMemDC, hBitmap);
 	::Rectangle(hMemDC, 0, 0, w, h);
 
-	//PrintXmlChart(hDC, m_XmlChartFile, m_rcItem.left, m_rcItem.top, m_patient_data, 7);  
+	//PrintXmlChart(hDC, m_XmlChartFile, m_rcItem.left, m_rcItem.top, m_patient_data, 7); 
+	int h1 = (int)(m_nOriginalHeight * m_fZoom);
+	int w1 = (int)(h1 * m_fConstRatio);
+
 	PrintXmlChart(hMemDC, m_XmlChartFile, 0, 0, m_patient_data, 7);
-	StretchBlt( hDC, m_rcItem.left, m_rcItem.top, 524,   
-		           720, hMemDC, 0, 0, 760, 1044, SRCCOPY);
+	StretchBlt( hDC, m_rcItem.left, m_rcItem.top, w1,   
+		           h1, hMemDC, 0, 0, w, h, SRCCOPY);     
 
 	SelectBitmap(hMemDC, hOld);
 	DeleteObject(hBitmap);
@@ -39,4 +46,40 @@ void CPatientDataPrintPreviewUI::DoEvent(DuiLib::TEventUI& event) {
 
 LPCTSTR CPatientDataPrintPreviewUI::GetClass() const {
 	return "PatientDataPrintPreview";
+}
+
+void CPatientDataPrintPreviewUI::ZoomIn() {
+	if ( m_fZoom >= 1.4f ) {
+		return;
+	}
+
+	m_fZoom += 0.1f;
+	if (m_fZoom > 1.4f) {
+		m_fZoom = 1.4f; 
+	}
+
+	int h = (int)(m_nOriginalHeight * m_fZoom);
+	int w = (int)(h * m_fConstRatio);
+	this->SetFixedWidth(w);
+	this->SetFixedHeight(h);
+
+	this->Invalidate();
+}
+
+void CPatientDataPrintPreviewUI::ZoomOut() {
+	if (m_fZoom <= 1.0f) {
+		return;
+	}
+
+	m_fZoom -= 0.1f;
+	if (m_fZoom < 1.0f) {
+		m_fZoom = 1.0f;
+	}
+
+	int h = (int)(m_nOriginalHeight * m_fZoom);
+	int w = (int)(h * m_fConstRatio);
+	this->SetFixedWidth(w);
+	this->SetFixedHeight(h);
+
+	this->Invalidate();
 }

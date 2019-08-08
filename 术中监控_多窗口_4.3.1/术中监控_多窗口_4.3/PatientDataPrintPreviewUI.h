@@ -12,9 +12,14 @@ public:
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
+	void ZoomIn();
+	void ZoomOut();
 
 private:
 	CXml2ChartFile   m_XmlChartFile;
+	int              m_nOriginalHeight;
+	float            m_fConstRatio;
+	float            m_fZoom;
 
 public:
 	PatientInfo                 m_patient_info;
