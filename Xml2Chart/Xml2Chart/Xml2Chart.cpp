@@ -1188,7 +1188,7 @@ CXml2ChartUI *  CXml2ChartFile::ParseXml(TiXmlDocument & xmlDoc) {
 			LOGFONT  logfont;
 			BOOL bValue = false;
 
-			GetObject(GetStockObject(SYSTEM_FONT), sizeof(LOGFONT), &logfont);
+			GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &logfont);
 
 			sAttr = pElmChild->Attribute("bold");
 			bValue = GetBoolean(sAttr);
@@ -1203,13 +1203,14 @@ CXml2ChartUI *  CXml2ChartFile::ParseXml(TiXmlDocument & xmlDoc) {
 			sAttr = pElmChild->Attribute("italic");
 			logfont.lfItalic = GetBoolean(sAttr);
 
-			sAttr = pElmChild->Attribute("charset");
-			if (sAttr && (0 == _stricmp(sAttr, "gb2312") || 0 == _stricmp(sAttr, "gbk"))) {
-				logfont.lfCharSet = GB2312_CHARSET;
-			}
-			else {
-				logfont.lfCharSet = ANSI_CHARSET;
-			}
+			//sAttr = pElmChild->Attribute("charset");
+			//if (sAttr && (0 == _stricmp(sAttr, "gb2312") || 0 == _stricmp(sAttr, "gbk"))) {
+			//	logfont.lfCharSet = GB2312_CHARSET;
+			//}
+			//else {
+			//	logfont.lfCharSet = ANSI_CHARSET;
+			//}
+			logfont.lfCharSet = DEFAULT_CHARSET;
 
 			sAttr = pElmChild->Attribute("facename");
 			if (sAttr) {
