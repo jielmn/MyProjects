@@ -227,8 +227,8 @@ using namespace DuiLib;
 #define UM_PATIENT_INFO                      (WM_USER+12)
 #define UM_PATIENT_DATA                      (WM_USER+13)
 
-#define XML_CHART_WIDTH              760
-#define XML_CHART_HEIGHT             1050
+#define XML_CHART_WIDTH              764
+#define XML_CHART_HEIGHT             1080
 
 #define CUR_BINDING_GRID_BKCOLOR       0xFFFCfB9C
 #define CUR_BINDING_GRID_TEXTCOLOR     0xFF000000
