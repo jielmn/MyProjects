@@ -239,8 +239,9 @@ void  CPatientDataDlg::InitData() {
 	const char * item_title[7] = { "大便次数", "尿量(次) ml", "总入量 ml", "总出量 ml", "血压 kpa", "体重 kg", "过敏药物" };
 	for (int i = 0; i < 7; i++) {
 		pSevenGrids = new CSevenGridsUI;
-		if (i == 4 || i == 5 || i == 6)
-			pSevenGrids->SetNumberOnly(FALSE); 
+		pSevenGrids->SetNumberOnly(FALSE);
+		if (i == 4)
+			pSevenGrids->SetFont(5);    
 		m_tree->AddNode(item_title[i], pSubTitleNode, 0, pSevenGrids, 2, 0xFF386382, 2, 0xFF386382, 30);    
 	}
 }

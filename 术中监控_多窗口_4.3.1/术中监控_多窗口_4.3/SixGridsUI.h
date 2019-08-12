@@ -31,7 +31,8 @@ public:
 	void  SetMode(int nMode);
 	void  SetNumberOnly(BOOL bOnly);
 	void  SetWeekStr(CDuiString * pWeek, DWORD dwSize);
-	void  SetValues(int nIndex,const char * szValue);
+	void  SetFont(int nFont);
+	void  SetValues(int nIndex,const char * szValue);	
 	CDuiString  GetValues(int nIndex);
 
 private:
@@ -47,5 +48,6 @@ private:
 	CHorizontalLayoutUI *  m_bottom;
 	int                    m_nMode;
 	BOOL                   m_bNumberOnly;
+	int                    m_nFont;
 	CDuiString             m_week_days[7];
 };

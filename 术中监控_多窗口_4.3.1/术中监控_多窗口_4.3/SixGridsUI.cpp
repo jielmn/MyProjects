@@ -81,6 +81,7 @@ CSevenGridsUI::CSevenGridsUI() {
 	m_bottom = 0;
 	m_nMode = 0;
 	m_bNumberOnly = TRUE;
+	m_nFont = 2;
 }
 
 CSevenGridsUI::~CSevenGridsUI() {
@@ -103,6 +104,10 @@ void  CSevenGridsUI::SetWeekStr(CDuiString * pWeek, DWORD dwSize) {
 	for (int i = 0; i < 7; i++) {
 		m_week_days[i] = pWeek[i];
 	}
+}
+
+void  CSevenGridsUI::SetFont(int nFont) {
+	m_nFont = nFont;
 }
 
 void  CSevenGridsUI::SetValues(int nIndex, const char * szValue) {
@@ -149,6 +154,7 @@ void  CSevenGridsUI::DoInit() {
 	for (int i = 0; i < 7; i++) {
 		strText.Format("edt_%d", i + 1);
 		m_edits[i] = static_cast<DuiLib::CEditUI*>(m_pManager->FindControl(strText));		
+		m_edits[i]->SetFont(m_nFont);
 
 		if (!m_bNumberOnly) {
 			m_edits[i]->SetNumberOnly(false);

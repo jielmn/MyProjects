@@ -228,7 +228,7 @@ using namespace DuiLib;
 #define UM_PATIENT_DATA                      (WM_USER+13)
 
 #define XML_CHART_WIDTH              760
-#define XML_CHART_HEIGHT             1044
+#define XML_CHART_HEIGHT             1050
 
 #define CUR_BINDING_GRID_BKCOLOR       0xFFFCfB9C
 #define CUR_BINDING_GRID_TEXTCOLOR     0xFF000000
@@ -317,6 +317,8 @@ public:
 	CControlUI *              m_DragDropCtl;
 	DuiLib::CEditUI *         m_edRemark;
 	DuiLib::CEditUI *         m_edHandRemark;
+	int                       m_nScreenWidth;
+	int                       m_nScreenHeight;
 
 	// 术中读卡器是否连接上
 	BOOL                      m_bSurReaderConnected[MAX_GRID_COUNT][MAX_READERS_PER_GRID];
@@ -341,6 +343,8 @@ public:
 		memset(m_bSurReaderConnected, 0, sizeof(m_bSurReaderConnected));
 
 		m_nVMargin = 0;
+		m_nScreenWidth = 0;
+		m_nScreenHeight = 0;
 	}
 };
 

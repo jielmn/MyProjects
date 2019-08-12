@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<Window width="760" height="1044" >
+<Window width="760" height="1050" >
 	<Font   id="0" bold="true"  italic="false" facename="宋体" height="24" />
 	<Font   id="1" bold="false" italic="false" facename="宋体" height="14" />
 	<!-- 4, 8, 12, 4, 8, 12 -->
-	<Font   id="2" bold="false" italic="false" facename="Times new Roman" height="10" />
+	<Font   id="2" bold="false" italic="false" facename="Times new Roman" height="14" />
 	<!-- 呼吸 -->
-	<Font   id="3" bold="false" italic="false" facename="Times new Roman" height="10" />
+	<Font   id="3" bold="false" italic="false" facename="Times new Roman" height="14" />
+	<!-- 血压 -->
+	<Font   id="4" bold="false" italic="false" facename="宋体" height="12" />
 	
 	<Thread id="5" width="2" color="#ff0000" />
 	<Thread id="6" width="1" color="#000000" />
@@ -44,7 +46,7 @@
 			</VerticalLayout>
 		</HorizontalLayout>
 		
-		<HorizontalLayout padding="15,5,15,5" height="30">
+		<HorizontalLayout padding="0,0,0,0" height="36">
 			<Item text="姓名" font="1" width="40" />
 			<HorizontalLayout border="0,0,0,7" width="60">
 				<Item font="1" name="patient_name" />
@@ -384,13 +386,13 @@
 					</HorizontalLayout>
 					
 					<HorizontalLayout VSplit="num='7',pen='5'" >
-						<Item font="1" name="blood_pressure_1" />
-						<Item font="1" name="blood_pressure_2" />
-						<Item font="1" name="blood_pressure_3" />
-						<Item font="1" name="blood_pressure_4" />
-						<Item font="1" name="blood_pressure_5" />
-						<Item font="1" name="blood_pressure_6" />
-						<Item font="1" name="blood_pressure_7" />
+						<Item font="4" name="blood_pressure_1" />
+						<Item font="4" name="blood_pressure_2" />
+						<Item font="4" name="blood_pressure_3" />
+						<Item font="4" name="blood_pressure_4" />
+						<Item font="4" name="blood_pressure_5" />
+						<Item font="4" name="blood_pressure_6" />
+						<Item font="4" name="blood_pressure_7" />
 					</HorizontalLayout>
 					
 					<HorizontalLayout VSplit="num='7',pen='5'" >

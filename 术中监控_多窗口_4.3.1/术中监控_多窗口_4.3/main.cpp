@@ -1776,7 +1776,7 @@ void   CDuiFrameWnd::OnQueryHandTagRetNotify(const char * szTagId, int nGridInde
                       
 
  
-          
+     
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }
@@ -1798,6 +1798,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	JTelSvrRegCommand("status", "print status", PrintStatus, 0);
 	DWORD  dwPort = 2019;
 	JTelSvrStart((unsigned short)dwPort, 10);
+
+	g_data.m_nScreenWidth  = GetSystemMetrics(SM_CXSCREEN);
+	g_data.m_nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 
 	LmnToolkits::ThreadManager::GetInstance();
