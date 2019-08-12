@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<Window width="760" height="1044" >
+<Window width="760" height="1054" >
 	<Font   id="0" bold="true"  italic="false" facename="宋体" height="36" />
 	<Font   id="1" bold="false" italic="false" facename="宋体" height="14" />
 	<!-- 4, 8, 12, 4, 8, 12 -->
 	<Font   id="2" bold="false" italic="false" facename="Times new Roman" height="10" />
 	<!-- 呼吸 -->
 	<Font   id="3" bold="false" italic="false" facename="Times new Roman" height="10" />
+	<!-- -->
+	<Font   id="11" bold="false" italic="false" facename="宋体" height="14" />
 	
 	<Thread id="5" width="2" color="#ff0000" />
 	<Thread id="6" width="1" color="#000000" />
@@ -44,7 +46,7 @@
 			</VerticalLayout>
 		</HorizontalLayout>
 		
-		<HorizontalLayout padding="15,5,15,5" height="30">
+		<HorizontalLayout padding="1,1,1,1" height="40">
 			<Item text="姓名" font="1" width="40" />
 			<HorizontalLayout border="0,0,0,7" width="60">
 				<Item font="1" name="patient_name" />
@@ -66,13 +68,41 @@
 			<Item text="" font="1" width="20" name="in_date_d" />
 			<Item text="日" font="1" width="20" />
 			
-			<Item text="" font="1" width="10"/>
-			<Item text="科别" font="1"/>
-			<Item text="" font="1" width="40" name="medical_department" />
-			<Item text="病室" font="1"/>
-			<Item text="" font="1" width="40" name="ward" />
-			<Item text="床号" font="1"/>
-			<Item text="" font="1" width="40" name="bed_no" />
+			<Item text="" font="1" width="10"/>			
+			<VerticalLayout>
+				<HorizontalLayout>
+					<Item text="科别" font="1" name="b_1" align="left" />
+					<Item text="" font="1" width="40" name="medical_department" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout visible="false" name="a_1">
+					<Item text="转科别" font="11" align="left" />
+					<Item text="2234" font="11" width="40" name="medical_department_1" />
+				</HorizontalLayout>				
+			</VerticalLayout>			
+			
+			<VerticalLayout>
+				<HorizontalLayout>
+					<Item text="病室" font="1"/>
+					<Item text="ssdd" font="1" width="40" name="ward" />
+				</HorizontalLayout>
+				<HorizontalLayout visible="false">
+					<Item text="转病室" font="1"/>
+					<Item text="" font="1" width="40" name="ward_1" />
+				</HorizontalLayout>	
+			</VerticalLayout>		
+						
+			<VerticalLayout>
+				<HorizontalLayout>
+					<Item text="床号" font="1" name="b_2" align="left" />
+					<Item text="" font="1" width="40" name="bed_no" />
+				</HorizontalLayout>
+				<HorizontalLayout visible="false" name="a_2">
+					<Item text="转床号" font="11" align="left" />
+					<Item text="12345" font="11" width="40" name="bed_no_1" />
+				</HorizontalLayout>
+			</VerticalLayout>		
+			
 		</HorizontalLayout>
 		
 		<HorizontalLayout >

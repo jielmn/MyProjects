@@ -3,7 +3,7 @@
 
 #define MIN(a, b) ((a)<=(b)?(a):(b))
 
-CXml2ChartUI::CXml2ChartUI() {
+CXml2ChartUI::CXml2ChartUI(CXml2ChartFile * pManager /*= 0*/) : m_pManager(pManager) {
 	m_tRect.left = m_tRect.right = m_tRect.top = m_tRect.bottom = 0;
 	for (int i = 0; i < 4; i++) {
 		m_BorderPen[i] = 0;
@@ -23,6 +23,7 @@ CXml2ChartUI::CXml2ChartUI() {
 	m_TextColor = RGB(0, 0, 0);
 
 	m_strName = "";
+	m_bVisible = TRUE;
 }
 
 CXml2ChartUI::~CXml2ChartUI() {
@@ -56,6 +57,16 @@ void  CXml2ChartUI::SetFixedHeight(int nHeight) {
 
 int   CXml2ChartUI::GetFixedHeight() const {
 	return m_nFixedHeight;
+}
+
+void  CXml2ChartUI::SetVisible(BOOL bVisible) {
+	m_bVisible = bVisible;
+	if (m_parent)
+		m_parent->RecacluteLayout();
+}
+
+BOOL  CXml2ChartUI::GetVisible() const {
+	return m_bVisible;
 }
 
 void  CXml2ChartUI::SetFloat(BOOL bFloat) {
@@ -313,15 +324,17 @@ void  CXml2ChartUI::RecacluteLayout() {
 		// 计算垂直方向，自动子UI的高度
 		for ( it = m_children.begin(); it != m_children.end(); it++ ) {
 			CXml2ChartUI * child = *it;
-			if (!child->m_bFloat) {
-				// 固定大小的
-				if (child->m_nFixedHeight != -1) {
-					nAccu += child->m_nFixedHeight;
+			if (child->GetVisible()) {
+				if (!child->m_bFloat) {
+					// 固定大小的
+					if (child->m_nFixedHeight != -1) {
+						nAccu += child->m_nFixedHeight;
+					}
+					// 自动计算大小的
+					else {
+						nAutoChildCnt++;
+					}
 				}
-				// 自动计算大小的
-				else {
-					nAutoChildCnt++;
-				}				
 			}
 		}
 
@@ -339,6 +352,11 @@ void  CXml2ChartUI::RecacluteLayout() {
 
 		for ( it = m_children.begin(), nIndex = 0; it != m_children.end(); it++, nIndex++ ) {
 			CXml2ChartUI * child = *it;
+			// 不可见的
+			if ( !child->GetVisible() ) {
+				continue;
+			}
+
 			// 如果是浮动的
 			if ( child->m_bFloat ) {
 				if (child->m_tPosition.left > nWidth) {
@@ -421,16 +439,18 @@ void  CXml2ChartUI::RecacluteLayout() {
 		// 计算垂直方向，自动子UI的高度
 		for (it = m_children.begin(); it != m_children.end(); it++) {
 			CXml2ChartUI * child = *it;
-			if (!child->m_bFloat) {
-				// 固定大小的
-				if (child->m_nFixedWidth != -1) {
-					nAccu += child->m_nFixedWidth;
+			if (child->GetVisible()) {
+				if (!child->m_bFloat) {
+					// 固定大小的
+					if (child->m_nFixedWidth != -1) {
+						nAccu += child->m_nFixedWidth;
+					}
+					// 自动计算大小的
+					else {
+						nAutoChildCnt++;
+					}
 				}
-				// 自动计算大小的
-				else {
-					nAutoChildCnt++;
-				}
-			}
+			}			
 		}
 
 		// 如果自动计算大小的存在
@@ -447,6 +467,9 @@ void  CXml2ChartUI::RecacluteLayout() {
 
 		for (it = m_children.begin(), nIndex = 0; it != m_children.end(); it++, nIndex++) {
 			CXml2ChartUI * child = *it;
+			if ( !child->GetVisible() ) {
+				continue;
+			}
 			// 如果是浮动的
 			if (child->m_bFloat) {
 				if (child->m_tPosition.left > nWidth) {
@@ -594,6 +617,32 @@ VAlignType  CXml2ChartUI::GetVAlignType() const {
 	return m_eVAlign;
 }
 
+void CXml2ChartUI::SetFontIndex(int nIndex) {
+	if (0 == m_pManager)
+		return;
+
+	std::map<int, HGDIOBJ> & fonts = m_pManager->m_mapFonts;
+	std::map<int, HGDIOBJ>::iterator it = fonts.find(nIndex);
+	if (it != fonts.end()) {
+		SetFont(it->second);
+	}
+}
+
+int  CXml2ChartUI::GetFontIndex() const {
+	if (0 == m_pManager)
+		return -1;
+
+	std::map<int, HGDIOBJ> & fonts = m_pManager->m_mapFonts;
+	std::map<int, HGDIOBJ>::iterator it;
+	for ( it = fonts.begin(); it != fonts.end(); ++it ) {
+		if (m_hFontText == it->second) {
+			return it->first;
+		}
+	}
+
+	return -1;
+}
+
 void CXml2ChartUI::SetFont(HGDIOBJ  hFont) {
 	m_hFontText = hFont;
 }
@@ -638,6 +687,9 @@ void  DrawXml2ChartUI(HDC hDc, CXml2ChartUI * pUI, int nOffsetX /*= 0*/, int nOf
 	if (0 == hDc) {
 		return;
 	}
+
+	if (!pUI->GetVisible())
+		return;
 
 	HGDIOBJ hPenLeft   = pUI->GetBorderPen(DIRECTION_LEFT);
 	HGDIOBJ hPenRight  = pUI->GetBorderPen(DIRECTION_RIGHT);
@@ -931,6 +983,13 @@ void CXml2ChartFile::SetFixed(TiXmlElement* pEle, CXml2ChartUI * pUI) {
 	}
 }
 
+void CXml2ChartFile::SetVisible(TiXmlElement* pEle, CXml2ChartUI * pUI) {
+	const char * szAttr = 0;
+	szAttr = pEle->Attribute("visible");
+	if (szAttr)
+		pUI->SetVisible(GetBoolean(szAttr));
+}
+
 void CXml2ChartFile::SetFloat(TiXmlElement* pEle, CXml2ChartUI * pUI) {
 	const char * szAttr = 0;
 	szAttr = pEle->Attribute("float");
@@ -1058,13 +1117,14 @@ void CXml2ChartFile::ReadXmlChartFile(TiXmlElement* pEleParent, CXml2ChartUI * p
 	while ( pChild ) {
 		const char * szElmName = pChild->Value();
 		if ( 0 == strcmp( "Item", szElmName ) ) {
-			pChildUI = new CXml2ChartUI;
+			pChildUI = new CXml2ChartUI(this);
 			pParentUI->AddChild(pChildUI);
 
 			SetText(pChild, pChildUI);
 			SetFloat(pChild, pChildUI);
 			SetFixed(pChild, pChildUI);
 			SetBorder(pChild, pChildUI);
+			SetVisible(pChild, pChildUI);
 			
 			szAttr = pChild->Attribute("name");
 			if (szAttr) {
@@ -1084,7 +1144,7 @@ void CXml2ChartFile::ReadXmlChartFile(TiXmlElement* pEleParent, CXml2ChartUI * p
 				continue;;
 			}
 
-			pChildUI = new CXml2ChartUI;
+			pChildUI = new CXml2ChartUI(this);
 			pParentUI->AddChild(pChildUI);
 			if ( bVertical )
 				pChildUI->SetChildrenLayout(LAYOUT_VERTICAL);
@@ -1097,6 +1157,7 @@ void CXml2ChartFile::ReadXmlChartFile(TiXmlElement* pEleParent, CXml2ChartUI * p
 			SetSplit(pChild, pChildUI);
 			SetBorder(pChild, pChildUI);
 			SetPadding(pChild, pChildUI);
+			SetVisible(pChild, pChildUI);
 
 			szAttr = pChild->Attribute("name");
 			if (szAttr) {
@@ -1292,7 +1353,7 @@ CXml2ChartUI *  CXml2ChartFile::ParseXml(TiXmlDocument & xmlDoc) {
 			if (m_ChartUI)
 				delete m_ChartUI;
 
-			m_ChartUI = new CXml2ChartUI;
+			m_ChartUI = new CXml2ChartUI(this);
 
 			const char * sAttr = 0;
 			int nWidth = 0;
@@ -1335,6 +1396,7 @@ CXml2ChartUI *  CXml2ChartFile::ParseXml(TiXmlDocument & xmlDoc) {
 			SetSplit(pElmChild, m_ChartUI);
 			SetBorder(pElmChild, m_ChartUI);
 			SetPadding(pElmChild, m_ChartUI);
+			SetVisible(pElmChild, m_ChartUI);
 
 			ReadXmlChartFile(pElmChild, m_ChartUI);
 		}

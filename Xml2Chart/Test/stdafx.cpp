@@ -183,6 +183,16 @@ void PrepareXmlChart(CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		pItem->SetText(pInfo->m_szMedicalDepartment);
 	}
 
+	// 转科别
+	pItem = xmlChart.FindChartUIByName("a_1");
+	if (pItem) {
+		pItem->SetVisible(TRUE);
+
+		pItem = xmlChart.FindChartUIByName("b_1");
+		if (pItem)
+			pItem->SetFontIndex(11);
+	}
+
 	// 病室
 	pItem = xmlChart.FindChartUIByName("ward");
 	if (pItem) {
@@ -193,6 +203,16 @@ void PrepareXmlChart(CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	pItem = xmlChart.FindChartUIByName("bed_no");
 	if (pItem) {
 		pItem->SetText(pInfo->m_szBedNo);
+	}
+
+	// 转床号
+	pItem = xmlChart.FindChartUIByName("a_2");
+	if (pItem) {
+		pItem->SetVisible(TRUE);
+
+		pItem = xmlChart.FindChartUIByName("b_2");  
+		if (pItem)
+			pItem->SetFontIndex(11);  
 	}
 
 	// 空数据不要打印
@@ -251,6 +271,7 @@ void PrepareXmlChart(CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 			pItem = xmlChart.FindChartUIByName(strText);
 			if (pItem) {
 				pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_breath[j]));
+				pItem->SetVAlignType(VALIGN_TOP);   
 			}
 		}
 	}

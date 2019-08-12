@@ -240,11 +240,19 @@ void CTestDlg::OnPaint()
 		info.m_sex = 1;
 		info.m_surgery = time(0);
 		STRNCPY(info.m_szBedNo, "1122", 20);
+		STRNCPY(info.m_szWard, "ssde", 20);
 
 		data[1].m_pulse[0] = 100;
 		data[1].m_pulse[1] = 110;
 		data[1].m_pulse[2] = 120;
 		data[1].m_pulse[3] = 113;
+
+		data[1].m_breath[0] = 120;
+		data[1].m_breath[1] = 122;
+		data[1].m_breath[2] = 124;
+		data[1].m_breath[3] = 126;
+		data[1].m_breath[4] = 130;
+		data[1].m_breath[5] = 125;
 
 		PrepareXmlChart(m_XmlChartFile, &info, data, 7, tFirstDay);
 

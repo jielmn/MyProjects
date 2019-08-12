@@ -81,10 +81,12 @@ enum  VAlignType {
 
 */
 
+class CXml2ChartFile;
+
 // 使用的时候，用new出来的堆内存，以便递归释放子UI
 class  CXml2ChartUI {
 public:
-	CXml2ChartUI();
+	CXml2ChartUI(CXml2ChartFile * pManager = 0);
 	~CXml2ChartUI();
 
 protected:
@@ -95,6 +97,7 @@ protected:
 	RECT       m_tPosition;      // 和float一起确定位置，父UI size改变，该值不变
 	int        m_nFixedWidth;    // 固定宽度(初始值为-1，表示自动计算，例如根据子窗口计算出的20%，100%等父窗口宽度)
 	int        m_nFixedHeight;   // 固定高度(初始值为-1)
+	BOOL       m_bVisible;       // 是否可见
 
 	HGDIOBJ    m_BorderPen[4];   // 边线Pen(包括线条粗细，颜色)
 
@@ -114,10 +117,14 @@ protected:
 	VAlignType                    m_eVAlign;               // 垂直排列
 
 	std::string                   m_strName;               // 名字
+	CXml2ChartFile *              m_pManager;
 
 public:
 	int   GetWidth() const;
 	int   GetHeight() const;
+
+	void  SetVisible(BOOL bVisible);
+	BOOL  GetVisible() const;
 
 	void  SetFloat(BOOL bFloat);
 	BOOL  GetFloat() const;
@@ -183,6 +190,9 @@ public:
 	void SetFont(HGDIOBJ  hFont);
 	HGDIOBJ  GetFont() const;
 
+	void SetFontIndex(int nIndex);
+	int  GetFontIndex() const;
+
 	void SetTextColor(COLORREF color);
 	COLORREF  GetTextColor() const;
 
@@ -203,8 +213,9 @@ public:
 
 	CXml2ChartUI * FindChartUIByName(const char * szName);
 
-protected:
+public:
 	std::map<int,HGDIOBJ>      m_mapFonts;
+protected:
 	std::map<int,HGDIOBJ>      m_mapPens;	
 
 	void ReadXmlChartFile(TiXmlElement* pElement, CXml2ChartUI * pParentUI );
@@ -216,6 +227,7 @@ protected:
 	void SetFloat(TiXmlElement* pEle, CXml2ChartUI * pUI);
 	void SetPadding(TiXmlElement* pEle, CXml2ChartUI * pUI);
 	void SetText(TiXmlElement* pEle, CXml2ChartUI * pUI);
+	void SetVisible(TiXmlElement* pEle, CXml2ChartUI * pUI);
 
 	CXml2ChartUI *  FindChartUIByName(CXml2ChartUI * pUI, const char * szName);
 
