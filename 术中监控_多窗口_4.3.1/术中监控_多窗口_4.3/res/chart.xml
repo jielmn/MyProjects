@@ -48,16 +48,16 @@
 		
 		<HorizontalLayout padding="0,0,0,0" height="36">
 			<Item text="姓名" font="1" width="40" />
-			<HorizontalLayout border="0,0,0,7" width="60">
-				<Item font="1" name="patient_name" />
+			<HorizontalLayout width="60" padding="0,5,0,5" >
+				<Item font="1" name="patient_name" border="0,0,0,7" />
 			</HorizontalLayout>
 			<Item text="性别" font="1" width="40" />
-			<HorizontalLayout border="0,0,0,7" width="20" >
-				<Item font="1" name="sex" />
+			<HorizontalLayout width="20" padding="0,5,0,5" >
+				<Item font="1" name="sex" border="0,0,0,7"  />
 			</HorizontalLayout>
 			<Item text="年龄" font="1" width="40" />			
-			<HorizontalLayout border="0,0,0,7" width="20" >
-				<Item font="1" name="age" />
+			<HorizontalLayout width="20" padding="0,5,0,5" >
+				<Item font="1" name="age" border="0,0,0,7" />
 			</HorizontalLayout>
 			
 			<Item text="入院日期" font="1" width="80"/>
@@ -69,12 +69,41 @@
 			<Item text="日" font="1" width="20" />
 			
 			<Item text="" font="1" width="10"/>
-			<Item text="科别" font="1"/>
-			<Item text="" font="1" width="40" name="medical_department" />
-			<Item text="病室" font="1"/>
-			<Item text="" font="1" width="40" name="ward" />
-			<Item text="床号" font="1"/>
-			<Item text="" font="1" width="40" name="bed_no" />
+			<VerticalLayout>
+				<HorizontalLayout>
+					<Item text="科别" font="1"/>
+					<Item text="" font="1" width="40" name="medical_department" />
+				</HorizontalLayout>
+
+				<HorizontalLayout>
+					<Item text="转科" font="1"/>
+					<Item text="" font="1" width="40" name="medical_department_to" />
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			<VerticalLayout>
+				<HorizontalLayout>
+					<Item text="病室" font="1"/>
+					<Item text="" font="1" width="40" name="ward" />
+				</HorizontalLayout>
+
+				<HorizontalLayout>
+					<Item text="转室" font="1"/>
+					<Item text="" font="1" width="40" name="ward_to" />
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			<VerticalLayout>
+				<HorizontalLayout>
+					<Item text="床号" font="1"/>
+					<Item text="" font="1" width="40" name="bed_no" />
+				</HorizontalLayout>
+
+				<HorizontalLayout>
+					<Item text="转床" font="1"/>
+					<Item text="" font="1" width="40" name="bed_no_to" />
+				</HorizontalLayout>
+			</VerticalLayout>
 		</HorizontalLayout>
 		
 		<HorizontalLayout >
