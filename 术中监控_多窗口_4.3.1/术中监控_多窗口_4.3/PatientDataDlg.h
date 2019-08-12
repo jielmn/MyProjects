@@ -7,6 +7,7 @@
 #include "WaitingBarUI.h"
 #include "sigslot.h"
 #include "PatientDataPrintPreviewUI.h"
+#include "SixGridsUI.h"
 
 class CPatientDataDlg : public DuiLib::WindowImplBase, public sigslot::has_slots<>
 {
@@ -66,8 +67,8 @@ private:
 
 	CPatientDataPrintPreviewUI *  m_preview;
 
-	CDateTimeUI *               m_date_start;
-	CDateTimeUI *               m_date_end;
+	CMyDateUI *               m_date_start;
+	CMyDateUI *               m_date_end;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

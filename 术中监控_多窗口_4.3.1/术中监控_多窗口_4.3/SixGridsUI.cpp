@@ -201,3 +201,66 @@ void CShiftUI::DoInit() {
 		m_edits[i] = static_cast<DuiLib::CEditUI*>(m_pManager->FindControl(strText));
 	}
 }
+
+
+CMyDateUI::CMyDateUI() {
+	
+}
+
+CMyDateUI::~CMyDateUI() {
+	m_pManager->RemoveNotifier(this);
+}
+
+LPCTSTR CMyDateUI::GetClass() const {
+	return "MyDate";
+}
+
+void CMyDateUI::Notify(TNotifyUI& msg) {
+	if (msg.sType == "killfocus") {
+		if (msg.pSender == this) {
+			char szDate[256];
+			CDuiString strText;
+			SYSTEMTIME s = GetTime();
+			if (IsToday(s)) {
+				Date2String(szDate, sizeof(szDate), s);
+				strText.Format("%s(今天)", szDate);
+				SetText(strText);
+			}
+		}
+	}
+}
+
+void CMyDateUI::SetMyTime(SYSTEMTIME* pst) {
+	assert(pst);
+	SetTime(pst);
+
+	char szDate[256];
+	CDuiString strText;
+	if ( IsToday(*pst) ) {
+		Date2String(szDate, sizeof(szDate), *pst);
+		strText.Format("%s(今天)", szDate);
+		SetText(strText);
+	}
+	else {
+		Date2String(szDate, sizeof(szDate), *pst);
+		SetText(szDate);
+	}
+}
+
+void CMyDateUI::DoInit() {
+	CDateTimeUI::DoInit();
+	m_pManager->AddNotifier(this);
+
+	SYSTEMTIME s = GetTime();
+	char szDate[256];
+	CDuiString strText;
+	if (IsToday(s)) {
+		Date2String(szDate, sizeof(szDate), s);
+		strText.Format("%s(今天)", szDate);
+		SetText(strText);
+	}
+	else {
+		Date2String(szDate, sizeof(szDate), s);
+		SetText(szDate);
+	}
+}

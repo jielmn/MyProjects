@@ -75,8 +75,8 @@ void  CPatientDataDlg::OnMyInited() {
 	m_btnPrint = (CButtonUI *)m_PaintManager.FindControl("btnPrint");
 	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
 	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
-	m_date_start = (CDateTimeUI *)m_PaintManager.FindControl("DateTimeS");
-	m_date_end = (CDateTimeUI *)m_PaintManager.FindControl("DateTimeE");
+	m_date_start = (CMyDateUI *)m_PaintManager.FindControl("DateTimeS");
+	m_date_end = (CMyDateUI *)m_PaintManager.FindControl("DateTimeE");
 
 	InitInfo();
 	InitData();
@@ -115,6 +115,9 @@ DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "PatientDataPrintPreview")) {
 		return new CPatientDataPrintPreviewUI;
 	}
+	else if (0 == strcmp(pstrClass, "MyDateTime")) {
+		return new CMyDateUI;
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -127,7 +130,7 @@ void   CPatientDataDlg::InitInfo() {
 	CListLabelElementUI * pElement = 0;
 	CEditUI * pEdit = 0;
 	CCheckBoxUI * pCheckBox = 0;
-	CDateTimeUI * pDateTime = 0;
+	CMyDateUI * pDateTime = 0;
 	CShiftUI * pShift = 0;
 	
 
@@ -166,7 +169,7 @@ void   CPatientDataDlg::InitInfo() {
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->SetFixedWidth(20);
 	m_tree->AddNode("是否入院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-	pDateTime = new DuiLib::CDateTimeUI;
+	pDateTime = new CMyDateUI;
 	pDateTime->SetFixedWidth(140);
 	m_tree->AddNode("入院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 
@@ -176,7 +179,7 @@ void   CPatientDataDlg::InitInfo() {
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->SetFixedWidth(20);
 	m_tree->AddNode("是否出院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-	pDateTime = new DuiLib::CDateTimeUI;
+	pDateTime = new CMyDateUI;
 	pDateTime->SetFixedWidth(140);
 	m_tree->AddNode("出院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 
@@ -198,7 +201,7 @@ void   CPatientDataDlg::InitInfo() {
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->SetFixedWidth(20);
 	m_tree->AddNode("是否手术", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-	pDateTime = new DuiLib::CDateTimeUI;
+	pDateTime = new CMyDateUI;
 	pDateTime->SetFixedWidth(140);
 	m_tree->AddNode("手术日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 }
@@ -888,28 +891,8 @@ void  CPatientDataDlg::OnDateStartChanged() {
 
 // 时间控件失去焦点
 void  CPatientDataDlg::OnDateStartKillFocus() {
-	char szDate[256];
-	CDuiString strText;
-
 	SYSTEMTIME s = m_date_start->GetTime();
-	if ( IsToday(s) ) {
-		Date2String(szDate, sizeof(szDate), s);
-		strText.Format("%s(今天)", szDate);
-		m_date_start->SetText(strText);
-	}
-
 	time_t e = SysTime2Time(s) + 3600 * 24 * 6;
 	SYSTEMTIME e1 = Time2SysTime(e);
-	m_date_end->SetTime(&e1);
-
-	if (IsToday(e1)) { 
-		Date2String(szDate, sizeof(szDate), e1);
-		strText.Format("%s(今天)", szDate);
-		m_date_end->SetText(strText);    
-	}
-	else {
-		Date2String(szDate, sizeof(szDate), e1);
-		m_date_end->SetText(szDate);
-	}
-
+	m_date_end->SetMyTime(&e1);
 }

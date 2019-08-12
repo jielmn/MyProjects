@@ -264,7 +264,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			pFileBrowse->SetAttribute("hotimage", "file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
 			pFileBrowse->SetAttribute("pushedimage", "file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
 		}
-		else if (0 == strcmp(pConfig->GetClass(), DUI_CTR_DATETIME)) {
+		else if (0 == strcmp(pConfig->GetClass(), DUI_CTR_DATETIME) || 0 == strcmp(pConfig->GetClass(), "MyDate") ) {
 			CDateTimeUI * pDateTime = (CDateTimeUI *)pConfig;
 			RECT r = { 5,0,5,0 };
 			pDateTime->SetTextPadding( r );

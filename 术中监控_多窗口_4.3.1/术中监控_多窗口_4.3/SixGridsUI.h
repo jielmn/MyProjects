@@ -66,3 +66,15 @@ private:
 private:
 	CEditUI *              m_edits[2];
 };
+
+class CMyDateUI : public  CDateTimeUI, INotifyUI {
+public:
+	CMyDateUI();
+	~CMyDateUI();
+	void SetMyTime(SYSTEMTIME* pst);
+
+private:
+	LPCTSTR GetClass() const;
+	void Notify(TNotifyUI& msg);
+	void DoInit();
+};
