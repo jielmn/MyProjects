@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Window size="820,802" mininfo="800,600" caption="0,0,0,32" sizebox="0,0,0,0" roundcorner="5,5" defaultfontcolor="#FF386382" > <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
+<Window size="800,802" mininfo="800,600" caption="0,0,0,32" sizebox="0,0,0,0" roundcorner="5,5" defaultfontcolor="#FF386382" > <!-- 窗口的初始尺寸(宽800，高600)、窗口的最小尺寸(宽600，高400)、标题栏拖拽区域(高32)、可拖拽边框大小(这里添加sizebox后就可以拖拽边框调整大小了) -->
 	<Font id="0" name="宋体" size="12" bold="true" />
 	<Font id="1" name="宋体" size="13" bold="false" />
 	<Font id="2" name="宋体" size="15" bold="false" />
@@ -35,7 +35,7 @@
 					<MyDateTime name="DateTimeS" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
 					<Control width="10" />
 					<Label text="到" width="20" /> 
-					<MyDateTime name="DateTimeE" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" disabledtextcolor="#FF386382" />
+					<MyDateTime name="DateTimeE" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="20" />

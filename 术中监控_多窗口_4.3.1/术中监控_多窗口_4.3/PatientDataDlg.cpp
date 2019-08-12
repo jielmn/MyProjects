@@ -107,7 +107,7 @@ LRESULT CPatientDataDlg::HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lP
 
 DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
 	if (0 == strcmp(pstrClass, MYTREE_CLASS_NAME)) {
-		return new CMyTreeCfgUI(180);
+		return new CMyTreeCfgUI(160);
 	}
 	else if (0 == strcmp(pstrClass, "WaitingBar")) {
 		return new CWaitingBarUI;
@@ -198,7 +198,7 @@ void   CPatientDataDlg::InitInfo() {
 
 	// 手术
 	pEvent = new CMyEventUI;
-	m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1);                        
+	m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1, 30);                                              
 }
 
 void  CPatientDataDlg::AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag) {
