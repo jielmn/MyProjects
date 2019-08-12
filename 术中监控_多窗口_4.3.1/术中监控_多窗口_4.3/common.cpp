@@ -7,6 +7,7 @@
 #include "MyImageUI.h"
 #include "ModeButtonUI.h"
 #include "resource.h"
+#include "SixGridsUI.h"
 
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
@@ -51,6 +52,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(pstrClass, "MyHandImage")) {
 		return new CMyHandImage;
+	}
+	else if (0 == strcmp(pstrClass, "MyDateTime")) {
+		return new CMyDateUI;
 	}
 	return NULL;
 }

@@ -132,6 +132,7 @@ void   CPatientDataDlg::InitInfo() {
 	CCheckBoxUI * pCheckBox = 0;
 	CMyDateUI * pDateTime = 0;
 	CShiftUI * pShift = 0;
+	CMyEventUI * pEvent = 0;
 	
 
 	strText.Format("病人基础信息");
@@ -196,14 +197,8 @@ void   CPatientDataDlg::InitInfo() {
 	m_tree->AddNode("床号", pTitleNode, 0, pShift, 2, 0xFF386382, -1, -1, 30);
 
 	// 手术
-	strText.Format("手术");
-	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
-	pCheckBox = new CCheckBoxUI;
-	pCheckBox->SetFixedWidth(20);
-	m_tree->AddNode("是否手术", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-	pDateTime = new CMyDateUI;
-	pDateTime->SetFixedWidth(140);
-	m_tree->AddNode("手术日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
+	pEvent = new CMyEventUI;
+	m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1);                        
 }
 
 void  CPatientDataDlg::AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag) {

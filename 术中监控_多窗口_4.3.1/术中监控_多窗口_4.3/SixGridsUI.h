@@ -80,3 +80,19 @@ private:
 	void Notify(TNotifyUI& msg);
 	void DoInit();
 };
+
+
+class CMyEventUI : public CContainerUI, INotifyUI
+{
+public:
+	CMyEventUI();
+	~CMyEventUI();
+
+private:
+	LPCTSTR GetClass() const;
+	void DoInit();
+	void Notify(TNotifyUI& msg);
+
+private:
+	CDialogBuilderCallbackEx                    m_callback;
+};

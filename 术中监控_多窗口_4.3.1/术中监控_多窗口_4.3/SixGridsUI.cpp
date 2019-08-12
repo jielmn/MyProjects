@@ -279,3 +279,32 @@ void CMyDateUI::DoInit() {
 		SetText(szDate);
 	}
 }
+
+
+CMyEventUI::CMyEventUI() : m_callback(m_pManager) {
+
+}
+
+CMyEventUI::~CMyEventUI() {
+
+}
+
+LPCTSTR CMyEventUI::GetClass() const {
+	return "MyEvent";
+}
+
+void CMyEventUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("Event.xml"), (UINT)0, &m_callback, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}
+}
+
+void CMyEventUI::Notify(TNotifyUI& msg) {
+
+}
