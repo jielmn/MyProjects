@@ -226,6 +226,11 @@ void CMyDateUI::Notify(TNotifyUI& msg) {
 				strText.Format("%s(½ñÌì)", szDate);
 				SetText(strText);
 			}
+			else {
+				Date2String(szDate, sizeof(szDate), s);
+				strText.Format("%s(%s)", szDate, GetWeekDayShortName(s.wDayOfWeek));
+				SetText(strText);				
+			}
 		}
 	}
 }
@@ -243,7 +248,8 @@ void CMyDateUI::SetMyTime(SYSTEMTIME* pst) {
 	}
 	else {
 		Date2String(szDate, sizeof(szDate), *pst);
-		SetText(szDate);
+		strText.Format("%s(%s)", szDate, GetWeekDayShortName(pst->wDayOfWeek));
+		SetText(strText);
 	}
 }
 
@@ -261,6 +267,7 @@ void CMyDateUI::DoInit() {
 	}
 	else {
 		Date2String(szDate, sizeof(szDate), s);
+		strText.Format("%s(%s)", szDate, GetWeekDayShortName(s.wDayOfWeek));
 		SetText(szDate);
 	}
 }

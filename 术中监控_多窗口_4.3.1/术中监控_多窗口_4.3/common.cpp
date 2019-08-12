@@ -1115,6 +1115,7 @@ SYSTEMTIME Time2SysTime(const time_t & t) {
 	s.wHour  = (WORD)tTmTime.tm_hour;
 	s.wMinute = (WORD)tTmTime.tm_min;
 	s.wSecond = (WORD)tTmTime.tm_sec;
+	s.wDayOfWeek = (WORD)tTmTime.tm_wday;
 
 	return s;
 }
