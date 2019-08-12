@@ -9,6 +9,7 @@ public:
 	void  SetMode(int nMode);
 	void  SetValues(int nIndex, const char * szValue);
 	CDuiString  GetValues(int nIndex);
+	void  SetNumberOnly(BOOL bOnly);
 
 private:
 	LPCTSTR GetClass() const;
@@ -21,6 +22,7 @@ private:
 	CHorizontalLayoutUI *  m_top;
 	CHorizontalLayoutUI *  m_bottom;
 	int                    m_nMode;
+	BOOL                   m_bNumberOnly;
 };
 
 class CSevenGridsUI : public CContainerUI

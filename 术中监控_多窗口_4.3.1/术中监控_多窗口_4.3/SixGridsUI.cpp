@@ -6,6 +6,7 @@ CSixGridsUI::CSixGridsUI() {
 	m_top = 0;
 	m_bottom = 0;
 	m_nMode = 0;
+	m_bNumberOnly = TRUE;
 }
 
 CSixGridsUI::~CSixGridsUI() {
@@ -40,6 +41,9 @@ void CSixGridsUI::DoInit() {
 	for (int i = 0; i < 6; i++) {
 		strText.Format("edt_%d", i + 1);
 		m_edits[i] = static_cast<DuiLib::CEditUI*>(m_pManager->FindControl(strText));
+		if (!m_bNumberOnly) {
+			m_edits[i]->SetNumberOnly(false);
+		}
 	}
 }
 
@@ -65,6 +69,10 @@ CDuiString  CSixGridsUI::GetValues(int nIndex) {
 		return m_edits[nIndex]->GetText();
 	}
 	return "";
+}
+
+void  CSixGridsUI::SetNumberOnly(BOOL bOnly) {
+	m_bNumberOnly = bOnly;
 }
 
 

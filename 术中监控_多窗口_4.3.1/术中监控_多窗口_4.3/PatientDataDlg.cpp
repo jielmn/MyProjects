@@ -249,11 +249,12 @@ void  CPatientDataDlg::InitData() {
 	// ºôÎü 
 	strText.Format("ºôÎü");
 	pSixGrids = new CSixGridsUI;
-	pSixGrids->SetMode(1);	
+	pSixGrids->SetMode(1);		
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666);
 
 	for (int i = 0; i < 7; i++) {
 		pSixGrids = new CSixGridsUI;
+		pSixGrids->SetNumberOnly(FALSE);
 		m_tree->AddNode(week_days[i], pSubTitleNode, 0, pSixGrids, 2, 0xFF386382, 2, 0xFF386382, 30);
 	}
 	 
