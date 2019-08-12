@@ -81,8 +81,8 @@ void  CPatientDataDlg::OnMyInited() {
 	InitInfo();
 	InitData();
 
-	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
-	SetBusy(TRUE);
+	//CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
+	//SetBusy(TRUE);
 }
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -128,6 +128,7 @@ void   CPatientDataDlg::InitInfo() {
 	CEditUI * pEdit = 0;
 	CCheckBoxUI * pCheckBox = 0;
 	CDateTimeUI * pDateTime = 0;
+	CShiftUI * pShift = 0;
 	
 
 	strText.Format("病人基础信息");
@@ -169,17 +170,27 @@ void   CPatientDataDlg::InitInfo() {
 	pDateTime->SetFixedWidth(140);
 	m_tree->AddNode("入院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
 
+	// 出院日期
+	strText.Format("出院");
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
+	pCheckBox = new CCheckBoxUI;
+	pCheckBox->SetFixedWidth(20);
+	m_tree->AddNode("是否出院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
+	pDateTime = new DuiLib::CDateTimeUI;
+	pDateTime->SetFixedWidth(140);
+	m_tree->AddNode("出院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
+
 	// 科别
-	pEdit = new CEditUI;
-	m_tree->AddNode("科别", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+	pShift = new CShiftUI;    
+	m_tree->AddNode("科别", pTitleNode, 0, pShift, 2, 0xFF386382, -1, -1, 30 );         
 
 	// 病室
-	pEdit = new CEditUI;
-	m_tree->AddNode("病室", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+	pShift = new CShiftUI;
+	m_tree->AddNode("病室", pTitleNode, 0, pShift, 2, 0xFF386382, -1, -1, 30);
 
 	// 床号
-	pEdit = new CEditUI;
-	m_tree->AddNode("床号", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+	pShift = new CShiftUI;
+	m_tree->AddNode("床号", pTitleNode, 0, pShift, 2, 0xFF386382, -1, -1, 30);
 
 	// 手术
 	strText.Format("手术");
@@ -532,36 +543,36 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 }
 
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
-	PatientInfo info;
-	PatientData data[7];
+	//PatientInfo info;
+	//PatientData data[7];
 
-	GetPatientInfo(&info);
-	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+	//GetPatientInfo(&info);
+	//STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
 
-	// 保存姓名
-	if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
-		CBusiness::GetInstance()->SaveTagPNameAsyn(m_szTagId, info.m_szPName);
-	}
+	//// 保存姓名
+	//if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
+	//	CBusiness::GetInstance()->SaveTagPNameAsyn(m_szTagId, info.m_szPName);
+	//}
 
-	if ( IsPatientInfoChanged(&info) ) {
-		// 保存数据库
-		CBusiness::GetInstance()->SavePatientInfoAsyn(&info);
-	}
+	//if ( IsPatientInfoChanged(&info) ) {
+	//	// 保存数据库
+	//	CBusiness::GetInstance()->SavePatientInfoAsyn(&info);
+	//}
 
-	GetPatientData(data, 7);
-	time_t  tFirstDay = m_tDate - 3600 * 24 * 6;
+	//GetPatientData(data, 7);
+	//time_t  tFirstDay = m_tDate - 3600 * 24 * 6;
 
-	for (DWORD i = 0; i < 7; i++) {
-		if (IsPatientInfoChanged( &data[i], i ) ) {
-			STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
-			data[i].m_date = tFirstDay + 3600 * 24 * i;
-			// 保存数据库
-			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
-		}
-	}
-	
+	//for (DWORD i = 0; i < 7; i++) {
+	//	if (IsPatientInfoChanged( &data[i], i ) ) {
+	//		STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
+	//		data[i].m_date = tFirstDay + 3600 * 24 * i;
+	//		// 保存数据库
+	//		CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+	//	}
+	//}
+	//
 
-	STRNCPY( m_szUIPName, info.m_szPName, MAX_TAG_PNAME_LENGTH );
+	//STRNCPY( m_szUIPName, info.m_szPName, MAX_TAG_PNAME_LENGTH );
 	WindowImplBase::OnFinalMessage(hWnd);
 }
 

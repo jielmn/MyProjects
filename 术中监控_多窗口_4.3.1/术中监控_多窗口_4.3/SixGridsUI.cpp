@@ -169,3 +169,35 @@ void  CSevenGridsUI::DoInit() {
 void   CSevenGridsUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 	CContainerUI::SetAttribute(pstrName, pstrValue); 
 }
+
+
+
+CShiftUI::CShiftUI() {
+
+}
+
+CShiftUI::~CShiftUI() {
+
+}
+
+LPCTSTR CShiftUI::GetClass() const {
+	return "Shift";
+}
+
+void CShiftUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("Shift.xml"), (UINT)0, NULL, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}
+
+	CDuiString strText;
+	for (int i = 0; i < 2; i++) {
+		strText.Format("edt_%d", i + 1);
+		m_edits[i] = static_cast<DuiLib::CEditUI*>(m_pManager->FindControl(strText));
+	}
+}

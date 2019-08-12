@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout>
+		<Edit font="2" name="edt_1" width="200"  />
+		<Label text="[转" font="2" align="center" width="50" textcolor="#FF0000FF" />
+		<Edit font="2" name="edt_2" width="200" />		
+		<Label text="]" font="2" textcolor="#FF0000FF" />
+	</HorizontalLayout>
+</Window>

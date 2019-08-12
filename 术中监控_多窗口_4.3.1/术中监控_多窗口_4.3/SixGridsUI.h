@@ -51,3 +51,18 @@ private:
 	int                    m_nFont;
 	CDuiString             m_week_days[7];
 };
+
+
+class CShiftUI : public CContainerUI
+{
+public:
+	CShiftUI();
+	~CShiftUI();
+
+private:
+	LPCTSTR GetClass() const;
+	void DoInit();
+
+private:
+	CEditUI *              m_edits[2];
+};
