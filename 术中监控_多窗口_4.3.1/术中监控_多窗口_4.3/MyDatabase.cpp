@@ -156,12 +156,11 @@ void  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szS
 // 删除过时的温度数据，Tag数据
 void  CMySqliteDatabase::PruneOldData() {
 	char *zErrMsg = 0;
-	// 删除一周前的温度
+	// 删除3个月前的温度数据
 	char szSql[8192];
 	time_t today_zero_time = GetTodayZeroTime();
-	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;  // 一周前的开始位置
+	time_t tWeekBegin = today_zero_time - 3600 * 24 * 89;
 
-	// 删除一周前的温度数据
 	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE, (DWORD)tWeekBegin);
 	int ret = sqlite3_exec( m_db, szSql, 0, 0, &zErrMsg);
 	assert(0 == ret);

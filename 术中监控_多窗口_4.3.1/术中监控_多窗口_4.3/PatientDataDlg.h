@@ -46,6 +46,10 @@ private:
 	BOOL  IsPatientInfoChanged(PatientInfo * pInfo);
 	// 病人data是否改变
 	BOOL  IsPatientInfoChanged(PatientData * pData, int nIndex);
+	// 时间范围的起始时间改变
+	void  OnDateStartChanged();
+	// 时间控件失去焦点
+	void  OnDateStartKillFocus();
 
 private:
 	CMyTreeCfgUI  *             m_tree;
@@ -61,6 +65,9 @@ private:
 	time_t                      m_tDate;
 
 	CPatientDataPrintPreviewUI *  m_preview;
+
+	CDateTimeUI *               m_date_start;
+	CDateTimeUI *               m_date_end;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

@@ -652,6 +652,10 @@ extern int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize);
 extern void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
 	                       PatientData * pData, DWORD dwDataSize );
 extern void LoadXmlChart(CXml2ChartFile & xmlChart);
+extern BOOL IsToday(const SYSTEMTIME & s);
+extern char * Date2String(char * szDest, DWORD dwDestSize, const SYSTEMTIME & s);
+extern time_t SysTime2Time(const SYSTEMTIME & s);
+extern SYSTEMTIME Time2SysTime(const time_t & t);
 
 // templates
 template <class T>

@@ -20,6 +20,9 @@ CPatientDataDlg::CPatientDataDlg() {
 
 	m_tDate = time(0);
 	m_preview = 0;
+
+	m_date_start = 0;
+	m_date_end = 0;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -46,6 +49,16 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			m_preview->ZoomOut();
 		}
 	}
+	else if (msg.sType == "textchanged") {
+		if (name == "DateTimeS") {
+			OnDateStartChanged();			
+		}
+	}
+	else if (msg.sType == "killfocus") {
+		if (name == "DateTimeS") {
+			OnDateStartKillFocus();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -62,6 +75,8 @@ void  CPatientDataDlg::OnMyInited() {
 	m_btnPrint = (CButtonUI *)m_PaintManager.FindControl("btnPrint");
 	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
 	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
+	m_date_start = (CDateTimeUI *)m_PaintManager.FindControl("DateTimeS");
+	m_date_end = (CDateTimeUI *)m_PaintManager.FindControl("DateTimeE");
 
 	InitInfo();
 	InitData();
@@ -850,4 +865,40 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	
 
 	SetBusy(FALSE);
+}
+
+// 时间范围的起始时间改变
+void  CPatientDataDlg::OnDateStartChanged() {
+	//CDuiString  str;
+	//SYSTEMTIME s = m_date_start->GetTime();
+	//str.Format("%d-%d-%d %d:%d:%d \n", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond);
+	//::OutputDebugString(str);
+}
+
+// 时间控件失去焦点
+void  CPatientDataDlg::OnDateStartKillFocus() {
+	char szDate[256];
+	CDuiString strText;
+
+	SYSTEMTIME s = m_date_start->GetTime();
+	if ( IsToday(s) ) {
+		Date2String(szDate, sizeof(szDate), s);
+		strText.Format("%s(今天)", szDate);
+		m_date_start->SetText(strText);
+	}
+
+	time_t e = SysTime2Time(s) + 3600 * 24 * 6;
+	SYSTEMTIME e1 = Time2SysTime(e);
+	m_date_end->SetTime(&e1);
+
+	if (IsToday(e1)) { 
+		Date2String(szDate, sizeof(szDate), e1);
+		strText.Format("%s(今天)", szDate);
+		m_date_end->SetText(strText);    
+	}
+	else {
+		Date2String(szDate, sizeof(szDate), e1);
+		m_date_end->SetText(szDate);
+	}
+
 }

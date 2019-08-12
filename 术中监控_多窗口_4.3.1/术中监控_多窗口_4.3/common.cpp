@@ -1070,3 +1070,51 @@ void LoadXmlChart(CXml2ChartFile & xmlChart) {
 		}
 	}
 }
+
+BOOL IsToday(const SYSTEMTIME & s) {
+	time_t now = time(0);
+
+	struct tm  tmp;
+	localtime_s(&tmp, &now);
+
+	if (tmp.tm_year + 1900 == s.wYear && tmp.tm_mon + 1 == s.wMonth && tmp.tm_mday == s.wDay) {
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+char * Date2String(char * szDest, DWORD dwDestSize, const SYSTEMTIME & s) {
+	_snprintf_s(szDest, dwDestSize, dwDestSize, "%04d-%02d-%02d", (int)s.wYear, (int)s.wMonth, (int)s.wDay);
+	return szDest;
+}
+
+time_t SysTime2Time(const SYSTEMTIME & s) {
+	struct tm tTmTime;
+
+	tTmTime.tm_year = (int)s.wYear - 1900;
+	tTmTime.tm_mon  = (int)s.wMonth - 1;
+	tTmTime.tm_mday = (int)s.wDay;
+	tTmTime.tm_hour = (int)s.wHour;
+	tTmTime.tm_min  = (int)s.wMinute;
+	tTmTime.tm_sec  = (int)s.wSecond;
+
+	return mktime(&tTmTime);
+}
+
+SYSTEMTIME Time2SysTime(const time_t & t) {
+	struct tm tTmTime;
+	localtime_s(&tTmTime, &t);
+
+	SYSTEMTIME s;
+	memset(&s, 0, sizeof(SYSTEMTIME));
+
+	s.wYear  = (WORD)(tTmTime.tm_year + 1900);
+	s.wMonth = (WORD)(tTmTime.tm_mon + 1);
+	s.wDay   = (WORD)tTmTime.tm_mday;
+	s.wHour  = (WORD)tTmTime.tm_hour;
+	s.wMinute = (WORD)tTmTime.tm_min;
+	s.wSecond = (WORD)tTmTime.tm_sec;
+
+	return s;
+}
