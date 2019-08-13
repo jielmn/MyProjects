@@ -51,6 +51,8 @@ private:
 	void  OnDateStartChanged();
 	// 时间控件失去焦点
 	void  OnDateStartKillFocus();
+	// 选中了事件UI
+	void  OnMyEventSelected(CControlUI * pCtl);
 
 private:
 	CMyTreeCfgUI  *             m_tree;
@@ -69,6 +71,7 @@ private:
 
 	CMyDateUI *               m_date_start;
 	CMyDateUI *               m_date_end;
+	CVerticalLayoutUI *       m_lay_events;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

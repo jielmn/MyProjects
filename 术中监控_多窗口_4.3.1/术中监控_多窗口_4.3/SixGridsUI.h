@@ -87,12 +87,26 @@ class CMyEventUI : public CContainerUI, INotifyUI
 public:
 	CMyEventUI();
 	~CMyEventUI();
+	void SetSelected(BOOL bSel);
 
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
 	void Notify(TNotifyUI& msg);
+	void DoEvent(DuiLib::TEventUI& event);
 
 private:
 	CDialogBuilderCallbackEx                    m_callback;
+
+	CComboUI *                                  m_cmbType;
+	CDateTimeUI *                               m_date_1;
+	CEditUI *                                   m_edt_1;
+	CEditUI *                                   m_edt_2;
+
+	CDateTimeUI *                               m_date_2;
+	CEditUI *                                   m_edt_3;
+	CEditUI *                                   m_edt_4;
+	CHorizontalLayoutUI *                       m_lay_2;
+
+	CControlUI *                                m_sel;
 };

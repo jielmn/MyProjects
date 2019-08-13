@@ -23,6 +23,7 @@ CPatientDataDlg::CPatientDataDlg() {
 
 	m_date_start = 0;
 	m_date_end = 0;
+	m_lay_events = 0;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -47,6 +48,11 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnZoomOut") {
 			m_preview->ZoomOut();
+		}
+		else {
+			if ( msg.pSender->GetClass() == "MyEvent" ) {
+				OnMyEventSelected(msg.pSender);
+			}
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -136,7 +142,6 @@ void   CPatientDataDlg::InitInfo() {
 	CMyDateUI * pDateTime = 0;
 	CShiftUI * pShift = 0;
 	CMyEventUI * pEvent = 0;
-	CVerticalLayoutUI * pLayout = 0;
 	CHorizontalLayoutUI * pHLayout = 0;
 	CButtonUI * pBtn = 0;
 	CControlUI * pCtl = 0;
@@ -235,24 +240,24 @@ void   CPatientDataDlg::InitInfo() {
 	pHLayout->Add(pBtn);  
 	
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pHLayout, 3, 0xFF666666, -1, -1, 32);
-	pLayout = new CVerticalLayoutUI;
-	pLayout->SetName("12345");
+	m_lay_events = new CVerticalLayoutUI;
+	m_lay_events->SetName("12345");
 	RECT r = { 1,1,1,1 };
-	pLayout->SetInset(r);
-	pLayout->SetManager(&this->m_PaintManager, 0);
-	pLayout->EnableScrollBar(true);
-	pLayout->SetSepHeight(4);
+	m_lay_events->SetInset(r);
+	m_lay_events->SetManager(&this->m_PaintManager, 0);
+	m_lay_events->EnableScrollBar(true);
+	m_lay_events->SetSepHeight(4);
 	pEvent = new CMyEventUI; 
-	pLayout->Add(pEvent); 
+	m_lay_events->Add(pEvent);
 	pEvent = new CMyEventUI;
-	pLayout->Add(pEvent);
+	m_lay_events->Add(pEvent);
 	pEvent = new CMyEventUI; 
-	pLayout->Add(pEvent);
+	m_lay_events->Add(pEvent);
 	pEvent = new CMyEventUI;
-	pLayout->Add(pEvent);
+	m_lay_events->Add(pEvent);
 	pEvent = new CMyEventUI;
-	pLayout->Add(pEvent); 	 
-	m_tree->AddNode("手术等事件", pSubTitleNode, 0, pLayout, 2, 0xFF386382, -1, -1, 99);    
+	m_lay_events->Add(pEvent);
+	m_tree->AddNode("手术等事件", pSubTitleNode, 0, m_lay_events, 2, 0xFF386382, -1, -1, 99);
 
 	//pEvent = new CMyEventUI;
 	//m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1, 30);                                              
@@ -948,4 +953,18 @@ void  CPatientDataDlg::OnDateStartKillFocus() {
 	time_t e = SysTime2Time(s) + 3600 * 24 * 6;
 	SYSTEMTIME e1 = Time2SysTime(e);
 	m_date_end->SetMyTime(&e1);
+}
+
+// 选中了事件UI
+void  CPatientDataDlg::OnMyEventSelected(CControlUI * pCtl) {
+	int cnt = m_lay_events->GetCount();
+	for (int i = 0; i < cnt; i++) {
+		CMyEventUI * pItem = (CMyEventUI *)m_lay_events->GetItemAt(i);
+		if (pItem == pCtl) {
+			pItem->SetSelected(TRUE); 
+		}
+		else {
+			pItem->SetSelected(FALSE); 
+		}
+	}
 }

@@ -2,8 +2,12 @@
 <Window>
 	<HorizontalLayout height="30" bordercolor="#FF768D9B" bordersize="1,1,1,0" inset="1,1,1,1" >
 		<Combo name="cmbType" width="100" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5, 1, 5, 1" itemfont="2" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0,0,1,0" >  
-			<ListLabelElement text="手术" selected="true" />  
-			<ListLabelElement text="呼吸心跳停止" />  
+			<ListLabelElement text="手术" selected="true" />
+			<ListLabelElement text="分娩" />
+			<ListLabelElement text="转入" />
+			<ListLabelElement text="转出" />
+			<ListLabelElement text="呼吸心跳停止" />
+			<ListLabelElement text="请假" />
 		</Combo>
 		
 		<HorizontalLayout width="5" />
@@ -17,7 +21,7 @@
 			<Label font="2" textcolor="#FF386382" text="分" width="20" />
 		</HorizontalLayout>
 					
-		<HorizontalLayout>
+		<HorizontalLayout name="lay_2" width="220">
 			<Label font="2" textcolor="#FF0000FF" text="到" width="20" />
 			<DateTime name="date_2" width="100" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
 			<HorizontalLayout width="5" />
@@ -26,6 +30,13 @@
 			<Edit name="edt_4" font="2" textcolor="#FF386382" width="25" numberonly="true" bordercolor="#FF768D9B" bordersize="0" />
 			<Label font="2" textcolor="#FF386382" text="分" width="20" />
 		</HorizontalLayout>
+		
+		<Control />
+		<VerticalLayout width="16">
+			<Control />
+			<Control bkimage="selected.png" height="16" name="sel" visible="false" />
+			<Control />
+		</VerticalLayout>
 		
 	</HorizontalLayout>
 </Window>

@@ -282,11 +282,19 @@ void CMyDateUI::DoInit() {
 
 
 CMyEventUI::CMyEventUI() : m_callback(m_pManager) {
-
+	m_cmbType = 0;
+	m_date_1 = 0;
+	m_edt_1 = 0;
+	m_edt_2 = 0;
+	m_date_2 = 0;
+	m_edt_3 = 0;
+	m_edt_4 = 0;
+	m_lay_2 = 0;
+	m_sel = 0;
 }
 
 CMyEventUI::~CMyEventUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 LPCTSTR CMyEventUI::GetClass() const {
@@ -304,8 +312,54 @@ void CMyEventUI::DoInit() {
 		return;
 	}
 	this->SetFixedHeight(30);
+
+	m_cmbType = static_cast<CComboUI*>(m_pManager->FindControl("cmbType"));
+	m_date_1 = static_cast<CDateTimeUI*>(m_pManager->FindControl("date_1"));
+	m_edt_1 = static_cast<CEditUI*>(m_pManager->FindControl("edt_1"));
+	m_edt_2 = static_cast<CEditUI*>(m_pManager->FindControl("edt_2"));
+	m_date_2 = static_cast<CDateTimeUI*>(m_pManager->FindControl("date_2"));
+	m_edt_3 = static_cast<CEditUI*>(m_pManager->FindControl("edt_3"));
+	m_edt_4 = static_cast<CEditUI*>(m_pManager->FindControl("edt_4"));
+	m_lay_2 = static_cast<CHorizontalLayoutUI*>(m_pManager->FindControl("lay_2"));
+	m_sel = m_pManager->FindControl("sel");
+
+	m_lay_2->SetVisible(false);
+	m_pManager->AddNotifier(this);
 }
 
 void CMyEventUI::Notify(TNotifyUI& msg) {
+	if (msg.sType == "itemselect") {
+		if ( msg.pSender == m_cmbType ) {
+			int nSel = m_cmbType->GetCurSel();
+			if (nSel == 5) {
+				m_lay_2->SetVisible(true);
+			}
+			else {
+				m_lay_2->SetVisible(false);
+			}
+		}
+	}
+	else if (msg.sType == "setfocus") {
+		if (msg.pSender == m_cmbType || msg.pSender == m_edt_1 || msg.pSender == m_edt_2
+			|| msg.pSender == m_edt_3 || msg.pSender == m_edt_4 || msg.pSender == m_date_1
+			|| msg.pSender == m_date_2 ) {
+			//告诉UIManager这个消息需要处理
+			m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+		}
+	}
+}
 
+void CMyEventUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN) {
+		//告诉UIManager这个消息需要处理
+		m_pManager->SendNotify(this, DUI_MSGTYPE_CLICK);
+	}
+	CContainerUI::DoEvent(event);
+}
+
+void CMyEventUI::SetSelected(BOOL bSel) {
+	if (bSel)
+		m_sel->SetVisible(true);
+	else
+		m_sel->SetVisible(false);
 }
