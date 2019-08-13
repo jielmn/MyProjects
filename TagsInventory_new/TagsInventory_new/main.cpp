@@ -1009,7 +1009,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 
 		strText.Format("%d", (int)s_check_tags.size());
-		m_lblCheckCount->SetText(strText);
+		SET_CONTROL_TEXT(m_lblCheckCount, strText);
 
 		if (0 == nError) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
