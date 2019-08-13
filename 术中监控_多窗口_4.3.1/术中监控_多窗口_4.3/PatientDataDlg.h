@@ -53,6 +53,10 @@ private:
 	void  OnDateStartKillFocus();
 	// 选中了事件UI
 	void  OnMyEventSelected(CControlUI * pCtl);
+	// 
+	void  OnAddMyEvent();
+	//
+	void  OnDelMyEvent();
 
 private:
 	CMyTreeCfgUI  *             m_tree;
@@ -72,6 +76,7 @@ private:
 	CMyDateUI *               m_date_start;
 	CMyDateUI *               m_date_end;
 	CVerticalLayoutUI *       m_lay_events;
+	int                       m_selected_event;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

@@ -24,6 +24,7 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_date_start = 0;
 	m_date_end = 0;
 	m_lay_events = 0;
+	m_selected_event = -1;
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -48,6 +49,12 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnZoomOut") {
 			m_preview->ZoomOut();
+		}
+		else if (name == "btnAddEvent") {
+			OnAddMyEvent();
+		}
+		else if (name == "btnDelEvent") {
+			OnDelMyEvent();
 		}
 		else {
 			if ( msg.pSender->GetClass() == "MyEvent" ) {
@@ -141,7 +148,6 @@ void   CPatientDataDlg::InitInfo() {
 	CCheckBoxUI * pCheckBox = 0;
 	CMyDateUI * pDateTime = 0;
 	CShiftUI * pShift = 0;
-	CMyEventUI * pEvent = 0;
 	CHorizontalLayoutUI * pHLayout = 0;
 	CButtonUI * pBtn = 0;
 	CControlUI * pCtl = 0;
@@ -247,20 +253,7 @@ void   CPatientDataDlg::InitInfo() {
 	m_lay_events->SetManager(&this->m_PaintManager, 0);
 	m_lay_events->EnableScrollBar(true);
 	m_lay_events->SetSepHeight(4);
-	pEvent = new CMyEventUI; 
-	m_lay_events->Add(pEvent);
-	pEvent = new CMyEventUI;
-	m_lay_events->Add(pEvent);
-	pEvent = new CMyEventUI; 
-	m_lay_events->Add(pEvent);
-	pEvent = new CMyEventUI;
-	m_lay_events->Add(pEvent);
-	pEvent = new CMyEventUI;
-	m_lay_events->Add(pEvent);
 	m_tree->AddNode("手术等事件", pSubTitleNode, 0, m_lay_events, 2, 0xFF386382, -1, -1, 99);
-
-	//pEvent = new CMyEventUI;
-	//m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1, 30);                                              
 }
 
 void  CPatientDataDlg::AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag) {
@@ -962,9 +955,57 @@ void  CPatientDataDlg::OnMyEventSelected(CControlUI * pCtl) {
 		CMyEventUI * pItem = (CMyEventUI *)m_lay_events->GetItemAt(i);
 		if (pItem == pCtl) {
 			pItem->SetSelected(TRUE); 
+			m_selected_event = i;
 		}
 		else {
 			pItem->SetSelected(FALSE); 
 		}
+	}
+}
+
+// 
+void  CPatientDataDlg::OnAddMyEvent() {
+	int cnt = m_lay_events->GetCount();
+	CMyEventUI * pEvent = new CMyEventUI;
+	if (cnt > 0) {
+		RECT r = { 1,0,1,1 };
+		pEvent->SetBorderSize(r);
+	}
+	else {
+		pEvent->SetBorderSize(1);
+		pEvent->SetSelected(TRUE);
+		m_selected_event = 0;
+	}
+	m_lay_events->Add(pEvent);  
+}
+
+//
+void  CPatientDataDlg::OnDelMyEvent() {
+	int cnt = m_lay_events->GetCount();
+	if (0 == cnt)
+		return;
+	if (m_selected_event < 0)
+		return;
+	if (m_selected_event >= cnt)
+		return;
+
+	m_lay_events->RemoveAt(m_selected_event);
+	cnt = m_lay_events->GetCount();
+	if ( cnt > 0 ) {
+		CMyEventUI * pEvent = (CMyEventUI *)m_lay_events->GetItemAt(0);
+		pEvent->m_lay_1->SetBorderSize(1);
+
+		if (m_selected_event < cnt) {
+			pEvent = (CMyEventUI *)m_lay_events->GetItemAt(m_selected_event);
+			pEvent->SetSelected(TRUE);
+		}
+		else {
+			pEvent = (CMyEventUI *)m_lay_events->GetItemAt(cnt-1);
+			pEvent->SetSelected(TRUE);
+			m_selected_event = cnt - 1;
+		}
+	}
+	else {
+		m_selected_event = -1;
 	}
 }

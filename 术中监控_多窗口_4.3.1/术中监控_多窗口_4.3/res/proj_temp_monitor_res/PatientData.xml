@@ -34,7 +34,7 @@
 				<HorizontalLayout height="30" inset="10,0,10,0">
 					<MyDateTime name="DateTimeS" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
 					<Control width="10" />
-					<Label text="到" width="20" /> 
+					<Label text="到" width="20" font="2" /> 
 					<MyDateTime name="DateTimeE" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" />
 				</HorizontalLayout>
 				

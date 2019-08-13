@@ -88,6 +88,7 @@ public:
 	CMyEventUI();
 	~CMyEventUI();
 	void SetSelected(BOOL bSel);
+	CHorizontalLayoutUI *                       m_lay_1;
 
 private:
 	LPCTSTR GetClass() const;
@@ -108,5 +109,6 @@ private:
 	CEditUI *                                   m_edt_4;
 	CHorizontalLayoutUI *                       m_lay_2;
 
-	CControlUI *                                m_sel;
+	CControlUI *                                m_sel;	
+	BOOL                                        m_bSelected;
 };

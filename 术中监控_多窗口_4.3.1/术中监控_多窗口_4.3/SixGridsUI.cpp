@@ -291,6 +291,8 @@ CMyEventUI::CMyEventUI() : m_callback(m_pManager) {
 	m_edt_4 = 0;
 	m_lay_2 = 0;
 	m_sel = 0;
+	m_lay_1 = 0;
+	m_bSelected = FALSE;
 }
 
 CMyEventUI::~CMyEventUI() {
@@ -322,8 +324,14 @@ void CMyEventUI::DoInit() {
 	m_edt_4 = static_cast<CEditUI*>(m_pManager->FindControl("edt_4"));
 	m_lay_2 = static_cast<CHorizontalLayoutUI*>(m_pManager->FindControl("lay_2"));
 	m_sel = m_pManager->FindControl("sel");
+	m_lay_1 = static_cast<CHorizontalLayoutUI*>(m_pManager->FindControl("lay_1"));
+	m_lay_1->SetBorderSize(this->GetBorderSize());
 
-	m_lay_2->SetVisible(false);
+	if (m_bSelected)
+		m_sel->SetVisible(true);
+	else
+		m_sel->SetVisible(false); 
+
 	m_pManager->AddNotifier(this);
 }
 
@@ -358,8 +366,11 @@ void CMyEventUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void CMyEventUI::SetSelected(BOOL bSel) {
-	if (bSel)
-		m_sel->SetVisible(true);
-	else
-		m_sel->SetVisible(false);
+	m_bSelected = bSel;
+	if (m_sel) {
+		if (bSel)
+			m_sel->SetVisible(true);
+		else
+			m_sel->SetVisible(false);
+	}		
 }
