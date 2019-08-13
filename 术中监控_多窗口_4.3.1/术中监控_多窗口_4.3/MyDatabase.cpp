@@ -37,10 +37,13 @@
 */
 
 // 病人基础信息(病人的id以Tag id计算)
-#define  PATIENT_INFO                   "patientinfo"
+#define  PATIENT_INFO_TABLE                   "pinfo"
+
+// 病人事件(手术，请假等)
+#define  PATIENT_EVENT_TABLE                  "pevent"
 
 // 病人的非温度数据
-#define  PATIENT_DATA                   "patientdata"
+#define  PATIENT_DATA_TABLE                   "pdata"
 
 
 CMySqliteDatabase::CMySqliteDatabase() {
@@ -77,19 +80,29 @@ int CMySqliteDatabase::InitDb() {
 		"bed_id        int          NOT NULL        PRIMARY KEY," \
 		"tag_id        CHAR(16)     NOT NULL");
 
-	CreateTable(PATIENT_INFO, 
+	CreateTable(PATIENT_INFO_TABLE,
 		"tag_id        CHAR(16)    NOT NULL         PRIMARY KEY," \
 		"sex           int," \
 	    "age           int," \
 	    "outpatient_no varchar(20)," \
 	    "hospital_admission_no varchar(20), " \
 	    "in_hospital_date int," \
+		"out_hospital_date int," \
 	    "medical_department varchar(20), " \
 	    "ward varchar(20), " \
 	    "bed_no varchar(20), " \
-	    "surgery_date int" );
+		"medical_department2 varchar(20), " \
+		"ward2 varchar(20), " \
+		"bed_no2 varchar(20)" );
 
-	CreateTable(PATIENT_DATA, 
+	CreateTable(PATIENT_EVENT_TABLE,
+		"id          INTEGER      PRIMARY KEY     AUTOINCREMENT," \
+		"tag_id      CHAR(16)     NOT NULL, " \
+		"type        int          NOT NULL," \
+		"date_1      int          NOT NULL," \
+		"date_2      int" );
+
+	CreateTable(PATIENT_DATA_TABLE,
 		"tag_id      CHAR(16)     NOT NULL, " \
 	    "date        int          NOT NULL, " \
 	    "pulse_1     int, " \
@@ -98,16 +111,16 @@ int CMySqliteDatabase::InitDb() {
 		"pulse_4     int, " \
 		"pulse_5     int, " \
 		"pulse_6     int, " \
-		"breath_1    int, " \
-		"breath_2    int, " \
-		"breath_3    int, " \
-		"breath_4    int, " \
-		"breath_5    int, " \
-		"breath_6    int, " \
-		"defecate    int, " \
-		"urine       int, " \
-		"total_income  int, " \
-		"total_output  int, " \
+		"breath_1    varchar(20), " \
+		"breath_2    varchar(20), " \
+		"breath_3    varchar(20), " \
+		"breath_4    varchar(20), " \
+		"breath_5    varchar(20), " \
+		"breath_6    varchar(20), " \
+		"defecate    varchar(20), " \
+		"urine       varchar(20), " \
+		"total_income  varchar(20), " \
+		"total_output  varchar(20), " \
 		"blood_pressure varchar(20), " \
 		"weight varchar(20), " \
 		"irritability varchar(20), PRIMARY KEY(tag_id, date) ");
@@ -568,7 +581,7 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 	memset(pRet, 0, sizeof(PatientInfo));
 
 	char sql[8192];
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", PATIENT_INFO, pParam->m_szTagId);
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", PATIENT_INFO_TABLE, pParam->m_szTagId);
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
@@ -638,7 +651,7 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 	char sql[8192];
 	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", 
-		PATIENT_INFO, pParam->m_info.m_szTagId );
+		PATIENT_INFO_TABLE, pParam->m_info.m_szTagId );
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
@@ -668,7 +681,7 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 		SNPRINTF(sql, sizeof(sql), "UPDATE %s set sex=%d, age=%d, outpatient_no='%s', "
 			"hospital_admission_no='%s', in_hospital_date=%lu, medical_department='%s', "
 			"ward='%s', bed_no='%s', surgery_date=%lu WHERE tag_id='%s' ", 
-			PATIENT_INFO, info.m_sex, info.m_age, info.m_szOutpatientNo, 
+			PATIENT_INFO_TABLE, info.m_sex, info.m_age, info.m_szOutpatientNo,
 			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, info.m_szMedicalDepartment,
 			info.m_szWard, info.m_szBedNo, (DWORD)info.m_surgery, info.m_szTagId );
 		sqlite3_exec(m_db, sql, 0, 0, 0);		
@@ -676,7 +689,7 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 	else {
 		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %d, %d, '%s', '%s',"
 			"%lu, '%s', '%s', '%s', %lu ); ",
-			PATIENT_INFO, info.m_szTagId, info.m_sex, info.m_age, info.m_szOutpatientNo,
+			PATIENT_INFO_TABLE, info.m_szTagId, info.m_sex, info.m_age, info.m_szOutpatientNo,
 			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, info.m_szMedicalDepartment,
 			info.m_szWard, info.m_szBedNo, (DWORD)info.m_surgery );
 		sqlite3_exec(m_db, sql, 0, 0, 0);
@@ -700,7 +713,7 @@ void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam,
 		time_t tDate = tFirstZeroTime + 3600 * 24 * i;
 
 		SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' AND date=%lu", 
-			PATIENT_DATA, pParam->m_szTagId, (DWORD)(tDate) );
+			PATIENT_DATA_TABLE, pParam->m_szTagId, (DWORD)(tDate) );
 
 		nrow = ncolumn = 0;
 		azResult = 0;
@@ -837,7 +850,7 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 
 	char sql[8192];
 	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' AND date=%lu ",
-		PATIENT_DATA, data.m_szTagId, (DWORD)data.m_date );
+		PATIENT_DATA_TABLE, data.m_szTagId, (DWORD)data.m_date );
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
@@ -853,7 +866,7 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 			"breath_3 = %d, breath_4 = %d, breath_5 = %d, breath_6 = %d, defecate = %d, " 
 			"urine = %d, total_income = %d, total_output = %d, blood_pressure = '%s', " 
 			"weight = '%s', irritability = '%s' WHERE tag_id = '%s' AND date = %lu ",
-			PATIENT_DATA, data.m_pulse[0], data.m_pulse[1],
+			PATIENT_DATA_TABLE, data.m_pulse[0], data.m_pulse[1],
 			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
 			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
 			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
@@ -864,7 +877,7 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 	else {
 		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %lu, %d, %d, %d, %d, %d, %d, "
 			"%d, %d, %d, %d, %d, %d,  %d, %d, %d, %d, '%s', '%s',  '%s' ); ",
-			PATIENT_DATA, data.m_szTagId, (DWORD)data.m_date, data.m_pulse[0], data.m_pulse[1],
+			PATIENT_DATA_TABLE, data.m_szTagId, (DWORD)data.m_date, data.m_pulse[0], data.m_pulse[1],
 			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
 			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
 			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
