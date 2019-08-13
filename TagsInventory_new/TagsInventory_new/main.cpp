@@ -8,6 +8,10 @@
 #include "39BarCode.h"
 #include "LmnString.h"
 
+
+// 保存已经入库的tag到文件
+static FILE * s_fp_conflit_tags = 0;
+
 void  CDuiFrameWnd::InitWindow() {
 	char buf[8192];
 
@@ -175,7 +179,7 @@ void  CDuiFrameWnd::InitWindow() {
 	t.wYear += 3;
 	m_dateValid->SetTime(&t);
 	SNPRINTF( buf, sizeof(buf), "%04d-%02d-%02d", t.wYear, t.wMonth, t.wDay);
-	m_dateValid->SetText( buf );
+	m_dateValid->SetText( buf );	
 
 	WindowImplBase::InitWindow();
 }
@@ -536,8 +540,10 @@ void  CDuiFrameWnd::OnTest() {
 	//m_edtBigBatchId->SetText("20180901");
 	//PrintInventoryBig();
 
-	m_edtPackageId->SetText("WHET201809012003");
-	PrintInventorySmall();
+	//SET_CONTROL_TEXT(m_lblCheckTagId, "123");
+
+	//m_edtPackageId->SetText("WHET201809012003");
+	//PrintInventorySmall();
 
 }
 
@@ -972,6 +978,10 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (1 == nError) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, ERROR_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_ERROR);
+			if (s_fp_conflit_tags) {
+				fwrite(pItem->abyUid, 1, pItem->dwUidLen, s_fp_conflit_tags);
+				fwrite("\r\n", 1, 2, s_fp_conflit_tags);
+			}
 		}
 		// 如果是断开连接
 		else  {
@@ -1488,6 +1498,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->sigInit.emit(&ret);
 
+	s_fp_conflit_tags = fopen("conflit_tags.txt", "wb");
+
 	DuiLib::CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	
@@ -1521,6 +1533,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CBusiness::GetInstance()->sigDeinit.emit(&ret);
 	delete CBusiness::GetInstance();
 	LmnToolkits::ThreadManager::ReleaseInstance();
+
+	if (s_fp_conflit_tags)
+		fclose(s_fp_conflit_tags);
 
 	return 0;
 }
