@@ -78,6 +78,9 @@ void  CPatientDataDlg::OnMyInited() {
 	m_date_start = (CMyDateUI *)m_PaintManager.FindControl("DateTimeS");
 	m_date_end = (CMyDateUI *)m_PaintManager.FindControl("DateTimeE");
 
+	m_tree->SetSelectedItemBkColor(0xFFFFFFFF);
+	m_tree->SetHotItemBkColor(0xFFFFFFFF);
+
 	InitInfo();
 	InitData();
 
@@ -133,7 +136,10 @@ void   CPatientDataDlg::InitInfo() {
 	CMyDateUI * pDateTime = 0;
 	CShiftUI * pShift = 0;
 	CMyEventUI * pEvent = 0;
-	
+	CVerticalLayoutUI * pLayout = 0;
+	CHorizontalLayoutUI * pHLayout = 0;
+	CButtonUI * pBtn = 0;
+	CControlUI * pCtl = 0;
 
 	strText.Format("病人基础信息");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
@@ -196,9 +202,60 @@ void   CPatientDataDlg::InitInfo() {
 	pShift = new CShiftUI;
 	m_tree->AddNode("床号", pTitleNode, 0, pShift, 2, 0xFF386382, -1, -1, 30);
 
-	// 手术
+	// 手术事件
+	strText.Format("事件");
+	pHLayout = new CHorizontalLayoutUI;
+	pCtl = new CControlUI;
+	pHLayout->Add(pCtl);
+
+	pBtn = new CButtonUI;
+	pBtn->SetText("添加");
+	pBtn->SetFixedWidth(60);
+	pBtn->SetNormalImage("file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetHotImage("file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetPushedImage("file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetFont(1);
+	pBtn->SetTextColor(0xFF386382);
+	pBtn->SetName("btnAddEvent");
+	pHLayout->Add(pBtn);
+
+	pCtl = new CControlUI;
+	pCtl->SetFixedWidth(10);
+	pHLayout->Add(pCtl);
+
+	pBtn = new CButtonUI;
+	pBtn->SetText("删除");
+	pBtn->SetFixedWidth(60);
+	pBtn->SetNormalImage("file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetHotImage("file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetPushedImage("file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetFont(1);
+	pBtn->SetTextColor(0xFF386382);
+	pBtn->SetName("btnDelEvent");
+	pHLayout->Add(pBtn);  
+	
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pHLayout, 3, 0xFF666666, -1, -1, 32);
+	pLayout = new CVerticalLayoutUI;
+	pLayout->SetName("12345");
+	RECT r = { 1,1,1,1 };
+	pLayout->SetInset(r);
+	pLayout->SetManager(&this->m_PaintManager, 0);
+	pLayout->EnableScrollBar(true);
+	pLayout->SetSepHeight(4);
+	pEvent = new CMyEventUI; 
+	pLayout->Add(pEvent); 
 	pEvent = new CMyEventUI;
-	m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1, 30);                                              
+	pLayout->Add(pEvent);
+	pEvent = new CMyEventUI; 
+	pLayout->Add(pEvent);
+	pEvent = new CMyEventUI;
+	pLayout->Add(pEvent);
+	pEvent = new CMyEventUI;
+	pLayout->Add(pEvent); 	 
+	m_tree->AddNode("手术等事件", pSubTitleNode, 0, pLayout, 2, 0xFF386382, -1, -1, 99);    
+
+	//pEvent = new CMyEventUI;
+	//m_tree->AddNode("手术", pTitleNode, 0, pEvent, 2, 0xFF386382, -1, -1, 30);                                              
 }
 
 void  CPatientDataDlg::AddComboItem(CComboUI * pCombo, const char * szItem, UINT_PTR tag) {

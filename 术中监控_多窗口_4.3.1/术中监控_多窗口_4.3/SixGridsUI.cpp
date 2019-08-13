@@ -303,6 +303,7 @@ void CMyEventUI::DoInit() {
 		this->RemoveAll();
 		return;
 	}
+	this->SetFixedHeight(30);
 }
 
 void CMyEventUI::Notify(TNotifyUI& msg) {
