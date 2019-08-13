@@ -84,8 +84,9 @@ private:
 	HFONT                    m_font_small;
 
 	// check
-	DuiLib::CLabelUI *       m_lblCheckTagId;
+	DuiLib::CEditUI *        m_lblCheckTagId;
 	DuiLib::CLabelUI *       m_lblCheckTagRet;
+	DuiLib::CLabelUI *       m_lblCheckCount;
 
 	// ´ó°ü×°
 	DuiLib::CButtonUI *      m_btnStartBig;

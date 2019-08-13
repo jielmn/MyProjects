@@ -11,6 +11,7 @@
 
 // 保存已经入库的tag到文件
 static FILE * s_fp_conflit_tags = 0;
+static std::vector<std::string>  s_check_tags;
 
 void  CDuiFrameWnd::InitWindow() {
 	char buf[8192];
@@ -34,8 +35,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblInvSmallSaveRet = (DuiLib::CLabelUI *)m_PaintManager.FindControl(INV_SMALL_SAVE_LABEL_ID);
 
 	// check
-	m_lblCheckTagId = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_ID_LABEL_ID)));
+	m_lblCheckTagId = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_ID_LABEL_ID))); 
 	m_lblCheckTagRet = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl(_T(CHECK_TAG_RET_LABEL_ID)));
+	m_lblCheckCount = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblCheckTagCnt"));
 
 	// 大盘点
 	m_btnStartBig = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl(_T(START_BIG_BUTTON_ID)));
@@ -544,6 +546,25 @@ void  CDuiFrameWnd::OnTest() {
 
 	//m_edtPackageId->SetText("WHET201809012003");
 	//PrintInventorySmall();
+	//m_lblCheckTagId->SetText("123a");
+
+	TagItem * pItem = new TagItem;
+	static int n = 0;
+	n++;
+	int a = n % 5;
+	if ( 0 == a )
+		memcpy( pItem->abyUid, "12345678", 8);
+	else if ( 1 == a )
+		memcpy(pItem->abyUid, "23456789", 8);
+	else if (2 == a)
+		memcpy(pItem->abyUid, "34567890", 8);
+	else if (3 == a)
+		memcpy(pItem->abyUid, "45678901", 8);
+	else
+		memcpy(pItem->abyUid, "56789012", 8);
+	pItem->dwUidLen = 8;
+
+	this->PostMessage(UM_CHECK_TAG_RESULT, 1, (LPARAM)pItem);
 
 }
 
@@ -919,6 +940,7 @@ void  CDuiFrameWnd::PrintInventoryBig() {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	int nError = 0;
 	char buf[8192];
+	DuiLib::CDuiString strText;
 
 	if ( uMsg == UM_INVENTORY_RESULT ) {
 		TagItem * pItem = (TagItem *)wParam;
@@ -968,8 +990,26 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		nError = (int)wParam;
 		TagItem * pItem = (TagItem *)lParam;
 
-		GetUid(buf, sizeof(buf), pItem->abyUid, pItem->dwUidLen, '-');
-		SET_CONTROL_TEXT(m_lblCheckTagId, buf);
+		GetUid(buf, sizeof(buf), pItem->abyUid, pItem->dwUidLen, '-'); 
+		SET_CONTROL_TEXT(m_lblCheckTagId, buf);  
+
+		BOOL  bNewTag = FALSE;
+		std::vector<std::string>::iterator it;
+		for (it = s_check_tags.begin(); it != s_check_tags.end(); ++it) {
+			std::string & s = *it;
+			// 找到同样的tag id
+			if (0 == strcmp(s.c_str(), buf)) {
+				break;
+			}
+		}
+
+		if ( it == s_check_tags.end() ) {
+			s_check_tags.push_back(buf);
+			bNewTag = TRUE;
+		}
+
+		strText.Format("%d", (int)s_check_tags.size());
+		m_lblCheckCount->SetText(strText);
 
 		if (0 == nError) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, NORMAL_COLOR);
@@ -978,7 +1018,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (1 == nError) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, ERROR_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_ERROR);
-			if (s_fp_conflit_tags) {
+			if (s_fp_conflit_tags && bNewTag) {
 				fwrite(pItem->abyUid, 1, pItem->dwUidLen, s_fp_conflit_tags);
 				fwrite("\r\n", 1, 2, s_fp_conflit_tags);
 			}
