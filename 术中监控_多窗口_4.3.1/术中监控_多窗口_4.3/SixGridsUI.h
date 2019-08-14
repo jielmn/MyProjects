@@ -91,6 +91,8 @@ public:
 	~CMyEventUI();
 	void SetSelected(BOOL bSel);
 	CHorizontalLayoutUI *                       m_lay_1;
+	void GetValue(int nDbId, int & nType, time_t & t1, time_t & t2);
+	void SetValue(int nDbId, int nType, time_t t1, time_t t2 = 0);
 
 private:
 	LPCTSTR GetClass() const;

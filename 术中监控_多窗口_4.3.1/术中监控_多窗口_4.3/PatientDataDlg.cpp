@@ -27,6 +27,10 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_selected_event = -1;
 }
 
+CPatientDataDlg::~CPatientDataDlg() {
+	ClearVector(m_vEvents);
+}
+
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 	CDuiString  name = msg.pSender->GetName();
 
@@ -51,7 +55,7 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			m_preview->ZoomOut();
 		}
 		else if (name == "btnAddEvent") {
-			OnAddMyEvent();
+			OnAddMyEvent(new CMyEventUI);
 		}
 		else if (name == "btnDelEvent") {
 			OnDelMyEvent();
@@ -527,6 +531,17 @@ void  CPatientDataDlg::GetPatientInfo( PatientInfo * pInfo,
 	nRow++;
 
 	// 事件
+	int cnt = m_lay_events->GetCount();
+	for ( int i = 0; i < cnt; i++) {
+		CMyEventUI * pEvent = (CMyEventUI *)m_lay_events->GetItemAt(i);
+
+		PatientEvent * pItem = new PatientEvent;
+		memset(pItem, 0, sizeof(PatientEvent));
+		pEvent->GetValue( pItem->m_nId, pItem->m_nType, pItem->m_time_1, pItem->m_time_2);
+		STRNCPY(pItem->m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+
+		vEvents.push_back(pItem);
+	}
 
 }
 
@@ -615,6 +630,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 
 	GetPatientInfo(&info, vEvents);
 	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+	ClearVector(vEvents);
 
 	//// 保存姓名
 	//if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
@@ -772,6 +788,13 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	delete pInfo;
 
 	std::vector<PatientEvent * > * pVec = (std::vector<PatientEvent * > *)lParam;
+	std::vector<PatientEvent * >::const_iterator it;
+	ClearVector(m_vEvents);
+	for (it = pVec->begin(); it != pVec->end(); ++it) {
+		PatientEvent * pEvent = *it;
+		m_vEvents.push_back(pEvent);
+	}
+	delete pVec;
 
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 1;
@@ -850,14 +873,15 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	nRow++;
 
 	// 事件
+	for (it = m_vEvents.begin(); it != m_vEvents.end(); ++it) {
+		PatientEvent * pItem = *it;
+		CMyEventUI * pUI = new CMyEventUI;
+		pUI->SetValue(pItem->m_nId, pItem->m_nType, pItem->m_time_1, pItem->m_time_2);
+		OnAddMyEvent(pUI);
+	}
 
 	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
 	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
-
-	if (pVec) {
-		ClearVector(*pVec);
-		delete pVec;
-	}
 }
 
 void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
@@ -992,19 +1016,18 @@ void  CPatientDataDlg::OnMyEventSelected(CControlUI * pCtl) {
 }
 
 // 
-void  CPatientDataDlg::OnAddMyEvent() {
+void  CPatientDataDlg::OnAddMyEvent(CMyEventUI * pEventUI) {
 	int cnt = m_lay_events->GetCount();
-	CMyEventUI * pEvent = new CMyEventUI;
 	if (cnt > 0) {
 		RECT r = { 1,0,1,1 };
-		pEvent->SetBorderSize(r);
+		pEventUI->SetBorderSize(r);
 	}
 	else {
-		pEvent->SetBorderSize(1);
-		pEvent->SetSelected(TRUE);
+		pEventUI->SetBorderSize(1);
+		pEventUI->SetSelected(TRUE);
 		m_selected_event = 0;
 	}
-	m_lay_events->Add(pEvent);  
+	m_lay_events->Add(pEventUI);
 }
 
 //

@@ -13,6 +13,7 @@ class CPatientDataDlg : public DuiLib::WindowImplBase, public sigslot::has_slots
 {
 public:
 	CPatientDataDlg();
+	~CPatientDataDlg();
 
 	virtual LPCTSTR    GetWindowClassName() const { return _T(PATIENT_DATA_FRAME_NAME); }
 	virtual DuiLib::CDuiString GetSkinFile() { return _T(PATIENT_DATA_FILE); }
@@ -54,7 +55,7 @@ private:
 	// 选中了事件UI
 	void  OnMyEventSelected(CControlUI * pCtl);
 	// 
-	void  OnAddMyEvent();
+	void  OnAddMyEvent(CMyEventUI * pEventUI);
 	//
 	void  OnDelMyEvent();
 	// 大于0的显示字符串数字，否则显示空白
@@ -70,6 +71,7 @@ private:
 
 	BOOL                        m_bBusy;
 	PatientInfo                 m_patient_info;
+	std::vector<PatientEvent *> m_vEvents;
 	PatientData                 m_patient_data[7];
 	time_t                      m_tDate;
 

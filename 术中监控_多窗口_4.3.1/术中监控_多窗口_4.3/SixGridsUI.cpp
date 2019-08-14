@@ -343,6 +343,39 @@ void CMyEventUI::DoInit() {
 	m_lay_1 = static_cast<CHorizontalLayoutUI*>(m_pManager->FindControl("lay_1"));
 	m_lay_1->SetBorderSize(this->GetBorderSize());
 
+	CListLabelElementUI * pItem = 0;
+
+	pItem = new CListLabelElementUI;
+	pItem->SetText("手术");
+	pItem->SetTag(PTYPE_SURGERY);
+	m_cmbType->Add(pItem);
+
+	pItem = new CListLabelElementUI;
+	pItem->SetText("分娩");
+	pItem->SetTag(PTYPE_BIRTH);
+	m_cmbType->Add(pItem);
+
+	pItem = new CListLabelElementUI;
+	pItem->SetText("转入");
+	pItem->SetTag(PTYPE_TURN_IN);
+	m_cmbType->Add(pItem);
+
+	pItem = new CListLabelElementUI;
+	pItem->SetText("转出");
+	pItem->SetTag(PTYPE_TURN_OUT);
+	m_cmbType->Add(pItem);
+
+	pItem = new CListLabelElementUI;
+	pItem->SetText("呼吸心跳停止");
+	pItem->SetTag(PTYPE_DEATH);
+	m_cmbType->Add(pItem);
+
+	pItem = new CListLabelElementUI;
+	pItem->SetText("请假");
+	pItem->SetTag(PTYPE_HOLIDAY);
+	m_cmbType->Add(pItem);
+	m_cmbType->SelectItem(0);
+
 	if (m_bSelected)
 		m_sel->SetVisible(true);
 	else
@@ -355,7 +388,8 @@ void CMyEventUI::Notify(TNotifyUI& msg) {
 	if (msg.sType == "itemselect") {
 		if ( msg.pSender == m_cmbType ) {
 			int nSel = m_cmbType->GetCurSel();
-			if (nSel == 5) {
+			int nTag = m_cmbType->GetItemAt(nSel)->GetTag();
+			if (nTag == PTYPE_HOLIDAY) {
 				m_lay_2->SetVisible(true);
 			}
 			else {
@@ -389,4 +423,94 @@ void CMyEventUI::SetSelected(BOOL bSel) {
 		else
 			m_sel->SetVisible(false);
 	}		
+}
+
+void CMyEventUI::GetValue(int nDbId, int & nType, time_t & t1, time_t & t2) {
+	nType = m_cmbType->GetCurSel();
+	SYSTEMTIME s1 = m_date_1->GetTime();
+	SYSTEMTIME s2 = m_date_1->GetTime();
+	int nHour1   = GetIntFromDb(m_edt_1->GetText());
+	int nMinute1 = GetIntFromDb(m_edt_2->GetText());
+	int nHour2   = GetIntFromDb(m_edt_3->GetText());
+	int nMinute2 = GetIntFromDb(m_edt_4->GetText());
+
+	if (nHour1 < 0 || nHour1 >= 24)
+		nHour1 = 0;
+
+	if (nHour2 < 0 || nHour2 >= 24)
+		nHour2 = 0;
+
+	if (nMinute1 < 0 || nMinute1 >= 60)
+		nMinute1 = 0;
+
+	if (nMinute2 < 0 || nMinute2 >= 60)
+		nMinute2 = 0;
+	
+	t1 = GetAnyDayZeroTime(SysTime2Time(s1)) + 3600 * nHour1 + 60 * nMinute1;
+	t2 = GetAnyDayZeroTime(SysTime2Time(s2)) + 3600 * nHour2 + 60 * nMinute2;
+
+	nDbId = GetTag();
+}
+
+void CMyEventUI::SetValue(int nDbId, int nType, time_t t1, time_t t2 /*= 0*/) {
+	SetTag(nDbId);
+
+	if (nType == PTYPE_SURGERY) {
+		m_cmbType->SelectItem(0);
+	}
+	else if (nType == PTYPE_BIRTH) {
+		m_cmbType->SelectItem(1);
+	}
+	else if (nType == PTYPE_TURN_IN) {
+		m_cmbType->SelectItem(2);
+	}
+	else if (nType == PTYPE_TURN_OUT) {
+		m_cmbType->SelectItem(3);
+	}
+	else if (nType == PTYPE_DEATH) {
+		m_cmbType->SelectItem(4);
+	}
+	else if (nType == PTYPE_HOLIDAY) {
+		m_cmbType->SelectItem(5);
+	}
+
+	if (nType == PTYPE_HOLIDAY) {
+		m_lay_2->SetVisible(true);
+	}
+	else {
+		m_lay_2->SetVisible(false);
+	}
+
+	SYSTEMTIME  s1 = Time2SysTime(t1);
+	m_date_1->SetTime(&s1);
+
+	char szTime[256];
+	Date2String(szTime, sizeof(szTime), &t1);
+	m_date_1->SetText(szTime);
+
+	struct tm  tmp;
+	localtime_s(&tmp, &t1);
+
+	CDuiString  strText;
+	strText.Format("%d", tmp.tm_hour);
+	m_edt_1->SetText(strText);
+	strText.Format("%d", tmp.tm_min);
+	m_edt_2->SetText(strText);
+
+	if (nType == PTYPE_HOLIDAY && t2 > 0) {
+		SYSTEMTIME  s2 = Time2SysTime(t2);
+		m_date_2->SetTime(&s2);
+
+		Date2String(szTime, sizeof(szTime), &t2);
+		m_date_2->SetText(szTime);
+
+		struct tm  tmp;
+		localtime_s(&tmp, &t2);
+
+		CDuiString  strText;
+		strText.Format("%d", tmp.tm_hour);
+		m_edt_3->SetText(strText);
+		strText.Format("%d", tmp.tm_min);
+		m_edt_4->SetText(strText);
+	}	
 }
