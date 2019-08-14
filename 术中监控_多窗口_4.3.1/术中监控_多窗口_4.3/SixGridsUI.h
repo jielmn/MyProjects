@@ -138,3 +138,16 @@ private:
 	time_t                                      m_time1;
 	time_t                                      m_time2;
 };
+
+class CTempUI : public  CContainerUI {
+public:
+	CTempUI();
+	~CTempUI();
+
+private:
+	LPCTSTR GetClass() const;
+	void DoInit();
+
+	CEditUI   *                                 m_temp1;
+	CEditUI   *                                 m_temp2;
+};

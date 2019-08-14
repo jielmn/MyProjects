@@ -45,8 +45,8 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			OnReturn();
 		}
 		else if (name == "btnPrint") {
-			OnPrint();
-			this->PostMessage(WM_CLOSE);
+			OnPrint();   
+			//this->PostMessage(WM_CLOSE); 
 		}
 		else if (name == "btnZoomIn") {
 			m_preview->ZoomIn();
@@ -319,6 +319,16 @@ void  CPatientDataDlg::InitData() {
 	pLayH->Add(m_date_end);
 	pTitleNode = m_tree->AddNode(strText, 0, 0, pLayH, 3, 0xFF666666, -1, -1, 40);
 
+	// ÌåÎÂ
+	strText.Format("ÌåÎÂ");
+	pSixGrids = new CSixGridsUI;  
+	pSixGrids->SetMode(1);
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666);
+
+	CTempUI * pTemp = new CTempUI;
+	pTemp->SetFixedWidth(94); 
+	m_tree->AddNode("abc", pSubTitleNode, 0, pTemp, 2, 0xFF386382);                  
+
 	// Âö²«  
 	strText.Format("Âö²«");   
 	pSixGrids = new CSixGridsUI;
@@ -386,6 +396,9 @@ void CPatientDataDlg::OnReturn() {
 }
 
 void  CPatientDataDlg::OnPrint() {
+	::MoveWindow(GetHWND(), 0, 0, 1024, 800, TRUE);       
+	return;   
+
 	PatientInfo info;
 	std::vector<PatientEvent * > vEvents;
 	PatientData data[7];

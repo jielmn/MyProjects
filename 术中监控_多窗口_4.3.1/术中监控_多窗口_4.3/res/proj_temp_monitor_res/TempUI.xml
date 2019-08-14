@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout>
+		<Edit font="6" name="edt_1"/>
+		<Button text="" width="6" bkcolor="#FF93f7f1" tooltip="降温" />
+		<Edit font="6" name="edt_2"/>		
+	</HorizontalLayout>
+</Window>

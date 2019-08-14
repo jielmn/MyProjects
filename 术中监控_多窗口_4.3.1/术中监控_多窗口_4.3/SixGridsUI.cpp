@@ -628,3 +628,32 @@ void CMyEventUI::SetValue(int nDbId, int nType, time_t t1, time_t t2 /*= 0*/) {
 		m_edt_4->SetText(strText);
 	}	
 }
+
+
+
+CTempUI::CTempUI() {
+
+}
+
+CTempUI::~CTempUI() {
+
+}
+
+LPCTSTR CTempUI::GetClass() const {
+	return "TempUI";
+}
+
+void CTempUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("TempUI.xml"), (UINT)0, 0, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}
+
+	m_temp1 = static_cast<CEditUI*>(m_pManager->FindControl("edt_1"));
+	m_temp2 = static_cast<CEditUI*>(m_pManager->FindControl("edt_2"));
+}
