@@ -57,6 +57,8 @@ private:
 	void  OnAddMyEvent();
 	//
 	void  OnDelMyEvent();
+	// 大于0的显示字符串数字，否则显示空白
+	CDuiString  FormatInt(int nValue);
 
 private:
 	CMyTreeCfgUI  *             m_tree;

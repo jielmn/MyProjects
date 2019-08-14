@@ -735,7 +735,16 @@ void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo, const std::vector<Pati
 	PatientInfo * pNewInfo = new PatientInfo;
 	memcpy(pNewInfo, pInfo, sizeof(PatientInfo));
 
-	::PostMessage(GetHWND(), UM_PATIENT_INFO, (WPARAM)pNewInfo, 0);
+	std::vector<PatientEvent * > * pVec = new std::vector<PatientEvent * >;
+	std::vector<PatientEvent * >::const_iterator it;
+	for (it = vEvents.begin(); it != vEvents.end(); ++it) {
+		PatientEvent * pEvent = *it;
+		PatientEvent * pNewEvent = new PatientEvent;
+		memcpy(pNewEvent, pEvent, sizeof(PatientEvent));
+		pVec->push_back(pNewEvent);
+	}
+
+	::PostMessage(GetHWND(), UM_PATIENT_INFO, (WPARAM)pNewInfo, (LPARAM)pVec);
 }
 
 void  CPatientDataDlg::OnPatientData(PatientData * pData, DWORD dwSize) {
@@ -751,6 +760,8 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	PatientInfo * pInfo = (PatientInfo *)wParam;
 	memcpy(&m_patient_info, pInfo, sizeof(PatientInfo));
 	delete pInfo;
+
+	std::vector<PatientEvent * > * pVec = (std::vector<PatientEvent * > *)lParam;
 
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 1;
@@ -768,12 +779,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	nRow++;
 
 	// 年龄
-	if ( m_patient_info.m_age > 0 ) {
-		cfgValue.m_strEdit.Format("%d", m_patient_info.m_age);
-	}
-	else {
-		cfgValue.m_strEdit = "";
-	}
+	cfgValue.m_strEdit = FormatInt(m_patient_info.m_age);
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
@@ -785,22 +791,35 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	// 住院号
 	cfgValue.m_strEdit = m_patient_info.m_szHospitalAdmissionNo;
 	m_tree->SetConfigValue(nRow, cfgValue);
-	nRow+=2;
+	nRow++;
 	
 	// 入院日期
 	if ( m_patient_info.m_in_hospital > 0 ) {
 		cfgValue.m_bCheckbox = TRUE;
-		m_tree->SetConfigValue(nRow, cfgValue);
+		m_tree->SetConfigValue(nRow+1, cfgValue);
 
 		cfgValue.m_time = m_patient_info.m_in_hospital;
-		m_tree->SetConfigValue(nRow+1, cfgValue);
+		m_tree->SetConfigValue(nRow+2, cfgValue);
 	}
 	else {
 		cfgValue.m_bCheckbox = FALSE;
-		m_tree->SetConfigValue(nRow, cfgValue);
-		m_tree->Invalidate();
+		m_tree->SetConfigValue(nRow+1, cfgValue);
 	}
-	nRow+=2;
+	nRow+=3;
+
+	// 出院日期
+	if (m_patient_info.m_out_hospital > 0) {
+		cfgValue.m_bCheckbox = TRUE;
+		m_tree->SetConfigValue(nRow + 1, cfgValue);
+
+		cfgValue.m_time = m_patient_info.m_out_hospital;
+		m_tree->SetConfigValue(nRow + 2, cfgValue);
+	}
+	else {
+		cfgValue.m_bCheckbox = FALSE;
+		m_tree->SetConfigValue(nRow + 1, cfgValue);
+	}
+	nRow += 3;
 
 	// 科室
 	cfgValue.m_strEdit = m_patient_info.m_szMedicalDepartment;
@@ -815,7 +834,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	// 床号
 	cfgValue.m_strEdit = m_patient_info.m_szBedNo;
 	m_tree->SetConfigValue(nRow, cfgValue);
-	nRow += 2;
+	nRow++;
 
 	//// 手术
 	//if (m_patient_info.m_surgery > 0) {
@@ -834,6 +853,11 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 
 	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
 	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+
+	if (pVec) {
+		ClearVector(*pVec);
+		delete pVec;
+	}
 }
 
 void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
@@ -1012,4 +1036,13 @@ void  CPatientDataDlg::OnDelMyEvent() {
 	else {
 		m_selected_event = -1;
 	}
+}
+
+//
+CDuiString  CPatientDataDlg::FormatInt(int nValue) {
+	CDuiString str;
+	if (nValue > 0) {
+		str.Format("%d", nValue);
+	}
+	return str;
 }
