@@ -460,6 +460,7 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 void  CPatientDataDlg::GetPatientInfo( PatientInfo * pInfo, 
 	                                   std::vector<PatientEvent * > & vEvents ) {
 	memset(pInfo, 0, sizeof(PatientInfo));
+	ClearVector(vEvents);
 
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 1;
@@ -628,8 +629,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	//PatientData data[7];
 
 	GetPatientInfo(&info, vEvents);
-	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
-	ClearVector(vEvents);
+	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);	
 
 	// 保存姓名
 	if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
@@ -640,6 +640,10 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 		// 保存数据库
 		CBusiness::GetInstance()->SavePatientInfoAsyn(&info);
 	}
+
+	// 保存事件
+	CBusiness::GetInstance()->SavePatientEventsAsyn(m_szTagId, vEvents);
+	ClearVector(vEvents);
 
 	//GetPatientData(data, 7);
 	//time_t  tFirstDay = m_tDate - 3600 * 24 * 6;

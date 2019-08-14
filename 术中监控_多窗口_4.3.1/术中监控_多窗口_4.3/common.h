@@ -210,6 +210,7 @@ using namespace DuiLib;
 #define MSG_QUERY_PATIENT_DATA              2016
 #define MSG_SAVE_PATIENT_INFO               2017
 #define MSG_SAVE_PATIENT_DATA               2018
+#define MSG_SAVE_PATIENT_EVENTS             2019
 
 
 // windows ÏûÏ¢
@@ -694,3 +695,26 @@ void ClearVector(std::vector<T> & v) {
 	}
 	v.clear();
 }
+
+
+
+class CSavePatientEventsParam : public LmnToolkits::MessageData {
+public:
+	CSavePatientEventsParam(const char * szTagId, const std::vector<PatientEvent*> & vEvents) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+		std::vector<PatientEvent*>::const_iterator it;
+		for (it = vEvents.begin(); it != vEvents.end(); ++it) {
+			PatientEvent* p = *it;
+			PatientEvent* pNew = new PatientEvent;
+			memcpy(pNew, p, sizeof(PatientEvent));
+			m_vEvents.push_back(pNew);
+		}
+	}
+
+	~CSavePatientEventsParam() {
+		ClearVector(m_vEvents);
+	}
+
+	char                            m_szTagId[MAX_TAG_ID_LENGTH];
+	std::vector<PatientEvent*>      m_vEvents;
+};

@@ -46,6 +46,27 @@
 #define  PATIENT_DATA_TABLE                   "pdata"
 
 
+class FindPEventObj {
+public:
+	FindPEventObj(int nId) : m_nId(nId) {
+
+	}
+
+	bool operator() (PatientEvent * p) {
+		if (0 == p->m_nId)
+			return false;
+
+		if (p->m_nId == m_nId)
+			return true;
+		else
+			return false;
+	}
+
+private:
+	int     m_nId;
+};
+
+
 CMySqliteDatabase::CMySqliteDatabase() {
 	m_db = 0;
 }
@@ -647,7 +668,7 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 	sqlite3_free_table(azResult);
 
 	// 事件
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", 
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' order by date_1 ", 
 		    PATIENT_EVENT_TABLE, pParam->m_szTagId);
 	nrow = ncolumn = 0;           // 查询结果集的行数、列数
 	azResult = 0;                 // 二维数组存放结果
@@ -659,6 +680,7 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 		pEvent->m_nType  = GetIntFromDb(azResult[(i + 1)*ncolumn + 2]);
 		pEvent->m_time_1 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
 		pEvent->m_time_2 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 4]);
+		vEvents.push_back(pEvent);
 	}
 	sqlite3_free_table(azResult);
 }
@@ -722,6 +744,73 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 			info.m_szMedicalDepartment2, info.m_szWard2, info.m_szBedNo2 );
 		sqlite3_exec(m_db, sql, 0, 0, 0);
 	}
+}
+
+// 保存patient events
+void CMySqliteDatabase::SavePatientEvents(const CSavePatientEventsParam * pParam) {
+	// 原来的事件
+	char sql[8192];
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	std::vector<PatientEvent * > vOld;
+	std::vector<PatientEvent * > vUpdate;
+	std::vector<PatientEvent * > vDelete;
+	const std::vector<PatientEvent * > & v = pParam->m_vEvents;
+
+	SNPRINTF( sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ",
+		      PATIENT_EVENT_TABLE, pParam->m_szTagId );
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		PatientEvent * pEvent = new PatientEvent;
+		memset(pEvent, 0, sizeof(PatientEvent));
+		pEvent->m_nId = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		pEvent->m_nType = GetIntFromDb(azResult[(i + 1)*ncolumn + 2]);
+		pEvent->m_time_1 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+		pEvent->m_time_2 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 4]);
+		vOld.push_back(pEvent);
+	}
+	sqlite3_free_table(azResult);
+
+	std::vector<PatientEvent * >::iterator it;
+	for ( it = vOld.begin(); it != vOld.end(); ++it ) {
+		PatientEvent * pItem = *it;
+		std::vector<PatientEvent * >::const_iterator it_find 
+			= std::find_if( v.begin(), v.end(), FindPEventObj(pItem->m_nId) );
+		// 没有找到
+		if (it_find == v.end()) {
+			vDelete.push_back(pItem);
+		}
+		else {
+			// 查看是否要Update
+			PatientEvent * pItem_1 = *it_find;
+			BOOL bNeedUpdate = FALSE;
+			// 如果类型不一致
+			if (pItem_1->m_nType != pItem->m_nType) {
+				bNeedUpdate = TRUE;
+			}
+			else if (pItem_1->m_time_1 != pItem->m_time_1) {
+				bNeedUpdate = TRUE;
+			}
+			// 如果类型一致，date1一致
+			else {
+				// 如果是holiday类型，date2不一致，则需要更新
+				if (pItem_1->m_nType == PTYPE_HOLIDAY && pItem_1->m_time_2 != pItem->m_time_2) {
+					bNeedUpdate = TRUE;
+				}
+			}
+
+			if (bNeedUpdate) {
+				vUpdate.push_back(pItem_1);
+			}
+		}
+	}
+
+	// 删除
+	// 插入
+	// 更新
+
+
+	ClearVector(vOld);
 }
 
 

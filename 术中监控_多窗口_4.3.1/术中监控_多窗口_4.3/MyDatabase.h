@@ -37,6 +37,8 @@ public:
 		std::vector<PatientEvent * > & vEvents);
 	// 保存info
 	void SavePatientInfo(const CSavePatientInfoParam * pParam);
+	// 保存patient events
+	void SavePatientEvents(const CSavePatientEventsParam * pParam);
 	// 查询PatientData
 	void QueryPatientData(const CQueryPatientDataParam * pParam, PatientData * pData, DWORD dwSize);
 	// 保存data

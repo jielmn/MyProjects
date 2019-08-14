@@ -104,6 +104,9 @@ public:
 	// 保存基本信息
 	void  SavePatientInfoAsyn(const PatientInfo * pInfo);
 	void  SavePatientInfo(const CSavePatientInfoParam * pParam);
+	// 保存病人事件信息
+	void  SavePatientEventsAsyn( const char * szTagId, const std::vector<PatientEvent*> & vEvents );
+	void  SavePatientEvents(const CSavePatientEventsParam * pParam);
 
 	// 获取某7天的病人的非体温数据信息
 	void  QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay);

@@ -1085,6 +1085,16 @@ void  CBusiness::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 	m_sqlite.SavePatientInfo(pParam);
 }
 
+// 保存病人事件信息
+void  CBusiness::SavePatientEventsAsyn(const char * szTagId, const std::vector<PatientEvent*> & vEvents) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_PATIENT_EVENTS,
+		new CSavePatientEventsParam(szTagId, vEvents));
+}
+
+void  CBusiness::SavePatientEvents(const CSavePatientEventsParam * pParam) {
+	m_sqlite.SavePatientEvents(pParam);
+}
+
 // 获取某天的病人的非体温数据信息
 void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay) {
 	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_DATA,
@@ -1261,6 +1271,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSavePatientDataParam * pParam = (CSavePatientDataParam *)pMessageData;
 		SavePatientData(pParam);
+	}
+	break;
+
+	case MSG_SAVE_PATIENT_EVENTS:
+	{
+		CSavePatientEventsParam * pParam = (CSavePatientEventsParam *)pMessageData;
+		SavePatientEvents(pParam);
 	}
 	break;
 
