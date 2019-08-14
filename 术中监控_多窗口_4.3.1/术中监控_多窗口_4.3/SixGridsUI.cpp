@@ -210,6 +210,22 @@ void CShiftUI::DoInit() {
 	}
 }
 
+void  CShiftUI::SetValues(int nIndex, const char * szValue) {
+	if (nIndex >= 0 && nIndex < 2) {
+		if (szValue)
+			m_edits[nIndex]->SetText(szValue);
+		else
+			m_edits[nIndex]->SetText("");
+	}
+}
+
+CDuiString  CShiftUI::GetValues(int nIndex) {
+	if (nIndex >= 0 && nIndex < 2) {
+		return m_edits[nIndex]->GetText();
+	}
+	return "";
+}
+
 
 CMyDateUI::CMyDateUI() {
 	

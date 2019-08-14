@@ -60,6 +60,8 @@ class CShiftUI : public CContainerUI
 public:
 	CShiftUI();
 	~CShiftUI();
+	void  SetValues(int nIndex, const char * szValue);
+	CDuiString  GetValues(int nIndex);
 
 private:
 	LPCTSTR GetClass() const;

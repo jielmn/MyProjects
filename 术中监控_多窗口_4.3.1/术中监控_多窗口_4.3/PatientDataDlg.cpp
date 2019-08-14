@@ -822,34 +822,24 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	nRow += 3;
 
 	// 科室
-	cfgValue.m_strEdit = m_patient_info.m_szMedicalDepartment;
+	cfgValue.m_Values[0] = m_patient_info.m_szMedicalDepartment;
+	cfgValue.m_Values[1] = m_patient_info.m_szMedicalDepartment2;
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
 	// 病室
-	cfgValue.m_strEdit = m_patient_info.m_szWard;
+	cfgValue.m_Values[0] = m_patient_info.m_szWard;
+	cfgValue.m_Values[1] = m_patient_info.m_szWard2;
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
 	// 床号
-	cfgValue.m_strEdit = m_patient_info.m_szBedNo;
+	cfgValue.m_Values[0] = m_patient_info.m_szBedNo;
+	cfgValue.m_Values[1] = m_patient_info.m_szBedNo;
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
-	//// 手术
-	//if (m_patient_info.m_surgery > 0) {
-	//	cfgValue.m_bCheckbox = TRUE;
-	//	m_tree->SetConfigValue(nRow, cfgValue);
-
-	//	cfgValue.m_time = m_patient_info.m_surgery;
-	//	m_tree->SetConfigValue(nRow + 1, cfgValue);
-	//}
-	//else {
-	//	cfgValue.m_bCheckbox = FALSE;
-	//	m_tree->SetConfigValue(nRow, cfgValue);
-	//	m_tree->Invalidate();
-	//}
-	nRow += 2;	
+	// 事件
 
 	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
 	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);

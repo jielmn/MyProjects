@@ -633,6 +633,12 @@ bool CMyTreeCfgUI::SetConfigValue(int nIndex, const ConfigValue & cfgValue) {
 			pSeven->SetValues(i, cfgValue.m_Values[i]);
 		}
 	}
+	else if (0 == strcmp(pCtl->GetClass(), "Shift")) {
+		CShiftUI * pShift = (CShiftUI *)pCtl;
+		for (int i = 0; i < 2; i++) {
+			pShift->SetValues(i, cfgValue.m_Values[i]);
+		}
+	}
 	else {
 		return false;
 	}
