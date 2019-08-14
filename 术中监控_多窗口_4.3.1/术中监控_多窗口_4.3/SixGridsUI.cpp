@@ -309,6 +309,9 @@ CMyEventUI::CMyEventUI() : m_callback(m_pManager) {
 	m_sel = 0;
 	m_lay_1 = 0;
 	m_bSelected = FALSE;
+	m_nType = 0;
+	m_time1 = 0;
+	m_time2 = 0;
 }
 
 CMyEventUI::~CMyEventUI() {
@@ -344,6 +347,7 @@ void CMyEventUI::DoInit() {
 	m_lay_1->SetBorderSize(this->GetBorderSize());
 
 	CListLabelElementUI * pItem = 0;
+	CDuiString strText;
 
 	pItem = new CListLabelElementUI;
 	pItem->SetText("ÊÖÊõ");
@@ -374,7 +378,32 @@ void CMyEventUI::DoInit() {
 	pItem->SetText("Çë¼Ù");
 	pItem->SetTag(PTYPE_HOLIDAY);
 	m_cmbType->Add(pItem);
-	m_cmbType->SelectItem(0);
+
+	m_cmbType->SelectItem(m_nType);
+
+	if (m_time1 > 0) {
+		SYSTEMTIME s = Time2SysTime(m_time1);
+		m_date_1->SetTime(&s);
+
+		struct tm  tmp;
+		localtime_s(&tmp, &m_time1);
+		strText.Format("%d", tmp.tm_hour);
+		m_edt_1->SetText(strText);
+		strText.Format("%d", tmp.tm_min);
+		m_edt_2->SetText(strText);
+	}
+
+	if (m_time2 > 0) {
+		SYSTEMTIME s = Time2SysTime(m_time2);
+		m_date_2->SetTime(&s);
+
+		struct tm  tmp;
+		localtime_s(&tmp, &m_time2);
+		strText.Format("%d", tmp.tm_hour);
+		m_edt_3->SetText(strText);
+		strText.Format("%d", tmp.tm_min);
+		m_edt_4->SetText(strText);
+	}
 
 	if (m_bSelected)
 		m_sel->SetVisible(true);
@@ -454,6 +483,11 @@ void CMyEventUI::GetValue(int nDbId, int & nType, time_t & t1, time_t & t2) {
 
 void CMyEventUI::SetValue(int nDbId, int nType, time_t t1, time_t t2 /*= 0*/) {
 	SetTag(nDbId);
+	m_nType = nType;
+	m_time1 = t1;
+	m_time2 = t2;
+	if (0 == m_cmbType)
+		return;
 
 	if (nType == PTYPE_SURGERY) {
 		m_cmbType->SelectItem(0);

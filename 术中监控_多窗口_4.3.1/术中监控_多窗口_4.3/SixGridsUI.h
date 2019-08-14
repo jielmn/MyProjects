@@ -115,4 +115,8 @@ private:
 
 	CControlUI *                                m_sel;	
 	BOOL                                        m_bSelected;
+
+	int                                         m_nType;
+	time_t                                      m_time1;
+	time_t                                      m_time2;
 };
