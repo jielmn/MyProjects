@@ -563,6 +563,10 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 			cfgValue.m_Values[i] = pShift->GetValues(i);
 		}
 	}
+	else if (0 == strcmp(pCtl->GetClass(), "MyDateTime")) {
+		CMyDateTimeUI * pTime = (CMyDateTimeUI *)pCtl;
+		cfgValue.m_time = pTime->GetTime();		
+	}
 	else {
 		return false;
 	}
@@ -644,6 +648,10 @@ bool CMyTreeCfgUI::SetConfigValue(int nIndex, const ConfigValue & cfgValue) {
 		for (int i = 0; i < 2; i++) {
 			pShift->SetValues(i, cfgValue.m_Values[i]);
 		}
+	}
+	else if (0 == strcmp(pCtl->GetClass(), "MyDateTime")) {
+		CMyDateTimeUI * pTime = (CMyDateTimeUI *)pCtl;
+		pTime->SetTime(cfgValue.m_time);
 	}
 	else {
 		return false;

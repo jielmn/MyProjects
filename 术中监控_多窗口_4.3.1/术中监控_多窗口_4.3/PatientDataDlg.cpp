@@ -876,7 +876,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 
 	// ´²ºÅ
 	cfgValue.m_Values[0] = m_patient_info.m_szBedNo;
-	cfgValue.m_Values[1] = m_patient_info.m_szBedNo;
+	cfgValue.m_Values[1] = m_patient_info.m_szBedNo2;
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 

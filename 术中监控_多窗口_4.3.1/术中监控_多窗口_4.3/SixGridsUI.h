@@ -87,12 +87,18 @@ class CMyDateTimeUI : public  CContainerUI {
 public:
 	CMyDateTimeUI();
 	~CMyDateTimeUI();
+	void SetTime(time_t t);
+	time_t GetTime();
 
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
 
 	CDialogBuilderCallbackEx                    m_callback;
+	CMyDateUI *                                 m_date;
+	CEditUI   *                                 m_hour;
+	CEditUI *                                   m_minute;
+	time_t                                      m_time;
 };
 
 

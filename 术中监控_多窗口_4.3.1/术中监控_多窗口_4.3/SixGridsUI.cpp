@@ -298,7 +298,10 @@ void CMyDateUI::DoInit() {
 
 
 CMyDateTimeUI::CMyDateTimeUI() : m_callback(m_pManager) {
-
+	m_date = 0;
+	m_time = 0;
+	m_hour = 0;
+	m_minute = 0;
 }
 
 CMyDateTimeUI::~CMyDateTimeUI() {
@@ -319,6 +322,52 @@ void CMyDateTimeUI::DoInit() {
 		this->RemoveAll();
 		return;
 	}	
+
+	m_date = static_cast<CMyDateUI*>(m_pManager->FindControl("date_1"));
+	m_hour = static_cast<CEditUI*>(m_pManager->FindControl("edt_1"));
+	m_minute = static_cast<CEditUI*>(m_pManager->FindControl("edt_2"));
+
+	if (m_time > 0) {
+		SYSTEMTIME s = Time2SysTime(m_time);
+		m_date->SetMyTime(&s);
+
+		CDuiString strText;
+		strText.Format("%d", (int)s.wHour);
+		m_hour->SetText(strText);
+
+		strText.Format("%d", (int)s.wMinute);
+		m_minute->SetText(strText);
+	}
+}
+
+void CMyDateTimeUI::SetTime(time_t t) {
+	m_time = t;
+	if (m_date > 0) {
+		SYSTEMTIME s = Time2SysTime(t);
+		m_date->SetMyTime(&s);
+
+		CDuiString strText;
+		strText.Format("%d", (int)s.wHour);
+		m_hour->SetText(strText);
+
+		strText.Format("%d", (int)s.wMinute);
+		m_minute->SetText(strText);
+	}
+}
+
+time_t CMyDateTimeUI::GetTime() {
+	SYSTEMTIME s = m_date->GetTime();
+	int nHour = GetIntFromDb(m_hour->GetText());
+	int nMinute = GetIntFromDb(m_minute->GetText());
+
+	if (nHour < 0 || nHour >= 24)
+		nHour = 0;
+
+	if (nMinute < 0 || nMinute >= 60)
+		nMinute = 0;
+
+	time_t t = GetAnyDayZeroTime(SysTime2Time(s)) + 3600 * nHour + 60 * nMinute;
+	return t;
 }
 
 
