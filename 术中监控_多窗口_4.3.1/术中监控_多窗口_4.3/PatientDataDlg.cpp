@@ -91,19 +91,13 @@ void  CPatientDataDlg::OnMyInited() {
 	m_btnPrint = (CButtonUI *)m_PaintManager.FindControl("btnPrint");
 	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
 	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
-	m_date_start = (CMyDateUI *)m_PaintManager.FindControl("DateTimeS");
-	m_date_end = (CMyDateUI *)m_PaintManager.FindControl("DateTimeE");
 
 	m_tree->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_tree->SetHotItemBkColor(0xFFFFFFFF);  
 
 	InitInfo();
 	InitData();
-
-	time_t tZeroTime = GetAnyDayZeroTime(m_tDate);
-	time_t tFirstDay = tZeroTime - 3600 * 24 * 6;
-	SYSTEMTIME s = Time2SysTime(tFirstDay);
-	m_date_start->SetMyTime(&s);
+	
 	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
 	SetBusy(TRUE);
 }
@@ -283,12 +277,47 @@ void  CPatientDataDlg::InitData() {
 	CSixGridsUI * pSixGrids = 0;
 	CSevenGridsUI * pSevenGrids = 0;
 	CDuiString  week_days[7];
+	CHorizontalLayoutUI * pLayH = 0;
+	CControlUI * pCtl = 0;
+	CLabelUI * pLabel = 0;
 
 	time_t now = time(0);
 	GetSevenDayStr(week_days, 7, now);
 
-	strText.Format("病人非体温数据");
-	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
+	strText.Format("病人数据");
+	RECT r = { 5,0,5,0 };
+	m_date_start = new CMyDateUI;
+	m_date_start->SetFixedWidth(180);
+	m_date_start->SetFont(3);
+	m_date_start->SetTextColor(0xFF666666);
+	m_date_start->SetTextPadding(r);
+
+	pCtl = new CControlUI;
+	pCtl->SetFixedWidth(10);
+	pLabel = new CLabelUI;
+	pLabel->SetText("到");
+	pLabel->SetFixedWidth(60);
+	pLabel->SetFont(3);
+	pLabel->SetTextColor(0xFF666666);
+
+	m_date_end   = new CMyDateUI;
+	m_date_end->SetFixedWidth(180);
+	m_date_end->SetFont(3);
+	m_date_end->SetTextColor(0xFF666666);
+	m_date_end->SetTextPadding(r);
+	m_date_end->SetEnabled(false);
+
+	time_t tZeroTime = GetAnyDayZeroTime(m_tDate);
+	time_t tFirstDay = tZeroTime - 3600 * 24 * 6;
+	SYSTEMTIME s = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s);
+
+	pLayH = new CHorizontalLayoutUI;
+	pLayH->Add(m_date_start);
+	pLayH->Add(pCtl);
+	pLayH->Add(pLabel);
+	pLayH->Add(m_date_end);
+	pTitleNode = m_tree->AddNode(strText, 0, 0, pLayH, 3, 0xFF666666, -1, -1, 40);
 
 	// 脉搏  
 	strText.Format("脉搏");   
@@ -624,6 +653,12 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 }
 
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
+	// 如果还在获取数据
+	if (m_bBusy) {
+		WindowImplBase::OnFinalMessage(hWnd);
+		return;
+	}
+
 	PatientInfo info;
 	std::vector<PatientEvent * > vEvents;
 	//PatientData data[7];

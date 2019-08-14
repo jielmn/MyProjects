@@ -27,6 +27,7 @@
 		<TabLayout name="switch">
 			<!-- 填表区 -->
 			<VerticalLayout  bkcolor="#FFFFFFFF" bordercolor="#FF768D9B" bordersize="1" inset="10,10,10,10" >
+				<!--
 				<HorizontalLayout height="30">
 					<Label text="时间范围" font="3" textcolor="#FF666666" />
 				</HorizontalLayout>
@@ -36,9 +37,9 @@
 					<Control width="10" />
 					<Label text="到" width="20" font="2" /> 
 					<MyDateTime name="DateTimeE" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" enabled="false" />
-				</HorizontalLayout>
-				
+				</HorizontalLayout>				
 				<HorizontalLayout height="20" />
+				-->
 				
 				<VerticalLayout vscrollbar="true" sepheight="4">
 					<MyTree name="CfgTree" header="hidden" menu="true"  /> 
