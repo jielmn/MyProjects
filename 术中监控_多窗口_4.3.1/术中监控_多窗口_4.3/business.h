@@ -99,7 +99,7 @@ public:
 	void  Alarm();
 
 	// 获取病人的基础信息
-	void  QueryPatientInfoAsyn(const char * szTagId, time_t tFirstDay);
+	void  QueryPatientInfoAsyn(const char * szTagId);
 	void  QueryPatientInfo(const CQueryPatientInfoParam * pParam);
 	// 保存基本信息
 	void  SavePatientInfoAsyn(const PatientInfo * pInfo);

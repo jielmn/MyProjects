@@ -723,81 +723,81 @@ void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam,
 		if (nrow > 0) {
 			int col = 2;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[0]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[0]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[1]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[1]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[2]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[2]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[3]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[3]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[4]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[4]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[5]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[5]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[0]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[0]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[1]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[1]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[2]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[2]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[3]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[3]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[4]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[4]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[5]);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[5]);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_defecate);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_defecate);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_urine);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_urine);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_income);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_income);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_output);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_output);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				STRNCPY(pData[i].m_szBloodPressure, azResult[ncolumn + col], MAX_BLOOD_PRESSURE_LENGTH);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	STRNCPY(pData[i].m_szBloodPressure, azResult[ncolumn + col], MAX_BLOOD_PRESSURE_LENGTH);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				STRNCPY(pData[i].m_szWeight, azResult[ncolumn + col], MAX_WEIGHT_LENGTH);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	STRNCPY(pData[i].m_szWeight, azResult[ncolumn + col], MAX_WEIGHT_LENGTH);
+			//col++;
 
-			if (azResult[ncolumn + col])
-				STRNCPY(pData[i].m_szIrritability, azResult[ncolumn + col], MAX_IRRITABILITY_LENGTH);
-			col++;
+			//if (azResult[ncolumn + col])
+			//	STRNCPY(pData[i].m_szIrritability, azResult[ncolumn + col], MAX_IRRITABILITY_LENGTH);
+			//col++;
 		}
 		sqlite3_free_table(azResult);
 
@@ -860,28 +860,28 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 	sqlite3_free_table(azResult);	
 
 	// Èç¹û´æÔÚ
-	if (nrow > 0) {
-		SNPRINTF(sql, sizeof(sql), "UPDATE %s set pulse_1 = %d, pulse_2 = %d, pulse_3 = %d, " 
-			"pulse_4 = %d, pulse_5 = %d, pulse_6 = %d, breath_1 = %d, breath_2 = %d, " 
-			"breath_3 = %d, breath_4 = %d, breath_5 = %d, breath_6 = %d, defecate = %d, " 
-			"urine = %d, total_income = %d, total_output = %d, blood_pressure = '%s', " 
-			"weight = '%s', irritability = '%s' WHERE tag_id = '%s' AND date = %lu ",
-			PATIENT_DATA_TABLE, data.m_pulse[0], data.m_pulse[1],
-			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
-			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
-			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
-			data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability, data.m_szTagId,
-			(DWORD)data.m_date );
-		sqlite3_exec(m_db, sql, 0, 0, 0);
-	}
-	else {
-		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %lu, %d, %d, %d, %d, %d, %d, "
-			"%d, %d, %d, %d, %d, %d,  %d, %d, %d, %d, '%s', '%s',  '%s' ); ",
-			PATIENT_DATA_TABLE, data.m_szTagId, (DWORD)data.m_date, data.m_pulse[0], data.m_pulse[1],
-			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
-			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
-			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
-			data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability );
-		sqlite3_exec(m_db, sql, 0, 0, 0);
-	}
+	//if (nrow > 0) {
+	//	SNPRINTF(sql, sizeof(sql), "UPDATE %s set pulse_1 = %d, pulse_2 = %d, pulse_3 = %d, " 
+	//		"pulse_4 = %d, pulse_5 = %d, pulse_6 = %d, breath_1 = %d, breath_2 = %d, " 
+	//		"breath_3 = %d, breath_4 = %d, breath_5 = %d, breath_6 = %d, defecate = %d, " 
+	//		"urine = %d, total_income = %d, total_output = %d, blood_pressure = '%s', " 
+	//		"weight = '%s', irritability = '%s' WHERE tag_id = '%s' AND date = %lu ",
+	//		PATIENT_DATA_TABLE, data.m_pulse[0], data.m_pulse[1],
+	//		data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
+	//		data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
+	//		data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
+	//		data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability, data.m_szTagId,
+	//		(DWORD)data.m_date );
+	//	sqlite3_exec(m_db, sql, 0, 0, 0);
+	//}
+	//else {
+	//	SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %lu, %d, %d, %d, %d, %d, %d, "
+	//		"%d, %d, %d, %d, %d, %d,  %d, %d, %d, %d, '%s', '%s',  '%s' ); ",
+	//		PATIENT_DATA_TABLE, data.m_szTagId, (DWORD)data.m_date, data.m_pulse[0], data.m_pulse[1],
+	//		data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
+	//		data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
+	//		data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
+	//		data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability );
+	//	sqlite3_exec(m_db, sql, 0, 0, 0);
+	//}
 }

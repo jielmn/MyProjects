@@ -590,13 +590,11 @@ typedef  struct   tagPatientData {
 
 class CQueryPatientInfoParam : public LmnToolkits::MessageData {
 public:
-	CQueryPatientInfoParam(const char * szTagId, time_t tFirstDay) {
+	CQueryPatientInfoParam(const char * szTagId) {
 		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
-		m_tFirstDay = tFirstDay;
 	}
 
 	char         m_szTagId[MAX_TAG_ID_LENGTH];
-	time_t       m_tFirstDay;
 };
 
 class CQueryPatientDataParam : public LmnToolkits::MessageData {

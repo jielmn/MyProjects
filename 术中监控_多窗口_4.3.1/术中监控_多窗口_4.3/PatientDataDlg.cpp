@@ -100,7 +100,7 @@ void  CPatientDataDlg::OnMyInited() {
 	time_t tFirstDay = tZeroTime - 3600 * 24 * 6;
 	SYSTEMTIME s = Time2SysTime(tFirstDay);
 	m_date_start->SetMyTime(&s);
-	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId, tFirstDay);
+	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
 	SetBusy(TRUE);
 }
 
@@ -538,44 +538,44 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 		nRow++;
 	}
 
-	// 呼吸
-	nRow++;
-	for (int i = 0; i < 7; i++) {
-		m_tree->GetConfigValue(nRow, cfgValue);
-		for (int j = 0; j < 6; j++) {
-			sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_breath[j]);
-		}
-		nRow++;
-	}
+	//// 呼吸
+	//nRow++;
+	//for (int i = 0; i < 7; i++) {
+	//	m_tree->GetConfigValue(nRow, cfgValue);
+	//	for (int j = 0; j < 6; j++) {
+	//		sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_breath[j]);
+	//	}
+	//	nRow++;
+	//}
 
-	// 大便次数
-	nRow++;
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_defecate);
-	}
-	nRow++;
+	//// 大便次数
+	//nRow++;
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_defecate);
+	//}
+	//nRow++;
 
-	// 尿量
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_urine);
-	}
-	nRow++;
+	//// 尿量
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_urine);
+	//}
+	//nRow++;
 
-	// 总入量
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_income);
-	}
-	nRow++;
+	//// 总入量
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_income);
+	//}
+	//nRow++;
 
-	// 总出量
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_output);
-	}
-	nRow++;
+	//// 总出量
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_output);
+	//}
+	//nRow++;
 
 	// 血压
 	m_tree->GetConfigValue(nRow, cfgValue);

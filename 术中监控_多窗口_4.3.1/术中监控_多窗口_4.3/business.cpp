@@ -1062,9 +1062,9 @@ void  CBusiness::InitThreadExcel() {
 }
 
 // 获取病人的基础信息
-void  CBusiness::QueryPatientInfoAsyn(const char * szTagId, time_t tFirstDay) {
+void  CBusiness::QueryPatientInfoAsyn(const char * szTagId) {
 	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_INFO,
-		new CQueryPatientInfoParam(szTagId, tFirstDay) );
+		new CQueryPatientInfoParam(szTagId) );
 }
 
 void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
