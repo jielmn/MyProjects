@@ -815,69 +815,69 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		}
 	}
 
-	// 手术后日数
-	if (pInfo->m_surgery > 0) {
-		time_t t1 = GetAnyDayZeroTime(pInfo->m_surgery);
-		for (int i = 0; i < 7 - nStartIndex; i++) {
-			time_t t2 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
-			if (t2 >= t1) {
-				int nInDays = (int)(t2 - t1) / (3600 * 24); 
-				strText.Format("sur_date_%d", i + 1);
-				pItem = xmlChart.FindChartUIByName(strText);
-				if (pItem) {
-					strText.Format("%d", nInDays);
-					pItem->SetText((const char *)strText);
-				}
-			}
-		}
-	}
+	//// 手术后日数
+	//if (pInfo->m_surgery > 0) {
+	//	time_t t1 = GetAnyDayZeroTime(pInfo->m_surgery);
+	//	for (int i = 0; i < 7 - nStartIndex; i++) {
+	//		time_t t2 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
+	//		if (t2 >= t1) {
+	//			int nInDays = (int)(t2 - t1) / (3600 * 24); 
+	//			strText.Format("sur_date_%d", i + 1);
+	//			pItem = xmlChart.FindChartUIByName(strText);
+	//			if (pItem) {
+	//				strText.Format("%d", nInDays);
+	//				pItem->SetText((const char *)strText);
+	//			}
+	//		}
+	//	}
+	//}
 
-	// 呼吸
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		for (int j = 0; j < 6; j++) {
-			strText.Format("breath_%d_%d", i + 1, j + 1);
-			pItem = xmlChart.FindChartUIByName(strText);
-			if (pItem) {
-				pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i+ nStartIndex].m_breath[j] ));
-			}
-		}
-	}
+	//// 呼吸
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	for (int j = 0; j < 6; j++) {
+	//		strText.Format("breath_%d_%d", i + 1, j + 1);
+	//		pItem = xmlChart.FindChartUIByName(strText);
+	//		if (pItem) {
+	//			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i+ nStartIndex].m_breath[j] ));
+	//		}
+	//	}
+	//}
 
-	// 大便次数
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("defecate_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i+ nStartIndex].m_defecate));
-		}
-	}
+	//// 大便次数
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("defecate_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i+ nStartIndex].m_defecate));
+	//	}
+	//}
 
-	// 尿量
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("urine_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_urine));
-		}
-	}
+	//// 尿量
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("urine_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_urine));
+	//	}
+	//}
 
-	// 入量
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("income_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_income));
-		}
-	}
+	//// 入量
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("income_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_income));
+	//	}
+	//}
 
-	// 出量
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("output_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_output));
-		}
-	}
+	//// 出量
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("output_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_output));
+	//	}
+	//}
 
 	// 血压
 	for (int i = 0; i < 7 - nStartIndex; i++) {

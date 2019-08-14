@@ -76,7 +76,6 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 }
 
 void   CPatientDataDlg::InitWindow() {
-	m_tDate = time(0);
 	WindowImplBase::InitWindow();
 }
 
@@ -97,8 +96,12 @@ void  CPatientDataDlg::OnMyInited() {
 	InitInfo();
 	InitData();
 
-	//CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
-	//SetBusy(TRUE);
+	time_t tZeroTime = GetAnyDayZeroTime(m_tDate);
+	time_t tFirstDay = tZeroTime - 3600 * 24 * 6;
+	SYSTEMTIME s = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s);
+	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId, tFirstDay);
+	SetBusy(TRUE);
 }
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -506,15 +509,15 @@ void  CPatientDataDlg::GetPatientInfo(PatientInfo * pInfo) {
 	STRNCPY(pInfo->m_szBedNo, cfgValue.m_strEdit, MAX_BED_NO_LENGTH);
 	nRow += 2;
 
-	// 手术
-	m_tree->GetConfigValue(nRow, cfgValue);
-	if (cfgValue.m_bCheckbox) {
-		m_tree->GetConfigValue(nRow + 1, cfgValue);
-		pInfo->m_surgery = cfgValue.m_time;
-	}
-	else {
-		pInfo->m_surgery = 0;
-	}
+	//// 手术
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//if (cfgValue.m_bCheckbox) {
+	//	m_tree->GetConfigValue(nRow + 1, cfgValue);
+	//	pInfo->m_surgery = cfgValue.m_time;
+	//}
+	//else {
+	//	pInfo->m_surgery = 0;
+	//}
 	nRow += 2;
 }
 
@@ -657,8 +660,8 @@ BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
 	if ( pInfo->m_in_hospital != m_patient_info.m_in_hospital )
 		return TRUE;
 
-	if ( pInfo->m_surgery != m_patient_info.m_surgery )
-		return TRUE;
+	//if ( pInfo->m_surgery != m_patient_info.m_surgery )
+	//	return TRUE;
 
 	return FALSE;
 }
@@ -709,16 +712,16 @@ void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
 
 	if ( bBusy ) {
 		m_tree->SetMouseChildEnabled(false);
-		//m_waiting_bar->SetVisible(true);
-		//m_waiting_bar->Start();
+		m_waiting_bar->SetVisible(true);
+		m_waiting_bar->Start();
 		m_btnPreview->SetEnabled(false);
 		m_btnPrint->SetEnabled(false);
 		m_btnReturn->SetEnabled(false);
 	}
 	else {
 		m_tree->SetMouseChildEnabled(true);
-		//m_waiting_bar->Stop();
-		//m_waiting_bar->SetVisible(false);		
+		m_waiting_bar->Stop();
+		m_waiting_bar->SetVisible(false);		
 		m_btnPreview->SetEnabled(true);
 		m_btnPrint->SetEnabled(true);
 		m_btnReturn->SetEnabled(true);
@@ -814,19 +817,19 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow += 2;
 
-	// 手术
-	if (m_patient_info.m_surgery > 0) {
-		cfgValue.m_bCheckbox = TRUE;
-		m_tree->SetConfigValue(nRow, cfgValue);
+	//// 手术
+	//if (m_patient_info.m_surgery > 0) {
+	//	cfgValue.m_bCheckbox = TRUE;
+	//	m_tree->SetConfigValue(nRow, cfgValue);
 
-		cfgValue.m_time = m_patient_info.m_surgery;
-		m_tree->SetConfigValue(nRow + 1, cfgValue);
-	}
-	else {
-		cfgValue.m_bCheckbox = FALSE;
-		m_tree->SetConfigValue(nRow, cfgValue);
-		m_tree->Invalidate();
-	}
+	//	cfgValue.m_time = m_patient_info.m_surgery;
+	//	m_tree->SetConfigValue(nRow + 1, cfgValue);
+	//}
+	//else {
+	//	cfgValue.m_bCheckbox = FALSE;
+	//	m_tree->SetConfigValue(nRow, cfgValue);
+	//	m_tree->Invalidate();
+	//}
 	nRow += 2;	
 
 	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
@@ -837,6 +840,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	PatientData * pData = (PatientData *)wParam;
 	memcpy(m_patient_data, pData, sizeof(PatientData) * 7);
 	delete[] pData;
+	return;
 
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 17;

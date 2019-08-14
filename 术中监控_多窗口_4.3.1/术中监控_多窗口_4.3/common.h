@@ -535,41 +535,68 @@ typedef  struct  tagPatientInfo {
 	char        m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
 	char        m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
 	time_t      m_in_hospital;
+	time_t      m_out_hospital;
 	char        m_szMedicalDepartment[MAX_MEDICAL_DEPARTMENT_LENGTH];
 	char        m_szWard[MAX_WARD_LENGTH];
 	char        m_szBedNo[MAX_BED_NO_LENGTH];
-	time_t      m_surgery;
+	char        m_szMedicalDepartment2[MAX_MEDICAL_DEPARTMENT_LENGTH];
+	char        m_szWard2[MAX_WARD_LENGTH];
+	char        m_szBedNo2[MAX_BED_NO_LENGTH];
 }PatientInfo;
+
+#define  PTYPE_SURGERY          1
+#define  PTYPE_BIRTH            2
+#define  PTYPE_TURN_IN          3
+#define  PTYPE_TURN_OUT         4
+#define  PTYPE_DEATH            5
+#define  PTYPE_HOLIDAY          6
+
+// 病人的事件信息
+typedef  struct  tagPatientEvent {
+	int         m_nId;
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
+	int         m_nType;
+	time_t      m_time_1;
+	time_t      m_time_2;
+}PatientEvent;
 
 #define  MAX_BLOOD_PRESSURE_LENGTH 20
 #define  MAX_WEIGHT_LENGTH         20
 #define  MAX_IRRITABILITY_LENGTH   20
+#define  MAX_BREATH_LENGTH         20
+#define  MAX_DEFECATE_LENGTH       20
+#define  MAX_URINE_LENGTH          20
+#define  MAX_INCOME_LENGTH         20
+#define  MAX_OUTPUT_LENGTH         20
 // 病人的非体温数据
 typedef  struct   tagPatientData {
 	char        m_szTagId[MAX_TAG_ID_LENGTH];
 	time_t      m_date;
 
 	int         m_pulse[6];
-	int         m_breath[6];	
-	int         m_defecate;
-	int         m_urine;
-	int         m_income;
-	int         m_output;
+	char        m_breath[6][MAX_BREATH_LENGTH];
+	char        m_defecate[MAX_DEFECATE_LENGTH];
+	char        m_urine[MAX_URINE_LENGTH];
+	char        m_income[MAX_INCOME_LENGTH];
+	char        m_output[MAX_OUTPUT_LENGTH];
 	char        m_szBloodPressure[MAX_BLOOD_PRESSURE_LENGTH];
 	char        m_szWeight[MAX_WEIGHT_LENGTH];
 	char        m_szIrritability[MAX_IRRITABILITY_LENGTH];
 
 	int         m_temp[6];
+	int         m_descend_temp[6];      // 降温温度
 }PatientData;
 
 
 class CQueryPatientInfoParam : public LmnToolkits::MessageData {
 public:
-	CQueryPatientInfoParam(const char * szTagId) {
+	CQueryPatientInfoParam(const char * szTagId, time_t tFirstDay) {
 		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+		m_tFirstDay = tFirstDay;
 	}
 
 	char         m_szTagId[MAX_TAG_ID_LENGTH];
+	time_t       m_tFirstDay;
 };
 
 class CQueryPatientDataParam : public LmnToolkits::MessageData {
