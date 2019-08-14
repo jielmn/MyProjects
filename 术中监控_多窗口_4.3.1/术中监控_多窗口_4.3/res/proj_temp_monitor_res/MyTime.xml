@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout>
+		<MyDateTime name="date_1" width="140" bkcolor="#FFFFFFFF" font="2" textcolor="#FF386382" bordercolor="#FF768D9B" bordersize="0" textpadding="5,0,5,0" />
+		<HorizontalLayout width="5" />
+		<Edit name="edt_1" font="2" textcolor="#FF386382" width="50" numberonly="true" bordercolor="#FF768D9B" bordersize="0" align="center" />
+		<Label font="2" textcolor="#FF386382" text="时" width="20" />		
+		<Edit name="edt_2" font="2" textcolor="#FF386382" width="50" numberonly="true" bordercolor="#FF768D9B" bordersize="0" align="center" />
+		<Label font="2" textcolor="#FF386382" text="分" width="20" />		
+	</HorizontalLayout>
+</Window>

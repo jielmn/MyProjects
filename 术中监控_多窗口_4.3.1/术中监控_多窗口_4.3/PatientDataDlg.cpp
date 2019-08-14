@@ -95,7 +95,7 @@ void  CPatientDataDlg::OnMyInited() {
 	m_date_end = (CMyDateUI *)m_PaintManager.FindControl("DateTimeE");
 
 	m_tree->SetSelectedItemBkColor(0xFFFFFFFF);
-	m_tree->SetHotItemBkColor(0xFFFFFFFF);
+	m_tree->SetHotItemBkColor(0xFFFFFFFF);  
 
 	InitInfo();
 	InitData();
@@ -158,6 +158,7 @@ void   CPatientDataDlg::InitInfo() {
 	CHorizontalLayoutUI * pHLayout = 0;
 	CButtonUI * pBtn = 0;
 	CControlUI * pCtl = 0;
+	CMyDateTimeUI * pMyTime = 0;
 
 	strText.Format("病人基础信息");
 	pTitleNode = m_tree->AddNode(strText, 0, 0, 0, 3, 0xFF666666);
@@ -189,14 +190,13 @@ void   CPatientDataDlg::InitInfo() {
 	m_tree->AddNode("住院号", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 入院日期
-	strText.Format("入院");
+	strText.Format("入院"); 
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->SetFixedWidth(20);
 	m_tree->AddNode("是否入院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-	pDateTime = new CMyDateUI;
-	pDateTime->SetFixedWidth(140);
-	m_tree->AddNode("入院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
+	pMyTime = new CMyDateTimeUI;
+	m_tree->AddNode("入院日期", pSubTitleNode, 0, pMyTime, 2, 0xFF386382);
 
 	// 出院日期
 	strText.Format("出院");
@@ -204,9 +204,8 @@ void   CPatientDataDlg::InitInfo() {
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->SetFixedWidth(20);
 	m_tree->AddNode("是否出院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
-	pDateTime = new CMyDateUI;
-	pDateTime->SetFixedWidth(140);
-	m_tree->AddNode("出院日期", pSubTitleNode, 0, pDateTime, 2, 0xFF386382, 2, 0xFF386382);
+	pMyTime = new CMyDateTimeUI;
+	m_tree->AddNode("出院日期", pSubTitleNode, 0, pMyTime, 2, 0xFF386382);
 
 	// 科别
 	pShift = new CShiftUI;    

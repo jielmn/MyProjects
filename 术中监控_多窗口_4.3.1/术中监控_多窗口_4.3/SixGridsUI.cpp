@@ -297,6 +297,31 @@ void CMyDateUI::DoInit() {
 }
 
 
+CMyDateTimeUI::CMyDateTimeUI() : m_callback(m_pManager) {
+
+}
+
+CMyDateTimeUI::~CMyDateTimeUI() {
+
+}
+
+LPCTSTR CMyDateTimeUI::GetClass() const {
+	return "MyDateTime";
+}
+
+void CMyDateTimeUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("MyTime.xml"), (UINT)0, &m_callback, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}	
+}
+
+
 CMyEventUI::CMyEventUI() : m_callback(m_pManager) {
 	m_cmbType = 0;
 	m_date_1 = 0;
@@ -324,7 +349,7 @@ LPCTSTR CMyEventUI::GetClass() const {
 
 void CMyEventUI::DoInit() {
 	CDialogBuilder builder;
-	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("Event.xml"), (UINT)0, &m_callback, m_pManager));
+	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("Event.xml"), (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
 	}
