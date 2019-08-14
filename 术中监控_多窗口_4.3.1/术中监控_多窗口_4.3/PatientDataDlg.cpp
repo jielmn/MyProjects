@@ -331,10 +331,11 @@ void  CPatientDataDlg::InitData() {
 
 void CPatientDataDlg::OnPrintPreview() {
 	PatientInfo info;
+	std::vector<PatientEvent * > vEvents;
 	PatientData data[7];
 
 	// 获取UI的填入信息
-	GetPatientInfo(&info);
+	GetPatientInfo(&info, vEvents);
 	GetPatientData(data, 7);
 
 	memcpy(&m_preview->m_patient_info, &info, sizeof(PatientInfo));
@@ -354,10 +355,11 @@ void CPatientDataDlg::OnReturn() {
 
 void  CPatientDataDlg::OnPrint() {
 	PatientInfo info;
+	std::vector<PatientEvent * > vEvents;
 	PatientData data[7];
 
 	// 获取UI的填入信息
-	GetPatientInfo(&info);
+	GetPatientInfo(&info, vEvents);
 	GetPatientData(data, 7);
 	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
 
@@ -452,7 +454,8 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 }
 
 // 从界面获取填入的info
-void  CPatientDataDlg::GetPatientInfo(PatientInfo * pInfo) {
+void  CPatientDataDlg::GetPatientInfo( PatientInfo * pInfo, 
+	                                   std::vector<PatientEvent * > & vEvents ) {
 	memset(pInfo, 0, sizeof(PatientInfo));
 
 	CMyTreeCfgUI::ConfigValue   cfgValue;
@@ -481,44 +484,50 @@ void  CPatientDataDlg::GetPatientInfo(PatientInfo * pInfo) {
 	// 住院号
 	m_tree->GetConfigValue(nRow, cfgValue);
 	STRNCPY(pInfo->m_szHospitalAdmissionNo, cfgValue.m_strEdit, MAX_HOSPITAL_ADMISSION_NO_LENGTH);
-	nRow += 2;
+	nRow++;
 
 	// 入院日期
-	m_tree->GetConfigValue(nRow, cfgValue);
+	m_tree->GetConfigValue(nRow+1, cfgValue);
 	if ( cfgValue.m_bCheckbox ) {
-		m_tree->GetConfigValue(nRow+1, cfgValue);
+		m_tree->GetConfigValue(nRow+2, cfgValue);
 		pInfo->m_in_hospital = cfgValue.m_time;
 	}
 	else {
 		pInfo->m_in_hospital = 0;
 	}
-	nRow += 2;
+	nRow += 3;
+
+	// 出院日期
+	m_tree->GetConfigValue(nRow + 1, cfgValue);
+	if (cfgValue.m_bCheckbox) {
+		m_tree->GetConfigValue(nRow + 2, cfgValue);
+		pInfo->m_out_hospital = cfgValue.m_time;
+	}
+	else {
+		pInfo->m_out_hospital = 0;
+	}
+	nRow += 3;
 
 	// 科室
 	m_tree->GetConfigValue(nRow, cfgValue);
-	STRNCPY(pInfo->m_szMedicalDepartment, cfgValue.m_strEdit, MAX_MEDICAL_DEPARTMENT_LENGTH);
+	STRNCPY(pInfo->m_szMedicalDepartment,  cfgValue.m_Values[0], MAX_MEDICAL_DEPARTMENT_LENGTH);
+	STRNCPY(pInfo->m_szMedicalDepartment2, cfgValue.m_Values[1], MAX_MEDICAL_DEPARTMENT_LENGTH);
 	nRow++;
 
 	// 病室
 	m_tree->GetConfigValue(nRow, cfgValue);
-	STRNCPY(pInfo->m_szWard, cfgValue.m_strEdit, MAX_WARD_LENGTH);
+	STRNCPY(pInfo->m_szWard, cfgValue.m_Values[0], MAX_WARD_LENGTH);
+	STRNCPY(pInfo->m_szWard, cfgValue.m_Values[1], MAX_WARD_LENGTH);
 	nRow++;
 
 	// 床号
 	m_tree->GetConfigValue(nRow, cfgValue);
-	STRNCPY(pInfo->m_szBedNo, cfgValue.m_strEdit, MAX_BED_NO_LENGTH);
-	nRow += 2;
+	STRNCPY(pInfo->m_szBedNo, cfgValue.m_Values[0], MAX_BED_NO_LENGTH);
+	STRNCPY(pInfo->m_szBedNo, cfgValue.m_Values[1], MAX_BED_NO_LENGTH);
+	nRow++;
 
-	//// 手术
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//if (cfgValue.m_bCheckbox) {
-	//	m_tree->GetConfigValue(nRow + 1, cfgValue);
-	//	pInfo->m_surgery = cfgValue.m_time;
-	//}
-	//else {
-	//	pInfo->m_surgery = 0;
-	//}
-	nRow += 2;
+	// 事件
+
 }
 
 // 从界面获取填入的data
@@ -600,11 +609,12 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 }
 
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
-	//PatientInfo info;
+	PatientInfo info;
+	std::vector<PatientEvent * > vEvents;
 	//PatientData data[7];
 
-	//GetPatientInfo(&info);
-	//STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+	GetPatientInfo(&info, vEvents);
+	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
 
 	//// 保存姓名
 	//if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
@@ -854,8 +864,8 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	PatientData * pData = (PatientData *)wParam;
 	memcpy(m_patient_data, pData, sizeof(PatientData) * 7);
 	delete[] pData;
-	return;
 
+	/*
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 17;
 
@@ -945,7 +955,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
-	
+	*/
 
 	SetBusy(FALSE);
 }

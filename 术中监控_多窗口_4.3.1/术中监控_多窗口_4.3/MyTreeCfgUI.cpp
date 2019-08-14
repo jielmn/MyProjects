@@ -557,6 +557,12 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 			cfgValue.m_Values[i] = pSeven->GetValues(i);
 		}
 	}
+	else if (0 == strcmp(pCtl->GetClass(), "Shift")) {
+		CShiftUI * pShift = (CShiftUI *)pCtl;
+		for (int i = 0; i < 2; i++) {
+			cfgValue.m_Values[i] = pShift->GetValues(i);
+		}
+	}
 	else {
 		return false;
 	}

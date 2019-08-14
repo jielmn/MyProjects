@@ -40,7 +40,7 @@ private:
 	void  OnPatientInfoRet(WPARAM wParam, LPARAM  lParam);
 	void  OnPatientDataRet(WPARAM wParam, LPARAM  lParam);
 	// 从界面获取填入的info
-	void  GetPatientInfo(PatientInfo * pInfo);
+	void  GetPatientInfo(PatientInfo * pInfo, std::vector<PatientEvent * > & vEvents);
 	// 从界面获取填入的data
 	void  GetPatientData(PatientData * pData, DWORD dwSize);
 	// 病人info是否改变
