@@ -1019,7 +1019,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			SET_CONTROL_TEXT_COLOR(m_lblCheckTagRet, ERROR_COLOR);
 			SET_CONTROL_TEXT(m_lblCheckTagRet, CHECK_TAG_RET_ERROR);
 			if (s_fp_conflit_tags && bNewTag) {
-				fwrite(pItem->abyUid, 1, pItem->dwUidLen, s_fp_conflit_tags);
+				GetUid(buf, sizeof(buf), pItem->abyUid, pItem->dwUidLen);
+				fwrite(buf, 1, strlen(buf), s_fp_conflit_tags);
 				fwrite("\r\n", 1, 2, s_fp_conflit_tags);
 			}
 		}
