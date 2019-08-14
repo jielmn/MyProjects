@@ -171,7 +171,7 @@ public:
 	void  InitThreadExcel();
 
 public:
-	sigslot::signal1<PatientInfo *>   m_sigPatientInfo;
+	sigslot::signal2<PatientInfo *, const std::vector<PatientEvent * > & >   m_sigPatientInfo;
 	sigslot::signal2<PatientData *, DWORD>  m_sigPatientData;
 };
 

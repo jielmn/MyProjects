@@ -731,7 +731,7 @@ void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
 	m_bBusy = bBusy;
 }
 
-void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo) {
+void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo, const std::vector<PatientEvent * > & vEvents) {
 	PatientInfo * pNewInfo = new PatientInfo;
 	memcpy(pNewInfo, pInfo, sizeof(PatientInfo));
 

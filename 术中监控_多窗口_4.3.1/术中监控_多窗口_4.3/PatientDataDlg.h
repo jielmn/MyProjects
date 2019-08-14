@@ -22,7 +22,7 @@ public:
 	virtual void   InitWindow();
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
-	void  OnPatientInfo(PatientInfo * pInfo);
+	void  OnPatientInfo(PatientInfo * pInfo, const std::vector<PatientEvent * > & vEvents);
 	void  OnPatientData(PatientData *, DWORD);
 	virtual LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 

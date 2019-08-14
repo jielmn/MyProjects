@@ -33,7 +33,8 @@ public:
 	// 查询tag绑定的grid index
 	int  QueryBindingIndexByTag(const char * szTagId);
 	// 查询PatientInfo
-	void QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet);
+	void QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet, 
+		std::vector<PatientEvent * > & vEvents);
 	// 保存info
 	void SavePatientInfo(const CSavePatientInfoParam * pParam);
 	// 查询PatientData

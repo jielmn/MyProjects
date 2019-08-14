@@ -577,11 +577,13 @@ int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
 }
 
 // 查询PatientInfo
-void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam, PatientInfo * pRet) {
+void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam, 
+	PatientInfo * pRet, std::vector<PatientEvent * > & vEvents) {
 	memset(pRet, 0, sizeof(PatientInfo));
 
 	char sql[8192];
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", PATIENT_INFO_TABLE, pParam->m_szTagId);
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", 
+		     PATIENT_INFO_TABLE, pParam->m_szTagId);
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
@@ -593,43 +595,41 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 	if (nrow > 0) {
 		int col = 1;
 
-		if ( azResult[ncolumn + col] )
-			sscanf_s( azResult[ncolumn + col], "%d", &pRet->m_sex );
+		pRet->m_sex = GetIntFromDb(azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			sscanf_s(azResult[ncolumn + col], "%d", &pRet->m_age);
+		pRet->m_age = GetIntFromDb(azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			STRNCPY(pRet->m_szOutpatientNo, azResult[ncolumn + col], MAX_OUTPATIENT_NO_LENGTH);
+		GetStrFromdDb(pRet->m_szOutpatientNo, MAX_OUTPATIENT_NO_LENGTH, azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			STRNCPY(pRet->m_szHospitalAdmissionNo, azResult[ncolumn + col], MAX_HOSPITAL_ADMISSION_NO_LENGTH);
+		GetStrFromdDb(pRet->m_szHospitalAdmissionNo, MAX_HOSPITAL_ADMISSION_NO_LENGTH, azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			sscanf_s(azResult[ncolumn + col], "%lu", &dwValue);
-		pRet->m_in_hospital = dwValue;
+		pRet->m_in_hospital = (time_t)GetIntFromDb(azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			STRNCPY(pRet->m_szMedicalDepartment, azResult[ncolumn + col], MAX_MEDICAL_DEPARTMENT_LENGTH);
+		pRet->m_out_hospital = (time_t)GetIntFromDb(azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			STRNCPY(pRet->m_szWard, azResult[ncolumn + col], MAX_WARD_LENGTH);
+		GetStrFromdDb(pRet->m_szMedicalDepartment, MAX_MEDICAL_DEPARTMENT_LENGTH, azResult[ncolumn + col]);
 		col++;
 
-		if (azResult[ncolumn + col])
-			STRNCPY(pRet->m_szBedNo, azResult[ncolumn + col], MAX_BED_NO_LENGTH);
+		GetStrFromdDb(pRet->m_szWard, MAX_WARD_LENGTH, azResult[ncolumn + col]);
 		col++;
 
-		//if (azResult[ncolumn + col])
-		//	sscanf_s(azResult[ncolumn + col], "%lu", &dwValue);
-		//pRet->m_surgery = dwValue;
-		//col++;
+		GetStrFromdDb(pRet->m_szBedNo, MAX_BED_NO_LENGTH, azResult[ncolumn + col]);
+		col++;
+
+		GetStrFromdDb(pRet->m_szMedicalDepartment2, MAX_MEDICAL_DEPARTMENT_LENGTH, azResult[ncolumn + col]);
+		col++;
+
+		GetStrFromdDb(pRet->m_szWard2, MAX_WARD_LENGTH, azResult[ncolumn + col]);
+		col++;
+
+		GetStrFromdDb(pRet->m_szBedNo2, MAX_BED_NO_LENGTH, azResult[ncolumn + col]);
+		col++;
 	}
 	sqlite3_free_table(azResult);
 
@@ -641,8 +641,24 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
 	// 如果存在
 	if (nrow > 0) {
-		STRNCPY(pRet->m_szTagId, azResult[ncolumn + 0], MAX_TAG_ID_LENGTH);
-		STRNCPY(pRet->m_szPName, azResult[ncolumn + 1], MAX_TAG_PNAME_LENGTH);
+		GetStrFromdDb(pRet->m_szTagId, MAX_TAG_ID_LENGTH, azResult[ncolumn + 0]);
+		GetStrFromdDb(pRet->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[ncolumn + 1]);
+	}
+	sqlite3_free_table(azResult);
+
+	// 事件
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", 
+		    PATIENT_EVENT_TABLE, pParam->m_szTagId);
+	nrow = ncolumn = 0;           // 查询结果集的行数、列数
+	azResult = 0;                 // 二维数组存放结果
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		PatientEvent * pEvent = new PatientEvent;
+		memset(pEvent, 0, sizeof(PatientEvent));
+		pEvent->m_nId    = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		pEvent->m_nType  = GetIntFromDb(azResult[(i + 1)*ncolumn + 2]);
+		pEvent->m_time_1 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+		pEvent->m_time_2 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 4]);
 	}
 	sqlite3_free_table(azResult);
 }

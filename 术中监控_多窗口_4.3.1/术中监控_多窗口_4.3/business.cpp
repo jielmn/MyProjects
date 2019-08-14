@@ -1069,8 +1069,10 @@ void  CBusiness::QueryPatientInfoAsyn(const char * szTagId) {
 
 void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
 	PatientInfo tRet;
-	m_sqlite.QueryPatientInfo(pParam, &tRet);
-	m_sigPatientInfo.emit(&tRet);
+	std::vector<PatientEvent * > vEvents;
+	m_sqlite.QueryPatientInfo(pParam, &tRet, vEvents);
+	m_sigPatientInfo.emit(&tRet, vEvents);
+	ClearVector(vEvents);
 }
 
 // 保存基本信息

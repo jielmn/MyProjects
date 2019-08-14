@@ -1123,3 +1123,19 @@ SYSTEMTIME Time2SysTime(const time_t & t) {
 
 	return s;
 }
+
+int GetIntFromDb(const char * szValue, int nDefault /*= 0*/) {
+	int nValue = nDefault;
+	if ( szValue )
+		sscanf_s( szValue, "%d", &nValue);
+	return nValue;
+}
+
+char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue) {
+	assert(dwSize > 0);
+	if (szValue)
+		STRNCPY(buf, szValue, dwSize);
+	else if ( dwSize > 0 )
+		buf[0] = '\0';
+	return buf;
+}
