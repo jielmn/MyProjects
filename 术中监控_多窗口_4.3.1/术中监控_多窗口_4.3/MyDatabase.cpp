@@ -806,9 +806,35 @@ void CMySqliteDatabase::SavePatientEvents(const CSavePatientEventsParam * pParam
 	}
 
 	// 删除
+	for (it = vDelete.begin(); it != vDelete.end(); ++it) {
+		PatientEvent * pItem = *it;
+		SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE id=%lu ",
+			PATIENT_EVENT_TABLE, (DWORD)pItem->m_nId );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	
 	// 插入
-	// 更新
+	std::vector<PatientEvent * >::const_iterator ix;
+	for (ix = v.begin(); ix != v.end(); ++ix) {
+		PatientEvent * pItem = *ix;
+		if ( pItem->m_nId != 0 ) {
+			continue;
+		}
 
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(null, '%s', %d, %lu, %lu) ",
+			PATIENT_EVENT_TABLE, pParam->m_szTagId, pItem->m_nType, 
+			(DWORD)pItem->m_time_1, (DWORD)pItem->m_time_2 );
+		sqlite3_exec(m_db, sql, 0, 0, 0);		
+	}
+
+	// 更新
+	for (it = vUpdate.begin(); it != vUpdate.end(); ++it) {
+		PatientEvent * pItem = *it;
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s SET type=%d, date_1=%lu, date_2=%lu WHERE id=%lu ",
+			PATIENT_EVENT_TABLE, pItem->m_nType, (DWORD)pItem->m_time_1, 
+			(DWORD)pItem->m_time_2, (DWORD)pItem->m_nId );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
 
 	ClearVector(vOld);
 }

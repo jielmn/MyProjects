@@ -456,8 +456,11 @@ void CMyEventUI::DoInit() {
 	m_cmbType->SelectItem(m_nType);
 
 	if (m_time1 > 0) {
+		char szTime[256];
 		SYSTEMTIME s = Time2SysTime(m_time1);
 		m_date_1->SetTime(&s);
+		Date2String(szTime, sizeof(szTime), &m_time1);
+		m_date_1->SetText(szTime);
 
 		struct tm  tmp;
 		localtime_s(&tmp, &m_time1);
@@ -468,8 +471,11 @@ void CMyEventUI::DoInit() {
 	}
 
 	if (m_time2 > 0) {
+		char szTime[256];
 		SYSTEMTIME s = Time2SysTime(m_time2);
 		m_date_2->SetTime(&s);
+		Date2String(szTime, sizeof(szTime), &m_time2);
+		m_date_2->SetText(szTime);
 
 		struct tm  tmp;
 		localtime_s(&tmp, &m_time2);
@@ -528,7 +534,7 @@ void CMyEventUI::SetSelected(BOOL bSel) {
 	}		
 }
 
-void CMyEventUI::GetValue(int nDbId, int & nType, time_t & t1, time_t & t2) {
+void CMyEventUI::GetValue(int & nDbId, int & nType, time_t & t1, time_t & t2) {
 	nType = m_cmbType->GetCurSel();
 	SYSTEMTIME s1 = m_date_1->GetTime();
 	SYSTEMTIME s2 = m_date_1->GetTime();
