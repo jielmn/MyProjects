@@ -521,13 +521,13 @@ void  CPatientDataDlg::GetPatientInfo( PatientInfo * pInfo,
 	// 病室
 	m_tree->GetConfigValue(nRow, cfgValue);
 	STRNCPY(pInfo->m_szWard, cfgValue.m_Values[0], MAX_WARD_LENGTH);
-	STRNCPY(pInfo->m_szWard, cfgValue.m_Values[1], MAX_WARD_LENGTH);
+	STRNCPY(pInfo->m_szWard2, cfgValue.m_Values[1], MAX_WARD_LENGTH);
 	nRow++;
 
 	// 床号
 	m_tree->GetConfigValue(nRow, cfgValue);
 	STRNCPY(pInfo->m_szBedNo, cfgValue.m_Values[0], MAX_BED_NO_LENGTH);
-	STRNCPY(pInfo->m_szBedNo, cfgValue.m_Values[1], MAX_BED_NO_LENGTH);
+	STRNCPY(pInfo->m_szBedNo2, cfgValue.m_Values[1], MAX_BED_NO_LENGTH);
 	nRow++;
 
 	// 事件
@@ -632,15 +632,15 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
 	ClearVector(vEvents);
 
-	//// 保存姓名
-	//if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
-	//	CBusiness::GetInstance()->SaveTagPNameAsyn(m_szTagId, info.m_szPName);
-	//}
+	// 保存姓名
+	if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {
+		CBusiness::GetInstance()->SaveTagPNameAsyn(m_szTagId, info.m_szPName);
+	}
 
-	//if ( IsPatientInfoChanged(&info) ) {
-	//	// 保存数据库
-	//	CBusiness::GetInstance()->SavePatientInfoAsyn(&info);
-	//}
+	if ( IsPatientInfoChanged(&info) ) {
+		// 保存数据库
+		CBusiness::GetInstance()->SavePatientInfoAsyn(&info);
+	}
 
 	//GetPatientData(data, 7);
 	//time_t  tFirstDay = m_tDate - 3600 * 24 * 6;
@@ -683,11 +683,20 @@ BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
 	if (0 != strcmp(pInfo->m_szBedNo, m_patient_info.m_szBedNo))
 		return TRUE;
 
+	if (0 != strcmp(pInfo->m_szMedicalDepartment2, m_patient_info.m_szMedicalDepartment2))
+		return TRUE;
+
+	if (0 != strcmp(pInfo->m_szWard2, m_patient_info.m_szWard2))
+		return TRUE;
+
+	if (0 != strcmp(pInfo->m_szBedNo2, m_patient_info.m_szBedNo2))
+		return TRUE;
+
 	if ( pInfo->m_in_hospital != m_patient_info.m_in_hospital )
 		return TRUE;
 
-	//if ( pInfo->m_surgery != m_patient_info.m_surgery )
-	//	return TRUE;
+	if (pInfo->m_out_hospital != m_patient_info.m_out_hospital)
+		return TRUE;
 
 	return FALSE;
 }

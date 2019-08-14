@@ -681,7 +681,7 @@ extern BOOL IsToday(const SYSTEMTIME & s);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const SYSTEMTIME & s);
 extern time_t SysTime2Time(const SYSTEMTIME & s);
 extern SYSTEMTIME Time2SysTime(const time_t & t);
-extern int GetIntFromDb(const char * szValue, int nDefault = 0);
+extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
 extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
 
 // templates

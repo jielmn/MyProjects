@@ -1124,11 +1124,11 @@ SYSTEMTIME Time2SysTime(const time_t & t) {
 	return s;
 }
 
-int GetIntFromDb(const char * szValue, int nDefault /*= 0*/) {
-	int nValue = nDefault;
+DWORD GetIntFromDb(const char * szValue, int nDefault /*= 0*/) {
+	DWORD dwValue = nDefault;
 	if ( szValue )
-		sscanf_s( szValue, "%d", &nValue);
-	return nValue;
+		sscanf_s( szValue, "%lu", &dwValue);
+	return dwValue;
 }
 
 char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue) {

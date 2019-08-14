@@ -692,24 +692,36 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 
 	StrReplaceAll(info.m_szBedNo, MAX_BED_NO_LENGTH, pParam->m_info.m_szBedNo, "'", "''");
 
-	//// 如果存在
-	//if (nrow > 0) {
-	//	//SNPRINTF(sql, sizeof(sql), "UPDATE %s set sex=%d, age=%d, outpatient_no='%s', "
-	//	//	"hospital_admission_no='%s', in_hospital_date=%lu, medical_department='%s', "
-	//	//	"ward='%s', bed_no='%s', surgery_date=%lu WHERE tag_id='%s' ", 
-	//	//	PATIENT_INFO_TABLE, info.m_sex, info.m_age, info.m_szOutpatientNo,
-	//	//	info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, info.m_szMedicalDepartment,
-	//	//	info.m_szWard, info.m_szBedNo, info.m_szTagId );
-	//	sqlite3_exec(m_db, sql, 0, 0, 0);		
-	//}
-	//else {
-	//	//SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %d, %d, '%s', '%s',"
-	//	//	"%lu, '%s', '%s', '%s', %lu ); ",
-	//	//	PATIENT_INFO_TABLE, info.m_szTagId, info.m_sex, info.m_age, info.m_szOutpatientNo,
-	//	//	info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, info.m_szMedicalDepartment,
-	//	//	info.m_szWard, info.m_szBedNo );
-	//	sqlite3_exec(m_db, sql, 0, 0, 0);
-	//}
+	StrReplaceAll(info.m_szMedicalDepartment2, MAX_MEDICAL_DEPARTMENT_LENGTH,
+		pParam->m_info.m_szMedicalDepartment2, "'", "''");
+
+	StrReplaceAll(info.m_szWard2, MAX_WARD_LENGTH, pParam->m_info.m_szWard2, "'", "''");
+
+	StrReplaceAll(info.m_szBedNo2, MAX_BED_NO_LENGTH, pParam->m_info.m_szBedNo2, "'", "''");
+
+
+	// 如果存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set sex=%d, age=%d, outpatient_no='%s', "
+			"hospital_admission_no='%s', in_hospital_date=%lu, out_hospital_date=%lu, "
+			"medical_department='%s', ward='%s', bed_no='%s', "
+			"medical_department2='%s', ward2='%s', bed_no2='%s' WHERE tag_id='%s' ",
+			PATIENT_INFO_TABLE, info.m_sex, info.m_age, info.m_szOutpatientNo,
+			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, 
+			(DWORD)info.m_out_hospital, info.m_szMedicalDepartment,
+			info.m_szWard, info.m_szBedNo, info.m_szMedicalDepartment2,
+			info.m_szWard2, info.m_szBedNo2, info.m_szTagId);
+		sqlite3_exec(m_db, sql, 0, 0, 0);		
+	}
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %d, %d, '%s', '%s',"
+			"%lu, %lu, '%s', '%s', '%s', '%s', '%s', '%s' ); ",
+			PATIENT_INFO_TABLE, info.m_szTagId, info.m_sex, info.m_age, info.m_szOutpatientNo,
+			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, (DWORD)info.m_out_hospital, 
+			info.m_szMedicalDepartment, info.m_szWard, info.m_szBedNo,
+			info.m_szMedicalDepartment2, info.m_szWard2, info.m_szBedNo2 );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
 }
 
 
