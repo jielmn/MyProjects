@@ -190,4 +190,25 @@ public:
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void DoEvent(DuiLib::TEventUI& event);
 	LPCTSTR GetClass() const;
+
+public:
+	std::vector<TempItem *> *               m_pVec;
+	time_t                                  m_tStart;
+	time_t                                  m_tEnd;
+	float                                   m_fSecondsPerPixel;
+
+private:
+	void  GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp);
+	int   GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin = MIN_MYIMAGE_VMARGIN);
+	void  DrawScaleLine(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
+		const RECT & rectScale, const RECT & rect);
+	void  DrawBorder(HDC hDC, const RECT & rectScale, int width);
+	void  DrawScale(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY, int nMaxTemp,
+		const RECT & rectScale, int width, BOOL bDrawRectangle = TRUE,
+		DWORD dwTextColor = RGB(255, 255, 255));
+
+private:
+	HPEN                         m_hCommonThreadPen;
+	HPEN                         m_hBrighterThreadPen;
+	HBRUSH                       m_hCommonBrush;
 };

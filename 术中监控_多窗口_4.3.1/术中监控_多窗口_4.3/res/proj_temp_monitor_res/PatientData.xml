@@ -54,7 +54,7 @@
 						<Label text="温度曲线" font="3" textcolor="#FF666666" />
 					</HorizontalLayout>
 					
-					<HorizontalLayout>
+					<HorizontalLayout hscrollbar="true" vscrollbar="false" sepheight="4" bkcolor="#FF434248" >
 						<PatientImage bordercolor="#FF768D9B" bordersize="1" name="img" />
 					</HorizontalLayout>
 					

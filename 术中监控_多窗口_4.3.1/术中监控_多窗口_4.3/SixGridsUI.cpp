@@ -811,16 +811,67 @@ void  CSixTempUI::GetValues(int nIndex, int & t1, int & t2) {
 
 
 CPatientImg::CPatientImg() {
+	m_pVec = 0;
+	m_tStart = 0;
+	m_tEnd = 0;
+	m_fSecondsPerPixel = 0.0f;
 
+	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
+	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
+	m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
 }
 
 CPatientImg::~CPatientImg() {
-
+	DeleteObject(m_hCommonThreadPen);
+	DeleteObject(m_hBrighterThreadPen);
+	DeleteObject(m_hCommonBrush);
 }
 
 bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
-	::TextOut(hDC, m_rcItem.left, m_rcItem.top, "Hello", 5); 
+
+	// GDI+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+	CContainerUI * pParent = (CContainerUI *)GetParent();
+
+	// self rectangle and width, height
+	RECT rect   = GetPos();
+	int  width  = pParent->GetWidth();
+	int  height = rect.bottom - rect.top;
+
+	// 水平滑动条位置
+	int  nScrollX = pParent->GetScrollPos().cx;
+
+	// 最高，最低温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp);
+
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;  
+
+	// 画水平刻度线
+	DrawScaleLine(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, rectScale, rect);
+
+	// 画边框
+	DrawBorder(hDC, rectScale, width);
+
+	// 画刻度值
+	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+	 
 	return true;
 }
 
@@ -830,4 +881,126 @@ void CPatientImg::DoEvent(DuiLib::TEventUI& event) {
 
 LPCTSTR CPatientImg::GetClass() const {
 	return "PatientImage";
+}
+
+void  CPatientImg::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp) {
+	if ( m_pVec == 0 ) {
+		nMinTemp = 35;
+		nMaxTemp = 39;
+		return;
+	}
+
+	const std::vector<TempItem * > & v = *m_pVec;
+	std::vector<TempItem * >::const_iterator it;
+	BOOL bFirst = TRUE;
+
+	for (it = v.begin(); it != v.end(); ++it) {
+		TempItem * pItem = *it;
+		if (bFirst) {
+			nMaxTemp = pItem->m_dwTemp;
+			nMinTemp = pItem->m_dwTemp;
+			bFirst = FALSE;
+		}
+		else {
+			if ((int)pItem->m_dwTemp > nMaxTemp) {
+				nMaxTemp = pItem->m_dwTemp;
+			}
+			else if ((int)pItem->m_dwTemp < nMinTemp) {
+				nMinTemp = pItem->m_dwTemp;
+			}
+		}
+	}
+
+	// 最大和最小显示温度必须为整数
+	// min: 2100~2199 ==> 2100
+	// max: 3800 ==> 3800, 3801~3899 ==> 3900
+	nMinTemp = nMinTemp / 100;
+	int nReminder = nMaxTemp % 100;
+	if (0 != nReminder) {
+		nMaxTemp = (nMaxTemp / 100 + 1);
+	}
+	else {
+		nMaxTemp /= 100;
+	}
+
+	if (nMinTemp == nMaxTemp) {
+		nMaxTemp = nMinTemp + 1;
+	}
+}
+
+int   CPatientImg::GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin /*= MIN_MYIMAGE_VMARGIN*/) {
+	int h = height / nCelsiusCount;
+	int r = height % nCelsiusCount;
+	// int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > r) {
+		int nSpared = (nVMargin * 2 - r - 1) / nCelsiusCount + 1;
+		h -= nSpared;
+	}
+	return h;
+}
+
+// 画水平刻度线
+void   CPatientImg::DrawScaleLine(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
+	const RECT & rectScale, const RECT & rect) {
+	int nVInterval = BRIGHT_DARK_INTERVAL;
+	for (int i = 0; i < nCelsiusCnt + 1; i++) {
+		if (nVInterval >= BRIGHT_DARK_INTERVAL) {
+			::SelectObject(hDC, m_hBrighterThreadPen);
+			nVInterval = nHeightPerCelsius;
+		}
+		else {
+			::SelectObject(hDC, m_hCommonThreadPen);
+			nVInterval += nHeightPerCelsius;
+		}
+		int  nTop = nMaxY + i * nHeightPerCelsius;
+		::MoveToEx(hDC, rectScale.right, nTop, 0);
+		::LineTo(hDC, rect.right, nTop);
+	}
+}
+
+// 画边框
+void   CPatientImg::DrawBorder(HDC hDC, const RECT & rectScale, int width) {
+
+	::MoveToEx(hDC, rectScale.left, rectScale.top, 0);
+	::LineTo(hDC, rectScale.left, rectScale.bottom);
+
+	int nX = rectScale.left + width - 1;
+	::MoveToEx(hDC, nX, rectScale.top, 0);
+	::LineTo(hDC, nX, rectScale.bottom);
+}
+
+// 画刻度值
+void  CPatientImg::DrawScale(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY, int nMaxTemp,
+	const RECT & rectScale, int width, BOOL bDrawRectangle /*= TRUE*/,
+	DWORD dwTextColor /*= RGB(255, 255, 255)*/) {
+	CDuiString strText;
+	int nVInterval = BRIGHT_DARK_INTERVAL;
+	::SetTextColor(hDC, dwTextColor);
+	::SelectObject(hDC, m_hCommonThreadPen);
+
+	if (bDrawRectangle)
+		::Rectangle(hDC, rectScale.left, rectScale.top, rectScale.right, rectScale.bottom);
+
+	RECT r = rectScale;
+	r.left++;
+	r.right--;
+	r.top++;
+	r.bottom--;
+	if (bDrawRectangle)
+		::FillRect(hDC, &r, m_hCommonBrush);
+
+	for (int i = 0; i < nCelsiusCnt + 1; i++) {
+		if (nVInterval >= BRIGHT_DARK_INTERVAL) {
+			int  nTop = nMaxY + i * nHeightPerCelsius;
+			int  nTemperature = nMaxTemp - i;
+			strText.Format("%d℃", nTemperature);
+			::TextOut(hDC, rectScale.right + (-40), nTop + (-8),
+				strText, strText.GetLength());
+			nVInterval = nHeightPerCelsius;
+		}
+		else {
+			nVInterval += nHeightPerCelsius;
+		}
+	}
 }
