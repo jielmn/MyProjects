@@ -869,6 +869,42 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 	// 画边框
 	DrawBorder(hDC, rectScale, width);
 
+	// 查看有无数据
+	int nPointsCnt = GetTempCount();
+	// 如果没有数据就不重绘了 
+	if (nPointsCnt > 0) {
+		//// 画温度曲线
+		//POINT  top_left;
+		//top_left.x = rect.left + SCALE_RECT_WIDTH;
+		//top_left.y = nMaxY;
+
+		//DrawPolyline(m_tStart, m_tEnd, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+		//	top_left, graphics, TRUE );
+
+		//// 有效矩形
+		//RECT rValid;
+		//rValid.left = rectScale.right;
+		//rValid.right = rectScale.left + width - 1;
+		//rValid.top = rectScale.top;
+		//rValid.bottom = rectScale.bottom;
+
+		//top_left.y += nHeightPerCelsius * nCelsiusCount;
+		//// 画时间文本
+		//DrawTimeText(hDC, m_tStart, m_tEnd, m_fSecondsPerPixel, top_left, rValid);
+
+		//// 画注释
+		//top_left.y = nMaxY;
+
+		//// 鼠标位置
+		//POINT cursor_point;
+		//GetCursorPos(&cursor_point);
+		//::ScreenToClient(g_data.m_hWnd, &cursor_point);
+
+		//// 画十字线
+		//DrawCrossLine(hDC, rValid, cursor_point, m_tStart, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+		
+	}
+
 	// 画刻度值
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
 	 
@@ -1003,4 +1039,9 @@ void  CPatientImg::DrawScale(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, in
 			nVInterval += nHeightPerCelsius;
 		}
 	}
+}
+
+// 温度数据个数
+DWORD  CPatientImg::GetTempCount() {
+	return 0;
 }

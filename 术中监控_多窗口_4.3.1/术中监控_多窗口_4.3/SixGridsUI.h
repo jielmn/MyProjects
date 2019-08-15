@@ -206,6 +206,8 @@ private:
 	void  DrawScale(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY, int nMaxTemp,
 		const RECT & rectScale, int width, BOOL bDrawRectangle = TRUE,
 		DWORD dwTextColor = RGB(255, 255, 255));
+	// 温度数据个数
+	DWORD  GetTempCount();
 
 private:
 	HPEN                         m_hCommonThreadPen;
