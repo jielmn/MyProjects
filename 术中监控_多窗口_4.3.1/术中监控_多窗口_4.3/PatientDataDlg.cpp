@@ -329,7 +329,7 @@ void  CPatientDataDlg::InitData() {
 	RECT r = { 5,0,5,0 };
 
 	time_t now = time(0);
-	GetSevenDayStr(week_days, 7, now);
+	GetSevenDayStr(week_days, 7, now - 3600 * 24 * 6);
 
 	strText.Format("病人数据");	
 	m_date_start = new CMyDateUI;
@@ -433,7 +433,7 @@ void  CPatientDataDlg::InitData() {
 	strText.Format("其他数据");
 	pSevenGrids = new CSevenGridsUI;
 	pSevenGrids->SetMode(1);
-	GetSevenDayStr(week_days, 7, now, TRUE);
+	GetSevenDayStr(week_days, 7, now - 3600 * 24 * 6, TRUE);
 	pSevenGrids->SetWeekStr(week_days, 7);
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSevenGrids, 3, 0xFF666666);
 
@@ -544,19 +544,19 @@ void  CPatientDataDlg::OnPrint() {
 	}
 }
 
-void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay /*= FALSE*/) {
+void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t tFirstTime, BOOL bMonthDay /*= FALSE*/) {
 	assert(dwSize >= 7);
 	if ( dwSize < 7 ) {
 		return;
 	}
 
 	char buf[256];
-	time_t tZeroTime = GetAnyDayZeroTime(tLastTime);
+	time_t tZeroTime = GetAnyDayZeroTime(tFirstTime);
 	time_t tTodayZeroTime = GetTodayZeroTime();
 	int nWeekDayIndex = GetWeekDay(tZeroTime);
 
 	for (int i = 0; i < 7; i++) {
-		time_t t = tZeroTime - (6-i) * 3600 * 24;
+		time_t t = tZeroTime + 3600 * 24 * i;
 		if (bMonthDay)
 			Date2String_md(buf, sizeof(buf), &t);
 		else
@@ -568,7 +568,7 @@ void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t t
 		}
 		else {
 			pDays[i] += "(";
-			pDays[i] += GetWeekDayShortName( (nWeekDayIndex + 1 + i) % 7 );
+			pDays[i] += GetWeekDayShortName( (nWeekDayIndex + i) % 7 );
 			pDays[i] += ")";
 		}
 	}
@@ -1095,6 +1095,10 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 18;
 
+	CDuiString  week_days[7];
+	time_t now = m_patient_data[0].m_date;
+	GetSevenDayStr(week_days, 7, now);
+
 	// 体温
 	for (int i = 0; i < 7; i++) {
 		for (int j = 0; j < 6; j++) {
@@ -1102,6 +1106,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 			cfgValue.m_nValues[j][1] = m_patient_data[i].m_descend_temp[j];
 		}
 		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
+		m_tree->SetTitle(nRow + 1 + i, week_days[i]);
 	}
 	nRow += 8;
 
@@ -1115,6 +1120,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 				cfgValue.m_Values[j] = "";
 		}
 		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
+		m_tree->SetTitle(nRow + 1 + i, week_days[i]);
 	}
 	nRow += 8;
 
@@ -1124,6 +1130,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 			cfgValue.m_Values[j] = m_patient_data[i].m_breath[j];
 		}
 		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
+		m_tree->SetTitle(nRow + 1 + i, week_days[i]);
 	}
 	nRow += 9;
 

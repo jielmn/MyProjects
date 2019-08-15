@@ -35,7 +35,7 @@ private:
 	void  OnPrintPreview();
 	void  OnReturn();
 	void  OnPrint();
-	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tLastTime, BOOL bMonthDay = FALSE );
+	void  GetSevenDayStr( CDuiString * pDays, DWORD dwSize, time_t tFirstTime, BOOL bMonthDay = FALSE );
 	void  OnFinalMessage(HWND hWnd);
 	void  SetBusy(BOOL bBusy = TRUE);
 	void  OnPatientInfoRet(WPARAM wParam, LPARAM  lParam);

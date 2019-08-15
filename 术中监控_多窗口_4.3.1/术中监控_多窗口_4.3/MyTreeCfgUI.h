@@ -109,6 +109,8 @@ public:
 
 	void OnExpandClick(CControlUI* pSender);
 
+	void SetTitle(int nIndex, LPCTSTR pTitle);
+
 private:
 	Node* _root;
 

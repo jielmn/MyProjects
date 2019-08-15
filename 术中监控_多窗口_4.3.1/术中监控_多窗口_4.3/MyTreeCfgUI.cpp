@@ -680,3 +680,24 @@ void  CMyTreeCfgUI::OnExpandClick(CControlUI* pSender) {
 	CMyTreeCfgUI::Node* node = (CMyTreeCfgUI::Node*)pSender->GetParent()->GetParent()->GetTag();
 	ExpandNode(node, !node->data()._expand);	
 }
+
+void  CMyTreeCfgUI::SetTitle(int nIndex, LPCTSTR pTitle) {
+	if (nIndex < 0) {
+		return;
+	}
+
+	int nCount = this->GetCount();
+	if (nIndex >= nCount) {
+		return;
+	}
+
+	CListContainerElementUI * pContainer = (CListContainerElementUI *)this->GetItemAt(nIndex);
+	CHorizontalLayoutUI * pLayout = (CHorizontalLayoutUI *)pContainer->GetItemAt(0);
+
+	if (pLayout->GetCount() < 2) {
+		return;
+	}
+
+	CLabelUI * pLbl = (CLabelUI *)pLayout->GetItemAt(1);
+	pLbl->SetText(pTitle);
+}
