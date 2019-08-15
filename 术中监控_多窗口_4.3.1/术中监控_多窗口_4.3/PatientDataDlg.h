@@ -73,7 +73,6 @@ private:
 	PatientInfo                 m_patient_info;
 	std::vector<PatientEvent *> m_vEvents;
 	PatientData                 m_patient_data[7];
-	time_t                      m_tDate;
 
 	CPatientDataPrintPreviewUI *  m_preview;
 

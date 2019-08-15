@@ -21,7 +21,6 @@ CPatientDataDlg::CPatientDataDlg() {
 	memset( &m_patient_info, 0, sizeof(m_patient_info) );
 	memset( m_patient_data,  0, sizeof(m_patient_data) );
 
-	m_tDate = time(0);
 	m_preview = 0;
 
 	m_date_start = 0;
@@ -459,7 +458,7 @@ void CPatientDataDlg::OnPrintPreview() {
 
 	memcpy(&m_preview->m_patient_info, &info, sizeof(PatientInfo));
 	memcpy(m_preview->m_patient_data, data, sizeof(PatientData) * 7);
-	m_preview->m_tFirstDay = m_tDate - 3600 * 24 * 6;
+	m_preview->m_tFirstDay = 0;
 	for (int i = 0; i < 7; i++) {
 		memcpy(m_preview->m_patient_data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
 	}
@@ -483,7 +482,7 @@ void  CPatientDataDlg::OnPrint() {
 	// 获取UI的填入信息
 	GetPatientInfo(&info, vEvents);
 	GetPatientData(data, 7);
-	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
+	time_t tFirstDay = 0;
 
 	for (int i = 0; i < 7; i++) {
 		memcpy(data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
@@ -1030,7 +1029,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	// 如果有住院日期
 	if ( m_patient_info.m_in_hospital > 0 ) {
 		time_t  tHospital  = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
-		time_t  tTodayZero = GetAnyDayZeroTime(m_tDate);
+		time_t  tTodayZero = GetTodayZeroTime();
 		if (tTodayZero < tHospital) {
 			tFirstDay = tTodayZero;
 		}
@@ -1044,7 +1043,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 		}
 	}
 	else {
-		tFirstDay = GetAnyDayZeroTime(m_tDate);
+		tFirstDay = GetTodayZeroTime();
 	}
 
 	SYSTEMTIME s = Time2SysTime(tFirstDay);
