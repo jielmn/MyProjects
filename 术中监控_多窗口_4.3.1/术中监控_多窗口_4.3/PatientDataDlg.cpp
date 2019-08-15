@@ -1187,14 +1187,14 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	nRow++;
 
 	GetSevenDayStr(week_days, 7, m_patient_data[0].m_date, TRUE);
-	m_OtherData_Week->SetWeekStr(week_days, 7);
+	m_OtherData_Week->SetWeekStr(week_days, 7);   
 
 	SetBusy(FALSE);
 }
 
 // 时间范围的起始时间改变
 void  CPatientDataDlg::OnDateStartChanged() {
-	//CDuiString  str;
+	//CDuiString  str; 
 	//SYSTEMTIME s = m_date_start->GetTime();
 	//str.Format("%d-%d-%d %d:%d:%d \n", s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute, s.wSecond);
 	//::OutputDebugString(str);
