@@ -208,9 +208,15 @@ private:
 		DWORD dwTextColor = RGB(255, 255, 255));
 	// 温度数据个数
 	DWORD  GetTempCount();
+	void   DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+		int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
+		BOOL  bDrawPoints,Pen * pen, SolidBrush * brush);
+	void  DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
 
 private:
 	HPEN                         m_hCommonThreadPen;
 	HPEN                         m_hBrighterThreadPen;
 	HBRUSH                       m_hCommonBrush;
+	Pen *                        m_temperature_pen;
+	SolidBrush *                 m_temperature_brush;
 };

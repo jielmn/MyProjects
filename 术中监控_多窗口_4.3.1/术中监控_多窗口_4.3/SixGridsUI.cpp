@@ -814,17 +814,22 @@ CPatientImg::CPatientImg() {
 	m_pVec = 0;
 	m_tStart = 0;
 	m_tEnd = 0;
-	m_fSecondsPerPixel = 0.0f;
+	m_fSecondsPerPixel = 20.0f;
 
 	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
 	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
 	m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
+
+	m_temperature_pen   = new Pen(Gdiplus::Color( RGB(255,0,0) ), 1.0);
+	m_temperature_brush = new SolidBrush(Gdiplus::Color( RGB(0, 0, 255)));
 }
 
 CPatientImg::~CPatientImg() {
 	DeleteObject(m_hCommonThreadPen);
 	DeleteObject(m_hBrighterThreadPen);
 	DeleteObject(m_hCommonBrush);
+	delete m_temperature_pen;
+	delete m_temperature_brush;
 }
 
 bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -873,13 +878,13 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 	int nPointsCnt = GetTempCount();
 	// 如果没有数据就不重绘了 
 	if (nPointsCnt > 0) {
-		//// 画温度曲线
-		//POINT  top_left;
-		//top_left.x = rect.left + SCALE_RECT_WIDTH;
-		//top_left.y = nMaxY;
+		// 画温度曲线
+		POINT  top_left;
+		top_left.x = rect.left + SCALE_RECT_WIDTH;
+		top_left.y = nMaxY;
 
-		//DrawPolyline(m_tStart, m_tEnd, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
-		//	top_left, graphics, TRUE );
+		DrawPolyline(m_tStart, m_tEnd, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
+			top_left, graphics, TRUE, m_temperature_pen, m_temperature_brush );
 
 		//// 有效矩形
 		//RECT rValid;
@@ -1043,5 +1048,135 @@ void  CPatientImg::DrawScale(HDC hDC, int nCelsiusCnt, int nHeightPerCelsius, in
 
 // 温度数据个数
 DWORD  CPatientImg::GetTempCount() {
-	return 0;
+	if (m_pVec == 0)
+		return 0;
+	if (m_tStart == 0)
+		return 0;
+	if (m_tEnd >= m_tStart)
+		return 0;
+
+	const std::vector<TempItem * > & v = *m_pVec;
+	std::vector<TempItem * >::const_iterator it;
+	DWORD  dwCnt = 0;
+
+	for (it = v.begin(); it != v.end(); it++) {
+		TempItem * pItem = *it;
+		if ( pItem->m_time < m_tStart )
+			continue;
+		if (pItem->m_time >= m_tEnd)
+			break;
+		dwCnt++;
+	}
+
+	return dwCnt;
+}
+
+void   CPatientImg::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+	int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
+	BOOL  bDrawPoints, Pen * pen, SolidBrush * brush) {
+
+	if (m_pVec == 0)
+		return;
+	if (m_tStart == 0)
+		return;
+	if (m_tEnd >= m_tStart)
+		return;
+
+	const std::vector<TempItem * > & vTempData = *m_pVec;
+
+	DWORD dwMaxTempCnt = vTempData.size();
+	Gdiplus::Point * points = new Gdiplus::Point[dwMaxTempCnt];
+	vector<TempItem *>::const_iterator it;
+
+	// 找到第一个点
+	for (it = vTempData.begin(); it != vTempData.end(); it++) {
+		TempItem * pItem = *it;
+		if (pItem->m_time >= tFirstTime) {
+			break;
+		}
+	}
+
+	// 找到第一个点后，其他的点不在和起始时间点比较
+	// 临时存储相同x坐标的vector
+	vector<TempItem *>  vTmp;
+	// 临时vector的item有共同的点，它们的x坐标相同
+	int nTmpX = 0;
+	// points数组的大小
+	int cnt = 0;
+
+	for (; it != vTempData.end(); it++) {
+		TempItem * pItem = *it;
+		// 如果最后时间有值
+		if (tLastTime > 0) {
+			// 如果超出范围
+			if (pItem->m_time > tLastTime) {
+				break;
+			}
+		}
+
+		int  nX = (int)((pItem->m_time - tFirstTime) / fSecondsPerPixel);
+
+		if (vTmp.size() == 0) {
+			vTmp.push_back(pItem);
+			nTmpX = nX;
+		}
+		else {
+			// 如果偏移量和上次的相同，放置在临时vector中
+			if (nX <= nTmpX + 1) {
+				vTmp.push_back(pItem);
+			}
+			else {
+				vector<TempItem *>::iterator  it_tmp;
+				int  sum = 0;
+				for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+					TempItem * pTmpItem = *it_tmp;
+					sum += pTmpItem->m_dwTemp;
+				}
+				// 求平均值
+				int  ave = sum / vTmp.size();
+
+				points[cnt].X = nTmpX + tTopLeft.x;
+				points[cnt].Y = tTopLeft.y + (int)((nMaxTemp - ave / 100.0) * nHeightPerCelsius);
+				cnt++;
+
+				vTmp.clear();
+				vTmp.push_back(pItem);
+				nTmpX = nX;
+			}
+		}
+	}
+
+	if (vTmp.size() > 0) {
+		vector<TempItem *>::iterator  it_tmp;
+		int  sum = 0;
+		for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+			TempItem * pTmpItem = *it_tmp;
+			sum += pTmpItem->m_dwTemp;
+		}
+		// 求平均值
+		int  ave = sum / vTmp.size();
+
+		points[cnt].X = nTmpX + tTopLeft.x;
+		points[cnt].Y = tTopLeft.y + (int)((nMaxTemp - ave / 100.0) * nHeightPerCelsius);
+		cnt++;
+
+		vTmp.clear();
+	}
+
+	if (bDrawPoints && fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f) {
+		for (int m = 0; m < cnt; ++m) {
+			DrawPoint(brush, graphics, points[m].X, points[m].Y, 0, 3);
+		}
+	}
+
+	if (cnt > 1)
+		graphics.DrawLines(pen, points, cnt);
+	else if (1 == cnt)
+		DrawPoint(brush, graphics, points[0].X, points[0].Y, 0, 3);
+
+	delete[] points;
+}
+
+void  CPatientImg::DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius) {
+	g.FillEllipse(brush, x - radius, y - radius, 2 * radius, 2 * radius);
 }
