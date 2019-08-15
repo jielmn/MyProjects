@@ -82,6 +82,9 @@ private:
 	CVerticalLayoutUI *       m_lay_events;
 	int                       m_selected_event;
 
+	CTempUI *                 m_cur_temp;
+	CTempUI *                 m_instant_temp;
+
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id
 	char                        m_szUIPName[MAX_TAG_PNAME_LENGTH];         // UI 传过来的name

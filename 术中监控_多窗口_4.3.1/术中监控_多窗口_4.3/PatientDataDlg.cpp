@@ -2,8 +2,8 @@
 #include "SixGridsUI.h"
 #include "resource.h"
 
-#define TIMER_REDRAW_PREVIEW      1001
-#define INTERVAL_REDRAW_PREVIEW   100
+#define TIMER_TEMP_UI             1002
+#define INTERVAL_TIMER_TEMP_UI    1000
 
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
@@ -25,6 +25,8 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_date_end = 0;
 	m_lay_events = 0;
 	m_selected_event = -1;
+	m_cur_temp = 0;
+	m_instant_temp = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -33,6 +35,7 @@ CPatientDataDlg::~CPatientDataDlg() {
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 	CDuiString  name = msg.pSender->GetName();
+	CDuiString strText;
 
 	if (msg.sType == "windowinit") {
 		OnMyInited();
@@ -76,6 +79,18 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			OnDateStartKillFocus();
 		}
 	}
+	else if (msg.sType == "tempui_setfocus") {
+		m_instant_temp = (CTempUI *)msg.pSender;
+		//strText.Format("%d-%d temp ui setfocus! \n", 
+		//	m_instant_temp->GetParent()->GetParent()->GetTag(), m_instant_temp->GetTag() );
+		//OutputDebugString(strText);
+		::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
+	}
+	else if (msg.sType == "tempui_killfocus") {
+		m_instant_temp = 0;
+		//OutputDebugString("tempui_killfocus \n");
+		::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -104,9 +119,11 @@ void  CPatientDataDlg::OnMyInited() {
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_TIMER) {
-		if (wParam == TIMER_REDRAW_PREVIEW) {
-			m_preview->Invalidate();
-			KillTimer(GetHWND(), wParam);  
+		if ( wParam == TIMER_TEMP_UI ) {
+			if (m_cur_temp != m_instant_temp) {
+				m_cur_temp = m_instant_temp;
+			}
+			KillTimer(GetHWND(), wParam);
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
@@ -357,6 +374,7 @@ void  CPatientDataDlg::InitData() {
 
 	for (int i = 0; i < 7; i++) {
 		CSixTempUI * pTemp = new CSixTempUI;
+		pTemp->SetTag(i);
 		m_tree->AddNode(week_days[i], pSubTitleNode, 0, pTemp, 2, 0xFF386382, -1, -1, 30);
 	}
 

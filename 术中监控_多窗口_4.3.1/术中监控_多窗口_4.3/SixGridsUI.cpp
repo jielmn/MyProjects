@@ -669,6 +669,18 @@ void CTempUI::Notify(TNotifyUI& msg) {
 			m_temp2->SetVisible(!b);
 		}
 	}
+	else if (msg.sType == "setfocus") {
+		if ( msg.pSender == m_temp1 || msg.pSender == m_temp2) {
+			//OutputDebugString("==== setfocus \n");
+			m_pManager->SendNotify(this, "tempui_setfocus");
+		}
+	}
+	else if (msg.sType == "killfocus") {
+		if (msg.pSender == m_temp1 || msg.pSender == m_temp2) {
+			//OutputDebugString("==== killfocus \n");
+			m_pManager->SendNotify(this, "tempui_killfocus");
+		}
+	}
 }
 
 
@@ -693,5 +705,12 @@ void CSixTempUI::DoInit() {
 	else {
 		this->RemoveAll();
 		return;
+	}
+
+	CDuiString  strText;
+	for (int i = 0; i < 6; i++) {
+		strText.Format("temp_%d", i + 1);
+		m_temp[i] = static_cast<CTempUI*>(m_pManager->FindControl(strText));
+		m_temp[i]->SetTag(i);
 	}
 }
