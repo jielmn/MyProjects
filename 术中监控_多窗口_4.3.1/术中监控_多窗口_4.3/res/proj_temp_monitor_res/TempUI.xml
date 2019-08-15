@@ -2,7 +2,7 @@
 <Window>
 	<HorizontalLayout>
 		<Edit font="6" name="edt_1"/>
-		<Button text="" width="6" bkcolor="#FF93f7f1" tooltip="降温" />
-		<Edit font="6" name="edt_2"/>		
+		<Button text="" width="6" bkcolor="#FF93f7f1" tooltip="降温" name="btn_1" keyboard="false" />
+		<Edit font="6" name="edt_2" visible="false" />		
 	</HorizontalLayout>
 </Window>

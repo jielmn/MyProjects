@@ -56,6 +56,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "MyDateTime")) {
 		return new CMyDateUI;
 	}
+	else if (0 == strcmp(pstrClass, "Temp")) {
+		return new CTempUI;
+	}
 	return NULL;
 }
 

@@ -632,11 +632,13 @@ void CMyEventUI::SetValue(int nDbId, int nType, time_t t1, time_t t2 /*= 0*/) {
 
 
 CTempUI::CTempUI() {
-
+	m_btn = 0;
+	m_temp1 = 0;
+	m_temp2 = 0;
 }
 
 CTempUI::~CTempUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 LPCTSTR CTempUI::GetClass() const {
@@ -648,12 +650,48 @@ void CTempUI::DoInit() {
 	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("TempUI.xml"), (UINT)0, 0, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
+		m_pManager->AddNotifier(this);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	} 
+
+	m_btn = static_cast<CButtonUI*>(m_pManager->FindControl("btn_1"));
+	m_temp1 = static_cast<CEditUI*>(m_pManager->FindControl("edt_1"));
+	m_temp2 = static_cast<CEditUI*>(m_pManager->FindControl("edt_2")); 
+}
+
+void CTempUI::Notify(TNotifyUI& msg) {
+	if (msg.sType == "click") {
+		if (msg.pSender == m_btn) {
+			bool b = m_temp2->IsVisible();
+			m_temp2->SetVisible(!b);
+		}
+	}
+}
+
+
+CSixTempUI::CSixTempUI() : m_callback(m_pManager) {
+
+}
+
+CSixTempUI::~CSixTempUI() {
+
+}
+
+LPCTSTR CSixTempUI::GetClass() const {
+	return "SixTempUI";
+}
+
+void CSixTempUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("SixTempUI.xml"), (UINT)0, &m_callback, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
 	}
 	else {
 		this->RemoveAll();
 		return;
 	}
-
-	m_temp1 = static_cast<CEditUI*>(m_pManager->FindControl("edt_1"));
-	m_temp2 = static_cast<CEditUI*>(m_pManager->FindControl("edt_2"));
 }

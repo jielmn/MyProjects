@@ -139,15 +139,33 @@ private:
 	time_t                                      m_time2;
 };
 
-class CTempUI : public  CContainerUI {
+class CTempUI : public  CContainerUI, INotifyUI {
 public:
 	CTempUI();
 	~CTempUI();
 
 private:
-	LPCTSTR GetClass() const;
+	LPCTSTR GetClass() const; 
 	void DoInit();
+	void Notify(TNotifyUI& msg);
 
 	CEditUI   *                                 m_temp1;
 	CEditUI   *                                 m_temp2;
+	CButtonUI *                                 m_btn;
+};
+
+
+class CSixTempUI : public  CContainerUI {
+public:
+	CSixTempUI();
+	~CSixTempUI();
+
+private:
+	LPCTSTR GetClass() const;
+	void DoInit();
+
+private:
+	CDialogBuilderCallbackEx                    m_callback;
+
+	CTempUI   *                                 m_temp[6];
 };

@@ -307,11 +307,6 @@ void  CPatientDataDlg::InitData() {
 	m_date_end->SetTextPadding(r);
 	m_date_end->SetEnabled(false);
 
-	time_t tZeroTime = GetAnyDayZeroTime(m_tDate);
-	time_t tFirstDay = tZeroTime - 3600 * 24 * 6;
-	SYSTEMTIME s = Time2SysTime(tFirstDay);
-	m_date_start->SetMyTime(&s);
-
 	pLayH = new CHorizontalLayoutUI;
 	pLayH->Add(m_date_start);
 	pLayH->Add(pCtl);
@@ -325,9 +320,10 @@ void  CPatientDataDlg::InitData() {
 	pSixGrids->SetMode(1);
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666);
 
-	CTempUI * pTemp = new CTempUI;
-	pTemp->SetFixedWidth(94); 
-	m_tree->AddNode("abc", pSubTitleNode, 0, pTemp, 2, 0xFF386382);                  
+	for (int i = 0; i < 7; i++) {
+		CSixTempUI * pTemp = new CSixTempUI;
+		m_tree->AddNode(week_days[i], pSubTitleNode, 0, pTemp, 2, 0xFF386382, -1, -1, 30);
+	}
 
 	// 脉搏  
 	strText.Format("脉搏");   
@@ -940,7 +936,32 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 		OnAddMyEvent(pUI);
 	}
 
-	time_t tFirstDay = m_tDate - 3600 * 24 * 6;
+	time_t tFirstDay = 0;
+	// 如果有住院日期
+	if ( m_patient_info.m_in_hospital > 0 ) {
+		time_t  tHospital  = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
+		time_t  tTodayZero = GetAnyDayZeroTime(m_tDate);
+		if (tTodayZero < tHospital) {
+			tFirstDay = tTodayZero;
+		}
+		// 差距小于一周
+		else if (tTodayZero - tHospital < 3600 * 24 * 6) {
+			tFirstDay = tHospital;
+		}
+		// 差距大于一周
+		else {
+			tFirstDay = tTodayZero - 3600 * 24 * 6; 
+		}
+	}
+	else {
+		tFirstDay = GetAnyDayZeroTime(m_tDate);
+	}
+
+	SYSTEMTIME s = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s);
+	s = Time2SysTime(tFirstDay + 3600 * 24 * 6);
+	m_date_end->SetMyTime(&s);
+
 	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
 }
 
