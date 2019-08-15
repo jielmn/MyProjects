@@ -40,7 +40,8 @@ public:
 	// ±£¥Êpatient events
 	void SavePatientEvents(const CSavePatientEventsParam * pParam);
 	// ≤È—ØPatientData
-	void QueryPatientData(const CQueryPatientDataParam * pParam, PatientData * pData, DWORD dwSize);
+	void QueryPatientData( const CQueryPatientDataParam * pParam, PatientData * pData, 
+		                   DWORD dwSize, std::vector<TempItem *> & vTemp );
 	// ±£¥Êdata
 	void SavePatientData(const CSavePatientDataParam * pParam);
 

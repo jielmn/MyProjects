@@ -24,7 +24,7 @@ public:
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
 	void  OnPatientInfo(PatientInfo * pInfo, const std::vector<PatientEvent * > & vEvents);
-	void  OnPatientData(PatientData *, DWORD);
+	void  OnPatientData(PatientData *, DWORD, const std::vector<TempItem *> &);
 	virtual LRESULT HandleCustomMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
 private:
@@ -84,6 +84,7 @@ private:
 
 	CTempUI *                 m_cur_temp;
 	CTempUI *                 m_instant_temp;
+	std::vector<TempItem *>   m_VTemp;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

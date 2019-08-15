@@ -34,6 +34,7 @@ CPatientDataDlg::CPatientDataDlg() {
 
 CPatientDataDlg::~CPatientDataDlg() {
 	ClearVector(m_vEvents);
+	ClearVector(m_VTemp);
 }
 
 void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -909,13 +910,22 @@ void  CPatientDataDlg::OnPatientInfo(PatientInfo * pInfo, const std::vector<Pati
 	::PostMessage(GetHWND(), UM_PATIENT_INFO, (WPARAM)pNewInfo, (LPARAM)pVec);
 }
 
-void  CPatientDataDlg::OnPatientData(PatientData * pData, DWORD dwSize) {
+void  CPatientDataDlg::OnPatientData(PatientData * pData, DWORD dwSize, const std::vector<TempItem *> & vTemp) {
 	assert(dwSize >= 7);
 
 	PatientData * pNewData = new PatientData[7];
 	memcpy(pNewData, pData, sizeof(PatientData) * 7);
 
-	::PostMessage(GetHWND(), UM_PATIENT_DATA, (WPARAM)pNewData, 0);
+	std::vector<TempItem *> * pVTemp = new std::vector<TempItem *>;
+	std::vector<TempItem *>::const_iterator it;
+	for (it = vTemp.begin(); it != vTemp.end(); ++it) {
+		TempItem * pTemp = *it;
+		TempItem * pNewTemp = new TempItem;
+		memcpy(pNewTemp, pTemp, sizeof(TempItem));
+		pVTemp->push_back(pNewTemp);
+	}
+
+	::PostMessage(GetHWND(), UM_PATIENT_DATA, (WPARAM)pNewData, (LPARAM)pVTemp);
 }
 
 void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
@@ -1050,10 +1060,21 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	memcpy(m_patient_data, pData, sizeof(PatientData) * 7);
 	delete[] pData;
 
-	/*
+	std::vector<TempItem *> * pVTemp = (std::vector<TempItem *> *)lParam;
+	if (pVTemp) {
+		std::vector<TempItem *>::iterator it;
+		for (it = pVTemp->begin(); it != pVTemp->end(); ++it) {
+			m_VTemp.push_back(*it);
+		}
+		pVTemp->clear();
+		delete pVTemp;
+	}
+
+	
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 17;
 
+	/*
 	// Âö²«
 	for (int i = 0; i < 7; i++) {		
 		for (int j = 0; j < 6; j++) {

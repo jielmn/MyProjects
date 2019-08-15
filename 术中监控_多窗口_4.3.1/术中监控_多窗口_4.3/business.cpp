@@ -1103,8 +1103,10 @@ void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay) {
 
 void  CBusiness::QueryPatientData(const CQueryPatientDataParam * pParam) {
 	PatientData patient_data[7];
-	m_sqlite.QueryPatientData(pParam, patient_data, 7);
-	m_sigPatientData.emit(patient_data, 7);
+	std::vector<TempItem *> vTemp;
+	m_sqlite.QueryPatientData(pParam, patient_data, 7, vTemp);
+	m_sigPatientData.emit(patient_data, 7, vTemp);
+	ClearVector(vTemp);
 }
 
 // 保存病人非温度数据

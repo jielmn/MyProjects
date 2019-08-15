@@ -126,6 +126,18 @@ int CMySqliteDatabase::InitDb() {
 	CreateTable(PATIENT_DATA_TABLE,
 		"tag_id      CHAR(16)     NOT NULL, " \
 	    "date        int          NOT NULL, " \
+		"temp_1      int, " \
+		"temp_2      int, " \
+		"temp_3      int, " \
+		"temp_4      int, " \
+		"temp_5      int, " \
+		"temp_6      int, " \
+		"temp_1_d    int, " \
+		"temp_2_d    int, " \
+		"temp_3_d    int, " \
+		"temp_4_d    int, " \
+		"temp_5_d    int, " \
+		"temp_6_d    int, " \
 	    "pulse_1     int, " \
 		"pulse_2     int, " \
 		"pulse_3     int, " \
@@ -842,9 +854,10 @@ void CMySqliteDatabase::SavePatientEvents(const CSavePatientEventsParam * pParam
 
 // 查询PatientData
 void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam, 
-	                   PatientData * pData, DWORD dwSize) {	
+	                   PatientData * pData, DWORD dwSize, std::vector<TempItem *> & vTemp ) {
 	assert(dwSize >= 7);
 	memset(pData, 0, sizeof(PatientData) * 7);
+	ClearVector(vTemp);
 
 	time_t  tFirstZeroTime = GetAnyDayZeroTime(pParam->m_tFirstDay);
 
@@ -861,119 +874,77 @@ void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam,
 		nrow = ncolumn = 0;
 		azResult = 0;
 
+		pData[i].m_date = tDate;
+
 		sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
 		// 如果存在
 		if (nrow > 0) {
 			int col = 2;
 
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[0]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[1]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[2]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[3]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[4]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_pulse[5]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[0]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[1]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[2]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[3]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[4]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_breath[5]);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_defecate);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_urine);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_income);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	sscanf_s(azResult[ncolumn + col], "%d", &pData[i].m_output);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	STRNCPY(pData[i].m_szBloodPressure, azResult[ncolumn + col], MAX_BLOOD_PRESSURE_LENGTH);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	STRNCPY(pData[i].m_szWeight, azResult[ncolumn + col], MAX_WEIGHT_LENGTH);
-			//col++;
-
-			//if (azResult[ncolumn + col])
-			//	STRNCPY(pData[i].m_szIrritability, azResult[ncolumn + col], MAX_IRRITABILITY_LENGTH);
-			//col++;
-		}
-		sqlite3_free_table(azResult);
-
-
-		// 获取温度数据
-		SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' "
-			"AND time>=%lu and time<%lu", TEMP_TABLE, pParam->m_szTagId, 
-			(DWORD)(tDate), (DWORD)(tDate+3600*24) );
-
-		nrow = ncolumn = 0;
-		azResult = 0;
-
-		sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
-		for (int j = 0; j < nrow; j++) {
-			DWORD dwTemp = 0;
-			DWORD dwTime = 0;
-
-			sscanf_s(azResult[(j + 1)*ncolumn + 2], "%lu", &dwTemp);
-			sscanf_s(azResult[(j + 1)*ncolumn + 3], "%lu", &dwTime);
-
-			DWORD dwTimeDiff = dwTime - (DWORD)tDate;
-			DWORD dwTimeZone = 0;
-			if (dwTimeDiff > 0) {
-				dwTimeZone = (dwTimeDiff - 1) / (3600 * 4);
+			for (int j = 0; j < 6; j++) {
+				pData[i].m_temp[j] = GetIntFromDb(azResult[ncolumn + col]);
+				col++;
 			}
 
-			assert(dwTimeZone < 6);
-			if (dwTimeZone < 6) {
-				pData[i].m_temp[dwTimeZone] = dwTemp;
+			for (int j = 0; j < 6; j++) {
+				pData[i].m_descend_temp[j] = GetIntFromDb(azResult[ncolumn + col]);
+				col++;
 			}
+			
+			for (int j = 0; j < 6; j++) {
+				pData[i].m_pulse[j] = GetIntFromDb(azResult[ncolumn + col]);
+				col++;
+			}
+
+			for (int j = 0; j < 6; j++) {
+				GetStrFromdDb(pData[i].m_breath[j], MAX_BREATH_LENGTH, azResult[ncolumn + col]);
+				col++;
+			}
+
+			GetStrFromdDb(pData[i].m_defecate, MAX_DEFECATE_LENGTH, azResult[ncolumn + col]);
+			col++;
+
+			GetStrFromdDb(pData[i].m_urine, MAX_URINE_LENGTH, azResult[ncolumn + col]);
+			col++;
+
+			GetStrFromdDb(pData[i].m_income, MAX_INCOME_LENGTH, azResult[ncolumn + col]);
+			col++;
+
+			GetStrFromdDb(pData[i].m_output, MAX_OUTPUT_LENGTH, azResult[ncolumn + col]);
+			col++;
+
+			GetStrFromdDb(pData[i].m_szBloodPressure, MAX_BLOOD_PRESSURE_LENGTH, azResult[ncolumn + col]);
+			col++;
+
+			GetStrFromdDb(pData[i].m_szWeight, MAX_WEIGHT_LENGTH, azResult[ncolumn + col]);
+			col++;
+
+			GetStrFromdDb(pData[i].m_szIrritability, MAX_IRRITABILITY_LENGTH, azResult[ncolumn + col]);
+			col++;
 		}
 		sqlite3_free_table(azResult);
 	}	
+
+	// 获取温度数据(因为有降温，所以查看范围为一周零半小时)
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' "
+		"AND time>=%lu and time<%lu", TEMP_TABLE, pParam->m_szTagId,
+		(DWORD)tFirstZeroTime, (DWORD)(tFirstZeroTime + 3600 * 24 * 7 + 1800));
+
+	nrow = ncolumn = 0;
+	azResult = 0;
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		TempItem * pTemp = new TempItem;
+		memset(pTemp, 0, sizeof(TempItem));
+
+		pTemp->m_dwDbId = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		pTemp->m_dwTemp = GetIntFromDb(azResult[(i + 1)*ncolumn + 2]);
+		pTemp->m_time   = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+
+		vTemp.push_back(pTemp);
+	}
+	sqlite3_free_table(azResult);
 }
 
 // 保存data
