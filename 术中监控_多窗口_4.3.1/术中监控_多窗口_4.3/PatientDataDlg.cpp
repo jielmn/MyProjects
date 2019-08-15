@@ -278,14 +278,16 @@ void  CPatientDataDlg::InitData() {
 	CSevenGridsUI * pSevenGrids = 0;
 	CDuiString  week_days[7];
 	CHorizontalLayoutUI * pLayH = 0;
+	CVerticalLayoutUI * pLayV = 0;
 	CControlUI * pCtl = 0;
 	CLabelUI * pLabel = 0;
+	CButtonUI * pBtn = 0;
+	RECT r = { 5,0,5,0 };
 
 	time_t now = time(0);
 	GetSevenDayStr(week_days, 7, now);
 
-	strText.Format("病人数据");
-	RECT r = { 5,0,5,0 };
+	strText.Format("病人数据");	
 	m_date_start = new CMyDateUI;
 	m_date_start->SetFixedWidth(180);
 	m_date_start->SetFont(3);
@@ -318,7 +320,40 @@ void  CPatientDataDlg::InitData() {
 	strText.Format("体温");
 	pSixGrids = new CSixGridsUI;  
 	pSixGrids->SetMode(1);
-	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSixGrids, 3, 0xFF666666);
+	pSixGrids->SetFixedHeight(22);
+
+	pLayV = new CVerticalLayoutUI;
+	pLayH = new CHorizontalLayoutUI;
+
+	pCtl = new CControlUI;
+	pCtl->SetFixedWidth(6);
+	pCtl->SetBkColor(0xFF93F7F1);
+	pLabel = new CLabelUI;
+	pLabel->SetTextPadding(r);
+	pLabel->SetText("展开或关闭降温措施后的体温");
+	pLabel->SetFont(2);
+	pLabel->SetTextColor(0xFF0000FF);
+	pBtn = new CButtonUI;
+	pBtn->SetFixedWidth(120);
+	pBtn->SetText("自动填充");
+	pBtn->SetNormalImage("file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetHotImage("file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetPushedImage("file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+	pBtn->SetFont(1);
+	pBtn->SetTextColor(0xFF386382);
+	pBtn->SetName("btnAuto");
+	pLayH->Add(pCtl);
+	pLayH->Add(pLabel);
+	pLayH->Add(pBtn);
+
+	pLayV->Add(pLayH);
+	pLayH = new CHorizontalLayoutUI;
+	pLayH->SetFixedHeight(3);
+	pLayV->Add(pLayH);
+	pLayV->Add(pSixGrids);
+
+
+	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pLayV, 3, 0xFF666666, -1, -1, 60);
 
 	for (int i = 0; i < 7; i++) {
 		CSixTempUI * pTemp = new CSixTempUI;
