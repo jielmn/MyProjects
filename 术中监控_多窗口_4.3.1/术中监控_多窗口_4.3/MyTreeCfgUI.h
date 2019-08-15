@@ -66,6 +66,7 @@ public:
 		time_t      m_time;
 		UINT_PTR    m_tag;
 		CDuiString  m_Values[7];
+		int         m_nValues[6][2];
 	};
 
 	CMyTreeCfgUI(DWORD  dwFixedLeft = 160);

@@ -669,16 +669,28 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 	memset(pData, 0, sizeof(PatientData) * 7);
 
 	CMyTreeCfgUI::ConfigValue   cfgValue;
-	int nRow = 17;
+	// 指向体温大栏
+	int nRow = 18; 
 
-	// 脉搏
+	// 体温
 	for (int i = 0; i < 7; i++) {
-		m_tree->GetConfigValue(nRow, cfgValue);
+		m_tree->GetConfigValue(nRow + 1 + i, cfgValue);
 		for (int j = 0; j < 6; j++) {
-			sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_pulse[j]);
-		}		
-		nRow++;
+			pData[i].m_temp[j] = cfgValue.m_nValues[j][0];
+			pData[i].m_descend_temp[j] = cfgValue.m_nValues[j][1];
+		}
 	}
+	nRow += 7;
+
+
+	//// 脉搏
+	//for (int i = 0; i < 7; i++) {
+	//	m_tree->GetConfigValue(nRow, cfgValue);
+	//	for (int j = 0; j < 6; j++) {
+	//		sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_pulse[j]);
+	//	}		
+	//	nRow++;
+	//}
 
 	//// 呼吸
 	//nRow++;
@@ -719,26 +731,26 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 	//}
 	//nRow++;
 
-	// 血压
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		STRNCPY(pData[i].m_szBloodPressure, cfgValue.m_Values[i], MAX_BLOOD_PRESSURE_LENGTH);		
-	}
-	nRow++;
+	//// 血压
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	STRNCPY(pData[i].m_szBloodPressure, cfgValue.m_Values[i], MAX_BLOOD_PRESSURE_LENGTH);		
+	//}
+	//nRow++;
 
-	// 体重
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		STRNCPY(pData[i].m_szWeight, cfgValue.m_Values[i], MAX_WEIGHT_LENGTH);		
-	}
-	nRow++;
+	//// 体重
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	STRNCPY(pData[i].m_szWeight, cfgValue.m_Values[i], MAX_WEIGHT_LENGTH);		
+	//}
+	//nRow++;
 
-	// 过敏药物
-	m_tree->GetConfigValue(nRow, cfgValue);
-	for (int i = 0; i < 7; i++) {
-		STRNCPY( pData[i].m_szIrritability, cfgValue.m_Values[i],MAX_IRRITABILITY_LENGTH );
-	}
-	nRow++;
+	//// 过敏药物
+	//m_tree->GetConfigValue(nRow, cfgValue);
+	//for (int i = 0; i < 7; i++) {
+	//	STRNCPY( pData[i].m_szIrritability, cfgValue.m_Values[i],MAX_IRRITABILITY_LENGTH );
+	//}
+	//nRow++;
 }
 
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
@@ -750,7 +762,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 
 	PatientInfo info;
 	std::vector<PatientEvent * > vEvents;
-	//PatientData data[7];
+	PatientData data[7];
 
 	GetPatientInfo(&info, vEvents);
 	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);	
@@ -769,7 +781,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	CBusiness::GetInstance()->SavePatientEventsAsyn(m_szTagId, vEvents);
 	ClearVector(vEvents);
 
-	//GetPatientData(data, 7);
+	GetPatientData(data, 7);
 	//time_t  tFirstDay = m_tDate - 3600 * 24 * 6;
 
 	//for (DWORD i = 0; i < 7; i++) {

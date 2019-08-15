@@ -567,6 +567,16 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 		CMyDateTimeUI * pTime = (CMyDateTimeUI *)pCtl;
 		cfgValue.m_time = pTime->GetTime();		
 	}
+	else if (0 == strcmp(pCtl->GetClass(), "SixTempUI")) {
+		CSixTempUI * pSixTemp = (CSixTempUI *)pCtl;
+		for (int i = 0; i < 6; i++) {
+			int t1 = 0;
+			int t2 = 0;
+			pSixTemp->GetValues(i, t1, t2);
+			cfgValue.m_nValues[i][0] = t1;
+			cfgValue.m_nValues[i][1] = t2;
+		}
+	}
 	else {
 		return false;
 	}

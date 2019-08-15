@@ -635,6 +635,8 @@ CTempUI::CTempUI() {
 	m_btn = 0;
 	m_temp1 = 0;
 	m_temp2 = 0;
+	m_t1 = 0;
+    m_t2 = 0;
 }
 
 CTempUI::~CTempUI() {
@@ -660,6 +662,25 @@ void CTempUI::DoInit() {
 	m_btn = static_cast<CButtonUI*>(m_pManager->FindControl("btn_1"));
 	m_temp1 = static_cast<CEditUI*>(m_pManager->FindControl("edt_1"));
 	m_temp2 = static_cast<CEditUI*>(m_pManager->FindControl("edt_2")); 
+
+	CDuiString  strText;
+	if (m_t1 > 0) {
+		strText.Format("%.2f", (float)m_t1 / 100.0f);
+	}
+	else {
+		strText = "";
+	}
+	m_temp1->SetText(strText);
+
+	if (m_t2 > 0) {
+		strText.Format("%.2f", (float)m_t2 / 100.0f);
+		m_temp2->SetVisible(true);
+	}
+	else {
+		strText = "";
+		m_temp2->SetVisible(false);
+	}
+	m_temp2->SetText(strText);
 }
 
 void CTempUI::Notify(TNotifyUI& msg) {
@@ -667,6 +688,7 @@ void CTempUI::Notify(TNotifyUI& msg) {
 		if (msg.pSender == m_btn) {
 			bool b = m_temp2->IsVisible();
 			m_temp2->SetVisible(!b);
+			m_pManager->SendNotify(this, "tempui_setfocus");
 		}
 	}
 	else if (msg.sType == "setfocus") {
@@ -683,9 +705,58 @@ void CTempUI::Notify(TNotifyUI& msg) {
 	}
 }
 
+void CTempUI::GetValue(int & t1, int &t2) {
+	CDuiString  strText;
+	float  fValue = 0.0f;
+
+	t1 = t2 = 0;
+
+	strText = m_temp1->GetText();
+	if ( 1 == sscanf_s(strText, "%f", &fValue) ) {
+		t1 = (int)(fValue * 100);
+	}
+
+	if (!m_temp2->IsVisible())
+		return;
+
+	strText = m_temp2->GetText();
+	if (1 == sscanf_s(strText, "%f", &fValue)) {
+		t2 = (int)(fValue * 100);
+	}
+}
+
+void CTempUI::SetValue(int t1, int t2 /*= 0*/) {
+	m_t1 = t1;
+	m_t2 = t2;
+
+	if (0 == m_temp1)
+		return;
+
+	CDuiString  strText;
+	if (m_t1 > 0) {
+		strText.Format("%.2f", (float)m_t1 /100.0f );
+	}
+	else {
+		strText = "";
+	}
+	m_temp1->SetText(strText);
+
+	if (m_t2 > 0) {
+		strText.Format("%.2f", (float)m_t2 / 100.0f);
+		m_temp2->SetVisible(true);
+	}
+	else {
+		strText = "";
+		m_temp2->SetVisible(false);
+	}
+	m_temp2->SetText(strText);
+}
+
+
 
 CSixTempUI::CSixTempUI() : m_callback(m_pManager) {
-
+	memset(m_values, 0, sizeof(m_values));
+	memset(m_temp, 0, sizeof(m_temp));
 }
 
 CSixTempUI::~CSixTempUI() {
@@ -712,5 +783,24 @@ void CSixTempUI::DoInit() {
 		strText.Format("temp_%d", i + 1);
 		m_temp[i] = static_cast<CTempUI*>(m_pManager->FindControl(strText));
 		m_temp[i]->SetTag(i);
+		m_temp[i]->SetValue(m_values[i][0], m_values[i][1]);
+	}
+}
+
+void  CSixTempUI::SetValues(int nIndex, int t1, int t2 /*= 0*/) {
+	if (nIndex >= 0 && nIndex < 6) {
+		m_values[nIndex][0] = t1;
+		m_values[nIndex][1] = t2;
+
+		if (0 == m_temp[nIndex])
+			return;
+
+		m_temp[nIndex]->SetValue(t1, t2);
+	}
+}
+
+void  CSixTempUI::GetValues(int nIndex, int & t1, int & t2) {
+	if (nIndex >= 0 && nIndex < 6) {
+		m_temp[nIndex]->GetValue(t1, t2);
 	}
 }

@@ -144,6 +144,9 @@ public:
 	CTempUI();
 	~CTempUI();
 
+	void GetValue(int & t1, int &t2);
+	void SetValue(int t1, int t2 = 0);
+
 private:
 	LPCTSTR GetClass() const; 
 	void DoInit();
@@ -152,6 +155,9 @@ private:
 	CEditUI   *                                 m_temp1;
 	CEditUI   *                                 m_temp2;
 	CButtonUI *                                 m_btn;
+
+	int                                         m_t1;
+	int                                         m_t2;
 };
 
 
@@ -159,6 +165,9 @@ class CSixTempUI : public  CContainerUI {
 public:
 	CSixTempUI();
 	~CSixTempUI();
+
+	void  SetValues(int nIndex, int t1, int t2 = 0);
+	void  GetValues(int nIndex, int & t1, int & t2);
 
 private:
 	LPCTSTR GetClass() const;
@@ -168,4 +177,5 @@ private:
 	CDialogBuilderCallbackEx                    m_callback;
 
 	CTempUI   *                                 m_temp[6];
+	int                                         m_values[6][2];
 };
