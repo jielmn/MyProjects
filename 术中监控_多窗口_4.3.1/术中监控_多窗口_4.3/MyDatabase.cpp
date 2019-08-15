@@ -953,6 +953,23 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 	memcpy(&data, &pParam->m_data, sizeof(PatientData));
 	data.m_date = GetAnyDayZeroTime(pParam->m_data.m_date); 
 
+	for (int i = 0; i < 6; i++) {
+		StrReplaceAll(data.m_breath[i], MAX_BREATH_LENGTH,
+			pParam->m_data.m_breath[i], "'", "''");
+	}
+
+	StrReplaceAll(data.m_defecate, MAX_DEFECATE_LENGTH,
+		pParam->m_data.m_defecate, "'", "''");
+
+	StrReplaceAll(data.m_urine, MAX_URINE_LENGTH,
+		pParam->m_data.m_urine, "'", "''");
+
+	StrReplaceAll(data.m_income, MAX_INCOME_LENGTH,
+		pParam->m_data.m_income, "'", "''");
+
+	StrReplaceAll(data.m_output, MAX_OUTPUT_LENGTH,
+		pParam->m_data.m_output, "'", "''");
+
 	StrReplaceAll(data.m_szBloodPressure, MAX_BLOOD_PRESSURE_LENGTH,
 		pParam->m_data.m_szBloodPressure, "'", "''");
 
@@ -974,28 +991,36 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 	sqlite3_free_table(azResult);	
 
 	// Èç¹û´æÔÚ
-	//if (nrow > 0) {
-	//	SNPRINTF(sql, sizeof(sql), "UPDATE %s set pulse_1 = %d, pulse_2 = %d, pulse_3 = %d, " 
-	//		"pulse_4 = %d, pulse_5 = %d, pulse_6 = %d, breath_1 = %d, breath_2 = %d, " 
-	//		"breath_3 = %d, breath_4 = %d, breath_5 = %d, breath_6 = %d, defecate = %d, " 
-	//		"urine = %d, total_income = %d, total_output = %d, blood_pressure = '%s', " 
-	//		"weight = '%s', irritability = '%s' WHERE tag_id = '%s' AND date = %lu ",
-	//		PATIENT_DATA_TABLE, data.m_pulse[0], data.m_pulse[1],
-	//		data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
-	//		data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
-	//		data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
-	//		data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability, data.m_szTagId,
-	//		(DWORD)data.m_date );
-	//	sqlite3_exec(m_db, sql, 0, 0, 0);
-	//}
-	//else {
-	//	SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %lu, %d, %d, %d, %d, %d, %d, "
-	//		"%d, %d, %d, %d, %d, %d,  %d, %d, %d, %d, '%s', '%s',  '%s' ); ",
-	//		PATIENT_DATA_TABLE, data.m_szTagId, (DWORD)data.m_date, data.m_pulse[0], data.m_pulse[1],
-	//		data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
-	//		data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
-	//		data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
-	//		data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability );
-	//	sqlite3_exec(m_db, sql, 0, 0, 0);
-	//}
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set temp_1=%d, temp_2=%d, temp_3=%d, "
+			"temp_4=%d, temp_5=%d, temp_6=%d, temp_1_d=%d, temp_2_d=%d, temp_3_d=%d, "
+			"temp_4_d=%d, temp_5_d=%d, temp_6_d=%d, pulse_1=%d, pulse_2=%d, pulse_3=%d, "
+			"pulse_4=%d, pulse_5=%d, pulse_6=%d, breath_1='%s', breath_2='%s', "
+			"breath_3='%s', breath_4='%s', breath_5='%s', breath_6='%s', defecate='%s', "
+			"urine='%s', total_income='%s', total_output='%s', blood_pressure='%s', "
+			"weight='%s', irritability='%s' WHERE tag_id = '%s' AND date = %lu ",
+			PATIENT_DATA_TABLE, data.m_temp[0], data.m_temp[1], data.m_temp[2], 
+			data.m_temp[3], data.m_temp[4], data.m_temp[5], data.m_descend_temp[0], 
+			data.m_descend_temp[1], data.m_descend_temp[2], data.m_descend_temp[3], 
+			data.m_descend_temp[4], data.m_descend_temp[5], data.m_pulse[0], data.m_pulse[1],
+			data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], data.m_breath[0],
+			data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4],
+			data.m_breath[5], data.m_defecate, data.m_urine, data.m_income, data.m_output,
+			data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability, data.m_szTagId,
+			(DWORD)data.m_date);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %lu, %d, %d, %d, %d, %d, %d, "
+			"%d, %d, %d, %d, %d, %d,  %d, %d, %d, %d, %d, %d,"
+			"'%s', '%s', '%s', '%s', '%s', '%s',  '%s', '%s', '%s', '%s', '%s', '%s', '%s' ); ",
+			PATIENT_DATA_TABLE, data.m_szTagId, (DWORD)data.m_date, 
+			data.m_temp[0], data.m_temp[1], data.m_temp[2], data.m_temp[3], data.m_temp[4], data.m_temp[5],
+			data.m_descend_temp[0], data.m_descend_temp[1], data.m_descend_temp[2], data.m_descend_temp[3], data.m_descend_temp[4], data.m_descend_temp[5],
+			data.m_pulse[0], data.m_pulse[1], data.m_pulse[2], data.m_pulse[3], data.m_pulse[4], data.m_pulse[5], 
+			data.m_breath[0], data.m_breath[1], data.m_breath[2], data.m_breath[3], data.m_breath[4], data.m_breath[5], 
+			data.m_defecate, data.m_urine, data.m_income, data.m_output,
+			data.m_szBloodPressure, data.m_szWeight, data.m_szIrritability);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
 }

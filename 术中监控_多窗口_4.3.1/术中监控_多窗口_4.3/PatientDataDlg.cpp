@@ -788,7 +788,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 			STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
 			data[i].m_date = tFirstDay + 3600 * 24 * i;
 			// 保存数据库
-			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]); 
 		}
 	}
 	
@@ -1080,6 +1080,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	memcpy(m_patient_data, pData, sizeof(PatientData) * 7);
 	delete[] pData;
 
+	ClearVector(m_VTemp);
 	std::vector<TempItem *> * pVTemp = (std::vector<TempItem *> *)lParam;
 	if (pVTemp) {
 		std::vector<TempItem *>::iterator it;
@@ -1092,9 +1093,19 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 
 	
 	CMyTreeCfgUI::ConfigValue   cfgValue;
-	int nRow = 17;
+	int nRow = 18;
 
-	/*
+	// 体温
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			cfgValue.m_nValues[j][0] = m_patient_data[i].m_temp[j];
+			cfgValue.m_nValues[j][1] = m_patient_data[i].m_descend_temp[j];
+		}
+		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
+	}
+	nRow += 8;
+
+	
 	// 脉搏
 	for (int i = 0; i < 7; i++) {		
 		for (int j = 0; j < 6; j++) {
@@ -1103,60 +1114,43 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 			else
 				cfgValue.m_Values[j] = "";
 		}
-		m_tree->SetConfigValue(nRow, cfgValue);
-		nRow++;
+		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
 	}
+	nRow += 8;
 
 	// 呼吸
-	nRow++;
 	for (int i = 0; i < 7; i++) {
 		for (int j = 0; j < 6; j++) {
-			if (m_patient_data[i].m_breath[j] > 0)
-				cfgValue.m_Values[j].Format("%d", m_patient_data[i].m_breath[j]);
-			else
-				cfgValue.m_Values[j] = "";
+			cfgValue.m_Values[j] = m_patient_data[i].m_breath[j];
 		}
-		m_tree->SetConfigValue(nRow, cfgValue);
-		nRow++;
+		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
 	}
+	nRow += 9;
 
 	// 大便次数
-	nRow++;
 	for (int i = 0; i < 7; i++) {
-		if (m_patient_data[i].m_defecate > 0)
-			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_defecate);
-		else
-			cfgValue.m_Values[i] = "";
+		cfgValue.m_Values[i] = m_patient_data[i].m_defecate;		
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
 	// 尿量
 	for (int i = 0; i < 7; i++) {
-		if (m_patient_data[i].m_urine > 0)
-			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_urine);
-		else
-			cfgValue.m_Values[i] = "";
+		cfgValue.m_Values[i] = m_patient_data[i].m_urine;
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
 	// 总入量
 	for (int i = 0; i < 7; i++) {
-		if (m_patient_data[i].m_income > 0)
-			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_income);
-		else
-			cfgValue.m_Values[i] = "";
+		cfgValue.m_Values[i] = m_patient_data[i].m_income;
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
 	// 总出量
 	for (int i = 0; i < 7; i++) {
-		if (m_patient_data[i].m_output > 0)
-			cfgValue.m_Values[i].Format("%d", m_patient_data[i].m_output);
-		else
-			cfgValue.m_Values[i] = "";
+		cfgValue.m_Values[i] = m_patient_data[i].m_output;
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
@@ -1181,7 +1175,6 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
-	*/
 
 	SetBusy(FALSE);
 }
