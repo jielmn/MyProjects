@@ -680,77 +680,76 @@ void  CPatientDataDlg::GetPatientData(PatientData * pData, DWORD dwSize) {
 			pData[i].m_descend_temp[j] = cfgValue.m_nValues[j][1];
 		}
 	}
-	nRow += 7;
+	nRow += 8;
 
 
-	//// 脉搏
-	//for (int i = 0; i < 7; i++) {
-	//	m_tree->GetConfigValue(nRow, cfgValue);
-	//	for (int j = 0; j < 6; j++) {
-	//		sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_pulse[j]);
-	//	}		
-	//	nRow++;
-	//}
+	// 脉搏
+	for (int i = 0; i < 7; i++) {
+		m_tree->GetConfigValue(nRow + 1 + i, cfgValue);
+		for (int j = 0; j < 6; j++) {
+			pData[i].m_pulse[j] = 0;
+			sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_pulse[j]);
+		}		
+	}
+	nRow += 8;
 
-	//// 呼吸
-	//nRow++;
-	//for (int i = 0; i < 7; i++) {
-	//	m_tree->GetConfigValue(nRow, cfgValue);
-	//	for (int j = 0; j < 6; j++) {
-	//		sscanf_s(cfgValue.m_Values[j], "%d", &pData[i].m_breath[j]);
-	//	}
-	//	nRow++;
-	//}
+	// 呼吸
+	for (int i = 0; i < 7; i++) {
+		m_tree->GetConfigValue(nRow + 1 + i, cfgValue);
+		for (int j = 0; j < 6; j++) {
+			STRNCPY(pData[i].m_breath[j], cfgValue.m_Values[j], MAX_BREATH_LENGTH);
+		}
+	}
+	nRow += 9;
 
-	//// 大便次数
-	//nRow++;
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_defecate);
-	//}
-	//nRow++;
+	// 大便次数
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY(pData[i].m_defecate, cfgValue.m_Values[i], MAX_DEFECATE_LENGTH);
+	}
+	nRow++;
 
-	//// 尿量
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_urine);
-	//}
-	//nRow++;
+	// 尿量
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY(pData[i].m_urine, cfgValue.m_Values[i], MAX_URINE_LENGTH);
+	}
+	nRow++;
 
-	//// 总入量
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_income);
-	//}
-	//nRow++;
+	// 总入量
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY(pData[i].m_income, cfgValue.m_Values[i], MAX_INCOME_LENGTH);
+	}
+	nRow++;
 
-	//// 总出量
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	sscanf_s(cfgValue.m_Values[i], "%d", &pData[i].m_output);
-	//}
-	//nRow++;
+	// 总出量
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY(pData[i].m_output, cfgValue.m_Values[i], MAX_OUTPUT_LENGTH);
+	}
+	nRow++;
 
-	//// 血压
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	STRNCPY(pData[i].m_szBloodPressure, cfgValue.m_Values[i], MAX_BLOOD_PRESSURE_LENGTH);		
-	//}
-	//nRow++;
+	// 血压
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY(pData[i].m_szBloodPressure, cfgValue.m_Values[i], MAX_BLOOD_PRESSURE_LENGTH);
+	}
+	nRow++;
 
-	//// 体重
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	STRNCPY(pData[i].m_szWeight, cfgValue.m_Values[i], MAX_WEIGHT_LENGTH);		
-	//}
-	//nRow++;
+	// 体重
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY(pData[i].m_szWeight, cfgValue.m_Values[i], MAX_WEIGHT_LENGTH);		
+	}
+	nRow++;
 
-	//// 过敏药物
-	//m_tree->GetConfigValue(nRow, cfgValue);
-	//for (int i = 0; i < 7; i++) {
-	//	STRNCPY( pData[i].m_szIrritability, cfgValue.m_Values[i],MAX_IRRITABILITY_LENGTH );
-	//}
-	//nRow++;
+	// 过敏药物
+	m_tree->GetConfigValue(nRow, cfgValue);
+	for (int i = 0; i < 7; i++) {
+		STRNCPY( pData[i].m_szIrritability, cfgValue.m_Values[i], MAX_IRRITABILITY_LENGTH );
+	}
+	nRow++;
 }
 
 void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
@@ -782,17 +781,17 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	ClearVector(vEvents);
 
 	GetPatientData(data, 7);
-	//time_t  tFirstDay = m_tDate - 3600 * 24 * 6;
+	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
 
-	//for (DWORD i = 0; i < 7; i++) {
-	//	if (IsPatientInfoChanged( &data[i], i ) ) {
-	//		STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
-	//		data[i].m_date = tFirstDay + 3600 * 24 * i;
-	//		// 保存数据库
-	//		CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
-	//	}
-	//}
-	//
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientInfoChanged( &data[i], i ) ) {
+			STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
+			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+		}
+	}
+	
 
 	//STRNCPY( m_szUIPName, info.m_szPName, MAX_TAG_PNAME_LENGTH );
 	WindowImplBase::OnFinalMessage(hWnd);
@@ -843,29 +842,39 @@ BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
 // 病人data是否改变
 BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientData * pData, int nIndex) {
 	assert(nIndex >= 0 && nIndex < 7);
-
+	
 	for (int i = 0; i < 6; i++) {
+		// 体温
+		if (pData->m_temp[i] != m_patient_data[nIndex].m_temp[i]) {
+			return TRUE;
+		}
+
+		// 降温
+		if (pData->m_descend_temp[i] != m_patient_data[nIndex].m_descend_temp[i]) {
+			return TRUE;
+		}
+
+		// 脉搏
 		if (pData->m_pulse[i] != m_patient_data[nIndex].m_pulse[i]) {
 			return TRUE;
 		}
-	}
 
-	for (int i = 0; i < 6; i++) {
-		if (pData->m_breath[i] != m_patient_data[nIndex].m_breath[i]) {
+		// 呼吸
+		if ( 0 != strcmp(pData->m_breath[i], m_patient_data[nIndex].m_breath[i]) ) {
 			return TRUE;
 		}
 	}
 
-	if ( pData->m_defecate != m_patient_data[nIndex].m_defecate )
+	if ( 0 != strcmp (pData->m_defecate, m_patient_data[nIndex].m_defecate) )
 		return TRUE;
 
-	if (pData->m_urine != m_patient_data[nIndex].m_urine )
+	if ( 0 != strcmp(pData->m_urine,m_patient_data[nIndex].m_urine) )
 		return TRUE;
 
-	if (pData->m_income != m_patient_data[nIndex].m_income )
+	if (0 != strcmp(pData->m_income, m_patient_data[nIndex].m_income) )
 		return TRUE;
 
-	if (pData->m_output != m_patient_data[nIndex].m_output )
+	if (0 != strcmp(pData->m_output, m_patient_data[nIndex].m_output) )
 		return TRUE;
 
 	if ( 0 != strcmp(pData->m_szBloodPressure, m_patient_data[nIndex].m_szBloodPressure) )
