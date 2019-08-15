@@ -111,6 +111,9 @@ void  CSevenGridsUI::SetWeekStr(CDuiString * pWeek, DWORD dwSize) {
 
 	for (int i = 0; i < 7; i++) {
 		m_week_days[i] = pWeek[i];
+		if (m_labels[i]) {
+			m_labels[i]->SetText(m_week_days[i]);
+		}
 	}
 }
 

@@ -338,6 +338,7 @@ void  CPatientDataDlg::InitData() {
 	m_date_start->SetFont(3);
 	m_date_start->SetTextColor(0xFF666666);
 	m_date_start->SetTextPadding(r);
+	m_date_start->SetName("DateTimeS");
 
 	pCtl = new CControlUI;
 	pCtl->SetFixedWidth(10);
@@ -353,6 +354,7 @@ void  CPatientDataDlg::InitData() {
 	m_date_end->SetTextColor(0xFF666666);
 	m_date_end->SetTextPadding(r);
 	m_date_end->SetEnabled(false);
+	m_date_end->SetName("DateTimeE");
 
 	pLayH = new CHorizontalLayoutUI;
 	pLayH->Add(m_date_start);
@@ -1201,9 +1203,13 @@ void  CPatientDataDlg::OnDateStartChanged() {
 // 时间控件失去焦点
 void  CPatientDataDlg::OnDateStartKillFocus() {
 	SYSTEMTIME s = m_date_start->GetTime();
-	time_t e = SysTime2Time(s) + 3600 * 24 * 6;
-	SYSTEMTIME e1 = Time2SysTime(e);
-	m_date_end->SetMyTime(&e1);
+	time_t tFirstDay = SysTime2Time(s);
+	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
+	SYSTEMTIME s1 = Time2SysTime(tEndDay);
+	m_date_end->SetMyTime(&s1);
+
+	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+	SetBusy(TRUE);
 }
 
 // 选中了事件UI
