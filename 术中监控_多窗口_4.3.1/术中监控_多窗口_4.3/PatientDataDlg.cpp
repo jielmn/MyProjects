@@ -3,7 +3,10 @@
 #include "resource.h"
 
 #define TIMER_TEMP_UI             1002
-#define INTERVAL_TIMER_TEMP_UI    1000
+#define INTERVAL_TIMER_TEMP_UI    200
+#define PATIENT_DLG_WIDTH         800
+#define PATIENT_DLG_HEIGHT        802
+#define IMAGE_PREFER_WIDTH        400             // 曲线图理想宽度
 
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
@@ -49,7 +52,6 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnPrint") {
 			OnPrint();   
-			//this->PostMessage(WM_CLOSE); 
 		}
 		else if (name == "btnZoomIn") {
 			m_preview->ZoomIn();
@@ -119,9 +121,34 @@ void  CPatientDataDlg::OnMyInited() {
 
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_TIMER) {
-		if ( wParam == TIMER_TEMP_UI ) {
+		if ( wParam == TIMER_TEMP_UI ) {			
 			if (m_cur_temp != m_instant_temp) {
+				BOOL  bSelected = FALSE;
+				if (0 != m_cur_temp) {
+					bSelected = TRUE;
+				}
 				m_cur_temp = m_instant_temp;
+				// 取消
+				if ( 0 == m_cur_temp ) {
+					RECT r = { 0 };
+					::GetWindowRect(GetHWND(), &r);
+					::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
+				}
+				// 选中
+				else {
+					// 之前未选中
+					if (!bSelected) {
+						RECT r = { 0 };
+						::GetWindowRect(GetHWND(), &r);
+						// 如果宽度足够大
+						if (g_data.m_nScreenWidth - r.right > IMAGE_PREFER_WIDTH) {
+							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + IMAGE_PREFER_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
+						}
+						else {
+							::MoveWindow(GetHWND(), r.left, r.top, 1024, PATIENT_DLG_HEIGHT, TRUE);
+						}
+					}					
+				}
 			}
 			KillTimer(GetHWND(), wParam);
 		}
