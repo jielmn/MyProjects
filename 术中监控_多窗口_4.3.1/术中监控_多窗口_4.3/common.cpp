@@ -59,6 +59,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp(pstrClass, "Temp")) {
 		return new CTempUI;
 	}
+	else if (0 == strcmp(pstrClass, "PatientImage")) {
+		return new CPatientImg;
+	}
 	return NULL;
 }
 

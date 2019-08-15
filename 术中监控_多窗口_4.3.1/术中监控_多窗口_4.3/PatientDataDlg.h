@@ -86,6 +86,7 @@ private:
 	std::vector<TempItem *>   m_VTemp;
 
 	CSevenGridsUI *           m_OtherData_Week;
+	CPatientImg *             m_img;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

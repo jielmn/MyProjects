@@ -179,3 +179,15 @@ private:
 	CTempUI   *                                 m_temp[6];
 	int                                         m_values[6][2];
 };
+
+
+class CPatientImg : public DuiLib::CControlUI
+{
+public:
+	CPatientImg();
+	~CPatientImg();
+
+	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	void DoEvent(DuiLib::TEventUI& event);
+	LPCTSTR GetClass() const;
+};

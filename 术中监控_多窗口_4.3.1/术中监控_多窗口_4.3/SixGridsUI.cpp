@@ -807,3 +807,27 @@ void  CSixTempUI::GetValues(int nIndex, int & t1, int & t2) {
 		m_temp[nIndex]->GetValue(t1, t2);
 	}
 }
+
+
+
+CPatientImg::CPatientImg() {
+
+}
+
+CPatientImg::~CPatientImg() {
+
+}
+
+bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+	::TextOut(hDC, m_rcItem.left, m_rcItem.top, "Hello", 5); 
+	return true;
+}
+
+void CPatientImg::DoEvent(DuiLib::TEventUI& event) {
+	CControlUI::DoEvent(event);
+}
+
+LPCTSTR CPatientImg::GetClass() const {
+	return "PatientImage";
+}

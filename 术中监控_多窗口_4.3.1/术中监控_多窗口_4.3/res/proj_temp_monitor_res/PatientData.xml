@@ -49,9 +49,13 @@
 				</VerticalLayout>
 				
 				<!-- 温度曲线 -->
-				<VerticalLayout inset="5,0,5,0">
+				<VerticalLayout inset="5,0,0,0">
 					<HorizontalLayout height="30" >
 						<Label text="温度曲线" font="3" textcolor="#FF666666" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout>
+						<PatientImage bordercolor="#FF768D9B" bordersize="1" name="img" />
 					</HorizontalLayout>
 					
 				</VerticalLayout>

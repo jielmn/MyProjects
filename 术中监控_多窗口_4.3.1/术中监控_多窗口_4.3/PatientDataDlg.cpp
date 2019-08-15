@@ -30,6 +30,7 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_cur_temp = 0;
 	m_instant_temp = 0;
 	m_OtherData_Week = 0;
+	m_img = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -81,18 +82,28 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		if (name == "DateTimeS") {
 			OnDateStartKillFocus();
 		}
+		else if (name == "img") {
+			m_instant_temp = 0;
+			::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
+		}
 	}
 	else if (msg.sType == "tempui_setfocus") {
 		m_instant_temp = (CTempUI *)msg.pSender;
 		//strText.Format("%d-%d temp ui setfocus! \n", 
 		//	m_instant_temp->GetParent()->GetParent()->GetTag(), m_instant_temp->GetTag() );
 		//OutputDebugString(strText);
-		::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
+		::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0); 
 	}
 	else if (msg.sType == "tempui_killfocus") {
 		m_instant_temp = 0;
 		//OutputDebugString("tempui_killfocus \n");
 		::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
+	}
+	else if (msg.sType == "setfocus") {
+		if (name == "img") {
+			//OutputDebugString("img set focus \n");
+			KillTimer(GetHWND(), TIMER_TEMP_UI);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -109,6 +120,7 @@ void  CPatientDataDlg::OnMyInited() {
 	m_btnPrint = (CButtonUI *)m_PaintManager.FindControl("btnPrint");
 	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
 	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
+	m_img = (CPatientImg *)m_PaintManager.FindControl("img");
 
 	m_tree->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_tree->SetHotItemBkColor(0xFFFFFFFF);  
@@ -179,6 +191,9 @@ DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(pstrClass, "MyDateTime")) {
 		return new CMyDateUI;
+	}
+	else if (0 == strcmp(pstrClass, "PatientImage")) {
+		return new CPatientImg;
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
