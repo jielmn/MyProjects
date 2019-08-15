@@ -85,6 +85,8 @@ private:
 	CTempUI *                 m_instant_temp;
 	std::vector<TempItem *>   m_VTemp;
 
+	CSevenGridsUI *           m_OtherData_Week;
+
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id
 	char                        m_szUIPName[MAX_TAG_PNAME_LENGTH];         // UI 传过来的name

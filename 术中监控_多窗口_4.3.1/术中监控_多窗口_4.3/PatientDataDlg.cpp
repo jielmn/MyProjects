@@ -29,6 +29,7 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_selected_event = -1;
 	m_cur_temp = 0;
 	m_instant_temp = 0;
+	m_OtherData_Week = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -435,6 +436,7 @@ void  CPatientDataDlg::InitData() {
 	pSevenGrids->SetMode(1);
 	GetSevenDayStr(week_days, 7, now - 3600 * 24 * 6, TRUE);
 	pSevenGrids->SetWeekStr(week_days, 7);
+	m_OtherData_Week = pSevenGrids;
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, pSevenGrids, 3, 0xFF666666);
 
 	const char * item_title[7] = { "大便次数", "尿量(次) ml", "总入量 ml", "总出量 ml", "血压 kpa", "体重 kg", "过敏药物" };
@@ -1096,8 +1098,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	int nRow = 18;
 
 	CDuiString  week_days[7];
-	time_t now = m_patient_data[0].m_date;
-	GetSevenDayStr(week_days, 7, now);
+	GetSevenDayStr(week_days, 7, m_patient_data[0].m_date);
 
 	// 体温
 	for (int i = 0; i < 7; i++) {
@@ -1132,7 +1133,7 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
 		m_tree->SetTitle(nRow + 1 + i, week_days[i]);
 	}
-	nRow += 9;
+	nRow += 9;	
 
 	// 大便次数
 	for (int i = 0; i < 7; i++) {
@@ -1182,6 +1183,9 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	}
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
+
+	GetSevenDayStr(week_days, 7, m_patient_data[0].m_date, TRUE);
+	m_OtherData_Week->SetWeekStr(week_days, 7);
 
 	SetBusy(FALSE);
 }
