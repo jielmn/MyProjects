@@ -75,7 +75,7 @@
 					<Item text="" font="1" width="40" name="medical_department" />
 				</HorizontalLayout>
 
-				<HorizontalLayout>
+				<HorizontalLayout name="medical_department2">
 					<Item text="转科" font="1"/>
 					<Item text="" font="1" width="40" name="medical_department_to" />
 				</HorizontalLayout>
@@ -87,7 +87,7 @@
 					<Item text="" font="1" width="40" name="ward" />
 				</HorizontalLayout>
 
-				<HorizontalLayout>
+				<HorizontalLayout name="ward2">
 					<Item text="转室" font="1"/>
 					<Item text="" font="1" width="40" name="ward_to" />
 				</HorizontalLayout>
@@ -99,7 +99,7 @@
 					<Item text="" font="1" width="40" name="bed_no" />
 				</HorizontalLayout>
 
-				<HorizontalLayout>
+				<HorizontalLayout name="bed2">
 					<Item text="转床" font="1"/>
 					<Item text="" font="1" width="40" name="bed_no_to" />
 				</HorizontalLayout>
@@ -191,13 +191,13 @@
 						<Item font="1" name="in_date_7" />
 					</HorizontalLayout>
 					<HorizontalLayout border="6,6,6,6" height="32" VSplit="num='7',pen='5'" >
-						<Item font="1" name="sur_date_1" />
-						<Item font="1" name="sur_date_2" />
-						<Item font="1" name="sur_date_3" />
-						<Item font="1" name="sur_date_4" />
-						<Item font="1" name="sur_date_5" />
-						<Item font="1" name="sur_date_6" />
-						<Item font="1" name="sur_date_7" />
+						<Item font="1" name="sur_date_1" textcolor="#FF0000" />
+						<Item font="1" name="sur_date_2" textcolor="#FF0000" />
+						<Item font="1" name="sur_date_3" textcolor="#FF0000" />
+						<Item font="1" name="sur_date_4" textcolor="#FF0000" />
+						<Item font="1" name="sur_date_5" textcolor="#FF0000" />
+						<Item font="1" name="sur_date_6" textcolor="#FF0000" />
+						<Item font="1" name="sur_date_7" textcolor="#FF0000" />
 					</HorizontalLayout>
 					<HorizontalLayout border="6,6,6,6" height="32">
 						<VerticalLayout>

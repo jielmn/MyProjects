@@ -774,10 +774,40 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		pItem->SetText(pInfo->m_szMedicalDepartment);
 	}
 
+	if (pInfo->m_szMedicalDepartment2[0] != '\0') {
+		pItem = xmlChart.FindChartUIByName("medical_department2");
+		if (pItem)
+			pItem->SetVisible(TRUE);
+
+		pItem = xmlChart.FindChartUIByName("medical_department_to");
+		if ( pItem )
+			pItem->SetText(pInfo->m_szMedicalDepartment2);
+	}
+	else {
+		pItem = xmlChart.FindChartUIByName("medical_department2");
+		if ( pItem )
+			pItem->SetVisible(FALSE);
+	}
+
 	// 病室
 	pItem = xmlChart.FindChartUIByName("ward");
 	if (pItem) {
 		pItem->SetText(pInfo->m_szWard);
+	}
+
+	if (pInfo->m_szWard2[0] != '\0') {
+		pItem = xmlChart.FindChartUIByName("ward2");
+		if (pItem)
+			pItem->SetVisible(TRUE);
+
+		pItem = xmlChart.FindChartUIByName("ward_to");
+		if (pItem)
+			pItem->SetText(pInfo->m_szWard2);
+	}
+	else {
+		pItem = xmlChart.FindChartUIByName("ward2");
+		if (pItem)
+			pItem->SetVisible(FALSE);
 	}
 
 	// 床号
@@ -786,9 +816,29 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		pItem->SetText(pInfo->m_szBedNo);
 	}
 
-	// 空数据不要打印
-	int nStartIndex = GetPatientDataStartIndex(pData, dwSize);
-	tFirstDay = tFirstDay + 3600 * 24 * nStartIndex;
+	if (pInfo->m_szBedNo2[0] != '\0') {
+		pItem = xmlChart.FindChartUIByName("bed2");
+		if (pItem)
+			pItem->SetVisible(TRUE);
+
+		pItem = xmlChart.FindChartUIByName("bed_no_to");
+		if (pItem)
+			pItem->SetText(pInfo->m_szBedNo2);
+	}
+	else {
+		pItem = xmlChart.FindChartUIByName("bed2");
+		if (pItem)
+			pItem->SetVisible(FALSE);
+	}
+
+	//// 空数据不要打印
+	//int nStartIndex = GetPatientDataStartIndex(pData, dwSize);
+	//tFirstDay = tFirstDay + 3600 * 24 * nStartIndex;
+
+	// 空数据也要打印
+	int nYear = 0;
+	int nMonth = 0;
+	int nDay = 0;
 
 	// 日期 
 	for (int i = 0; i < 7; i++) {
@@ -796,7 +846,40 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		pItem = xmlChart.FindChartUIByName(strText);
 		if ( pItem ) {
 			time_t t = tFirstDay + 3600 * 24 * i;
-			Date2String_md( buf, sizeof(buf), &t );
+			struct tm  tmp;
+			localtime_s(&tmp, &t);
+
+			// 第一天显示全
+			if (0 == i) {
+				nYear = tmp.tm_year + 1900;
+				nMonth = tmp.tm_mon + 1;
+				nDay = tmp.tm_mday;
+
+				SNPRINTF(buf, sizeof(buf), "%04d-%02d-%02d", 
+					nYear, nMonth, nDay);
+			}
+			else {
+				nDay = tmp.tm_mday;
+				// 如果和第一天的月份不同
+				if (tmp.tm_mon + 1 != nMonth) {
+					nMonth = tmp.tm_mon + 1;
+					// 如果连年份都不同
+					if (tmp.tm_year+1900 != nYear) {
+						nYear = tmp.tm_year + 1900;
+						SNPRINTF(buf, sizeof(buf), 
+							"%04d-%02d-%02d",
+							nYear, nMonth, nDay );
+					}
+					// 年份相同
+					else {
+						SNPRINTF(buf, sizeof(buf),
+							"%02d-%02d", nMonth, nDay);
+					}
+				}
+				else {
+					SNPRINTF(buf, sizeof(buf), "%02d", nDay);
+				}
+			}
 			pItem->SetText(buf);
 		}
 	}
@@ -804,15 +887,22 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	// 住院日数
 	if ( pInfo->m_in_hospital > 0 ) {
 		time_t t1 = GetAnyDayZeroTime(pInfo->m_in_hospital);
-		for  (int i = 0; i < 7 - nStartIndex; i++ ) {
+		for  (int i = 0; i < 7; i++ ) {
 			time_t t2 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
 			if ( t2 >= t1) {
 				int nInDays = (int)(t2 - t1) / (3600 * 24);
 				strText.Format("in_date_%d", i + 1);
 				pItem = xmlChart.FindChartUIByName(strText);
 				if (pItem) {
-					strText.Format("%d", nInDays);
+					strText.Format("%d", nInDays+1);
 					pItem->SetText((const char *)strText);
+				}
+			}
+			else {
+				strText.Format("in_date_%d", i + 1);
+				pItem = xmlChart.FindChartUIByName(strText);
+				if (pItem) {
+					pItem->SetText(""); 
 				}
 			}
 		}
@@ -882,32 +972,32 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	//	}
 	//}
 
-	// 血压
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("blood_pressure_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(pData[i + nStartIndex].m_szBloodPressure);
-		}
-	}
+	//// 血压
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("blood_pressure_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(pData[i + nStartIndex].m_szBloodPressure);
+	//	}
+	//}
 
-	// 体重
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("weight_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(pData[i + nStartIndex].m_szWeight);
-		}
-	}
+	//// 体重
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("weight_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(pData[i + nStartIndex].m_szWeight);
+	//	}
+	//}
 
-	// 过敏
-	for (int i = 0; i < 7 - nStartIndex; i++) {
-		strText.Format("irritability_%d", i + 1);
-		pItem = xmlChart.FindChartUIByName(strText);
-		if (pItem) {
-			pItem->SetText(pData[i + nStartIndex].m_szIrritability);
-		}
-	}
+	//// 过敏
+	//for (int i = 0; i < 7 - nStartIndex; i++) {
+	//	strText.Format("irritability_%d", i + 1);
+	//	pItem = xmlChart.FindChartUIByName(strText);
+	//	if (pItem) {
+	//		pItem->SetText(pData[i + nStartIndex].m_szIrritability);
+	//	}
+	//}
 }
 
 int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
