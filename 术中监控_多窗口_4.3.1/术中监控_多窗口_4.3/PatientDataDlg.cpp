@@ -6,7 +6,8 @@
 #define INTERVAL_TIMER_TEMP_UI    200
 #define PATIENT_DLG_WIDTH         800
 #define PATIENT_DLG_HEIGHT        802
-#define IMAGE_MIN_WIDTH           224             // 曲线图理想宽度
+#define IMAGE_MIN_WIDTH           224             // 曲线图最小宽度
+#define IMAGE_PREFER_WIDTH        540             // 曲线图理想宽度
 
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
@@ -160,8 +161,12 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 						RECT r = { 0 };
 						::GetWindowRect(GetHWND(), &r);
 						// 如果宽度足够大
-						int nDiff = g_data.m_nScreenWidth - r.right;
-						if ( nDiff > IMAGE_MIN_WIDTH ) {
+						int nDiff = g_data.m_nScreenWidth - (r.right - r.left);
+						if ( nDiff > IMAGE_PREFER_WIDTH) {
+							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + IMAGE_PREFER_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
+							nImgWidth = IMAGE_PREFER_WIDTH;
+						}
+						else if (nDiff > IMAGE_MIN_WIDTH) {
 							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + nDiff, PATIENT_DLG_HEIGHT, TRUE);
 							nImgWidth = nDiff;
 						}
