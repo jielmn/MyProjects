@@ -108,6 +108,14 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			KillTimer(GetHWND(), TIMER_TEMP_UI);
 		}
 	}
+	else if (msg.sType == "get_temp") {
+		int t = msg.wParam;
+		//strText.Format("temp = %.2f \n", t / 100.0f);
+		//OutputDebugString(strText);
+		if ( t > 0 && m_cur_temp) {
+			m_cur_temp->SetFocusValue(t);
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 

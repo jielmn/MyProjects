@@ -640,6 +640,7 @@ CTempUI::CTempUI() {
 	m_temp2 = 0;
 	m_t1 = 0;
     m_t2 = 0;
+	m_nSel = 0;
 }
 
 CTempUI::~CTempUI() {
@@ -691,12 +692,23 @@ void CTempUI::Notify(TNotifyUI& msg) {
 		if (msg.pSender == m_btn) {
 			bool b = m_temp2->IsVisible();
 			m_temp2->SetVisible(!b);
+
+			if (b) {
+				m_nSel = 0;
+			}
+			else {
+				m_nSel = 1;
+			}
 			m_pManager->SendNotify(this, "tempui_setfocus");
 		}
 	}
 	else if (msg.sType == "setfocus") {
-		if ( msg.pSender == m_temp1 || msg.pSender == m_temp2) {
-			//OutputDebugString("==== setfocus \n");
+		if ( msg.pSender == m_temp1) {
+			m_nSel = 0;
+			m_pManager->SendNotify(this, "tempui_setfocus");
+		}
+		else if (msg.pSender == m_temp2) {
+			m_nSel = 1;
 			m_pManager->SendNotify(this, "tempui_setfocus");
 		}
 	}
@@ -753,6 +765,39 @@ void CTempUI::SetValue(int t1, int t2 /*= 0*/) {
 		m_temp2->SetVisible(false);
 	}
 	m_temp2->SetText(strText);
+}
+
+int CTempUI::GetSel() {
+	return m_nSel;
+}
+
+void CTempUI::SetFocusValue(int t) {
+	assert(m_nSel >= 0 && m_nSel <= 1);
+
+	if (m_nSel == 0) {
+		m_t1 = t;
+	}
+	else {
+		m_t2 = t;
+	}
+
+	if (0 == m_temp1)
+		return;
+
+	CDuiString  strText;
+	if (t > 0) {
+		strText.Format("%.2f", (float)t / 100.0f);
+	}
+	else {
+		strText = "";
+	}
+
+	if (m_nSel == 0) {		
+		m_temp1->SetText(strText);
+	}
+	else {
+		m_temp2->SetText(strText);
+	}
 }
 
 
@@ -946,6 +991,9 @@ void CPatientImg::DoEvent(DuiLib::TEventUI& event) {
 	if (event.Type == UIEVENT_MOUSEMOVE) {
 		//::OutputDebugString("== on mouse move! \n");
 		this->Invalidate();
+	}
+	else if (event.Type == UIEVENT_DBLCLICK) {
+		m_pManager->SendNotify(this, "get_temp", GetDbClickTemp() );
 	}
 	CControlUI::DoEvent(event);
 }
@@ -1333,4 +1381,55 @@ void   CPatientImg::DrawCrossLine(HDC hDC, const RECT & rValid, const POINT & cu
 		else
 			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
 	}
+}
+
+int CPatientImg::GetDbClickTemp() {
+
+	// 查看有无数据
+	int nPointsCnt = GetTempCount();
+	if (0 == nPointsCnt) {
+		return 0;
+	}
+
+	CContainerUI * pParent = (CContainerUI *)GetParent();
+	// self rectangle and width, height
+	RECT rect = GetPos();
+	int  width = pParent->GetFixedWidth();
+	int  height = rect.bottom - rect.top;
+
+	// 水平滑动条位置
+	int  nScrollX = pParent->GetScrollPos().cx;
+
+	// 最高，最低温度
+	int  nMinTemp, nMaxTemp;
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp);
+
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边刻度区域和右边折线图
+	RECT rectScale;
+	rectScale.left = rect.left + nScrollX;
+	rectScale.top = rect.top;
+	rectScale.right = rectScale.left + SCALE_RECT_WIDTH;
+	rectScale.bottom = rect.bottom;
+
+	// 画温度曲线
+	POINT  top_left;
+	top_left.x = rect.left + SCALE_RECT_WIDTH;
+	top_left.y = nMaxY;
+
+	// 鼠标位置
+	POINT cursor_point;
+	GetCursorPos(&cursor_point);
+	::ScreenToClient(m_hWnd, &cursor_point);
+	
+	float  cursot_temp = nMaxTemp + (float)(top_left.y - cursor_point.y) / nHeightPerCelsius;
+	return (int)(cursot_temp * 100.0f);
 }

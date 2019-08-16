@@ -146,6 +146,8 @@ public:
 
 	void GetValue(int & t1, int &t2);
 	void SetValue(int t1, int t2 = 0);
+	int  GetSel();
+	void SetFocusValue(int t);
 
 private:
 	LPCTSTR GetClass() const; 
@@ -158,6 +160,7 @@ private:
 
 	int                                         m_t1;
 	int                                         m_t2;
+	int                                         m_nSel;          // 哪个输入框获得焦点
 };
 
 
@@ -220,6 +223,7 @@ private:
 	void   DrawCrossLine(HDC hDC, const RECT & rValid, const POINT & cursor_point,
 		time_t tFirstTime, float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
 		POINT  top_left);
+	int GetDbClickTemp();
 
 private:
 	HPEN                         m_hCommonThreadPen;
