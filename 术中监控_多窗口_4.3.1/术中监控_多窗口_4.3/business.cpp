@@ -149,6 +149,8 @@ int CBusiness::Init() {
 
 	// ·¢ÉäÆ÷¶Ë¿Ú
 	g_data.m_cfg->GetConfig(CFG_LAUNCH_COM_PORT, g_data.m_szLaunchPort, sizeof(g_data.m_szLaunchPort), "");
+
+	g_data.m_cfg->GetConfig("temp char footer", g_data.m_TempChartFooter, sizeof(g_data.m_szLaunchPort), "A¼×22051612");
 	/******************** end ÅäÖÃÏî **********************/
 
 

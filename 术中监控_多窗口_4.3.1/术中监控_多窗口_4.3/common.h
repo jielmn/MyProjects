@@ -327,6 +327,8 @@ public:
 
 	// 温度曲线的垂直margin
 	int                       m_nVMargin;
+	// 体温单脚注
+	char                      m_TempChartFooter[20];
 
 public:
 	CGlobalData() {
@@ -347,6 +349,7 @@ public:
 		m_nVMargin = 0;
 		m_nScreenWidth = 0;
 		m_nScreenHeight = 0;
+		memset(m_TempChartFooter, 0, sizeof(m_TempChartFooter));
 	}
 };
 

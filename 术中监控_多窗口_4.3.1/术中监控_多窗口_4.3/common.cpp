@@ -700,6 +700,7 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	char day[16];
 	CXml2ChartUI * pItem = 0;
 	CDuiString strText;
+	int nIndex = 0;
 
 	// 门诊号
 	pItem = xmlChart.FindChartUIByName("outpatient_no");
@@ -974,80 +975,99 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		}
 	}
 
+	// 呼吸
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			strText.Format("breath_%d_%d", i + 1, j + 1);
+			pItem = xmlChart.FindChartUIByName(strText);
 
-	//// 呼吸
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	for (int j = 0; j < 6; j++) {
-	//		strText.Format("breath_%d_%d", i + 1, j + 1);
-	//		pItem = xmlChart.FindChartUIByName(strText);
-	//		if (pItem) {
-	//			pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i+ nStartIndex].m_breath[j] ));
-	//		}
-	//	}
-	//}
+			if (pData[i].m_breath[j][0] != '\0') {
+				nIndex++;
+				if (pItem) {
+					pItem->SetText(pData[i].m_breath[j]);
+					if (nIndex % 2 == 1) {
+						pItem->SetVAlignType(VALIGN_TOP);
+					}
+					else {
+						pItem->SetVAlignType(VALIGN_BOTTOM);
+					}
+				}
+			}
+			else {
+				if (pItem) {
+					pItem->SetText("");
+				}
+			}
+		}
+	}
 
-	//// 大便次数
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("defecate_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i+ nStartIndex].m_defecate));
-	//	}
-	//}
+	// 大便次数
+	for (int i = 0; i < 7; i++) {
+		strText.Format("defecate_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_defecate);
+		}
+	}
 
-	//// 尿量
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("urine_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_urine));
-	//	}
-	//}
+	// 尿量
+	for (int i = 0; i < 7; i++) {
+		strText.Format("urine_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_urine);
+		}
+	}
 
-	//// 入量
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("income_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_income));
-	//	}
-	//}
+	// 入量
+	for (int i = 0; i < 7; i++) {
+		strText.Format("income_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_income);
+		}
+	}
 
-	//// 出量
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("output_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(PreviewNum(buf, sizeof(buf), pData[i + nStartIndex].m_output));
-	//	}
-	//}
+	// 出量
+	for (int i = 0; i < 7; i++) {
+		strText.Format("output_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_output);
+		}
+	}
 
-	//// 血压
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("blood_pressure_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(pData[i + nStartIndex].m_szBloodPressure);
-	//	}
-	//}
+	// 血压
+	for (int i = 0; i < 7; i++) {
+		strText.Format("blood_pressure_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_szBloodPressure);
+		}
+	}
 
-	//// 体重
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("weight_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(pData[i + nStartIndex].m_szWeight);
-	//	}
-	//}
+	// 体重
+	for (int i = 0; i < 7; i++) {
+		strText.Format("weight_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_szWeight);
+		}
+	}
 
-	//// 过敏
-	//for (int i = 0; i < 7 - nStartIndex; i++) {
-	//	strText.Format("irritability_%d", i + 1);
-	//	pItem = xmlChart.FindChartUIByName(strText);
-	//	if (pItem) {
-	//		pItem->SetText(pData[i + nStartIndex].m_szIrritability);
-	//	}
-	//}
+	// 过敏
+	for (int i = 0; i < 7; i++) {
+		strText.Format("irritability_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText(pData[i].m_szIrritability);
+		}
+	}
+
+	pItem = xmlChart.FindChartUIByName("footer");
+	if (pItem) {
+		pItem->SetText(g_data.m_TempChartFooter);
+	}
 }
 
 int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
