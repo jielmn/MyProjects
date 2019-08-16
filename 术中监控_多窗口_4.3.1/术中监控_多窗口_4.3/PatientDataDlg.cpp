@@ -1265,8 +1265,26 @@ void  CPatientDataDlg::OnDateStartChanged() {
 
 // 时间控件失去焦点
 void  CPatientDataDlg::OnDateStartKillFocus() {
+
+	// 先保存数据
+	PatientData data[7];
+	GetPatientData(data, 7);
+	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
+
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientInfoChanged(&data[i], i)) {
+			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
+			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+		}
+	}
+	// END 保存数据
+
+
+
 	SYSTEMTIME s = m_date_start->GetTime();
-	time_t tFirstDay = SysTime2Time(s);
+	tFirstDay = SysTime2Time(s);
 	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
 	SYSTEMTIME s1 = Time2SysTime(tEndDay);
 	m_date_end->SetMyTime(&s1);
