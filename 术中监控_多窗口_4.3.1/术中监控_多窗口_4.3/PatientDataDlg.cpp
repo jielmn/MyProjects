@@ -596,8 +596,8 @@ void  CPatientDataDlg::OnPrint() {
 			//SetBkMode(printInfo.hDC, TRANSPARENT);
 			//DrawXml2ChartUI(printInfo.hDC, xmlChart.m_ChartUI);
 
-			PrepareXmlChart(xmlChart, &info, data, 7, tFirstDay);
-			PrintXmlChart(printInfo.hDC, xmlChart, 0, 0, data, 7);
+			//PrepareXmlChart(xmlChart, &info, data, 7, tFirstDay);
+			//PrintXmlChart(printInfo.hDC, xmlChart, 0, 0, data, 7);
 
 			EndPage(printInfo.hDC);
 		}

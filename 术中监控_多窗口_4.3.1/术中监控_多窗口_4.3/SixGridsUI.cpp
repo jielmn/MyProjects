@@ -456,7 +456,27 @@ void CMyEventUI::DoInit() {
 	pItem->SetTag(PTYPE_HOLIDAY);
 	m_cmbType->Add(pItem);
 
-	m_cmbType->SelectItem(m_nType);
+	if (m_nType == PTYPE_SURGERY) {
+		m_cmbType->SelectItem(0);
+	}
+	else if (m_nType == PTYPE_BIRTH) {
+		m_cmbType->SelectItem(1);
+	}
+	else if (m_nType == PTYPE_TURN_IN) {
+		m_cmbType->SelectItem(2);
+	}
+	else if (m_nType == PTYPE_TURN_OUT) {
+		m_cmbType->SelectItem(3);
+	}
+	else if (m_nType == PTYPE_DEATH) {
+		m_cmbType->SelectItem(4);
+	}
+	else if (m_nType == PTYPE_HOLIDAY) {
+		m_cmbType->SelectItem(5);
+	}
+	else {
+		m_cmbType->SelectItem(0);
+	}
 
 	if (m_time1 > 0) {
 		char szTime[256];
@@ -538,7 +558,13 @@ void CMyEventUI::SetSelected(BOOL bSel) {
 }
 
 void CMyEventUI::GetValue(int & nDbId, int & nType, time_t & t1, time_t & t2) {
-	nType = m_cmbType->GetCurSel();
+	int nSel = m_cmbType->GetCurSel();
+	CControlUI * pCtl = m_cmbType->GetItemAt(nSel);
+	if (pCtl)
+		nType = m_cmbType->GetItemAt(nSel)->GetTag();
+	else
+		nType = PTYPE_SURGERY;
+
 	SYSTEMTIME s1 = m_date_1->GetTime();
 	SYSTEMTIME s2 = m_date_1->GetTime();
 	int nHour1   = GetIntFromDb(m_edt_1->GetText());
@@ -589,6 +615,9 @@ void CMyEventUI::SetValue(int nDbId, int nType, time_t t1, time_t t2 /*= 0*/) {
 	}
 	else if (nType == PTYPE_HOLIDAY) {
 		m_cmbType->SelectItem(5);
+	}
+	else {
+		m_cmbType->SelectItem(0);
 	}
 
 	if (nType == PTYPE_HOLIDAY) {

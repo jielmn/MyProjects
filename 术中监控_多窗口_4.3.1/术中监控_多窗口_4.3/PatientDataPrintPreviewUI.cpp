@@ -20,7 +20,7 @@ CPatientDataPrintPreviewUI::~CPatientDataPrintPreviewUI() {
 bool CPatientDataPrintPreviewUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);		
 	//SET_CLIP_REGION_ON_PAINT(rcPaint);
-	PrepareXmlChart(m_XmlChartFile, &m_patient_info, m_patient_data, 7, m_tFirstDay);
+	PrepareXmlChart(m_XmlChartFile, &m_patient_info, m_patient_data, 7, m_tFirstDay, m_vEvents );
 
 	int w = XML_CHART_WIDTH;
 	int h = XML_CHART_HEIGHT;

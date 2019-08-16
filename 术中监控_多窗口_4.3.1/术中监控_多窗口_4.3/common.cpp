@@ -692,7 +692,8 @@ void GetDateStr(char * year, DWORD d1, char * month, DWORD d2, char * day, DWORD
 }
 
 void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
-	                  PatientData * pData, DWORD dwSize, time_t tFirstDay) {
+	                  PatientData * pData, DWORD dwSize, time_t tFirstDay, 
+	                  const std::vector<PatientEvent * > & vEvents ) {
 	char buf[256];
 	char year[16];
 	char month[16];
@@ -908,22 +909,71 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 		}
 	}
 
-	//// 手术后日数
-	//if (pInfo->m_surgery > 0) {
-	//	time_t t1 = GetAnyDayZeroTime(pInfo->m_surgery);
-	//	for (int i = 0; i < 7 - nStartIndex; i++) {
-	//		time_t t2 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
-	//		if (t2 >= t1) {
-	//			int nInDays = (int)(t2 - t1) / (3600 * 24); 
-	//			strText.Format("sur_date_%d", i + 1);
-	//			pItem = xmlChart.FindChartUIByName(strText);
-	//			if (pItem) {
-	//				strText.Format("%d", nInDays);
-	//				pItem->SetText((const char *)strText);
-	//			}
-	//		}
-	//	}
-	//}
+	// 手术后日数
+	// 术日  术2  分娩
+	for (int i = 0; i < 7; i++) {
+		time_t t1 = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * i);
+
+		std::vector<PatientEvent * >::const_iterator it;
+		int nSurgeryIndex = 0;
+		int nBirthIndex = 0;
+		CDuiString strLine;
+
+		for (it = vEvents.begin(); it != vEvents.end(); ++it) {
+			PatientEvent * pEvent = *it;
+			CDuiString strDayName;
+			if ( pEvent->m_nType == PTYPE_SURGERY ) {
+				nSurgeryIndex++;
+				if (nSurgeryIndex == 1) {
+					strDayName = "术日";
+				}
+				else {
+					strDayName.Format("术%d", nSurgeryIndex);
+				}
+			}
+			else if (pEvent->m_nType == PTYPE_BIRTH) {
+				if ( nBirthIndex == 0 ) {
+					nBirthIndex++;
+					strDayName = "分娩";
+				}
+				else
+					continue;
+			}
+			else {
+				continue;
+			}
+
+			time_t t2 = GetAnyDayZeroTime(pEvent->m_time_1);
+			if (t1 < t2)
+				continue;
+
+			if (t1 - t2 > 3600 * 24 * 14)
+				continue;
+
+			CDuiString strItem;
+			if (t1 == t2) {
+				strItem = strDayName;
+			}
+			else {
+				strItem.Format("%d", (t1 - t2) / (3600 * 24) );
+			}
+
+			if (strLine.GetLength() == 0) {
+				strLine = strItem;
+			}
+			else {
+				strLine += "/";
+				strLine += strItem;
+			}
+		}
+
+		strText.Format("sur_date_%d", i + 1);
+		pItem = xmlChart.FindChartUIByName(strText);
+		if (pItem) {
+			pItem->SetText((const char *)strLine);
+		}
+	}
+
 
 	//// 呼吸
 	//for (int i = 0; i < 7 - nStartIndex; i++) {

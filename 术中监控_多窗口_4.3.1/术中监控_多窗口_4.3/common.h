@@ -674,7 +674,8 @@ extern void GetDateStr(char * year, DWORD d1, char * month, DWORD d2,
 	                   char * day, DWORD d3, time_t t);
 
 extern void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
-	                         PatientData * pData, DWORD dwSize, time_t tFirstDay );
+	                         PatientData * pData, DWORD dwSize, time_t tFirstDay, 
+	                         const std::vector<PatientEvent * > & vEvents);
 extern int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize);
 extern void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
 	                       PatientData * pData, DWORD dwDataSize );
