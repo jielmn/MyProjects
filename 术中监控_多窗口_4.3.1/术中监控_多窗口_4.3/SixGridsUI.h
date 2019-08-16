@@ -213,6 +213,9 @@ private:
 		int    nMaxTemp, int nHeightPerCelsius, POINT  tTopLeft, Graphics & graphics,
 		BOOL  bDrawPoints,Pen * pen, SolidBrush * brush);
 	void  DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
+	// 画时间文本
+	void   DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
+		float fSecondsPerPixel, POINT  top_left, const RECT & rValid);
 
 private:
 	HPEN                         m_hCommonThreadPen;

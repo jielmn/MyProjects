@@ -888,16 +888,16 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 		DrawPolyline(m_tStart, m_tEnd, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius,
 			top_left, graphics, TRUE, m_temperature_pen, m_temperature_brush );
 
-		//// 有效矩形
-		//RECT rValid;
-		//rValid.left = rectScale.right;
-		//rValid.right = rectScale.left + width - 1;
-		//rValid.top = rectScale.top;
-		//rValid.bottom = rectScale.bottom;
+		// 有效矩形
+		RECT rValid;
+		rValid.left = rectScale.right;
+		rValid.right = rectScale.left + width - 1;
+		rValid.top = rectScale.top;
+		rValid.bottom = rectScale.bottom;
 
-		//top_left.y += nHeightPerCelsius * nCelsiusCount;
-		//// 画时间文本
-		//DrawTimeText(hDC, m_tStart, m_tEnd, m_fSecondsPerPixel, top_left, rValid);
+		top_left.y += nHeightPerCelsius * nCelsiusCount;
+		// 画时间文本
+		DrawTimeText(hDC, m_tStart, m_tEnd, m_fSecondsPerPixel, top_left, rValid);
 
 		//// 画注释
 		//top_left.y = nMaxY;
@@ -910,6 +910,23 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 		//// 画十字线
 		//DrawCrossLine(hDC, rValid, cursor_point, m_tStart, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
 		
+	}
+	else {
+		// 画温度曲线
+		POINT  top_left;
+		top_left.x = rect.left + SCALE_RECT_WIDTH;
+		top_left.y = nMaxY;
+
+		// 有效矩形
+		RECT rValid;
+		rValid.left = rectScale.right;
+		rValid.right = rectScale.left + width - 1;
+		rValid.top = rectScale.top;
+		rValid.bottom = rectScale.bottom;
+
+		top_left.y += nHeightPerCelsius * nCelsiusCount;
+		// 画时间文本
+		DrawTimeText(hDC, m_tStart, m_tEnd, m_fSecondsPerPixel, top_left, rValid);
 	}
 
 	// 画刻度值
@@ -1221,4 +1238,57 @@ void CPatientImg::MyInvalidate(BOOL bReset /*= TRUE*/, int nWidth /*= 0*/) {
 
 	this->SetMinWidth(width);
 	Invalidate();
+}
+
+
+// 画时间文本
+void    CPatientImg::DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
+	float fSecondsPerPixel, POINT  top_left, const RECT & rValid) {
+	char szTime[256];
+	::SetTextColor(hDC, RGB(255, 255, 255));
+	const int OFFSET_Y = 5;
+	const int TIME_TEXT_INTERVAL = 80;
+	const int TIME_TEXT_WIDTH = 60;
+	BOOL  bFirst = TRUE;
+
+	int nDivide = 3600;
+	int  remainder = tFirstTime % nDivide;
+	time_t  time_point = tFirstTime + (nDivide - remainder);
+	int  time_width = (int)((time_point - tFirstTime) / fSecondsPerPixel);
+	// 如果宽度足够大，开始画text
+	if (time_width >= TIME_TEXT_INTERVAL / 2) {
+		Time2String(szTime, sizeof(szTime), &time_point);
+		//::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+		::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
+		bFirst = FALSE;
+	}
+
+
+	int last_time_width = time_width;
+	time_point += nDivide;
+	while (time_point <= tLastTime) {
+		time_width = (int)((time_point - tFirstTime) / fSecondsPerPixel);
+		if (bFirst) {
+			// 如果宽度足够大，开始画text
+			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL / 2) {
+				Time2String(szTime, sizeof(szTime), &time_point);
+				//::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
+				last_time_width = time_width;
+				bFirst = FALSE;
+			}
+		}
+		else {
+			// 如果宽度足够大，开始画text
+			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL) {
+				Time2String(szTime, sizeof(szTime), &time_point);
+				//::TextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, szTime, strlen(szTime));
+				::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
+				last_time_width = time_width;
+			}
+		}
+
+
+		time_point += nDivide;
+	}
 }
