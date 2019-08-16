@@ -9,6 +9,12 @@
 #define IMAGE_MIN_WIDTH           224             // 曲线图最小宽度
 #define IMAGE_PREFER_WIDTH        540             // 曲线图理想宽度
 
+//自定义事件排序
+bool sortFun(PatientEvent * p1, PatientEvent * p2)
+{
+	return p1->m_time_1 < p2->m_time_2;
+}
+
 CPatientDataDlg::CPatientDataDlg() {
 	m_tree = 0;
 	m_switch = 0;
@@ -516,10 +522,9 @@ void CPatientDataDlg::OnPrintPreview() {
 
 	memcpy(&m_preview->m_patient_info, &info, sizeof(PatientInfo));
 	memcpy(m_preview->m_patient_data, data, sizeof(PatientData) * 7);
-	m_preview->m_tFirstDay = 0;
-	for (int i = 0; i < 7; i++) {
-		memcpy(m_preview->m_patient_data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
-	}
+	m_preview->m_tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
+	ClearVector(m_preview->m_vEvents);
+	std::copy(vEvents.begin(), vEvents.end(), std::back_inserter(m_preview->m_vEvents));	
 
 	m_switch->SelectItem(1);
 	m_preview->Invalidate();
@@ -719,6 +724,8 @@ void  CPatientDataDlg::GetPatientInfo( PatientInfo * pInfo,
 		vEvents.push_back(pItem);
 	}
 
+	// 按照时间顺序排序
+	sort(vEvents.begin(), vEvents.end(), sortFun);
 }
 
 // 从界面获取填入的data

@@ -13,6 +13,10 @@ CPatientDataPrintPreviewUI::CPatientDataPrintPreviewUI() {
 	LoadXmlChart(m_XmlChartFile);
 }
 
+CPatientDataPrintPreviewUI::~CPatientDataPrintPreviewUI() {
+	ClearVector(m_vEvents);
+}
+
 bool CPatientDataPrintPreviewUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);		
 	//SET_CLIP_REGION_ON_PAINT(rcPaint);

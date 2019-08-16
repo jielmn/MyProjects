@@ -8,6 +8,7 @@ using namespace DuiLib;
 class CPatientDataPrintPreviewUI : public CControlUI {
 public:
 	CPatientDataPrintPreviewUI();
+	~CPatientDataPrintPreviewUI();
 
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
@@ -22,7 +23,8 @@ private:
 	float            m_fZoom;
 
 public:
-	PatientInfo                 m_patient_info;
-	PatientData                 m_patient_data[7];
-	time_t                      m_tFirstDay;
+	PatientInfo                  m_patient_info;
+	std::vector<PatientEvent * > m_vEvents;
+	PatientData                  m_patient_data[7];
+	time_t                       m_tFirstDay;
 };
