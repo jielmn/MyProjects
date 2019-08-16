@@ -844,7 +844,7 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 
 	// self rectangle and width, height
 	RECT rect   = GetPos();
-	int  width  = pParent->GetWidth();
+	int  width  = pParent->GetFixedWidth();
 	int  height = rect.bottom - rect.top;
 
 	// 水平滑动条位置
@@ -1199,7 +1199,7 @@ void CPatientImg::MyInvalidate(BOOL bReset /*= TRUE*/, int nWidth /*= 0*/) {
 		return;
 
 	CContainerUI * pParent = (CContainerUI *)GetParent();
-	int  width = pParent->GetWidth();
+	int  width = pParent->GetFixedWidth();
 	if (0 == width)
 		width = nWidth;
 

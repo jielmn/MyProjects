@@ -31,6 +31,7 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_instant_temp = 0;
 	m_OtherData_Week = 0;
 	m_img = 0;
+	m_layImg = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -104,6 +105,9 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			//OutputDebugString("img set focus \n");
 			KillTimer(GetHWND(), TIMER_TEMP_UI);
 		}
+		else if (name == "layImg" || name == "layTree") {
+			KillTimer(GetHWND(), TIMER_TEMP_UI);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -121,6 +125,7 @@ void  CPatientDataDlg::OnMyInited() {
 	m_btnReturn = (CButtonUI *)m_PaintManager.FindControl("btnReturn");
 	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
 	m_img = (CPatientImg *)m_PaintManager.FindControl("img");
+	m_layImg = (CHorizontalLayoutUI *)m_PaintManager.FindControl("layImg");
 
 	m_tree->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_tree->SetHotItemBkColor(0xFFFFFFFF);  
@@ -146,6 +151,7 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					RECT r = { 0 };
 					::GetWindowRect(GetHWND(), &r);
 					::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
+					m_layImg->EnableScrollBar(false, false);
 				}
 				// бЁжа
 				else {
@@ -165,9 +171,11 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + IMAGE_MIN_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
 							nImgWidth = IMAGE_MIN_WIDTH;
 						}
+						m_layImg->SetFixedWidth(nImgWidth - 5);
+						m_layImg->EnableScrollBar(false, true);
 					}
 
-					int nDayIndex = m_cur_temp->GetParent()->GetParent()->GetTag();
+					int nDayIndex = m_cur_temp->GetParent()->GetParent()->GetTag(); 
 					int nTimeIndex = m_cur_temp->GetTag();
 					assert(nDayIndex >= 0 && nDayIndex < 7);
 					assert(nTimeIndex >= 0 && nTimeIndex < 6);
@@ -176,7 +184,7 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					m_img->m_pVec = &m_VTemp;
 					m_img->m_tStart = tFirstDay + nDayIndex * 3600 * 24 + 3600 * 4 * nTimeIndex;
 					m_img->m_tEnd = m_img->m_tStart + 4 * 3600 + 1800;
-					m_img->MyInvalidate(TRUE, nImgWidth - 5);
+					m_img->MyInvalidate(TRUE, nImgWidth - 5); 
 				}
 			}
 			KillTimer(GetHWND(), wParam);

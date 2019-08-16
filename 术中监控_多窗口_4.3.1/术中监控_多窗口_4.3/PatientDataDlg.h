@@ -87,6 +87,7 @@ private:
 
 	CSevenGridsUI *           m_OtherData_Week;
 	CPatientImg *             m_img;
+	CHorizontalLayoutUI *     m_layImg;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id
