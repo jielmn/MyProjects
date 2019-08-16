@@ -184,7 +184,7 @@ private:
 class CPatientImg : public DuiLib::CControlUI
 {
 public:
-	CPatientImg();
+	CPatientImg(HWND hWnd);
 	~CPatientImg();
 
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
@@ -216,6 +216,10 @@ private:
 	// 画时间文本
 	void   DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
 		float fSecondsPerPixel, POINT  top_left, const RECT & rValid);
+	// 画十字线
+	void   DrawCrossLine(HDC hDC, const RECT & rValid, const POINT & cursor_point,
+		time_t tFirstTime, float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
+		POINT  top_left);
 
 private:
 	HPEN                         m_hCommonThreadPen;
@@ -224,4 +228,5 @@ private:
 	Pen *                        m_temperature_pen;
 	SolidBrush *                 m_temperature_brush;
 	BOOL                         m_bSetSecondsPerPixel;
+	HWND                         m_hWnd;
 };

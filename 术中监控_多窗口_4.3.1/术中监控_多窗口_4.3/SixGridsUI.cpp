@@ -810,7 +810,7 @@ void  CSixTempUI::GetValues(int nIndex, int & t1, int & t2) {
 
 
 
-CPatientImg::CPatientImg() {
+CPatientImg::CPatientImg(HWND hWnd) : m_hWnd(hWnd) {
 	m_pVec = 0;
 	m_tStart = 0;
 	m_tEnd = 0;
@@ -899,16 +899,16 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 		// 画时间文本
 		DrawTimeText(hDC, m_tStart, m_tEnd, m_fSecondsPerPixel, top_left, rValid);
 
-		//// 画注释
-		//top_left.y = nMaxY;
+		// 画注释
+		top_left.y = nMaxY;
 
-		//// 鼠标位置
-		//POINT cursor_point;
-		//GetCursorPos(&cursor_point);
-		//::ScreenToClient(g_data.m_hWnd, &cursor_point);
+		// 鼠标位置
+		POINT cursor_point;
+		GetCursorPos(&cursor_point);
+		::ScreenToClient(m_hWnd, &cursor_point);
 
-		//// 画十字线
-		//DrawCrossLine(hDC, rValid, cursor_point, m_tStart, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
+		// 画十字线
+		DrawCrossLine(hDC, rValid, cursor_point, m_tStart, m_fSecondsPerPixel, nMaxTemp, nHeightPerCelsius, top_left);
 		
 	}
 	else {
@@ -931,11 +931,22 @@ bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 
 	// 画刻度值
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
+
+	char szDate[256];
+	Date2String(szDate, sizeof(szDate), &m_tStart);
+	int nWeekDayIndex = GetWeekDay(m_tStart);
+	strText.Format("%s %s", szDate, GetWeekDayName(nWeekDayIndex));
+	RECT tmpRect = { rectScale.left, rectScale.top, rectScale.right + width - 1, rectScale.top + nVMargin };
+	::DrawText(hDC, strText, strText.GetLength(), &tmpRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
 	 
 	return true;
 }
 
 void CPatientImg::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_MOUSEMOVE) {
+		//::OutputDebugString("== on mouse move! \n");
+		this->Invalidate();
+	}
 	CControlUI::DoEvent(event);
 }
 
@@ -1290,5 +1301,36 @@ void    CPatientImg::DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
 
 
 		time_point += nDivide;
+	}
+}
+
+// 画十字线
+void   CPatientImg::DrawCrossLine(HDC hDC, const RECT & rValid, const POINT & cursor_point,
+	time_t tFirstTime, float fSecondsPerPixel, int nMaxTemp, int nHeightPerCelsius,
+	POINT  top_left) {
+	CDuiString strText;
+
+	// 如果满足画十字线的要求
+	if ( ::PtInRect(&rValid, cursor_point) ) {
+
+		::SelectObject(hDC, m_hCommonThreadPen);
+		::MoveToEx(hDC, cursor_point.x, rValid.top, 0);
+		::LineTo(hDC, cursor_point.x, rValid.bottom);
+		::MoveToEx(hDC, rValid.left, cursor_point.y, 0);
+		::LineTo(hDC, rValid.right, cursor_point.y);
+
+		float  cursot_temp = nMaxTemp + (float)(top_left.y - cursor_point.y) / nHeightPerCelsius;
+		time_t cursor_time = (time_t)((float)(cursor_point.x - top_left.x) * fSecondsPerPixel) + tFirstTime;
+
+		char szTime[256];
+		Time2String(szTime, sizeof(szTime), &cursor_time);
+
+		strText.Format("%.2f℃,%s", cursot_temp, szTime);
+
+		// 判断是在左边，还是右边
+		if (rValid.right - cursor_point.x >= 120)
+			::TextOut(hDC, cursor_point.x + 5, cursor_point.y - 20, strText, strText.GetLength());
+		else
+			::TextOut(hDC, cursor_point.x - 120, cursor_point.y - 20, strText, strText.GetLength());
 	}
 }

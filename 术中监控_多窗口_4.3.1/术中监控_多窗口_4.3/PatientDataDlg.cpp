@@ -82,8 +82,10 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 	else if (msg.sType == "killfocus") {
 		if (name == "DateTimeS") {
 			OnDateStartKillFocus();
+			m_instant_temp = 0;
+			::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
 		}
-		else if (name == "img") {
+		else if (name == "img"|| name == "layImg" || name == "layTree" ) {
 			m_instant_temp = 0;
 			::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
 		}
@@ -101,11 +103,7 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		::SetTimer(GetHWND(), TIMER_TEMP_UI, INTERVAL_TIMER_TEMP_UI, 0);
 	}
 	else if (msg.sType == "setfocus") {
-		if (name == "img") {
-			//OutputDebugString("img set focus \n");
-			KillTimer(GetHWND(), TIMER_TEMP_UI);
-		}
-		else if (name == "layImg" || name == "layTree" || name == "DateTimeS" ) {
+		if (name == "img" || name == "layImg" || name == "layTree" || name == "DateTimeS") {
 			KillTimer(GetHWND(), TIMER_TEMP_UI);
 		}
 	}
@@ -151,7 +149,7 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					RECT r = { 0 };
 					::GetWindowRect(GetHWND(), &r);
 					::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
-					m_layImg->EnableScrollBar(false, false);
+					m_layImg->EnableScrollBar(false, false);					
 				}
 				// бЁжа
 				else {
@@ -186,6 +184,7 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					m_img->m_tEnd = m_img->m_tStart + 4 * 3600 + 1800;
 					m_img->MyInvalidate(TRUE, nImgWidth - 5); 
 				}
+				::InvalidateRect(GetHWND(), 0, TRUE);
 			}
 			KillTimer(GetHWND(), wParam);
 		}
@@ -217,7 +216,7 @@ DuiLib::CControlUI * CPatientDataDlg::CreateControl(LPCTSTR pstrClass) {
 		return new CMyDateUI;
 	}
 	else if (0 == strcmp(pstrClass, "PatientImage")) {
-		return new CPatientImg;
+		return new CPatientImg(GetHWND());
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
