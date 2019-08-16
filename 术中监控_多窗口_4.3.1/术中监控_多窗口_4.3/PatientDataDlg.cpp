@@ -105,7 +105,7 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 			//OutputDebugString("img set focus \n");
 			KillTimer(GetHWND(), TIMER_TEMP_UI);
 		}
-		else if (name == "layImg" || name == "layTree") {
+		else if (name == "layImg" || name == "layTree" || name == "DateTimeS" ) {
 			KillTimer(GetHWND(), TIMER_TEMP_UI);
 		}
 	}
@@ -1134,6 +1134,18 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 		delete pVTemp;
 	}
 
+	if (m_cur_temp) {
+		int nDayIndex = m_cur_temp->GetParent()->GetParent()->GetTag();
+		int nTimeIndex = m_cur_temp->GetTag();
+		assert(nDayIndex >= 0 && nDayIndex < 7);
+		assert(nTimeIndex >= 0 && nTimeIndex < 6);
+		time_t tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
+
+		m_img->m_pVec = &m_VTemp;
+		m_img->m_tStart = tFirstDay + nDayIndex * 3600 * 24 + 3600 * 4 * nTimeIndex;
+		m_img->m_tEnd = m_img->m_tStart + 4 * 3600 + 1800;
+		m_img->MyInvalidate();
+	}
 	
 	CMyTreeCfgUI::ConfigValue   cfgValue;
 	int nRow = 18;
