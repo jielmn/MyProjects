@@ -69,6 +69,9 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		else if (name == "btnDelEvent") {
 			OnDelMyEvent();
 		}
+		else if (name == "btnAuto") {
+			OnAutoTemp();
+		}
 		else {
 			if ( msg.pSender->GetClass() == "MyEvent" ) {
 				OnMyEventSelected(msg.pSender);
@@ -1361,4 +1364,35 @@ CDuiString  CPatientDataDlg::FormatInt(int nValue) {
 		str.Format("%d", nValue);
 	}
 	return str;
+}
+
+// ×Ô¶¯Ìî³äÌåÎÂ
+void  CPatientDataDlg::OnAutoTemp() {
+	CMyTreeCfgUI::ConfigValue   cfgValue;
+	int nRow = 18;
+	time_t tFirstDay = GetAnyDayZeroTime(m_patient_data[0].m_date);
+
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			time_t tStart = tFirstDay + 3600 * 24 * i + 3600 * 4 * j;
+			time_t tEnd = tStart + 3600 * 4;
+			cfgValue.m_nValues[j][0] = GetTemp(tStart, tEnd);
+			cfgValue.m_nValues[j][1] = 0;
+		}
+		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
+	}
+}
+
+DWORD  CPatientDataDlg::GetTemp(time_t tStart, time_t tEnd) {
+	DWORD  dwTemp = 0;
+	std::vector<TempItem *>::iterator it;
+	for (it = m_VTemp.begin(); it != m_VTemp.end(); ++it) {
+		TempItem * pItem = *it;
+		if ( pItem->m_time < tStart )
+			continue;;
+		if (pItem->m_time >= tEnd)
+			break;
+		dwTemp = pItem->m_dwTemp;
+	}
+	return dwTemp;
 }

@@ -60,6 +60,9 @@ private:
 	void  OnDelMyEvent();
 	// 大于0的显示字符串数字，否则显示空白
 	CDuiString  FormatInt(int nValue);
+	// 自动填充体温
+	void  OnAutoTemp();
+	DWORD  GetTemp(time_t tStart, time_t tEnd);
 
 private:
 	CMyTreeCfgUI  *             m_tree;
