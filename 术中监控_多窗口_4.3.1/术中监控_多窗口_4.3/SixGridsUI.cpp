@@ -820,8 +820,8 @@ CPatientImg::CPatientImg() {
 	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
 	m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
 
-	m_temperature_pen   = new Pen(Gdiplus::Color( RGB(255,0,0) ), 1.0);
-	m_temperature_brush = new SolidBrush(Gdiplus::Color( RGB(0, 0, 255)));
+	m_temperature_pen   = new Pen(Gdiplus::Color( 0xFF00FF00 ), 1.0);
+	m_temperature_brush = new SolidBrush(Gdiplus::Color(0xFF00FF00));
 }
 
 CPatientImg::~CPatientImg() {
@@ -925,9 +925,12 @@ LPCTSTR CPatientImg::GetClass() const {
 }
 
 void  CPatientImg::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp) {
+	nMinTemp = 3500;
+	nMaxTemp = 3900;
+
 	if ( m_pVec == 0 ) {
 		nMinTemp = 35;
-		nMaxTemp = 39;
+		nMinTemp = 39;
 		return;
 	}
 
@@ -937,6 +940,10 @@ void  CPatientImg::GetMaxMinShowTemp(int & nMinTemp, int & nMaxTemp) {
 
 	for (it = v.begin(); it != v.end(); ++it) {
 		TempItem * pItem = *it;
+		if ( pItem->m_time < m_tStart )
+			continue;
+		if (pItem->m_time >= m_tEnd)
+			break;
 		if (bFirst) {
 			nMaxTemp = pItem->m_dwTemp;
 			nMinTemp = pItem->m_dwTemp;
@@ -1052,7 +1059,7 @@ DWORD  CPatientImg::GetTempCount() {
 		return 0;
 	if (m_tStart == 0)
 		return 0;
-	if (m_tEnd >= m_tStart)
+	if (m_tEnd <= m_tStart)
 		return 0;
 
 	const std::vector<TempItem * > & v = *m_pVec;
@@ -1079,7 +1086,7 @@ void   CPatientImg::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSec
 		return;
 	if (m_tStart == 0)
 		return;
-	if (m_tEnd >= m_tStart)
+	if (m_tEnd <= m_tStart)
 		return;
 
 	const std::vector<TempItem * > & vTempData = *m_pVec;

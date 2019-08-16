@@ -161,7 +161,18 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 						else {
 							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + IMAGE_MIN_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
 						}
-					}					
+					}
+
+					int nDayIndex = m_cur_temp->GetParent()->GetParent()->GetTag();
+					int nTimeIndex = m_cur_temp->GetTag();
+					assert(nDayIndex >= 0 && nDayIndex < 7);
+					assert(nTimeIndex >= 0 && nTimeIndex < 6);
+					time_t tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
+
+					m_img->m_pVec = &m_VTemp;
+					m_img->m_tStart = tFirstDay + nDayIndex * 3600 * 24 + 3600 * 4 * nTimeIndex;
+					m_img->m_tEnd = m_img->m_tStart + 4 * 3600 + 1800;
+					m_img->Invalidate();
 				}
 			}
 			KillTimer(GetHWND(), wParam);
