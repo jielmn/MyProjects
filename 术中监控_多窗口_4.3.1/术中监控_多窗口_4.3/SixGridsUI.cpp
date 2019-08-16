@@ -814,7 +814,7 @@ CPatientImg::CPatientImg() {
 	m_pVec = 0;
 	m_tStart = 0;
 	m_tEnd = 0;
-	m_fSecondsPerPixel = 20.0f;
+	m_fSecondsPerPixel = 0.0f;
 
 	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
 	m_hBrighterThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
@@ -822,6 +822,7 @@ CPatientImg::CPatientImg() {
 
 	m_temperature_pen   = new Pen(Gdiplus::Color( 0xFF00FF00 ), 1.0);
 	m_temperature_brush = new SolidBrush(Gdiplus::Color(0xFF00FF00));
+	m_bSetSecondsPerPixel = FALSE;
 }
 
 CPatientImg::~CPatientImg() {
@@ -834,6 +835,7 @@ CPatientImg::~CPatientImg() {
 
 bool CPatientImg::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+	CDuiString  strText;
 
 	// GDI+
 	Graphics graphics(hDC);
@@ -1186,4 +1188,37 @@ void   CPatientImg::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSec
 
 void  CPatientImg::DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius) {
 	g.FillEllipse(brush, x - radius, y - radius, 2 * radius, 2 * radius);
+}
+
+void CPatientImg::MyInvalidate(BOOL bReset /*= TRUE*/, int nWidth /*= 0*/) {
+	if (m_pVec == 0)
+		return;
+	if (m_tStart == 0)
+		return;
+	if (m_tEnd <= m_tStart)
+		return;
+
+	CContainerUI * pParent = (CContainerUI *)GetParent();
+	int  width = pParent->GetWidth();
+	if (0 == width)
+		width = nWidth;
+
+	m_bSetSecondsPerPixel = !bReset;
+
+	if (!m_bSetSecondsPerPixel) {
+		m_fSecondsPerPixel = (float)(m_tEnd - m_tStart) / (width - SCALE_RECT_WIDTH);
+		if (m_fSecondsPerPixel < 1.0f) {
+			m_fSecondsPerPixel = 1.0f;
+		}
+		else if (m_fSecondsPerPixel > 200.0f) {
+			m_fSecondsPerPixel = 200.0f;
+		}
+		m_bSetSecondsPerPixel = TRUE;
+	}
+	else {
+		width = (int)((m_tEnd - m_tStart) / m_fSecondsPerPixel) + SCALE_RECT_WIDTH;
+	}
+
+	this->SetMinWidth(width);
+	Invalidate();
 }

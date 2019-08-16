@@ -190,6 +190,7 @@ public:
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void DoEvent(DuiLib::TEventUI& event);
 	LPCTSTR GetClass() const;
+	void MyInvalidate(BOOL bReset = TRUE, int nWidth = 0);
 
 public:
 	std::vector<TempItem *> *               m_pVec;
@@ -219,4 +220,5 @@ private:
 	HBRUSH                       m_hCommonBrush;
 	Pen *                        m_temperature_pen;
 	SolidBrush *                 m_temperature_brush;
+	BOOL                         m_bSetSecondsPerPixel;
 };

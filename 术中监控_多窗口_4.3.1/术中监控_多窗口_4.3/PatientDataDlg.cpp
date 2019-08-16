@@ -149,6 +149,8 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				// 选中
 				else {
+					int nImgWidth = 0;
+
 					// 之前未选中
 					if (!bSelected) {
 						RECT r = { 0 };
@@ -157,9 +159,11 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 						int nDiff = g_data.m_nScreenWidth - r.right;
 						if ( nDiff > IMAGE_MIN_WIDTH ) {
 							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + nDiff, PATIENT_DLG_HEIGHT, TRUE);
+							nImgWidth = nDiff;
 						}
 						else {
 							::MoveWindow(GetHWND(), r.left, r.top, PATIENT_DLG_WIDTH + IMAGE_MIN_WIDTH, PATIENT_DLG_HEIGHT, TRUE);
+							nImgWidth = IMAGE_MIN_WIDTH;
 						}
 					}
 
@@ -172,7 +176,7 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					m_img->m_pVec = &m_VTemp;
 					m_img->m_tStart = tFirstDay + nDayIndex * 3600 * 24 + 3600 * 4 * nTimeIndex;
 					m_img->m_tEnd = m_img->m_tStart + 4 * 3600 + 1800;
-					m_img->Invalidate();
+					m_img->MyInvalidate(TRUE, nImgWidth - 5);
 				}
 			}
 			KillTimer(GetHWND(), wParam);
