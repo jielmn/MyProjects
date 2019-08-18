@@ -1082,84 +1082,6 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	}
 }
 
-int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
-	assert(dwSize >= 7);
-	for (int i = 0; i < 7; i++) {
-		for (int j = 0; j < 6; j++) {
-			if (pData[i].m_pulse[j] > 0) {
-				return i;
-			}
-			if (pData[i].m_breath[j] > 0) {
-				return i;
-			}
-			if (pData[i].m_temp[j] > 0) {
-				return i;
-			}
-		}
-
-		if (pData[i].m_defecate > 0)
-			return i;
-
-		if (pData[i].m_urine > 0)
-			return i;
-
-		if (pData[i].m_income > 0)
-			return i;
-
-		if (pData[i].m_output > 0)
-			return i;
-
-		if (pData[i].m_szBloodPressure[0] != '\0')
-			return i;
-
-		if (pData[i].m_szWeight[0] != '\0')
-			return i;
-
-		if (pData[i].m_szIrritability[0] != '\0')
-			return i;		
-	}
-
-	return 6;
-}
-
-//static int  GetTempPointsFromPDataImage( POINT * points, DWORD  dwSize, int w, int h,
-//	                                   int nUnitsX, int nUnitsY, int nMaxY, 
-//									   int nLeft, int nTop, int nOffsetX, int nOffsetY,
-//	                                   PatientData * pData, DWORD dwDataSize, int nType = 0 ) {
-//	assert(dwDataSize >= 7);
-//	assert(dwSize >= 6 * 7);
-//
-//	float x = (float)w / (float)nUnitsX;
-//	float y = (float)h / (float)nUnitsY;
-//	int cnt = 0;
-//	int nStartIndex = GetPatientDataStartIndex(pData, dwDataSize);
-//
-//	for ( int i = 0; i < 7 - nStartIndex; i++ ) {
-//		// 温度
-//		if (nType == 0) {
-//			for (int j = 0; j < 6; j++) {
-//				if ( pData[i + nStartIndex].m_temp[j] >= 3400 && pData[i + nStartIndex].m_temp[j] <= 4200) {
-//					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
-//					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_temp[j]) * y) + nTop + nOffsetY;
-//					cnt++;
-//				}
-//			}			
-//		}
-//		// 脉搏
-//		else {
-//			for (int j = 0; j < 6; j++) {
-//				if (pData[i + nStartIndex].m_pulse[j] >= 20 && pData[i + nStartIndex].m_pulse[j] <= 192 ) {
-//					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
-//					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_pulse[j]) * y) + nTop + nOffsetY;
-//					cnt++;
-//				}
-//			}
-//		}
-//	}
-//
-//	return cnt;
-//}
-
 static void DrawTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
 	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
 
@@ -1182,6 +1104,26 @@ static void DrawTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
 static void DrawDesTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
 	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
 	::Ellipse(hDC, pt.x - radius, pt.y - radius, pt.x + radius, pt.y + radius);
+	SelectObject(hDC, hOld);
+}
+
+static void DrawTempPointLowHighArrow( BOOL bLow, int x, int y, int nArrowH, int nArrowR, 
+	                                   HDC hDC, HPEN hPen) {
+	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
+	if (bLow) {
+		::MoveToEx(hDC, x, y+6, 0);
+		::LineTo(hDC, x, y + nArrowH);
+		::LineTo(hDC, x - nArrowR, y + nArrowH - nArrowR);
+		::MoveToEx(hDC, x, y + nArrowH, 0);
+		::LineTo(hDC, x + nArrowR, y + nArrowH - nArrowR);
+	}
+	else {
+		::MoveToEx(hDC, x, y - 6, 0);
+		::LineTo(hDC, x, y - nArrowH);
+		::LineTo(hDC, x - nArrowR, y - nArrowH + nArrowR);
+		::MoveToEx(hDC, x, y - nArrowH, 0);
+		::LineTo(hDC, x + nArrowR, y - nArrowH + nArrowR);
+	}
 	SelectObject(hDC, hOld);
 }
 
@@ -1215,6 +1157,10 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 		tmp_point.x = (int)((index + 0.5f) * x) + nLeft + nOffsetX;
 		tmp_point.y = (int)((nMaxY - pItem->m_nTemp) * y) + nTop + nOffsetY;
 		DrawTempPointImg(tmp_point, radius, hDC, hTempPointPen);
+		if (pItem->m_nType != 0) {
+			DrawTempPointLowHighArrow(pItem->m_nType == 1, tmp_point.x, tmp_point.y, 
+				(int)(2 * x), 6, hDC, hBluePen);
+		}
 
 		// 处理连线
 		points[cnt].x = tmp_point.x;
@@ -1268,7 +1214,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	RECT rect   = pMain->GetAbsoluteRect();
 	int width   = rect.right  - rect.left;
 	int height  = rect.bottom - rect.top;
-	int radius  = 3;
+	int radius  = 4;
 
 	HPEN   hOldPen = 0;
 	HBRUSH hOldBrush = 0;
@@ -1390,11 +1336,11 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 
 				// 如果脉搏低于20
 				if (grid_pulses[i * 6 + j].m_nPulse < 20) {
-					grid_pulses[i * 6 + j].m_nPulse = 0;
+					grid_pulses[i * 6 + j].m_nPulse = 20;
 				}
 				// 如果脉搏大于192
 				else if (grid_pulses[i * 6 + j].m_nPulse > 192) {
-					grid_pulses[i * 6 + j].m_nPulse = 0;
+					grid_pulses[i * 6 + j].m_nPulse = 192;
 				}
 				else {
 					// 如果同一时间格子内有体温
