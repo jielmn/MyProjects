@@ -33,7 +33,7 @@ bool CPatientDataPrintPreviewUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlU
 	int h1 = (int)(m_nOriginalHeight * m_fZoom);
 	int w1 = (int)(h1 * m_fConstRatio);
 
-	PrintXmlChart(hMemDC, m_XmlChartFile, 0, 0, m_patient_data, 7); 
+	PrintXmlChart(hMemDC, m_XmlChartFile, 0, 0, m_patient_data, 7, m_vEvents); 
 
 	// µÚ¶þ¸ömem dc
 	HDC hMemDC_1 = CreateCompatibleDC(hDC);

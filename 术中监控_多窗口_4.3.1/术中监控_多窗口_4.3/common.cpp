@@ -1110,7 +1110,7 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 	return 6;
 }
 
-static int  GetPatientDataImagePoints( POINT * points, DWORD  dwSize, int w, int h,
+static int  GetTempPointsFromPDataImage( POINT * points, DWORD  dwSize, int w, int h,
 	                                   int nUnitsX, int nUnitsY, int nMaxY, 
 									   int nLeft, int nTop, int nOffsetX, int nOffsetY,
 	                                   PatientData * pData, DWORD dwDataSize, int nType = 0 ) {
@@ -1149,7 +1149,7 @@ static int  GetPatientDataImagePoints( POINT * points, DWORD  dwSize, int w, int
 }
 
 void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
-	                PatientData * pData, DWORD dwDataSize ) {
+	                PatientData * pData, DWORD dwDataSize, const std::vector<PatientEvent * > & vEvents ) {
 	SetBkMode(hDC, TRANSPARENT);
 	DrawXml2ChartUI(hDC, xmlChart.m_ChartUI, nOffsetX, nOffsetY);
 
@@ -1157,67 +1157,169 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	if (0 == pMain)
 		return;
 
-	HPEN   hOld_pen = 0;
-	HBRUSH hOld_brush = 0;
-	HPEN pen   = ::CreatePen(PS_SOLID, 1, RGB(0, 0, 0xFF));
-	HPEN pen_1 = ::CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
-	HPEN pen_2 = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
-	HBRUSH hBrush = ::CreateSolidBrush( RGB(0xFF, 0, 0));
+	RECT rect   = pMain->GetAbsoluteRect();
+	int width   = rect.right  - rect.left;
+	int height  = rect.bottom - rect.top;
+	int radius  = 3;
 
-	int radius = 3;
+	HPEN   hOldPen = 0;
+	HBRUSH hOldBrush = 0;
+	HPEN hBluePen = ::CreatePen(PS_SOLID, 1, RGB(0, 0, 0xFF));
+	HPEN hRedPen = ::CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
+	HPEN hBluePen_2 = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
+	HBRUSH hRedBrush = ::CreateSolidBrush(RGB(0xFF, 0, 0));
 
-	RECT r = pMain->GetAbsoluteRect();
-	int w = r.right - r.left;
-	int h = r.bottom - r.top;
+	time_t tFirstDay = GetAnyDayZeroTime(pData[0].m_date);
+	time_t tLastDay = tFirstDay + 3600 * 24 * 7;
 
-	POINT points[6 * 7];
-	int cnt = 0;
+	typedef struct tagGridEvent {
+		int        m_nType;
+		time_t     m_tTime;
+	}GridEvent;
+	GridEvent    events_type[6 * 7];
+	memset(events_type, 0, sizeof(events_type));
 
-	// 计算体温曲线
-	cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 860, 4260, r.left, r.top,
-		                       nOffsetX, nOffsetY, pData, dwDataSize );	
-	hOld_pen = (HPEN)::SelectObject(hDC, pen);
-	::Polyline(hDC, points, cnt);
-	
-	// 画体温点
-	::SelectObject(hDC, pen_2);
-	for (int i = 0; i < cnt; i++) {
-		POINT temp_points[2];		
+	// 获得每个小个子属于的事件
+	std::vector<PatientEvent * >::const_iterator it;
+	for (it = vEvents.begin(); it != vEvents.end(); ++it) {
+		PatientEvent * pEvent = *it;
+		if (pEvent->m_nType == PTYPE_HOLIDAY) {
+			// 如果超出一周范围
+			if (pEvent->m_time_1 >= tLastDay) {
+				continue;
+			}
+			// 如果超出一周范围
+			else if ( pEvent->m_time_2 < tFirstDay ) {
+				continue;
+			}
 
-		temp_points[0].x = points[i].x - radius;
-		temp_points[0].y = points[i].y - radius;
-		temp_points[1].x = points[i].x + radius;
-		temp_points[1].y = points[i].y + radius;
-		::Polyline(hDC, temp_points, 2);
-
-		temp_points[0].x = points[i].x - radius;
-		temp_points[0].y = points[i].y + radius;
-		temp_points[1].x = points[i].x + radius;
-		temp_points[1].y = points[i].y - radius;
-		::Polyline(hDC, temp_points, 2);
-	}	
-
-	
-	// 计算脉搏曲线
-	cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 172, 192, r.left, r.top,
-		nOffsetX, nOffsetY, pData, dwDataSize, 1);
-	::SelectObject(hDC, pen_1);
-	::Polyline(hDC, points, cnt);
-
-	// 画脉搏点
-	hOld_brush = (HBRUSH)::SelectObject(hDC, hBrush);
-	for (int i = 0; i < cnt; i++) {
-		::Ellipse( hDC, points[i].x - radius, points[i].y - radius,
-			       points[i].x + radius, points[i].y + radius );
+			if ( pEvent->m_time_1 < tFirstDay ) {
+				// 全包含
+				if (pEvent->m_time_2 >= tLastDay) {
+					for (int i = 0; i < 42; i++) {
+						events_type[i].m_nType = pEvent->m_nType;
+					}
+				}
+				else {
+					int index = (int)(pEvent->m_time_2 - tFirstDay) / (3600 * 4);
+					assert(index >= 0 && index < 42);
+					for (int i = 0; i < index; i++) {
+						events_type[i].m_nType = pEvent->m_nType;
+					}
+				}
+			}
+			else {
+				int start_index = (int)(pEvent->m_time_1 - tFirstDay) / (3600 * 4);
+				assert(start_index >= 0 && start_index < 42);
+				int end_index = (int)(pEvent->m_time_2 - tFirstDay) / (3600 * 4);
+				for (int i = start_index; (i < 42) && (i < end_index); i++) {
+					events_type[i].m_nType = pEvent->m_nType;
+				}
+			}
+		}
+		else {
+			// 如果超出这一周的时间范围
+			if (pEvent->m_time_1 < tFirstDay || pEvent->m_time_1 >= tLastDay ) {
+				continue;
+			}
+			int index = (int)(pEvent->m_time_1 - tFirstDay) / (3600 * 4);
+			assert(index >= 0 && index < 42);
+			events_type[index].m_nType = pEvent->m_nType;
+			events_type[index].m_tTime = pEvent->m_time_1;
+		}
 	}
 
-	::SelectObject(hDC, hOld_pen);
-	::SelectObject(hDC, hOld_brush);
+	typedef struct tagGridTemp {
+		int   m_nTemp;
+		int   m_nType;        // 1, 太低了，低于35℃；2. 太高了，高于42℃
+		int   m_nDTemp;       // 降温温度
+		int   m_nDType;       // 1, 太低了，低于35℃；2. 太高了，高于42℃
+	}GridTemp;
 
-	DeleteObject(pen);
-	DeleteObject(pen_1);
-	DeleteObject(pen_2);
-	DeleteObject(hBrush);
+	GridTemp  grid_temps[42];
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			// 如果有温度
+			if (pData[i].m_temp[j] > 0) {
+				grid_temps[i * 6 + j].m_nTemp = pData[i].m_temp[j];
+				if (pData[i].m_descend_temp[j] > 0) {
+					grid_temps[i * 6 + j].m_nDTemp = pData[i].m_descend_temp[j];
+				}
+			}			
+		}
+	}
+
+
+	DeleteObject(hBluePen);
+	DeleteObject(hRedPen);
+	DeleteObject(hBluePen_2);
+	DeleteObject(hRedBrush);
+
+
+
+
+
+	//HPEN   hOld_pen = 0;
+	//HBRUSH hOld_brush = 0;
+	//HPEN pen   = ::CreatePen(PS_SOLID, 1, RGB(0, 0, 0xFF));
+	//HPEN pen_1 = ::CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
+	//HPEN pen_2 = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
+	//HBRUSH hBrush = ::CreateSolidBrush( RGB(0xFF, 0, 0));
+
+	//int radius = 3;
+
+	//RECT r = pMain->GetAbsoluteRect();
+	//int w = r.right - r.left;
+	//int h = r.bottom - r.top;
+
+	//POINT points[6 * 7];
+	//int cnt = 0;
+
+	//// 计算体温曲线
+	//cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 860, 4260, r.left, r.top,
+	//	                       nOffsetX, nOffsetY, pData, dwDataSize );	
+	//hOld_pen = (HPEN)::SelectObject(hDC, pen);
+	//::Polyline(hDC, points, cnt);
+	//
+	//// 画体温点
+	//::SelectObject(hDC, pen_2);
+	//for (int i = 0; i < cnt; i++) {
+	//	POINT temp_points[2];		
+
+	//	temp_points[0].x = points[i].x - radius;
+	//	temp_points[0].y = points[i].y - radius;
+	//	temp_points[1].x = points[i].x + radius;
+	//	temp_points[1].y = points[i].y + radius;
+	//	::Polyline(hDC, temp_points, 2);
+
+	//	temp_points[0].x = points[i].x - radius;
+	//	temp_points[0].y = points[i].y + radius;
+	//	temp_points[1].x = points[i].x + radius;
+	//	temp_points[1].y = points[i].y - radius;
+	//	::Polyline(hDC, temp_points, 2);
+	//}	
+
+	//
+	//// 计算脉搏曲线
+	//cnt = GetPatientDataImagePoints( points, 6 * 7, w, h, 42, 172, 192, r.left, r.top,
+	//	nOffsetX, nOffsetY, pData, dwDataSize, 1);
+	//::SelectObject(hDC, pen_1);
+	//::Polyline(hDC, points, cnt);
+
+	//// 画脉搏点
+	//hOld_brush = (HBRUSH)::SelectObject(hDC, hBrush);
+	//for (int i = 0; i < cnt; i++) {
+	//	::Ellipse( hDC, points[i].x - radius, points[i].y - radius,
+	//		       points[i].x + radius, points[i].y + radius );
+	//}
+
+	//::SelectObject(hDC, hOld_pen);
+	//::SelectObject(hDC, hOld_brush);
+
+	//DeleteObject(pen);
+	//DeleteObject(pen_1);
+	//DeleteObject(pen_2);
+	//DeleteObject(hBrush);
 }
 
 void LoadXmlChart(CXml2ChartFile & xmlChart) {

@@ -681,7 +681,7 @@ extern void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	                         const std::vector<PatientEvent * > & vEvents);
 extern int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize);
 extern void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
-	                       PatientData * pData, DWORD dwDataSize );
+	                       PatientData * pData, DWORD dwDataSize, const std::vector<PatientEvent * > & vEvents);
 extern void LoadXmlChart(CXml2ChartFile & xmlChart);
 extern BOOL IsToday(const SYSTEMTIME & s);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const SYSTEMTIME & s);
