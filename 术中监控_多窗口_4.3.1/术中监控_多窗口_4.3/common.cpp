@@ -13,6 +13,18 @@
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "ole32.lib")
 
+typedef struct tagGridTemp {
+	int   m_nTemp;
+	int   m_nType;        // 1, 太低了，低于35℃；2. 太高了，高于42℃
+	int   m_nDTemp;       // 降温温度
+	int   m_nDType;       // 1, 太低了，低于35℃；2. 太高了，高于42℃
+}GridTemp;
+
+typedef struct tagGridPulse {
+	int   m_nPulse;
+	BOOL  m_bConfilct;    // 是否和体温冲突（在图纸上重合）
+}GridPulse;
+
 
 
 CGlobalData  g_data;
@@ -1110,42 +1122,138 @@ int GetPatientDataStartIndex(PatientData * pData, DWORD dwSize) {
 	return 6;
 }
 
-static int  GetTempPointsFromPDataImage( POINT * points, DWORD  dwSize, int w, int h,
-	                                   int nUnitsX, int nUnitsY, int nMaxY, 
-									   int nLeft, int nTop, int nOffsetX, int nOffsetY,
-	                                   PatientData * pData, DWORD dwDataSize, int nType = 0 ) {
-	assert(dwDataSize >= 7);
-	assert(dwSize >= 6 * 7);
+//static int  GetTempPointsFromPDataImage( POINT * points, DWORD  dwSize, int w, int h,
+//	                                   int nUnitsX, int nUnitsY, int nMaxY, 
+//									   int nLeft, int nTop, int nOffsetX, int nOffsetY,
+//	                                   PatientData * pData, DWORD dwDataSize, int nType = 0 ) {
+//	assert(dwDataSize >= 7);
+//	assert(dwSize >= 6 * 7);
+//
+//	float x = (float)w / (float)nUnitsX;
+//	float y = (float)h / (float)nUnitsY;
+//	int cnt = 0;
+//	int nStartIndex = GetPatientDataStartIndex(pData, dwDataSize);
+//
+//	for ( int i = 0; i < 7 - nStartIndex; i++ ) {
+//		// 温度
+//		if (nType == 0) {
+//			for (int j = 0; j < 6; j++) {
+//				if ( pData[i + nStartIndex].m_temp[j] >= 3400 && pData[i + nStartIndex].m_temp[j] <= 4200) {
+//					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
+//					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_temp[j]) * y) + nTop + nOffsetY;
+//					cnt++;
+//				}
+//			}			
+//		}
+//		// 脉搏
+//		else {
+//			for (int j = 0; j < 6; j++) {
+//				if (pData[i + nStartIndex].m_pulse[j] >= 20 && pData[i + nStartIndex].m_pulse[j] <= 192 ) {
+//					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
+//					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_pulse[j]) * y) + nTop + nOffsetY;
+//					cnt++;
+//				}
+//			}
+//		}
+//	}
+//
+//	return cnt;
+//}
 
-	float x = (float)w / (float)nUnitsX;
-	float y = (float)h / (float)nUnitsY;
+static void DrawTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
+	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
+
+	POINT temp_points[2];
+	temp_points[0].x = pt.x - radius;
+	temp_points[0].y = pt.y - radius;
+	temp_points[1].x = pt.x + radius;
+	temp_points[1].y = pt.y + radius;
+	::Polyline(hDC, temp_points, 2);
+
+	temp_points[0].x = pt.x - radius;
+	temp_points[0].y = pt.y + radius;
+	temp_points[1].x = pt.x + radius;
+	temp_points[1].y = pt.y - radius;
+	::Polyline(hDC, temp_points, 2);
+
+	SelectObject(hDC, hOld);
+}
+
+static void DrawDesTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
+	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
+	::Ellipse(hDC, pt.x - radius, pt.y - radius, pt.x + radius, pt.y + radius);
+	SelectObject(hDC, hOld);
+}
+
+// 画温度图
+static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int nMaxY, 
+	                     int nLeft, int nTop, int nOffsetX, int nOffsetY, int nStartIndex, 
+	                     const std::vector<GridTemp *> & vTemp, int radius, HDC hDC, HPEN hTempPointPen,
+	                     HPEN hDashReadPen, HPEN hRedPen, HPEN  hBluePen) {
+	if ( vTemp.size() == 0 )
+		return;
+
+	float x = (float)width / (float)nUnitsX;
+	float y = (float)height / (float)nUnitsY;
+	HPEN hOld = 0;
+
+	// 有效个数
+	POINT points[6 * 7];
 	int cnt = 0;
-	int nStartIndex = GetPatientDataStartIndex(pData, dwDataSize);
 
-	for ( int i = 0; i < 7 - nStartIndex; i++ ) {
-		// 温度
-		if (nType == 0) {
-			for (int j = 0; j < 6; j++) {
-				if ( pData[i + nStartIndex].m_temp[j] >= 3400 && pData[i + nStartIndex].m_temp[j] <= 4200) {
-					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
-					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_temp[j]) * y) + nTop + nOffsetY;
-					cnt++;
-				}
-			}			
+	std::vector<GridTemp *>::const_iterator it;
+	int index = nStartIndex;
+	for (it = vTemp.begin(); it != vTemp.end(); ++it, index++) {
+		GridTemp * pItem = *it;
+		// 没有体温数据(空的)
+		if (pItem->m_nTemp <= 0) {
+			continue;
 		}
-		// 脉搏
-		else {
-			for (int j = 0; j < 6; j++) {
-				if (pData[i + nStartIndex].m_pulse[j] >= 20 && pData[i + nStartIndex].m_pulse[j] <= 192 ) {
-					points[cnt].x = (int)((i * 6 + j + 0.5f) * x) + nLeft + nOffsetX;
-					points[cnt].y = (int)((nMaxY - pData[i + nStartIndex].m_pulse[j]) * y) + nTop + nOffsetY;
-					cnt++;
-				}
+		
+		// 有体温数据
+		POINT  tmp_point;
+		tmp_point.x = (int)((index + 0.5f) * x) + nLeft + nOffsetX;
+		tmp_point.y = (int)((nMaxY - pItem->m_nTemp) * y) + nTop + nOffsetY;
+		DrawTempPointImg(tmp_point, radius, hDC, hTempPointPen);
+
+		// 处理连线
+		points[cnt].x = tmp_point.x;
+		points[cnt].y = tmp_point.y;
+
+		// 如果还有降温数据
+		if ( pItem->m_nDTemp > 0 ) {
+			POINT  des_temp_point;
+			des_temp_point.x = tmp_point.x;
+			des_temp_point.y = (int)((nMaxY - pItem->m_nDTemp) * y) + nTop + nOffsetY;
+
+			int nVDistance = 0;
+			// 如果降温比常温高
+			if (pItem->m_nDTemp >= pItem->m_nTemp) {
+				points[cnt].y = des_temp_point.y;
 			}
+			nVDistance = tmp_point.y - des_temp_point.y;
+
+			// 如果distance大于radius, 画虚线
+			if (nVDistance > radius || nVDistance < -radius) {
+				hOld = (HPEN)SelectObject(hDC, hDashReadPen);
+				::MoveToEx(hDC, tmp_point.x, tmp_point.y, 0);
+				::LineTo(hDC, des_temp_point.x, des_temp_point.y);
+				SelectObject(hDC, hOld);
+			}
+
+			// 画降温点
+			DrawDesTempPointImg(des_temp_point, radius, hDC, hRedPen);
 		}
+		cnt++;
+
 	}
 
-	return cnt;
+	if (cnt > 0) {
+		hOld = (HPEN)SelectObject(hDC, hBluePen);
+		::Polyline(hDC, points, cnt);
+		SelectObject(hDC, hOld);
+	}
+
 }
 
 void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
@@ -1166,7 +1274,8 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	HBRUSH hOldBrush = 0;
 	HPEN hBluePen = ::CreatePen(PS_SOLID, 1, RGB(0, 0, 0xFF));
 	HPEN hRedPen = ::CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
-	HPEN hBluePen_2 = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
+	HPEN hDashReadPen = ::CreatePen(PS_DASH, 1, RGB(0xFF, 0, 0));
+	HPEN hTempPointPen = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
 	HBRUSH hRedBrush = ::CreateSolidBrush(RGB(0xFF, 0, 0));
 
 	time_t tFirstDay = GetAnyDayZeroTime(pData[0].m_date);
@@ -1229,30 +1338,132 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 		}
 	}
 
-	typedef struct tagGridTemp {
-		int   m_nTemp;
-		int   m_nType;        // 1, 太低了，低于35℃；2. 太高了，高于42℃
-		int   m_nDTemp;       // 降温温度
-		int   m_nDType;       // 1, 太低了，低于35℃；2. 太高了，高于42℃
-	}GridTemp;
-
 	GridTemp  grid_temps[42];
+	memset(grid_temps, 0, sizeof(grid_temps));
+
+	const int  IMG_MIN_TEMP = 3500;
+	const int  IMG_MAX_TEMP = 4200;
+
 	for (int i = 0; i < 7; i++) {
 		for (int j = 0; j < 6; j++) {
 			// 如果有温度
 			if (pData[i].m_temp[j] > 0) {
 				grid_temps[i * 6 + j].m_nTemp = pData[i].m_temp[j];
+				// 如果常温低于35度
+				if (grid_temps[i * 6 + j].m_nTemp < IMG_MIN_TEMP) {
+					grid_temps[i * 6 + j].m_nTemp = IMG_MIN_TEMP;
+					grid_temps[i * 6 + j].m_nType = 1;
+				}
+				// 如果常温大于42度
+				else if (grid_temps[i * 6 + j].m_nTemp > IMG_MAX_TEMP) {
+					grid_temps[i * 6 + j].m_nTemp = IMG_MAX_TEMP;
+					grid_temps[i * 6 + j].m_nType = 2;
+				}
+
+				// 如果有降温
 				if (pData[i].m_descend_temp[j] > 0) {
 					grid_temps[i * 6 + j].m_nDTemp = pData[i].m_descend_temp[j];
+
+					// 如果降温低于35度
+					if (grid_temps[i * 6 + j].m_nDTemp < IMG_MIN_TEMP) {
+						grid_temps[i * 6 + j].m_nDTemp = IMG_MIN_TEMP;
+						grid_temps[i * 6 + j].m_nDType = 1;
+					}
+					// 如果降温大于42度
+					else if (grid_temps[i * 6 + j].m_nDTemp > IMG_MAX_TEMP) {
+						grid_temps[i * 6 + j].m_nDTemp = IMG_MAX_TEMP;
+						grid_temps[i * 6 + j].m_nDTemp = 2;
+					}
 				}
 			}			
 		}
 	}
 
+	GridPulse  grid_pulses[42];
+	memset(grid_pulses, 0, sizeof(grid_pulses));
+
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			// 如果有脉搏
+			if (pData[i].m_pulse[j] > 0) {
+				grid_pulses[i * 6 + j].m_nPulse = pData[i].m_pulse[j];
+
+				// 如果脉搏低于20
+				if (grid_pulses[i * 6 + j].m_nPulse < 20) {
+					grid_pulses[i * 6 + j].m_nPulse = 0;
+				}
+				// 如果脉搏大于192
+				else if (grid_pulses[i * 6 + j].m_nPulse > 192) {
+					grid_pulses[i * 6 + j].m_nPulse = 0;
+				}
+				else {
+					// 如果同一时间格子内有体温
+					if (grid_temps[i * 6 + j].m_nTemp > 0) {
+						float f1 = (float)(192 - grid_pulses[i * 6 + j].m_nPulse) / (float)(192 - 20);
+						float f2 = (float)(4260 - grid_temps[i * 6 + j].m_nTemp) / (float)(4260 - 3400);
+						float fDiff = ( f1 > f2 ? f1 - f2 : f2 - f1);
+						// 如果两者垂直间相隔不到3像素
+						if ( (int)(fDiff * height) <= 3) {
+							grid_pulses[i * 6 + j].m_bConfilct = TRUE;
+						}
+					}
+				}
+
+			}
+		}
+	}
+
+	// 分割曲线的位置
+	std::vector<int >    vSplit;
+
+	// 假期把温度和脉搏数据分为几段
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			int index = i * 6 + j;
+			// 如果没有事件
+			if (events_type[index].m_nType == 0) {
+				continue;
+			}
+
+			// 如果不是假期事件
+			if (events_type[index].m_nType != PTYPE_HOLIDAY) {
+				continue;
+			}
+
+			vSplit.push_back(index);
+		}
+	}
+
+	// 体温数据
+	int nStartIndex = 0;
+	std::vector<GridTemp *>  vTemp;
+	std::vector<int >::iterator  ia;
+
+	for (ia = vSplit.begin(); ia != vSplit.end(); ++ia) {
+		int nSplit = *ia;
+		vTemp.clear();
+		for (int i = nStartIndex; i < nSplit; ++i) {
+			vTemp.push_back(&grid_temps[i]);
+		}
+		DrawTempImg( width, height, 42, 4260 - 3400, 4260, rect.left, rect.top,
+			         nOffsetX, nOffsetY, nStartIndex, vTemp, radius, hDC, hTempPointPen, 
+			         hDashReadPen,hRedPen, hBluePen);
+		nStartIndex = nSplit + 1;
+	}
+
+	vTemp.clear();
+	for (int i = nStartIndex; i < 42; ++i) {
+		vTemp.push_back(&grid_temps[i]);
+	}
+	DrawTempImg(width, height, 42, 4260 - 3400, 4260, rect.left, rect.top,
+		nOffsetX, nOffsetY, nStartIndex, vTemp, radius, hDC, hTempPointPen,
+		hDashReadPen, hRedPen, hBluePen);
+
 
 	DeleteObject(hBluePen);
 	DeleteObject(hRedPen);
-	DeleteObject(hBluePen_2);
+	DeleteObject(hDashReadPen);
+	DeleteObject(hTempPointPen);
 	DeleteObject(hRedBrush);
 
 
