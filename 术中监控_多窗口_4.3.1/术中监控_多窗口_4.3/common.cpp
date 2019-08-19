@@ -1204,7 +1204,8 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 
 void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
 	                PatientData * pData, DWORD dwDataSize, time_t tFirstDay,
-	                const std::vector<PatientEvent * > & vEvents ) {
+	                const std::vector<PatientEvent * > & vEvents, 
+	                const PatientInfo & patient_info) {
 	SetBkMode(hDC, TRANSPARENT);
 	DrawXml2ChartUI(hDC, xmlChart.m_ChartUI, nOffsetX, nOffsetY);
 
@@ -1284,6 +1285,25 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 			events_type[index].m_tTime = pEvent->m_time_1;
 		}
 	}
+
+	// 加上入院和出院事件
+	if ( patient_info.m_in_hospital > 0 ) {
+		if (patient_info.m_in_hospital >= tFirstDay && patient_info.m_in_hospital < tLastDay) {
+			int index = (int)(patient_info.m_in_hospital - tFirstDay) / (3600 * 4);
+			events_type[index].m_nType = PTYE_IN_HOSPITAL;
+			events_type[index].m_tTime = patient_info.m_in_hospital;
+		}
+	}
+
+	if (patient_info.m_out_hospital > 0) {
+		if (patient_info.m_out_hospital >= tFirstDay && patient_info.m_out_hospital < tLastDay) {
+			int index = (int)(patient_info.m_out_hospital - tFirstDay) / (3600 * 4);
+			events_type[index].m_nType = PTYE_OUT_HOSPITAL;
+			events_type[index].m_tTime = patient_info.m_out_hospital;
+		}
+	}
+	// END 加上入院和出院事件
+
 
 	GridTemp  grid_temps[42];
 	memset(grid_temps, 0, sizeof(grid_temps));

@@ -556,6 +556,9 @@ typedef  struct  tagPatientInfo {
 #define  PTYPE_DEATH            5
 #define  PTYPE_HOLIDAY          6
 
+#define  PTYE_IN_HOSPITAL       100             // 入院
+#define  PTYE_OUT_HOSPITAL      101             // 出院
+
 // 病人的事件信息
 typedef  struct  tagPatientEvent {
 	int         m_nId;
@@ -681,7 +684,8 @@ extern void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	                         const std::vector<PatientEvent * > & vEvents);
 extern void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
 	                       PatientData * pData, DWORD dwDataSize, time_t tFirstDay, 
-	                       const std::vector<PatientEvent * > & vEvents);
+	                       const std::vector<PatientEvent * > & vEvents,
+	                       const PatientInfo & patient_info);
 extern void LoadXmlChart(CXml2ChartFile & xmlChart);
 extern BOOL IsToday(const SYSTEMTIME & s);
 extern char * Date2String(char * szDest, DWORD dwDestSize, const SYSTEMTIME & s);
