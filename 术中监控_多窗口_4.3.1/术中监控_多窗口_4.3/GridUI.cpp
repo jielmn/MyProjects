@@ -1180,6 +1180,14 @@ void  CGridUI::SetCurPatientName(const char * szName) {
 	if (m_cstPatientName) {
 		m_cstPatientName->SetText(szName);
 		m_cstPatientNameM->SetText(szName);
+
+		// 如果是单点和多点模式，还需要保存配置文件
+		if (m_cstModeBtn->GetMode() == CModeButton::Mode_Single
+			|| m_cstModeBtn->GetMode() == CModeButton::Mode_Multiple) {
+			DWORD  i = GetTag();
+			STRNCPY(g_data.m_CfgData.m_GridCfg[i].m_szPatientName, szName, MAX_TAG_PNAME_LENGTH);
+			SavePatientName(i);
+		}		
 	}
 }
 

@@ -851,8 +851,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 		}
 	}
 	
-
-	//STRNCPY( m_szUIPName, info.m_szPName, MAX_TAG_PNAME_LENGTH );
+	STRNCPY( m_szUIPName, info.m_szPName, MAX_TAG_PNAME_LENGTH );
 	WindowImplBase::OnFinalMessage(hWnd);
 }
 
