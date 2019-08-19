@@ -1085,6 +1085,8 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 static void DrawTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
 	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
 
+	radius = (int)round(radius * 0.707f);
+	
 	POINT temp_points[2];
 	temp_points[0].x = pt.x - radius;
 	temp_points[0].y = pt.y - radius;
