@@ -1389,10 +1389,12 @@ DWORD  CPatientDataDlg::GetTemp(time_t tStart, time_t tEnd) {
 	for (it = m_VTemp.begin(); it != m_VTemp.end(); ++it) {
 		TempItem * pItem = *it;
 		if ( pItem->m_time < tStart )
-			continue;;
+			continue;
 		if (pItem->m_time >= tEnd)
 			break;
-		dwTemp = pItem->m_dwTemp;
+		// 以前是取最后的值，现在改为最大值
+		if (pItem->m_dwTemp > dwTemp)
+			dwTemp = pItem->m_dwTemp;
 	}
 	return dwTemp;
 }
