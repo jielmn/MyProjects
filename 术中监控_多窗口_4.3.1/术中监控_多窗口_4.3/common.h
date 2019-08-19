@@ -556,8 +556,8 @@ typedef  struct  tagPatientInfo {
 #define  PTYPE_DEATH            5
 #define  PTYPE_HOLIDAY          6
 
-#define  PTYE_IN_HOSPITAL       100             // 入院
-#define  PTYE_OUT_HOSPITAL      101             // 出院
+#define  PTYPE_IN_HOSPITAL      100             // 入院
+#define  PTYPE_OUT_HOSPITAL     101             // 出院
 
 // 病人的事件信息
 typedef  struct  tagPatientEvent {
@@ -693,6 +693,7 @@ extern time_t SysTime2Time(const SYSTEMTIME & s);
 extern SYSTEMTIME Time2SysTime(const time_t & t);
 extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
 extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
+extern char * Time2String_hm_cn(char * szDest, DWORD dwDestSize, const time_t * t);
 
 // templates
 template <class T>

@@ -1286,13 +1286,21 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	int radius  = 4;
 	int pulse_radius = 5;
 
-	HPEN   hOldPen = 0;
-	HBRUSH hOldBrush = 0;
 	HPEN hBluePen = ::CreatePen(PS_SOLID, 1, RGB(0, 0, 0xFF));
 	HPEN hRedPen = ::CreatePen(PS_SOLID, 1, RGB(0xFF, 0, 0));
 	HPEN hDashReadPen = ::CreatePen(PS_DASH, 1, RGB(0xFF, 0, 0));
 	HPEN hTempPointPen = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
 	HBRUSH hRedBrush = ::CreateSolidBrush(RGB(0xFF, 0, 0));
+	// 创建字体
+	LOGFONT  logfont;
+	GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(LOGFONT), &logfont);
+	logfont.lfWeight  = FW_NORMAL;
+	logfont.lfItalic  = false;
+	logfont.lfCharSet = DEFAULT_CHARSET;
+	STRNCPY(logfont.lfFaceName, "宋体", sizeof(logfont.lfFaceName));
+	logfont.lfHeight = 11;
+	HFONT hfont = CreateFontIndirect(&logfont);
+	// END 创建字体
 
 	tFirstDay = GetAnyDayZeroTime(tFirstDay);
 	time_t tLastDay = tFirstDay + 3600 * 24 * 7;
@@ -1358,7 +1366,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	if ( patient_info.m_in_hospital > 0 ) {
 		if (patient_info.m_in_hospital >= tFirstDay && patient_info.m_in_hospital < tLastDay) {
 			int index = (int)(patient_info.m_in_hospital - tFirstDay) / (3600 * 4);
-			events_type[index].m_nType = PTYE_IN_HOSPITAL;
+			events_type[index].m_nType = PTYPE_IN_HOSPITAL;
 			events_type[index].m_tTime = patient_info.m_in_hospital;
 		}
 	}
@@ -1366,7 +1374,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	if (patient_info.m_out_hospital > 0) {
 		if (patient_info.m_out_hospital >= tFirstDay && patient_info.m_out_hospital < tLastDay) {
 			int index = (int)(patient_info.m_out_hospital - tFirstDay) / (3600 * 4);
-			events_type[index].m_nType = PTYE_OUT_HOSPITAL;
+			events_type[index].m_nType = PTYPE_OUT_HOSPITAL;
 			events_type[index].m_tTime = patient_info.m_out_hospital;
 		}
 	}
@@ -1520,11 +1528,112 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	// END 脉搏数据
 
 
+	// 写事件信息
+	float fGridW = (float)width / (float)42;
+	float fGridH = (float)height / (float)43;
+	HFONT  hOldFont = (HFONT)SelectObject(hDC, hfont);
+	SetTextColor(hDC, RGB(255, 0, 0));
+	HPEN hOldPen = (HPEN)SelectObject(hDC, hRedPen);
+
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 6; j++) {
+			int index = i * 6 + j;
+			// 如果没有事件
+			if (events_type[index].m_nType == 0) {
+				continue;
+			}
+
+			CDuiString  strType;
+			BOOL        bNeedTime = TRUE;
+
+			switch (events_type[index].m_nType)
+			{
+			case PTYPE_HOLIDAY:
+				strType = "请假";
+				bNeedTime = FALSE;
+				break;
+			case PTYPE_SURGERY:
+				strType = "手术";
+				bNeedTime = FALSE;
+				break;
+			case PTYPE_BIRTH:
+				strType = "分娩";
+				break;
+			case PTYPE_TURN_IN:
+				strType = "转入";
+				break;
+			case PTYPE_TURN_OUT:
+				strType = "转出";
+				break;
+			case PTYPE_DEATH:
+				strType = "呼吸心跳停止";
+				break;
+			case PTYPE_IN_HOSPITAL:
+				strType = "入院";
+				break;
+			case PTYPE_OUT_HOSPITAL:
+				strType = "出院";
+				break;
+			default:
+				break;
+			}
+
+			float  ox = index * fGridW + rect.left + nOffsetX;
+			float  oy = 3 * fGridH + rect.top + nOffsetY;
+
+			for (int k = 0; k < strType.GetLength(); k+=2) {
+				int n = k / 2;
+				CDuiString s = strType.Mid(k, 2);
+				RECT  gridRect = { (int)ox, (int)(oy + n * fGridH), (int)(ox + fGridW),
+					               (int)(oy + n * fGridH + fGridH) };
+				// 以下两种方法，还是有时显得不够居中
+				//int nGridWidth = gridRect.right - gridRect.left;
+				//int nGridHeight = gridRect.bottom - gridRect.top;
+				//RECT rcText;
+				//::DrawText(hDC, s, s.GetLength(), &rcText, DT_CALCRECT);
+				//int  nStrWidth = rcText.right - rcText.left;
+				//int  nStrHeight = rcText.bottom - rcText.top;
+				//::TextOut( hDC, gridRect.left + (nGridWidth - nStrWidth) / 2, 
+				//	       gridRect.top + (nGridHeight - nStrHeight) / 2, s, s.GetLength());
+				::DrawText(hDC, s, s.GetLength(), &gridRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+			}
+
+			// 如果需要时间
+			if (bNeedTime) {
+				// 画破折号
+				int nTypeLen = strType.GetLength() / 2;
+				float x = ox + 0.5f * fGridW;
+				float y = oy + nTypeLen * fGridH;
+				MoveToEx(hDC, (int)x, (int)y, 0);
+				LineTo(hDC, (int)x, (int)(y + 2.0f * fGridH));
+
+				char szTime[256];
+				Time2String_hm_cn(szTime, sizeof(szTime), &events_type[index].m_tTime);
+				CDuiString strTime = szTime;
+
+				oy = y + 2.0f * fGridH;
+				for (int k = 0; k < strTime.GetLength(); k += 2) {
+					int n = k / 2;
+					CDuiString s = strTime.Mid(k, 2);
+					RECT  gridRect = { (int)ox, (int)(oy + n * fGridH), (int)(ox + fGridW),
+						(int)(oy + n * fGridH + fGridH) };
+					::DrawText(hDC, s, s.GetLength(), &gridRect, DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+				}
+			}
+
+		}
+	}
+	// END 写事件信息
+	SelectObject(hDC, hOldFont);
+	SelectObject(hDC, hOldPen);
+
+
 	DeleteObject(hBluePen);
 	DeleteObject(hRedPen);
 	DeleteObject(hDashReadPen);
 	DeleteObject(hTempPointPen);
 	DeleteObject(hRedBrush);
+	DeleteObject(hfont);
 
 
 
@@ -1674,4 +1783,53 @@ char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue) {
 	else if ( dwSize > 0 )
 		buf[0] = '\0';
 	return buf;
+}
+
+static  const char * GetCnDigital(int n) {
+	assert(n >= 0 && n < 10);
+	const char * arrDigital[10] = { "零","一","二","三", "四","五","六","七","八","九" };
+	return arrDigital[n];
+}
+
+static  const char * GetCnDigital_1(int n) {
+	assert(n >= 1 && n < 10);
+	const char * arrDigital[9] = { "十","二十","三十", "四十","五十","六十","七十","八十","九十" };
+	return arrDigital[n-1];
+}
+
+extern char * Time2String_hm_cn(char * szDest, DWORD dwDestSize, const time_t * t) {
+	struct tm  tmp;
+	localtime_s(&tmp, t);
+
+	CDuiString  strText;
+	if (tmp.tm_hour < 10) {
+		strText += GetCnDigital(tmp.tm_hour);
+		strText += "时";
+	}
+	else {
+		int a = tmp.tm_hour / 10;
+		int b = tmp.tm_hour % 10;
+		strText += GetCnDigital_1(a);
+		if (b > 0) {
+			strText += GetCnDigital(b);
+		}
+		strText += "时";
+	}
+
+	if (tmp.tm_min < 10) {
+		strText += GetCnDigital(tmp.tm_min);
+		strText += "分";
+	}
+	else {
+		int a = tmp.tm_min / 10;
+		int b = tmp.tm_min % 10;
+		strText += GetCnDigital_1(a);
+		if (b > 0) {
+			strText += GetCnDigital(b);
+		}
+		strText += "分";
+	}
+	
+	STRNCPY(szDest, strText, dwDestSize);
+	return szDest;
 }

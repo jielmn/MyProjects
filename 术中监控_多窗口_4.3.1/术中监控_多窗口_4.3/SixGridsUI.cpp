@@ -1284,11 +1284,11 @@ void   CPatientImg::DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSec
 		vTmp.clear();
 	}
 
-	if (bDrawPoints && fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f) {
+	//if (bDrawPoints && fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f) {
 		for (int m = 0; m < cnt; ++m) {
 			DrawPoint(brush, graphics, points[m].X, points[m].Y, 0, 3);
 		}
-	}
+	//}
 
 	if (cnt > 1)
 		graphics.DrawLines(pen, points, cnt);
