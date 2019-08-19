@@ -478,6 +478,13 @@ void CMyEventUI::DoInit() {
 		m_cmbType->SelectItem(0);
 	}
 
+	if (m_nType == PTYPE_HOLIDAY) {
+		m_lay_2->SetVisible(true);
+	}
+	else {
+		m_lay_2->SetVisible(false);
+	}
+
 	if (m_time1 > 0) {
 		char szTime[256];
 		SYSTEMTIME s = Time2SysTime(m_time1);

@@ -1203,7 +1203,8 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 }
 
 void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
-	                PatientData * pData, DWORD dwDataSize, const std::vector<PatientEvent * > & vEvents ) {
+	                PatientData * pData, DWORD dwDataSize, time_t tFirstDay,
+	                const std::vector<PatientEvent * > & vEvents ) {
 	SetBkMode(hDC, TRANSPARENT);
 	DrawXml2ChartUI(hDC, xmlChart.m_ChartUI, nOffsetX, nOffsetY);
 
@@ -1224,7 +1225,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	HPEN hTempPointPen = ::CreatePen(PS_SOLID, 2, RGB(0, 0, 0xFF));
 	HBRUSH hRedBrush = ::CreateSolidBrush(RGB(0xFF, 0, 0));
 
-	time_t tFirstDay = GetAnyDayZeroTime(pData[0].m_date);
+	tFirstDay = GetAnyDayZeroTime(tFirstDay);
 	time_t tLastDay = tFirstDay + 3600 * 24 * 7;
 
 	typedef struct tagGridEvent {
@@ -1258,7 +1259,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 				else {
 					int index = (int)(pEvent->m_time_2 - tFirstDay) / (3600 * 4);
 					assert(index >= 0 && index < 42);
-					for (int i = 0; i < index; i++) {
+					for (int i = 0; i <= index; i++) {
 						events_type[i].m_nType = pEvent->m_nType;
 					}
 				}
@@ -1267,7 +1268,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 				int start_index = (int)(pEvent->m_time_1 - tFirstDay) / (3600 * 4);
 				assert(start_index >= 0 && start_index < 42);
 				int end_index = (int)(pEvent->m_time_2 - tFirstDay) / (3600 * 4);
-				for (int i = start_index; (i < 42) && (i < end_index); i++) {
+				for (int i = start_index; (i < 42) && (i <= end_index); i++) {
 					events_type[i].m_nType = pEvent->m_nType;
 				}
 			}
