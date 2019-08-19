@@ -1103,8 +1103,10 @@ static void DrawTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
 
 static void DrawDesTempPointImg(POINT pt, int radius, HDC hDC, HPEN hPen) {
 	HPEN  hOld = (HPEN)SelectObject(hDC, hPen);
+	HBRUSH  hOldBrush = (HBRUSH)SelectObject(hDC, GetStockBrush(NULL_BRUSH));
 	::Ellipse(hDC, pt.x - radius, pt.y - radius, pt.x + radius, pt.y + radius);
 	SelectObject(hDC, hOld);
+	SelectObject(hDC, hOldBrush);
 }
 
 static void DrawTempPointLowHighArrow( BOOL bLow, int x, int y, int nArrowH, int nArrowR, 
@@ -1202,6 +1204,71 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 
 }
 
+
+static void DrawPulsePointImg( POINT pt, int radius, BOOL bConflict, HDC hDC, 
+	                           HPEN hPen, HBRUSH hBrush ) {
+	// 如果和体温点冲突，画个圆
+	if (bConflict) {
+		HPEN hOld = (HPEN)SelectObject(hDC, hPen);
+		HBRUSH hOldBrush = (HBRUSH)SelectObject(hDC, GetStockBrush(NULL_BRUSH) );
+		::Ellipse(hDC, pt.x - radius, pt.y - radius, pt.x + radius, pt.y + radius);
+		SelectObject(hDC, hOld);
+		SelectObject(hDC, hOldBrush);
+	}
+	// 不冲突，画实心红圆点
+	else {
+		HPEN hOldPen = (HPEN)SelectObject(hDC, hPen);
+		HBRUSH hOld = (HBRUSH)SelectObject(hDC, hBrush);
+		::Ellipse(hDC, pt.x - radius, pt.y - radius, pt.x + radius, pt.y + radius);
+		SelectObject(hDC, hOld);
+		SelectObject(hDC, hOldPen);
+	}
+}
+
+// 画脉搏图
+static void  DrawPulseImg(int width, int height, int nUnitsX, int nUnitsY, int nMaxY,
+	                      int nLeft, int nTop, int nOffsetX, int nOffsetY, int nStartIndex,
+	                      const std::vector<GridPulse *> & vPulse, int radius, 
+	                      HDC hDC, HPEN hRedPen, HBRUSH hRedBrush) {
+	if (vPulse.size() == 0)
+		return;
+
+	float x = (float)width / (float)nUnitsX;
+	float y = (float)height / (float)nUnitsY;
+	HPEN hOld = 0;
+
+	// 有效个数
+	POINT points[6 * 7];
+	int cnt = 0;
+
+	std::vector<GridPulse *>::const_iterator it;
+	int index = nStartIndex;
+	for (it = vPulse.begin(); it != vPulse.end(); ++it, index++) {
+		GridPulse * pItem = *it;
+		// 没有数据(空的)
+		if (pItem->m_nPulse <= 0) {
+			continue;
+		}
+
+		// 有数据
+		POINT  pulse_point;
+		pulse_point.x = (int)((index + 0.5f) * x) + nLeft + nOffsetX;
+		pulse_point.y = (int)((nMaxY - pItem->m_nPulse) * y) + nTop + nOffsetY;
+		DrawPulsePointImg(pulse_point, radius, pItem->m_bConfilct, hDC, hRedPen, hRedBrush);
+
+		// 处理连线
+		points[cnt].x = pulse_point.x;
+		points[cnt].y = pulse_point.y;
+		cnt++;
+	}
+
+	if (cnt > 1) {
+		hOld = (HPEN)SelectObject(hDC, hRedPen);
+		::Polyline(hDC, points, cnt);
+		SelectObject(hDC, hOld);
+	}
+}
+
 void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffsetY, 
 	                PatientData * pData, DWORD dwDataSize, time_t tFirstDay,
 	                const std::vector<PatientEvent * > & vEvents, 
@@ -1217,6 +1284,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	int width   = rect.right  - rect.left;
 	int height  = rect.bottom - rect.top;
 	int radius  = 4;
+	int pulse_radius = 5;
 
 	HPEN   hOldPen = 0;
 	HBRUSH hOldBrush = 0;
@@ -1425,6 +1493,31 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	DrawTempImg(width, height, 42, 4260 - 3400, 4260, rect.left, rect.top,
 		nOffsetX, nOffsetY, nStartIndex, vTemp, radius, hDC, hTempPointPen,
 		hDashReadPen, hRedPen, hBluePen);
+	// END 体温数据
+
+
+	// 脉搏数据
+	nStartIndex = 0;
+	std::vector<GridPulse *>  vPulse;
+
+	for (ia = vSplit.begin(); ia != vSplit.end(); ++ia) {
+		int nSplit = *ia;
+		vPulse.clear();
+		for (int i = nStartIndex; i < nSplit; ++i) {
+			vPulse.push_back(&grid_pulses[i]);
+		}
+		DrawPulseImg(width, height, 42, 192 - 20, 192, rect.left, rect.top,
+			nOffsetX, nOffsetY, nStartIndex, vPulse, pulse_radius, hDC, hRedPen, hRedBrush);
+		nStartIndex = nSplit + 1;
+	}
+
+	vPulse.clear();
+	for (int i = nStartIndex; i < 42; ++i) {
+		vPulse.push_back(&grid_pulses[i]);
+	}
+	DrawPulseImg(width, height, 42, 192 - 20, 192, rect.left, rect.top,
+		nOffsetX, nOffsetY, nStartIndex, vPulse, pulse_radius, hDC, hRedPen, hRedBrush);
+	// END 脉搏数据
 
 
 	DeleteObject(hBluePen);
