@@ -51,7 +51,7 @@
 				<!-- 温度曲线 -->
 				<VerticalLayout inset="5,0,0,0">
 					<HorizontalLayout height="30" >
-						<Label text="温度曲线" font="3" textcolor="#FF666666" />
+						<Label text="温度曲线(双击温度点，拾取温度数据到温度格子)" font="3" textcolor="#FF666666" />
 					</HorizontalLayout>
 					
 					<HorizontalLayout name="layImg" hscrollbar="true" vscrollbar="false" sepheight="4" bkcolor="#FF434248" >
