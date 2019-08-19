@@ -534,9 +534,7 @@ void CPatientDataDlg::OnReturn() {
 	m_switch->SelectItem(0);      
 }
 
-void  CPatientDataDlg::OnPrint() {
-	::MoveWindow(GetHWND(), 0, 0, 1024, 800, TRUE);       
-	return;   
+void  CPatientDataDlg::OnPrint() { 
 
 	PatientInfo info;
 	std::vector<PatientEvent * > vEvents;
@@ -545,11 +543,7 @@ void  CPatientDataDlg::OnPrint() {
 	// 获取UI的填入信息
 	GetPatientInfo(&info, vEvents);
 	GetPatientData(data, 7);
-	time_t tFirstDay = 0;
-
-	for (int i = 0; i < 7; i++) {
-		memcpy(data[i].m_temp, m_patient_data[i].m_temp, sizeof(int) * 6);
-	}
+	time_t tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
 
 	CXml2ChartFile   xmlChart;
 	LoadXmlChart(xmlChart);
@@ -593,11 +587,9 @@ void  CPatientDataDlg::OnPrint() {
 		for (int i = 0; i < 1; i++) {
 			StartPage(printInfo.hDC);
 
-			//SetBkMode(printInfo.hDC, TRANSPARENT);
-			//DrawXml2ChartUI(printInfo.hDC, xmlChart.m_ChartUI);
-
-			//PrepareXmlChart(xmlChart, &info, data, 7, tFirstDay);
-			//PrintXmlChart(printInfo.hDC, xmlChart, 0, 0, data, 7);
+			// SetBkMode(printInfo.hDC, TRANSPARENT);
+			PrepareXmlChart(xmlChart, &info, data, 7, tFirstDay, vEvents);
+			PrintXmlChart(printInfo.hDC, xmlChart, 0, 0, data, 7, tFirstDay, vEvents, info);
 
 			EndPage(printInfo.hDC);
 		}
@@ -605,6 +597,8 @@ void  CPatientDataDlg::OnPrint() {
 		EndDoc(printInfo.hDC);
 		DeleteDC(printInfo.hDC);
 	}
+
+	ClearVector(vEvents);
 }
 
 void  CPatientDataDlg::GetSevenDayStr(CDuiString * pDays, DWORD dwSize, time_t tFirstTime, BOOL bMonthDay /*= FALSE*/) {

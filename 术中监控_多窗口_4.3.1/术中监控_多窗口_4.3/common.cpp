@@ -1185,7 +1185,7 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 			if (nVDistance > radius || nVDistance < -radius) {
 				hOld = (HPEN)SelectObject(hDC, hDashReadPen);
 				::MoveToEx(hDC, tmp_point.x, tmp_point.y, 0);
-				::LineTo(hDC, des_temp_point.x, des_temp_point.y);
+				::LineTo(hDC, des_temp_point.x, nVDistance > radius ? des_temp_point.y + radius : des_temp_point.y - radius);
 				SelectObject(hDC, hOld);
 			}
 
