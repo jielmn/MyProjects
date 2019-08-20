@@ -8,6 +8,7 @@
 #include "ModeButtonUI.h"
 #include "resource.h"
 #include "SixGridsUI.h"
+#include "LmnGdi.h"
 
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
@@ -1185,10 +1186,14 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 
 			// 如果distance大于radius, 画虚线
 			if (nVDistance > radius || nVDistance < -radius) {
-				hOld = (HPEN)SelectObject(hDC, hDashReadPen);
-				::MoveToEx(hDC, tmp_point.x, tmp_point.y, 0);
-				::LineTo(hDC, des_temp_point.x, nVDistance > radius ? des_temp_point.y + radius : des_temp_point.y - radius);
-				SelectObject(hDC, hOld);
+				//hOld = (HPEN)SelectObject(hDC, hDashReadPen);
+				//::MoveToEx(hDC, tmp_point.x, tmp_point.y, 0);
+				//::LineTo(hDC, des_temp_point.x, nVDistance > radius ? des_temp_point.y + radius : des_temp_point.y - radius);
+				//SelectObject(hDC, hOld);
+				POINT end;
+				end.x = des_temp_point.x;
+				end.y = (nVDistance > radius ? des_temp_point.y + radius : des_temp_point.y - radius);
+				DashLineTo(hDC, hRedPen, tmp_point, end, 8, 3);
 			}
 
 			// 画降温点
