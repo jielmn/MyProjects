@@ -92,7 +92,11 @@ public:
 			return;
 		}
 		CButtonUI::DoEvent(event);
-	}	
+	}
+
+	LPCTSTR GetClass() const {
+		return "MyExpandButton";
+	}
 
 private:
 	sigslot::signal1<CControlUI *>     sigClick;
@@ -271,7 +275,7 @@ CMyTreeCfgUI::Node* CMyTreeCfgUI::AddNode( LPCTSTR text, Node* parent /*= NULL*/
 			pDateTime->SetTextColor(dwCfgColor);
 		}
 		else {
-			//assert(0);
+			assert(0);
 		}
 	}
 	
@@ -498,12 +502,33 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 
 	CListContainerElementUI * pContainer =  (CListContainerElementUI *)this->GetItemAt(nIndex);
 	CHorizontalLayoutUI * pLayout = (CHorizontalLayoutUI *)pContainer->GetItemAt(0);
-
+	// place_holder + expand_button + title + [config],   可伸展的父节点
+	// 或者 place_holder + title + config,  叶子节点
 	if ( pLayout->GetCount() < 3 ) {
 		return false;
 	}
 
-	CControlUI * pCtl = pLayout->GetItemAt(2);
+	BOOL  bLeaf = TRUE;
+	CControlUI * pCtl = 0;
+
+	pCtl = pLayout->GetItemAt(1);
+	// 如果有伸展按钮
+	if ( 0 == strcmp(pCtl->GetClass(), "MyExpandButton") ) {
+		bLeaf = FALSE;
+	}
+
+	// 如果是叶子节点
+	if (bLeaf) {
+		pCtl = pLayout->GetItemAt(2);
+	}
+	// 如果是父节点
+	else {
+		if (pLayout->GetCount() > 3)
+			pCtl = pLayout->GetItemAt(3);
+		else
+			return false;
+	}		
+
 	if ( 0 == strcmp( pCtl->GetClass(),DUI_CTR_EDIT) ) {
 		cfgValue.m_eConfigType = ConfigType_EDIT;
 		cfgValue.m_strEdit = pCtl->GetText();
@@ -545,6 +570,7 @@ bool  CMyTreeCfgUI::GetConfigValue(int nIndex, ConfigValue & cfgValue) {
 		cfgValue.m_tag = pCtl->GetTag();
 	}
 	else {
+		assert(0);
 		return false;
 	}
 
@@ -609,6 +635,7 @@ bool CMyTreeCfgUI::SetConfigValue(int nIndex, const ConfigValue & cfgValue) {
 		pDateTime->SetText(buf);
 	}
 	else {
+		assert(0);
 		return false;
 	}
 
