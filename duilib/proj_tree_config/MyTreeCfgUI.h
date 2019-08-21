@@ -106,6 +106,7 @@ public:
 	bool SetConfigValue(int nIndex, const ConfigValue & cfgValue);
 
 	void OnExpandClick(CControlUI* pSender);
+	void SetTitle(int nIndex, LPCTSTR pTitle);
 
 private:
 	Node* _root;

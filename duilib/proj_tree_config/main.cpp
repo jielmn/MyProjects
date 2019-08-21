@@ -136,6 +136,10 @@ void CDuiFrameWnd::InitWindow() {
 		}
 	}
 	m_tree->SelectItem(0);	
+
+	m_tree->SetTitle(2, "ABCDEF");
+	m_tree->SetTitle(3, "UVWXYZ");
+	m_tree->SetTitle(4, "1234");
 	WindowImplBase::InitWindow();
 }
 
