@@ -388,6 +388,9 @@ void  CPatientDataDlg::InitData() {
 	CLabelUI * pLabel = 0;
 	CButtonUI * pBtn = 0;
 	RECT r = { 5,0,5,0 };
+	CControlUI * pToolTip = 0;
+	CVerticalLayoutUI * pLayV1 = 0;
+	RECT r1 = { 10,0,0,0 };
 
 	time_t now = time(0);
 	GetSevenDayStr(week_days, 7, now - 3600 * 24 * 6);
@@ -449,9 +452,24 @@ void  CPatientDataDlg::InitData() {
 	pBtn->SetFont(1);
 	pBtn->SetTextColor(0xFF386382);
 	pBtn->SetName("btnAuto");
+
+	pToolTip = new CControlUI; 
+	pToolTip->SetBkImage("question.png");
+	pToolTip->SetFixedWidth(16);
+	pToolTip->SetFixedHeight(16);     
+	pToolTip->SetToolTip("自动填充会把每个时段的最高温度填进对应的温度格子<n>不能识别降温措施后的降温，如果要降温，请手动填写");
+
+	pLayV1 = new CVerticalLayoutUI;
+	pLayV1->Add(new CControlUI);
+	pLayV1->Add(pToolTip);
+	pLayV1->Add(new CControlUI);
+	pLayV1->SetFixedWidth(26);
+	pLayV1->SetInset(r1);
+ 
 	pLayH->Add(pCtl);
 	pLayH->Add(pLabel);
 	pLayH->Add(pBtn);
+	pLayH->Add(pLayV1);
 
 	pLayV->Add(pLayH);
 	pLayH = new CHorizontalLayoutUI;
