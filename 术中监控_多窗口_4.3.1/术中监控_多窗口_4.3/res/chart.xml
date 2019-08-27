@@ -152,7 +152,7 @@
 				</HorizontalLayout>
 	
 				
-				<VerticalLayout HSplit="num='8',pen='6'" height="160" border="0,6,0,0" test=";;;">
+				<VerticalLayout HSplit="num='8',pen='6'" height="240" border="0,6,0,0" test=";;;">
 					<Item text="呼吸" font="1"/>
 					<Item text="大便次数" font="1"/>
 					<Item text="尿量(次) ml" font="1"/>
@@ -310,7 +310,7 @@
 				
 				<!-- little square grid 12 -->
 				<VerticalLayout VSplit1="num='42',pen='7'" VSplit="num='7',pen='5'" HSplit="num='43',pen='7'" name="main" >
-					<VerticalLayout height="42" border="0,0,0,8" />
+					<VerticalLayout height="36" border="0,0,0,8" />
 					<VerticalLayout border="0,0,0,8" />
 					<VerticalLayout border="0,0,0,8" />
 					<VerticalLayout border="0,0,0,8" />
@@ -322,7 +322,7 @@
 				</VerticalLayout>
 	
 				
-				<VerticalLayout HSplit="num='8',pen='6'" height="160" border="0,6,0,0" test=";;;">
+				<VerticalLayout HSplit="num='8',pen='6'" height="240" border="0,6,0,0" test=";;;">
 					<HorizontalLayout VSplit1="num='42',pen='7'" VSplit="num='7',pen='5'" >
 						<Item font="3" name="breath_1_1" valign="top" textcolor="#FF0000" />
 						<Item font="3" name="breath_1_2" valign="bottom" textcolor="#FF0000" />
@@ -448,7 +448,7 @@
 			
 		</HorizontalLayout>
 		
-		<HorizontalLayout height="30">
+		<HorizontalLayout height="36">
 			<VerticalLayout width="250" />
 			<VerticalLayout />
 			<Item text="第" font="1" width="20" />
