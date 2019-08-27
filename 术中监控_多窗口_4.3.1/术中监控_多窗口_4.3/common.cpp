@@ -1132,6 +1132,17 @@ static void DrawTempPointLowHighArrow( BOOL bLow, int x, int y, int nArrowH, int
 	SelectObject(hDC, hOld);
 }
 
+static void DrawLineCb_(void * pArg, POINT start, POINT end) {
+	void ** args = (void **)pArg;
+	HDC    hDC = (HDC)args[0];
+	HPEN   hPen = (HPEN)args[1];
+
+	HPEN hOldPen = (HPEN)::SelectObject(hDC, hPen);
+	::MoveToEx(hDC, start.x, start.y, 0);
+	::LineTo(hDC, end.x, end.y);
+	SelectObject(hDC, hOldPen);
+}
+
 // »­ÎÂ¶ÈÍ¼
 static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int nMaxY, 
 	                     int nLeft, int nTop, int nOffsetX, int nOffsetY, int nStartIndex, 
@@ -1190,10 +1201,15 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 				//::MoveToEx(hDC, tmp_point.x, tmp_point.y, 0);
 				//::LineTo(hDC, des_temp_point.x, nVDistance > radius ? des_temp_point.y + radius : des_temp_point.y - radius);
 				//SelectObject(hDC, hOld);
+
+				void * args[2] = { 0 };
+				args[0] = hDC;
+				args[1] = hRedPen;
+
 				POINT end;
 				end.x = des_temp_point.x;
 				end.y = (nVDistance > radius ? des_temp_point.y + radius : des_temp_point.y - radius);
-				DashLineTo(hDC, hRedPen, tmp_point, end, 8, 3);
+				DashLineTo(tmp_point, end, 8, 3, 1, (void *)args, DrawLineCb_);
 			}
 
 			// »­½µÎÂµã
