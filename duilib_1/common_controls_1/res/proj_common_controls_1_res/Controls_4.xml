@@ -13,5 +13,12 @@
 			<Label text="==>" textcolor="#FFFFFFFF" width="60" />
 			<Label name="lblEdtBtnText" text="" textcolor="#FFFFFFFF" />
 		</HorizontalLayout>
+		
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout height="40" bkcolor="#FF333333" inset="5,5,5,5" >		
+			<Label text="带有句柄的控件" textcolor="#FFFFFFFF" width="160" font="3" />
+			<MyWnd width="130" bkcolor="#FF00FF00" />
+		</HorizontalLayout>
 	</VerticalLayout>	
 </Window>

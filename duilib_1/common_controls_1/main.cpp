@@ -9,6 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "MyWndUI.h"
 
 // 等待浏览器的时间是60秒
 #define  WAIT_BROWSER_TIME    60000
@@ -25,6 +26,9 @@ CControlUI* CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp("DragDrop", pstrClass)) {
 		return new CDragDropUI;
+	}
+	else if (0 == strcmp("MyWnd", pstrClass)) {
+		return new CMyWndUI;
 	}
 	return 0;   
 }
@@ -188,7 +192,7 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	}
 	return WindowImplBase::CreateControl(pstrClass); 
 }
-    
+  
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	DuiLib::CDuiString name = msg.pSender->GetName();
 	DuiLib::CDuiString strText;

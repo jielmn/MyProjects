@@ -159,6 +159,7 @@
     <ClCompile Include="EditableButtonUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyControlUI.cpp" />
+    <ClCompile Include="MyWndUI.cpp" />
     <ClCompile Include="PatientCardUI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +169,7 @@
     <ClInclude Include="EditableButtonUI.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyControlUI.h" />
+    <ClInclude Include="MyWndUI.h" />
     <ClInclude Include="PatientCardUI.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
