@@ -457,7 +457,7 @@ void  CPatientDataDlg::InitData() {
 	pToolTip->SetBkImage("question.png");
 	pToolTip->SetFixedWidth(16);
 	pToolTip->SetFixedHeight(16);     
-	pToolTip->SetToolTip("自动填充会把每个时段的最高温度填进对应的温度格子<n>不能识别降温措施后的降温，如果要降温，请手动填写");
+	pToolTip->SetToolTip("1.自动填充会把每个时段的最高温度填进对应的温度格子<n>2.不能识别降温措施后的降温，如果要降温，请手动填写<n>3.有数据的格子不会自动填充");
 
 	pLayV1 = new CVerticalLayoutUI;
 	pLayV1->Add(new CControlUI);
@@ -1391,11 +1391,16 @@ void  CPatientDataDlg::OnAutoTemp() {
 	time_t tFirstDay = GetAnyDayZeroTime(m_patient_data[0].m_date);
 
 	for (int i = 0; i < 7; i++) {
+		// 先获取温度数据
+		m_tree->GetConfigValue(nRow + 1 + i, cfgValue);
 		for (int j = 0; j < 6; j++) {
-			time_t tStart = tFirstDay + 3600 * 24 * i + 3600 * 4 * j;
-			time_t tEnd = tStart + 3600 * 4;
-			cfgValue.m_nValues[j][0] = GetTemp(tStart, tEnd);
-			cfgValue.m_nValues[j][1] = 0;
+			// 如果是空的数据
+			if ( (cfgValue.m_nValues[j][0] == 0) && (cfgValue.m_nValues[j][1] == 0) ) {
+				time_t tStart = tFirstDay + 3600 * 24 * i + 3600 * 4 * j;
+				time_t tEnd = tStart + 3600 * 4;
+				cfgValue.m_nValues[j][0] = GetTemp(tStart, tEnd);
+				cfgValue.m_nValues[j][1] = 0;
+			}			
 		}
 		m_tree->SetConfigValue(nRow + 1 + i, cfgValue);
 	}
