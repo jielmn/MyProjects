@@ -202,20 +202,61 @@ void  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szS
 // 删除过时的温度数据，Tag数据
 void  CMySqliteDatabase::PruneOldData() {
 	char *zErrMsg = 0;
-	// 删除3个月前的温度数据
 	char szSql[8192];
 	time_t today_zero_time = GetTodayZeroTime();
-	time_t tWeekBegin = today_zero_time - 3600 * 24 * 89;
+	time_t tThreeMonthAgo = today_zero_time - 3600 * 24 * 90;
+	time_t tSixMonthAgo = today_zero_time - 3600 * 24 * 180;
+	//time_t tThreeMonthAgo = today_zero_time - 3600;
+	//time_t tSixMonthAgo = today_zero_time - 3600;
 
-	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE, (DWORD)tWeekBegin);
+	// 删除3个月前的温度数据
+	SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TEMP_TABLE, (DWORD)tThreeMonthAgo);
 	int ret = sqlite3_exec( m_db, szSql, 0, 0, &zErrMsg);
 	assert(0 == ret);
 
-	// 删除三个月前的tag数据
-	//time_t tThreeMonthAgo = today_zero_time - 3600 * 24 * 89;
-	//SNPRINTF(szSql, sizeof(szSql), "delete from %s where time < %lu", TAGS_TABLE, (DWORD)tThreeMonthAgo);
-	//ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
-	//assert(0 == ret);
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	SNPRINTF(szSql, sizeof(szSql), "SELECT tag_id FROM %s where time < %lu", TAGS_TABLE, (DWORD)tSixMonthAgo);
+	std::vector<std::string> vDelTag;
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		char  szTagId[MAX_TAG_ID_LENGTH];
+		STRNCPY(szTagId, azResult[(i + 1)*ncolumn + 0], MAX_TAG_ID_LENGTH);
+		vDelTag.push_back(szTagId);
+	}
+	sqlite3_free_table(azResult);
+
+	// 删除半年前的tag数据
+	std::vector<std::string>::iterator it;
+	for (it = vDelTag.begin(); it != vDelTag.end(); ++it) {
+		std::string & s = *it;
+
+		SNPRINTF( szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'", 
+			      PATIENT_INFO_TABLE, s.c_str() );
+		ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+		assert(0 == ret);
+
+		SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+			PATIENT_EVENT_TABLE, s.c_str());
+		ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+		assert(0 == ret);
+
+		SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+			PATIENT_DATA_TABLE, s.c_str());
+		ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+		assert(0 == ret);
+
+		SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+			TEMP_TABLE, s.c_str());
+		ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+		assert(0 == ret);
+	}
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE time < %lu", TAGS_TABLE, (DWORD)tSixMonthAgo);
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
 }
 
 void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
