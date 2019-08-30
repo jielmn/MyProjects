@@ -439,6 +439,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_prepared.connect(pMainWnd, &CDuiFrameWnd::OnPreparedNotify);
 	m_sigBindingRet.connect(pMainWnd, &CDuiFrameWnd::OnBindingRetNotify);
 	m_sigQueyHandTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryHandTagRetNotify);
+	m_sigQueryBindingByTag.connect(pMainWnd, &CDuiFrameWnd::OnQueryBindingByTagRetNotify);
 	return;
 }
 
@@ -838,6 +839,24 @@ void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
 	ret.m_nOldGridIndex = old_grid_index;
 
 	m_sigBindingRet.emit(ret);
+}
+
+// 获取绑定窗格
+void  CBusiness::QueryBindingByTagIdAsyn(const char * szTagId) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_BINDING_BY_TAG, 
+		new CQueryBindingByTag(szTagId));
+}
+
+void  CBusiness::QueryBindingByTagId(const CQueryBindingByTag * pParam) {
+	int nGridIndex = m_sqlite.QueryBindingGridIndexByTagId(pParam->m_szTagId);
+	// 如果有绑定
+	if (nGridIndex > 0) {
+		TagBindingGridRet ret;
+		memset(&ret, 0, sizeof(ret));
+		STRNCPY(ret.m_szTagId, pParam->m_szTagId, MAX_TAG_ID_LENGTH);
+		ret.m_nGridIndex = nGridIndex;
+		m_sigQueryBindingByTag.emit(ret);
+	}
 }
 
 // 请求Hand Tag历史温度数据
@@ -1282,6 +1301,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSavePatientEventsParam * pParam = (CSavePatientEventsParam *)pMessageData;
 		SavePatientEvents(pParam);
+	}
+	break;
+
+	case MSG_QUERY_BINDING_BY_TAG:
+	{
+		CQueryBindingByTag * pParam = (CQueryBindingByTag *)pMessageData;
+		QueryBindingByTagId(pParam);
 	}
 	break;
 

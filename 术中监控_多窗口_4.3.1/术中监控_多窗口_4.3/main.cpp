@@ -283,6 +283,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if ( uMsg == UM_TAG_NAME_CHANGED ) {
 		OnTagNameChanged( wParam, lParam );
 	}
+	else if (uMsg == UM_QUERY_BINDING_BY_TAG_RET) {
+		OnQueryBindingByTag(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1198,6 +1201,8 @@ void   CDuiFrameWnd::OnHandReaderTemp(WPARAM wParam, LPARAM  lParam) {
 		pTagUI->OnHandTemp(pItem, tag_patient_name); 
 
 		m_tags_ui.insert( std::make_pair(pItem->m_szTagId, pTagUI) );
+
+		CBusiness::GetInstance()->QueryBindingByTagIdAsyn(pItem->m_szTagId);		
 	}
 	else {		
 		pTagUI = m_tags_ui[pItem->m_szTagId];
@@ -1678,6 +1683,46 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 	delete pDlg;            
 }
 
+// 查询到的tag的绑定grid
+void   CDuiFrameWnd::OnQueryBindingByTag(WPARAM wParam, LPARAM lParam) {
+	TagBindingGridRet * pParam = (TagBindingGridRet *)wParam;
+
+	std::map<std::string, CTagUI *>::iterator it;
+	it = m_tags_ui.find(pParam->m_szTagId);
+	if (it != m_tags_ui.end()) {
+		CTagUI * pTagUI = it->second;
+		if (pTagUI) {
+			pTagUI->SetBindingGridIndex(pParam->m_nGridIndex);
+			assert(pParam->m_nGridIndex > 0);
+			CDuiString  strPName = pTagUI->GetPTagName();
+			m_pGrids[pParam->m_nGridIndex - 1]->SetPatientNameInHandMode(strPName);
+
+			// 如果当前选中的tag是修改绑定的tag
+			if (m_cur_selected_tag == pTagUI->GetTagId()) {
+				int cnt = m_layDragDropGrids->GetCount();
+				for (int i = 0; i < cnt; i++) {
+					CLabelUI* pChild = (CLabelUI*)m_layDragDropGrids->GetItemAt(i);
+					if (i == pTagUI->m_nBindingGridIndex - 1) {
+						pChild->SetBorderColor(CUR_BINDING_GRID_BORDERCOLOR);
+						pChild->SetTextColor(CUR_BINDING_GRID_TEXTCOLOR);
+						pChild->SetBkColor(CUR_BINDING_GRID_BKCOLOR);
+					}
+					else {
+						pChild->SetBorderColor(UNBINDING_GRID_BORDERCOLOR);
+						pChild->SetTextColor(UNBINDING_GRID_TEXTCOLOR);
+						pChild->SetBkColor(UNBINDING_GRID_BKCOLOR);
+					}
+				}
+			}
+		}
+	}
+
+	CBusiness::GetInstance()->QueryTempByHandTagAsyn(pParam->m_szTagId, pParam->m_nGridIndex);
+
+	assert(pParam);
+	delete pParam;
+}
+
 
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
@@ -1772,6 +1817,13 @@ void   CDuiFrameWnd::OnQueryHandTagRetNotify(const char * szTagId, int nGridInde
 	pParam[2] = (void *)pvRet;
 
 	::PostMessage(GetHWND(), UM_QUERY_HAND_TEMP_BY_TAG_ID_RET, (WPARAM)pParam, 0);
+}
+
+// 查询tag的绑定grid id
+void  CDuiFrameWnd::OnQueryBindingByTagRetNotify(const TagBindingGridRet & ret) {
+	TagBindingGridRet * pParam = new TagBindingGridRet;
+	memcpy(pParam, &ret, sizeof(TagBindingGridRet));
+	::PostMessage(GetHWND(), UM_QUERY_BINDING_BY_TAG_RET, (WPARAM)pParam, 0);
 }
                       
 

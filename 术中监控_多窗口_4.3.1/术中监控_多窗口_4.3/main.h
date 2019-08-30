@@ -150,6 +150,8 @@ private:
 	void   OnHandPrintExcel();
 	// 温度打印
 	void   OnBtnPrint(DWORD  dwIndex);
+	// 查询到的tag的绑定grid
+	void   OnQueryBindingByTag(WPARAM, LPARAM);
 
 public:
 	// 接收器连接状态通知
@@ -174,6 +176,9 @@ public:
 	void   OnBindingRetNotify(const TagBindingGridRet & item);
 	// 查询手持Tag结果通知
 	void   OnQueryHandTagRetNotify(const char *, int, std::vector<TempItem*> *);
+	// 查询tag的绑定grid id
+	void   OnQueryBindingByTagRetNotify(const TagBindingGridRet &);
+
 
 private:	
 	CDialogBuilderCallbackEx                    m_callback;

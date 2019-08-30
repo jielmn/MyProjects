@@ -212,6 +212,7 @@ using namespace DuiLib;
 #define MSG_SAVE_PATIENT_INFO               2017
 #define MSG_SAVE_PATIENT_DATA               2018
 #define MSG_SAVE_PATIENT_EVENTS             2019
+#define MSG_QUERY_BINDING_BY_TAG            2020
 
 
 // windows ÏûÏ¢
@@ -228,6 +229,7 @@ using namespace DuiLib;
 #define UM_TAG_NAME_CHANGED                  (WM_USER+11)
 #define UM_PATIENT_INFO                      (WM_USER+12)
 #define UM_PATIENT_DATA                      (WM_USER+13)
+#define UM_QUERY_BINDING_BY_TAG_RET          (WM_USER+14)
 
 #define XML_CHART_WIDTH              764
 #define XML_CHART_HEIGHT             1080
@@ -522,6 +524,15 @@ public:
 	time_t      m_time;
 	DWORD       m_i;
 	DWORD       m_j;
+};
+
+class CQueryBindingByTag : public LmnToolkits::MessageData {
+public:
+	CQueryBindingByTag(const char * szTagId) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+	}
+
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
 };
 
 #define  MAX_OUTPATIENT_NO_LENGTH           20
