@@ -210,6 +210,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "cstMyImageHand") {
 			OnHandImageMenu(msg.ptMouse, msg.pSender);
 		}
+		else if (name == "layHandTag") {
+			OnTagMenu(msg);
+		}
 	}
 	else if ( msg.sType == "menu_export_excel" ) {
 		OnExportExcel(msg.wParam);
@@ -228,6 +231,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "tag_selected") {
 		OnHandTagSelected(msg.pSender);
+	}
+	else if (msg.sType == "menu_del_tag") {
+		OnDeleteTag(msg);
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -285,6 +291,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_QUERY_BINDING_BY_TAG_RET) {
 		OnQueryBindingByTag(wParam, lParam);
+	}
+	else if (uMsg == UM_DEL_TAG_RET) {
+		OnDelTagRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -1099,6 +1108,7 @@ void   CDuiFrameWnd::On60SecondsTimer() {
 	for (int i = 0; i < MAX_GRID_COUNT; i++) {
 		m_pGrids[i]->UpdateElapsed();
 		m_pGrids[i]->PruneData();
+		m_pGrids[i]->Invalidate();
 	}
 
 	m_cstHandImg->PruneData();
@@ -1723,6 +1733,44 @@ void   CDuiFrameWnd::OnQueryBindingByTag(WPARAM wParam, LPARAM lParam) {
 	delete pParam;
 }
 
+// 右键弹出菜单
+void   CDuiFrameWnd::OnTagMenu(TNotifyUI& msg) {
+	CTagUI * pTagUI = (CTagUI *)msg.pSender->GetParent();
+	CDuiString s = pTagUI->GetTagId();
+
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_tag.xml"), pTagUI);
+	pMenu->Init(*this, msg.ptMouse);
+	pMenu->ShowWindow(TRUE);      
+}
+
+// 删除Tag
+void   CDuiFrameWnd::OnDeleteTag(TNotifyUI& msg) {
+	if ( IDYES == ::MessageBox(GetHWND(), "确定要删除该Tag全部数据吗？", "删除Tag", MB_YESNO | MB_DEFBUTTON2 ) ) {
+		CTagUI * pTagUI = (CTagUI *)msg.pSender;
+		CDuiString  strTagId = pTagUI->GetTagId();
+		CBusiness::GetInstance()->DelTagAsyn(strTagId);
+	}
+}
+
+// 删除Tag数据结果
+void  CDuiFrameWnd::OnDelTagRet(WPARAM wParam, LPARAM lParam) {
+	char * szTagId = (char *)wParam;
+
+	OnHandTagErasedNotify(szTagId);
+	m_cstHandImg->DelTag(szTagId);
+	m_cstHandImg->SetCurTag("");
+
+	// 如果还有tag
+	if (m_layTags->GetCount() > 0) {
+		CControlUI * pChildUI = m_layTags->GetItemAt(0);
+		OnHandTagSelected(pChildUI);
+	}
+
+	assert(szTagId);
+	delete[] szTagId;
+}
+
+
 
 // 接收器连接状态通知
 void   CDuiFrameWnd::OnLauchStatusNotify(CLmnSerialPort::PortStatus e) {
@@ -1790,6 +1838,10 @@ void   CDuiFrameWnd::OnHandTagErasedNotify(const char * szTagId) {
 	// 如果找到了
 	if (it != m_tags_ui.end()) {
 		CTagUI * pTagUI = it->second;
+		int nBindingGridIndex = pTagUI->GetBindingGridIndex();
+		if (nBindingGridIndex > 0 ) {
+			m_pGrids[nBindingGridIndex - 1]->OnReleaseTagBinding();
+		}
 		m_tags_ui.erase(it);
 
 		if (pTagUI) {
@@ -1824,6 +1876,13 @@ void  CDuiFrameWnd::OnQueryBindingByTagRetNotify(const TagBindingGridRet & ret) 
 	TagBindingGridRet * pParam = new TagBindingGridRet;
 	memcpy(pParam, &ret, sizeof(TagBindingGridRet));
 	::PostMessage(GetHWND(), UM_QUERY_BINDING_BY_TAG_RET, (WPARAM)pParam, 0);
+}
+
+// 删除Tag
+void  CDuiFrameWnd::OnDelTagRetNotify(const char * szDelTagId) {
+	char * szTagId = new char[MAX_TAG_ID_LENGTH];
+	STRNCPY(szTagId, szDelTagId, MAX_TAG_ID_LENGTH);
+	::PostMessage(GetHWND(), UM_DEL_TAG_RET, (WPARAM)szTagId, 0);
 }
                       
 

@@ -44,6 +44,8 @@ public:
 		                   DWORD dwSize, std::vector<TempItem *> & vTemp );
 	// ±£´ædata
 	void SavePatientData(const CSavePatientDataParam * pParam);
+	// É¾³ýtag
+	void DelTag(const CDelTag * pParam);
 
 private:
 	sqlite3 *                         m_db;

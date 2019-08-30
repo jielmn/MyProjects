@@ -152,6 +152,12 @@ private:
 	void   OnBtnPrint(DWORD  dwIndex);
 	// 查询到的tag的绑定grid
 	void   OnQueryBindingByTag(WPARAM, LPARAM);
+	// 右键弹出菜单
+	void   OnTagMenu(TNotifyUI& msg);
+	// 删除Tag
+	void   OnDeleteTag(TNotifyUI& msg);
+	// 删除Tag数据结果
+	void   OnDelTagRet(WPARAM, LPARAM);
 
 public:
 	// 接收器连接状态通知
@@ -178,6 +184,8 @@ public:
 	void   OnQueryHandTagRetNotify(const char *, int, std::vector<TempItem*> *);
 	// 查询tag的绑定grid id
 	void   OnQueryBindingByTagRetNotify(const TagBindingGridRet &);
+	// 删除Tag
+	void   OnDelTagRetNotify(const char * szTagId);
 
 
 private:	

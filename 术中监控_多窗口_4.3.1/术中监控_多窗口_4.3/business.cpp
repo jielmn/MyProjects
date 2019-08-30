@@ -440,6 +440,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigBindingRet.connect(pMainWnd, &CDuiFrameWnd::OnBindingRetNotify);
 	m_sigQueyHandTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryHandTagRetNotify);
 	m_sigQueryBindingByTag.connect(pMainWnd, &CDuiFrameWnd::OnQueryBindingByTagRetNotify);
+	m_sigDelTag.connect(pMainWnd, &CDuiFrameWnd::OnDelTagRetNotify);
 	return;
 }
 
@@ -1140,6 +1141,16 @@ void  CBusiness::SavePatientData(const CSavePatientDataParam * pParam) {
 	m_sqlite.SavePatientData(pParam);
 }
 
+// 删除Tag数据
+void  CBusiness::DelTagAsyn(const char * szTagId) {
+	g_data.m_thrd_sqlite->PostMessage( this, MSG_DEL_TAG, new CDelTag(szTagId) );
+}
+
+void  CBusiness::DelTag(const CDelTag * pParam) {
+	m_sqlite.DelTag(pParam);
+	m_sigDelTag.emit(pParam->m_szTagId);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1308,6 +1319,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryBindingByTag * pParam = (CQueryBindingByTag *)pMessageData;
 		QueryBindingByTagId(pParam);
+	}
+	break;
+
+	case MSG_DEL_TAG:
+	{
+		CDelTag * pParam = (CDelTag *)pMessageData;
+		DelTag(pParam);
 	}
 	break;
 

@@ -213,6 +213,7 @@ using namespace DuiLib;
 #define MSG_SAVE_PATIENT_DATA               2018
 #define MSG_SAVE_PATIENT_EVENTS             2019
 #define MSG_QUERY_BINDING_BY_TAG            2020
+#define MSG_DEL_TAG                         2021
 
 
 // windows ÏûÏ¢
@@ -230,6 +231,7 @@ using namespace DuiLib;
 #define UM_PATIENT_INFO                      (WM_USER+12)
 #define UM_PATIENT_DATA                      (WM_USER+13)
 #define UM_QUERY_BINDING_BY_TAG_RET          (WM_USER+14)
+#define UM_DEL_TAG_RET                       (WM_USER+15)
 
 #define XML_CHART_WIDTH              764
 #define XML_CHART_HEIGHT             1080
@@ -644,6 +646,15 @@ public:
 	}
 
 	PatientData     m_data;
+};
+
+class CDelTag : public LmnToolkits::MessageData {
+public:
+	CDelTag(const char * szTagId) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+	}
+
+	char        m_szTagId[MAX_TAG_ID_LENGTH];
 };
 
 

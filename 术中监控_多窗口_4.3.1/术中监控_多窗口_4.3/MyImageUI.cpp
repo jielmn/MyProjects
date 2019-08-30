@@ -2461,3 +2461,14 @@ void  CMyHandImage::PrintExcel(const char * szPatientName) {
 		::MessageBox(g_data.m_hWnd, strText, "´òÓ¡excelÍ¼±í", 0);
 	}
 }
+
+// É¾³ýTag
+void  CMyHandImage::DelTag(const char * szTagId) {
+	vector<TempItem *> * pVec = 0;
+	pVec = m_data[szTagId];
+	if (0 != pVec) {
+		ClearVector(*pVec);
+		delete pVec;
+	}
+	m_data.erase(szTagId);
+}

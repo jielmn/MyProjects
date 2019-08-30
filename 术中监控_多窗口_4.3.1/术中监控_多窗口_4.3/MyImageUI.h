@@ -176,6 +176,9 @@ public:
 	// ´òÓ¡excel±í¸ñ
 	void  PrintExcel(const char * szPatientName);
 
+	// É¾³ýTag
+	void  DelTag(const char * szTagId);
+
 private:
 	virtual void   DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void   DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);

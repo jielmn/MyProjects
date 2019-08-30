@@ -118,6 +118,10 @@ public:
 	void  SavePatientDataAsyn(const PatientData * pData);
 	void  SavePatientData(const CSavePatientDataParam * pParam);
 
+	// 删除Tag数据
+	void  DelTagAsyn(const char * szTagId);
+	void  DelTag(const CDelTag * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -148,6 +152,7 @@ private:
 	sigslot::signal3<const char *, int, std::vector<TempItem*> *>
 		                                            m_sigQueyHandTemp;         // param: tag id, grid index, vector result
 	sigslot::signal1<const TagBindingGridRet &>     m_sigQueryBindingByTag;
+	sigslot::signal1<const char *>                  m_sigDelTag;
 
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	

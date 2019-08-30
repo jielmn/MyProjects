@@ -1084,3 +1084,47 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 		sqlite3_exec(m_db, sql, 0, 0, 0);
 	}
 }
+
+// É¾³ýtag
+void CMySqliteDatabase::DelTag(const CDelTag * pParam) {
+	char *zErrMsg = 0;
+	char szSql[8192];
+	int  ret = 0;
+
+	std::string s = pParam->m_szTagId;
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		PATIENT_INFO_TABLE, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		PATIENT_EVENT_TABLE, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		PATIENT_DATA_TABLE, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		TAGS_TABLE, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		GRID_BINDING_TABLE, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		LAST_SUR_TAGS, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE tag_id = '%s'",
+		TEMP_TABLE, s.c_str());
+	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
+	assert(0 == ret);
+}

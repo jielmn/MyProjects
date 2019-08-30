@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>
-	<VerticalLayout height="110" name="layHandTag" bordersize="1" bordercolor="#FFCCCCCC" >	
+	<VerticalLayout height="110" name="layHandTag" bordersize="1" bordercolor="#FFCCCCCC" menu="true" >	
 		<HorizontalLayout height="60" inset="30,5,0,5"  >	
 			
 			<VerticalLayout width="105">
