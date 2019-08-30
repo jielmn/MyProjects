@@ -47,7 +47,7 @@ private:
 	// 病人info是否改变
 	BOOL  IsPatientInfoChanged(PatientInfo * pInfo);
 	// 病人data是否改变
-	BOOL  IsPatientInfoChanged(PatientData * pData, int nIndex);
+	BOOL  IsPatientDataChanged(PatientData * pData, int nIndex);
 	// 时间范围的起始时间改变
 	void  OnDateStartChanged();
 	// 时间控件失去焦点

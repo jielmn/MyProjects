@@ -742,7 +742,7 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	// 年龄
 	pItem = xmlChart.FindChartUIByName("age");
 	if (pItem) {
-		pItem->SetText(PreviewNum(buf, sizeof(buf), pInfo->m_age));
+		pItem->SetText(pInfo->m_age);
 	}
 
 	// 入院日期

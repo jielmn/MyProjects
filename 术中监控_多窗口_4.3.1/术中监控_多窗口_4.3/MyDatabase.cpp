@@ -37,7 +37,7 @@
 */
 
 // 病人基础信息(病人的id以Tag id计算)
-#define  PATIENT_INFO_TABLE                   "pinfo"
+#define  PATIENT_INFO_TABLE                   "pinfo0"
 
 // 病人事件(手术，请假等)
 #define  PATIENT_EVENT_TABLE                  "pevent"
@@ -104,7 +104,7 @@ int CMySqliteDatabase::InitDb() {
 	CreateTable(PATIENT_INFO_TABLE,
 		"tag_id        CHAR(16)    NOT NULL         PRIMARY KEY," \
 		"sex           int," \
-	    "age           int," \
+	    "age           varchar(20)," \
 	    "outpatient_no varchar(20)," \
 	    "hospital_admission_no varchar(20), " \
 	    "in_hospital_date int," \
@@ -689,7 +689,7 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 		pRet->m_sex = GetIntFromDb(azResult[ncolumn + col]);
 		col++;
 
-		pRet->m_age = GetIntFromDb(azResult[ncolumn + col]);
+		GetStrFromdDb(pRet->m_age, MAX_AGE_LENGTH, azResult[ncolumn + col]);
 		col++;
 
 		GetStrFromdDb(pRet->m_szOutpatientNo, MAX_OUTPATIENT_NO_LENGTH, azResult[ncolumn + col]);
@@ -791,10 +791,12 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 
 	StrReplaceAll(info.m_szBedNo2, MAX_BED_NO_LENGTH, pParam->m_info.m_szBedNo2, "'", "''");
 
+	StrReplaceAll(info.m_age, MAX_AGE_LENGTH, pParam->m_info.m_age, "'", "''");
+
 
 	// 如果存在
 	if (nrow > 0) {
-		SNPRINTF(sql, sizeof(sql), "UPDATE %s set sex=%d, age=%d, outpatient_no='%s', "
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set sex=%d, age='%s', outpatient_no='%s', "
 			"hospital_admission_no='%s', in_hospital_date=%lu, out_hospital_date=%lu, "
 			"medical_department='%s', ward='%s', bed_no='%s', "
 			"medical_department2='%s', ward2='%s', bed_no2='%s' WHERE tag_id='%s' ",
@@ -806,7 +808,7 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 		sqlite3_exec(m_db, sql, 0, 0, 0);		
 	}
 	else {
-		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %d, %d, '%s', '%s',"
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES ('%s', %d, '%s', '%s', '%s',"
 			"%lu, %lu, '%s', '%s', '%s', '%s', '%s', '%s' ); ",
 			PATIENT_INFO_TABLE, info.m_szTagId, info.m_sex, info.m_age, info.m_szOutpatientNo,
 			info.m_szHospitalAdmissionNo, (DWORD)info.m_in_hospital, (DWORD)info.m_out_hospital, 

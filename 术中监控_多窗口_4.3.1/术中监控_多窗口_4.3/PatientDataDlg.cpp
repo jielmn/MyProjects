@@ -277,7 +277,7 @@ void   CPatientDataDlg::InitInfo() {
 
 	// 年龄
 	pEdit = new CEditUI;
-	pEdit->SetNumberOnly(true);
+	//pEdit->SetNumberOnly(true);
 	m_tree->AddNode("年龄", pTitleNode, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
 
 	// 门诊号
@@ -670,7 +670,7 @@ void  CPatientDataDlg::GetPatientInfo( PatientInfo * pInfo,
 
 	// 年龄
 	m_tree->GetConfigValue(nRow, cfgValue);
-	sscanf_s(cfgValue.m_strEdit, "%d", &pInfo->m_age);
+	STRNCPY(pInfo->m_age, cfgValue.m_strEdit, MAX_AGE_LENGTH);
 	nRow++;
 
 	// 门诊号
@@ -861,7 +861,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
 
 	for (DWORD i = 0; i < 7; i++) {
-		if (IsPatientInfoChanged( &data[i], i ) ) {
+		if (IsPatientDataChanged( &data[i], i ) ) {
 			STRNCPY( data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH ); 
 			data[i].m_date = tFirstDay + 3600 * 24 * i;
 			// 保存数据库
@@ -879,7 +879,7 @@ BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
 	if ( pInfo->m_sex != m_patient_info.m_sex )
 		return TRUE;
 
-	if (pInfo->m_age != m_patient_info.m_age)
+	if ( 0 != strcmp(pInfo->m_age,m_patient_info.m_age) )
 		return TRUE;
 
 	if ( 0 != strcmp(pInfo->m_szOutpatientNo, m_patient_info.m_szOutpatientNo) )
@@ -916,7 +916,7 @@ BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientInfo * pInfo) {
 }
 
 // 病人data是否改变
-BOOL  CPatientDataDlg::IsPatientInfoChanged(PatientData * pData, int nIndex) {
+BOOL  CPatientDataDlg::IsPatientDataChanged(PatientData * pData, int nIndex) {
 	assert(nIndex >= 0 && nIndex < 7);
 	
 	for (int i = 0; i < 6; i++) {
@@ -1054,7 +1054,7 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	nRow++;
 
 	// 年龄
-	cfgValue.m_strEdit = FormatInt(m_patient_info.m_age);
+	cfgValue.m_strEdit = m_patient_info.m_age;
 	m_tree->SetConfigValue(nRow, cfgValue);
 	nRow++;
 
@@ -1293,7 +1293,7 @@ void  CPatientDataDlg::OnDateStartKillFocus() {
 	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
 
 	for (DWORD i = 0; i < 7; i++) {
-		if (IsPatientInfoChanged(&data[i], i)) {
+		if (IsPatientDataChanged(&data[i], i)) {
 			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
 			data[i].m_date = tFirstDay + 3600 * 24 * i;
 			// 保存数据库

@@ -540,6 +540,7 @@ public:
 #define  MAX_MEDICAL_DEPARTMENT_LENGTH      20
 #define  MAX_WARD_LENGTH                    20
 #define  MAX_BED_NO_LENGTH                  20
+#define  MAX_AGE_LENGTH                     20
 
 // 病人的基础信息
 typedef  struct  tagPatientInfo {
@@ -547,7 +548,7 @@ typedef  struct  tagPatientInfo {
 	char        m_szPName[MAX_TAG_PNAME_LENGTH];
 
 	int         m_sex;
-	int         m_age;
+	char        m_age[MAX_AGE_LENGTH];
 	char        m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
 	char        m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
 	time_t      m_in_hospital;
