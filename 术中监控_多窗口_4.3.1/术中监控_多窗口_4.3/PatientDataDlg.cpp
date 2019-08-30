@@ -10,7 +10,7 @@
 #define IMAGE_PREFER_WIDTH        540             // 曲线图理想宽度
 
 //自定义事件排序
-bool sortFun(PatientEvent * p1, PatientEvent * p2)
+static bool sortFun(PatientEvent * p1, PatientEvent * p2)
 {
 	return p1->m_time_1 < p2->m_time_2;
 }

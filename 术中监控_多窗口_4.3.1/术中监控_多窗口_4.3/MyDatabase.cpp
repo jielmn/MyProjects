@@ -66,6 +66,23 @@ private:
 	int     m_nId;
 };
 
+//自定义事件排序
+static bool sortHand(HandTagResult * p1, HandTagResult * p2)
+{
+	if (p1->m_nBindingGridIndex > 0 && p2->m_nBindingGridIndex > 0) {
+		return p1->m_nBindingGridIndex < p2->m_nBindingGridIndex;
+	}
+	else if (p1->m_nBindingGridIndex > 0) {
+		return true;
+	}
+	else if (p2->m_nBindingGridIndex > 0) {
+		return false;
+	}
+	else {
+		return false;
+	}
+}
+
 
 CMySqliteDatabase::CMySqliteDatabase() {
 	m_db = 0;
@@ -524,6 +541,9 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 		}
 		sqlite3_free_table(azResult);
 	}
+
+	// 按照绑定顺序排列
+	sort(vHandTagRet.begin(), vHandTagRet.end(), sortHand);
 }
 
 // 保存Tag和窗格绑定
