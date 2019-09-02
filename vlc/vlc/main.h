@@ -10,6 +10,8 @@ using namespace DuiLib;
 
 #include "resource.h"
 
+#include "MyWndUI.h"
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -44,5 +46,7 @@ protected:
 	libvlc_instance_t *         libvlc_inst;
 	libvlc_media_player_t *     libvlc_mp;
 	libvlc_media_t *            libvlc_m;
+
+	CMyWndUI *                  m_video;
 
 };

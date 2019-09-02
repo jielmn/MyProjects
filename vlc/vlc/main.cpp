@@ -23,16 +23,18 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 void  CDuiFrameWnd::InitWindow() {
 	WindowImplBase::InitWindow();
 
+	m_video = (CMyWndUI *)m_PaintManager.FindControl("video");
+
 	libvlc_inst = libvlc_new(0, NULL);
 
-	HWND screen_hwnd = GetHWND();
+	//HWND screen_hwnd = GetHWND();
+	HWND screen_hwnd = m_video->GetHWnd();
 
 	/* Create a new item */
 	//m = libvlc_media_new_location (libvlc_inst, "http://mycool.movie.com/test.mov");
 
-	//libvlc_m = libvlc_media_new_path(libvlc_inst, "d:\\test.flv");
-	//libvlc_m = libvlc_media_new_path(libvlc_inst, "http://localhost:8080/test/a.flv");
-	libvlc_m = libvlc_media_new_location(libvlc_inst, "http://localhost:8080/test/a.flv");
+	libvlc_m = libvlc_media_new_path(libvlc_inst, "d:\\test.flv");
+	//libvlc_m = libvlc_media_new_location(libvlc_inst, "http://localhost:8080/test/a.flv");
 
 	/* Create a media player playing environement */
 	libvlc_mp = libvlc_media_player_new_from_media(libvlc_m);
@@ -48,6 +50,9 @@ void  CDuiFrameWnd::InitWindow() {
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if ( 0 == strcmp(pstrClass, "MyWnd") ) {
+		return new CMyWndUI;
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
