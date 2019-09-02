@@ -77,7 +77,7 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 #else
-	for (int i = 1; i <= 10; i++) {
+	for (int i = 1; i <= 96; i++) {
 		strText.Format("%d", i);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
