@@ -123,6 +123,8 @@ private:
 	void   OnHandTagSelected(CControlUI * pTagUI);
 	// 点击了按时间排序
 	void   OnHandTagTimeOrder();
+	// 点击了默认排序
+	void   OnHandTagDefaultOrder();
 	void   OnHandTagTimeOrder(CTagUI * pTagUI);
 	// 移动Tag UI，绑定窗格
 	void   MoveTagUI(const POINT & pt);

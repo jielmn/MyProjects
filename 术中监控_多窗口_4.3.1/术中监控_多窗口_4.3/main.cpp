@@ -21,6 +21,23 @@
 // 1分钟定时器
 #define   TIMER_60_SECONDS                       1002
 #define   INTERVAL_TIMER_60_SECONDS              60000
+
+//自定义事件排序
+static bool sortTagUI(CTagUI * p1, CTagUI * p2)
+{
+	if (p1->m_nBindingGridIndex > 0 && p2->m_nBindingGridIndex > 0) {
+		return p1->m_nBindingGridIndex < p2->m_nBindingGridIndex;
+	}
+	else if (p1->m_nBindingGridIndex > 0) {
+		return true;
+	}
+	else if (p2->m_nBindingGridIndex > 0) {
+		return false;
+	}
+	else {
+		return false;
+	}
+}
   
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {	
 	m_dwCurSelGridIndex = 0;
@@ -166,10 +183,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			m_tabs->SelectItem(TAB_INDEX_MONITOR);
 		}
 		else if (name == _T("opn_reader")) {
+			// 如果是默认排序，把绑定的放在前面
+			HandTagSortType eSortType = GetHandTagSortType();
+			if (eSortType == HandTagSortType_Default) {
+				OnHandTagDefaultOrder();
+			}
 			m_tabs->SelectItem(TAB_INDEX_READER);                  
 		}
 		else if ( name == "rdTimeOrder" ) {
 			OnHandTagTimeOrder();
+		}
+		else if (name == "rdDefaultOrder") {
+			OnHandTagDefaultOrder();
 		}
 	}
 	else if (msg.sType == "click") {
@@ -1354,6 +1379,24 @@ void  CDuiFrameWnd::OnHandTagTimeOrder() {
 		CTagUI * pTagUI = it->second;
 		assert(pTagUI);
 		OnHandTagTimeOrder(pTagUI);
+	}
+}
+
+// 点击了默认排序
+void   CDuiFrameWnd::OnHandTagDefaultOrder() {
+	std::vector<CTagUI *> vSort;
+	int nCnt = m_layTags->GetCount();
+	for (int i = 0; i < nCnt; i++) {
+		CTagUI * pTagUI = (CTagUI *)m_layTags->GetItemAt(0);
+		vSort.push_back(pTagUI);
+		m_layTags->RemoveAt(0, true);
+	}
+
+	std::sort(vSort.begin(), vSort.end(), sortTagUI);
+	std::vector<CTagUI *>::iterator it;
+	for (it = vSort.begin(); it != vSort.end(); ++it) {
+		CTagUI * pTagUI = *it;
+		m_layTags->Add(pTagUI);
 	}
 }
 
