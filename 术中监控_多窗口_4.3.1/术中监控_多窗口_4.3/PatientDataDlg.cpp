@@ -202,7 +202,7 @@ LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 					time_t tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
 
 					m_img->m_pVec = &m_VTemp;
-					m_img->m_tStart = tFirstDay + nDayIndex * 3600 * 24 + 3600 * 4 * nTimeIndex;
+					m_img->m_tStart = tFirstDay + nDayIndex * 3600 * 24 + 3600 * 4 * nTimeIndex + 3600 * 2;
 					m_img->m_tEnd = m_img->m_tStart + 4 * 3600 + 1800;
 					m_img->MyInvalidate(TRUE, nImgWidth - 5); 
 				}
@@ -1396,7 +1396,7 @@ void  CPatientDataDlg::OnAutoTemp() {
 		for (int j = 0; j < 6; j++) {
 			// 如果是空的数据
 			if ( (cfgValue.m_nValues[j][0] == 0) && (cfgValue.m_nValues[j][1] == 0) ) {
-				time_t tStart = tFirstDay + 3600 * 24 * i + 3600 * 4 * j;
+				time_t tStart = tFirstDay + 3600 * 24 * i + 3600 * 4 * j + 3600 * 2;
 				time_t tEnd = tStart + 3600 * 4;
 				cfgValue.m_nValues[j][0] = GetTemp(tStart, tEnd);
 				cfgValue.m_nValues[j][1] = 0;

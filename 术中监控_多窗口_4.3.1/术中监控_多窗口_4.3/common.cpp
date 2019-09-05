@@ -1325,8 +1325,8 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	HFONT hfont = CreateFontIndirect(&logfont);
 	// END ´´½¨×ÖÌå
 
-	tFirstDay = GetAnyDayZeroTime(tFirstDay);
-	time_t tLastDay = tFirstDay + 3600 * 24 * 7;
+	tFirstDay = GetAnyDayZeroTime(tFirstDay) + 3600 * 2;
+	time_t tLastDay = tFirstDay + 3600 * 24 * 7 + 3600 * 2;
 
 	typedef struct tagGridEvent {
 		int        m_nType;

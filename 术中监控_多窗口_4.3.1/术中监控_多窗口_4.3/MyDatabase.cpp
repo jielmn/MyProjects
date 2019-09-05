@@ -1008,7 +1008,7 @@ void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam,
 	// 获取温度数据(因为有降温，所以查看范围为一周零半小时)
 	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' "
 		"AND time>=%lu and time<%lu order by time", TEMP_TABLE, pParam->m_szTagId,
-		(DWORD)tFirstZeroTime, (DWORD)(tFirstZeroTime + 3600 * 24 * 7 + 1800));
+		(DWORD)tFirstZeroTime + 3600 * 2, (DWORD)(tFirstZeroTime + 3600 * 24 * 7 + 3600 * 2 + 1800));
 
 	nrow = ncolumn = 0;
 	azResult = 0;
