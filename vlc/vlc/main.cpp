@@ -38,8 +38,8 @@ void  CDuiFrameWnd::InitWindow() {
 	/* Create a new item */
 	//m = libvlc_media_new_location (libvlc_inst, "http://mycool.movie.com/test.mov");
 
-	libvlc_m = libvlc_media_new_path(libvlc_inst, "d:\\test.flv"); 
-	//libvlc_m = libvlc_media_new_location(libvlc_inst, "http://localhost:8080/test/a.flv");
+	//libvlc_m = libvlc_media_new_path(libvlc_inst, "d:\\test.flv"); 
+	libvlc_m = libvlc_media_new_location(libvlc_inst, "http://localhost:8080/test/a.flv");
 
 	/* Create a media player playing environement */
 	libvlc_mp = libvlc_media_player_new_from_media(libvlc_m);

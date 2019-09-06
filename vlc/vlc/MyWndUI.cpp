@@ -26,3 +26,13 @@ bool CMyWndUI::OnMySize(void * pParam) {
 	}	
 	return true;
 }
+
+void CMyWndUI::DoEvent(DuiLib::TEventUI& event) {
+	if ( event.Type == UIEVENT_MOUSEENTER ) {
+		OutputDebugString("== mouse enter! \n");
+	}
+	else if (event.Type == UIEVENT_MOUSELEAVE) {
+		OutputDebugString("== mouse leave!!! \n");
+	}
+	CControlUI::DoEvent(event);
+}

@@ -19,6 +19,8 @@ public:
 		return "MyWnd";
 	}
 
+	virtual void DoEvent(DuiLib::TEventUI& event);
+
 private:
 	void  DoInit();
 	bool  OnMySize(void * pParam);
