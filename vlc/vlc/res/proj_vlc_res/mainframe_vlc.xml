@@ -7,7 +7,7 @@
 	<VerticalLayout>
 		<VerticalLayout bkcolor="#FFD1E8F5" bkcolor2="#FFC6E0F1" bordercolor="#FF768D9B" bordersize="1" inset="1,1,1,1" > <!-- 整个窗口的背景色 -->
 			<!-- 标题栏区 -->
-			<HorizontalLayout height="32" bkcolor="#FFCCE3F0" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
+			<HorizontalLayout height="32" bkcolor="#FFCCE3F0" name="header" > <!-- 标题栏背景色 bkcolor、bkcolor2、bkcolor3分别是渐变色的三个值-->   
 				<HorizontalLayout inset="10,1,10,1" width="150" >
 					<Container width="61" height="27" bkimage="file='logo.png'" />
 					<VerticalLayout>
@@ -27,14 +27,14 @@
 			
 			<!-- 客户区 -->
 			<HorizontalLayout>
-				<MyWnd name="video" />
+				<MyWnd name="video" menu="true" />
 			</HorizontalLayout>
 			
 			<!--Tab区-->		
 		</VerticalLayout>
 		
 		<!-- 状态栏 -->
-		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
+		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3" name="bottom" >
 			<Label name="lblDatabaseStatus"         text="数据库连接失败"         width="250" font="0" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />		
 		</HorizontalLayout>
 	</VerticalLayout>

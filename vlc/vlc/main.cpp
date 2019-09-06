@@ -9,11 +9,13 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "DuiMenu.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	libvlc_inst = 0;
 	libvlc_mp = 0;
 	libvlc_m = 0;
+	m_bFullScreen = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -24,6 +26,9 @@ void  CDuiFrameWnd::InitWindow() {
 	WindowImplBase::InitWindow();
 
 	m_video = (CMyWndUI *)m_PaintManager.FindControl("video");
+	m_header = m_PaintManager.FindControl("header");
+	m_bottom = m_PaintManager.FindControl("bottom");
+
 
 	libvlc_inst = libvlc_new(0, NULL);
 
@@ -33,7 +38,7 @@ void  CDuiFrameWnd::InitWindow() {
 	/* Create a new item */
 	//m = libvlc_media_new_location (libvlc_inst, "http://mycool.movie.com/test.mov");
 
-	libvlc_m = libvlc_media_new_path(libvlc_inst, "d:\\test.flv");
+	libvlc_m = libvlc_media_new_path(libvlc_inst, "d:\\test.flv"); 
 	//libvlc_m = libvlc_media_new_location(libvlc_inst, "http://localhost:8080/test/a.flv");
 
 	/* Create a media player playing environement */
@@ -57,11 +62,35 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if (msg.sType == "menu") {
+		CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender, IsPlaying(), m_bFullScreen);
+		pMenu->Init(*this, msg.ptMouse);
+		pMenu->ShowWindow(TRUE);  
+	}
+	else if (msg.sType == "menu_full_screen") {
+		if ( !m_bFullScreen ) {
+			m_header->SetVisible(false);
+			m_bottom->SetVisible(false);
+		}
+		else {
+			m_header->SetVisible(true);
+			m_bottom->SetVisible(true);
+		}
+		m_bFullScreen = !m_bFullScreen;
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
+}
+
+BOOL CDuiFrameWnd::IsPlaying() {
+	BOOL bPlay = FALSE;
+	if (libvlc_mp && 1 == libvlc_media_player_is_playing(libvlc_mp)) {
+		bPlay = TRUE;
+	}
+	return bPlay;
 }
 
 

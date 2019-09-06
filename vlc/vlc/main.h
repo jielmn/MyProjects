@@ -48,5 +48,10 @@ protected:
 	libvlc_media_t *            libvlc_m;
 
 	CMyWndUI *                  m_video;
+	CControlUI *                m_header;
+	CControlUI *                m_bottom;
+	BOOL                        m_bFullScreen;
 
+private:
+	BOOL    IsPlaying();
 };

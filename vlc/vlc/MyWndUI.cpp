@@ -15,6 +15,7 @@ CMyWndUI::~CMyWndUI() {
 void CMyWndUI::DoInit() {
 	m_hWnd = CreateWindow(_T("STATIC"), _T(""), WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 
 		0, 0, 0, 0, m_pManager->GetPaintWindow(), NULL, NULL, NULL);
+	EnableWindow(m_hWnd, FALSE);
 }
 
 bool CMyWndUI::OnMySize(void * pParam) {

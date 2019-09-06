@@ -27,6 +27,9 @@
     <ClCompile Include="MyWndUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DuiMenu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MyWndUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DuiMenu.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
