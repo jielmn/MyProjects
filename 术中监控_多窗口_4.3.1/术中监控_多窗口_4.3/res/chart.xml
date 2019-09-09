@@ -56,12 +56,12 @@
 				<Item font="1" name="sex" border="0,0,0,7"  />
 			</HorizontalLayout>
 			<Item text="年龄" font="1" width="40" />			
-			<HorizontalLayout width="20" padding="0,5,0,5" >
+			<HorizontalLayout width="60" padding="0,5,0,5" >
 				<Item font="1" name="age" border="0,0,0,7" />
 			</HorizontalLayout>
 			
-			<Item text="入院日期" font="1" width="80"/>
-			<Item text="" font="1" width="40" name="in_date_y" />
+			<Item text="入院日期" font="1" width="70"/>
+			<Item text="" font="1" width="30" name="in_date_y" />
 			<Item text="年" font="1" width="20" />
 			<Item text="" font="1" width="20" name="in_date_m" />
 			<Item text="月" font="1" width="20" />
@@ -121,9 +121,9 @@
 				<!-- little square grid 12 -->
 				<HorizontalLayout>
 					<VerticalLayout border="6,6,6,6" >
-						<Item text="脉搏" font="1" height="28" />
-						<Item text="180" font="1" height="28" />
-						<VerticalLayout padding="0,21,0,0">
+						<Item text="脉搏" font="1" height="24" />
+						<Item text="180" font="1" height="24" />
+						<VerticalLayout padding="0,18,0,0">
 							<Item text="160" font="1" />
 							<Item text="140" font="1" />
 							<Item text="120" font="1" />
@@ -132,13 +132,13 @@
 							<Item text="60" font="1" />
 							<Item text="40" font="1" />
 						</VerticalLayout>
-						<Item text="20" font="1" height="35" />
+						<Item text="20" font="1" height="30" />
 					</VerticalLayout>
 					
 					<VerticalLayout>
-						<Item text="体温" font="1" height="28" />
-						<Item text="42℃" font="1" height="28" />
-						<VerticalLayout padding="0,21,0,0">
+						<Item text="体温" font="1" height="24" />
+						<Item text="42℃" font="1" height="24" />
+						<VerticalLayout padding="0,18,0,0">
 							<Item text="41℃" font="1" />
 							<Item text="40℃" font="1" />
 							<Item text="39℃" font="1" />
@@ -147,7 +147,7 @@
 							<Item text="36℃" font="1" />
 							<Item text="35℃" font="1" />
 						</VerticalLayout>
-						<Item text="34℃" font="1" height="35" />
+						<Item text="34℃" font="1" height="30" />
 					</VerticalLayout>
 				</HorizontalLayout>
 	
