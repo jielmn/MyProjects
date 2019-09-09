@@ -221,7 +221,7 @@ void  CMySqliteDatabase::PruneOldData() {
 	char *zErrMsg = 0;
 	char szSql[8192];
 	time_t today_zero_time = GetTodayZeroTime();
-	time_t tThreeMonthAgo = today_zero_time - 3600 * 24 * 90;
+	time_t tThreeMonthAgo = today_zero_time - 3600 * 24 * 730;
 	//time_t tThreeMonthAgo = time(0);
 
 	// 删除3个月前的温度数据
