@@ -922,6 +922,15 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 			}
 		}
 	}
+	else {
+		for (int i = 0; i < 7; i++) {
+			strText.Format("in_date_%d", i + 1);
+			pItem = xmlChart.FindChartUIByName(strText);
+			if (pItem) {
+				pItem->SetText("");
+			}
+		}
+	}
 
 	// 手术后日数
 	// 术日  术2  分娩
@@ -1080,6 +1089,28 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 	pItem = xmlChart.FindChartUIByName("footer");
 	if (pItem) {
 		pItem->SetText(g_data.m_TempChartFooter);
+	}
+
+	// 页码(根据入院时间计算)
+	if (pInfo->m_in_hospital > 0) {
+		time_t tLastDay = GetAnyDayZeroTime(tFirstDay + 3600 * 24 * 7);
+		time_t t = GetAnyDayZeroTime(pInfo->m_in_hospital);
+		if ( tLastDay > t ) {
+			int nPageIndex = (int)(tLastDay - t) / (3600 * 24 * 7);
+			if (nPageIndex == 0)
+				nPageIndex = 1;
+			pItem = xmlChart.FindChartUIByName("page");
+			if (pItem) {
+				strText.Format("%d", nPageIndex);
+				pItem->SetText((const char *)strText);
+			}
+		}
+	}
+	else {
+		pItem = xmlChart.FindChartUIByName("page");
+		if (pItem) {
+			pItem->SetText("");
+		}
 	}
 }
 

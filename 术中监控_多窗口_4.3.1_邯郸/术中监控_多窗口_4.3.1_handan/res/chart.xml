@@ -452,7 +452,7 @@
 			<VerticalLayout width="250" />
 			<VerticalLayout />
 			<Item text="第" font="1" width="20" />
-			<Item text="" font="1"   width="100" />
+			<Item text="" font="1"   width="100" name="page" />
 			<Item text="页" font="1" width="20" />
 			<VerticalLayout />
 			<VerticalLayout width="250" >
