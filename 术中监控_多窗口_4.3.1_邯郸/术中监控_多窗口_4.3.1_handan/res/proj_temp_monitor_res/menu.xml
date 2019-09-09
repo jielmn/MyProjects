@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window size="150,48">
+<VerticalLayout bkimage="file='menu_bk.png' corner='30,8,8,8' mask='#FFFF0000' " hole="false" bkcolor="#FFCCCCCC">
+    <List header="hidden" inset="1,1,1,1" itemhotimage="file='menu_hot_bk.png' corner='2,2,2,2'">
+	
+        <ListContainerElement name="setting" height="22" inset="40,0,0,0">
+            <Label text="设置" mouse="false"/>
+        </ListContainerElement>
+		
+        <ListContainerElement name="about" height="22" inset="40,0,0,0">
+            <Label text="关于" mouse="false"/>
+        </ListContainerElement>
+		
+    </List>
+</VerticalLayout>
+</Window>
