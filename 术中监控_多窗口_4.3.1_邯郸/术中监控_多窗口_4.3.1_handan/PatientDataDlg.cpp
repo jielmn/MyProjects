@@ -39,6 +39,8 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_OtherData_Week = 0;
 	m_img = 0;
 	m_layImg = 0;
+
+	m_out_hospital_time = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -842,6 +844,7 @@ void CPatientDataDlg::OnFinalMessage(HWND hWnd) {
 
 	GetPatientInfo(&info, vEvents);
 	STRNCPY(info.m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);	
+	m_out_hospital_time = info.m_out_hospital;
 
 	// ±£¥Ê–’√˚
 	if ( 0 != strcmp(info.m_szPName, m_patient_info.m_szPName) ) {

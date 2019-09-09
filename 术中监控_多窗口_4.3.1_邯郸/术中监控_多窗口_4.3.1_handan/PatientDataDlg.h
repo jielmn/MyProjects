@@ -95,4 +95,5 @@ private:
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id
 	char                        m_szUIPName[MAX_TAG_PNAME_LENGTH];         // UI 传过来的name
+	time_t                      m_out_hospital_time;                       // 出院日期
 };
