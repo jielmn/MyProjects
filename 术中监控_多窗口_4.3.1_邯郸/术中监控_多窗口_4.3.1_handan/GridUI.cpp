@@ -1211,3 +1211,22 @@ void  CGridUI::OnReleaseTagBinding() {
 
 	this->Invalidate();
 }
+
+// 当病人出院(单点模式下)
+void CGridUI::OnOutHospital() {
+	assert(m_cstModeBtn->GetMode() == CModeButton::Mode_Single);
+
+	ClearVector(m_vTemp[0]);
+	memset(&m_aLastTemp[0], 0, sizeof(m_aLastTemp[0]));
+
+	m_readers[0]->m_lblTagId->SetText("");
+	m_readers[0]->m_lblReaderId->SetText("");
+	m_readers[0]->m_lblTemp->SetText("");
+
+	m_lblElapsed->SetText("");
+	m_cstImgLabel->SetText("");
+	//m_cstPatientName->SetText("");
+	//m_cstPatientNameM->SetText("");
+
+	this->Invalidate();
+}

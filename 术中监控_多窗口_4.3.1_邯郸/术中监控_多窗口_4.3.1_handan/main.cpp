@@ -1727,20 +1727,28 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 		m_pGrids[dwIndex]->SetCurPatientName(pDlg->m_szUIPName);
 	}
 
-	// 如果出院了,不显示
+	// 如果出院了,不显示	
 	if ( pDlg->m_out_hospital_time > 0 ) {
-		OnHandTagErasedNotify(strTagId);
-		m_cstHandImg->DelTag(strTagId);
-		m_cstHandImg->SetCurTag("");
 
-		// 如果删除了选中的tag
-		if ( m_cur_selected_tag == strTagId ) {
-			// 如果还有tag
-			if (m_layTags->GetCount() > 0) {
-				CControlUI * pChildUI = m_layTags->GetItemAt(0);
-				OnHandTagSelected(pChildUI);
+		// 如果是手持模式
+		if (m_pGrids[dwIndex]->GetMode() == CModeButton::Mode_Hand) {
+			OnHandTagErasedNotify(strTagId);
+			m_cstHandImg->DelTag(strTagId);
+			m_cstHandImg->SetCurTag("");
+
+			// 如果删除了选中的tag
+			if (m_cur_selected_tag == strTagId) {
+				// 如果还有tag
+				if (m_layTags->GetCount() > 0) {
+					CControlUI * pChildUI = m_layTags->GetItemAt(0);
+					OnHandTagSelected(pChildUI);
+				}
 			}
-		}		
+		}			
+		// 如果非手持模式(单点)
+		else if (m_pGrids[dwIndex]->GetMode() == CModeButton::Mode_Single) {
+			m_pGrids[dwIndex]->OnOutHospital();
+		}
 	}
 
 	// 如果不是click ok

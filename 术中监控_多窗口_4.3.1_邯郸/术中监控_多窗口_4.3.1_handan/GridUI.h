@@ -72,6 +72,9 @@ public:
 	// 当格子的绑定Tag被其他格子夺去
 	void OnReleaseTagBinding();
 
+	// 当病人出院(单点模式下)
+	void OnOutHospital();
+
 private:
 	LPCTSTR GetClass() const;
 

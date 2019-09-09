@@ -466,6 +466,14 @@ void CMySqliteDatabase::GetAllLastSurTags(std::vector<LastSurTagItem *> & vRet) 
 
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for (int i = 0; i < nrow; i++) {
+		char szTagId[MAX_TAG_ID_LENGTH];
+		STRNCPY(szTagId, azResult[(i + 1)*ncolumn + 1], MAX_TAG_ID_LENGTH);
+		// 是否出院
+		BOOL bOutHospital = IsOutHospital(szTagId);
+		if (bOutHospital) {
+			continue;
+		}
+
 		LastSurTagItem * pItem = new LastSurTagItem;
 		memset(pItem, 0, sizeof(LastSurTagItem));
 
@@ -499,6 +507,14 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 	/*****  获取所有的手持tag id  *****/
 	int ret = sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for (int i = 0; i < nrow; i++) {
+		char szTagId[MAX_TAG_ID_LENGTH];
+		STRNCPY(szTagId, azResult[(i + 1)*ncolumn + 0], MAX_TAG_ID_LENGTH);
+		BOOL  bOutHospital = IsOutHospital(szTagId);
+		// 如果出院了，就不需要了
+		if ( bOutHospital ) {
+			continue;
+		}
+
 		HandTagResult * pItem = new HandTagResult;
 		memset(pItem, 0, sizeof(HandTagResult));
 
@@ -1147,4 +1163,26 @@ void CMySqliteDatabase::DelTag(const CDelTag * pParam) {
 		TEMP_TABLE, s.c_str());
 	ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
 	assert(0 == ret);
+}
+
+// 是否出院
+BOOL CMySqliteDatabase::IsOutHospital(const char * szTagId) {
+	assert(szTagId);
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT out_hospital_date FROM %s WHERE tag_id='%s' ", PATIENT_INFO_TABLE, szTagId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	time_t t = 0;
+	// 如果存在
+	if (nrow > 0) {
+		t = (time_t)GetIntFromDb(azResult[ncolumn + 0]);
+	}
+	sqlite3_free_table(azResult);
+
+	return t > 0 ? TRUE : FALSE;
 }

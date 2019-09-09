@@ -46,6 +46,8 @@ public:
 	void SavePatientData(const CSavePatientDataParam * pParam);
 	// É¾³ýtag
 	void DelTag(const CDelTag * pParam);
+	// ÊÇ·ñ³öÔº
+	BOOL IsOutHospital(const char * szTagId);
 
 private:
 	sqlite3 *                         m_db;
