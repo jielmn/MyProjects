@@ -73,6 +73,8 @@ using namespace DuiLib;
 #define   TABS_ID                  "switch"
 #define   TAB_INDEX_MONITOR        0
 #define   TAB_INDEX_READER         1
+#define   TAB_INDEX_INHOSPITAL     2
+#define   TAB_INDEX_OUTHOSPITAL     3
 #define   LAYOUT_MAIN_NAME         "layGrids"
 #define   GRID_XML_FILE            "grid.xml"
 #define   GRID_NAME                "MyGrid"

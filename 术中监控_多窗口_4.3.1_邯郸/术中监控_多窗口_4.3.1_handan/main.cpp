@@ -171,6 +171,16 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp("DragDrop", pstrClass)) {
 		return new CDragDropUI;
 	}
+	else if (0 == strcmp("InHospital", pstrClass)) {
+		strText.Format("%s.xml", pstrClass);
+		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
+		return pUI;
+	}
+	else if (0 == strcmp("OutHospital", pstrClass)) {
+		strText.Format("%s.xml", pstrClass);
+		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
+		return pUI;
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -189,6 +199,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 				OnHandTagDefaultOrder();
 			}
 			m_tabs->SelectItem(TAB_INDEX_READER);                  
+		}
+		else if (name == _T("opn_inhospital")) {
+			m_tabs->SelectItem(TAB_INDEX_INHOSPITAL); 
+		}
+		else if (name == _T("opn_outhospital")) {
+			m_tabs->SelectItem(TAB_INDEX_OUTHOSPITAL);
 		}
 		else if ( name == "rdTimeOrder" ) {
 			OnHandTagTimeOrder();

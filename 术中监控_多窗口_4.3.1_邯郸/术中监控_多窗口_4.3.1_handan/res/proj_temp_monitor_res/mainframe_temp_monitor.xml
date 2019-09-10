@@ -102,6 +102,12 @@
 				
 				<!-- 非连续测温(手持读卡器) -->
 				<HandReaderTemp />				
+				
+				<!-- 住院信息查询 -->
+				<InHospital />
+				
+				<!-- 出院信息查询 -->
+				<OutHospital />
 			</TabLayout>
 
 			<Control name="dragdrop" float="true" pos="100,100,580,200" text="123" font="1" visible="false" bkcolor="#AA000000" /> 

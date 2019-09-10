@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout bkcolor="#FF43424C" inset="0,0,0,0" >
+		<Label text="住院信息" textcolor="#FFFF0000" />		
+	</VerticalLayout>
+</Window>
