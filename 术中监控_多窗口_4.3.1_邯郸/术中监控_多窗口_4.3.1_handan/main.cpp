@@ -2022,7 +2022,7 @@ void  CDuiFrameWnd::OnDelTagRetNotify(const char * szDelTagId) {
                       
 
   
-        
+            
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }
