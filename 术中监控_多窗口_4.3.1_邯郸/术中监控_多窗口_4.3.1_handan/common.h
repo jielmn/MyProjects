@@ -684,7 +684,7 @@ typedef struct tagQueryInHospital {
 	char         m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
 	time_t       m_in_hospital_s;
 	time_t       m_in_hospital_e;
-}QueryInHospital;
+}TQueryInHospital;
 
 
 extern CGlobalData  g_data;

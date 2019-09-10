@@ -154,7 +154,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnQNext = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQNextPage"));
 
 	m_lblQueryRet->SetText("");
-	m_btnQPrev->SetEnabled(false);
+	m_btnQPrev->SetEnabled(false); 
 	m_btnQNext->SetEnabled(false);	
 	time_t t = now - 3600 * 24 * 30;
 	SYSTEMTIME s = Time2SysTime(t);
@@ -163,6 +163,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_datInHospitalStart->SetTime(&s);
 	m_datInHospitalStart->SetText(szDate);
 
+	m_q_waiting_bar->SetBkImage("file='progress_back_1.png' corner='5,5,5,5'");
 
 	/*************  end 获取控件 *****************/
 
@@ -256,6 +257,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == BTN_PRINT) {
 			OnBtnPrint(g_data.m_CfgData.m_GridOrder[m_dwCurSelGridIndex]);
+		}
+		else if (name == "btnQ") {
+			OnQueryInHospital();
 		}
 	}
 	else if (msg.sType == "setting") {
@@ -1934,6 +1938,38 @@ void  CDuiFrameWnd::OnDelTagRet(WPARAM wParam, LPARAM lParam) {
 
 	assert(szTagId);
 	delete[] szTagId;
+}
+
+// 查询住院信息
+void  CDuiFrameWnd::OnQueryInHospital() {
+	TQueryInHospital  query;
+	memset(&query, 0, sizeof(query));
+
+	CBusiness::GetInstance()->QueryInHospitalAsyn(&query);
+
+	SetQueryBusy(TRUE);	
+}
+
+// 查询住院信息时忙
+void   CDuiFrameWnd::SetQueryBusy(BOOL bBusy /*= TRUE*/) {
+	if (bBusy) {
+		m_q_waiting_bar->SetVisible(true);
+		m_q_waiting_bar->Start();
+		m_edQName->SetEnabled(false);
+		m_cmbQSex->SetEnabled(false);
+		m_edQAge->SetEnabled(false);
+		m_edQOutPatient->SetEnabled(false);
+		m_edQHospitalAdmissionNo->SetEnabled(false);
+		m_datInHospitalStart->SetEnabled(false);
+		m_datInHospitalEnd->SetEnabled(false);
+		m_btnQuery->SetEnabled(false);
+		m_lstQueryRet->SetEnabled(false);
+		m_btnQPrev->SetEnabled(false);
+		m_btnQNext->SetEnabled(false);    
+	}
+	else {
+
+	}
 }
 
 

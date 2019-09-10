@@ -122,6 +122,10 @@ public:
 	void  DelTagAsyn(const char * szTagId);
 	void  DelTag(const CDelTag * pParam);
 
+	// 查询住院信息
+	void  QueryInHospitalAsyn(const TQueryInHospital * pQuery);
+	void  QueryInHospital();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

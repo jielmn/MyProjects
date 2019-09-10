@@ -1151,6 +1151,15 @@ void  CBusiness::DelTag(const CDelTag * pParam) {
 	m_sigDelTag.emit(pParam->m_szTagId);
 }
 
+// 查询住院信息
+void  CBusiness::QueryInHospitalAsyn(const TQueryInHospital * pQuery) {
+
+}
+
+void  CBusiness::QueryInHospital() {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {

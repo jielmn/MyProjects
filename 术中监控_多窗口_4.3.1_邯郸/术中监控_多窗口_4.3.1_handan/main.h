@@ -162,6 +162,10 @@ private:
 	void   OnDeleteTag(TNotifyUI& msg);
 	// 删除Tag数据结果
 	void   OnDelTagRet(WPARAM, LPARAM);
+	// 查询住院信息
+	void   OnQueryInHospital();
+	// 查询住院信息时忙
+	void   SetQueryBusy(BOOL bBusy = TRUE);
 
 public:
 	// 接收器连接状态通知
