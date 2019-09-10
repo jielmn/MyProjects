@@ -28,12 +28,13 @@ private:
 
 	CLabelUI *                                  m_lblReaderId;
 	CLabelUI *                                  m_lblTagId;
-	CLabelUI *                                  m_lblTempTime;
-	CEditableButtonUI  *                        m_cstPatientName;
+	CLabelUI *                                  m_lblTempTime;	
 	CLabelUI *                                  m_lblTemp;
 	CLabelUI *                                  m_lblBinding;                // 绑定到哪个窗格 
 
 public:
 	TempItem                                    m_item;
 	int                                         m_nBindingGridIndex;
+
+	CEditableButtonUI  *                        m_cstPatientName;
 };

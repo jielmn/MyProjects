@@ -1765,7 +1765,51 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 }
 
 void  CDuiFrameWnd::OnBtnPrint1(TNotifyUI& msg) {
+	CTagUI * pTagUI = (CTagUI *)msg.pSender;
+	CDuiString  strTagId = pTagUI->GetTagId();
+	CDuiString strPatientName = pTagUI->GetPTagName();
 
+	CPatientDataDlg * pDlg = new CPatientDataDlg;
+	CBusiness::GetInstance()->m_sigPatientInfo.connect(pDlg, &CPatientDataDlg::OnPatientInfo);
+	CBusiness::GetInstance()->m_sigPatientData.connect(pDlg, &CPatientDataDlg::OnPatientData);
+
+	STRNCPY(pDlg->m_szTagId, strTagId, MAX_TAG_ID_LENGTH);
+	STRNCPY(pDlg->m_szUIPName, strPatientName, MAX_TAG_PNAME_LENGTH);
+
+	pDlg->Create(this->m_hWnd, _T("打印体温单"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+
+	// 如果名字改变
+	if (strPatientName != pDlg->m_szUIPName) {
+		pTagUI->m_cstPatientName->SetText(pDlg->m_szUIPName);
+	}
+
+	// 如果出院了,不显示	
+	if (pDlg->m_out_hospital_time > 0) {
+
+		// 如果是手持模式
+		OnHandTagErasedNotify(strTagId);
+		m_cstHandImg->DelTag(strTagId);
+		m_cstHandImg->SetCurTag("");
+
+		// 如果删除了选中的tag
+		if (m_cur_selected_tag == strTagId) {
+			// 如果还有tag
+			if (m_layTags->GetCount() > 0) {
+				CControlUI * pChildUI = m_layTags->GetItemAt(0);
+				OnHandTagSelected(pChildUI);
+			}
+		}
+	}
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pDlg;
+		return;
+	}
+
+	delete pDlg;
 }
 
 // 查询到的tag的绑定grid
