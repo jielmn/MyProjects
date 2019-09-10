@@ -657,6 +657,11 @@ public:
 	char        m_szTagId[MAX_TAG_ID_LENGTH];
 };
 
+typedef struct tagGridEvent {
+	int        m_nType;
+	time_t     m_tTime;
+}GridEvent;
+
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
@@ -717,6 +722,9 @@ extern SYSTEMTIME Time2SysTime(const time_t & t);
 extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
 extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
 extern char * Time2String_hm_cn(char * szDest, DWORD dwDestSize, const time_t * t);
+extern void  SetGridEvent(GridEvent events_type2[6 * 7][2], int nIndex, int nType, time_t t);
+extern void  SortGridEvent(GridEvent events_type2[6 * 7][2]);
+extern void  ConvertGridEvent(GridEvent events_type2[6 * 7][2], GridEvent events_type[6 * 7]);
 
 // templates
 template <class T>

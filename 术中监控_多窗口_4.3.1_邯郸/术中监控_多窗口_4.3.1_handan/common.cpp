@@ -1359,12 +1359,13 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	tFirstDay = GetAnyDayZeroTime(tFirstDay) + 3600 * 2;
 	time_t tLastDay = tFirstDay + 3600 * 24 * 7;
 
-	typedef struct tagGridEvent {
-		int        m_nType;
-		time_t     m_tTime;
-	}GridEvent;
+	
 	GridEvent    events_type[6 * 7];
 	memset(events_type, 0, sizeof(events_type));
+
+	GridEvent    events_type2[6 * 7][2];
+	memset(events_type2, 0, sizeof(events_type2));
+
 
 	// 获得每个小个子属于的事件
 	std::vector<PatientEvent * >::const_iterator it;
@@ -1384,14 +1385,14 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 				// 全包含
 				if (pEvent->m_time_2 >= tLastDay) {
 					for (int i = 0; i < 42; i++) {
-						events_type[i].m_nType = pEvent->m_nType;
+						SetGridEvent(events_type2, i, pEvent->m_nType, tFirstDay + 3600 * 4 * i);
 					}
 				}
 				else {
 					int index = (int)(pEvent->m_time_2 - tFirstDay) / (3600 * 4);
 					assert(index >= 0 && index < 42);
 					for (int i = 0; i <= index; i++) {
-						events_type[i].m_nType = pEvent->m_nType;
+						SetGridEvent(events_type2, i, pEvent->m_nType, tFirstDay + 3600 * 4 * i);
 					}
 				}
 			}
@@ -1400,7 +1401,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 				assert(start_index >= 0 && start_index < 42);
 				int end_index = (int)(pEvent->m_time_2 - tFirstDay) / (3600 * 4);
 				for (int i = start_index; (i < 42) && (i <= end_index); i++) {
-					events_type[i].m_nType = pEvent->m_nType;
+					SetGridEvent(events_type2, i, pEvent->m_nType, tFirstDay + 3600 * 4 * i);
 				}
 			}
 		}
@@ -1411,8 +1412,7 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 			}
 			int index = (int)(pEvent->m_time_1 - tFirstDay) / (3600 * 4);
 			assert(index >= 0 && index < 42);
-			events_type[index].m_nType = pEvent->m_nType;
-			events_type[index].m_tTime = pEvent->m_time_1;
+			SetGridEvent( events_type2, index, pEvent->m_nType, pEvent->m_time_1 );
 		}
 	}
 
@@ -1420,18 +1420,21 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 	if ( patient_info.m_in_hospital > 0 ) {
 		if (patient_info.m_in_hospital >= tFirstDay && patient_info.m_in_hospital < tLastDay) {
 			int index = (int)(patient_info.m_in_hospital - tFirstDay) / (3600 * 4);
-			events_type[index].m_nType = PTYPE_IN_HOSPITAL;
-			events_type[index].m_tTime = patient_info.m_in_hospital;
+			SetGridEvent(events_type2, index, PTYPE_IN_HOSPITAL, patient_info.m_in_hospital);
 		}
 	}
 
 	if (patient_info.m_out_hospital > 0) {
 		if (patient_info.m_out_hospital >= tFirstDay && patient_info.m_out_hospital < tLastDay) {
 			int index = (int)(patient_info.m_out_hospital - tFirstDay) / (3600 * 4);
-			events_type[index].m_nType = PTYPE_OUT_HOSPITAL;
-			events_type[index].m_tTime = patient_info.m_out_hospital;
+			SetGridEvent(events_type2, index, PTYPE_OUT_HOSPITAL, patient_info.m_out_hospital);
 		}
 	}
+
+	SortGridEvent(events_type2);
+
+	ConvertGridEvent(events_type2, events_type);
+
 	// END 加上入院和出院事件
 
 
@@ -1820,4 +1823,128 @@ extern char * Time2String_hm_cn(char * szDest, DWORD dwDestSize, const time_t * 
 	
 	STRNCPY(szDest, strText, dwDestSize);
 	return szDest;
+}
+
+static int  GetGridEventPriority(int nType) {
+	switch (nType)
+	{
+	case PTYPE_SURGERY:
+		return 20;
+	case PTYPE_BIRTH:
+		return 2;
+	case PTYPE_TURN_IN:
+		return 2;
+	case PTYPE_TURN_OUT:
+		return 2;
+	case PTYPE_DEATH:
+		return 40;
+	case PTYPE_HOLIDAY:
+		return 1;
+	case PTYPE_IN_HOSPITAL:
+		return 10;
+	case PTYPE_OUT_HOSPITAL:
+		return 10;
+	default:
+		return 0;
+	}
+	return 0;
+}
+
+void  SetGridEvent( GridEvent events_type2[6 * 7][2], int nIndex, int nType, time_t t ) {
+	assert(nIndex >= 0 && nIndex < 6 * 7);
+	BOOL bFindEmpty = FALSE;
+	for (int i = 0; i < 2; i++) {
+		if (events_type2[nIndex][i].m_nType == 0) {
+			events_type2[nIndex][i].m_nType = nType;
+			events_type2[nIndex][i].m_tTime = t;
+			bFindEmpty = TRUE;
+			break;
+		}
+	}
+
+	if (bFindEmpty)
+		return;
+
+	int nPrio = GetGridEventPriority(nType);
+	int nMinPrio   = -1;
+	int nFindIndex = -1;
+
+	for (int i = 0; i < 2; i++) {
+		int nItemPrio = GetGridEventPriority(events_type2[nIndex][i].m_nType);
+		// 如果是开始
+		if (nFindIndex == -1) {
+			nFindIndex = i;
+			nMinPrio = nItemPrio;
+		}
+		else {
+			if ( nItemPrio < nMinPrio ) {
+				nFindIndex = i;
+				nMinPrio = nItemPrio;
+			}
+		}
+	}
+	
+	assert(nFindIndex >= 0 && nMinPrio >= 0);
+
+	// 如果优先级大，挤出去
+	if ( nPrio > nMinPrio ) {
+		events_type2[nIndex][nFindIndex].m_nType = nType;
+		events_type2[nIndex][nFindIndex].m_tTime = t;
+	}
+}
+
+void  SortGridEvent(GridEvent events_type2[6 * 7][2]) {
+	for ( int i = 0; i < 42; i++ ) {
+		if (events_type2[i][0].m_tTime == 0)
+			continue;
+
+		if (events_type2[i][1].m_tTime == 0)
+			continue;
+
+		if ( events_type2[i][0].m_tTime > events_type2[i][1].m_tTime ) {
+			GridEvent tmp;
+			memcpy(&tmp, &events_type2[i][0], sizeof(GridEvent));
+			memcpy(&events_type2[i][0], &events_type2[i][1], sizeof(GridEvent));
+			memcpy(&events_type2[i][1], &tmp, sizeof(GridEvent));
+		}
+	}
+}
+
+void  ConvertGridEvent(GridEvent events_type2[6 * 7][2], GridEvent events_type[6 * 7]) {
+	for (int i = 0; i < 42; i++) {
+		memcpy(&events_type[i], &events_type2[i][0], sizeof(GridEvent));
+		// 如果当前时间段，没有第二事件
+		if ( events_type2[i][1].m_nType <= 0 ) {
+			continue;
+		}
+
+		// 如果当前时间段，还有事件
+		// 没有格子了
+		if (i == 42 - 1) {
+			break;
+		}
+
+		// 如果右边的相邻格子没有事件
+		if ( events_type2[i + 1][0].m_nType == 0 ) {
+			memcpy(&events_type[i+1], &events_type2[i][1], sizeof(GridEvent));
+			i++;
+		}
+		else {
+			BOOL  bGreat = TRUE;
+			int nPrio = GetGridEventPriority(events_type2[i][1].m_nType);
+
+			for (int j = 0; j < 2; j++) {
+				int nItemPrio = GetGridEventPriority(events_type2[i + 1][j].m_nType);
+				if (nPrio <= nItemPrio) {
+					bGreat = FALSE;
+					break;
+				}
+			}
+
+			if (bGreat) {
+				memcpy(&events_type[i + 1], &events_type2[i][1], sizeof(GridEvent));
+				i++;
+			}
+		}
+	}
 }
