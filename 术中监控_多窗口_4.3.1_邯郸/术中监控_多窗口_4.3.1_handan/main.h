@@ -152,6 +152,7 @@ private:
 	void   OnHandPrintExcel();
 	// 温度打印
 	void   OnBtnPrint(DWORD  dwIndex);
+	void   OnBtnPrint1(TNotifyUI& msg);
 	// 查询到的tag的绑定grid
 	void   OnQueryBindingByTag(WPARAM, LPARAM);
 	// 右键弹出菜单

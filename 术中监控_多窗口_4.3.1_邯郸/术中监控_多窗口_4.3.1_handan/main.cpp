@@ -248,6 +248,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if ( msg.sType == "menu_print_chart" ) {
 		OnBtnPrint(msg.wParam);
 	}
+	// 根据手持读卡器的tag打印体温单
+	else if (msg.sType == "menu_print_chart_1") {
+		OnBtnPrint1(msg);
+	}
 	else if (msg.sType == "menu_hand_export_excel") {
 		OnHanxExportExcel();
 	}
@@ -1760,6 +1764,10 @@ void   CDuiFrameWnd::OnBtnPrint(DWORD dwIndex) {
 	delete pDlg;            
 }
 
+void  CDuiFrameWnd::OnBtnPrint1(TNotifyUI& msg) {
+
+}
+
 // 查询到的tag的绑定grid
 void   CDuiFrameWnd::OnQueryBindingByTag(WPARAM wParam, LPARAM lParam) {
 	TagBindingGridRet * pParam = (TagBindingGridRet *)wParam;
@@ -1954,7 +1962,7 @@ void  CDuiFrameWnd::OnDelTagRetNotify(const char * szDelTagId) {
                       
 
   
-         
+        
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }
