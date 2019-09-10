@@ -9,6 +9,7 @@
 #include "resource.h"
 #include "SixGridsUI.h"
 #include "LmnGdi.h"
+#include "WaitingBarUI.h"
 
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
@@ -71,6 +72,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp(pstrClass, "Temp")) {
 		return new CTempUI;
+	}
+	else if (0 == strcmp("WaitingBar", pstrClass)) {
+		return new CWaitingBarUI;
 	}
 	return NULL;
 }

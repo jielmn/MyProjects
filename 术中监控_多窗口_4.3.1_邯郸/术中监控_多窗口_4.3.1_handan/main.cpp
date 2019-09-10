@@ -74,7 +74,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
-
+	ClearVector(m_vQRet);
 }
 
 void  CDuiFrameWnd::RemoveAllGrids() {
@@ -99,6 +99,7 @@ void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 	g_data.m_hWnd = GetHWND();
 	g_data.m_hCursor = LoadCursor(NULL, IDC_SIZENS);
+	time_t  now = time(0);
 
 	/*************  获取控件 *****************/
 	m_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(TABS_ID));
@@ -136,6 +137,33 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_hand_tabs = static_cast<DuiLib::CTabLayoutUI*>(m_PaintManager.FindControl(HAND_TABS_ID));
 	m_layDragDropGrids = static_cast<CTileLayoutUI *>(m_PaintManager.FindControl(LAY_DRAGDROP_GRIDS));
+
+	// 住院信息
+	m_edQName = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQName"));
+	m_cmbQSex = static_cast<CComboUI *>(m_PaintManager.FindControl("cmbQSex"));
+	m_edQAge  = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQAge"));
+	m_edQOutPatient = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQOutPatient"));
+	m_edQHospitalAdmissionNo = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQHospitalAdmissionNo"));
+	m_datInHospitalStart = static_cast<CDateTimeUI *>(m_PaintManager.FindControl("datQTime1"));
+	m_datInHospitalEnd = static_cast<CDateTimeUI *>(m_PaintManager.FindControl("datQTime2"));
+	m_btnQuery = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQ"));
+	m_q_waiting_bar = static_cast<CWaitingBarUI *>(m_PaintManager.FindControl("Q_waiting_bar"));
+	m_lblQueryRet = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblQRet"));
+	m_lstQueryRet = static_cast<CListUI *>(m_PaintManager.FindControl("lstQRet"));
+	m_btnQPrev = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQPrePage"));
+	m_btnQNext = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQNextPage"));
+
+	m_lblQueryRet->SetText("");
+	m_btnQPrev->SetEnabled(false);
+	m_btnQNext->SetEnabled(false);	
+	time_t t = now - 3600 * 24 * 30;
+	SYSTEMTIME s = Time2SysTime(t);
+	char szDate[256];
+	Date2String(szDate, sizeof(szDate), &t);
+	m_datInHospitalStart->SetTime(&s);
+	m_datInHospitalStart->SetText(szDate);
+
+
 	/*************  end 获取控件 *****************/
 
 	m_cstHandImg->m_sigTagErased.connect(this, &CDuiFrameWnd::OnHandTagErasedNotify);
@@ -180,6 +208,9 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 		strText.Format("%s.xml", pstrClass);
 		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
+	}
+	else if (0 == strcmp("WaitingBar", pstrClass)) {
+		return new CWaitingBarUI;
 	}
 	return WindowImplBase::CreateControl(pstrClass);
 }

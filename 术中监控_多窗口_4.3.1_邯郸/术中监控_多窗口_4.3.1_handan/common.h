@@ -664,6 +664,28 @@ typedef struct tagGridEvent {
 	time_t     m_tTime;
 }GridEvent;
 
+// 住院信息
+#define  MAX_QEVENTS_COUNT  10
+typedef struct tagInHospitalItem {
+	char         m_szPName[MAX_TAG_PNAME_LENGTH];
+	int          m_sex;
+	char         m_age[MAX_AGE_LENGTH];
+	char         m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
+	char         m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
+	time_t       m_in_hospital;
+	PatientEvent m_events[MAX_QEVENTS_COUNT];
+}InHospitalItem;
+
+typedef struct tagQueryInHospital {
+	char         m_szPName[MAX_TAG_PNAME_LENGTH];
+	int          m_sex;
+	char         m_age[MAX_AGE_LENGTH];
+	char         m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
+	char         m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
+	time_t       m_in_hospital_s;
+	time_t       m_in_hospital_e;
+}QueryInHospital;
+
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

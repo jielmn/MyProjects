@@ -11,6 +11,7 @@ using namespace DuiLib;
 #include "DragDropUI.h"
 #include "Launch.h"
 #include "TagUI.h"
+#include "WaitingBarUI.h"
 
 class CDuiFrameWnd : public WindowImplBase , public sigslot::has_slots<>
 {
@@ -239,4 +240,21 @@ private:
 
 	// 定时保存excel
 	time_t                                      m_LastSaveExcelTime;
+
+// 查询住院信息
+private:
+	CEditUI *                                   m_edQName;
+	CComboUI *                                  m_cmbQSex;
+	CEditUI *                                   m_edQAge;
+	CEditUI *                                   m_edQOutPatient;
+	CEditUI *                                   m_edQHospitalAdmissionNo;
+	CDateTimeUI *                               m_datInHospitalStart;
+	CDateTimeUI *                               m_datInHospitalEnd;
+	CButtonUI *                                 m_btnQuery;
+	CWaitingBarUI *                             m_q_waiting_bar;
+	CLabelUI *                                  m_lblQueryRet;
+	CListUI *                                   m_lstQueryRet;
+	CButtonUI *                                 m_btnQPrev;
+	CButtonUI *                                 m_btnQNext;
+	std::vector<InHospitalItem *>               m_vQRet;
 };
