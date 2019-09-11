@@ -48,6 +48,8 @@ public:
 	void DelTag(const CDelTag * pParam);
 	// 是否出院
 	BOOL IsOutHospital(const char * szTagId);
+	// 查询住院信息
+	void QueryInHospital(const CQueryInHospital * pParam, std::vector<InHospitalItem * > & vRet);
 
 private:
 	sqlite3 *                         m_db;
@@ -58,6 +60,10 @@ private:
 	void  CreateTable(const char * szTableName, const char * szSql);
 	// 删除过时的温度数据，Tag数据
 	void  PruneOldData();
+	// 拼接Where子句
+	void  ConcatWhereClause(CDuiString & strClause, const CDuiString & strItem);
+	// 查询事件信息
+	void  QueryEventsByTag(const char * szTagId, InHospitalItem * pRet);
 
 public:
 	// 根据TagID查询绑定的grid index(Return: 0 notfound, > 0 found)

@@ -166,6 +166,16 @@ private:
 	void   OnQueryInHospital();
 	// 查询住院信息时忙
 	void   SetQueryBusy(BOOL bBusy = TRUE);
+	// 查询住院信息结果
+	void   OnQueryInHospitalRet(WPARAM, LPARAM);
+	// 显示住院结果第几页
+	void   ShowInHospitalRetPage(int nPageIndex);
+	// 格式化手术事件信息
+	CDuiString  FormatEvents(PatientEvent * events, int nEventCnt);
+	// 住院信息下一页
+	void   NextInHospitalPage();
+	// 住院信息上一页
+	void   PrevInHospitalPage();
 
 public:
 	// 接收器连接状态通知
@@ -194,6 +204,8 @@ public:
 	void   OnQueryBindingByTagRetNotify(const TagBindingGridRet &);
 	// 删除Tag
 	void   OnDelTagRetNotify(const char * szTagId);
+	// 查询住院信息的结果通知
+	void OnQueryInHospitalNotify(const std::vector<InHospitalItem*>&);
 
 
 private:	
@@ -261,4 +273,5 @@ private:
 	CButtonUI *                                 m_btnQPrev;
 	CButtonUI *                                 m_btnQNext;
 	std::vector<InHospitalItem *>               m_vQRet;
+	int                                         m_nQCurPageIndex;
 };

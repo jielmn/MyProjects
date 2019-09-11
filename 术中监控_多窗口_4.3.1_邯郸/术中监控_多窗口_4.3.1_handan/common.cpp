@@ -1952,3 +1952,28 @@ void  ConvertGridEvent(GridEvent events_type2[6 * 7][2], GridEvent events_type[6
 		}
 	}
 }
+
+const char * GetEventTypeStr(int nType) {
+	switch (nType)
+	{
+	case PTYPE_HOLIDAY:
+		return "请假";
+	case PTYPE_SURGERY:
+		return "手术";
+	case PTYPE_BIRTH:
+		return "分娩";
+	case PTYPE_TURN_IN:
+		return "转入";
+	case PTYPE_TURN_OUT:
+		return "转出";
+	case PTYPE_DEATH:
+		return "呼吸心跳停止";
+	case PTYPE_IN_HOSPITAL:
+		return "入院";
+	case PTYPE_OUT_HOSPITAL:
+		return "出院";
+	default:
+		return "";
+	}
+	return "";
+}

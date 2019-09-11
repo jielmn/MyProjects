@@ -1186,3 +1186,127 @@ BOOL CMySqliteDatabase::IsOutHospital(const char * szTagId) {
 
 	return t > 0 ? TRUE : FALSE;
 }
+
+// 查询住院信息
+void  CMySqliteDatabase::QueryInHospital( const CQueryInHospital * pParam, 
+	                                      std::vector<InHospitalItem * > & vRet ) {
+	CDuiString  strSql;
+	CDuiString  strClause;
+	CDuiString  strItem;
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	TQueryInHospital query;
+	memcpy(&query, &pParam->m_query, sizeof(TQueryInHospital));
+
+	StrReplaceAll( query.m_szPName, MAX_TAG_PNAME_LENGTH,
+		           pParam->m_query.m_szPName, "'", "''" );
+
+	StrReplaceAll(query.m_szHospitalAdmissionNo, MAX_HOSPITAL_ADMISSION_NO_LENGTH,
+		pParam->m_query.m_szHospitalAdmissionNo, "'", "''");
+
+	StrReplaceAll(query.m_szOutpatientNo, MAX_OUTPATIENT_NO_LENGTH,
+		pParam->m_query.m_szOutpatientNo, "'", "''");
+
+	StrReplaceAll(query.m_age, MAX_AGE_LENGTH,
+		pParam->m_query.m_age, "'", "''");
+
+	/* 组建where clause */
+	if (query.m_szHospitalAdmissionNo[0] != '\0') {
+		strItem.Format("a.hospital_admission_no like '%%%s%%'", query.m_szHospitalAdmissionNo);
+		ConcatWhereClause(strClause, strItem);
+	}
+
+	if (query.m_szOutpatientNo[0] != '\0') {
+		strItem.Format("a.outpatient_no like '%%%s%%'", query.m_szOutpatientNo);
+		ConcatWhereClause(strClause, strItem);
+	}
+
+	if (query.m_age[0] != '\0') {
+		strItem.Format("a.age like '%%%s%%'", query.m_age);
+		ConcatWhereClause(strClause, strItem);
+	}
+
+	if (query.m_sex != 0) {
+		strItem.Format("a.sex=%d", query.m_sex);
+		ConcatWhereClause(strClause, strItem);
+	}
+
+	strItem.Format("a.in_hospital_date >= %lu", (DWORD)query.m_in_hospital_s);
+	ConcatWhereClause(strClause, strItem);
+
+	strItem.Format("a.in_hospital_date < %lu", (DWORD)query.m_in_hospital_e);
+	ConcatWhereClause(strClause, strItem);
+
+	strItem.Format("a.out_hospital_date == 0");
+	ConcatWhereClause(strClause, strItem);
+
+	if (pParam->m_query.m_szPName[0] != '\0') {
+		strItem.Format("b.patient_name like '%%%s%%'", query.m_szPName);
+		ConcatWhereClause(strClause, strItem);
+	}
+	/* END 组建 where clause */
+
+	strSql.Format("SELECT * FROM %s a INNER JOIN %s b ON a.tag_id = b.tag_id WHERE %s",
+		PATIENT_INFO_TABLE, TAGS_TABLE, strClause);
+
+	sqlite3_get_table(m_db, strSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		InHospitalItem * pItem = new InHospitalItem;
+		memset(pItem, 0, sizeof(InHospitalItem));
+		
+		GetStrFromdDb(pItem->m_age, MAX_AGE_LENGTH, azResult[(i + 1)*ncolumn + 2]);
+		GetStrFromdDb(pItem->m_szOutpatientNo, MAX_OUTPATIENT_NO_LENGTH, azResult[(i + 1)*ncolumn + 3]);
+		GetStrFromdDb(pItem->m_szHospitalAdmissionNo, MAX_HOSPITAL_ADMISSION_NO_LENGTH, 
+			          azResult[(i + 1)*ncolumn + 4]);
+		pItem->m_in_hospital = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 5]);
+		pItem->m_sex = (int)GetIntFromDb(azResult[(i + 1)*ncolumn + 1]);
+		GetStrFromdDb(pItem->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[(i + 1)*ncolumn + 14]);
+
+		char szTagId[MAX_TAG_ID_LENGTH];
+		GetStrFromdDb(szTagId, MAX_TAG_ID_LENGTH, azResult[(i + 1)*ncolumn + 0]);
+		QueryEventsByTag(szTagId, pItem);
+
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+}
+
+// 拼接Where子句
+void  CMySqliteDatabase::ConcatWhereClause(CDuiString & strClause, const CDuiString & strItem) {
+	if (strClause.GetLength() == 0) {
+		strClause = strItem;
+	}
+	else {
+		strClause += " AND ";
+		strClause += strItem;
+	}
+}
+
+// 查询事件信息
+void  CMySqliteDatabase::QueryEventsByTag(const char * szTagId, InHospitalItem * pRet) {
+	char sql[8192];
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	// 事件
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' order by date_1 ", 
+		                       PATIENT_EVENT_TABLE, szTagId );
+	pRet->m_events_cnt = 0;
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		int nType = GetIntFromDb(azResult[(i + 1)*ncolumn + 2]);
+		if (nType == PTYPE_SURGERY || nType == PTYPE_BIRTH || nType == PTYPE_DEATH) {
+			if (pRet->m_events_cnt < MAX_QEVENTS_COUNT) {
+				pRet->m_events[pRet->m_events_cnt].m_nType = nType;
+				pRet->m_events[pRet->m_events_cnt].m_time_1 = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+				pRet->m_events_cnt++;
+			}
+			else {
+				break;
+			}
+		}
+	}
+	sqlite3_free_table(azResult);
+}

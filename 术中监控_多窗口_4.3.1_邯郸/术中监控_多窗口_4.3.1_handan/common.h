@@ -68,6 +68,7 @@ using namespace DuiLib;
 
 #define   VERSION                     "2.1.8"
 #define   COMPILE_TIME                "2019-09-06 09:32"
+#define   MAX_ITEMS_PER_PAGE          2
 
 // ¿Ø¼þid
 #define   TABS_ID                  "switch"
@@ -216,6 +217,7 @@ using namespace DuiLib;
 #define MSG_SAVE_PATIENT_EVENTS             2019
 #define MSG_QUERY_BINDING_BY_TAG            2020
 #define MSG_DEL_TAG                         2021
+#define MSG_QUERY_INHOSPITAL                2022
 
 
 // windows ÏûÏ¢
@@ -234,6 +236,7 @@ using namespace DuiLib;
 #define UM_PATIENT_DATA                      (WM_USER+13)
 #define UM_QUERY_BINDING_BY_TAG_RET          (WM_USER+14)
 #define UM_DEL_TAG_RET                       (WM_USER+15)
+#define UM_QUERY_INHOSPITAL_RET              (WM_USER+16)
 
 #define XML_CHART_WIDTH              764
 #define XML_CHART_HEIGHT             1080
@@ -674,6 +677,7 @@ typedef struct tagInHospitalItem {
 	char         m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
 	time_t       m_in_hospital;
 	PatientEvent m_events[MAX_QEVENTS_COUNT];
+	int          m_events_cnt;
 }InHospitalItem;
 
 typedef struct tagQueryInHospital {
@@ -685,6 +689,15 @@ typedef struct tagQueryInHospital {
 	time_t       m_in_hospital_s;
 	time_t       m_in_hospital_e;
 }TQueryInHospital;
+
+class CQueryInHospital : public LmnToolkits::MessageData {
+public:
+	CQueryInHospital(const TQueryInHospital * pQuery) {
+		memcpy( &m_query, pQuery, sizeof(TQueryInHospital) );
+	}
+
+	TQueryInHospital        m_query;
+};
 
 
 extern CGlobalData  g_data;
@@ -749,6 +762,7 @@ extern char * Time2String_hm_cn(char * szDest, DWORD dwDestSize, const time_t * 
 extern void  SetGridEvent(GridEvent events_type2[6 * 7][2], int nIndex, int nType, time_t t);
 extern void  SortGridEvent(GridEvent events_type2[6 * 7][2]);
 extern void  ConvertGridEvent(GridEvent events_type2[6 * 7][2], GridEvent events_type[6 * 7]);
+extern const char * GetEventTypeStr(int nType);
 
 // templates
 template <class T>

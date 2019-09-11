@@ -441,6 +441,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigQueyHandTemp.connect(pMainWnd, &CDuiFrameWnd::OnQueryHandTagRetNotify);
 	m_sigQueryBindingByTag.connect(pMainWnd, &CDuiFrameWnd::OnQueryBindingByTagRetNotify);
 	m_sigDelTag.connect(pMainWnd, &CDuiFrameWnd::OnDelTagRetNotify);
+	m_sigInHospitalRet.connect(pMainWnd, &CDuiFrameWnd::OnQueryInHospitalNotify);
 	return;
 }
 
@@ -1153,11 +1154,14 @@ void  CBusiness::DelTag(const CDelTag * pParam) {
 
 // 查询住院信息
 void  CBusiness::QueryInHospitalAsyn(const TQueryInHospital * pQuery) {
-
+	g_data.m_thrd_sqlite->PostMessage( this, MSG_QUERY_INHOSPITAL, new CQueryInHospital(pQuery) );
 }
 
-void  CBusiness::QueryInHospital() {
-
+void  CBusiness::QueryInHospital(const CQueryInHospital * pParam) {
+	std::vector<InHospitalItem * > vRet;
+	m_sqlite.QueryInHospital(pParam, vRet);
+	m_sigInHospitalRet.emit(vRet);
+	ClearVector(vRet);
 }
 
 
@@ -1335,6 +1339,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CDelTag * pParam = (CDelTag *)pMessageData;
 		DelTag(pParam);
+	}
+	break;
+
+	case MSG_QUERY_INHOSPITAL:
+	{
+		CQueryInHospital * pParam = (CQueryInHospital *)pMessageData;
+		QueryInHospital(pParam);
 	}
 	break;
 
