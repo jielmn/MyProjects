@@ -411,7 +411,8 @@ void  CMySqliteDatabase::QueryTagPNameByTagId(const char * szTagId, char * szPNa
 
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	if ( nrow > 0 ) {
-		STRNCPY( szPName, azResult[ncolumn + 1], dwPNameLen );
+		//STRNCPY( szPName, azResult[ncolumn + 1], dwPNameLen );
+		Utf8ToAnsi(szPName, dwPNameLen, azResult[ncolumn + 1]);
 	}
 	else {
 		szPName[0] = '\0';
@@ -656,10 +657,12 @@ void  CMySqliteDatabase::RemoveGridBinding(const CRemoveGridBindingParam * pPara
 void  CMySqliteDatabase::SaveTagPName(const CSaveTagPNameParam * pParam) {
 	char sql[8192];
 	char szName[256];
+	char szTemp[256];
 	int  ret = 0;
 	time_t now = time(0);
 
-	StrReplaceAll(szName, sizeof(szName), pParam->m_szPName, "'", "''");
+	StrReplaceAll(szTemp, sizeof(szTemp), pParam->m_szPName, "'", "''");
+	AnsiToUtf8(szName, sizeof(szName), szTemp);
 
 	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", TAGS_TABLE, pParam->m_szTagId);
 
@@ -769,7 +772,8 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 	// Èç¹û´æÔÚ
 	if (nrow > 0) {
 		GetStrFromdDb(pRet->m_szTagId, MAX_TAG_ID_LENGTH, azResult[ncolumn + 0]);
-		GetStrFromdDb(pRet->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[ncolumn + 1]);
+		//GetStrFromdDb(pRet->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[ncolumn + 1]);
+		Utf8ToAnsi(pRet->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[ncolumn + 1]);
 	}
 	sqlite3_free_table(azResult);
 
@@ -1200,8 +1204,10 @@ void  CMySqliteDatabase::QueryInHospital( const CQueryInHospital * pParam,
 	TQueryInHospital query;
 	memcpy(&query, &pParam->m_query, sizeof(TQueryInHospital));
 
-	StrReplaceAll( query.m_szPName, MAX_TAG_PNAME_LENGTH,
+	char szTemp[256];
+	StrReplaceAll(szTemp, sizeof(szTemp),
 		           pParam->m_query.m_szPName, "'", "''" );
+	AnsiToUtf8(query.m_szPName, MAX_TAG_PNAME_LENGTH, szTemp);
 
 	StrReplaceAll(query.m_szHospitalAdmissionNo, MAX_HOSPITAL_ADMISSION_NO_LENGTH,
 		pParam->m_query.m_szHospitalAdmissionNo, "'", "''");
@@ -1262,7 +1268,8 @@ void  CMySqliteDatabase::QueryInHospital( const CQueryInHospital * pParam,
 			          azResult[(i + 1)*ncolumn + 4]);
 		pItem->m_in_hospital = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 5]);
 		pItem->m_sex = (int)GetIntFromDb(azResult[(i + 1)*ncolumn + 1]);
-		GetStrFromdDb(pItem->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[(i + 1)*ncolumn + 14]);
+		//GetStrFromdDb(pItem->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[(i + 1)*ncolumn + 14]);
+		Utf8ToAnsi(pItem->m_szPName, MAX_TAG_PNAME_LENGTH, azResult[(i + 1)*ncolumn + 14]);
 
 		char szTagId[MAX_TAG_ID_LENGTH];
 		GetStrFromdDb(szTagId, MAX_TAG_ID_LENGTH, azResult[(i + 1)*ncolumn + 0]);
