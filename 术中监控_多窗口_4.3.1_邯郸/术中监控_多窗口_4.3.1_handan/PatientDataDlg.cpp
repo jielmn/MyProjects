@@ -1128,19 +1128,26 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 	time_t tFirstDay = 0;
 	// 如果有住院日期
 	if ( m_patient_info.m_in_hospital > 0 ) {
-		time_t  tHospital  = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
-		time_t  tTodayZero = GetTodayZeroTime();
-		if (tTodayZero < tHospital) {
-			tFirstDay = tTodayZero;
+		// 如果没有出院日期
+		if (m_patient_info.m_out_hospital == 0) {
+			time_t  tHospital = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
+			time_t  tTodayZero = GetTodayZeroTime();
+			if (tTodayZero < tHospital) {
+				tFirstDay = tTodayZero;
+			}
+			// 差距小于一周
+			else if (tTodayZero - tHospital < 3600 * 24 * 6) {
+				tFirstDay = tHospital;
+			}
+			// 差距大于一周
+			else {
+				tFirstDay = tTodayZero - 3600 * 24 * 6;
+			}
 		}
-		// 差距小于一周
-		else if (tTodayZero - tHospital < 3600 * 24 * 6) {
-			tFirstDay = tHospital;
-		}
-		// 差距大于一周
+		// 有出院日期
 		else {
-			tFirstDay = tTodayZero - 3600 * 24 * 6; 
-		}
+			tFirstDay = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
+		}		
 	}
 	else {
 		tFirstDay = GetTodayZeroTime();
