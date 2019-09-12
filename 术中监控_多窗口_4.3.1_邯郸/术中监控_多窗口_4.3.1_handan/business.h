@@ -126,6 +126,10 @@ public:
 	void  QueryInHospitalAsyn(const TQueryInHospital * pQuery);
 	void  QueryInHospital(const CQueryInHospital * pParam);
 
+	// 查询出院信息
+	void  QueryOutHospitalAsyn(const TQueryOutHospital * pQuery);
+	void  QueryOutHospital(const CQueryOutHospital * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -158,6 +162,7 @@ private:
 	sigslot::signal1<const TagBindingGridRet &>     m_sigQueryBindingByTag;
 	sigslot::signal1<const char *>                  m_sigDelTag;
 	sigslot::signal1<const std::vector<InHospitalItem * > & >   m_sigInHospitalRet;
+	sigslot::signal1<const std::vector<OutHospitalItem * > & >  m_sigOutHospitalRet;
 
 	// 术中读卡器是否得到温度数据
 	BOOL                          m_bSurReaderTemp[MAX_GRID_COUNT][MAX_READERS_PER_GRID];	

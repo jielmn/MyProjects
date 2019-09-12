@@ -50,6 +50,8 @@ public:
 	BOOL IsOutHospital(const char * szTagId);
 	// 查询住院信息
 	void QueryInHospital(const CQueryInHospital * pParam, std::vector<InHospitalItem * > & vRet);
+	// 查询出院信息
+	void QueryOutHospital(const CQueryOutHospital * pParam, std::vector<OutHospitalItem * > & vRet);
 
 private:
 	sqlite3 *                         m_db;
@@ -64,6 +66,7 @@ private:
 	void  ConcatWhereClause(CDuiString & strClause, const CDuiString & strItem);
 	// 查询事件信息
 	void  QueryEventsByTag(const char * szTagId, InHospitalItem * pRet);
+	void  QueryEventsByTag(const char * szTagId, OutHospitalItem * pRet);
 	// 更新config表里的版本号
 	void  UpdateConfigVersion(BOOL bCreated);
 	int   GetVersion();

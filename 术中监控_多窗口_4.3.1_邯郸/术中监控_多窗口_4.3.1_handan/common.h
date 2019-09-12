@@ -222,6 +222,7 @@ using namespace DuiLib;
 #define MSG_QUERY_BINDING_BY_TAG            2020
 #define MSG_DEL_TAG                         2021
 #define MSG_QUERY_INHOSPITAL                2022
+#define MSG_QUERY_OUTHOSPITAL               2023
 
 
 // windows ÏûÏ¢
@@ -241,6 +242,7 @@ using namespace DuiLib;
 #define UM_QUERY_BINDING_BY_TAG_RET          (WM_USER+14)
 #define UM_DEL_TAG_RET                       (WM_USER+15)
 #define UM_QUERY_INHOSPITAL_RET              (WM_USER+16)
+#define UM_QUERY_OUTHOSPITAL_RET             (WM_USER+17)
 
 #define XML_CHART_WIDTH              764
 #define XML_CHART_HEIGHT             1080
@@ -716,6 +718,27 @@ typedef struct tagOutHospitalItem {
 	PatientEvent m_events[MAX_QEVENTS_COUNT];
 	int          m_events_cnt;
 }OutHospitalItem;
+
+typedef struct tagQueryOutHospital {
+	char         m_szPName[MAX_TAG_PNAME_LENGTH];
+	int          m_sex;
+	char         m_age[MAX_AGE_LENGTH];
+	char         m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
+	char         m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
+	time_t       m_in_hospital_s;
+	time_t       m_in_hospital_e;
+	time_t       m_out_hospital_s;
+	time_t       m_out_hospital_e;
+}TQueryOutHospital;
+
+class CQueryOutHospital : public LmnToolkits::MessageData {
+public:
+	CQueryOutHospital(const TQueryOutHospital * pQuery) {
+		memcpy(&m_query, pQuery, sizeof(TQueryOutHospital));
+	}
+
+	TQueryOutHospital        m_query;
+};
 
 
 extern CGlobalData  g_data;

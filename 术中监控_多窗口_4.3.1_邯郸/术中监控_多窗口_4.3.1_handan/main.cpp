@@ -295,6 +295,15 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnQPrePage") {
 			PrevInHospitalPage();
 		}
+		else if (name == "btnQ1") {
+			OnQueryOutHospital();
+		}
+		else if (name == "btnQNextPage1") {
+			NextOutHospitalPage();
+		}
+		else if (name == "btnQPrePage1") {
+			PrevOutHospitalPage();
+		}
 	}
 	else if (msg.sType == "setting") {
 		OnSetting();
@@ -417,6 +426,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_QUERY_INHOSPITAL_RET) {
 		OnQueryInHospitalRet(wParam, lParam);
+	}
+	else if (uMsg == UM_QUERY_OUTHOSPITAL_RET) {
+		OnQueryOutHospitalRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -2082,8 +2094,8 @@ void  CDuiFrameWnd::OnQueryInHospital() {
 	STRNCPY(query.m_age, strText, MAX_AGE_LENGTH);
 
 	query.m_sex = m_cmbQSex->GetCurSel();
-	query.m_in_hospital_s = SysTime2Time( m_datInHospitalStart->GetTime() );
-	query.m_in_hospital_e = SysTime2Time( m_datInHospitalEnd->GetTime() );
+	query.m_in_hospital_s = GetAnyDayZeroTime(SysTime2Time( m_datInHospitalStart->GetTime() ));
+	query.m_in_hospital_e = GetAnyDayZeroTime(SysTime2Time( m_datInHospitalEnd->GetTime() )) + 3600 * 24;
 
 	CBusiness::GetInstance()->QueryInHospitalAsyn(&query);
 
@@ -2241,6 +2253,157 @@ void  CDuiFrameWnd::OnInHospitalMenu(TNotifyUI& msg) {
 	pMenu->ShowWindow(TRUE);
 }
 
+// 查询出院信息
+void   CDuiFrameWnd::OnQueryOutHospital() {
+	TQueryOutHospital  query;
+	memset(&query, 0, sizeof(query));
+	CDuiString  strText;
+
+	strText = m_edQName1->GetText();
+	STRNCPY(query.m_szPName, strText, MAX_TAG_PNAME_LENGTH);
+
+	strText = m_edQHospitalAdmissionNo1->GetText();
+	STRNCPY(query.m_szHospitalAdmissionNo, strText, MAX_HOSPITAL_ADMISSION_NO_LENGTH);
+
+	strText = m_edQOutPatient1->GetText();
+	STRNCPY(query.m_szOutpatientNo, strText, MAX_OUTPATIENT_NO_LENGTH);
+
+	strText = m_edQAge1->GetText();
+	STRNCPY(query.m_age, strText, MAX_AGE_LENGTH);
+
+	query.m_sex = m_cmbQSex1->GetCurSel();
+	query.m_in_hospital_s = GetAnyDayZeroTime(SysTime2Time(m_datInHospitalStart1->GetTime()));
+	query.m_in_hospital_e = GetAnyDayZeroTime(SysTime2Time(m_datInHospitalEnd1->GetTime())) + 3600 * 24;
+	query.m_out_hospital_s = GetAnyDayZeroTime(SysTime2Time(m_datOutHospitalStart1->GetTime()));
+	query.m_out_hospital_e = GetAnyDayZeroTime(SysTime2Time(m_datOutHospitalEnd1->GetTime())) + 3600 * 24;
+
+	CBusiness::GetInstance()->QueryOutHospitalAsyn(&query);
+
+	SetQuery1Busy(TRUE);
+}
+
+// 查询出院信息时忙
+void   CDuiFrameWnd::SetQuery1Busy(BOOL bBusy /*= TRUE*/) {
+	if (bBusy) {
+		m_q_waiting_bar1->SetVisible(true);
+		m_q_waiting_bar1->Start();
+		m_edQName1->SetEnabled(false);
+		m_cmbQSex1->SetEnabled(false);
+		m_edQAge1->SetEnabled(false);
+		m_edQOutPatient1->SetEnabled(false);
+		m_edQHospitalAdmissionNo1->SetEnabled(false);
+		m_datInHospitalStart1->SetEnabled(false);
+		m_datInHospitalEnd1->SetEnabled(false);
+		m_datOutHospitalStart1->SetEnabled(false);
+		m_datOutHospitalEnd1->SetEnabled(false);
+		m_btnQuery1->SetEnabled(false);
+		m_lstQueryRet1->SetEnabled(false);
+		m_btnQPrev1->SetEnabled(false);
+		m_btnQNext1->SetEnabled(false);
+	}
+	else {
+		m_q_waiting_bar1->Stop();
+		m_q_waiting_bar1->SetVisible(false);
+		m_edQName1->SetEnabled(true);
+		m_cmbQSex1->SetEnabled(true);
+		m_edQAge1->SetEnabled(true);
+		m_edQOutPatient1->SetEnabled(true);
+		m_edQHospitalAdmissionNo1->SetEnabled(true);
+		m_datInHospitalStart1->SetEnabled(true);
+		m_datInHospitalEnd1->SetEnabled(true);
+		m_datOutHospitalStart1->SetEnabled(true);
+		m_datOutHospitalEnd1->SetEnabled(true);
+		m_btnQuery1->SetEnabled(true);
+		m_lstQueryRet1->SetEnabled(true);
+	}
+}
+
+// 查询出院信息结果
+void   CDuiFrameWnd::OnQueryOutHospitalRet(WPARAM wParam, LPARAM lParam) {
+	std::vector<OutHospitalItem *> * pRet = (std::vector<OutHospitalItem*> *)wParam;
+	ClearVector(m_vQRet1);
+	std::copy(pRet->begin(), pRet->end(), std::back_inserter(m_vQRet1));
+
+	SetQuery1Busy(FALSE);
+
+	CDuiString  strText;
+	strText.Format("(%lu条记录)", m_vQRet1.size());
+	m_lblQueryRet1->SetText(strText);
+
+	m_nQCurPageIndex1 = 0;
+	ShowOutHospitalRetPage(m_nQCurPageIndex1);
+
+	delete pRet;
+}
+
+// 显示出院结果第几页
+void  CDuiFrameWnd::ShowOutHospitalRetPage(int nPageIndex) {
+	m_lstQueryRet1->RemoveAll();
+
+	int nCnt = m_vQRet1.size();
+	// 没有记录
+	if (0 == nCnt) {
+		m_btnQPrev1->SetEnabled(false);
+		m_btnQNext1->SetEnabled(false);
+		return;
+	}
+
+	int nMaxPage = (m_vQRet1.size() - 1) / MAX_ITEMS_PER_PAGE;
+	assert(nPageIndex >= 0 && nPageIndex <= nMaxPage);
+
+	if (nPageIndex == 0) {
+		if (nMaxPage == 0) {
+			m_btnQPrev1->SetEnabled(false);
+			m_btnQNext1->SetEnabled(false);
+		}
+		else {
+			m_btnQPrev1->SetEnabled(false);
+			m_btnQNext1->SetEnabled(true);
+		}
+	}
+	else if (nPageIndex < nMaxPage) {
+		m_btnQPrev1->SetEnabled(true);
+		m_btnQNext1->SetEnabled(true);
+	}
+	else {
+		m_btnQPrev1->SetEnabled(true);
+		m_btnQNext1->SetEnabled(false);
+	}
+
+	CDuiString strText;
+	char szDate[256];
+	for (int i = nPageIndex * MAX_ITEMS_PER_PAGE; i < (nPageIndex + 1) * MAX_ITEMS_PER_PAGE && i < nCnt; i++) {
+		CListTextElementUI* pItem = new CListTextElementUI;
+		m_lstQueryRet1->Add(pItem);
+		OutHospitalItem * pData = m_vQRet1[i];
+
+		strText.Format("%d", i + 1);
+		pItem->SetText(0, strText);
+
+		pItem->SetText(1, pData->m_szPName);
+		pItem->SetText(2, GetSexStr(pData->m_sex));
+		pItem->SetText(3, pData->m_age);
+		pItem->SetText(4, pData->m_szOutpatientNo);
+		pItem->SetText(5, pData->m_szHospitalAdmissionNo);
+		pItem->SetText(6, LmnFormatTime(szDate, sizeof(szDate), pData->m_in_hospital, "%Y-%m-%d %H:%M"));
+		pItem->SetText(7, LmnFormatTime(szDate, sizeof(szDate), pData->m_out_hospital, "%Y-%m-%d %H:%M"));
+		pItem->SetText(8, FormatEvents(pData->m_events, pData->m_events_cnt));
+		pItem->SetTag((UINT_PTR)pData->m_szTagId);
+	}
+}
+
+// 出院信息下一页
+void   CDuiFrameWnd::NextOutHospitalPage() {
+	m_nQCurPageIndex1++;
+	ShowOutHospitalRetPage(m_nQCurPageIndex1);
+}
+
+// 出院信息上一页
+void   CDuiFrameWnd::PrevOutHospitalPage() {
+	m_nQCurPageIndex1--;
+	ShowOutHospitalRetPage(m_nQCurPageIndex1);
+}
+
 
 
 // 接收器连接状态通知
@@ -2366,6 +2529,19 @@ void CDuiFrameWnd::OnQueryInHospitalNotify(const std::vector<InHospitalItem*>& v
 		pRet->push_back(pNewItem);
 	}
 	::PostMessage(GetHWND(), UM_QUERY_INHOSPITAL_RET, (WPARAM)pRet, 0);
+}
+
+// 查询出院信息的结果通知
+void CDuiFrameWnd::OnQueryOutHospitalNotify(const std::vector<OutHospitalItem*>& vRet) {
+	std::vector<OutHospitalItem*>::const_iterator it;
+	std::vector<OutHospitalItem*> * pRet = new std::vector<OutHospitalItem*>;
+	for (it = vRet.begin(); it != vRet.end(); ++it) {
+		OutHospitalItem* pItem = *it;
+		OutHospitalItem* pNewItem = new OutHospitalItem;
+		memcpy(pNewItem, pItem, sizeof(OutHospitalItem));
+		pRet->push_back(pNewItem);
+	}
+	::PostMessage(GetHWND(), UM_QUERY_OUTHOSPITAL_RET, (WPARAM)pRet, 0);
 }
                       
 

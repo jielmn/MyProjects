@@ -180,6 +180,18 @@ private:
 	void   PrevInHospitalPage();
 	// 住院列表右键弹出菜单
 	void   OnInHospitalMenu(TNotifyUI& msg);
+	// 查询出院信息
+	void   OnQueryOutHospital();
+	// 查询出院信息时忙
+	void   SetQuery1Busy(BOOL bBusy = TRUE);
+	// 查询出院信息结果
+	void   OnQueryOutHospitalRet(WPARAM, LPARAM);
+	// 显示出院结果第几页
+	void   ShowOutHospitalRetPage(int nPageIndex);
+	// 出院信息下一页
+	void   NextOutHospitalPage();
+	// 出院信息上一页
+	void   PrevOutHospitalPage();
 
 public:
 	// 接收器连接状态通知
@@ -210,6 +222,8 @@ public:
 	void   OnDelTagRetNotify(const char * szTagId);
 	// 查询住院信息的结果通知
 	void OnQueryInHospitalNotify(const std::vector<InHospitalItem*>&);
+	// 查询出院信息的结果通知
+	void OnQueryOutHospitalNotify(const std::vector<OutHospitalItem*>&);
 
 
 private:	

@@ -59,7 +59,7 @@
 		
 		<HorizontalLayout inset="10,20,10,0" height="50">
 			<Label text="查询结果" textcolor="#FFFFFFFF" font="90" width="100" />		
-			<Label text="(0条记录)" textcolor="#FFFFFFFF" font="90" name="lblQRet1" width="100" />		
+			<Label text="(0条记录)" textcolor="#FFFFFFFF" font="90" name="lblQRet1" width="200" />		
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="20,10,20,0">

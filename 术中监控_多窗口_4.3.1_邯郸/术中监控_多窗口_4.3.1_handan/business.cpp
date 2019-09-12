@@ -442,6 +442,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 	m_sigQueryBindingByTag.connect(pMainWnd, &CDuiFrameWnd::OnQueryBindingByTagRetNotify);
 	m_sigDelTag.connect(pMainWnd, &CDuiFrameWnd::OnDelTagRetNotify);
 	m_sigInHospitalRet.connect(pMainWnd, &CDuiFrameWnd::OnQueryInHospitalNotify);
+	m_sigOutHospitalRet.connect(pMainWnd, &CDuiFrameWnd::OnQueryOutHospitalNotify);
 	return;
 }
 
@@ -1164,6 +1165,18 @@ void  CBusiness::QueryInHospital(const CQueryInHospital * pParam) {
 	ClearVector(vRet);
 }
 
+// 查询出院信息
+void  CBusiness::QueryOutHospitalAsyn(const TQueryOutHospital * pQuery) {
+	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_OUTHOSPITAL, new CQueryOutHospital(pQuery));
+}
+
+void  CBusiness::QueryOutHospital(const CQueryOutHospital * pParam) {
+	std::vector<OutHospitalItem * > vRet;
+	m_sqlite.QueryOutHospital(pParam, vRet);
+	m_sigOutHospitalRet.emit(vRet);
+	ClearVector(vRet);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1346,6 +1359,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryInHospital * pParam = (CQueryInHospital *)pMessageData;
 		QueryInHospital(pParam);
+	}
+	break;
+
+	case MSG_QUERY_OUTHOSPITAL:
+	{
+		CQueryOutHospital * pParam = (CQueryOutHospital *)pMessageData;
+		QueryOutHospital(pParam);
 	}
 	break;
 
