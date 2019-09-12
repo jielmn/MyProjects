@@ -45,6 +45,12 @@
 // 病人的非温度数据
 #define  PATIENT_DATA_TABLE                   "pdata"
 
+// 全局配置数据库
+#define  GLOBAL_CONFIG_TABLE                  "config"
+#define  VERSION_ID                           100
+#define  CUR_DB_VERSION                       1
+#define  CUR_DB_DESCRIPTION                   "2.1.9"
+
 
 class FindPEventObj {
 public:
@@ -105,6 +111,7 @@ int CMySqliteDatabase::InitDb() {
 	    "readerid   CHAR(16)       NOT NULL" );
 
 
+	BOOL  bCreateTagsTable = 
 	CreateTable(TAGS_TABLE,
 		"tag_id         CHAR(16)           NOT NULL           PRIMARY KEY," \
 		"patient_name   VARCHAR(16)        NOT NULL," \
@@ -175,6 +182,26 @@ int CMySqliteDatabase::InitDb() {
 		"weight varchar(20), " \
 		"irritability varchar(20), PRIMARY KEY(tag_id, date) ");
 	
+	int nDbVersion = GetVersion();
+
+	// 如果tags数据库是原有的，不是此次运行时创建的
+	// 需要把名字从gbk转为utf8
+	if ( !bCreateTagsTable ) {
+		// 没有配置数据库，需要转换的版本
+		if ( nDbVersion == 0 ) {
+			ConvertTagNames();
+		}
+	}
+
+	BOOL  bCreateConfig =
+	CreateTable(GLOBAL_CONFIG_TABLE,
+		"id          INTEGER      PRIMARY KEY," \
+		"param0      int          NOT NULL,"    \
+		"param1      int          NOT NULL,"    \
+		"param2      varchar(512) NOT NULL" );
+	UpdateConfigVersion(bCreateConfig);
+
+
 
 	// 删除过时的旧数据
 	PruneOldData();
@@ -194,7 +221,7 @@ int CMySqliteDatabase::DeinitDb() {
 
 // szTableName: 要创建的表名
 // szSql: create table (...)，括号里面的内容
-void  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szSql ) {
+BOOL  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szSql ) {
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
 	//char *zErrMsg = 0;            // 错误描述
@@ -204,16 +231,20 @@ void  CMySqliteDatabase::CreateTable( const char * szTableName, const char * szS
 	SNPRINTF(buf, sizeof(buf), "select name from sqlite_master where name = '%s';", szTableName);
 	sqlite3_get_table( m_db, buf, &azResult, &nrow, &ncolumn, 0 );
 
+	BOOL  bCreated = FALSE;
 	// 表不存在，则创建表
 	if ( 0 == nrow ) {
 		SNPRINTF(buf, sizeof(buf), "CREATE TABLE %s (%s);", szTableName, szSql);
 		int ret = sqlite3_exec(m_db, buf, 0, 0, 0);
 		if (ret != 0) {
 			sqlite3_free_table(azResult);
-			return;
+			return bCreated;
 		}
+		bCreated = TRUE;
 	}
 	sqlite3_free_table(azResult);
+
+	return bCreated;
 }
 
 // 删除过时的温度数据，Tag数据
@@ -1314,6 +1345,80 @@ void  CMySqliteDatabase::QueryEventsByTag(const char * szTagId, InHospitalItem *
 				break;
 			}
 		}
+	}
+	sqlite3_free_table(azResult);
+}
+
+// 更新config表里的版本号
+void  CMySqliteDatabase::UpdateConfigVersion(BOOL bCreated) {
+	char sql[8192];
+	SNPRINTF( sql, sizeof(sql), "SELECT * FROM %s WHERE id=%d ",
+		GLOBAL_CONFIG_TABLE, VERSION_ID);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	// 存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s SET param0=%d, param1=%d, param2='%s' WHERE id=%d ", 
+			 GLOBAL_CONFIG_TABLE, CUR_DB_VERSION, 0, CUR_DB_DESCRIPTION, VERSION_ID );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	// 不存在
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(%d, %d, %d, '%s')",
+			GLOBAL_CONFIG_TABLE, VERSION_ID, CUR_DB_VERSION, 0, CUR_DB_DESCRIPTION);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+}
+
+int  CMySqliteDatabase::GetVersion() {
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE id=%d ",
+		GLOBAL_CONFIG_TABLE, VERSION_ID);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	int ret = sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	int version = 0;
+	if ( 0 == ret && nrow > 0 ) {
+		version = GetIntFromDb(azResult[ncolumn + 1]);
+	}
+	sqlite3_free_table(azResult);
+	return version;
+}
+
+// 转换tag名称
+void  CMySqliteDatabase::ConvertTagNames() {
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s", TAGS_TABLE);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	for ( int i = 0; i < nrow; i++ ) {
+		char szTagId[MAX_TAG_ID_LENGTH];
+		char szPName[MAX_TAG_PNAME_LENGTH];
+		char szNewPName[256];
+		char szTemp[256];
+
+		GetStrFromdDb(szTagId, MAX_TAG_ID_LENGTH,    azResult[(i + 1)*ncolumn + 0]);
+		GetStrFromdDb(szPName, MAX_TAG_PNAME_LENGTH, azResult[(i + 1)*ncolumn + 1]);
+
+		// 如果为空字符串
+		if ( szPName[0] == '\0' )
+			continue;
+
+		StrReplaceAll(szTemp, sizeof(szTemp), szPName, "'", "''");
+		AnsiToUtf8(szNewPName, sizeof(szNewPName), szTemp);
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set patient_name='%s' WHERE tag_id='%s'", 
+			TAGS_TABLE, szNewPName, szTagId);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
 	}
 	sqlite3_free_table(azResult);
 }

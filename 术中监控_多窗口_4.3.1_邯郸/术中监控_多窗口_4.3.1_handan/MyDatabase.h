@@ -57,13 +57,18 @@ private:
 private:
 	// szTableName: 要创建的表名
 	// szSql: create table (...)，括号里面的内容
-	void  CreateTable(const char * szTableName, const char * szSql);
+	BOOL  CreateTable(const char * szTableName, const char * szSql);
 	// 删除过时的温度数据，Tag数据
 	void  PruneOldData();
 	// 拼接Where子句
 	void  ConcatWhereClause(CDuiString & strClause, const CDuiString & strItem);
 	// 查询事件信息
 	void  QueryEventsByTag(const char * szTagId, InHospitalItem * pRet);
+	// 更新config表里的版本号
+	void  UpdateConfigVersion(BOOL bCreated);
+	int   GetVersion();
+	// 转换tag名称
+	void  ConvertTagNames();
 
 public:
 	// 根据TagID查询绑定的grid index(Return: 0 notfound, > 0 found)
