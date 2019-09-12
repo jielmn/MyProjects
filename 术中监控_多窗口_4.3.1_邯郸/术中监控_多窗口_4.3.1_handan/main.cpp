@@ -2343,7 +2343,7 @@ void CDuiFrameWnd::OnQueryInHospitalNotify(const std::vector<InHospitalItem*>& v
                       
 
   
-            
+          
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }
