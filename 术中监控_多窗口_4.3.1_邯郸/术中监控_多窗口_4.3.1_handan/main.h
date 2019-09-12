@@ -278,4 +278,24 @@ private:
 	CButtonUI *                                 m_btnQNext;
 	std::vector<InHospitalItem *>               m_vQRet;
 	int                                         m_nQCurPageIndex;
+
+	// 查询出院信息
+private:
+	CEditUI *                                   m_edQName1;
+	CComboUI *                                  m_cmbQSex1;
+	CEditUI *                                   m_edQAge1;
+	CEditUI *                                   m_edQOutPatient1;
+	CEditUI *                                   m_edQHospitalAdmissionNo1;
+	CDateTimeUI *                               m_datInHospitalStart1;
+	CDateTimeUI *                               m_datInHospitalEnd1;
+	CDateTimeUI *                               m_datOutHospitalStart1;
+	CDateTimeUI *                               m_datOutHospitalEnd1;
+	CButtonUI *                                 m_btnQuery1;
+	CWaitingBarUI *                             m_q_waiting_bar1;
+	CLabelUI *                                  m_lblQueryRet1;
+	CListUI *                                   m_lstQueryRet1;
+	CButtonUI *                                 m_btnQPrev1;
+	CButtonUI *                                 m_btnQNext1;
+	std::vector<OutHospitalItem *>              m_vQRet1;
+	int                                         m_nQCurPageIndex1;
 };

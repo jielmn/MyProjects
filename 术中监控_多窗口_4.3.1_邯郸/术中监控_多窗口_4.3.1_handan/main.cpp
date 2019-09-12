@@ -72,10 +72,12 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 	m_LastSaveExcelTime = 0;
 	m_nQCurPageIndex = 0;
+	m_nQCurPageIndex1 = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
 	ClearVector(m_vQRet);
+	ClearVector(m_vQRet1);
 }
 
 void  CDuiFrameWnd::RemoveAllGrids() {
@@ -163,8 +165,33 @@ void  CDuiFrameWnd::InitWindow() {
 	Date2String(szDate, sizeof(szDate), &t);
 	m_datInHospitalStart->SetTime(&s);
 	m_datInHospitalStart->SetText(szDate);
-
 	m_q_waiting_bar->SetBkImage("file='progress_back_1.png' corner='5,5,5,5'");
+
+	// 出院信息
+	m_edQName1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQName1"));
+	m_cmbQSex1 = static_cast<CComboUI *>(m_PaintManager.FindControl("cmbQSex1"));
+	m_edQAge1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQAge1"));
+	m_edQOutPatient1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQOutPatient1"));
+	m_edQHospitalAdmissionNo1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtQHospitalAdmissionNo1"));
+	m_datInHospitalStart1 = static_cast<CDateTimeUI *>(m_PaintManager.FindControl("datQTime11"));
+	m_datInHospitalEnd1 = static_cast<CDateTimeUI *>(m_PaintManager.FindControl("datQTime12"));
+	m_datOutHospitalStart1 = static_cast<CDateTimeUI *>(m_PaintManager.FindControl("datQTime21"));
+	m_datOutHospitalEnd1 = static_cast<CDateTimeUI *>(m_PaintManager.FindControl("datQTime22"));
+	m_btnQuery1 = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQ1"));
+	m_q_waiting_bar1 = static_cast<CWaitingBarUI *>(m_PaintManager.FindControl("Q_waiting_bar1"));
+	m_lblQueryRet1 = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblQRet1"));
+	m_lstQueryRet1 = static_cast<CListUI *>(m_PaintManager.FindControl("lstQRet1"));
+	m_btnQPrev1 = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQPrePage1"));
+	m_btnQNext1 = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnQNextPage1"));
+
+	m_lblQueryRet1->SetText("");
+	m_btnQPrev1->SetEnabled(false);
+	m_btnQNext1->SetEnabled(false);
+	m_datInHospitalStart1->SetTime(&s);
+	m_datInHospitalStart1->SetText(szDate);
+	m_datOutHospitalStart1->SetTime(&s);
+	m_datOutHospitalStart1->SetText(szDate);
+	m_q_waiting_bar1->SetBkImage("file='progress_back_1.png' corner='5,5,5,5'");
 
 	/*************  end 获取控件 *****************/
 

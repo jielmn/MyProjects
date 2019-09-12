@@ -704,6 +704,19 @@ public:
 	TQueryInHospital        m_query;
 };
 
+typedef struct tagOutHospitalItem {
+	char         m_szTagId[MAX_TAG_ID_LENGTH];
+	char         m_szPName[MAX_TAG_PNAME_LENGTH];
+	int          m_sex;
+	char         m_age[MAX_AGE_LENGTH];
+	char         m_szOutpatientNo[MAX_OUTPATIENT_NO_LENGTH];
+	char         m_szHospitalAdmissionNo[MAX_HOSPITAL_ADMISSION_NO_LENGTH];
+	time_t       m_in_hospital;
+	time_t       m_out_hospital;
+	PatientEvent m_events[MAX_QEVENTS_COUNT];
+	int          m_events_cnt;
+}OutHospitalItem;
+
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
