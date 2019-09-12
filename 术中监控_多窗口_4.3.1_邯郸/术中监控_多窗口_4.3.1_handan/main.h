@@ -154,6 +154,8 @@ private:
 	// 温度打印
 	void   OnBtnPrint(DWORD  dwIndex);
 	void   OnBtnPrint1(TNotifyUI& msg);
+	// 住院温度打印
+	void   OnBtnPrint2(TNotifyUI& msg);
 	// 查询到的tag的绑定grid
 	void   OnQueryBindingByTag(WPARAM, LPARAM);
 	// 右键弹出菜单
@@ -176,6 +178,8 @@ private:
 	void   NextInHospitalPage();
 	// 住院信息上一页
 	void   PrevInHospitalPage();
+	// 住院列表右键弹出菜单
+	void   OnInHospitalMenu(TNotifyUI& msg);
 
 public:
 	// 接收器连接状态通知

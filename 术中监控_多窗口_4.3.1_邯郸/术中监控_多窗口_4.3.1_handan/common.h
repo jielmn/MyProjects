@@ -68,7 +68,11 @@ using namespace DuiLib;
 
 #define   VERSION                     "2.1.8"
 #define   COMPILE_TIME                "2019-09-06 09:32"
+#ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
+#else
+#define   MAX_ITEMS_PER_PAGE          10
+#endif
 
 // 控件id
 #define   TABS_ID                  "switch"
@@ -670,6 +674,7 @@ typedef struct tagGridEvent {
 // 住院信息
 #define  MAX_QEVENTS_COUNT  10
 typedef struct tagInHospitalItem {
+	char         m_szTagId[MAX_TAG_ID_LENGTH];
 	char         m_szPName[MAX_TAG_PNAME_LENGTH];
 	int          m_sex;
 	char         m_age[MAX_AGE_LENGTH];

@@ -1293,6 +1293,7 @@ void  CMySqliteDatabase::QueryInHospital( const CQueryInHospital * pParam,
 		InHospitalItem * pItem = new InHospitalItem;
 		memset(pItem, 0, sizeof(InHospitalItem));
 		
+		GetStrFromdDb(pItem->m_szTagId, MAX_TAG_ID_LENGTH, azResult[(i + 1)*ncolumn + 0]);
 		GetStrFromdDb(pItem->m_age, MAX_AGE_LENGTH, azResult[(i + 1)*ncolumn + 2]);
 		GetStrFromdDb(pItem->m_szOutpatientNo, MAX_OUTPATIENT_NO_LENGTH, azResult[(i + 1)*ncolumn + 3]);
 		GetStrFromdDb(pItem->m_szHospitalAdmissionNo, MAX_HOSPITAL_ADMISSION_NO_LENGTH, 

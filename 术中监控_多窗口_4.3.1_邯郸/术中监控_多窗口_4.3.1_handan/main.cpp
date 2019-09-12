@@ -296,6 +296,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "layHandTag") {
 			OnTagMenu(msg);
 		}
+		else if (name == "lstQRet") {
+			OnInHospitalMenu(msg);
+		}
 	}
 	else if ( msg.sType == "menu_export_excel" ) {
 		OnExportExcel(msg.wParam);
@@ -321,6 +324,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "menu_del_tag") {
 		OnDeleteTag(msg);
+	}
+	else if (msg.sType == "menu_print_chart_2") {
+		OnBtnPrint2(msg);
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -1873,6 +1879,86 @@ void  CDuiFrameWnd::OnBtnPrint1(TNotifyUI& msg) {
 	delete pDlg;
 }
 
+// 住院温度打印
+void  CDuiFrameWnd::OnBtnPrint2(TNotifyUI& msg) {
+	int nSel = m_lstQueryRet->GetCurSel();
+	if (nSel < 0)
+		return;
+
+	CListTextElementUI* pItemUI = (CListTextElementUI*)m_lstQueryRet->GetItemAt(nSel);
+	CDuiString  strTagId = (const char *)pItemUI->GetTag();
+	CDuiString  strPatientName = pItemUI->GetText(1);
+
+	CPatientDataDlg * pDlg = new CPatientDataDlg;
+	CBusiness::GetInstance()->m_sigPatientInfo.connect(pDlg, &CPatientDataDlg::OnPatientInfo);
+	CBusiness::GetInstance()->m_sigPatientData.connect(pDlg, &CPatientDataDlg::OnPatientData);
+
+	STRNCPY(pDlg->m_szTagId, strTagId, MAX_TAG_ID_LENGTH);
+	STRNCPY(pDlg->m_szUIPName, strPatientName, MAX_TAG_PNAME_LENGTH);
+
+	pDlg->Create(this->m_hWnd, _T("打印体温单"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+
+	// 如果名字改变
+	if (strPatientName != pDlg->m_szUIPName) {
+		BOOL  bFind = FALSE;
+		// 从手持部分找
+		std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find((const char *)strTagId);
+		// 如果找到了
+		if (it != m_tags_ui.end()) {
+			CTagUI * pTagUI = it->second;
+			pTagUI->m_cstPatientName->SetText(pDlg->m_szUIPName);
+			if ( pTagUI->GetBindingGridIndex() > 0 ) {
+				int nIndex = pTagUI->GetBindingGridIndex() - 1;
+				if (m_pGrids[nIndex]->GetMode() == CModeButton::Mode_Hand) {
+					m_pGrids[nIndex]->SetCurPatientName(pDlg->m_szUIPName);
+				}
+			}
+			bFind = TRUE;
+		}
+
+		// 从窗格部分找
+		if (!bFind) {
+			for (DWORD i = 0; i < g_data.m_CfgData.m_dwLayoutGridsCnt; i++) {
+				if ( m_pGrids[i]->GetCurTagId() == strTagId ) {
+					m_pGrids[i]->SetCurPatientName(pDlg->m_szUIPName);
+					break;
+				}
+			}
+		}
+	}
+
+	// 如果出院了,不显示	
+	if (pDlg->m_out_hospital_time > 0) {
+
+		// 从手持模式找
+		OnHandTagErasedNotify(strTagId);
+		m_cstHandImg->DelTag(strTagId);
+		m_cstHandImg->SetCurTag("");
+
+		// 如果删除了选中的tag
+		if (m_cur_selected_tag == strTagId) {
+			// 如果还有tag
+			if (m_layTags->GetCount() > 0) {
+				CControlUI * pChildUI = m_layTags->GetItemAt(0);
+				OnHandTagSelected(pChildUI);
+			}
+		}
+
+		// 从窗格模式找
+		for (DWORD i = 0; i < g_data.m_CfgData.m_dwLayoutGridsCnt; i++) {
+			if (m_pGrids[i]->GetCurTagId() == strTagId) {
+				if ( m_pGrids[i]->GetMode() == CModeButton::Mode_Single ) {
+					m_pGrids[i]->OnOutHospital();
+				}
+			}
+		}
+	}
+
+	delete pDlg;
+}
+
 // 查询到的tag的绑定grid
 void   CDuiFrameWnd::OnQueryBindingByTag(WPARAM wParam, LPARAM lParam) {
 	TagBindingGridRet * pParam = (TagBindingGridRet *)wParam;
@@ -2080,6 +2166,7 @@ void  CDuiFrameWnd::ShowInHospitalRetPage(int nPageIndex) {
 		pItem->SetText(5, pData->m_szHospitalAdmissionNo);
 		pItem->SetText(6, LmnFormatTime(szDate, sizeof(szDate), pData->m_in_hospital, "%Y-%m-%d %H:%M"));
 		pItem->SetText(7, FormatEvents(pData->m_events, pData->m_events_cnt) );
+		pItem->SetTag((UINT_PTR)pData->m_szTagId);
 	}
 
 }
@@ -2114,6 +2201,17 @@ void   CDuiFrameWnd::NextInHospitalPage() {
 void  CDuiFrameWnd::PrevInHospitalPage() {
 	m_nQCurPageIndex--;
 	ShowInHospitalRetPage(m_nQCurPageIndex);
+}
+
+// 住院列表右键弹出菜单
+void  CDuiFrameWnd::OnInHospitalMenu(TNotifyUI& msg) {
+	int nSel = m_lstQueryRet->GetCurSel();
+	if (nSel < 0)
+		return;
+
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_inhos.xml"), m_lstQueryRet);
+	pMenu->Init(*this, msg.ptMouse);
+	pMenu->ShowWindow(TRUE);
 }
 
 
