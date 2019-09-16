@@ -63,7 +63,7 @@
 		</HorizontalLayout>
 		
 		<HorizontalLayout inset="20,10,20,0">
-			<List name="lstQRet1" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="91" itemtextcolor="#FF386382" >
+			<List name="lstQRet1" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="91" itemtextcolor="#FF386382" itemalignex="center,center,center,center,center,center,center,center,left" >
 				<ListHeader height="24" menu="true">
 					<ListHeaderItem text="序号" font="91" width="50"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'"    sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					<ListHeaderItem text="姓名" font="91" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'"    sepimage="file='list_header_sep.png'" sepwidth="1"/>
