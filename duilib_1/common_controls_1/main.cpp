@@ -37,6 +37,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_dwBrowerProcId = 0;
 	m_hWndBrowser = 0;
 	memset(&m_BrowserRect, 0, sizeof(m_BrowserRect));
+	m_bPhoneSorted = FALSE;
+	m_bPhoneAsc = TRUE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -66,6 +68,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_mycontrol = static_cast<CMyControlUI *>(m_PaintManager.FindControl("cstMyControl_1"));
 	m_edbtn_1 = static_cast<CEditableButtonUI *>(m_PaintManager.FindControl("cstEdtBtn_1"));
 	m_lblShowEdbtnText = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblEdtBtnText"));
+	m_lstHeaderPhone = static_cast<CListHeaderItemUI *>(m_PaintManager.FindControl("headerPhone"));
 
 	HCURSOR h = LoadCursor(NULL, IDC_SIZEWE);
 	m_dragdrop->SetCursor(h);
@@ -83,21 +86,21 @@ void  CDuiFrameWnd::InitWindow() {
 	m_List1->Add(pItem);
 	pItem->SetText(0, "White");
 	pItem->SetText(1, "Smith");
-	pItem->SetText(2, "1092652");
+	pItem->SetText(2, "4092652");
 	pItem->SetText(3, "Smith@hotmail.com");	
 
 	pItem = new CListTextElementUI;
 	m_List1->Add(pItem);
 	pItem->SetText(0, "Black");
 	pItem->SetText(1, "Mike");
-	pItem->SetText(2, "43987721");
+	pItem->SetText(2, "1398772");
 	pItem->SetText(3, "Mike@hotmail.com");
 
 	pItem = new CListTextElementUI;
 	m_List1->Add(pItem);
 	pItem->SetText(0, "³Â");
 	pItem->SetText(1, "ÓêÀ´");
-	pItem->SetText(2, "92888112");
+	pItem->SetText(2, "9288812");
 	pItem->SetText(3, "Yulai@163.com");
 	
 	CDuiString  strText;
@@ -237,7 +240,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnShowFileName") {
 			m_edFileName->SetText(m_filebrowse->GetFileName());
-		}
+		}		
 	}  
 	else if (msg.sType == "windowinit") {
 		OnWndInit();
@@ -278,6 +281,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			m_lblShowEdbtnText->SetText(m_edbtn_1->GetText());
 		}
 	}
+	else if (msg.sType == "headerclick") {
+		if ( name == "headerPhone" ) {
+			if (!m_bPhoneSorted) {
+				m_bPhoneSorted = TRUE;
+				SortPhone();								
+			}
+			else {
+				m_bPhoneAsc = !m_bPhoneAsc;
+				SortPhone();
+			}
+		}
+	}
 	WindowImplBase::Notify(msg);
 }                                            
          
@@ -307,13 +322,41 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 
 }
 
+int CALLBACK ListSortCompareFunc(UINT_PTR param1, UINT_PTR param2, UINT_PTR param3)
+{
+	CListTextElementUI* pControl1 = (CListTextElementUI*)param1;
+	CListTextElementUI* pControl2 = (CListTextElementUI*)param2;
+	int nIndex = LOWORD(param3);
+	BOOL bAsc  = HIWORD(param3);
+
+	CDuiString strText1 = pControl1->GetText(nIndex);
+	CDuiString strText2 = pControl2->GetText(nIndex);	
+
+	if ( bAsc )
+		return strcmp(strText1.GetData(), strText2.GetData());
+	else 
+		return strcmp(strText2.GetData(), strText1.GetData());
+}
+
+void CDuiFrameWnd::SortPhone() {
+	if (m_bPhoneAsc) {
+		m_lstHeaderPhone->SetBkImage("file='list_header_bg_sort_1.png' corner='0,0,10,0'");
+		m_lstHeaderPhone->SetHotImage("file='list_header_hot_sort_1.png' corner='0,0,10,0'");
+	}
+	else {
+		m_lstHeaderPhone->SetBkImage("file='list_header_bg_sort.png' corner='0,0,10,0'");
+		m_lstHeaderPhone->SetHotImage("file='list_header_hot_sort.png' corner='0,0,10,0'");
+	}	
+
+	m_List1->SortItems(ListSortCompareFunc, MAKELONG(2, m_bPhoneAsc) );
+}
 
 
 
 
 
 
-
+       
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,

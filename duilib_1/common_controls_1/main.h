@@ -60,6 +60,7 @@ private:
 	void OnWndInit();
 	LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	void MoveBrowser();
+	void SortPhone();
 
 private:
 	DuiLib::CTabLayoutUI *   m_tabs;
@@ -85,6 +86,11 @@ private:
 
 	CEditableButtonUI *      m_edbtn_1;
 	CLabelUI *               m_lblShowEdbtnText;
+
+private:
+	BOOL                     m_bPhoneSorted;
+	BOOL                     m_bPhoneAsc;
+	CListHeaderItemUI *      m_lstHeaderPhone;
 };
  
 
