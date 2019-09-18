@@ -30,22 +30,31 @@
 			<VerticalLayout inset="10,1,10,1" bkcolor="#FFD1E8F5"  >	
 				<HorizontalLayout height="20" />
 				
-				<HorizontalLayout height="40" inset="10,5,10,5">
+				<HorizontalLayout height="60" inset="10,5,10,25">
 					<Label text="选择串口" width="80" font="3" textcolor="#FF386382" />
 					<Combo name="cmComPort" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382"  />
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="20" />
+				<HorizontalLayout height="1" bkcolor="#FF000000" />
 				
-				<HorizontalLayout height="40" inset="10,5,10,5">
+				<HorizontalLayout height="60" inset="10,25,10,5">
 					<Label text="温度(℃)" width="80" font="3" textcolor="#FF386382" />
 					<Edit name="edTemp" width="100" font="3" textcolor="#FF386382" />
+				</HorizontalLayout>				
+				
+				<HorizontalLayout height="60" inset="10,5,10,25">
+					<Button name="btnSend" text="发送" font="3" textcolor="#FF386382" width="150" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
 				</HorizontalLayout>
 				
-				<HorizontalLayout height="20" />
+				<HorizontalLayout height="1" bkcolor="#FF000000" />
 				
+				<HorizontalLayout height="60" inset="10,25,10,5">
+					<Label text="XX"  width="80"  font="3" textcolor="#FF386382" />
+					<Edit name="edXX" width="100" font="3" textcolor="#FF386382" />
+				</HorizontalLayout>
+								
 				<HorizontalLayout height="40" inset="10,5,10,5">
-					<Button name="btnSend" text="发送" font="3" textcolor="#FF386382" width="150" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Button name="btnSend1" text="发送" font="3" textcolor="#FF386382" width="150" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
 				</HorizontalLayout>
 				
 				

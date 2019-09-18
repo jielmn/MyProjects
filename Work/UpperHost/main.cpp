@@ -22,6 +22,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 void  CDuiFrameWnd::InitWindow() {
 	m_cmbComPorts = (CComboUI *)m_PaintManager.FindControl("cmComPort");
 	m_edTemp = (CEditUI *)m_PaintManager.FindControl("edTemp");
+	m_edXX = (CEditUI *)m_PaintManager.FindControl("edXX");
 
 	OnDeviceChanged(0,0);
 	WindowImplBase::InitWindow();
@@ -36,6 +37,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == "click") {
 		if (name == "btnSend") {
 			OnBtnSend();
+		}
+		else if (name == "btnSend1") {
+			OnBtnSend1();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -166,10 +170,59 @@ void  CDuiFrameWnd::OnBtnSend() {
 	write_data[16] = (BYTE)(dwTemp / 100);
 	write_data[17] = (BYTE)(dwTemp % 100);
 
+	serial_port.Write(write_data, dwDataLen); 
+	serial_port.CloseUartPort();         
+}
+
+void  CDuiFrameWnd::OnBtnSend1() {
+	int nSel = m_cmbComPorts->GetCurSel();
+	if (nSel < 0) {
+		MessageBox(GetHWND(), "没有选中串口", "系统提示", 0);
+		return;
+	}
+
+	CDuiString strTemp = m_edXX->GetText();
+	if (strTemp.GetLength() == 0) {
+		MessageBox(GetHWND(), "请输入XX", "系统提示", 0);
+		return;
+	}
+
+	int nXX = 0;
+	int ret = sscanf(strTemp, "%d", &nXX);
+	if (0 == ret) {
+		MessageBox(GetHWND(), "XX不是数字", "系统提示", 0);
+		return;
+	}
+
+	if (nXX > 127 || nXX < -128) {
+		MessageBox(GetHWND(), "数据XX超出范围(-128到127)", "系统提示", 0);
+		return;
+	}
+
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	char  write_data[256];
+
+	CListLabelElementUI * pItem = (CListLabelElementUI *)m_cmbComPorts->GetItemAt(nSel);
+	int nPort = pItem->GetTag();
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", nPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		MessageBox(GetHWND(), "打开串口失败", "系统提示", 0);
+		return;
+	}
+
+	const char * pData = 0;
+	DWORD  dwDataLen = 0;
+	pData = "\x55\x1A\x00\x01\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x59\x3F\xD4\x93\xCD\x59\x02\xE0\x03\x05\x02\x03\xFF\x55\x09\x05\x02\x07\x00\xFF";
+	dwDataLen = 36;
+	memcpy(write_data, pData, dwDataLen);
+	write_data[34] = (char)nXX;
 	serial_port.Write(write_data, dwDataLen);
 	serial_port.CloseUartPort();
 }
-
 
 
 

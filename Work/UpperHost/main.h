@@ -40,9 +40,11 @@ public:
 private:
 	void  OnDeviceChanged(WPARAM wParm, LPARAM  lParam);
 	void  OnBtnSend();
+	void  OnBtnSend1();
 
 private:
 	BOOL                   m_bBusy;
 	CComboUI *             m_cmbComPorts;
 	CEditUI *              m_edTemp;
+	CEditUI *              m_edXX;
 };
