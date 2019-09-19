@@ -11,6 +11,7 @@ private:
 	LPCTSTR GetClass() const;
 	void DoInit();
 
-private:
-	
+public:
+	static const int  WIDTH;
+	static const int  HEIGHT;
 };

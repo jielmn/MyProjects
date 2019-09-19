@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<VerticalLayout bordersize="1" bordercolor="#FFFF0000" inset="1,1,1,1" width="100" height="30">
+		<label text="控件" />
+	</VerticalLayout>
+</Window>

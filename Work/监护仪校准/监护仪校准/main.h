@@ -7,6 +7,8 @@ using namespace DuiLib;
 
 #include "resource.h"
 
+#include "CustomControls.h"
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -37,4 +39,12 @@ public:
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+private:
+	DuiLib::CHorizontalLayoutUI *             m_layMain;
+	DuiLib::CVerticalLayoutUI *               m_layColumns[MAX_COLUMNS_CNT];
+
+private:
+	void  OnWindowInit();
+	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	bool  OnMainSize(void * pParam);
 };

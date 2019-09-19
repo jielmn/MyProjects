@@ -54,7 +54,7 @@
 				</HorizontalLayout>
 				
 				<HorizontalLayout inset="10,5,10,5">
-					<HorizontalLayout bordercolor="#FF000000" bordersize="1">
+					<HorizontalLayout bordercolor="#FF000000" bordersize="1" name="layMain">
 					</HorizontalLayout>
 				</HorizontalLayout>
 				

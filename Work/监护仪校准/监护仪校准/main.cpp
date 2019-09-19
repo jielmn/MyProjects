@@ -21,14 +21,27 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
+	m_layMain = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain"));
+
+	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
+		m_layColumns[i] = new CVerticalLayoutUI;
+		m_layMain->Add(m_layColumns[i]);
+	}
+	m_layMain->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMainSize);
+
+	for( int i = 0; i < 5; i++)
+		m_layColumns[0]->Add(new CTempItemUI);
 	WindowImplBase::InitWindow();
 }
-
+ 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if ( msg.sType == "windowinit" ) {
+		OnWindowInit();
+	}
 	WindowImplBase::Notify(msg);                
 }
 
@@ -36,6 +49,17 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
+void  CDuiFrameWnd::OnWindowInit() {
+	
+}
+
+LRESULT CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	return WindowImplBase::OnSize(uMsg, wParam, lParam, bHandled);
+}
+
+bool CDuiFrameWnd::OnMainSize(void * pParam) {
+	return true;
+}
 
 
 
