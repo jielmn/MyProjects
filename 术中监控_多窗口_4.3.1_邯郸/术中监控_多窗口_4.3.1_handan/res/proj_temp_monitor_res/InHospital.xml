@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout bkcolor="#FF43424C" inset="0,0,0,0" >
+	<VerticalLayout bkcolor="#FF43424C" inset="0,0,0,0" vscrollbar="true" >
 	
 		<HorizontalLayout inset="10,20,10,0" height="50">
 			<Label text="查询条件" textcolor="#FFFFFFFF" font="90" />			
@@ -55,7 +55,7 @@
 			<Label text="(0条记录)" textcolor="#FFFFFFFF" font="90" name="lblQRet" width="200" />		
 		</HorizontalLayout>
 		
-		<HorizontalLayout inset="20,10,20,0">
+		<HorizontalLayout inset="20,10,20,0" height="300" >
 			<List name="lstQRet" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="91" itemtextcolor="#FF386382" itemalignex="center,center,center,center,center,center,center,left" >
 				<ListHeader height="24" menu="true">
 					<ListHeaderItem text="序号" font="91" width="50"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'"    sepimage="file='list_header_sep.png'" sepwidth="1"/>
