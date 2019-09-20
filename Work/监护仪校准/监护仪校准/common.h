@@ -40,6 +40,7 @@ public:
 
 extern CGlobalData  g_data;
 
+extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 
 // templates
 template <class T>

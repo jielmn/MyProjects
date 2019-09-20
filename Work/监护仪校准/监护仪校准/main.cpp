@@ -24,6 +24,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
+	m_cmbComPorts = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmComPort"));
 	m_layMain = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain"));
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
@@ -37,6 +38,8 @@ void  CDuiFrameWnd::InitWindow() {
 		m_temp_items[i] = new CTempItemUI;
 		m_temp_items[i]->SetTemp(FIRST_TEMP + i * 10);
 	}
+
+	CheckDevice();     
 	WindowImplBase::InitWindow();
 }
  
@@ -106,6 +109,54 @@ bool CDuiFrameWnd::OnMainSize(void * pParam) {
 	return true;
 }   
 
+// ¼ì²éÓ²¼þ(´®¿Ú)
+void  CDuiFrameWnd::CheckDevice() {
+	m_cmbComPorts->RemoveAll();
+
+	std::vector<std::string> vComPorts;
+	EnumPortsWdm(vComPorts);
+
+	BOOL  bFindReader = FALSE;
+	int   nFindeIndex = -1;
+
+	std::vector<std::string>::iterator it;
+	int i = 0;
+	for (it = vComPorts.begin(); it != vComPorts.end(); it++, i++) {
+		std::string & s = *it;
+
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(s.c_str());
+		m_cmbComPorts->Add(pElement);
+
+		int nComPort = 0;
+		const char * pFind = strstr(s.c_str(), "COM");
+		while (pFind) {
+			if (1 == sscanf(pFind + 3, "%d", &nComPort)) {
+				pElement->SetTag(nComPort);
+				break;
+			}
+			pFind = strstr(pFind + 3, "COM");
+		}
+
+		if (!bFindReader) {
+			char tmp[256];
+			Str2Lower(s.c_str(), tmp, sizeof(tmp));
+			if (0 != strstr(tmp, "usb-serial ch340")) {
+				bFindReader = TRUE;
+				nFindeIndex = i;
+			}
+		}
+	}
+
+	if (m_cmbComPorts->GetCount() > 0) {
+		if (nFindeIndex >= 0) {
+			m_cmbComPorts->SelectItem(nFindeIndex);
+		}
+		else {
+			m_cmbComPorts->SelectItem(0);
+		}
+	}
+}
 
 
 

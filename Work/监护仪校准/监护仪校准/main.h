@@ -45,8 +45,13 @@ private:
 	int                                       m_nCurColumns;
 	CTempItemUI *                             m_temp_items[MAX_TEMP_ITEMS_CNT];
 
+	// 串口
+	CComboUI *             m_cmbComPorts;
+
 private:
 	void  OnWindowInit();
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	bool  OnMainSize(void * pParam);
+	// 检查硬件(串口)
+	void  CheckDevice();
 };

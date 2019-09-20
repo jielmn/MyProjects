@@ -34,7 +34,7 @@
 			<VerticalLayout inset="10,10,10,10">
 				<HorizontalLayout height="25" inset="10,0,10,0">
 					<Label text="选择串口" width="70" font="1" textcolor="#FF386382" />
-					<Combo name="cmComPort" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="200" />
+					<Combo name="cmComPort" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="510" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="30" inset="10,5,10,0">
