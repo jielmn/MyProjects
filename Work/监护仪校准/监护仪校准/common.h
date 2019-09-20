@@ -23,27 +23,35 @@ using namespace DuiLib;
 #define   MAX_TEMP_ITEMS_CNT       160            // 一共160个子项
 #define   FIRST_TEMP               3000           // 从30℃开始
 
-
-class  CGlobalData {
-public:
-	ILog    *                 m_log;
-	IConfig *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_db;
-
-public:
-	CGlobalData() {
-		m_log = 0;
-		m_cfg = 0;
-		m_thrd_db = 0;
-	}
-};
-
+#define   MAX_MACHINE_CNT   4
 enum MachineType {
 	MachineType_MR = 0,
 	MachineType_FLP,
 	MachineType_GE,
 	MachineType_GE2,
 };
+
+typedef  struct  tagTempItem {
+	int    m_nTemp;
+	int    m_nDutyCycle;
+}TempItem;
+
+class  CGlobalData {
+public:
+	ILog    *                 m_log;
+	IConfig *                 m_cfg;
+	LmnToolkits::Thread *     m_thrd_db;
+	TempItem                  m_standard_items[MAX_MACHINE_CNT][MAX_TEMP_ITEMS_CNT];
+
+public:
+	CGlobalData() {
+		m_log = 0;
+		m_cfg = 0;
+		m_thrd_db = 0;
+		memset(m_standard_items, 0, sizeof(m_standard_items));
+	}
+};
+
 
 extern CGlobalData  g_data;
 
