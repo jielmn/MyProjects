@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window>
-	<VerticalLayout bordersize="1" bordercolor="#FFFF0000" inset="1,1,1,1" width="100" height="30">
-		<label text="控件" />
+	<VerticalLayout bkcolor="#FF00FF00">
+		<HorizontalLayout bordersize="0" bordercolor="#FFFF0000" >
+			<Control width="5" />
+			<!-- 是否基准点 -->
+			<VerticalLayout width="16">
+				<Control />
+				<Option name="option1" text="" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" width="16" height="16" />
+				<Control />
+			</VerticalLayout>		
+			<Control width="10" />
+			<label text="30.0℃" font="2" textcolor="#FF386382" width="50" />
+			<label text="255" font="2" textcolor="#FF386382" width="35" />
+			<VerticalLayout width="16">
+				<Button text="+" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
+				<Button text="-" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
+			</VerticalLayout>	
+			<Control width="10" />
+			<VerticalLayout width="50">
+				<Control />
+				<Button text="校准" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " width="50" height="24" font="2" />
+				<Control />
+			</VerticalLayout>			
+		</HorizontalLayout>		
 	</VerticalLayout>
 </Window>

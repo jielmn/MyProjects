@@ -1,7 +1,7 @@
 #include "CustomControls.h"
 
-const int CTempItemUI::WIDTH = 100;
-const int CTempItemUI::HEIGHT = 30;
+const int CTempItemUI::WIDTH = 200;
+const int CTempItemUI::HEIGHT = 32;                       
 
 CTempItemUI::CTempItemUI() {
 

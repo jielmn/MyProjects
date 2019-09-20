@@ -59,7 +59,7 @@ LRESULT CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 
 bool CDuiFrameWnd::OnMainSize(void * pParam) {
 	return true;
-}
+}   
 
 
 
