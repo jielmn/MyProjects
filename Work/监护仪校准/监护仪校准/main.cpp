@@ -25,6 +25,8 @@ void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 	m_cmbComPorts = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmComPort"));
+	m_cmbMachineType = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmMachine"));
+	m_cmbFiles = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmFiles"));
 	m_layMain = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain"));
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
@@ -39,6 +41,18 @@ void  CDuiFrameWnd::InitWindow() {
 		m_temp_items[i]->SetTemp(FIRST_TEMP + i * 10);
 	}
 
+	for (int i = MachineType_MR; i <= MachineType_GE2; i++) {
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(GetMachineType((MachineType)i));
+		m_cmbMachineType->Add(pElement);
+	}
+	m_cmbMachineType->SelectItem(0,false,false);
+
+	CListLabelElementUI * pElement = new CListLabelElementUI;
+	pElement->SetText("±ê×¼");
+	m_cmbFiles->Add(pElement);
+	m_cmbFiles->SelectItem(0);
+
 	CheckDevice();     
 	WindowImplBase::InitWindow();
 }
@@ -48,8 +62,17 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	CDuiString  name = msg.pSender->GetName();
 	if ( msg.sType == "windowinit" ) {
 		OnWindowInit();
+	}
+	else if (msg.sType == "itemselect") {
+		if (name == "cmFiles") {
+			OnFileChanged();
+		}
+		else if (name == "cmMachine") {
+			OnMachineChanged();
+		}
 	}
 	WindowImplBase::Notify(msg);                
 }
@@ -150,14 +173,21 @@ void  CDuiFrameWnd::CheckDevice() {
 
 	if (m_cmbComPorts->GetCount() > 0) {
 		if (nFindeIndex >= 0) {
-			m_cmbComPorts->SelectItem(nFindeIndex);
+			m_cmbComPorts->SelectItem(nFindeIndex,false,false);
 		}
 		else {
-			m_cmbComPorts->SelectItem(0);
+			m_cmbComPorts->SelectItem(0,false,false);
 		}
 	}
 }
 
+void  CDuiFrameWnd::OnFileChanged() {
+
+}
+
+void  CDuiFrameWnd::OnMachineChanged() {
+
+}
 
 
 

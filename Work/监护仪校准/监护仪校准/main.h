@@ -47,6 +47,8 @@ private:
 
 	// 串口
 	CComboUI *             m_cmbComPorts;
+	CComboUI *             m_cmbMachineType;
+	CComboUI *             m_cmbFiles;
 
 private:
 	void  OnWindowInit();
@@ -54,4 +56,6 @@ private:
 	bool  OnMainSize(void * pParam);
 	// 检查硬件(串口)
 	void  CheckDevice();
+	void  OnFileChanged();
+	void  OnMachineChanged();
 };

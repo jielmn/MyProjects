@@ -117,3 +117,20 @@ BOOL EnumPortsWdm(std::vector<std::string> & v)
 
 	return TRUE;
 }
+
+const char * GetMachineType(MachineType e) {
+	switch (e)
+	{
+	case MachineType_MR:
+		return "MR";
+	case MachineType_FLP:
+		return "·ÉÀûÆÖ";
+	case MachineType_GE:
+		return "GE";
+	case MachineType_GE2:
+		return "GE2";
+	default:
+		break;
+	}
+	return "Î´Öª»úÆ÷";
+}

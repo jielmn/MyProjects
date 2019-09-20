@@ -38,9 +38,17 @@ public:
 	}
 };
 
+enum MachineType {
+	MachineType_MR = 0,
+	MachineType_FLP,
+	MachineType_GE,
+	MachineType_GE2,
+};
+
 extern CGlobalData  g_data;
 
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
+extern const char * GetMachineType(MachineType e);
 
 // templates
 template <class T>
