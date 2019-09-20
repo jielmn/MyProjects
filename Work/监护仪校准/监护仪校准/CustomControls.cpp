@@ -1,6 +1,6 @@
 #include "CustomControls.h"
 
-const int CTempItemUI::WIDTH = 200;
+const int CTempItemUI::WIDTH = 210;
 const int CTempItemUI::HEIGHT = 32;                       
 
 CTempItemUI::CTempItemUI() {
@@ -13,10 +13,11 @@ CTempItemUI::CTempItemUI() {
 
 	m_nTemp = 0;
 	m_nDutyCycle = 0;
+	m_bHighlight = FALSE;
 }
 
 CTempItemUI::~CTempItemUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 LPCTSTR  CTempItemUI::GetClass()  const {
@@ -24,10 +25,12 @@ LPCTSTR  CTempItemUI::GetClass()  const {
 }
 
 void  CTempItemUI::DoInit() {
+	m_pManager->AddNotifier(this);
+
 	CDialogBuilder builder;
 	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("TempItemUI.xml"), (UINT)0, NULL, m_pManager));
 	if (pChildWindow) {
-		this->Add(pChildWindow);
+		this->Add(pChildWindow);		
 	}
 	else {
 		this->RemoveAll();
@@ -46,6 +49,10 @@ void  CTempItemUI::DoInit() {
 
 	SetTemp();
 	SetDutyCycle();
+
+	m_btnDown->SetVisible(false);
+	m_btnUp->SetVisible(false);
+	m_btnAdjust->SetVisible(false);
 }
 
 void  CTempItemUI::SetTemp(int nTemp) {
@@ -71,7 +78,7 @@ void  CTempItemUI::SetTemp() {
 		return;
 
 	CDuiString  strText;
-	strText.Format("%.2f", m_nTemp / 100.0);
+	strText.Format("%.1f¡æ", m_nTemp / 100.0); 
 	m_lblTemp->SetText(strText);
 }
 
@@ -82,4 +89,57 @@ void  CTempItemUI::SetDutyCycle() {
 	CDuiString  strText;
 	strText.Format("%d", m_nDutyCycle);
 	m_lblDutyCycle->SetText(strText);
+}
+
+void CTempItemUI::DoEvent(DuiLib::TEventUI& event) {
+	if ( event.Type == UIEVENT_MOUSEENTER ) {
+		if ( !m_bHighlight ) {
+			bool bSelected = m_opBasePoint->IsSelected();
+			if (bSelected) {
+				m_btnDown->SetVisible(true);
+				m_btnUp->SetVisible(true);
+			}
+			m_btnAdjust->SetVisible(true);
+			this->SetBkColor(0x30000000);
+			m_bHighlight = TRUE;
+		}		
+	}
+	else if ( event.Type == UIEVENT_MOUSELEAVE ) {
+		if (m_bHighlight) {
+			m_btnDown->SetVisible(false);
+			m_btnUp->SetVisible(false);
+			m_btnAdjust->SetVisible(false);
+			this->SetBkColor(0x00000000);
+			m_bHighlight = FALSE;
+		}		
+	}
+	CContainerUI::DoEvent(event);
+}
+
+void CTempItemUI::Notify(TNotifyUI& msg) {
+	if ( msg.sType == "selectchanged" ) {
+		if (msg.pSender == m_opBasePoint) {
+			bool bSelected = m_opBasePoint->IsSelected();
+			if (bSelected) {
+				m_lblTemp->SetTextColor(0xFFFF0000);
+				m_lblDutyCycle->SetTextColor(0xFFFF0000);
+				m_lblTemp->SetFont(3);
+				m_lblDutyCycle->SetFont(3);
+				if (m_bHighlight) {
+					m_btnUp->SetVisible(true);
+					m_btnDown->SetVisible(true);
+				}
+			}
+			else {
+				m_lblTemp->SetTextColor(0xFF386382);
+				m_lblDutyCycle->SetTextColor(0xFF386382);
+				m_lblTemp->SetFont(2);
+				m_lblDutyCycle->SetFont(2);
+				if (m_bHighlight) {
+					m_btnUp->SetVisible(false);
+					m_btnDown->SetVisible(false);
+				}
+			}			
+		}
+	}
 }

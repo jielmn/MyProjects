@@ -11,7 +11,10 @@
 #include "resource.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
-
+	m_nCurColumns = 0;
+	m_layMain = 0;
+	memset(m_layColumns, 0, sizeof(m_layColumns));
+	memset(m_temp_items, 0, sizeof(m_temp_items));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -25,12 +28,15 @@ void  CDuiFrameWnd::InitWindow() {
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
 		m_layColumns[i] = new CVerticalLayoutUI;
+		m_layColumns[i]->SetVisible(false);
 		m_layMain->Add(m_layColumns[i]);
 	}
 	m_layMain->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMainSize);
 
-	for( int i = 0; i < 5; i++)
-		m_layColumns[0]->Add(new CTempItemUI);
+	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+		m_temp_items[i] = new CTempItemUI;
+		m_temp_items[i]->SetTemp(FIRST_TEMP + i * 10);
+	}
 	WindowImplBase::InitWindow();
 }
  
@@ -58,6 +64,45 @@ LRESULT CDuiFrameWnd::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 }
 
 bool CDuiFrameWnd::OnMainSize(void * pParam) {
+	RECT rcMain = m_layMain->GetPos();
+	int nWidth = rcMain.right - rcMain.left - 2;
+	int nColumn = nWidth / CTempItemUI::WIDTH;
+	if (nColumn > MAX_COLUMNS_CNT)
+		nColumn = MAX_COLUMNS_CNT;
+	else if (nColumn <= 0)
+		nColumn = 1;
+
+	// 如果列数不变
+	if (m_nCurColumns == nColumn)
+		return true;
+
+	for (int i = 0; i < MAX_COLUMNS_CNT; i++) {
+		int nCnt = m_layColumns[i]->GetCount();
+		for (int j = 0; j < nCnt; j++) {
+			m_layColumns[i]->RemoveAt( 0, true );
+		}
+		m_layColumns[i]->SetVisible(false);
+	}
+	
+	int nRows = (MAX_TEMP_ITEMS_CNT - 1) / nColumn + 1;
+	int nResume = nRows % 10;
+	// 如果不是整数10行
+	if (0 != nResume ) {
+		nRows += 10 - nResume;
+	}
+	// 重新计算列数
+	nColumn = ( MAX_TEMP_ITEMS_CNT - 1 ) / nRows + 1;
+	m_nCurColumns = nColumn;
+
+	int nItemIndex = 0;
+	for ( int i = 0; i < m_nCurColumns; i++ ) {
+		m_layColumns[i]->SetVisible(true);   
+		for ( int j = nRows * i; j < (i + 1) * nRows && nItemIndex < MAX_TEMP_ITEMS_CNT; j++, nItemIndex++ ) {
+			m_layColumns[i]->Add(m_temp_items[j]);
+		}
+	}
+
+	m_layMain->SetFixedHeight(nRows * CTempItemUI::HEIGHT + 2); 
 	return true;
 }   
 

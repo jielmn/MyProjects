@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
 
-class CTempItemUI : public CContainerUI
+class CTempItemUI : public CContainerUI, INotifyUI
 {
 public:
 	CTempItemUI();
@@ -16,6 +16,8 @@ private:
 	void DoInit();
 	void  SetTemp();
 	void  SetDutyCycle();
+	virtual void DoEvent(DuiLib::TEventUI& event);
+	void Notify(TNotifyUI& msg);
 
 public:
 	static const int  WIDTH;
@@ -32,4 +34,5 @@ private:
 private:
 	int                            m_nTemp;
 	int                            m_nDutyCycle;
+	BOOL                           m_bHighlight;
 };

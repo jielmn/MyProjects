@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window>
-	<VerticalLayout bkcolor="#FF00FF00">
+	<VerticalLayout>
 		<HorizontalLayout bordersize="0" bordercolor="#FFFF0000" >
 			<Control width="5" />
 			<!-- 是否基准点 -->
@@ -10,7 +10,7 @@
 				<Control />
 			</VerticalLayout>		
 			<Control width="10" />
-			<label name="lblTemp" text="30.0℃" font="2" textcolor="#FF386382" width="50" />
+			<label name="lblTemp" text="30.0℃" font="2" textcolor="#FF386382" width="60" />
 			<label name="lblDutyCycle" text="255" font="2" textcolor="#FF386382" width="35" />
 			<VerticalLayout width="16">
 				<Button name="btnUp" text="+" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
