@@ -58,4 +58,10 @@
   <ItemGroup>
     <None Include="res\proj_MonitorAdjust_res.zip" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="res\MR.txt" />
+    <Text Include="res\FLP.txt" />
+    <Text Include="res\GE.txt" />
+    <Text Include="res\GE2.txt" />
+  </ItemGroup>
 </Project>

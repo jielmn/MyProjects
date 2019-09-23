@@ -44,6 +44,7 @@ void  CDuiFrameWnd::InitWindow() {
 	for (int i = MachineType_MR; i <= MachineType_GE2; i++) {
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(GetMachineType((MachineType)i));
+		pElement->SetTag(i);
 		m_cmbMachineType->Add(pElement);
 	}
 	m_cmbMachineType->SelectItem(0,false,false);
@@ -182,11 +183,26 @@ void  CDuiFrameWnd::CheckDevice() {
 }
 
 void  CDuiFrameWnd::OnFileChanged() {
+	int nFileSel     = m_cmbFiles->GetCurSel();
+	int nMachineSel  = m_cmbMachineType->GetCurSel();
+	assert(nFileSel >= 0 && nMachineSel >= 0);
+	int nMachine = m_cmbMachineType->GetItemAt(nMachineSel)->GetTag();
 
+	// 如果是标准类型
+	if (nFileSel == 0) {
+		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+			m_temp_items[i]->SetDutyCycle( g_data.m_standard_items[nMachine][i].m_nDutyCycle );
+		}
+	}
+	// 不是标准类型
+	else {
+
+	}
 }
 
 void  CDuiFrameWnd::OnMachineChanged() {
-
+	m_cmbFiles->SelectItem(0, false, false);
+	OnFileChanged();
 }
 
 

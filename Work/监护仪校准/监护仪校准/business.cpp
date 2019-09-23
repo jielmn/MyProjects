@@ -49,6 +49,9 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
+	BOOL bRet = LoadStandardRes();
+	assert(bRet);
+
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
 		return -1;

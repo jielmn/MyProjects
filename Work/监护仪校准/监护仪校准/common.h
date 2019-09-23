@@ -57,6 +57,7 @@ extern CGlobalData  g_data;
 
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 extern const char * GetMachineType(MachineType e);
+extern BOOL LoadStandardRes();
 
 // templates
 template <class T>

@@ -2,6 +2,7 @@
 #include "common.h"
 #include <setupapi.h>
 #include <locale.h>
+#include "resource.h"
 
 CGlobalData  g_data;
 
@@ -133,4 +134,61 @@ const char * GetMachineType(MachineType e) {
 		break;
 	}
 	return "未知机器";
+}
+
+BOOL LoadStandardRes() {
+	int ret = 0;
+	int ids[MAX_MACHINE_CNT] = { IDR_TXT1 ,IDR_TXT2 ,IDR_TXT3 ,IDR_TXT4 };
+	for ( int i = 0; i < MAX_MACHINE_CNT; i++ ) {
+		HRSRC hResource = ::FindResource(0, MAKEINTRESOURCE(ids[i]), "TXT");
+		if (hResource == 0)
+			return FALSE;
+
+		// 加载资源
+		HGLOBAL hg = LoadResource(0, hResource);
+		if ( hg == 0 )
+			return FALSE;
+
+		// 锁定资源
+		LPVOID pData = LockResource(hg);
+		if (pData == 0)
+			return FALSE;
+
+		// 获取资源大小
+		DWORD dwSize = SizeofResource(0, hResource);
+		char buf[8192];
+		assert(dwSize < 8192);
+		if ( dwSize >= 8192 )
+			return FALSE;
+
+		memcpy(buf, pData, dwSize);
+		buf[dwSize] = '\0';
+
+		SplitString  s;
+		s.Split(buf, '\n');
+		DWORD  dwItemsCnt = s.Size();
+		for ( DWORD j = 0; j < dwItemsCnt; j++ ) {
+			SplitString s1;
+			s1.SplitByBlankChars(s[j]);
+			DWORD dwSubCnt = s1.Size();
+			if (dwSubCnt == 2) {
+				float fValue = 0.0f;
+				ret = sscanf_s(s1[0], "%f", &fValue);
+				assert(1 == ret);
+				if (ret != 1)
+					return FALSE;
+
+				g_data.m_standard_items[i][j].m_nTemp = (int)round( fValue * 100.0f );
+				if (g_data.m_standard_items[i][j].m_nTemp != FIRST_TEMP + j * 10)
+					return FALSE;
+
+				ret = sscanf_s(s1[1], "%d", &g_data.m_standard_items[i][j].m_nDutyCycle);
+				assert(1 == ret);
+				if (ret != 1)
+					return FALSE;
+			}
+		}
+	}
+	
+	return TRUE;
 }
