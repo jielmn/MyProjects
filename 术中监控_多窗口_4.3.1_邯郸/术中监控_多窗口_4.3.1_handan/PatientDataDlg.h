@@ -63,6 +63,9 @@ private:
 	// 自动填充体温
 	void  OnAutoTemp();
 	DWORD  GetTemp(time_t tStart, time_t tEnd);
+	// 上一页，下一页
+	void  OnPrevPage();
+	void  OnNextPage();
 
 private:
 	CMyTreeCfgUI  *             m_tree;
@@ -91,6 +94,11 @@ private:
 	CSevenGridsUI *           m_OtherData_Week;
 	CPatientImg *             m_img;
 	CHorizontalLayoutUI *     m_layImg;
+
+	CButtonUI *               m_btnPrev;
+	CButtonUI *               m_btnNext;
+	CButtonUI *               m_btnZoomout;
+	CButtonUI *               m_btnZoomin;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

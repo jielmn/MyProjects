@@ -1109,6 +1109,12 @@ void PrepareXmlChart( CXml2ChartFile & xmlChart, PatientInfo * pInfo,
 				pItem->SetText((const char *)strText);
 			}
 		}
+		else {
+			pItem = xmlChart.FindChartUIByName("page");
+			if (pItem) {
+				pItem->SetText("");
+			}
+		}
 	}
 	else {
 		pItem = xmlChart.FindChartUIByName("page");
@@ -1210,7 +1216,7 @@ static void  DrawTempImg( int width, int height, int nUnitsX, int nUnitsY, int n
 		DrawTempPointImg(tmp_point, radius, hDC, hTempPointPen);
 		if (pItem->m_nType != 0) {
 			DrawTempPointLowHighArrow(pItem->m_nType == 1, tmp_point.x, tmp_point.y, 
-				(int)(2 * x), 6, hDC, hBluePen);
+				(int)(40.0f * y), 6, hDC, hBluePen);
 		}
 
 		// 处理连线

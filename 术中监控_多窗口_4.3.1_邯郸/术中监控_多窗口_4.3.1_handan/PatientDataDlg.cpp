@@ -41,6 +41,10 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_layImg = 0;
 
 	m_out_hospital_time = 0;
+	m_btnPrev = 0;
+	m_btnNext = 0;
+	m_btnZoomout = 0;
+	m_btnZoomin = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -79,6 +83,12 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if (name == "btnAuto") {
 			OnAutoTemp();
+		}
+		else if ( name == "btnPrev" ) {
+			OnPrevPage();
+		}
+		else if ( name == "btnNext" ) {
+			OnNextPage();
 		}
 		else {
 			if ( msg.pSender->GetClass() == "MyEvent" ) {
@@ -144,6 +154,10 @@ void  CPatientDataDlg::OnMyInited() {
 	m_preview = (CPatientDataPrintPreviewUI *)m_PaintManager.FindControl("preview");
 	m_img = (CPatientImg *)m_PaintManager.FindControl("img");
 	m_layImg = (CHorizontalLayoutUI *)m_PaintManager.FindControl("layImg");
+	m_btnPrev = (CButtonUI *)m_PaintManager.FindControl("btnPrev");
+	m_btnNext = (CButtonUI *)m_PaintManager.FindControl("btnNext");
+	m_btnZoomout = (CButtonUI *)m_PaintManager.FindControl("btnZoomOut");
+	m_btnZoomin = (CButtonUI *)m_PaintManager.FindControl("btnZoomIn");
 
 	m_tree->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_tree->SetHotItemBkColor(0xFFFFFFFF);  
@@ -154,7 +168,7 @@ void  CPatientDataDlg::OnMyInited() {
 	CBusiness::GetInstance()->QueryPatientInfoAsyn(m_szTagId);
 	SetBusy(TRUE);
 }
-
+   
 LRESULT  CPatientDataDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_TIMER) {
 		if ( wParam == TIMER_TEMP_UI ) {			
@@ -979,6 +993,10 @@ void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnPreview->SetEnabled(false);
 		m_btnPrint->SetEnabled(false);
 		m_btnReturn->SetEnabled(false);
+		m_btnPrev->SetEnabled(false);
+		m_btnNext->SetEnabled(false);
+		m_btnZoomout->SetEnabled(false);
+		m_btnZoomin->SetEnabled(false);
 	}
 	else {
 		m_tree->SetMouseChildEnabled(true);
@@ -987,7 +1005,10 @@ void CPatientDataDlg::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnPreview->SetEnabled(true);
 		m_btnPrint->SetEnabled(true);
 		m_btnReturn->SetEnabled(true);
-
+		m_btnPrev->SetEnabled(true);
+		m_btnNext->SetEnabled(true);
+		m_btnZoomout->SetEnabled(true);
+		m_btnZoomin->SetEnabled(true);
 	}
 	
 	m_bBusy = bBusy;
@@ -1284,6 +1305,23 @@ void  CPatientDataDlg::OnPatientDataRet(WPARAM wParam, LPARAM  lParam) {
 	m_OtherData_Week->SetWeekStr(week_days, 7);   
 
 	SetBusy(FALSE);
+
+	if (m_switch->GetCurSel() == 1) {
+		PatientInfo info;
+		std::vector<PatientEvent * > vEvents;
+		PatientData data[7];
+
+		// 获取UI的填入信息
+		GetPatientInfo(&info, vEvents);
+		GetPatientData(data, 7);
+
+		memcpy(&m_preview->m_patient_info, &info, sizeof(PatientInfo));
+		memcpy(m_preview->m_patient_data, data, sizeof(PatientData) * 7);
+		m_preview->m_tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_start->GetTime()));
+		ClearVector(m_preview->m_vEvents);
+		std::copy(vEvents.begin(), vEvents.end(), std::back_inserter(m_preview->m_vEvents));
+		m_preview->Invalidate();
+	}
 }
 
 // 时间范围的起始时间改变
@@ -1430,4 +1468,60 @@ DWORD  CPatientDataDlg::GetTemp(time_t tStart, time_t tEnd) {
 			dwTemp = pItem->m_dwTemp;
 	}
 	return dwTemp;
+}
+
+// 上一页，下一页
+void  CPatientDataDlg::OnPrevPage() {
+	PatientData data[7];
+	GetPatientData(data, 7);
+	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
+
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientDataChanged(&data[i], i)) {
+			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
+			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+		}
+	}
+	// END 保存数据
+
+	tFirstDay -= 3600 * 24 * 7;
+	SYSTEMTIME s = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s);
+	
+	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
+	SYSTEMTIME s1 = Time2SysTime(tEndDay);
+	m_date_end->SetMyTime(&s1);
+
+	//m_switch->SelectItem(0);
+	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+	SetBusy(TRUE);
+}
+
+void  CPatientDataDlg::OnNextPage() {
+	PatientData data[7];
+	GetPatientData(data, 7);
+	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
+
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientDataChanged(&data[i], i)) {
+			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
+			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);   
+		}
+	}
+	// END 保存数据
+
+	tFirstDay += 3600 * 24 * 7;
+	SYSTEMTIME s = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s);
+
+	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
+	SYSTEMTIME s1 = Time2SysTime(tEndDay);
+	m_date_end->SetMyTime(&s1);
+
+	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+	SetBusy(TRUE);
 }
