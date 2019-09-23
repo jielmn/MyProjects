@@ -84,6 +84,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "adjust") {
 		OnAdjust(msg);
 	}
+	else if (msg.sType == "click") {
+		if (name == "btnDiff") {
+			OnDiff();
+		}
+	}
 	WindowImplBase::Notify(msg);                
 }
 
@@ -208,6 +213,10 @@ void  CDuiFrameWnd::OnFileChanged() {
 	else {
 
 	}
+
+	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+		m_temp_items[i]->SetChecked(FALSE);
+	}
 }
 
 void  CDuiFrameWnd::OnMachineChanged() {
@@ -218,6 +227,64 @@ void  CDuiFrameWnd::OnMachineChanged() {
 void  CDuiFrameWnd::OnAdjust(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	assert(nIndex >= 0 && nIndex < MAX_TEMP_ITEMS_CNT);
+}
+
+void  CDuiFrameWnd::OnDiff() {
+	int nCheckedCnt = 0;
+	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+		if (m_temp_items[i]->IsChecked()) {
+			nCheckedCnt++;
+		}
+	}
+
+	if (nCheckedCnt < 2) {
+		MessageBox(GetHWND(), "红色的基准点必须两个以上", "错误", 0);
+		return;
+	}
+
+	// 开始计算线性差值
+	// 分成 nCheckedCnt + 1 段，但是我们只要计算出中间的 nCheckedCnt - 1 段即可
+	float * arrDiffs = new float[nCheckedCnt - 1];
+	memset(arrDiffs, 0, sizeof(arrDiffs));
+
+	int nLastCheckIndex  = -1;
+	int nSegmentIndex    = 0;
+	int nFirstCheckIndex = -1;
+	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+		if ( m_temp_items[i]->IsChecked() ) {
+			// 计算diff
+			if ( nLastCheckIndex != -1 ) {
+				int m = m_temp_items[i]->GetDutyCycle();
+				int n = m_temp_items[nLastCheckIndex]->GetDutyCycle();
+				assert(nSegmentIndex < nCheckedCnt - 1);
+				arrDiffs[nSegmentIndex] = (float)(m - n) / (float)(i - nLastCheckIndex);
+				for ( int j = nLastCheckIndex + 1; j < i; j++ ) {
+					int w = (int)round(n + arrDiffs[nSegmentIndex] * (j - nLastCheckIndex));
+					m_temp_items[j]->SetDutyCycle(w);
+				}
+				nSegmentIndex++;
+			}
+			else {
+				nFirstCheckIndex = i;
+			}
+			nLastCheckIndex = i;
+		}
+	}
+
+	// 计算头和尾
+	int m = m_temp_items[nFirstCheckIndex]->GetDutyCycle();
+	int n = m_temp_items[nLastCheckIndex]->GetDutyCycle();
+	for ( int i = 0; i < nFirstCheckIndex; i++ ) {
+		int w = (int)round(m - arrDiffs[0] * (nFirstCheckIndex - i));
+		m_temp_items[i]->SetDutyCycle(w);
+	}
+
+	for (int i = nLastCheckIndex + 1; i < MAX_TEMP_ITEMS_CNT; i++) {
+		int w = (int)round(n + arrDiffs[nCheckedCnt - 2] * (i - nLastCheckIndex));
+		m_temp_items[i]->SetDutyCycle(w);
+	}
+
+	delete[] arrDiffs;
 }
 
 

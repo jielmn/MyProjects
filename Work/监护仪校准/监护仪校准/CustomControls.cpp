@@ -14,6 +14,7 @@ CTempItemUI::CTempItemUI() {
 	m_nTemp = 0;
 	m_nDutyCycle = 0;
 	m_bHighlight = FALSE;
+	m_bChecked = FALSE;
 }
 
 CTempItemUI::~CTempItemUI() {
@@ -49,6 +50,7 @@ void  CTempItemUI::DoInit() {
 
 	SetTemp();
 	SetDutyCycle();
+	SetChecked();
 
 	m_btnDown->SetVisible(false);
 	m_btnUp->SetVisible(false);
@@ -89,6 +91,24 @@ void  CTempItemUI::SetDutyCycle() {
 	CDuiString  strText;
 	strText.Format("%d", m_nDutyCycle);
 	m_lblDutyCycle->SetText(strText);
+}
+
+BOOL  CTempItemUI::IsChecked() const {
+	return m_bChecked;
+}
+
+void  CTempItemUI::SetChecked(BOOL bChecked) {
+	m_bChecked = bChecked;
+	SetChecked();
+}
+
+void  CTempItemUI::SetChecked() {
+	if (0 == m_opBasePoint)
+		return;
+	if (m_bChecked)
+		m_opBasePoint->Selected(true);
+	else
+		m_opBasePoint->Selected(false);
 }
 
 void CTempItemUI::DoEvent(DuiLib::TEventUI& event) {

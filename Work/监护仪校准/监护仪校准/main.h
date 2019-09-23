@@ -62,4 +62,5 @@ private:
 	void  OnFileChanged();
 	void  OnMachineChanged();
 	void  OnAdjust(TNotifyUI& msg);
+	void  OnDiff();
 };
