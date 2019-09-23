@@ -15,6 +15,9 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_layMain = 0;
 	memset(m_layColumns, 0, sizeof(m_layColumns));
 	memset(m_temp_items, 0, sizeof(m_temp_items));
+
+	m_btnSave = 0;
+	m_btnSaveAs = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -28,6 +31,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_cmbMachineType = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmMachine"));
 	m_cmbFiles = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmFiles"));
 	m_layMain = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain"));
+	m_btnSave = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSave"));
+	m_btnSaveAs = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveAs"));
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
 		m_layColumns[i] = new CVerticalLayoutUI;
@@ -39,6 +44,7 @@ void  CDuiFrameWnd::InitWindow() {
 	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
 		m_temp_items[i] = new CTempItemUI;
 		m_temp_items[i]->SetTemp(FIRST_TEMP + i * 10);
+		m_temp_items[i]->SetTag(i);
 	}
 
 	for (int i = MachineType_MR; i <= MachineType_GE2; i++) {
@@ -74,6 +80,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "cmMachine") {
 			OnMachineChanged();
 		}
+	}
+	else if (msg.sType == "adjust") {
+		OnAdjust(msg);
 	}
 	WindowImplBase::Notify(msg);                
 }
@@ -193,6 +202,7 @@ void  CDuiFrameWnd::OnFileChanged() {
 		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
 			m_temp_items[i]->SetDutyCycle( g_data.m_standard_items[nMachine][i].m_nDutyCycle );
 		}
+		m_btnSave->SetEnabled(false);    
 	}
 	// 不是标准类型
 	else {
@@ -203,6 +213,11 @@ void  CDuiFrameWnd::OnFileChanged() {
 void  CDuiFrameWnd::OnMachineChanged() {
 	m_cmbFiles->SelectItem(0, false, false);
 	OnFileChanged();
+}
+
+void  CDuiFrameWnd::OnAdjust(TNotifyUI& msg) {
+	int nIndex = msg.pSender->GetTag();
+	assert(nIndex >= 0 && nIndex < MAX_TEMP_ITEMS_CNT);
 }
 
 

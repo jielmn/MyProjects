@@ -50,6 +50,9 @@ private:
 	CComboUI *             m_cmbMachineType;
 	CComboUI *             m_cmbFiles;
 
+	CButtonUI *            m_btnSave;
+	CButtonUI *            m_btnSaveAs;
+
 private:
 	void  OnWindowInit();
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -58,4 +61,5 @@ private:
 	void  CheckDevice();
 	void  OnFileChanged();
 	void  OnMachineChanged();
+	void  OnAdjust(TNotifyUI& msg);
 };

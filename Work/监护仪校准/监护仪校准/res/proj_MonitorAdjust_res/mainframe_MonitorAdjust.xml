@@ -44,9 +44,9 @@
 					<Label text="数据文件" width="70" font="1" textcolor="#FF386382" />
 					<Combo name="cmFiles" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="200" />
 					<Control width="80" />
-					<Button width="25" height="25" normalimage="save.png" pushedimage="save_pushed.png" />
+					<Button width="25" height="25" normalimage="save.png" pushedimage="save_pushed.png" name="btnSaveAs" />
 					<Control width="20" />
-					<Button width="25" height="25" normalimage="saveas.png" pushedimage="saveas_pushed.png" />
+					<Button width="25" height="25" normalimage="saveas.png" pushedimage="saveas_pushed.png" disabledimage="saveas_disabled.png"  name="btnSave" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="35" inset="10,5,10,5">

@@ -142,4 +142,19 @@ void CTempItemUI::Notify(TNotifyUI& msg) {
 			}			
 		}
 	}
+	else if (msg.sType == "click") {
+		if (msg.pSender == m_btnUp) {
+			int nDutyCycle = GetDutyCycle();
+			nDutyCycle++;
+			SetDutyCycle(nDutyCycle);
+		}
+		else if (msg.pSender == m_btnDown) {
+			int nDutyCycle = GetDutyCycle();
+			nDutyCycle--;
+			SetDutyCycle(nDutyCycle);
+		}
+		else if (msg.pSender == m_btnAdjust) {
+			m_pManager->SendNotify(this, "adjust");
+		}
+	}
 }
