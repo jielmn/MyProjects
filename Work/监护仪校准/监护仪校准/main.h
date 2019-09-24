@@ -53,6 +53,10 @@ private:
 	CButtonUI *            m_btnSave;
 	CButtonUI *            m_btnSaveAs;
 
+	BOOL                   m_bBusy;
+	CButtonUI *            m_btnAdjustAll;
+	CButtonUI *            m_btnDiff;
+
 private:
 	void  OnWindowInit();
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -67,4 +71,6 @@ private:
 	void  OnSave();
 	MachineType  GetMachineType();
 	CDuiString GetTempDataFileName();
+	int   GetComPort();
+	void  SetBusy(BOOL bBusy = TRUE);
 };

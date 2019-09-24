@@ -31,6 +31,9 @@ enum MachineType {
 	MachineType_GE2,
 };
 
+#define MSG_ADJUST                   1001
+#define MSG_ADJUST_RET               1002
+
 #define UM_WRONG_DATA                (WM_USER + 1)
 
 typedef  struct  tagTempItem {
@@ -44,12 +47,14 @@ public:
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
 	TempItem                  m_standard_items[MAX_MACHINE_CNT][MAX_TEMP_ITEMS_CNT];
+	HWND                      m_hWnd;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
 		m_thrd_db = 0;
+		m_hWnd = 0;
 		memset(m_standard_items, 0, sizeof(m_standard_items));
 	}
 };
@@ -65,6 +70,19 @@ public:
 
 public:
 	DuiLib::CPaintManagerUI *  m_pManager;
+};
+
+class CAdjustParam : public LmnToolkits::MessageData {
+public:
+	CAdjustParam(int nComPort, int nTemp, int nDutyCycle) {
+		m_nComPort = nComPort;
+		m_nTemp = nTemp;
+		m_nDutyCycle = nDutyCycle;
+	}
+
+	int m_nComPort;
+	int m_nTemp;
+	int m_nDutyCycle;
 };
 
 

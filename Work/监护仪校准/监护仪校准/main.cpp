@@ -19,6 +19,9 @@ CDuiFrameWnd::CDuiFrameWnd() {
 
 	m_btnSave = 0;
 	m_btnSaveAs = 0;
+	m_bBusy = FALSE;
+	m_btnAdjustAll = 0;
+	m_btnDiff = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -26,6 +29,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+	g_data.m_hWnd = m_hWnd;
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 	m_cmbComPorts = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmComPort"));
@@ -34,6 +38,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layMain = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain"));
 	m_btnSave = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSave"));
 	m_btnSaveAs = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveAs"));
+	m_btnAdjustAll = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAdjust"));
+	m_btnDiff = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnDiff"));
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
 		m_layColumns[i] = new CVerticalLayoutUI;
@@ -97,6 +103,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == UM_WRONG_DATA) {
 		MessageBox(m_hWnd, "数据文件格式不对", "错误", 0);
+	}
+	else if (uMsg == MSG_ADJUST_RET) {
+		if (wParam != 0) {
+			MessageBox(m_hWnd, "校验失败!", "失败", 0);
+		}
+		SetBusy(FALSE);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -276,6 +288,9 @@ void  CDuiFrameWnd::OnMachineChanged() {
 void  CDuiFrameWnd::OnAdjust(TNotifyUI& msg) {
 	int nIndex = msg.pSender->GetTag();
 	assert(nIndex >= 0 && nIndex < MAX_TEMP_ITEMS_CNT);
+	CBusiness::GetInstance()->AdjustAsyn(GetComPort(), m_temp_items[nIndex]->GetTemp(), 
+		m_temp_items[nIndex]->GetDutyCycle());
+	SetBusy();
 }
 
 void  CDuiFrameWnd::OnDiff() {
@@ -435,6 +450,43 @@ CDuiString CDuiFrameWnd::GetTempDataFileName() {
 
 	CListLabelElementUI * pElement = (CListLabelElementUI *)m_cmbFiles->GetItemAt(nFileSel);
 	return pElement->GetText();
+}
+
+int  CDuiFrameWnd::GetComPort() {
+	int nSel = m_cmbComPorts->GetCurSel();
+	if (nSel < 0)
+		return -1;
+
+	return m_cmbComPorts->GetItemAt(nSel)->GetTag();
+}
+
+void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
+	m_bBusy = bBusy;
+	if ( m_bBusy ) {
+		m_cmbComPorts->SetEnabled(false);
+		m_cmbMachineType->SetEnabled(false);
+		m_cmbFiles->SetEnabled(false);
+		m_btnSaveAs->SetEnabled(false);
+		m_btnSave->SetEnabled(false);
+		m_btnAdjustAll->SetEnabled(false);
+		m_btnDiff->SetEnabled(false);
+		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+			m_temp_items[i]->SetMouseChildEnabled(false);
+		}
+	}
+	else {
+		m_cmbComPorts->SetEnabled(true);
+		m_cmbMachineType->SetEnabled(true);
+		m_cmbFiles->SetEnabled(true);
+		m_btnSaveAs->SetEnabled(true);
+		if ( m_cmbFiles->GetCurSel() > 0 )
+			m_btnSave->SetEnabled(true);
+		m_btnAdjustAll->SetEnabled(true);
+		m_btnDiff->SetEnabled(true);
+		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+			m_temp_items[i]->SetMouseChildEnabled(true);  
+		}
+	}
 }
 
 

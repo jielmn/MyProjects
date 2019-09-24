@@ -1,4 +1,5 @@
 #include "business.h"
+#include "LmnSerialPort.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -73,9 +74,49 @@ int CBusiness::DeInit() {
 	return 0;
 }
 
+void  CBusiness::AdjustAsyn(int nComPort, int nTemp, int nDutyCycle) {
+	g_data.m_thrd_db->PostMessage(this, MSG_ADJUST, new	CAdjustParam(nComPort, nTemp, nDutyCycle));
+}
+
+void  CBusiness::Adjust(const CAdjustParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  szComPort[32];
+	char  write_data[256];
+	DWORD dwWriteLen = 8;
+	int   nRegMsg = MSG_ADJUST_RET;
+
+	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nComPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return;
+	}
+
+	memcpy(write_data, "\x66\x20\x01\x04\xB0\xFF\xDD\xAA", dwWriteLen);
+	write_data[1] = pParam->m_nTemp / 100;
+	write_data[2] = (pParam->m_nTemp / 10) % 10;
+	write_data[3] = ( pParam->m_nDutyCycle >> 8 ) & 0xFF;
+	write_data[4] = pParam->m_nDutyCycle & 0xFF;
+	serial_port.Write(write_data, dwWriteLen);
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
+}
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_ADJUST:
+	{
+		CAdjustParam * pParam = (CAdjustParam *)pMessageData;
+		Adjust(pParam);
+	}
+	break;
 
+	default:
+		break;
+	}
 }

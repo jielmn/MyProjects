@@ -15,6 +15,9 @@ public:
 	int Init();
 	int DeInit();
 
+	void  AdjustAsyn(int nComPort, int nTemp, int nDutyCycle);
+	void  Adjust(const CAdjustParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
