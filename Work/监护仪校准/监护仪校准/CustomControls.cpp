@@ -159,7 +159,8 @@ void CTempItemUI::Notify(TNotifyUI& msg) {
 					m_btnUp->SetVisible(false);
 					m_btnDown->SetVisible(false);
 				}
-			}			
+			}	
+			m_bChecked = bSelected ? TRUE : FALSE;
 		}
 	}
 	else if (msg.sType == "click") {
