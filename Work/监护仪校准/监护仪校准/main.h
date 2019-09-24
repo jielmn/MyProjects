@@ -8,6 +8,7 @@ using namespace DuiLib;
 #include "resource.h"
 
 #include "CustomControls.h"
+#include "WaitingBarUI.h"
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -56,6 +57,7 @@ private:
 	BOOL                   m_bBusy;
 	CButtonUI *            m_btnAdjustAll;
 	CButtonUI *            m_btnDiff;
+	CWaitingBarUI *        m_waiting_bar;
 
 private:
 	void  OnWindowInit();
@@ -72,5 +74,5 @@ private:
 	MachineType  GetMachineType();
 	CDuiString GetTempDataFileName();
 	int   GetComPort();
-	void  SetBusy(BOOL bBusy = TRUE);
+	void  SetBusy(BOOL bBusy = TRUE, BOOL bWaitingBar = FALSE);
 };

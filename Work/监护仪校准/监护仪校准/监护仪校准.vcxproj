@@ -158,6 +158,7 @@
     <ClCompile Include="CustomControls.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="SaveAsDlg.cpp" />
+    <ClCompile Include="WaitingBarUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SaveAsDlg.h" />
+    <ClInclude Include="WaitingBarUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="监护仪校准.rc" />

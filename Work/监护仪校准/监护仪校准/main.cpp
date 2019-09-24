@@ -22,6 +22,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_bBusy = FALSE;
 	m_btnAdjustAll = 0;
 	m_btnDiff = 0;
+	m_waiting_bar = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -40,6 +41,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnSaveAs = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveAs"));
 	m_btnAdjustAll = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAdjust"));
 	m_btnDiff = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnDiff"));
+	m_waiting_bar = static_cast<CWaitingBarUI*>(m_PaintManager.FindControl("waiting"));
+	m_waiting_bar->SetVisible(false);
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
 		m_layColumns[i] = new CVerticalLayoutUI;
@@ -67,6 +70,9 @@ void  CDuiFrameWnd::InitWindow() {
 }
  
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, "MyProgress")) {
+		return new CWaitingBarUI;
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -460,7 +466,7 @@ int  CDuiFrameWnd::GetComPort() {
 	return m_cmbComPorts->GetItemAt(nSel)->GetTag();
 }
 
-void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
+void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/) {
 	m_bBusy = bBusy;
 	if ( m_bBusy ) {
 		m_cmbComPorts->SetEnabled(false);
@@ -473,6 +479,10 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
 			m_temp_items[i]->SetMouseChildEnabled(false);
 		}
+		if (bWaitingBar) {
+			m_waiting_bar->SetVisible(true);
+			m_waiting_bar->Start();
+		}		
 	}
 	else {
 		m_cmbComPorts->SetEnabled(true);
@@ -485,7 +495,11 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 		m_btnDiff->SetEnabled(true);
 		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
 			m_temp_items[i]->SetMouseChildEnabled(true);  
-		}
+		}		
+		if (bWaitingBar) {
+			m_waiting_bar->Stop();
+			m_waiting_bar->SetVisible(false);
+		}		
 	}
 }
 
