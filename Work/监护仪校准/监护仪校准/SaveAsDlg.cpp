@@ -13,6 +13,13 @@ void  CSaveAsDlg::Notify(DuiLib::TNotifyUI& msg) {
 			OnMyOk();
 		}
 	}
+	else if ( msg.sType == "itemactivate" ) {
+		name = msg.pSender->GetParent()->GetParent()->GetName();
+		if (name == "lstFiles") {
+			CListTextElementUI * pItem = (CListTextElementUI *)msg.pSender;
+			m_edFileName->SetText(pItem->GetText(0));
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -33,9 +40,9 @@ void  CSaveAsDlg::InitWindow() {
 	hFind = FindFirstFile(szFilePathName, &FindData);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
-			CListTextElementUI* pItem = new CListTextElementUI;
-			pItem->SetText(0, FindData.cFileName);
+			CListTextElementUI* pItem = new CListTextElementUI;			
 			m_lst->Add(pItem);
+			pItem->SetText(0, FindData.cFileName);  
 
 			if (!::FindNextFile(hFind, &FindData)) {
 				break;
@@ -92,7 +99,7 @@ void  CSaveAsDlg::OnMyOk() {
 		return;
 	}
 
-	CDuiString strFilePath = strPath + "\\" + strFileName;
+	CDuiString strFilePath = strPath + "\\" + strFileName + ".txt";
 	FILE * fp = fopen(strFilePath, "wb");
 	if (0 == fp) {
 		MessageBox(GetHWND(), "创建文件失败!", "错误", 0);

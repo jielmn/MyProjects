@@ -319,6 +319,16 @@ void  CDuiFrameWnd::OnSaveAs() {
 		return;
 	}
 
+	// 如果文件名另存为成功
+	if (pSaveAsDlg->m_strFileName != strOldFileName) {
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(pSaveAsDlg->m_strFileName);
+		m_cmbFiles->Add(pElement);
+		int nCnt = m_cmbFiles->GetCount();
+		m_cmbFiles->SelectItem(nCnt - 1, false, false);
+		m_btnSave->SetEnabled(true);
+	}
+
 	delete pSaveAsDlg;
 	return;
 }

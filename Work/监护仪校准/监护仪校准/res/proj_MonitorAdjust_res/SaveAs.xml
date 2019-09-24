@@ -30,7 +30,7 @@
 			<HorizontalLayout height="10" />
 			<HorizontalLayout vscrollbar="true" >
 				<List name="lstFiles" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="1" itemtextcolor="#FF386382" >
-					<ListHeader height="24" menu="true">
+					<ListHeader height="24" >
 						<ListHeaderItem text="已经存在文件名" font="1" textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'"    sepimage="file='list_header_sep.png'" sepwidth="1"/>
 					</ListHeader>
 				</List>
