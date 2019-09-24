@@ -87,6 +87,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnSaveAs") {
 			OnSaveAs();
 		}
+		else if (name == "btnSave") {
+			OnSave();
+		}
 	}
 	WindowImplBase::Notify(msg);                
 }
@@ -373,6 +376,48 @@ void  CDuiFrameWnd::OnSaveAs() {
 
 	delete pSaveAsDlg;
 	return;
+}
+
+void  CDuiFrameWnd::OnSave() {
+	CDuiString  strFileName = GetTempDataFileName();
+	CDuiString strPath = DuiLib::CPaintManagerUI::GetInstancePath();
+	MachineType eType = GetMachineType();
+	strPath += GetMachineTypeStr(eType);
+
+	CDuiString strFilePath = strPath + "\\" + strFileName + ".txt";
+	FILE * fp = fopen(strFilePath, "wb");
+	if (0 == fp) {
+		MessageBox(GetHWND(), "±£¥Ê ß∞‹!", "¥ÌŒÛ", 0);
+		return;
+	}
+
+	CDuiString  strChecked;
+	char buf[8192];
+	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+		int nTemp = m_temp_items[i]->GetTemp();
+		int nDutyCycle = m_temp_items[i]->GetDutyCycle();
+		if (m_temp_items[i]->IsChecked()) {
+			if (strChecked.GetLength() == 0) {
+				strChecked.Format("%d", i);
+			}
+			else {
+				CDuiString strTemp;
+				strTemp.Format("%d", i);
+				strChecked += ",";
+				strChecked += strTemp;
+			}
+		}
+
+		SNPRINTF(buf, sizeof(buf), "%.1f\t%d\r\n", nTemp / 100.0f, nDutyCycle);
+		int nSize = strlen(buf);
+		fwrite(buf, 1, nSize, fp);
+	}
+
+	fwrite("\r\n", 1, 2, fp);
+	fwrite(strChecked, 1, strChecked.GetLength(), fp);
+	fwrite("\r\n", 1, 2, fp);
+
+	fclose(fp);
 }
 
 MachineType CDuiFrameWnd::GetMachineType() {
