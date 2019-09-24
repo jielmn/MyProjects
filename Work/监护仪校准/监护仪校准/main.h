@@ -64,4 +64,6 @@ private:
 	void  OnAdjust(TNotifyUI& msg);
 	void  OnDiff();
 	void  OnSaveAs();
+	MachineType  GetMachineType();
+	CDuiString GetTempDataFileName();
 };

@@ -120,7 +120,7 @@ BOOL EnumPortsWdm(std::vector<std::string> & v)
 	return TRUE;
 }
 
-const char * GetMachineType(MachineType e) {
+const char * GetMachineTypeStr(MachineType e) {
 	switch (e)
 	{
 	case MachineType_MR:
@@ -203,4 +203,78 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 		return new CMyButtonUI; 
 	}
 	return NULL;
+}
+
+
+BOOL LoadFileData(CTempItemUI *  temp_items[MAX_TEMP_ITEMS_CNT], int nItemCnt, MachineType eType,
+	const char * szFileName) {
+
+	CDuiString strFoldName = GetMachineTypeStr(eType);
+	CDuiString strCurPath  = DuiLib::CPaintManagerUI::GetInstancePath();
+
+	char szFilePathName[256];
+	SNPRINTF(szFilePathName, sizeof(szFilePathName), "%s%s\\%s.txt",
+		(const char *)strCurPath, (const char *)strFoldName,szFileName);
+
+	char buf[8192];
+	FILE * fp = fopen(szFilePathName, "rb");
+	if (0 == fp)
+		return FALSE;
+
+	int nReadSize = fread(buf, 1, sizeof(buf), fp);
+	if (nReadSize >= sizeof(buf)) {
+		fclose(fp);
+		return FALSE;
+	}
+	buf[nReadSize] = '\0';
+
+	SplitString  s;
+	s.Split(buf, "\n");
+	DWORD dwItemsCnt = s.Size();
+
+	// 如果行数不够
+	if ( dwItemsCnt < MAX_TEMP_ITEMS_CNT + 2 + 1 ) {
+		fclose(fp);
+		return FALSE;
+	}
+
+	int ret = 0;
+	for ( DWORD j = 0; j < MAX_TEMP_ITEMS_CNT; j++ ) {
+		SplitString s1;
+		s1.SplitByBlankChars(s[j]);
+		DWORD dwSubCnt = s1.Size();
+		if ( dwSubCnt != 2 ) {
+			return FALSE;
+		}
+
+		float fValue = 0.0f;
+		ret = sscanf_s(s1[0], "%f", &fValue);
+		if (ret != 1)
+			return FALSE;
+
+		int nTemp = (int)round(fValue * 100.0f);
+		if (nTemp != FIRST_TEMP + j * 10)
+			return FALSE;
+
+		int nDutyCycle = 0;
+		ret = sscanf_s(s1[1], "%d", &nDutyCycle);
+		if (ret != 1)
+			return FALSE;
+
+		temp_items[j]->SetDutyCycle(nDutyCycle);
+	}
+
+	SplitString s2;
+	s2.Split(s[MAX_TEMP_ITEMS_CNT + 1], ',');
+	int nCheckedCnt = s2.Size();
+	for ( int j = 0; j < nCheckedCnt; j++ ) {
+		int nIndex = 0;
+		ret = sscanf_s(s2[j], "%d", &nIndex);
+		if (ret != 1)
+			return FALSE;
+		temp_items[nIndex]->SetChecked(TRUE);
+	}
+
+	fclose(fp);
+	return TRUE;
 }

@@ -31,6 +31,8 @@ enum MachineType {
 	MachineType_GE2,
 };
 
+#define UM_WRONG_DATA                (WM_USER + 1)
+
 typedef  struct  tagTempItem {
 	int    m_nTemp;
 	int    m_nDutyCycle;
@@ -69,8 +71,11 @@ public:
 extern CGlobalData  g_data;
 
 extern BOOL EnumPortsWdm(std::vector<std::string> & v);
-extern const char * GetMachineType(MachineType e);
+extern const char * GetMachineTypeStr(MachineType e);
 extern BOOL LoadStandardRes();
+class CTempItemUI;
+extern BOOL LoadFileData(CTempItemUI *  temp_items[MAX_TEMP_ITEMS_CNT], int nItemCnt, MachineType eType,
+	const char * szFileName);
 
 // templates
 template <class T>

@@ -50,7 +50,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	for (int i = MachineType_MR; i <= MachineType_GE2; i++) {
 		CListLabelElementUI * pElement = new CListLabelElementUI;
-		pElement->SetText(GetMachineType((MachineType)i));
+		pElement->SetText(GetMachineTypeStr((MachineType)i));
 		pElement->SetTag(i);
 		m_cmbMachineType->Add(pElement);
 	}
@@ -92,6 +92,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (uMsg == UM_WRONG_DATA) {
+		MessageBox(m_hWnd, "数据文件格式不对", "错误", 0);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -206,16 +209,21 @@ void  CDuiFrameWnd::OnFileChanged() {
 		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
 			m_temp_items[i]->SetDutyCycle( g_data.m_standard_items[nMachine][i].m_nDutyCycle );
 		}
-		m_btnSave->SetEnabled(false);    
+
+		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+			m_temp_items[i]->SetChecked(FALSE);
+		}
+
+		m_btnSave->SetEnabled(false);
 	}
 	// 不是标准类型
 	else {
-
-	}
-
-	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
-		m_temp_items[i]->SetChecked(FALSE);
-	}
+		BOOL bRet = LoadFileData( m_temp_items, MAX_TEMP_ITEMS_CNT, GetMachineType(), GetTempDataFileName() );
+		m_btnSave->SetEnabled(true);
+		if (!bRet) {
+			this->PostMessage(UM_WRONG_DATA);			
+		}
+	}	
 }
 
 void  CDuiFrameWnd::OnMachineChanged() {
@@ -231,7 +239,7 @@ void  CDuiFrameWnd::OnMachineChanged() {
 	int nMachineSel = m_cmbMachineType->GetCurSel();
 	assert(nMachineSel >= 0);
 	int nMachine = m_cmbMachineType->GetItemAt(nMachineSel)->GetTag();
-	CDuiString strFoldName = GetMachineType((MachineType)nMachine);
+	CDuiString strFoldName = GetMachineTypeStr((MachineType)nMachine);
 
 	WIN32_FIND_DATA FindData;
 	HANDLE hFind;
@@ -244,10 +252,13 @@ void  CDuiFrameWnd::OnMachineChanged() {
 	// 列出已有的文件
 	hFind = FindFirstFile(szFilePathName, &FindData);
 	if (hFind != INVALID_HANDLE_VALUE) {
-		do {
+		do {			
+			char szFile[256];
+			ParseFileName(FindData.cFileName, 0, 0,szFile, sizeof(szFile));
+
 			pElement = new CListLabelElementUI;
 			m_cmbFiles->Add(pElement);
-			pElement->SetText(FindData.cFileName);
+			pElement->SetText(szFile);
 
 			if (!::FindNextFile(hFind, &FindData)) {
 				break;
@@ -329,7 +340,7 @@ void  CDuiFrameWnd::OnSaveAs() {
 	int nMachine = m_cmbMachineType->GetItemAt(nMachineSel)->GetTag();
 
 	CSaveAsDlg * pSaveAsDlg = new CSaveAsDlg;
-	pSaveAsDlg->m_strFoldName = GetMachineType( (MachineType)nMachine );
+	pSaveAsDlg->m_strFoldName = GetMachineTypeStr( (MachineType)nMachine );
 	if (nFileSel == 0) {
 		pSaveAsDlg->m_strFileName = "";
 	}
@@ -364,6 +375,22 @@ void  CDuiFrameWnd::OnSaveAs() {
 	return;
 }
 
+MachineType CDuiFrameWnd::GetMachineType() {
+	int nMachineSel = m_cmbMachineType->GetCurSel();
+	assert(nMachineSel >= 0);
+	int nMachine = m_cmbMachineType->GetItemAt(nMachineSel)->GetTag();
+	return (MachineType)nMachine;
+}
+
+CDuiString CDuiFrameWnd::GetTempDataFileName() {
+	int nFileSel = m_cmbFiles->GetCurSel();
+	assert(nFileSel >= 0);
+	if (0 == nFileSel)
+		return "";
+
+	CListLabelElementUI * pElement = (CListLabelElementUI *)m_cmbFiles->GetItemAt(nFileSel);
+	return pElement->GetText();
+}
 
 
        

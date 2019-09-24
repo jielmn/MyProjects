@@ -40,9 +40,12 @@ void  CSaveAsDlg::InitWindow() {
 	hFind = FindFirstFile(szFilePathName, &FindData);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		do {
+			char szFile[256];
+			ParseFileName(FindData.cFileName, 0, 0, szFile, sizeof(szFile));
+
 			CListTextElementUI* pItem = new CListTextElementUI;			
 			m_lst->Add(pItem);
-			pItem->SetText(0, FindData.cFileName);  
+			pItem->SetText(0, szFile);
 
 			if (!::FindNextFile(hFind, &FindData)) {
 				break;
