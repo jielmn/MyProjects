@@ -32,10 +32,11 @@ enum MachineType {
 };
 
 #define MSG_ADJUST                   1001
-#define MSG_ADJUST_RET               1002
-#define MSG_ADJUST_ALL               1003
+#define MSG_ADJUST_ALL               1002
 
 #define UM_WRONG_DATA                (WM_USER + 1)
+#define UM_ADJUST_RET                (WM_USER + 2)
+#define UM_ADJUST_ALL_RET            (WM_USER + 3)
 
 typedef  struct  tagTempItem {
 	int    m_nTemp;
@@ -54,6 +55,8 @@ public:
 	LmnToolkits::Thread *     m_thrd_db;
 	TempItem                  m_standard_items[MAX_MACHINE_CNT][MAX_TEMP_ITEMS_CNT];
 	HWND                      m_hWnd;
+	DWORD                     m_dwSleepTime;
+	BOOL                      m_bQuit;
 
 public:
 	CGlobalData() {
@@ -61,6 +64,8 @@ public:
 		m_cfg = 0;
 		m_thrd_db = 0;
 		m_hWnd = 0;
+		m_dwSleepTime = 1000;
+		m_bQuit = FALSE;
 		memset(m_standard_items, 0, sizeof(m_standard_items));
 	}
 };
@@ -98,11 +103,13 @@ public:
 		m_eType = eType;
 		assert(dwSize == MAX_TEMP_ITEMS_CNT);
 		memcpy(m_items, items, sizeof(TempAdjust) * MAX_TEMP_ITEMS_CNT);
+		m_dwSize = dwSize;
 	}
 
 	int          m_nComPort;
 	MachineType  m_eType;
 	TempAdjust   m_items[MAX_TEMP_ITEMS_CNT];
+	DWORD        m_dwSize;
 };
 
 
