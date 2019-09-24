@@ -63,4 +63,5 @@ private:
 	void  OnMachineChanged();
 	void  OnAdjust(TNotifyUI& msg);
 	void  OnDiff();
+	void  OnSaveAs();
 };

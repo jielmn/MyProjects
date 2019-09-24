@@ -27,6 +27,9 @@
     <ClCompile Include="CustomControls.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SaveAsDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CustomControls.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveAsDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -9,6 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "SaveAsDlg.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_nCurColumns = 0;
@@ -87,6 +88,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "click") {
 		if (name == "btnDiff") {
 			OnDiff();
+		}
+		else if (name == "btnSaveAs") {
+			OnSaveAs();
 		}
 	}
 	WindowImplBase::Notify(msg);                
@@ -287,6 +291,36 @@ void  CDuiFrameWnd::OnDiff() {
 	delete[] arrDiffs;
 }
 
+void  CDuiFrameWnd::OnSaveAs() {
+	int nFileSel = m_cmbFiles->GetCurSel();
+	int nMachineSel = m_cmbMachineType->GetCurSel();
+	assert(nFileSel >= 0 && nMachineSel >= 0);
+	int nMachine = m_cmbMachineType->GetItemAt(nMachineSel)->GetTag();
+
+	CSaveAsDlg * pSaveAsDlg = new CSaveAsDlg;
+	pSaveAsDlg->m_strFoldName = GetMachineType( (MachineType)nMachine );
+	if (nFileSel == 0) {
+		pSaveAsDlg->m_strFileName = "";
+	}
+	else {
+		CListLabelElementUI * pElement = (CListLabelElementUI *)m_cmbFiles->GetItemAt(nFileSel);
+		pSaveAsDlg->m_strFileName = pElement->GetText();
+	}
+	CDuiString  strOldFileName = pSaveAsDlg->m_strFileName; 
+
+	pSaveAsDlg->Create(this->m_hWnd, _T("另存为"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pSaveAsDlg->CenterWindow();
+	int ret = pSaveAsDlg->ShowModal();
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pSaveAsDlg;
+		return;
+	}
+
+	delete pSaveAsDlg;
+	return;
+}
 
 
 
