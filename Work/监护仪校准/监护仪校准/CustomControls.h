@@ -1,6 +1,12 @@
 #pragma once
 #include "common.h"
 
+class CMyButtonUI : public CButtonUI {
+private:
+	LPCTSTR GetClass() const;
+	virtual void DoEvent(DuiLib::TEventUI& event);
+};
+
 class CTempItemUI : public CContainerUI, INotifyUI
 {
 public:
@@ -30,9 +36,10 @@ private:
 	COptionUI *                    m_opBasePoint;
 	CLabelUI *                     m_lblTemp;
 	CLabelUI *                     m_lblDutyCycle;
-	CButtonUI *                    m_btnUp;
-	CButtonUI *                    m_btnDown;
+	CMyButtonUI *                  m_btnUp;
+	CMyButtonUI *                  m_btnDown;
 	CButtonUI *                    m_btnAdjust;
+	CDialogBuilderCallbackEx       m_callback;
 
 private:
 	int                            m_nTemp;

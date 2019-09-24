@@ -3,6 +3,7 @@
 #include <setupapi.h>
 #include <locale.h>
 #include "resource.h"
+#include "CustomControls.h"
 
 CGlobalData  g_data;
 
@@ -191,4 +192,15 @@ BOOL LoadStandardRes() {
 	}
 	
 	return TRUE;
+}
+
+CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
+	DuiLib::CDialogBuilder builder;
+	DuiLib::CDuiString  strText;
+	DuiLib::CControlUI * pUI = 0;
+
+	if (0 == strcmp(pstrClass, "MyButton")) {
+		return new CMyButtonUI; 
+	}
+	return NULL;
 }

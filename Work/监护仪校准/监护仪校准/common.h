@@ -52,6 +52,19 @@ public:
 	}
 };
 
+// 创建duilib控件的回调
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+
+public:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
+
 
 extern CGlobalData  g_data;
 

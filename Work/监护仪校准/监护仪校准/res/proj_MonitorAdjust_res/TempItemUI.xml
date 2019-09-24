@@ -13,8 +13,8 @@
 			<label name="lblTemp" text="30.0℃" font="2" textcolor="#FF386382" width="60" />
 			<label name="lblDutyCycle" text="255" font="2" textcolor="#FF386382" width="35" />
 			<VerticalLayout width="16">
-				<Button name="btnUp" text="+" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
-				<Button name="btnDown" text="-" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
+				<MyButton name="btnUp" text="+" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
+				<MyButton name="btnDown" text="-" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
 			</VerticalLayout>	
 			<Control width="10" />
 			<VerticalLayout width="50">

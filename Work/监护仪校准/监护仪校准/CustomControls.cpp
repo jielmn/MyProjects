@@ -3,7 +3,7 @@
 const int CTempItemUI::WIDTH = 210;
 const int CTempItemUI::HEIGHT = 32;                       
 
-CTempItemUI::CTempItemUI() {
+CTempItemUI::CTempItemUI() : m_callback(m_pManager) {
 	m_opBasePoint = 0;
 	m_lblTemp = 0;
 	m_lblDutyCycle = 0;
@@ -29,7 +29,7 @@ void  CTempItemUI::DoInit() {
 	m_pManager->AddNotifier(this);
 
 	CDialogBuilder builder;
-	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("TempItemUI.xml"), (UINT)0, NULL, m_pManager));
+	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("TempItemUI.xml"), (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);		
 	}
@@ -44,9 +44,9 @@ void  CTempItemUI::DoInit() {
 	m_opBasePoint = static_cast<COptionUI*>(m_pManager->FindControl("optBasePoint"));
 	m_lblTemp = static_cast<CLabelUI*>(m_pManager->FindControl("lblTemp"));
 	m_lblDutyCycle = static_cast<CLabelUI*>(m_pManager->FindControl("lblDutyCycle"));
-	m_btnUp = static_cast<CButtonUI*>(m_pManager->FindControl("btnUp"));
-	m_btnDown = static_cast<CButtonUI*>(m_pManager->FindControl("btnDown"));
-	m_btnAdjust = static_cast<CButtonUI*>(m_pManager->FindControl("btnAdjust"));
+	m_btnUp = static_cast<CMyButtonUI*>(m_pManager->FindControl("btnUp"));
+	m_btnDown = static_cast<CMyButtonUI*>(m_pManager->FindControl("btnDown"));
+	m_btnAdjust = static_cast<CButtonUI*>(m_pManager->FindControl("btnAdjust")); 
 
 	SetTemp();
 	SetDutyCycle();
@@ -132,7 +132,7 @@ void CTempItemUI::DoEvent(DuiLib::TEventUI& event) {
 			this->SetBkColor(0x00000000);
 			m_bHighlight = FALSE;
 		}		
-	}
+	}	
 	CContainerUI::DoEvent(event);
 }
 
@@ -178,4 +178,31 @@ void CTempItemUI::Notify(TNotifyUI& msg) {
 			m_pManager->SendNotify(this, "adjust");
 		}
 	}
+}
+
+
+LPCTSTR CMyButtonUI::GetClass() const {
+	return "MyButton";
+}
+
+void CMyButtonUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_BUTTONDOWN) {
+		m_pManager->SetTimer(this, 10, 1000);
+	}
+	else if (event.Type == UIEVENT_BUTTONUP) {
+		m_pManager->KillTimer(this, 10);
+		m_pManager->KillTimer(this, 11);
+	}
+	else if (event.Type == UIEVENT_TIMER) {
+		if (event.wParam == 10) {
+			m_pManager->SendNotify(this, "click");
+			m_pManager->KillTimer(this, 10);
+			m_pManager->SetTimer(this, 11, 50);
+		}
+		else if (event.wParam == 11) {
+			m_pManager->SendNotify(this, "click");
+		}
+		
+	}
+	CButtonUI::DoEvent(event);
 }
