@@ -307,6 +307,7 @@ void  CDuiFrameWnd::OnSaveAs() {
 		pSaveAsDlg->m_strFileName = pElement->GetText();
 	}
 	CDuiString  strOldFileName = pSaveAsDlg->m_strFileName; 
+	memcpy(pSaveAsDlg->m_temp_items, m_temp_items, sizeof(m_temp_items));
 
 	pSaveAsDlg->Create(this->m_hWnd, _T("Áí´æÎª"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSaveAsDlg->CenterWindow();

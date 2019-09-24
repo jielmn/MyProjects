@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "business.h"
+#include "CustomControls.h"
 
 class CSaveAsDlg : public DuiLib::WindowImplBase
 {
@@ -20,4 +21,12 @@ public:
 public:
 	CDuiString     m_strFoldName;
 	CDuiString     m_strFileName;
+	CTempItemUI *  m_temp_items[MAX_TEMP_ITEMS_CNT];
+
+private:
+	CListUI *      m_lst;
+	CEditUI *      m_edFileName;
+
+private:
+	void  OnMyOk();
 };

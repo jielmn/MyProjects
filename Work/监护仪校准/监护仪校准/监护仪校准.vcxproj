@@ -94,7 +94,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;Ws2_32.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\proj_MonitorAdjust_res  ..\Debug\res\proj_MonitorAdjust_res /dseiy</Command>
