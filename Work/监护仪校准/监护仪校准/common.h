@@ -33,6 +33,7 @@ enum MachineType {
 
 #define MSG_ADJUST                   1001
 #define MSG_ADJUST_RET               1002
+#define MSG_ADJUST_ALL               1003
 
 #define UM_WRONG_DATA                (WM_USER + 1)
 
@@ -40,6 +41,11 @@ typedef  struct  tagTempItem {
 	int    m_nTemp;
 	int    m_nDutyCycle;
 }TempItem;
+
+typedef  struct  tagTempAdjust {
+	int    m_nTemp;
+	int    m_nOffset;
+}TempAdjust;
 
 class  CGlobalData {
 public:
@@ -83,6 +89,20 @@ public:
 	int m_nComPort;
 	int m_nTemp;
 	int m_nDutyCycle;
+};
+
+class CAdjustAllParam : public LmnToolkits::MessageData {
+public:
+	CAdjustAllParam(int nComPort, MachineType eType, TempAdjust * items, DWORD dwSize) {
+		m_nComPort = nComPort;
+		m_eType = eType;
+		assert(dwSize == MAX_TEMP_ITEMS_CNT);
+		memcpy(m_items, items, sizeof(TempAdjust) * MAX_TEMP_ITEMS_CNT);
+	}
+
+	int          m_nComPort;
+	MachineType  m_eType;
+	TempAdjust   m_items[MAX_TEMP_ITEMS_CNT];
 };
 
 

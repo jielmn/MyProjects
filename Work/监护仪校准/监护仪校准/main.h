@@ -70,9 +70,10 @@ private:
 	void  OnAdjust(TNotifyUI& msg);
 	void  OnDiff();
 	void  OnSaveAs();
-	void  OnSave();
+	void  OnSave();	
 	MachineType  GetMachineType();
 	CDuiString GetTempDataFileName();
 	int   GetComPort();
 	void  SetBusy(BOOL bBusy = TRUE, BOOL bWaitingBar = FALSE);
+	void  OnAdjustAll();
 };

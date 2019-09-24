@@ -18,6 +18,9 @@ public:
 	void  AdjustAsyn(int nComPort, int nTemp, int nDutyCycle);
 	void  Adjust(const CAdjustParam * pParam);
 
+	void  AdjustAllAsyn(int nComPort, MachineType eType, TempAdjust * items, DWORD dwSize);
+	void  AdjustAll(const CAdjustAllParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

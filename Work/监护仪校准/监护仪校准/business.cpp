@@ -104,6 +104,15 @@ void  CBusiness::Adjust(const CAdjustParam * pParam) {
 	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
 }
 
+void  CBusiness::AdjustAllAsyn(int nComPort, MachineType eType, TempAdjust * items, DWORD dwSize) {
+	g_data.m_thrd_db->PostMessage(this, MSG_ADJUST_ALL, 
+		new	CAdjustAllParam(nComPort, eType, items, dwSize));
+}
+
+void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -113,6 +122,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAdjustParam * pParam = (CAdjustParam *)pMessageData;
 		Adjust(pParam);
+	}
+	break;
+
+	case MSG_ADJUST_ALL:
+	{
+		CAdjustAllParam * pParam = (CAdjustAllParam *)pMessageData;
+		AdjustAll(pParam);
 	}
 	break;
 

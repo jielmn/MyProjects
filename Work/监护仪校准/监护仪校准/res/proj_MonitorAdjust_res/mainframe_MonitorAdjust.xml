@@ -52,7 +52,7 @@
 				<HorizontalLayout height="35" inset="10,5,10,5">
 					<Button name="btnDiff" text="线性差值" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
 					<Control width="20" />
-					<Button name="btnAdjust" text="全部校准" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Button name="btnAdjustAll" text="全部校准" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
 				</HorizontalLayout>
 				
 				<HorizontalLayout inset="10,5,10,5" vscrollbar="true">

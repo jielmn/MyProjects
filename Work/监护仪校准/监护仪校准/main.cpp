@@ -39,7 +39,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layMain = static_cast<DuiLib::CHorizontalLayoutUI*>(m_PaintManager.FindControl("layMain"));
 	m_btnSave = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSave"));
 	m_btnSaveAs = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveAs"));
-	m_btnAdjustAll = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAdjust"));
+	m_btnAdjustAll = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAdjustAll"));
 	m_btnDiff = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnDiff"));
 	m_waiting_bar = static_cast<CWaitingBarUI*>(m_PaintManager.FindControl("waiting"));
 	m_waiting_bar->SetVisible(false);
@@ -101,6 +101,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnSave") {
 			OnSave();
+		}
+		else if (name == "btnAdjustAll") {
+			OnAdjustAll();
 		}
 	}
 	WindowImplBase::Notify(msg);                
@@ -501,6 +504,23 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 			m_waiting_bar->SetVisible(false);
 		}		
 	}
+}
+
+void  CDuiFrameWnd::OnAdjustAll() {
+	TempAdjust items[MAX_TEMP_ITEMS_CNT];
+	memset(items, 0, sizeof(items));
+
+	MachineType eType = GetMachineType();
+	int nType = (int)eType;
+
+	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
+		items[i].m_nTemp   = m_temp_items[i]->GetTemp();
+		items[i].m_nOffset = m_temp_items[i]->GetDutyCycle() - g_data.m_standard_items[nType][i].m_nDutyCycle;
+	}
+
+	CBusiness::GetInstance()->AdjustAllAsyn(GetComPort(), GetMachineType(), 
+		items, MAX_TEMP_ITEMS_CNT);
+	SetBusy(TRUE, TRUE);
 }
 
 
