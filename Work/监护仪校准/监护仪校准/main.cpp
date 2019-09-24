@@ -54,12 +54,7 @@ void  CDuiFrameWnd::InitWindow() {
 		pElement->SetTag(i);
 		m_cmbMachineType->Add(pElement);
 	}
-	m_cmbMachineType->SelectItem(0,false,false);
-
-	CListLabelElementUI * pElement = new CListLabelElementUI;
-	pElement->SetText("标准");
-	m_cmbFiles->Add(pElement);
-	m_cmbFiles->SelectItem(0);
+	m_cmbMachineType->SelectItem(0);
 
 	CheckDevice();     
 	WindowImplBase::InitWindow();
@@ -224,8 +219,44 @@ void  CDuiFrameWnd::OnFileChanged() {
 }
 
 void  CDuiFrameWnd::OnMachineChanged() {
-	m_cmbFiles->SelectItem(0, false, false);
-	OnFileChanged();
+	// 清空
+	m_cmbFiles->RemoveAll();
+
+	// 添加标准
+	CListLabelElementUI * pElement = new CListLabelElementUI;	
+	m_cmbFiles->Add(pElement);
+	pElement->SetText("标准");
+
+	// 添加其他
+	int nMachineSel = m_cmbMachineType->GetCurSel();
+	assert(nMachineSel >= 0);
+	int nMachine = m_cmbMachineType->GetItemAt(nMachineSel)->GetTag();
+	CDuiString strFoldName = GetMachineType((MachineType)nMachine);
+
+	WIN32_FIND_DATA FindData;
+	HANDLE hFind;
+	CDuiString strCurPath = DuiLib::CPaintManagerUI::GetInstancePath();
+
+	char szFilePathName[256];
+	SNPRINTF(szFilePathName, sizeof(szFilePathName), "%s%s\\*.txt",
+		(const char *)strCurPath, (const char *)strFoldName);
+
+	// 列出已有的文件
+	hFind = FindFirstFile(szFilePathName, &FindData);
+	if (hFind != INVALID_HANDLE_VALUE) {
+		do {
+			pElement = new CListLabelElementUI;
+			m_cmbFiles->Add(pElement);
+			pElement->SetText(FindData.cFileName);
+
+			if (!::FindNextFile(hFind, &FindData)) {
+				break;
+			}
+		} while (TRUE);
+		FindClose(hFind);
+	}
+	
+	m_cmbFiles->SelectItem(0);
 }
 
 void  CDuiFrameWnd::OnAdjust(TNotifyUI& msg) {
