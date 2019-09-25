@@ -133,6 +133,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		strText.Format("%d%%", (int)round((double)(wParam + 1) / MAX_TEMP_ITEMS_CNT * 100.0) );
 		m_waiting_bar->SetText(strText);
 	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		CheckDevice();
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
