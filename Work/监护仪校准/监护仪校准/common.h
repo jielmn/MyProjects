@@ -38,6 +38,7 @@ enum MachineType {
 #define UM_WRONG_DATA                (WM_USER + 1)
 #define UM_ADJUST_RET                (WM_USER + 2)
 #define UM_ADJUST_ALL_RET            (WM_USER + 3)
+#define UM_ADJUST_ALL_PROGRESS       (WM_USER + 4)
 
 typedef  struct  tagTempItem {
 	int    m_nTemp;

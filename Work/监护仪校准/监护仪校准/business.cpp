@@ -172,6 +172,8 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 					return;
 				}
 
+				::PostMessage(g_data.m_hWnd, UM_ADJUST_ALL_PROGRESS, i, 0);
+
 				//  ’µΩOK
 				break;
 			}

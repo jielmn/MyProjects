@@ -41,7 +41,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnSaveAs = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveAs"));
 	m_btnAdjustAll = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAdjustAll"));
 	m_btnDiff = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnDiff"));
-	m_waiting_bar = static_cast<CWaitingBarUI*>(m_PaintManager.FindControl("waiting"));
+	m_waiting_bar = static_cast<CProgressUI*>(m_PaintManager.FindControl("waiting")); 
 	m_waiting_bar->SetVisible(false);
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
@@ -110,6 +110,8 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	CDuiString strText;
+
 	if (uMsg == UM_WRONG_DATA) {
 		MessageBox(m_hWnd, "数据文件格式不对", "错误", 0);
 	}
@@ -124,6 +126,12 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (wParam != 0) {
 			MessageBox(m_hWnd, "全部校准失败!", "失败", 0);
 		}		
+	}
+	else if (uMsg == UM_ADJUST_ALL_PROGRESS) {
+		m_waiting_bar->SetValue(wParam + 1);
+		
+		strText.Format("%d%%", (int)round((double)(wParam + 1) / MAX_TEMP_ITEMS_CNT * 100.0) );
+		m_waiting_bar->SetText(strText);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -490,7 +498,8 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 		}
 		if (bWaitingBar) {
 			m_waiting_bar->SetVisible(true);
-			m_waiting_bar->Start();
+			m_waiting_bar->SetValue(0);
+			m_waiting_bar->SetText("0%%"); 
 		}		
 	}
 	else {
@@ -506,7 +515,6 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 			m_temp_items[i]->SetMouseChildEnabled(true);  
 		}		
 		if (bWaitingBar) {
-			m_waiting_bar->Stop();
 			m_waiting_bar->SetVisible(false);
 		}		
 	}

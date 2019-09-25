@@ -57,7 +57,7 @@ private:
 	BOOL                   m_bBusy;
 	CButtonUI *            m_btnAdjustAll;
 	CButtonUI *            m_btnDiff;
-	CWaitingBarUI *        m_waiting_bar;
+	CProgressUI *          m_waiting_bar;
 
 private:
 	void  OnWindowInit();

@@ -67,7 +67,7 @@
 		
 		<!-- 状态栏 -->
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
-			<MyProgress name="waiting" height="24" />
+			<Progress name="waiting" text="Progress" height="24" foreimage="progressf.png" bkimage="progressb.png" min="0" max="160" value="50" hor="true" align="center" valign="vcenter" font="1" textcolor="#FF386382"  />
 		</HorizontalLayout>
 	</VerticalLayout>
 </Window>
