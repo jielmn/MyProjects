@@ -551,7 +551,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	JTelSvrStart((unsigned short)dwPort, 3);
 
 	LmnToolkits::ThreadManager::GetInstance();
-	CBusiness::GetInstance()->Init();
+	int ret = CBusiness::GetInstance()->Init();
+	if (0 != ret) {
+		MessageBox(0, "³õÊ¼»¯Ê§°Ü!", "´íÎó", 0);
+		return -1;
+	}
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
 
 	CPaintManagerUI::SetInstance(hInstance);

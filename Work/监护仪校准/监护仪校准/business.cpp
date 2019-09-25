@@ -54,6 +54,9 @@ int CBusiness::Init() {
 
 	BOOL bRet = LoadStandardRes();
 	assert(bRet);
+	if (!bRet) {
+		return -1;
+	}
 
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
