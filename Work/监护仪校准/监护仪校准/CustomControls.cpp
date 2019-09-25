@@ -187,11 +187,11 @@ LPCTSTR CMyButtonUI::GetClass() const {
 
 void CMyButtonUI::DoEvent(DuiLib::TEventUI& event) {
 	if (event.Type == UIEVENT_BUTTONDOWN) {
-		JTelSvrPrint("set timer 10");
+		//JTelSvrPrint("set timer 10");
 		m_pManager->SetTimer(this, 10, 1000);
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
-		JTelSvrPrint("kill timer 10 and 11");
+		//JTelSvrPrint("kill timer 10 and 11");
 		m_pManager->KillTimer(this, 10);
 		m_pManager->KillTimer(this, 11);
 	}
@@ -199,11 +199,11 @@ void CMyButtonUI::DoEvent(DuiLib::TEventUI& event) {
 		if (event.wParam == 10) {
 			m_pManager->SendNotify(this, "click");
 			m_pManager->KillTimer(this, 10);
-			JTelSvrPrint("set timer 11");
+			//JTelSvrPrint("set timer 11");
 			m_pManager->SetTimer(this, 11, 50);
 		}
 		else if (event.wParam == 11) {
-			JTelSvrPrint("on timer 11");
+			//JTelSvrPrint("on timer 11");
 			m_pManager->SendNotify(this, "click");
 		}
 		
