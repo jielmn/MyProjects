@@ -127,20 +127,20 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 		return;
 	}
 
-	memcpy(write_data, "\x55\x01\x02\x03\xDD\xFF\xDD\xAA", dwWriteLen);
-	write_data[1] = (int)pParam->m_eType + 1;
-
 	for (DWORD i = 0; i < pParam->m_dwSize; i++) {
+		dwWriteLen = 8;
+		memcpy(write_data, "\x55\x01\x02\x03\xDD\xFF\xDD\xAA", dwWriteLen);
+		// write_data[0] = 0x55;
+		write_data[1] = (int)pParam->m_eType + 1;
 		write_data[2] = pParam->m_items[i].m_nTemp / 100;
 		write_data[3] = (pParam->m_items[i].m_nTemp / 10) % 10;
-		write_data[4] = pParam->m_items[i].m_nOffset;
-		dwWriteLen = 8;
+		write_data[4] = pParam->m_items[i].m_nOffset;		
 		serial_port.Write(write_data, dwWriteLen);
 		LmnSleep(g_data.m_dwSleepTime);
 
 #ifndef _DEBUG
 		dwWriteLen = sizeof(write_data);
-		serial_port.Read(write_data, dwWriteLen);
+		BOOL bRet = serial_port.Read(write_data, dwWriteLen);
 		// 没有得到OK回应
 		if ( !(dwWriteLen == 2 && write_data[0] == 'O' && write_data[1] == 'K') ) {
 			serial_port.CloseUartPort();
@@ -148,6 +148,7 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 			return;
 		}
 #endif
+
 		// 如果当前应用程序正在退出
 		if (g_data.m_bQuit)
 			break;

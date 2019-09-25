@@ -536,6 +536,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	DWORD  dwPort = 1601;
+	JTelSvrStart((unsigned short)dwPort, 3);
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");

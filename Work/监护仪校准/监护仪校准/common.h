@@ -8,6 +8,7 @@
 #include "LmnLog.h"
 #include "LmnThread.h"
 #include "LmnString.h"
+#include "LmnTelSvr.h"
 
 #include "UIlib.h"
 using namespace DuiLib;
