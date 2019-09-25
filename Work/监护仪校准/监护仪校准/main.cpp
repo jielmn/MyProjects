@@ -502,7 +502,7 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 		if (bWaitingBar) {
 			m_waiting_bar->SetVisible(true);
 			m_waiting_bar->SetValue(0);
-			m_waiting_bar->SetText("0%%"); 
+			m_waiting_bar->SetText("0%"); 
 		}		
 	}
 	else {
