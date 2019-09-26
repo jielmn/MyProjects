@@ -63,6 +63,7 @@ public:
 
 extern CGlobalData  g_data;
 extern BOOL  IsAbnormal(BYTE beat, BYTE beatV, BYTE byOxy, BYTE byOxyV, int nTemp);
+extern BOOL EnumPortsWdm(std::vector<std::string> & v);
 
 
 // templates

@@ -27,6 +27,7 @@ CGridUI::CGridUI() {
 }
 
 CGridUI::~CGridUI() {
+	m_pManager->RemoveNotifier(this);
 }
 
 LPCTSTR CGridUI::GetClass() const {

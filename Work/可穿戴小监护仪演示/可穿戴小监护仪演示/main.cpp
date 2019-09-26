@@ -9,6 +9,7 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "SettingDlg.h"
 
 #define   ITEM_WIDTH      240
 #define   ITEM_HEIGHT     240  
@@ -63,6 +64,27 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if (msg.sType == "click") {
+		if (msg.pSender->GetName() == "menubtn") {
+			CSettingDlg * pSettingDlg = new CSettingDlg;
+			pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+			pSettingDlg->CenterWindow();
+			int ret = pSettingDlg->ShowModal();
+
+			// 如果是click ok
+			if (0 == ret) {
+				if (pSettingDlg->m_nComPort != g_data.m_nComPort) {
+					g_data.m_nComPort = pSettingDlg->m_nComPort;
+					DWORD  dwValue = g_data.m_nComPort;
+					g_data.m_cfg->SetConfig("serial port", dwValue);
+					g_data.m_cfg->Save();
+					CBusiness::GetInstance()->OpenComAsyn();
+					m_layMain->RemoveAll();
+				}
+			}
+			delete pSettingDlg;
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -152,7 +174,7 @@ bool  CDuiFrameWnd::OnMainSize(void * pParam) {
 
 
 
-
+ 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,

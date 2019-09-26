@@ -90,6 +90,7 @@ int CBusiness::DeInit() {
 }
 
 void  CBusiness::OpenComAsyn() {
+	g_data.m_thrd_db->DeleteMessages();
 	g_data.m_thrd_db->PostMessage(this, MSG_OPEN_COM);
 }
 
@@ -100,6 +101,8 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_OPEN_COM:
 	{
 		if ( g_data.m_nComPort > 0 ) {
+			m_serial_port.CloseUartPort();
+
 			char szCom[256];
 			SNPRINTF(szCom, sizeof(szCom), "com%d", g_data.m_nComPort);
 			BOOL bRet = m_serial_port.OpenUartPort(szCom, 19200);
