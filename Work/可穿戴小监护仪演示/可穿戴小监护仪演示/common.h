@@ -21,12 +21,17 @@ using namespace DuiLib;
 
 #define   MAX_GRID_COUNT 4
 
+#define   MSG_OPEN_COM             1001
+
+#define   UM_COM_STATUS           (WM_USER + 1)
+
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
 	HWND                      m_hWnd;
+	int                       m_nComPort;
 
 public:
 	CGlobalData() {
@@ -34,6 +39,7 @@ public:
 		m_cfg = 0;
 		m_thrd_db = 0;
 		m_hWnd = 0;
+		m_nComPort = 0;
 	}
 };
 

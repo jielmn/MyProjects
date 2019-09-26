@@ -42,6 +42,7 @@ public:
 private:
 	DuiLib::CTileLayoutUI *                     m_layMain;
 	CGridUI *                                   m_grids[MAX_GRID_COUNT];
+	CLabelUI *                                  m_lblStatus;
 
 private:
 	bool  OnMainSize(void * pParam);

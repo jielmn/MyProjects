@@ -23,6 +23,8 @@ void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 	m_layMain = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layGrids"));
+	m_lblStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblDatabaseStatus"));
+	m_lblStatus->SetText("没有打开串口");
 
 	// 添加窗格
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
@@ -36,6 +38,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_layMain->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMainSize);
 
+	CBusiness::GetInstance()->OpenComAsyn();
 	WindowImplBase::InitWindow();
 }
 
@@ -48,6 +51,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (uMsg == UM_COM_STATUS) {
+		BOOL bRet = wParam;
+		CDuiString strText;
+		if (bRet) {
+			strText.Format("打开串口com%d成功", g_data.m_nComPort);
+			m_lblStatus->SetText(strText);
+		}
+		else {
+			strText.Format("打开串口com%d失败", g_data.m_nComPort);
+			m_lblStatus->SetText(strText);
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 

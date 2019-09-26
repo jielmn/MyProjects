@@ -49,6 +49,10 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
+	DWORD  dwValue = 0;
+	g_data.m_cfg->GetConfig("serial port", dwValue, 0);
+	g_data.m_nComPort = dwValue;
+
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
 		return -1;
@@ -70,9 +74,26 @@ int CBusiness::DeInit() {
 	return 0;
 }
 
-
+void  CBusiness::OpenComAsyn() {
+	g_data.m_thrd_db->PostMessage(this, MSG_OPEN_COM);
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_OPEN_COM:
+	{
+		if ( g_data.m_nComPort > 0 ) {
+			char szCom[256];
+			SNPRINTF(szCom, sizeof(szCom), "com%d", g_data.m_nComPort);
+			BOOL bRet = m_serial_port.OpenUartPort(szCom);
+			PostMessage(g_data.m_hWnd, UM_COM_STATUS, bRet, 0);
+		}
+	}
+	break;
 
+	default:
+		break;
+	}
 }
