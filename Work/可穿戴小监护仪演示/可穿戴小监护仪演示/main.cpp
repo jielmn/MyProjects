@@ -122,13 +122,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		pItem->SetTemp(nTemp);
 		pItem->SetPose(byPose);
 
-		if (IsAbnormal(byBeat, byBeatV, byOxy, byOxyV, nTemp)) {
-			pItem->SetGridBkColor(ABNORMAL_COLOR);
-		}
-		else {
-			pItem->SetGridBkColor(NORMAL_COLOR);
-		}
-		
+		BOOL bAbnormal = IsAbnormal(byBeat, byBeatV, byOxy, byOxyV, nTemp);
+		pItem->SetAbnormal(bAbnormal);
 		delete[] pData;
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);  

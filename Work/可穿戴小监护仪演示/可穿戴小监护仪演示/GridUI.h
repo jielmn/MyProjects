@@ -17,7 +17,7 @@ public:
 	BYTE  GetNo() const;
 	void  SetFreq(BYTE freq);
 	BYTE  GetFreq() const;
-	void  SetGridBkColor(DWORD dwColor);
+	void  SetAbnormal(BOOL bAbnormal);
 
 private:
 	LPCTSTR GetClass() const;
@@ -52,4 +52,11 @@ private:
 	CLabelUI *         m_lblNo;
 	CLabelUI *         m_lblFreq;
 	CVerticalLayoutUI *  m_main;
+
+	//CLabelUI *         m_lblBeatT;
+	//CLabelUI *         m_lblOxyT;
+	//CLabelUI *         m_lblTempT;
+	//CLabelUI *         m_lblPoseT;
+	//CLabelUI *         m_lblNoT;
+	//CLabelUI *         m_lblFreqT;
 };

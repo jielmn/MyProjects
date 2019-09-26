@@ -168,8 +168,23 @@ BYTE  CGridUI::GetFreq() const {
 	return m_freq;
 }
 
-void  CGridUI::SetGridBkColor(DWORD dwColor) {
+
+DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData) {
+	if (0 == strcmp(pSubControl->GetClass(), DUI_CTR_LABEL)) {
+		((CLabelUI *)pSubControl)->SetTextColor((DWORD)lpData);
+	}
+	return 0;
+}
+
+void  CGridUI::SetAbnormal(BOOL bAbnormal) {
 	if (m_main) {
-		m_main->SetBkColor(dwColor);
+		if (bAbnormal) {
+			m_main->SetBkColor(ABNORMAL_COLOR);
+			m_main->FindControl(CS_FINDCONTROLPROC, (LPVOID)0xFF333333, 0);
+		}
+		else {
+			m_main->SetBkColor(NORMAL_COLOR);
+			m_main->FindControl(CS_FINDCONTROLPROC, (LPVOID)0xFFFFFFFF, 0);
+		}
 	}
 }

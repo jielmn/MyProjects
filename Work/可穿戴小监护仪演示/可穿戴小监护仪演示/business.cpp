@@ -102,7 +102,7 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 		if ( g_data.m_nComPort > 0 ) {
 			char szCom[256];
 			SNPRINTF(szCom, sizeof(szCom), "com%d", g_data.m_nComPort);
-			BOOL bRet = m_serial_port.OpenUartPort(szCom);
+			BOOL bRet = m_serial_port.OpenUartPort(szCom, 19200);
 			PostMessage(g_data.m_hWnd, UM_COM_STATUS, bRet, 0);
 
 			g_data.m_thrd_db->PostDelayMessage(100, this, MSG_READ_COM);
