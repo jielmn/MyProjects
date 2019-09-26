@@ -28,6 +28,7 @@ private:
 
 private:
 	CLmnSerialPort                              m_serial_port;
+	CDataBuf                                    m_buf;
 };
 
 

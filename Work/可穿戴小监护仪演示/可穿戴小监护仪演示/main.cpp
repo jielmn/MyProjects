@@ -10,8 +10,11 @@
 #include "business.h"
 #include "resource.h"
 
+#define   ITEM_WIDTH      240
+#define   ITEM_HEIGHT     240  
+
 CDuiFrameWnd::CDuiFrameWnd() {
-	 
+	m_nColumns = 2;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -26,15 +29,28 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblDatabaseStatus"));
 	m_lblStatus->SetText("没有打开串口");
 
+#if TEST_FLAG
 	// 添加窗格
 	for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 		m_grids[i] = new CGridUI;
-		m_grids[i]->SetBorderSize(4);
-		m_grids[i]->SetBorderColor(0xFF434248); 
 		m_grids[i]->SetName("grid");
 		m_grids[i]->SetTag(i);
-		m_layMain->Add(m_grids[i]);    
+		m_grids[i]->SetIndex(i + 1);
+		m_grids[i]->SetBeat((BYTE)(90 + i), 1);
+		m_grids[i]->SetOxy((BYTE)(80 + i), 1);
+		m_grids[i]->SetTemp(3600 + i * 10);
+		m_grids[i]->SetPose((BYTE)i);
+		m_grids[i]->SetNo((BYTE)i);
+		m_grids[i]->SetFreq((BYTE)i);
+		m_layMain->Add(m_grids[i]);
 	}
+#endif
+
+	SIZE s;
+	s.cx = ITEM_WIDTH;
+	s.cy = ITEM_HEIGHT;
+	m_layMain->SetItemSize(s);
+	m_layMain->SetFixedColumns(m_nColumns);
 
 	m_layMain->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMainSize);
 
@@ -63,17 +79,76 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_lblStatus->SetText(strText);
 		}
 	}
-	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
+	else if (uMsg == UM_COM_DATA) {
+		BYTE * pData = (BYTE *)wParam;
+		DWORD  dwDataLen = lParam;
+		assert(dwDataLen == 13);
+		assert(pData);
+
+		BYTE  byBeat  = pData[2];
+		BYTE  byBeatV = pData[3];
+		BYTE  byOxy   = pData[4];
+		BYTE  byOxyV  = pData[5];
+		int   nTemp   = pData[6] * 100 + pData[7];
+		BYTE  byPose  = pData[8];
+		BYTE  byFreq  = pData[9];
+		BYTE  byNo    = pData[10];
+
+		int cnt = m_layMain->GetCount();
+		CGridUI * pItem = 0;
+		for ( int i = 0; i < cnt; i++ ) {
+			pItem = (CGridUI *)m_layMain->GetItemAt(i);
+			// 找到
+			if (pItem->GetFreq() == byFreq && pItem->GetNo() == byNo) {
+				break;
+			}
+			else {
+				pItem = 0;
+			}
+		}
+
+
+		// 没有找到
+		if ( pItem == 0 ) {
+			pItem = new CGridUI;
+			m_layMain->Add(pItem);
+			pItem->SetNo(byNo);
+			pItem->SetFreq(byFreq);
+			pItem->SetIndex(cnt + 1);
+		}
+
+		pItem->SetBeat(byBeat, byBeatV);
+		pItem->SetOxy(byOxy, byOxyV);
+		pItem->SetTemp(nTemp);
+		pItem->SetPose(byPose);
+
+		if (IsAbnormal(byBeat, byBeatV, byOxy, byOxyV, nTemp)) {
+			pItem->SetGridBkColor(ABNORMAL_COLOR);
+		}
+		else {
+			pItem->SetGridBkColor(NORMAL_COLOR);
+		}
+		
+		delete[] pData;
+	}
+	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);  
 }
 
 bool  CDuiFrameWnd::OnMainSize(void * pParam) {
-	SIZE s;
-	RECT rect = m_layMain->GetPos();
-	int width  = rect.right - rect.left;
-	int height = rect.bottom - rect.top;
-	s.cx = (width - 1) / 2 + 1;
-	s.cy = (height - 1) / 2 + 1;
+	RECT r = m_layMain->GetPos();
+	int width = r.right - r.left;
+	int nColumns = width / ITEM_WIDTH;
+	if (nColumns <= 0)
+		nColumns = 1;
+
+	m_nColumns = nColumns;
+	m_layMain->SetFixedColumns(m_nColumns);
+
+	SIZE  s;
+	s.cx = width / m_nColumns;
+	s.cy = ITEM_HEIGHT;
 	m_layMain->SetItemSize(s);
+	 
 	return true;
 }
 

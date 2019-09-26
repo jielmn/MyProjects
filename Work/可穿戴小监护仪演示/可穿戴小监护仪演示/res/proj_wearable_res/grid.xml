@@ -1,37 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>	
-	<VerticalLayout>	
-		<HorizontalLayout />
-		
-		<HorizontalLayout height="120">
-			<Label text="01" align="center" textcolor="#FFFFFFFF" font="1"  />
-		</HorizontalLayout>
-		
-		<HorizontalLayout inset="50,0,50,0" height="40">
-			<Label text="心率：" textcolor="#FFFFFFFF" font="2" width="130"  />
-			<Label name="lblBeat" textcolor="#FFFFFFFF" font="2" text="120" />
-			<Label text="有效位：" textcolor="#FFFFFFFF" font="2"  />
-			<Label name="lblBeatV" textcolor="#FFFFFFFF" font="2" text="56" />
-		</HorizontalLayout>
-		
-		<HorizontalLayout inset="50,0,50,0" height="40">
-			<Label text="血氧饱和度：" textcolor="#FFFFFFFF" font="2"  width="130"  />
-			<Label name="lblOxy"  textcolor="#FFFFFFFF" font="2" text="100" />
-			<Label text="有效位：" textcolor="#FFFFFFFF" font="2"  />
-			<Label name="lblOxyV" textcolor="#FFFFFFFF" font="2" text="56" />
-		</HorizontalLayout>
-		
-		<HorizontalLayout inset="50,0,50,0" height="40">
-			<Label text="体温：" textcolor="#FFFFFFFF" font="2"  width="130"  />
-			<Label name="lblTemp"  textcolor="#FFFFFFFF" font="2" text="36.8℃" />
-		</HorizontalLayout>
-		
-		<HorizontalLayout inset="50,0,50,0" height="40">
-			<Label text="人体姿势：" textcolor="#FFFFFFFF" font="2"  width="130"  />
-			<Label name="lblPose"  textcolor="#FFFFFFFF" font="2" text="12" />
-		</HorizontalLayout>
-		
-		<HorizontalLayout />
-		
+	<VerticalLayout inset="6,6,6,6" bkcolor="#FF4AB20A" bordersize="6" bordercolor="#FF434248" name="main">	
+		<HorizontalLayout>
+			<VerticalLayout />
+			
+			<VerticalLayout width="160">
+				<HorizontalLayout height="40">
+					<Label name="lblIndex" text="01" align="center" textcolor="#FFFFFFFF" font="1"  />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,0,5,0" height="30">
+					<Label text="心率：" textcolor="#FFFFFFFF" font="2" width="90"  />
+					<Label name="lblBeat" textcolor="#FFFFFFFF" font="2" text="120" />
+					<Label text="有效位：" textcolor="#FFFFFFFF" font="2" visible="false"  />
+					<Label name="lblBeatV" textcolor="#FFFFFFFF" font="2" text="56" visible="false" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,0,5,0" height="30">
+					<Label text="血氧饱和度：" textcolor="#FFFFFFFF" font="2"  width="90"  />
+					<Label name="lblOxy"  textcolor="#FFFFFFFF" font="2" text="100" />
+					<Label text="有效位：" textcolor="#FFFFFFFF" font="2"  visible="false" />
+					<Label name="lblOxyV" textcolor="#FFFFFFFF" font="2" text="56"  visible="false" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,0,5,0" height="30">
+					<Label text="体温：" textcolor="#FFFFFFFF" font="2"  width="90"  />
+					<Label name="lblTemp"  textcolor="#FFFFFFFF" font="2" text="36.8℃" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,0,5,0" height="30">
+					<Label text="人体姿势：" textcolor="#FFFFFFFF" font="2"  width="90"  />
+					<Label name="lblPose"  textcolor="#FFFFFFFF" font="2" text="12" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,0,5,0" height="30">
+					<Label text="设备编号：" textcolor="#FFFFFFFF" font="2"  width="90"  />
+					<Label name="lblNo"  textcolor="#FFFFFFFF" font="2" text="19" />
+				</HorizontalLayout>
+				
+				<HorizontalLayout inset="5,0,5,0" height="30">
+					<Label text="通信频率：" textcolor="#FFFFFFFF" font="2"  width="90"  />
+					<Label name="lblFrequence"  textcolor="#FFFFFFFF" font="2" text="203" />
+				</HorizontalLayout>
+			</VerticalLayout>
+			
+			<VerticalLayout />
+		</HorizontalLayout>		
 	</VerticalLayout>
 </Window>
