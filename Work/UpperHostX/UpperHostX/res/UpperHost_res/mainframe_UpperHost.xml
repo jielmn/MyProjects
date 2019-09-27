@@ -42,7 +42,7 @@
 				
 				<HorizontalLayout height="60" inset="10,5,10,25" >
 					<Label text="文件描述" width="120" font="3" textcolor="#FF386382" height="40" />
-					<Edit  name="etDescription" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC"  />
+					<Edit  name="etDescription" readonly="true" bkcolor="0xFFCCCCCC" nativebkcolor="0xFFCCCCCC" textcolor="#FF386382"  />
 				</HorizontalLayout>
 				
 				<HorizontalLayout inset="10,5,10,25">

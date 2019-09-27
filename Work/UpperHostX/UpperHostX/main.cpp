@@ -149,7 +149,39 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	if (!m_btnSend->IsEnabled())
 		m_btnSend->SetEnabled(true);
 
+	m_edDescription->SetText("");
 
+	int nSel = m_cmbLuaFiles->GetCurSel();
+	CDuiString strFile = m_cmbLuaFiles->GetItemAt(nSel)->GetText();
+	char szFilePathName[256];
+	SNPRINTF(szFilePathName, sizeof(szFilePathName), ".\\Lua\\%s", (const char *)strFile );
+
+	int ret = luaL_loadfile(m_L, szFilePathName);
+	if (0 != ret) {
+		return;
+	}
+
+	ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
+	if (0 != ret)
+		return;
+
+	lua_getglobal(m_L, "utf8");
+	BOOL bUtf8 = lua_toboolean(m_L, -1); 
+	lua_settop(m_L, 0);
+
+	lua_getglobal(m_L, "description");
+	size_t len = 0;
+	const char * szDescription = lua_tolstring(m_L, -1, &len);
+	if (szDescription) {
+		if ( bUtf8 ) {
+			char szTemp[1024];
+			Utf8ToAnsi(szTemp, sizeof(szTemp), szDescription);
+			m_edDescription->SetText(szTemp); 
+		}
+		else {
+			m_edDescription->SetText(szDescription);
+		}
+	}
 }
 
 
