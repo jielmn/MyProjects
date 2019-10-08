@@ -16,6 +16,8 @@
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\" PROJ_NAME "_res")
 
+#define   UM_WRONG_LUA            (WM_USER +1)
+
 
 class  CGlobalData {
 public:

@@ -38,6 +38,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnSend = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnSend"));
 	m_btnSend->SetEnabled(false);
 
+	m_params->SetSelectedItemBkColor(0xFFFFFFFF);
+	m_params->SetHotItemBkColor(0xFFFFFFFF);
+
 	InitCmbLuaFiles();
 
 	OnDeviceChanged(0,0);   
@@ -58,12 +61,20 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnLuaFileSelected();
 		}
 	}
+	else if (msg.sType == "click") {
+		if (name == "btnSend") {
+			OnSend();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_DEVICECHANGE) {
 		OnDeviceChanged(wParam, lParam);
+	}
+	else if (uMsg == UM_WRONG_LUA) {
+		MessageBox(GetHWND(), "加载文件出现错误", "错误", 0);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -145,25 +156,36 @@ void  CDuiFrameWnd::InitCmbLuaFiles() {
 		m_cmbLuaFiles->SelectItem(0);
 }
 
-void  CDuiFrameWnd::OnLuaFileSelected() {
-	if (!m_btnSend->IsEnabled())
-		m_btnSend->SetEnabled(true);
+void  CDuiFrameWnd::OnLuaFileSelected() {	
+	m_btnSend->SetEnabled(false);
 
+	lua_settop(m_L, 0);
 	m_edDescription->SetText("");
+	m_params->RemoveAll();
+
+	const char * szDefault = "utf8=false;description=\"\";params={};function send(t) \n end\n";
+	luaL_loadstring(m_L, szDefault);
+	int ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
+	if (0 != ret) {
+		return;
+	}
 
 	int nSel = m_cmbLuaFiles->GetCurSel();
 	CDuiString strFile = m_cmbLuaFiles->GetItemAt(nSel)->GetText();
 	char szFilePathName[256];
 	SNPRINTF(szFilePathName, sizeof(szFilePathName), ".\\Lua\\%s", (const char *)strFile );
 
-	int ret = luaL_loadfile(m_L, szFilePathName);
+	ret = luaL_loadfile(m_L, szFilePathName);
 	if (0 != ret) {
+		this->PostMessage(UM_WRONG_LUA);
 		return;
 	}
 
 	ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
-	if (0 != ret)
-		return;
+	if (0 != ret) {
+		this->PostMessage(UM_WRONG_LUA);
+		return; 
+	}
 
 	lua_getglobal(m_L, "utf8");
 	BOOL bUtf8 = lua_toboolean(m_L, -1); 
@@ -182,6 +204,90 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 			m_edDescription->SetText(szDescription);
 		}
 	}
+	lua_settop(m_L, 0);
+
+	lua_getglobal(m_L, "params");
+	lua_pushnil(m_L);
+	while ( lua_next(m_L, 1) != 0 ) {		
+
+		int i = 0;
+		char szTemp[2][1024];
+
+		lua_pushnil(m_L);
+		while (lua_next(m_L, 3) != 0 && i < 2) {
+			size_t n = 0;
+			const char * s = lua_tolstring(m_L, -1, &n);
+			
+			if (s) {
+				if (bUtf8) {
+					Utf8ToAnsi(szTemp[i], sizeof(szTemp[i]), s);
+				}
+				else {
+					STRNCPY(szTemp[i], s, sizeof(szTemp[i]));
+				}
+			}
+			lua_pop(m_L, 1);
+			i++;			
+		}
+
+		CEditUI * pEdit = new CEditUI;
+		pEdit->SetText(szTemp[1]);
+		m_params->AddNode(szTemp[0], 0, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+
+		lua_settop(m_L, 3);
+		lua_pop(m_L, 1);
+	}
+	lua_settop(m_L, 0);
+
+	m_btnSend->SetEnabled(true);
+}
+
+void  CDuiFrameWnd::OnSend() {
+	lua_settop(m_L, 0);
+	lua_getglobal(m_L, "send");
+	lua_newtable(m_L);
+
+	int cnt = m_params->GetCount();
+	for (int i = 0; i < cnt; i++) {
+		CMyTreeCfgUI::ConfigValue value;
+		m_params->GetConfigValue(i, value);
+		lua_pushstring(m_L, value.m_strEdit);
+		lua_rawseti(m_L, -2, i+1);
+	}
+
+	int ret = lua_pcall(m_L, 1, 1, 0);
+	if (0 != ret) {
+		size_t err_len = 0;
+		const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
+		MessageBox(GetHWND(), szErrDescription, "错误", 0);
+		lua_settop(m_L, 0);
+		return;
+	}
+
+	size_t len = 0;
+	const char * pData = lua_tolstring(m_L, 1, &len);
+	if ( len <= 0 ) {
+		MessageBox(GetHWND(), "待发送的数据长度为0", "错误", 0);
+		lua_settop(m_L, 0);
+		return;
+	}	
+
+	CLmnSerialPort  serial_port;
+
+	int nSel = m_cmbComPorts->GetCurSel();
+	CListLabelElementUI * pItem = (CListLabelElementUI *)m_cmbComPorts->GetItemAt(nSel);
+	int nPort = pItem->GetTag();
+
+	BOOL bRet = serial_port.OpenUartPort(nPort);
+	if (!bRet) {
+		MessageBox(GetHWND(), "打开串口失败", "错误", 0);
+		lua_settop(m_L, 0);
+		return;
+	}
+
+	DWORD  dwLen = len;
+	serial_port.Write(pData, dwLen);
+	serial_port.CloseUartPort();
 }
 
 

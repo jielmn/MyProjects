@@ -43,6 +43,7 @@ private:
 	void  OnDeviceChanged(WPARAM wParm, LPARAM  lParam);
 	void  InitCmbLuaFiles();
 	void  OnLuaFileSelected();
+	void  OnSend();
 
 private:
 	CComboUI *             m_cmbComPorts;

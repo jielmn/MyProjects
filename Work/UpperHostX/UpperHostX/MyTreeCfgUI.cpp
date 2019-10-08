@@ -128,7 +128,7 @@ CMyTreeCfgUI::CMyTreeCfgUI(DWORD  dwFixedLeft /*= 160*/) : _root(NULL), m_dwDela
 
 	m_dwFixedLeft = dwFixedLeft;
 	m_dwFixedItemHeight = 26;
-	m_hPen = CreatePen(PS_DOT, 1, RGB(0x99, 0x99, 0x99));
+	m_hPen = CreatePen(PS_SOLID, 1, RGB(0x99, 0x99, 0x99));
 }
 
 CMyTreeCfgUI::~CMyTreeCfgUI() { 
@@ -462,11 +462,10 @@ bool CMyTreeCfgUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopContro
 	HPEN hOldPen = (HPEN)::SelectObject(hDC, m_hPen);
 
 	RECT r = this->GetPos();
-	//::MoveToEx(hDC, r.left, r.top, 0);
-	//::LineTo(hDC, r.right-1, r.top);
-	//::LineTo(hDC, r.right-1, r.bottom-1);
-	//::LineTo(hDC, r.left, r.bottom-1);
-	//::LineTo(hDC, r.left, r.top);
+	::MoveToEx(hDC, r.left, r.top, 0);
+	::LineTo(hDC, r.left, r.bottom - 1);
+	::MoveToEx(hDC, r.right-1, r.top, 0);
+	::LineTo(hDC, r.right-1, r.bottom - 1);
 
 	int nCount = this->GetCount();
 	int h = r.top;
