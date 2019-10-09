@@ -33,6 +33,7 @@ public:
 
 extern CGlobalData  g_data;
 
+extern char *  VlcTime2Str(char * szTime, DWORD dwTimeSize, int nTime);
 
 // templates
 template <class T>

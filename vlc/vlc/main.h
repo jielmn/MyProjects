@@ -11,6 +11,7 @@ using namespace DuiLib;
 #include "resource.h"
 
 #include "MyWndUI.h"
+#include "MyProgressUI.h"
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -51,6 +52,12 @@ protected:
 	CControlUI *                m_header;
 	CControlUI *                m_bottom;
 	BOOL                        m_bFullScreen;
+
+	CLabelUI *                  m_lblCurTime;
+	CLabelUI *                  m_lblDuration;
+	CMyProgressUI *             m_progress;
+	CButtonUI *                 m_btnStart;
+	CButtonUI *                 m_btnStop;
 
 private:
 	BOOL    IsPlaying();
