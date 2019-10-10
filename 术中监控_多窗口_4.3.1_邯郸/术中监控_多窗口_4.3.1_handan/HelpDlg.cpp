@@ -106,6 +106,15 @@ void CHelpDlg::Notify(TNotifyUI& msg) {
 			else if (playerstate == libvlc_Stopped) {
 				libvlc_media_player_play(libvlc_mp);
 				SetTimer(GetHWND(), VLC_TIMER, 1000, 0);
+				m_btnStart->SetNormalImage("pause.png");
+			}
+			else if (playerstate == libvlc_Ended) {
+				libvlc_media_player_stop(libvlc_mp);
+				libvlc_media_player_play(libvlc_mp);
+				m_progress->SetValue(0);
+				SetTimer(GetHWND(), VLC_TIMER, 1000, 0);
+				m_btnStart->SetNormalImage("pause.png");
+				m_lblCurTime->SetText("00:00:00");
 			}
 		}
 		else if (msg.pSender->GetName() == "btnStop") {
@@ -151,6 +160,7 @@ LRESULT CHelpDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 				// 如果播放过
 				if (m_progress->GetValue() > 0) {
 					m_progress->SetValue(1000);
+					m_btnStart->SetNormalImage("start.png");
 				}
 				KillTimer(GetHWND(), wParam);
 			}
