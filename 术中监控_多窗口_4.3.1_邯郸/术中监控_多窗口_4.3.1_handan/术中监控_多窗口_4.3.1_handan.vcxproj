@@ -96,11 +96,13 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqliteD.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;Xml2ChartD.lib;tinyxml.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqliteD.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;Xml2ChartD.lib;tinyxml.lib;libvlc.lib;libvlccore.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Xml2Chart\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy res\proj_temp_monitor_res  ..\Debug\res\proj_temp_monitor_res /dseiy</Command>
+      <Command>xcopy res\proj_temp_monitor_res  ..\Debug\res\proj_temp_monitor_res /dseiy
+xcopy plugins  ..\Debug\plugins /dseiy
+xcopy video  ..\Debug\video /dseiy</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,9 +137,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;Xml2Chart.lib;tinyxml.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilib.lib;LmnCommonX.lib;User32.lib;Advapi32.lib;Gdi32.lib;winmm.lib;Comdlg32.lib;sqlite.lib;gdiplus.lib;Ws2_32.lib;Setupapi.lib;Xml2Chart.lib;tinyxml.lib;libvlc.lib;libvlccore.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\Xml2Chart\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/SAFESEH:NO %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy plugins  ..\Release\plugins /dseiy
+xcopy video  ..\Release\video /dseiy</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -165,12 +172,15 @@
     <ClCompile Include="DuiMenu.cpp" />
     <ClCompile Include="EditableButtonUI.cpp" />
     <ClCompile Include="GridUI.cpp" />
+    <ClCompile Include="HelpDlg.cpp" />
     <ClCompile Include="Launch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ModeButton.cpp" />
     <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="MyImageUI.cpp" />
+    <ClCompile Include="MyProgressUI.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
+    <ClCompile Include="MyWndUI.cpp" />
     <ClCompile Include="PatientDataDlg.cpp" />
     <ClCompile Include="PatientDataPrintPreviewUI.cpp" />
     <ClCompile Include="ReaderUI.cpp" />
@@ -186,13 +196,16 @@
     <ClInclude Include="DragDropUI.h" />
     <ClInclude Include="EditableButtonUI.h" />
     <ClInclude Include="GridUI.h" />
+    <ClInclude Include="HelpDlg.h" />
     <ClInclude Include="Launch.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="DuiMenu.h" />
     <ClInclude Include="ModeButtonUI.h" />
     <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="MyImageUI.h" />
+    <ClInclude Include="MyProgressUI.h" />
     <ClInclude Include="MyTreeCfgUI.h" />
+    <ClInclude Include="MyWndUI.h" />
     <ClInclude Include="PatientDataDlg.h" />
     <ClInclude Include="PatientDataPrintPreviewUI.h" />
     <ClInclude Include="ReaderUI.h" />

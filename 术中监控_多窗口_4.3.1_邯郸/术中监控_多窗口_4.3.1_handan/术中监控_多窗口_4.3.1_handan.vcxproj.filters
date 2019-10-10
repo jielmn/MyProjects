@@ -75,6 +75,15 @@
     <ClCompile Include="PatientDataPrintPreviewUI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="HelpDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyWndUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyProgressUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -138,6 +147,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="PatientDataPrintPreviewUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HelpDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyWndUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyProgressUI.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

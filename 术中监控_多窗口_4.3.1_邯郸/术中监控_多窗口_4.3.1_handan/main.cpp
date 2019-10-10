@@ -14,6 +14,7 @@
 #include "SettingDlg.h"
 #include "TagUI.h"
 #include "PatientDataDlg.h"
+#include "HelpDlg.h"
 
 #define   TIMER_DRAG_DROP_GRID                   1001
 #define   INTERVAL_TIMER_DRAG_DROP_GRIDS         1500
@@ -320,6 +321,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "about") {
 		OnAbout();
+	}
+	else if (msg.sType == "help") {
+		OnHelp();
 	}
 	else if (msg.sType == "killfocus") {
 		if (name == EDIT_REMARK) {
@@ -1170,6 +1174,17 @@ void  CDuiFrameWnd::OnAbout() {
 	pAboutDlg->ShowModal();
 
 	delete pAboutDlg;
+}
+
+// 点击了“帮助”
+void   CDuiFrameWnd::OnHelp() {
+	CHelpDlg * pHelpDlg = new CHelpDlg;
+
+	pHelpDlg->Create(this->m_hWnd, _T("关于"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pHelpDlg->CenterWindow();
+	pHelpDlg->ShowModal();
+
+	delete pHelpDlg;
 }
 
 // 硬件设备变动，可能有串口变动

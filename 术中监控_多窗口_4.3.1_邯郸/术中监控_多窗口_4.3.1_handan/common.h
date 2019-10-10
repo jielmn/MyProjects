@@ -806,6 +806,7 @@ extern void  SetGridEvent(GridEvent events_type2[6 * 7][2], int nIndex, int nTyp
 extern void  SortGridEvent(GridEvent events_type2[6 * 7][2]);
 extern void  ConvertGridEvent(GridEvent events_type2[6 * 7][2], GridEvent events_type[6 * 7]);
 extern const char * GetEventTypeStr(int nType);
+extern char *  VlcTime2Str(char * szTime, DWORD dwTimeSize, int nTime);
 
 // templates
 template <class T>

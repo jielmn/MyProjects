@@ -86,6 +86,8 @@ private:
 	void   OnSetting();
 	// 点击了“关于”
 	void   OnAbout();
+	// 点击了“帮助”
+	void   OnHelp();
 	// 保存格子配置
 	void   SaveGrid(DWORD  dwIndex);
 	// 删除格子配置
