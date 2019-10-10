@@ -315,4 +315,8 @@ private:
 	CButtonUI *                                 m_btnQNext1;
 	std::vector<OutHospitalItem *>              m_vQRet1;
 	int                                         m_nQCurPageIndex1;
+
+private:
+	COptionUI *                                 m_optInHospital;
+	COptionUI *                                 m_optOutHospital;
 };

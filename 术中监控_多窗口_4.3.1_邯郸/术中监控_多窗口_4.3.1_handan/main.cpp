@@ -73,6 +73,9 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_LastSaveExcelTime = 0;
 	m_nQCurPageIndex = 0;
 	m_nQCurPageIndex1 = 0;
+
+	m_optInHospital = 0;
+	m_optOutHospital = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -115,6 +118,13 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_BAR_TIPS));
 	m_lblLaunchStatus = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_LAUNCH_STATUS));
 	m_lblSurReaderTry = static_cast<CLabelUI*>(m_PaintManager.FindControl(LBL_PROC_TIPS));
+	m_optInHospital = static_cast<COptionUI*>(m_PaintManager.FindControl("opn_inhospital"));
+	m_optOutHospital = static_cast<COptionUI*>(m_PaintManager.FindControl("opn_outhospital"));
+
+#if !SHOW_IN_HOSPITAL_FLAG
+	m_optInHospital->SetVisible(false);
+	m_optOutHospital->SetVisible(false); 
+#endif
 
 	// Ìí¼Ó´°¸ñ
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {

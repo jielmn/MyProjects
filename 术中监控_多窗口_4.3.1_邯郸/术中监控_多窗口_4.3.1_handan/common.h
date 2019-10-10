@@ -73,6 +73,8 @@ using namespace DuiLib;
 #else
 #define   MAX_ITEMS_PER_PAGE          10
 #endif
+// 是否显示住院和出院两个选项块
+#define  SHOW_IN_HOSPITAL_FLAG        0
 
 // 控件id
 #define   TABS_ID                  "switch"
