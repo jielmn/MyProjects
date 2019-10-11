@@ -50,7 +50,9 @@
 				
 				<HorizontalLayout inset="10,5,10,25" height="134">
 					<Label text="输入参数" width="120" font="3" textcolor="#FF386382" height="40" />
-					<MyTree name="params" header="hidden" bordercolor="#FF000000" bordersize="0" bkcolor="#FFFFFFFF" />
+					<VerticalLayout vscrollbar="true">
+						<MyTree name="params" header="hidden" bordercolor="#FF000000" bordersize="0" bkcolor="#FFFFFFFF" />
+					</VerticalLayout>					
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="40" inset="10,5,10,5">

@@ -99,7 +99,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_cmbLuaFiles->SetEnabled(true); 
 		}
 	}
-	else if (uMsg == UM_WRITE_COM_RET) {
+	else if (uMsg == UM_WRITE_COM_RET) {     
 		BOOL bRet = (BOOL)wParam;
 		if (bRet) {
 			m_btnSend->SetEnabled(true);
