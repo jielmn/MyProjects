@@ -11,6 +11,8 @@
 #include "resource.h"
 #include "LmnSerialPort.h"
 
+#define   MAX_RICHEDIT_SIZE       512  
+
 static lua_State* init_lua() {
 	lua_State* L = luaL_newstate();  //创建Lua栈
 									 //lua_checkstack(L, 60);//修改Lua栈大小为60，防止在C和Lua之间传递大数据时，崩溃
@@ -41,6 +43,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_params = static_cast<CMyTreeCfgUI *>(m_PaintManager.FindControl("params"));
 	m_btnSend = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnSend"));
 	m_btnOpen = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnOpen"));
+	m_rich = static_cast<CRichEditUI *>(m_PaintManager.FindControl("rchData"));
 
 	m_params->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_params->SetHotItemBkColor(0xFFFFFFFF); 
@@ -89,6 +92,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_btnOpen->SetText("关闭");
 			m_bOpend = TRUE;
 			m_cmbLuaFiles->SetEnabled(false);
+			m_buf.Clear();
+			m_buf_rch.Clear();
 		}
 	}
 	else if (uMsg == UM_CLOSE_COM_RET) {
@@ -99,7 +104,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_cmbLuaFiles->SetEnabled(true); 
 		}
 	}
-	else if (uMsg == UM_WRITE_COM_RET) {     
+	else if (uMsg == UM_WRITE_COM_RET) {                        
 		BOOL bRet = (BOOL)wParam;
 		if (bRet) {
 			m_btnSend->SetEnabled(true);
@@ -107,6 +112,25 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else {
 			m_btnSend->SetEnabled(true);
 			MessageBox(GetHWND(), "写串口数据失败", "错误", 0);     
+		}
+	}
+	else if (uMsg == UM_READ_COM_RET) {
+		BYTE * pData = (BYTE *)wParam;
+		DWORD  dwSize = lParam;
+
+		m_buf.Append(pData, dwSize);
+		m_buf_rch.Append(pData, dwSize);
+		if ( m_buf_rch.GetDataLength() > MAX_RICHEDIT_SIZE ) {
+			m_buf_rch.SetReadPos( m_buf_rch.GetDataLength() - MAX_RICHEDIT_SIZE );
+			m_buf_rch.Reform();
+		}
+
+		char buf[8192];
+		DebugStream(buf, sizeof(buf), m_buf_rch.GetData(), m_buf_rch.GetDataLength());
+		m_rich->SetText(buf);  
+
+		if (pData) {
+			delete[] pData;
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 

@@ -20,10 +20,12 @@
 #define   UM_OPEN_COM_RET         (WM_USER +2)
 #define   UM_CLOSE_COM_RET        (WM_USER +3)
 #define   UM_WRITE_COM_RET        (WM_USER +4)
+#define   UM_READ_COM_RET         (WM_USER +5)
 
 #define   MSG_OPEN_COM             1001
 #define   MSG_CLOSE_COM            1002
 #define   MSG_WRITE_COM            1003
+#define   MSG_READ_COM             1004
 
 class COpenComParam : public LmnToolkits::MessageData {
 public:

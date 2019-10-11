@@ -77,9 +77,13 @@ void  CBusiness::OpenComPortAsyn(int nComPort) {
 void  CBusiness::OpenComPort(const COpenComParam * pParam) {
 	BOOL bRet = m_serial_port.OpenUartPort(pParam->m_nCom);
 	::PostMessage(g_data.m_hWnd, UM_OPEN_COM_RET, bRet, 0);
+	if ( bRet ) {
+		g_data.m_thrd_db->PostDelayMessage( 200, this, MSG_READ_COM );
+	}
 }
 
 void  CBusiness::CloseComPortAsyn() {
+	g_data.m_thrd_db->DeleteMessages();
 	g_data.m_thrd_db->PostMessage(this, MSG_CLOSE_COM);
 }
 
@@ -121,6 +125,20 @@ void  CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * 
 	{
 		CWriteComParam * pParam = (CWriteComParam *)pMessageData;
 		WriteComData(pParam);
+	}
+	break;
+
+	case MSG_READ_COM:
+	{
+		BYTE  buf[8192];
+		DWORD  dwSize = sizeof(buf);
+		BOOL bRet = m_serial_port.Read(buf, dwSize);
+		if ( bRet && dwSize > 0 ) {
+			BYTE * pNewData = new BYTE[dwSize];
+			memcpy(pNewData, buf, dwSize);
+			::PostMessage(g_data.m_hWnd, UM_READ_COM_RET, (WPARAM)pNewData, dwSize);
+		}
+		g_data.m_thrd_db->PostDelayMessage(200, this, MSG_READ_COM);
 	}
 	break;
 

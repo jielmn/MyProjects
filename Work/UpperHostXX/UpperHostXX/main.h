@@ -53,8 +53,11 @@ private:
 	CMyTreeCfgUI *         m_params;
 	CButtonUI *            m_btnSend;
 	CButtonUI *            m_btnOpen;
+	CRichEditUI *          m_rich;
 
 private:
 	lua_State*             m_L;        // lua
 	BOOL                   m_bOpend;
+	CDataBuf               m_buf;
+	CDataBuf               m_buf_rch;
 };
