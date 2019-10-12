@@ -155,12 +155,14 @@
   <ItemGroup>
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="GridUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="GridUI.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyTreeCfgUI.h" />
     <ClInclude Include="resource.h" />

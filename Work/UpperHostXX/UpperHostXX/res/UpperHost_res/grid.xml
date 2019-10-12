@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="6,6,6,6" bkcolor="#FF4AB20A" bordersize="6" bordercolor="#FF434248" name="main">	
+		<HorizontalLayout height="30">
+			<Label text="1" name="lblIndex" font="6" textcolor="#FF386382" align="center" />
+		</HorizontalLayout>
+
+		 <HorizontalLayout>
+			<Text name="textValue" font="5" textcolor="#FF386382" align="center" />
+		</HorizontalLayout>
+	</VerticalLayout>
+</Window>

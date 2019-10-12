@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include "LmnSerialPort.h"
+#include "GridUI.h"
 
 #define   MAX_RICHEDIT_SIZE       512  
 #define   FORMAT_TYPE_NIL         0
@@ -188,12 +189,89 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 					m_buf.Reform();
 
 					if (m_nFormatType == FORMAT_TYPE_GRIDS) {
+						std::vector<CMyData *> * pVKey = new std::vector<CMyData *>;
 						lua_pop(m_L, 2);
 						lua_pushnil(m_L);
 						while (lua_next(m_L, -2) != 0) {
-							//int a = (int)lua_tonumber(m_L, -1);
-							//int b = 100;
-							lua_pop(m_L, 1);
+							int nType = lua_type(m_L, -1);
+							if (nType == LUA_TNUMBER) {
+								CMyData * pKey = new CMyData;
+								pKey->m_nDataype = MYDATA_TYPE_INT;
+								pKey->m_nData = (int)lua_tonumber(m_L, -1);
+								pVKey->push_back(pKey);
+							}
+							else if (nType == LUA_TSTRING) {
+								CMyData * pKey = new CMyData;
+								pKey->m_nDataype = MYDATA_TYPE_STRING;
+								pKey->m_strData = lua_tostring(m_L, -1);
+								pVKey->push_back(pKey);
+							}							
+							lua_pop(m_L, 1); 
+						}
+
+						BOOL  bFoundItem = FALSE;
+						CGridUI * pFoundItemUI = 0;
+
+						if ( pVKey->size() > 0 ) {
+							int nItemsCnt = m_layFormat->GetCount();
+							for (int i = 0; i < nItemsCnt; i++) {
+								CGridUI * pItemUI =  (CGridUI *)m_layFormat->GetItemAt(i);
+								std::vector<CMyData *> * pVec = (std::vector<CMyData *> *)pItemUI->GetTag();
+								if ( pVec && pVec->size() == pVKey->size() ) {
+									DWORD j = 0;
+									for ( j = 0; j < pVKey->size(); j++ ) {
+										if ( pVKey->at(j)->m_nDataype == pVec->at(j)->m_nDataype ) {
+											if ( pVKey->at(j)->m_nDataype == MYDATA_TYPE_INT ) {
+												if (pVKey->at(j)->m_nData == pVec->at(j)->m_nData) {
+													continue;
+												}
+												else {
+													break;
+												}
+											}
+											else if (pVKey->at(j)->m_nDataype == MYDATA_TYPE_STRING) {
+												if ( pVKey->at(j)->m_strData == pVec->at(j)->m_strData ) {
+													continue;
+												}
+												else {
+													break;
+												}
+											}
+											else {
+												break;
+											}
+										}
+										else {
+											break;
+										}
+									}
+									if (j >= pVKey->size()) {
+										bFoundItem = TRUE;
+										pFoundItemUI = pItemUI;
+										break;
+									}
+								}
+							}
+						}
+						
+						if ( 0 == pFoundItemUI) {
+							pFoundItemUI = new CGridUI;
+							m_layFormat->Add(pFoundItemUI);
+							pFoundItemUI->SetTag((UINT_PTR)pVKey); 
+							pFoundItemUI->SetIndex(m_layFormat->GetCount());     
+						}
+						else {
+							ClearVector(*pVKey);
+							delete pVKey;
+						}
+				
+						if (m_bUtf8) {
+							char szTemp[1024];
+							Utf8ToAnsi(szTemp, sizeof(szTemp), szText);
+							pFoundItemUI->SetText(szTemp);
+						}
+						else {
+							pFoundItemUI->SetText(szText);
 						}
 					}
 					else if (m_nFormatType == FORMAT_TYPE_TEXT) {
@@ -417,7 +495,7 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 				m_nFormatType = FORMAT_TYPE_TEXT;
 			}
 			else if (0 == StrICmp(szType, "grids")) {
-				m_nFormatType = FORMAT_TYPE_GRIDS;
+				m_nFormatType = FORMAT_TYPE_GRIDS; 
 			}
 		}
 	}
@@ -560,6 +638,9 @@ bool CDuiFrameWnd::OnGridsSize(void * pParam) {
 	return true;
 }
 
+void  CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
+	OnClear1();
+}
 
 
 

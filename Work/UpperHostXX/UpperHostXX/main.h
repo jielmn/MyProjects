@@ -48,6 +48,7 @@ private:
 	void  OnClear();
 	bool  OnGridsSize(void * pParam);
 	void  OnClear1();
+	void  OnFinalMessage(HWND hWnd);
 
 private:
 	CComboUI *             m_cmbComPorts;
