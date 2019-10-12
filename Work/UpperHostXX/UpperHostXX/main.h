@@ -45,6 +45,7 @@ private:
 	void  OnLuaFileSelected();
 	void  OnSend();
 	void  OnOpen();
+	void  OnClear();
 
 private:
 	CComboUI *             m_cmbComPorts;
@@ -54,10 +55,15 @@ private:
 	CButtonUI *            m_btnSend;
 	CButtonUI *            m_btnOpen;
 	CRichEditUI *          m_rich;
+	CTabLayoutUI *         m_tabs;
+	CTileLayoutUI *        m_layFormat;
 
 private:
 	lua_State*             m_L;        // lua
 	BOOL                   m_bOpend;
 	CDataBuf               m_buf;
 	CDataBuf               m_buf_rch;
+	int                    m_nFormatType;
+	int                    m_nMaxItemsCnt;
+	int                    m_nColumns;
 };

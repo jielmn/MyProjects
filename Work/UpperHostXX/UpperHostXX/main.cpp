@@ -12,6 +12,9 @@
 #include "LmnSerialPort.h"
 
 #define   MAX_RICHEDIT_SIZE       512  
+#define   FORMAT_TYPE_NIL         0
+#define   FORMAT_TYPE_TEXT        1
+#define   FORMAT_TYPE_GRIDS       2
 
 static lua_State* init_lua() {
 	lua_State* L = luaL_newstate();  //¥¥Ω®Lua’ª
@@ -27,6 +30,9 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_btnSend = 0;
 	m_L = init_lua();
 	m_bOpend = FALSE;
+	m_nFormatType = FORMAT_TYPE_NIL;
+	m_nMaxItemsCnt = 0;
+	m_nColumns = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -44,6 +50,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnSend = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnSend"));
 	m_btnOpen = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnOpen"));
 	m_rich = static_cast<CRichEditUI *>(m_PaintManager.FindControl("rchData"));
+	m_tabs = static_cast<CTabLayoutUI *>(m_PaintManager.FindControl("data"));
+	m_layFormat = static_cast<CTileLayoutUI *>(m_PaintManager.FindControl("layGrids"));
 
 	m_params->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_params->SetHotItemBkColor(0xFFFFFFFF); 
@@ -74,6 +82,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnOpen") {
 			OnOpen();
+		}
+		else if (name == "btnClear") {
+			OnClear();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -220,7 +231,7 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	m_edDescription->SetText("");
 	m_params->RemoveAll();
 
-	const char * szDefault = "utf8=false;description=\"\";params={};function send(t) \n end\n";
+	const char * szDefault = "utf8=false;description=\"\";params={};function send(t) \n end\n formattype=nil; columns=1; itemheight=100; maxitemscnt=10; function receive(t) \n end \n";
 	luaL_loadstring(m_L, szDefault);
 	int ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
 	if (0 != ret) {
@@ -297,6 +308,50 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	lua_settop(m_L, 0);
 
 	m_btnSend->SetEnabled(true);
+
+	m_nFormatType = FORMAT_TYPE_NIL;
+
+	lua_getglobal(m_L, "formattype");
+	int nType = lua_type(m_L, -1);
+	if (nType == LUA_TSTRING) {
+		len = 0;
+		const char * szType = lua_tolstring(m_L, -1, &len);
+		if (szType) {
+			if (0 == StrICmp(szType, "text")) {
+				m_nFormatType = FORMAT_TYPE_TEXT;
+			}
+			else if (0 == StrICmp(szType, "grids")) {
+				m_nFormatType = FORMAT_TYPE_GRIDS;
+			}
+		}
+	}
+	lua_settop(m_L, 0);
+
+	lua_getglobal(m_L, "maxitemscnt");
+	m_nMaxItemsCnt = (int)lua_tonumber(m_L, -1);
+	lua_settop(m_L, 0);
+
+	m_nColumns = 1;
+	if (m_nFormatType == FORMAT_TYPE_GRIDS) {
+		lua_getglobal(m_L, "columns");
+		m_nColumns = (int)lua_tonumber(m_L, -1);
+		lua_settop(m_L, 0);
+	}	
+
+	int nCnt = m_layFormat->GetCount();
+	for ( int i = 0; i < nCnt; i++ ) {
+		CControlUI * pItemUI = m_layFormat->GetItemAt(i);
+		void * pArg = (void *)pItemUI->GetTag();
+		if ( pArg == 0 )
+			continue;
+		std::vector<CMyData * > * pVec = (std::vector<CMyData * > *)pArg;
+		ClearVector(*pVec);
+		delete pVec;
+	}
+	m_layFormat->RemoveAll();
+
+	m_layFormat->SetFixedColumns(m_nColumns);
+	
 }
 
 void  CDuiFrameWnd::OnSend() {
@@ -354,6 +409,11 @@ void  CDuiFrameWnd::OnOpen() {
 	else {
 		CBusiness::GetInstance()->CloseComPortAsyn();
 	}
+}
+
+void  CDuiFrameWnd::OnClear() {
+	m_buf_rch.Clear();
+	m_rich->SetText("");
 }
 
 

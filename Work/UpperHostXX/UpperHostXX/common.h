@@ -9,6 +9,9 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#include "UIlib.h"
+using namespace DuiLib;
+
 #define   PROJ_NAME               "UpperHost"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
@@ -26,6 +29,21 @@
 #define   MSG_CLOSE_COM            1002
 #define   MSG_WRITE_COM            1003
 #define   MSG_READ_COM             1004
+
+#define  MYDATA_TYPE_INT           0
+#define  MYDATA_TYPE_STRING        1
+
+class  CMyData {
+public:
+	CMyData() {
+		m_nDataype = MYDATA_TYPE_INT;
+		m_nData = 0;
+	}
+
+	int          m_nDataype;
+	CDuiString   m_strData;
+	int          m_nData;
+};
 
 class COpenComParam : public LmnToolkits::MessageData {
 public:

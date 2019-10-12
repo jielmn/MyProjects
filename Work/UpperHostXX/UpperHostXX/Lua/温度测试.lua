@@ -29,3 +29,7 @@ function send(t)
   
   return send_data;
 end
+
+formattype="text";
+columns=1;
+maxitemscnt = 5;
