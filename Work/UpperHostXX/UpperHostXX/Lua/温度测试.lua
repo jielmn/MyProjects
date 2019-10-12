@@ -31,5 +31,5 @@ function send(t)
 end
 
 formattype="text";
-columns=1;
 maxitemscnt = 5;
+itemheight=36;

@@ -32,7 +32,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_bOpend = FALSE;
 	m_nFormatType = FORMAT_TYPE_NIL;
 	m_nMaxItemsCnt = 0;
-	m_nColumns = 0;
+	m_nItemWidth = 0;
+	m_nItemHeight = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -55,6 +56,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_params->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_params->SetHotItemBkColor(0xFFFFFFFF); 
+
+	m_layFormat->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsSize);
 
 	InitCmbLuaFiles();
 
@@ -231,7 +234,7 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	m_edDescription->SetText("");
 	m_params->RemoveAll();
 
-	const char * szDefault = "utf8=false;description=\"\";params={};function send(t) \n end\n formattype=nil; columns=1; itemheight=100; maxitemscnt=10; function receive(t) \n end \n";
+	const char * szDefault = "utf8=false;description=\"\";params={};function send(t) \n end\n formattype=nil; itemwidth=100; itemheight=30; maxitemscnt=10; function receive(t) \n end \n";
 	luaL_loadstring(m_L, szDefault);
 	int ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
 	if (0 != ret) {
@@ -331,10 +334,15 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	m_nMaxItemsCnt = (int)lua_tonumber(m_L, -1);
 	lua_settop(m_L, 0);
 
-	m_nColumns = 1;
-	if (m_nFormatType == FORMAT_TYPE_GRIDS) {
-		lua_getglobal(m_L, "columns");
-		m_nColumns = (int)lua_tonumber(m_L, -1);
+	m_nItemWidth  = 100;
+	m_nItemHeight = 30;
+	if (m_nFormatType != FORMAT_TYPE_NIL) {
+		lua_getglobal(m_L, "itemwidth");
+		m_nItemWidth = (int)lua_tonumber(m_L, -1);
+		lua_settop(m_L, 0);
+
+		lua_getglobal(m_L, "itemheight");
+		m_nItemHeight = (int)lua_tonumber(m_L, -1);
 		lua_settop(m_L, 0);
 	}	
 
@@ -350,8 +358,7 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	}
 	m_layFormat->RemoveAll();
 
-	m_layFormat->SetFixedColumns(m_nColumns);
-	
+	OnGridsSize(0);	
 }
 
 void  CDuiFrameWnd::OnSend() {
@@ -414,6 +421,36 @@ void  CDuiFrameWnd::OnOpen() {
 void  CDuiFrameWnd::OnClear() {
 	m_buf_rch.Clear();
 	m_rich->SetText("");
+}
+
+bool CDuiFrameWnd::OnGridsSize(void * pParam) {
+	RECT r = m_layFormat->GetPos();
+	int width = r.right - r.left;
+	if (width <= 0)
+		return true;
+
+	if ( m_nFormatType == FORMAT_TYPE_TEXT ) {
+		m_layFormat->SetFixedColumns(1);
+
+		SIZE  s;
+		s.cx = width;
+		s.cy = m_nItemHeight;
+		m_layFormat->SetItemSize(s);
+	}
+	else if (m_nFormatType == FORMAT_TYPE_GRIDS) {
+		int nColumns = width / m_nItemWidth;
+		if (nColumns <= 0)
+			nColumns = 1;
+
+		m_layFormat->SetFixedColumns(nColumns);
+
+		SIZE  s;
+		s.cx = width / nColumns;
+		s.cy = m_nItemHeight;
+		m_layFormat->SetItemSize(s);
+	}
+
+	return true;
 }
 
 
