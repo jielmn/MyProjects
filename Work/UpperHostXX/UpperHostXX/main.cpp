@@ -317,7 +317,7 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	m_edDescription->SetText("");
 	m_params->RemoveAll();
 
-	const char * szDefault = "utf8=false;description=\"\";params={};function send(t) \n end\n formattype=nil; itemwidth=100; itemheight=30; maxitemscnt=10; function receive(t) \n end \n";
+	const char * szDefault = "utf8=false;description=\"\";params={};nosend=false;function send(t) \n end\n formattype=nil; itemwidth=100; itemheight=30; maxitemscnt=10; function receive(t) \n end \n";
 	luaL_loadstring(m_L, szDefault);
 	int ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
 	if (0 != ret) {
@@ -393,8 +393,17 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 		lua_pop(m_L, 1);
 	}
 	lua_settop(m_L, 0);
+	int nParamCnt = m_params->GetCount();
+	if (0 == nParamCnt) {
+		m_params->AddNode("(нч)", 0, 0, 0, 2, 0xFF386382, 2, 0xFF386382);
+	}
 
-	m_btnSend->SetEnabled(true);
+	lua_getglobal(m_L, "nosend");
+	BOOL bNoSend = lua_toboolean(m_L, 1);
+	if (bNoSend)
+		m_btnSend->SetEnabled(false);  
+	else
+		m_btnSend->SetEnabled(true);
 
 	m_nFormatType = FORMAT_TYPE_NIL;
 

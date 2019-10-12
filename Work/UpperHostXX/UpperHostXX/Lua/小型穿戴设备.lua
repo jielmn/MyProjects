@@ -1,14 +1,15 @@
 require("bit")
 
 utf8=true;
-description="发送温度数据(浮点型)到串口";
+description="小型可穿戴设备演示";
 -- 参数列表，格式是：参数名，缺省参数值
-params = { {"温度", "32.56"} };
-nosend = false;
+params = {  };
+nosend = true;
 
 -- t[1] 是第一个参数: 温度
 -- t[2] 是第二个参数: 测试参数1
 function send(t)
+  --[[
   -- 参数序号从1开始，不是0
   local temperature = tonumber(t[1]);								
   -- 如果温度不是数字，则设为温度0
@@ -29,6 +30,7 @@ function send(t)
 								 0x02, 0x8D, 0x5A, 0x6C, 0x4B, 0x3F, 0x00, 0xFF );
   
   return send_data;
+  ]]--
 end
 
 formattype="text";
