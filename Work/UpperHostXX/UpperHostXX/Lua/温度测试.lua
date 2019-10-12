@@ -31,5 +31,24 @@ function send(t)
 end
 
 formattype="text";
-maxitemscnt = 5;
-itemheight=36;
+maxitemscnt = 20;
+itemheight=30;
+
+-- 返回值：消耗的字节数，格式字符串，key值（确定唯一块），背景色，文字颜色
+function receive(data)
+  if ( string.len(data) < 13 )
+  then
+    return 0,"0",{},0,0;
+  end
+  
+  local beat = string.byte(data,3);
+  local beatV = string.byte(data,4);
+  local oxy = string.byte(data,5);
+  local oxyV = string.byte(data,6);
+  local temp = string.byte(data,7) + string.byte(data,8) / 100;
+  local body = string.byte(data,9);
+  local freq = string.byte(data,10);
+  local machine = string.byte(data,11);
+  local s = string.format("心率=%d,心率有效位=%d,血氧饱和度=%d,血氧有效位=%d,体温=%.2f℃,人体姿势=%d,通信频率=%d,设备编号=%d", beat,beatV,oxy,oxyV,temp,body,freq,machine);
+  return 13,s,{},0,0;
+end

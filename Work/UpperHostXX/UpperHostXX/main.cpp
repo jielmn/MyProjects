@@ -34,6 +34,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_nMaxItemsCnt = 0;
 	m_nItemWidth = 0;
 	m_nItemHeight = 0;
+	m_bUtf8 = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -89,6 +90,17 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnClear") {
 			OnClear();
 		}
+		else if (name == "btnClear1") {
+			OnClear1(); 
+		}
+	}
+	else if (msg.sType == "selectchanged") {
+		if (name == "opn_raw_data" ) {
+			m_tabs->SelectItem(0);
+		}
+		else if (name == "opn_format_data") {
+			m_tabs->SelectItem(1);
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -134,6 +146,11 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		m_buf.Append(pData, dwSize);
 		m_buf_rch.Append(pData, dwSize);
+
+		if (pData) {
+			delete[] pData;
+		}
+
 		if ( m_buf_rch.GetDataLength() > MAX_RICHEDIT_SIZE ) {
 			m_buf_rch.SetReadPos( m_buf_rch.GetDataLength() - MAX_RICHEDIT_SIZE );
 			m_buf_rch.Reform();
@@ -143,9 +160,75 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		DebugStream(buf, sizeof(buf), m_buf_rch.GetData(), m_buf_rch.GetDataLength());
 		m_rich->SetText(buf);  
 
-		if (pData) {
-			delete[] pData;
+		lua_settop(m_L, 0);
+		lua_getglobal(m_L, "receive");
+		lua_pushlstring(m_L, (const char *)m_buf.GetData(), m_buf.GetDataLength());
+
+		int ret = lua_pcall(m_L, 1, 5, 0);
+		if (0 != ret) {
+			size_t err_len = 0;
+			const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
+			MessageBox(GetHWND(), szErrDescription, "错误", 0);
+			lua_settop(m_L, 0);
 		}
+		else {
+			int nRet = lua_gettop(m_L);
+			if (nRet != 5) {
+				MessageBox(GetHWND(), "receive 函数返回的参数个数不是5", "错误", 0);
+				lua_settop(m_L, 0);
+			}
+			else {
+				int nTextColor = (int)lua_tonumber(m_L, -1);
+				int nBkColor   = (int)lua_tonumber(m_L, -2);
+				const char * szText = lua_tostring(m_L, -4);
+				int nComsume = (int)lua_tonumber(m_L, -5);
+
+				if (nComsume > 0) {
+					m_buf.SetReadPos(nComsume);
+					m_buf.Reform();
+
+					if (m_nFormatType == FORMAT_TYPE_GRIDS) {
+						lua_pop(m_L, 2);
+						lua_pushnil(m_L);
+						while (lua_next(m_L, -2) != 0) {
+							//int a = (int)lua_tonumber(m_L, -1);
+							//int b = 100;
+							lua_pop(m_L, 1);
+						}
+					}
+					else if (m_nFormatType == FORMAT_TYPE_TEXT) {
+						CTextUI * pItemUI = new CTextUI;
+						int nItemsCnt = m_layFormat->GetCount();
+						if (nItemsCnt >= m_nMaxItemsCnt) {
+							m_layFormat->RemoveAt(0);
+						}
+						m_layFormat->Add(pItemUI);
+						pItemUI->SetShowHtml(true);  
+						if (m_bUtf8) {
+							char szTemp[1024];
+							Utf8ToAnsi(szTemp, sizeof(szTemp), szText);
+							pItemUI->SetText(szTemp);
+						}
+						else {
+							pItemUI->SetText(szText);  
+						} 						
+						pItemUI->SetFixedHeight(m_nItemHeight);
+						pItemUI->SetFont(5);
+						if (nBkColor != 0) {
+							pItemUI->SetBkColor(nBkColor);
+						}
+						if (nTextColor == 0) { 
+							pItemUI->SetTextColor(0xFF386382); 
+						}
+						else {
+							pItemUI->SetTextColor(nTextColor);
+						}
+					}
+				}
+			}
+		}
+
+		
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam); 
 }
@@ -260,6 +343,7 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 
 	lua_getglobal(m_L, "utf8");
 	BOOL bUtf8 = lua_toboolean(m_L, -1); 
+	m_bUtf8 = bUtf8;
 	lua_settop(m_L, 0);
 
 	lua_getglobal(m_L, "description");
@@ -421,6 +505,20 @@ void  CDuiFrameWnd::OnOpen() {
 void  CDuiFrameWnd::OnClear() {
 	m_buf_rch.Clear();
 	m_rich->SetText("");
+}
+
+void  CDuiFrameWnd::OnClear1() {
+	int nCnt = m_layFormat->GetCount();
+	for (int i = 0; i < nCnt; i++) {
+		CControlUI * pItemUI = m_layFormat->GetItemAt(i);
+		void * pArg = (void *)pItemUI->GetTag();
+		if (pArg == 0)
+			continue;
+		std::vector<CMyData * > * pVec = (std::vector<CMyData * > *)pArg;
+		ClearVector(*pVec);
+		delete pVec;
+	}
+	m_layFormat->RemoveAll();
 }
 
 bool CDuiFrameWnd::OnGridsSize(void * pParam) {

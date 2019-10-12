@@ -47,6 +47,7 @@ private:
 	void  OnOpen();
 	void  OnClear();
 	bool  OnGridsSize(void * pParam);
+	void  OnClear1();
 
 private:
 	CComboUI *             m_cmbComPorts;
@@ -68,4 +69,5 @@ private:
 	int                    m_nMaxItemsCnt;
 	int                    m_nItemWidth;
 	int                    m_nItemHeight;
+	BOOL                   m_bUtf8;
 };
