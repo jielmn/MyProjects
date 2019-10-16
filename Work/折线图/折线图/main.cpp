@@ -198,12 +198,87 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 }
 
 void  CDuiFrameWnd::SaveData() {
-	return;
+	std::vector<WORD> v1;
+	std::vector<WORD> v2;
+	std::vector<WORD>::iterator it;
+	WORD  wMin = 0xFFFF;
+	int index = 0;
+	char buf[256];
+
+	DWORD  dwDataLen = m_buf.GetDataLength();
+	DWORD  dwItemCnt = dwDataLen / 3;
+	const BYTE * pData = (const BYTE *)m_buf.GetData();
+	for ( DWORD i = 0; i < dwItemCnt; i++ ) {
+		const BYTE * pItem = pData + 3 * i;
+		if ( pItem[0] == 1 ) {
+			v1.push_back( MAKEWORD(pItem[2], pItem[1]) );
+		}
+		else if (pItem[0] == 2) {
+			v2.push_back(MAKEWORD(pItem[2], pItem[1]));
+		}
+	}
 
 	FILE * fp = fopen("result\\js\\data.js", "wb");
 	if (0 == fp) {
 		return;
 	}
+
+	const char * s = 0;
+
+	s = "var temp_data = \r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	s = "[\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	s = "\t{\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	s = "\t\t's1':[\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	for ( it = v1.begin(), index = 1; it != v1.end(); ++it, index++ ) {
+		SNPRINTF(buf, sizeof(buf), "\t\t\t\t[%d,%d],\r\n", index, (int)*it );
+		fwrite(buf, 1, strlen(buf), fp);
+		if (*it < wMin) {
+			wMin = *it;
+		}
+	}
+
+	s = "\t\t\t],\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	s = "\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	s = "\t\t's2':[\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	for (it = v2.begin(), index = 1; it != v2.end(); ++it, index++) {
+		SNPRINTF(buf, sizeof(buf), "\t\t\t\t[%d,%d],\r\n", index, (int)*it);
+		fwrite(buf, 1, strlen(buf), fp);
+		if (*it < wMin) {
+			wMin = *it;
+		}
+	}
+
+	s = "\t\t\t],\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	WORD r = wMin % 10;
+	if ( r > 0 ) {
+		wMin -= r;
+	}
+
+	SNPRINTF(buf, sizeof(buf), "\t\tmin:%d,\r\n", (int)wMin );
+	fwrite(buf, 1, strlen(buf), fp);
+
+	s = "\t},\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
+	s = "];\r\n";
+	fwrite(s, 1, strlen(s), fp);
+
 	fclose(fp);
 }
 
