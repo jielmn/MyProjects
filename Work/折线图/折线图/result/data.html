@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>体温测试</title>
+    <!-- 引入 echarts.js -->
+    <script type="text/javascript" src="js/echarts.common.min.js"></script>
+	<script type="text/javascript" src="js/data.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+	<div style="text-align:center;font-size:30px;margin-bottom:30px;">折线图</div>
+    <div id="main_0" style="width:98%;height:800px;display:inline-block;"></div>
+	
+    <script type="text/javascript">
+		var minTemp = 32.0;
+		var count = 1;
+		
+        // 基于准备好的dom，初始化echarts实例
+		var myCharts = new Array();
+		for ( var i = 0; i < count; i++ ) {
+			myCharts[i] = echarts.init(document.getElementById('main_' +i));
+		}
+		
+		var titles = [ '' ];
+		
+		var data = new Array();
+		for ( var i = 0; i < count; i++ ) {
+			data[i] = {};
+			data[i].s1 = new Array;
+			data[i].s2 = new Array;
+						
+			if ( temp_data[i] ) {
+				var s1 = temp_data[i].s1;
+				var s2 = temp_data[i].s2;
+				
+				if ( s1 ) {
+					data[i].s1 = s1;
+				}
+				
+				if ( s2 ) {
+					data[i].s2 = s2;
+				}
+			}
+		}
+
+        // 指定图表的配置项和数据
+		var options = new Array();
+		for ( var i = 0; i < count; i++ ) {
+			options[i] = 
+			{
+				title: { text: titles[i] },
+				tooltip: {
+					formatter: function (params) {
+						return "[" + params.value + "]";
+					},
+				},
+				legend: {
+					data:['s1','s2']
+				},
+				xAxis: {
+					type: 'value',
+				},
+				yAxis: {
+					type: 'value'
+				},
+				series: [
+					{
+						name: 's1',
+						type: 'line',
+						smooth: true,
+						data: data[i].s1,
+					},
+					{
+						name: 's2',
+						type: 'line',
+						smooth: true,
+						data: data[i].s2,
+					}
+				]
+			};
+		}
+
+        // 使用刚指定的配置项和数据显示图表。
+		for ( var i = 0; i < count; i++ ) {
+			myCharts[i].setOption(options[i]);
+		}
+    </script>
+</body>
+</html>
