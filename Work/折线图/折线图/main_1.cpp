@@ -48,7 +48,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnMyOpen();
 		}
 		else if (name == "btnBrowse") {
-			ShellExecute(NULL, "open", "result\\data.html", NULL, NULL, SW_SHOW);
+			ShellExecute(NULL, "open", "result\\data_1.html", NULL, NULL, SW_SHOW); 
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -201,7 +201,8 @@ void  CDuiFrameWnd::SaveData() {
 	std::vector<DWORD> v1;
 	std::vector<DWORD> v2;
 	std::vector<DWORD>::iterator it;
-	DWORD  wMin = 0xFFFFFFFF;
+	DWORD  wMin   = 0xFFFFFFFF;
+	DWORD  wMin_1 = 0xFFFFFFFF;
 	int index = 0;
 	char buf[256];
 
@@ -253,8 +254,8 @@ void  CDuiFrameWnd::SaveData() {
 	for (it = v2.begin(), index = 1; it != v2.end(); ++it, index++) {
 		SNPRINTF(buf, sizeof(buf), "\t\t\t\t[%d,%d],\r\n", index, (int)*it);
 		fwrite(buf, 1, strlen(buf), fp);
-		if (*it < wMin) {
-			wMin = *it;
+		if (*it < wMin_1) {
+			wMin_1 = *it;
 		}
 	}
 
@@ -265,13 +266,23 @@ void  CDuiFrameWnd::SaveData() {
 		wMin = 0;
 	}
 	else {
-		DWORD r = wMin % 100;
+		DWORD r = wMin % 10;
 		if (r > 0) {
 			wMin -= r;
 		}
 	}	
 
-	SNPRINTF(buf, sizeof(buf), "\t\tmin:%lu,\r\n", wMin);
+	if (wMin_1 == 0xFFFFFFFF) {
+		wMin_1 = 0;
+	}
+	else {
+		DWORD r = wMin_1 % 10;
+		if (r > 0) {
+			wMin_1 -= r;
+		}
+	}
+
+	SNPRINTF(buf, sizeof(buf), "\t\tmin:[%lu,%lu],\r\n", wMin, wMin_1);
 	fwrite(buf, 1, strlen(buf), fp);
 
 	s = "\t},\r\n";
