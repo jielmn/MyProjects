@@ -24,6 +24,8 @@
 #define   UM_CLOSE_COM_RET        (WM_USER +3)
 #define   UM_READ_COM_RET         (WM_USER +5)
 
+#define   COM_PORT_RATE           19200
+
 class  CGlobalData {
 public:
 	ILog    *                 m_log;

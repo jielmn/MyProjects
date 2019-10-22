@@ -75,7 +75,7 @@ void  CBusiness::OpenComPortAsyn(int nCom) {
 }
 
 void  CBusiness::OpenComPort(const COpenComParam * pParam) {
-	BOOL bRet = m_serial_port.OpenUartPort(pParam->m_nCom, 115200);
+	BOOL bRet = m_serial_port.OpenUartPort(pParam->m_nCom, COM_PORT_RATE);
 	::PostMessage(g_data.m_hWnd, UM_OPEN_COM_RET, bRet, 0);
 	if (bRet) {
 		g_data.m_thrd_db->PostDelayMessage(200, this, MSG_READ_COM);
