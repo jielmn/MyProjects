@@ -261,12 +261,17 @@ void  CDuiFrameWnd::SaveData() {
 	s = "\t\t\t],\r\n";
 	fwrite(s, 1, strlen(s), fp);
 
-	WORD r = wMin % 100;
-	if (r > 0) {
-		wMin -= r;
+	if (wMin == 0xFFFFFFFF) {
+		wMin = 0;
 	}
+	else {
+		DWORD r = wMin % 100;
+		if (r > 0) {
+			wMin -= r;
+		}
+	}	
 
-	SNPRINTF(buf, sizeof(buf), "\t\tmin:%d,\r\n", (int)wMin);
+	SNPRINTF(buf, sizeof(buf), "\t\tmin:%lu,\r\n", wMin);
 	fwrite(buf, 1, strlen(buf), fp);
 
 	s = "\t},\r\n";
