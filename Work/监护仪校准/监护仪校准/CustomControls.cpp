@@ -1,12 +1,12 @@
 #include "CustomControls.h"
 
-const int CTempItemUI::WIDTH = 210;
+const int CTempItemUI::WIDTH = 220;
 const int CTempItemUI::HEIGHT = 24;                       
 
 CTempItemUI::CTempItemUI() : m_callback(m_pManager) {
 	m_opBasePoint = 0;
 	m_lblTemp = 0;
-	m_lblDutyCycle = 0;
+	m_edDutyCycle = 0;
 	m_btnUp = 0;
 	m_btnDown = 0;
 	m_btnAdjust = 0;
@@ -43,7 +43,7 @@ void  CTempItemUI::DoInit() {
 
 	m_opBasePoint = static_cast<COptionUI*>(m_pManager->FindControl("optBasePoint"));
 	m_lblTemp = static_cast<CLabelUI*>(m_pManager->FindControl("lblTemp"));
-	m_lblDutyCycle = static_cast<CLabelUI*>(m_pManager->FindControl("lblDutyCycle"));
+	m_edDutyCycle = static_cast<CEditUI*>(m_pManager->FindControl("edDutyCycle"));
 	m_btnUp = static_cast<CMyButtonUI*>(m_pManager->FindControl("btnUp"));
 	m_btnDown = static_cast<CMyButtonUI*>(m_pManager->FindControl("btnDown"));
 	m_btnAdjust = static_cast<CButtonUI*>(m_pManager->FindControl("btnAdjust")); 
@@ -85,12 +85,12 @@ void  CTempItemUI::SetTemp() {
 }
 
 void  CTempItemUI::SetDutyCycle() {
-	if ( 0 == m_lblDutyCycle)
+	if ( 0 == m_edDutyCycle)
 		return;
 
 	CDuiString  strText;
 	strText.Format("%d", m_nDutyCycle);
-	m_lblDutyCycle->SetText(strText);
+	m_edDutyCycle->SetText(strText);
 }
 
 BOOL  CTempItemUI::IsChecked() const {
@@ -142,9 +142,10 @@ void CTempItemUI::Notify(TNotifyUI& msg) {
 			bool bSelected = m_opBasePoint->IsSelected();
 			if (bSelected) {
 				m_lblTemp->SetTextColor(0xFFFF0000);
-				m_lblDutyCycle->SetTextColor(0xFFFF0000);
+				m_edDutyCycle->SetTextColor(0xFFFF0000);
 				m_lblTemp->SetFont(3);
-				m_lblDutyCycle->SetFont(3);
+				m_edDutyCycle->SetFont(3);
+				m_edDutyCycle->SetEnabled(true);
 				if (m_bHighlight) {
 					m_btnUp->SetVisible(true);
 					m_btnDown->SetVisible(true);
@@ -152,9 +153,10 @@ void CTempItemUI::Notify(TNotifyUI& msg) {
 			}
 			else {
 				m_lblTemp->SetTextColor(0xFF386382);
-				m_lblDutyCycle->SetTextColor(0xFF386382);
+				m_edDutyCycle->SetTextColor(0xFF386382);
 				m_lblTemp->SetFont(2);
-				m_lblDutyCycle->SetFont(2);
+				m_edDutyCycle->SetFont(2);
+				m_edDutyCycle->SetEnabled(false);
 				if (m_bHighlight) {
 					m_btnUp->SetVisible(false);
 					m_btnDown->SetVisible(false);
@@ -175,7 +177,16 @@ void CTempItemUI::Notify(TNotifyUI& msg) {
 			SetDutyCycle(nDutyCycle);
 		}
 		else if (msg.pSender == m_btnAdjust) {
-			m_pManager->SendNotify(this, "adjust");
+			m_pManager->SendNotify(this, "adjust");     
+		}
+	}
+	else if (msg.sType == "killfocus") {
+		if (msg.pSender == m_edDutyCycle) {
+			CDuiString strText = m_edDutyCycle->GetText();
+			int nDutyCycle = 0;
+			int ret = sscanf(strText, "%d", &nDutyCycle);
+			if ( 1 == ret )
+				SetDutyCycle(nDutyCycle);
 		}
 	}
 }

@@ -35,7 +35,7 @@ public:
 private:
 	COptionUI *                    m_opBasePoint;
 	CLabelUI *                     m_lblTemp;
-	CLabelUI *                     m_lblDutyCycle;
+	CEditUI *                      m_edDutyCycle;
 	CMyButtonUI *                  m_btnUp;
 	CMyButtonUI *                  m_btnDown;
 	CButtonUI *                    m_btnAdjust;
