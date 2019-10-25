@@ -50,7 +50,51 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
-	g_data.m_cfg->GetConfig("sleep time", g_data.m_dwSleepTime, 1000);
+	g_data.m_cfg->GetConfig("sleep time", g_data.m_dwSleepTime, 2000);
+
+#if NEW_VERSION_FLAG
+	BOOL bUtf8 = FALSE;
+	g_data.m_cfg->GetBooleanConfig("utf8", bUtf8);
+
+	char buf[8192];
+	char buf1[8192];
+	if (!bUtf8) {
+		g_data.m_cfg->GetConfig("other machine types", buf, sizeof(buf));
+	}
+	else {
+		g_data.m_cfg->GetConfig("other machine types", buf1, sizeof(buf1));
+		Utf8ToAnsi(buf, sizeof(buf), buf1);
+	}
+		
+	SplitString split;
+	split.Split(buf, ',');
+	DWORD dwCnt = split.Size();
+	for ( DWORD i = 0; i < dwCnt; i++ ) {
+		if (g_data.m_vOtherMachineType.size() >= MAX_MACHINE_CNT - 4) {
+			break;
+		}
+		std::string s = (const char *)split[i].Trim();
+		if (   0 == StrICmp(s.c_str(), "MR") || 0 == StrICmp(s.c_str(), "飞利浦") 
+			|| 0 == StrICmp(s.c_str(), "GE") || 0 == StrICmp(s.c_str(), "GE2") ) {
+			continue;
+		}
+
+		if (s.length() > 0) {
+			std::vector<std::string>::iterator it;
+			for (it = g_data.m_vOtherMachineType.begin(); it != g_data.m_vOtherMachineType.end(); ++it) {
+				std::string t = *it;
+				// 如果有重名
+				if ( 0 == StrICmp( t.c_str(), s.c_str() ) ) {
+					break;
+				}				
+			}
+			if (it == g_data.m_vOtherMachineType.end()) {
+				g_data.m_vOtherMachineType.push_back(s);
+			}
+		}		
+	}
+#endif
+
 
 	BOOL bRet = LoadStandardRes();
 	assert(bRet);
@@ -131,6 +175,7 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 	}
 
 	for (DWORD i = 0; i < pParam->m_dwSize; i++) {
+#if !NEW_VERSION_FLAG
 		dwWriteLen = 8;
 		memcpy(write_data, "\x55\x01\x02\x03\xDD\xFF\xDD\xAA", dwWriteLen);
 		// write_data[0] = 0x55;
@@ -138,6 +183,15 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 		write_data[2] = pParam->m_items[i].m_nTemp / 100;
 		write_data[3] = (pParam->m_items[i].m_nTemp / 10) % 10;
 		write_data[4] = pParam->m_items[i].m_nOffset;		
+#else
+		dwWriteLen = 9;
+		memcpy(write_data, "\x55\x01\x02\x03\xDD\xAA\xFF\xDD\xAA", dwWriteLen);
+		write_data[1] = (int)pParam->m_eType + 1;
+		write_data[2] = pParam->m_items[i].m_nTemp / 100;
+		write_data[3] = (pParam->m_items[i].m_nTemp / 10) % 10;
+		write_data[4] = ( pParam->m_items[i].m_nOffset >> 8 ) & 0xFF ;
+		write_data[5] = pParam->m_items[i].m_nOffset & 0xFF;
+#endif
 		serial_port.Write(write_data, dwWriteLen);
 
 		//LmnSleep(g_data.m_dwSleepTime);

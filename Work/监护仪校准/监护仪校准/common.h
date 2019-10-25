@@ -13,6 +13,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#define  NEW_VERSION_FLAG         1
+
 #define   PROJ_NAME               "MonitorAdjust"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
@@ -24,6 +26,7 @@ using namespace DuiLib;
 #define   MAX_TEMP_ITEMS_CNT       160            // 一共160个子项
 #define   FIRST_TEMP               3000           // 从30℃开始
 
+#if !NEW_VERSION_FLAG
 #define   MAX_MACHINE_CNT   4
 enum MachineType {
 	MachineType_MR = 0,
@@ -31,6 +34,19 @@ enum MachineType {
 	MachineType_GE,
 	MachineType_GE2,
 };
+#else
+#define   MAX_MACHINE_CNT   8
+enum MachineType {
+	MachineType_MR = 0,
+	MachineType_FLP,
+	MachineType_GE,
+	MachineType_GE2,
+	MachineType_5,
+	MachineType_6,
+	MachineType_7,
+	MachineType_max,
+};
+#endif
 
 #define MSG_ADJUST                   1001
 #define MSG_ADJUST_ALL               1002
@@ -60,6 +76,10 @@ public:
 	DWORD                     m_dwSleepTime;
 	BOOL                      m_bQuit;
 
+#if NEW_VERSION_FLAG
+	std::vector<std::string>  m_vOtherMachineType;   // 除去4种基本类型之外的机器类型
+#endif
+
 public:
 	CGlobalData() {
 		m_log = 0;
@@ -68,7 +88,15 @@ public:
 		m_hWnd = 0;
 		m_dwSleepTime = 1000;
 		m_bQuit = FALSE;
+#if !NEW_VERSION_FLAG
 		memset(m_standard_items, 0, sizeof(m_standard_items));
+#else
+		for (int i = 0; i < MAX_MACHINE_CNT; i++) {
+			for (int j = 0; j < MAX_TEMP_ITEMS_CNT; j++) {
+				m_standard_items[i][j].m_nDutyCycle = 1000;
+			}
+		}
+#endif
 	}
 };
 

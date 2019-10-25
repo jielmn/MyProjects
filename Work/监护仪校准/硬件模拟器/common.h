@@ -9,6 +9,8 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#define  NEW_VERSION_FLAG         1
+
 #define   PROJ_NAME               "sim"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")

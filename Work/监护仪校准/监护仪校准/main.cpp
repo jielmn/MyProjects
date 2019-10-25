@@ -57,7 +57,11 @@ void  CDuiFrameWnd::InitWindow() {
 		m_temp_items[i]->SetTag(i);
 	}
 
+#if !NEW_VERSION_FLAG
 	for (int i = MachineType_MR; i <= MachineType_GE2; i++) {
+#else
+	for (int i = MachineType_MR; i <= MachineType(MachineType_GE2 + g_data.m_vOtherMachineType.size()); i++) {
+#endif
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(GetMachineTypeStr((MachineType)i));
 		pElement->SetTag(i);
@@ -532,7 +536,11 @@ void  CDuiFrameWnd::OnAdjustAll() {
 
 	for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
 		items[i].m_nTemp   = m_temp_items[i]->GetTemp();
+#if !NEW_VERSION_FLAG
 		items[i].m_nOffset = m_temp_items[i]->GetDutyCycle() - g_data.m_standard_items[nType][i].m_nDutyCycle;
+#else
+		items[i].m_nOffset = m_temp_items[i]->GetDutyCycle();
+#endif
 	}
 
 	CBusiness::GetInstance()->AdjustAllAsyn(GetComPort(), GetMachineType(), 

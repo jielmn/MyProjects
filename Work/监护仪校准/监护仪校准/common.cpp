@@ -131,16 +131,33 @@ const char * GetMachineTypeStr(MachineType e) {
 		return "GE";
 	case MachineType_GE2:
 		return "GE2";
+#if !NEW_VERSION_FLAG
 	default:
 		break;
+#else
+	default: 
+	{
+		int index = (int)(e - MachineType_5);
+		if ( index < (int)g_data.m_vOtherMachineType.size() ) {
+			return g_data.m_vOtherMachineType[index].c_str();
+		}
+	}
+	break;
+#endif
 	}
 	return "Î´Öª»úÆ÷";
 }
 
 BOOL LoadStandardRes() {
 	int ret = 0;
+
+#if !NEW_VERSION_FLAG
 	int ids[MAX_MACHINE_CNT] = { IDR_TXT1 ,IDR_TXT2 ,IDR_TXT3 ,IDR_TXT4 };
 	for ( int i = 0; i < MAX_MACHINE_CNT; i++ ) {
+#else
+	int ids[4] = { IDR_TXT1 ,IDR_TXT2 ,IDR_TXT3 ,IDR_TXT4 };
+	for (int i = 0; i < 4; i++) {
+#endif
 		HRSRC hResource = ::FindResource(0, MAKEINTRESOURCE(ids[i]), "TXT");
 		if (hResource == 0)
 			return FALSE;
@@ -265,7 +282,7 @@ BOOL LoadFileData(CTempItemUI *  temp_items[MAX_TEMP_ITEMS_CNT], int nItemCnt, M
 	}
 
 	SplitString s2;
-	s2.Split(s[MAX_TEMP_ITEMS_CNT + 1], ',');
+	s2.Split(s[MAX_TEMP_ITEMS_CNT + 1].Trim(), ',');
 	int nCheckedCnt = s2.Size();
 	for ( int j = 0; j < nCheckedCnt; j++ ) {
 		int nIndex = 0;

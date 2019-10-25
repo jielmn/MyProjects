@@ -116,7 +116,11 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 		BYTE  buf[8192];
 		DWORD  dwSize = sizeof(buf);
 		m_serial_port.Read(buf, dwSize);
+#if !NEW_VERSION_FLAG
 		if ( dwSize == 8 ) {
+#else
+		if (dwSize == 9) {
+#endif
 			DWORD  dwWrite = 2;
 			m_serial_port.Write("OK", dwWrite);
 		}
