@@ -1,0 +1,139 @@
+﻿html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,table,strong,th,td,frameset,frame,iframe,span,em,img,acronym,abbr{padding: 0;margin: 0;border:none; line-height: 100%;}table{border-collapse: collapse;border-spacing: 0;}img{ vertical-align:middle;}ol,ul,li{list-style: none;}address,caption,cite,code,dfn,th,var{font-weight: normal;font-style: normal;}h1,h2,h3,h4,h5,h6{font-size: 100%;}q:before,q:after{content: '';}input,select{ vertical-align:middle;}
+
+
+body{ font-family:"Microsoft YaHei"; font-size:12px;color:#333;}
+
+/* link start */
+
+a{ color:#fff; text-decoration: none;}
+a:hover{ text-decoration: underline;}
+
+.white,a.white{color:#fff;}
+a.white:hover{ text-decoration: underline; color:#fff;}
+
+.black,a.black{color:#000;}
+a.black:hover{ text-decoration: underline; color:#000;}
+
+.red,a.red{color:#ff5656;}
+a.red:hover{ text-decoration: underline; color:#ff5656;}
+
+.radius{border-radius: 999px;}
+
+
+/* link end */
+
+/* gap start */
+
+.h5{ width: 100%; height: 5px; line-height: 5px; overflow: hidden; font-size:5px; clear: both;}
+.h10{ width: 100%; height: 10px; line-height: 10px; overflow: hidden; font-size:10px; clear: both;}
+.h15{ width: 100%; height: 15px; line-height: 15px; overflow: hidden; font-size:15px; clear: both;}
+.h18{ width: 100%; height: 18px; line-height: 18px; overflow: hidden; font-size:18px; clear: both;}
+.h20{ width: 100%; height: 20px; line-height: 20px; overflow: hidden; font-size:20px; clear: both;}
+.h25{ width: 100%; height: 25px; line-height: 25px; overflow: hidden; font-size:25px; clear: both;}
+.h30{ width: 100%; height: 30px; line-height: 30px; overflow: hidden; font-size:30px; clear: both;}
+.h35{ width: 100%; height: 35px; line-height: 35px; overflow: hidden; font-size:35px; clear: both;}
+.h40{ width: 100%; height: 40px; line-height: 40px; overflow: hidden; font-size:40px; clear: both;}
+.h45{ width: 100%; height: 45px; line-height: 45px; overflow: hidden; font-size:45px; clear: both;}
+.h50{ width: 100%; height: 50px; line-height: 50px; overflow: hidden; font-size:50px; clear: both;}
+.h55{ width: 100%; height: 55px; line-height: 55px; overflow: hidden; font-size:55px; clear: both;}
+.h60{ width: 100%; height: 60px; line-height: 60px; overflow: hidden; font-size:60px; clear: both;}
+.h65{ width: 100%; height: 65px; line-height: 65px; overflow: hidden; font-size:65px; clear: both;}
+.h70{ width: 100%; height: 70px; line-height: 70px; overflow: hidden; font-size:70px; clear: both;}
+.h75{ width: 100%; height: 75px; line-height: 75px; overflow: hidden; font-size:75px; clear: both;}
+
+.mT5{margin-top:5px;}.mT10{margin-top:10px;}.mT15{margin-top:15px;}.mT20{margin-top:20px;}.mT25{margin-top:25px;}.mT30{margin-top:30px;}.mT35{margin-top:35px;}.mT40{margin-top:40px;}.mT45{margin-top:45px;}.mT50{margin-top:50px;}.mL5{margin-left:5px;}.mL10{margin-left:10px;}.mL15{margin-left:15px;}.mL20{margin-left:20px;}.mL25{margin-left:25px;}.mL30{margin-left:30px;}.mL35{margin-left:35px;}.mL40{margin-left:40px;}.mL45{margin-left:45px;}.mL50{margin-left:50px;}.mR5{margin-right:5px;}.mR10{margin-right:10px;}.mR15{margin-right:15px;}.mR20{margin-right:20px;}.mR25{margin-right:25px;}.mR30{margin-right:30px;}.mR35{margin-right:35px;}.mR40{margin-right:40px;}.mR45{margin-right:45px;}.mR50{margin-right:50px;}.mB5{margin-bottom:5px;}.mB10{margin-bottom:10px;}.mB15{margin-bottom:15px;}.mB20{margin-bottom:20px;}.mB25{margin-bottom:25px;}.mB30{margin-bottom:30px;}.mB35{margin-bottom:35px;}.mB40{margin-bottom:40px;}.mB45{margin-bottom:45px;}.mB50{margin-bottom:50px;}.pT5{padding-top:5px;}.pT10{padding-top:10px;}.pT15{padding-top:15px;}.pT20{padding-top:20px;}.pT25{padding-top:25px;}.pT30{padding-top:30px;}.pT35{padding-top:35px;}.pT40{padding-top:40px;}.pT45{padding-top:45px;}.pT50{padding-top:50px;}.pL5{padding-left:5px;}.pL10{padding-left:10px;}.pL15{padding-left:15px;}.pL20{padding-left:20px;}.pL25{padding-left:25px;}.pL30{padding-left:30px;}.pL35{padding-left:35px;}.pL40{padding-left:40px;}.pL45{padding-left:45px;}.pL50{padding-left:50px;}.pR5{padding-right:5px;}.pR10{padding-right:10px;}.pR15{padding-right:15px;}.pR20{padding-right:20px;}.pR25{padding-right:25px;}.pR30{padding-right:30px;}.pR35{padding-right:35px;}.pR40{padding-right:40px;}.pR45{padding-right:45px;}.pR50{padding-right:50px;}.pB5{padding-bottom:5px;}.pB10{padding-bottom:10px;}.pB15{padding-bottom:15px;}.pB20{padding-bottom:20px;}.pB25{padding-bottom:25px;}.pB30{padding-bottom:30px;}.pB35{padding-bottom:35px;}.pB40{padding-bottom:40px;}.pB45{padding-bottom:45px;}.pB50{padding-bottom:50px;}
+
+
+/* gap end */
+
+/* font-size start */
+
+.f9{font-size:9px;}
+.f10{font-size:10px;}
+.f11{font-size:11px;}
+.f12{font-size:12px;}
+.f13{ font-size:13px;}
+.f14{ font-size:14px;}
+.f15{ font-size:15px;}
+.f16{ font-size:16px;}
+.f17{ font-size:17px;}
+.f18{font-size: 18px;}
+.f19{ font-size:19px;}
+.f20{ font-size: 20px;}
+.f21{ font-size: 21px;}
+.f22{ font-size: 22px;}
+.f23{ font-size: 23px;}
+.f24{ font-size: 24px;}
+.f25{ font-size: 25px;}
+.f26{ font-size: 26px;}
+.f27{ font-size: 27px;}
+.f28{ font-size: 28px;}
+.f29{ font-size: 29px;}
+.f30{ font-size: 30px;}
+
+/* font-size end */
+
+/* topology start */
+
+.auto{margin:0 auto;}
+.relative{position:relative;}
+.absolute{position:absolute;}
+.text-center{ text-align: center;}
+
+/* topology end */
+
+/* clear start */
+
+.clear{ height:0px;line-height:0px;width:100%;clear:both;overflow:hidden;visibility:hidden;font-size:0px;border:none;background:transparent;}
+.clearfix:after{ content: " ";display: block;clear: both;height: 0;}
+.clearfix{ zoom: 1;}
+
+/* clear end */
+    
+
+
+/* float start */
+
+.float-right{float: right; display: inline;}
+.float-left{float: left; display: inline;}
+
+.left{ display: inline; float: left;}
+.right{ display: inline; float: left;}
+
+/* float end */
+
+/* font-family start */
+
+.ar{font-family: "Arial";}
+.ve{font-family:"Verdana";}
+.ta{font-family:"Tahoma";}
+
+/* font-family end */
+
+/* line-height start */
+
+.l14{line-height:14px;}
+.l15{line-height:15px;}
+.l16{line-height:16px;}
+.l17{line-height:17px;}
+.l18{line-height:18px;}
+.l19{line-height:19px;}
+.l20{line-height:20px;}
+.l21{line-height:21px;}
+.l22{line-height:22px;}
+.l23{line-height:23px;}
+.l24{line-height:24px;}
+.l25{line-height:25px;}
+.l26{line-height:26px;}
+.l27{line-height:27px;}
+.l28{line-height:28px;}
+.l29{line-height:29px;}
+.l30{line-height:30px;}
+
+/* line-height end */
+
+/* other start */
+
+.strong{ font-weight: bold;}
+
+/* other end */
