@@ -1,8 +1,6 @@
 body{ font-family:"Microsoft YaHei";font-size: 12px;color:#000;}
-a{color:#fff;}
-a:hover{text-decoration: none;color:#fff}
-a:visited{text-decoration: none;color:#fff}
-a:link{text-decoration: none;color:#fff}
+a{color:#000;}
+a:hover{text-decoration: none;color:#bd3a5b}
 .green,a.green{color:#3eb134;}
 .blue,a.blue{color:#1dbaee;}
 .red,a.red{color:#b9194b!important;}
@@ -166,3 +164,8 @@ a:link{text-decoration: none;color:#fff}
 .p_table_header{ background: #d95244; color:#fff;}
 .p_table_bg1{ background: #fff;}
 .p_table_bg2{ background: #eee;}
+
+a.bo{color:#fff;}
+a.bo:hover{text-decoration: none;color:#fff}
+a.bo:visited{text-decoration: none;color:#fff}
+a.bo:link{text-decoration: none;color:#fff}
