@@ -49,6 +49,8 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
+	g_data.m_cfg->GetConfig("baud", g_data.m_dwBaud, 9600);
+
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
 		return -1;
@@ -78,7 +80,7 @@ void  CBusiness::StartAsyn(int nComPort) {
 void  CBusiness::Start(const CStartParam * pParam) {
 	char szCom[256];
 	SNPRINTF(szCom, sizeof(szCom), "com%d", pParam->m_nComPort);
-	BOOL bRet = m_serial_port.OpenUartPort(szCom);
+	BOOL bRet = m_serial_port.OpenUartPort(szCom, g_data.m_dwBaud);
 	PostMessage(g_data.m_hWnd, UM_START_RET, bRet, 0);
 
 	g_data.m_thrd_db->PostMessage(this, MSG_READ);

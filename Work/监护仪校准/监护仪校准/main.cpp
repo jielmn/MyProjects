@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include "SaveAsDlg.h"
+#include "LmnSerialPort.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_nCurColumns = 0;
@@ -198,30 +199,25 @@ bool CDuiFrameWnd::OnMainSize(void * pParam) {
 void  CDuiFrameWnd::CheckDevice() {
 	m_cmbComPorts->RemoveAll();
 
-	std::vector<std::string> vComPorts;
-	EnumPortsWdm(vComPorts);
+	//std::vector<std::string> vComPorts;
+	//EnumPortsWdm(vComPorts);
+	std::map<int, std::string> mComPorts;
+	GetAllSerialPorts(mComPorts);
 
 	BOOL  bFindReader = FALSE;
 	int   nFindeIndex = -1;
 
-	std::vector<std::string>::iterator it;
+	std::map<int, std::string>::iterator it;
 	int i = 0;
-	for (it = vComPorts.begin(); it != vComPorts.end(); it++, i++) {
-		std::string & s = *it;
+	for (it = mComPorts.begin(); it != mComPorts.end(); it++, i++) {
+		std::string & s = it->second;
 
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(s.c_str());
 		m_cmbComPorts->Add(pElement);
 
-		int nComPort = 0;
-		const char * pFind = strstr(s.c_str(), "COM");
-		while (pFind) {
-			if (1 == sscanf(pFind + 3, "%d", &nComPort)) {
-				pElement->SetTag(nComPort);
-				break;
-			}
-			pFind = strstr(pFind + 3, "COM");
-		}
+		int nComPort = it->first;
+		pElement->SetTag(nComPort);
 
 		if (!bFindReader) {
 			char tmp[256];

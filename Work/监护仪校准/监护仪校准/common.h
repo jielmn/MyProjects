@@ -75,6 +75,7 @@ public:
 	HWND                      m_hWnd;
 	DWORD                     m_dwSleepTime;
 	BOOL                      m_bQuit;
+	DWORD                     m_dwBaud;
 
 #if NEW_VERSION_FLAG
 	std::vector<std::string>  m_vOtherMachineType;   // 除去4种基本类型之外的机器类型
@@ -88,6 +89,7 @@ public:
 		m_hWnd = 0;
 		m_dwSleepTime = 1000;
 		m_bQuit = FALSE;
+		m_dwBaud = 9600;
 #if !NEW_VERSION_FLAG
 		memset(m_standard_items, 0, sizeof(m_standard_items));
 #else

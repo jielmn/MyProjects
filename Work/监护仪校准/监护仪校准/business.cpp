@@ -95,6 +95,8 @@ int CBusiness::Init() {
 	}
 #endif
 
+	g_data.m_cfg->GetConfig("baud", g_data.m_dwBaud, 9600);
+
 
 	BOOL bRet = LoadStandardRes();
 	assert(bRet);
@@ -137,7 +139,7 @@ void  CBusiness::Adjust(const CAdjustParam * pParam) {
 	int   nRegMsg = UM_ADJUST_RET;
 
 	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nComPort);
-	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort, g_data.m_dwBaud);
 	if (!bRet) {
 		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
 		return;
@@ -168,7 +170,7 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 	int   nRegMsg = UM_ADJUST_ALL_RET;
 
 	SNPRINTF(szComPort, sizeof(szComPort), "com%d", pParam->m_nComPort);
-	BOOL bRet = serial_port.OpenUartPort(szComPort);
+	BOOL bRet = serial_port.OpenUartPort(szComPort, g_data.m_dwBaud);
 	if (!bRet) {
 		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
 		return;

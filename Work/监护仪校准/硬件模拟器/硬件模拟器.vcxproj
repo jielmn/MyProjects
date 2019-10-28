@@ -94,7 +94,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;Advapi32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\proj_sim_res  ..\Debug\res\proj_sim_res /dseiy</Command>

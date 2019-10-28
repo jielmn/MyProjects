@@ -31,6 +31,7 @@ public:
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
 	HWND                      m_hWnd;
+	DWORD                     m_dwBaud;
 
 public:
 	CGlobalData() {
@@ -38,6 +39,7 @@ public:
 		m_cfg = 0;
 		m_thrd_db = 0;
 		m_hWnd = 0;
+		m_dwBaud = 9600;
 	}
 };
 
