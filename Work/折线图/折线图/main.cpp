@@ -198,23 +198,23 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 }
 
 void  CDuiFrameWnd::SaveData() {
-	std::vector<WORD> v1;
-	std::vector<WORD> v2;
-	std::vector<WORD>::iterator it;
-	WORD  wMin = 0xFFFF;
+	std::vector<DWORD> v1;
+	std::vector<DWORD> v2;
+	std::vector<DWORD>::iterator it;
+	DWORD  wMin = 0xFFFFFFFF;
 	int index = 0;
 	char buf[256];
 
 	DWORD  dwDataLen = m_buf.GetDataLength();
-	DWORD  dwItemCnt = dwDataLen / 3;
+	DWORD  dwItemCnt = dwDataLen / 5;
 	const BYTE * pData = (const BYTE *)m_buf.GetData();
 	for ( DWORD i = 0; i < dwItemCnt; i++ ) {
-		const BYTE * pItem = pData + 3 * i;
+		const BYTE * pItem = pData + 5 * i;
 		if ( pItem[0] == 1 ) {
-			v1.push_back( MAKEWORD(pItem[2], pItem[1]) );
+			v1.push_back( (pItem[1] << 24) | (pItem[2] << 16) | (pItem[3] << 8) | pItem[4] );
 		}
 		else if (pItem[0] == 2) {
-			v2.push_back(MAKEWORD(pItem[2], pItem[1]));
+			v2.push_back( (pItem[1] << 24) | (pItem[2] << 16) | (pItem[3] << 8) | pItem[4] );
 		}
 	}
 
