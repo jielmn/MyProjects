@@ -47,14 +47,14 @@ public:
 	BOOL GetBoolean(const char * szKey, BOOL bDefault = FALSE) const;
 	CLuaTable *  GetTable(const char * szKey);
 	
-	void SetString(const char * szKey, const char * szValue);
-	void SetInt(const char * szKey, int nValue);
-	void SetBoolean(const char * szKey, BOOL bValue);
+	void SetString(const char * szKey, const char * szValue, const char * szDefault = "");
+	void SetInt(const char * szKey, int nValue, int nDefault = 0);
+	void SetBoolean(const char * szKey, BOOL bValue, BOOL bDefault = FALSE);
 	void SetTable(const char * szKey, const CLuaTable * pTable);
 
-	void SetString(int nKey, const char * szValue);
-	void SetInt(int nKey, int nValue);
-	void SetBoolean(int nKey, BOOL bValue);
+	void SetString(int nKey, const char * szValue, const char * szDefault = "");
+	void SetInt(int nKey, int nValue, int nDefault = 0);
+	void SetBoolean(int nKey, BOOL bValue, BOOL bDefault = FALSE);
 	void SetTable(int nKey, const CLuaTable * pTable);
 
 	BOOL  HasKey(const char * szKey);
@@ -64,6 +64,9 @@ public:
 	// 用于遍历
 	DWORD  Size() const;
 	CLuaValue * GetItemAt ( DWORD dwIndex, const char ** ppKey = 0 );
+
+	// 是否有有效配置项(int, boolean, string)
+	BOOL HasLeafConfig() const;
 
 private:
 	std::map<std::string, CLuaValue *>  m_table;
@@ -91,9 +94,9 @@ public:
 	BOOL GetBoolean(const char * szPath, BOOL bDefault = 0);
 	const char * GetString(const char * szPath, const char * szDefault = "");
 
-	void  SetInt(const char * szPath, int nValue);
-	void  SetBoolean(const char * szPath, BOOL bValue);
-	void  SetString(const char * szPath, const char * szValue);
+	void  SetInt(const char * szPath, int nValue, int nDefault = 0);
+	void  SetBoolean(const char * szPath, BOOL bValue, BOOL bDefault = FALSE);
+	void  SetString(const char * szPath, const char * szValue, const char * szDefault = "");
 
 	void  Save();
 	void  ResetChangeFlag();

@@ -86,16 +86,35 @@ void  test_3() {
 	printf("c.m.p=%s \n", cfg.GetString("c.m.p"));
 	printf("c.m.q=%s \n", cfg.GetString("c.m.q"));
 	cfg.SetBoolean("c.m.a", TRUE);
-	cfg.SetString("c.m.b", "this is a test.");
+	cfg.SetString("c.m.b", "a");
 
 	cfg.ResetChangeFlag();
+	cfg.DeInit();
+}
+
+void  test_4() {
+	CLuaCfg cfg;
+	int ret = cfg.Init("Lua\\d.lua");
+	assert(0 == ret);
+	
+	cfg.SetInt("c.1", 10, 10);
+	cfg.SetString("c.2", "xyz", "xyz");
+	cfg.SetBoolean("c.m.p", TRUE, TRUE);
+	cfg.SetString("c.m.q", "quit", "quit");
+
+	cfg.SetInt("1", 100, 100);
+	cfg.SetString("b", "123", "123");
+	cfg.SetBoolean("d", FALSE);
+
+	//cfg.ResetChangeFlag();
 	cfg.DeInit();
 }
 
 int main() {
 	//test_1();
 	//test_2();
-	test_3();
+	//test_3();
+	test_4();
 	getchar();
 	return 0;
 }
