@@ -42,7 +42,7 @@ void test_1() {
 
 void test_2() {
 	LuaCfgInit();
-	CLuaTable * pTable = LoadLuaCfgFile("Lua\\b.lua");
+	CLuaTable * pTable = LoadLuaCfgFile("Lua\\a.lua");
 
 	DWORD  len = pTable->Size();
 	for (DWORD i = 0; i < len; i++) {
@@ -50,6 +50,9 @@ void test_2() {
 		CLuaValue * pValue = pTable->GetItemAt(i, &szKey);
 		if ( pValue->GetType() == CLuaValue::Integer ) {
 			printf("%s:%d\n", szKey, pValue->GetInt());
+		}
+		else if (pValue->GetType() == CLuaValue::Boolean) {
+			printf("%s:%s\n", szKey, pValue->GetBoolean() ? "true" : "false" );
 		}
 		else if (pValue->GetType() == CLuaValue::String) {
 			printf("%s:%s\n", szKey, pValue->GetString());

@@ -25,6 +25,9 @@ void CLuaValue::Clear() {
 		else if (m_eType == Integer) {
 			// do nothing
 		}
+		else if (m_eType == Boolean) {
+			// do nothing
+		}
 		else {
 			assert(0);
 		}
@@ -56,6 +59,15 @@ int  CLuaValue::GetInt() const {
 	}
 }
 
+BOOL  CLuaValue::GetBoolean() const {
+	if (m_eType == Boolean) {
+		return (BOOL)m_pValue;
+	}
+	else {
+		return 0;
+	}
+}
+
 CLuaTable * CLuaValue::GetTable() {
 	if ( m_eType == Table ) {
 		return (CLuaTable *)m_pValue;
@@ -75,6 +87,12 @@ void CLuaValue::SetInt(int nValue) {
 	Clear();
 	m_eType = Integer;
 	m_pValue = (void *)nValue;
+}
+
+void  CLuaValue::SetBoolean(BOOL bValue) {
+	Clear();
+	m_eType = Boolean;
+	m_pValue = (void *)bValue;
 }
 
 void CLuaValue::SetTable(const CLuaTable * pTable) {
@@ -189,6 +207,23 @@ void CLuaTable::SetInt(const char * szKey, int nValue) {
 	pValue->SetInt(nValue);
 }
 
+void CLuaTable::SetBoolean(const char * szKey, BOOL bValue) {
+	if (0 == szKey)
+		return;
+
+	std::map<std::string, CLuaValue *>::const_iterator it;
+	it = m_table.find(szKey);
+	if (it == m_table.end()) {
+		CLuaValue * pValue = new CLuaValue;
+		pValue->SetBoolean(bValue);
+		m_table.insert(std::pair<std::string, CLuaValue *>(szKey, pValue));
+		return;
+	}
+
+	CLuaValue * pValue = it->second;
+	pValue->SetBoolean(bValue);
+}
+
 void CLuaTable::SetTable(const char * szKey, const CLuaTable * pTable) {
 	if (0 == szKey)
 		return;
@@ -216,6 +251,12 @@ void CLuaTable::SetInt(int nKey, int nValue) {
 	char szKey[32];
 	SNPRINTF(szKey, sizeof(szKey), "%d", nKey);
 	SetInt(szKey, nValue);
+}
+
+void CLuaTable::SetBoolean(int nKey, BOOL bValue) {
+	char szKey[32];
+	SNPRINTF(szKey, sizeof(szKey), "%d", nKey);
+	SetBoolean(szKey, bValue);
 }
 
 void CLuaTable::SetTable(int nKey, const CLuaTable * pTable) {
@@ -336,7 +377,7 @@ static void LoadLuaTable(lua_State* L, CLuaTable * pTable) {
 			pTable->SetInt(szKey, 0);
 		}
 		else if (nValueType == LUA_TBOOLEAN) {
-			pTable->SetInt(szKey, lua_toboolean(L, -1));
+			pTable->SetBoolean(szKey, (BOOL)lua_toboolean(L, -1));
 		}
 		else if (nValueType == LUA_TNUMBER) {
 			pTable->SetInt(szKey, (int)lua_tonumber(L, -1));
@@ -448,6 +489,10 @@ static int WriteLuaTable(CLuaTable * pTable, FILE * fp, int nDepth) {
 
 		if (eType == CLuaValue::Integer) {
 			SNPRINTF( buf, sizeof(buf), "%s=%d,\r\n", szKey, pValue->GetInt() );
+			fwrite(buf, 1, strlen(buf), fp);
+		}
+		else if (eType == CLuaValue::Boolean) {
+			SNPRINTF(buf, sizeof(buf), "%s=%s,\r\n", szKey, pValue->GetBoolean() ? "true" : "false" );
 			fwrite(buf, 1, strlen(buf), fp);
 		}
 		else if (eType == CLuaValue::String) {
