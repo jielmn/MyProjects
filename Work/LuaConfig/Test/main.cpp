@@ -3,6 +3,7 @@
 #endif
 
 #include <stdio.h>
+#include <assert.h>
 #include "LuaConfig.h"
 
 void test_1() {
@@ -62,16 +63,39 @@ void test_2() {
 		}
 	}
 
-	int ret = SaveLuaCfgFile("Lua\\c.lua", pTable);
+	int ret = SaveLuaCfgFile("Lua\\x.lua", pTable);
 
 	if (pTable)
 		delete pTable;
 	LuaCfgDeinit();
 }
 
+void  test_3() {
+	CLuaCfg cfg;
+	int ret = cfg.Init("Lua\\c.lua");
+	assert(0 == ret);
+	printf("config\n");
+	printf("------------------\n");
+	printf("1=%d \n", cfg.GetInt("1"));
+	printf("b=%s \n", cfg.GetString("b"));
+	printf("d=%s \n", cfg.GetBoolean("d") ? "true" : "false" );
+	printf("hello\n\"world\"=%s \n", cfg.GetString("hello\n\"world\""));
+	printf("c.1=%d \n", cfg.GetInt("c.1"));
+	printf("c.2=%s \n", cfg.GetString("c.2"));
+	printf("c.1=%d \n", cfg.GetInt("c.1"));
+	printf("c.m.p=%s \n", cfg.GetString("c.m.p"));
+	printf("c.m.q=%s \n", cfg.GetString("c.m.q"));
+	cfg.SetBoolean("c.m.a", TRUE);
+	cfg.SetString("c.m.b", "this is a test.");
+
+	cfg.ResetChangeFlag();
+	cfg.DeInit();
+}
+
 int main() {
 	//test_1();
-	test_2();
+	//test_2();
+	test_3();
 	getchar();
 	return 0;
 }

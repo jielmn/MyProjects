@@ -1,0 +1,14 @@
+{
+	[1]=100,
+	b="123",
+	c={
+		[1]=10,
+		[2]="xyz",
+		m={
+			p="pop",
+			q="quit",
+		},
+	},
+	d=false,
+	["hello\n\"world\""]="Hello\"World\nxyz",
+}

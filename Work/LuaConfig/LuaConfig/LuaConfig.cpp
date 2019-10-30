@@ -121,19 +121,19 @@ void CLuaTable::Clear() {
 
 const char * CLuaTable::GetString(const char * szKey) const {
 	if (0 == szKey)
-		return 0;
+		return "";
 
 	std::map<std::string, CLuaValue *>::const_iterator it;
 	it = m_table.find(szKey);
 	if (it == m_table.end())
-		return 0;
+		return "";
 
 	CLuaValue * pValue = it->second;
 	if ( pValue && pValue->GetType() == CLuaValue::String ) {
 		return pValue->GetString();
 	}
 	else {
-		return 0;
+		return "";
 	}
 }
 
@@ -152,6 +152,24 @@ int CLuaTable::GetInt(const char * szKey) const {
 	}
 	else {
 		return 0;
+	}
+}
+
+BOOL CLuaTable::GetBoolean(const char * szKey) const {
+	if (0 == szKey)
+		return FALSE;
+
+	std::map<std::string, CLuaValue *>::const_iterator it;
+	it = m_table.find(szKey);
+	if (it == m_table.end())
+		return FALSE;
+
+	CLuaValue * pValue = it->second;
+	if (pValue && pValue->GetType() == CLuaValue::Boolean) {
+		return pValue->GetBoolean();
+	}
+	else {
+		return FALSE;
 	}
 }
 
@@ -263,6 +281,15 @@ void CLuaTable::SetTable(int nKey, const CLuaTable * pTable) {
 	char szKey[32];
 	SNPRINTF(szKey, sizeof(szKey), "%d", nKey);
 	SetTable(szKey, pTable);
+}
+
+CLuaValue::ValueType  CLuaTable::GetType(const char * szKey) const {
+	std::map<std::string, CLuaValue *>::const_iterator it;
+	it = m_table.find(szKey);
+	if (it == m_table.end())
+		return CLuaValue::Unknown;
+	else
+		return it->second->GetType();
 }
 
 BOOL  CLuaTable::HasKey(const char * szKey) {
@@ -533,4 +560,242 @@ int SaveLuaCfgFile(const char * szFilePath, CLuaTable * pTable) {
 
 	fclose(fp);
 	return 0;
+}
+
+CLuaCfg::CLuaCfg() {
+	m_pRootTable = 0;
+	memset( m_szFileName, 0, sizeof(m_szFileName) );
+	m_bChanged = FALSE;
+}
+
+CLuaCfg::~CLuaCfg() {
+	if (m_pRootTable) {
+		delete m_pRootTable;
+		m_pRootTable = 0;
+	}
+}
+
+int CLuaCfg::Init(const char * szCfgFileName) {
+	if (0 == szCfgFileName)
+		return -1;
+
+	LuaCfgInit();
+
+	m_pRootTable = LoadLuaCfgFile(szCfgFileName);
+	if (0 == m_pRootTable)
+		return -1;
+
+	STRNCPY(m_szFileName, szCfgFileName, sizeof(m_szFileName));
+	return 0;
+}
+
+void CLuaCfg::DeInit() {
+	if ( m_bChanged ) {
+		Save();
+	}
+
+	if (m_pRootTable) {
+		delete m_pRootTable;
+		m_pRootTable = 0;
+	}
+
+	memset(m_szFileName, 0, sizeof(m_szFileName));
+
+	LuaCfgDeinit();
+}
+
+// pathÀýÈç: a.1.b.x
+int  CLuaCfg::GetInt(const char * szPath) {
+	if (0 == szPath)
+		return 0;
+
+	if (m_pRootTable == 0)
+		return 0;
+
+	SplitString split;
+	split.Split(szPath, ".");
+
+	CLuaTable * pTable = m_pRootTable;
+	DWORD dwSize = split.Size();
+	for ( DWORD i = 0; i < dwSize; i++ ) {
+		CLmnString key = split[i];
+		if ( i < dwSize - 1 ) {
+			pTable = pTable->GetTable(key);
+			if (0 == pTable) {
+				return 0;
+			}
+		}
+		else {
+			return pTable->GetInt(key);
+		}
+	}
+
+	return 0;
+}
+
+BOOL CLuaCfg::GetBoolean(const char * szPath) {
+	if (0 == szPath)
+		return FALSE;
+
+	if (m_pRootTable == 0)
+		return FALSE;
+
+	SplitString split;
+	split.Split(szPath, ".");
+
+	CLuaTable * pTable = m_pRootTable;
+	DWORD dwSize = split.Size();
+	for (DWORD i = 0; i < dwSize; i++) {
+		CLmnString key = split[i];
+		if (i < dwSize - 1) {
+			pTable = pTable->GetTable(key);
+			if (0 == pTable) {
+				return FALSE;
+			}
+		}
+		else {
+			return pTable->GetBoolean(key);
+		}
+	}
+
+	return FALSE;
+}
+
+const char * CLuaCfg::GetString(const char * szPath) {
+	if (0 == szPath)
+		return "";
+
+	if (m_pRootTable == 0)
+		return "";
+
+	SplitString split;
+	split.Split(szPath, ".");
+
+	CLuaTable * pTable = m_pRootTable;
+	DWORD dwSize = split.Size();
+	for (DWORD i = 0; i < dwSize; i++) {
+		CLmnString key = split[i];
+		if (i < dwSize - 1) {
+			pTable = pTable->GetTable(key);
+			if (0 == pTable) {
+				return "";
+			}
+		}
+		else {
+			return pTable->GetString(key);
+		}
+	}
+
+	return "";
+}
+
+void  CLuaCfg::SetInt(const char * szPath, int nValue) {
+	if (0 == szPath)
+		return;
+
+	if (m_pRootTable == 0)
+		return;
+
+	SplitString split;
+	split.Split(szPath, ".");
+
+	CLuaTable * pTable = m_pRootTable;
+	DWORD dwSize = split.Size();
+	for (DWORD i = 0; i < dwSize; i++) {
+		CLmnString key = split[i];
+		if (i < dwSize - 1) {
+			CLuaTable * pChildTable = pTable->GetTable(key);
+			if ( 0 == pChildTable) {
+				pChildTable = new CLuaTable;
+				pTable->SetTable(key, pChildTable);				
+			}
+			pTable = pChildTable;			
+		}
+		else {
+			pTable->SetInt(key, nValue);
+		}
+	}
+
+	m_bChanged = TRUE;
+}
+
+void  CLuaCfg::SetBoolean(const char * szPath, BOOL bValue) {
+	if (0 == szPath)
+		return;
+
+	if (m_pRootTable == 0)
+		return;
+
+	SplitString split;
+	split.Split(szPath, ".");
+
+	CLuaTable * pTable = m_pRootTable;
+	DWORD dwSize = split.Size();
+	for (DWORD i = 0; i < dwSize; i++) {
+		CLmnString key = split[i];
+		if (i < dwSize - 1) {
+			CLuaTable * pChildTable = pTable->GetTable(key);
+			if (0 == pChildTable) {
+				pChildTable = new CLuaTable;
+				pTable->SetTable(key, pChildTable);
+			}
+			pTable = pChildTable;
+		}
+		else {
+			pTable->SetBoolean(key, bValue);
+		}
+	}
+
+	m_bChanged = TRUE;
+}
+
+void  CLuaCfg::SetString(const char * szPath, const char * szValue) {
+	if (0 == szPath)
+		return;
+
+	if (m_pRootTable == 0)
+		return;
+
+	if (szValue == 0)
+		szValue = "";
+
+	SplitString split;
+	split.Split(szPath, ".");
+
+	CLuaTable * pTable = m_pRootTable;
+	DWORD dwSize = split.Size();
+	for (DWORD i = 0; i < dwSize; i++) {
+		CLmnString key = split[i];
+		if (i < dwSize - 1) {
+			CLuaTable * pChildTable = pTable->GetTable(key);
+			if (0 == pChildTable) {
+				pChildTable = new CLuaTable;
+				pTable->SetTable(key, pChildTable);
+			}
+			pTable = pChildTable;
+		}
+		else {
+			pTable->SetString(key, szValue);
+		}
+	}
+
+	m_bChanged = TRUE;
+}
+
+void  CLuaCfg::Save() {
+	if ( m_pRootTable == 0 )
+		return;
+
+	if ( m_szFileName[0] == '\0' ) {
+		return;
+	}
+
+	if (!m_bChanged)
+		return;
+
+	SaveLuaCfgFile(m_szFileName, m_pRootTable);
+}
+
+void  CLuaCfg::ResetChangeFlag() {
+	m_bChanged = FALSE;
 }
