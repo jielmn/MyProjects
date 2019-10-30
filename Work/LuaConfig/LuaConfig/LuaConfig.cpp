@@ -191,7 +191,8 @@ CLuaTable *  CLuaTable::GetTable(const char * szKey) {
 	}
 }
 
-void CLuaTable::SetString(const char * szKey, const char * szValue, const char * szDefault /*= ""*/) {
+void CLuaTable::SetString( const char * szKey, const char * szValue, 
+	                       const char * szDefault /*= ""*/, BOOL bAlwaysReserved /*= FALSE*/) {
 	if (0 == szKey)
 		return;
 
@@ -202,7 +203,7 @@ void CLuaTable::SetString(const char * szKey, const char * szValue, const char *
 		szDefault = "";
 
 	// 如果是缺省值，则删除配置项
-	if ( 0 == strcmp(szValue, szDefault) ) {
+	if ( !bAlwaysReserved && 0 == strcmp(szValue, szDefault) ) {
 		RemoveKey(szKey);
 		return;
 	}
@@ -220,11 +221,12 @@ void CLuaTable::SetString(const char * szKey, const char * szValue, const char *
 	pValue->SetString(szValue);
 }
 
-void CLuaTable::SetInt(const char * szKey, int nValue, int nDefault /*= 0*/) {
+void CLuaTable::SetInt( const char * szKey, int nValue, int nDefault /*= 0*/, 
+	                    BOOL bAlwaysReserved /*= FALSE*/) {
 	if (0 == szKey)
 		return;
 
-	if (nValue == nDefault) {
+	if ( !bAlwaysReserved && nValue == nDefault) {
 		RemoveKey(szKey);
 		return;
 	}
@@ -243,11 +245,12 @@ void CLuaTable::SetInt(const char * szKey, int nValue, int nDefault /*= 0*/) {
 	pValue->SetInt(nValue);
 }
 
-void CLuaTable::SetBoolean(const char * szKey, BOOL bValue, BOOL bDefault /*= FALSE*/) {
+void CLuaTable::SetBoolean( const char * szKey, BOOL bValue, BOOL bDefault /*= FALSE*/, 
+	                        BOOL bAlwaysReserved /*= FALSE*/) {
 	if (0 == szKey)
 		return;
 
-	if (bValue == bDefault) {
+	if ( !bAlwaysReserved && bValue == bDefault) {
 		RemoveKey(szKey);
 		return;
 	}
@@ -282,22 +285,23 @@ void CLuaTable::SetTable(const char * szKey, const CLuaTable * pTable) {
 	pValue->SetTable(pTable);
 }
 
-void CLuaTable::SetString(int nKey, const char * szValue, const char * szDefault /*= ""*/) {
+void CLuaTable::SetString( int nKey, const char * szValue, const char * szDefault /*= ""*/, 
+	                       BOOL bAlwaysReserved /*= FALSE*/) {
 	char szKey[32];
 	SNPRINTF(szKey, sizeof(szKey), "%d", nKey);
-	SetString(szKey, szValue, szDefault);
+	SetString(szKey, szValue, szDefault, bAlwaysReserved);
 }
 
-void CLuaTable::SetInt(int nKey, int nValue, int nDefault /*= 0*/) {
+void CLuaTable::SetInt(int nKey, int nValue, int nDefault /*= 0*/, BOOL bAlwaysReserved /*= FALSE*/) {
 	char szKey[32];
 	SNPRINTF(szKey, sizeof(szKey), "%d", nKey);
-	SetInt(szKey, nValue, nDefault);
+	SetInt(szKey, nValue, nDefault, bAlwaysReserved);
 }
 
-void CLuaTable::SetBoolean(int nKey, BOOL bValue, BOOL bDefault /*= FALSE*/ ) {
+void CLuaTable::SetBoolean(int nKey, BOOL bValue, BOOL bDefault /*= FALSE*/, BOOL bAlwaysReserved /*= FALSE*/) {
 	char szKey[32];
 	SNPRINTF(szKey, sizeof(szKey), "%d", nKey);
-	SetBoolean(szKey, bValue, bDefault);
+	SetBoolean(szKey, bValue, bDefault, bAlwaysReserved);
 }
 
 void CLuaTable::SetTable(int nKey, const CLuaTable * pTable) {
@@ -589,6 +593,7 @@ static int WriteLuaTable(CLuaTable * pTable, FILE * fp, int nDepth) {
 				continue;
 			}
 
+			Indent(fp, nDepth);
 			SNPRINTF(buf, sizeof(buf), "%s={\r\n", szKey);
 			fwrite(buf, 1, strlen(buf), fp);
 			WriteLuaTable(pValue->GetTable(), fp, nDepth + 1);
@@ -747,7 +752,7 @@ const char * CLuaCfg::GetString(const char * szPath, const char * szDefault /*= 
 	return szDefault;
 }
 
-void  CLuaCfg::SetInt(const char * szPath, int nValue, int nDefault /*= 0*/) {
+void  CLuaCfg::SetInt(const char * szPath, int nValue, int nDefault /*= 0*/, BOOL bAlwaysReserved /*= FALSE*/) {
 	if (0 == szPath)
 		return;
 
@@ -770,14 +775,14 @@ void  CLuaCfg::SetInt(const char * szPath, int nValue, int nDefault /*= 0*/) {
 			pTable = pChildTable;			
 		}
 		else {
-			pTable->SetInt(key, nValue, nDefault);
+			pTable->SetInt(key, nValue, nDefault, bAlwaysReserved);
 		}
 	}
 
 	m_bChanged = TRUE;
 }
 
-void  CLuaCfg::SetBoolean(const char * szPath, BOOL bValue, BOOL bDefault /*= FALSE*/) {
+void  CLuaCfg::SetBoolean(const char * szPath, BOOL bValue, BOOL bDefault /*= FALSE*/, BOOL bAlwaysReserved /*= FALSE*/) {
 	if (0 == szPath)
 		return;
 
@@ -800,14 +805,14 @@ void  CLuaCfg::SetBoolean(const char * szPath, BOOL bValue, BOOL bDefault /*= FA
 			pTable = pChildTable;
 		}
 		else {
-			pTable->SetBoolean(key, bValue, bDefault);
+			pTable->SetBoolean(key, bValue, bDefault, bAlwaysReserved);
 		}
 	}
 
 	m_bChanged = TRUE;
 }
 
-void  CLuaCfg::SetString(const char * szPath, const char * szValue, const char * szDefault /*=""*/) {
+void  CLuaCfg::SetString(const char * szPath, const char * szValue, const char * szDefault /*=""*/, BOOL bAlwaysReserved /*= FALSE*/) {
 	if (0 == szPath)
 		return;
 
@@ -833,7 +838,7 @@ void  CLuaCfg::SetString(const char * szPath, const char * szValue, const char *
 			pTable = pChildTable;
 		}
 		else {
-			pTable->SetString(key, szValue, szDefault);
+			pTable->SetString(key, szValue, szDefault, bAlwaysReserved);
 		}
 	}
 

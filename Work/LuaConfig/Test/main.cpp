@@ -100,11 +100,11 @@ void  test_4() {
 	cfg.SetInt("c.1", 10, 10);
 	cfg.SetString("c.2", "xyz", "xyz");
 	cfg.SetBoolean("c.m.p", TRUE, TRUE);
-	cfg.SetString("c.m.q", "quit", "quit");
+	cfg.SetString("c.m.q", "quit", "quit", TRUE);
 
 	cfg.SetInt("1", 100, 100);
 	cfg.SetString("b", "123", "123");
-	cfg.SetBoolean("d", FALSE);
+	cfg.SetBoolean("d", FALSE, FALSE, TRUE);
 
 	//cfg.ResetChangeFlag();
 	cfg.DeInit();
