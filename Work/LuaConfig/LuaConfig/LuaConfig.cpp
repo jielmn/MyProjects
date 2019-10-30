@@ -119,57 +119,57 @@ void CLuaTable::Clear() {
 	m_table.clear();
 }
 
-const char * CLuaTable::GetString(const char * szKey) const {
+const char * CLuaTable::GetString(const char * szKey, const char * szDefault /*= ""*/) const {
 	if (0 == szKey)
-		return "";
+		return szDefault;
 
 	std::map<std::string, CLuaValue *>::const_iterator it;
 	it = m_table.find(szKey);
 	if (it == m_table.end())
-		return "";
+		return szDefault;
 
 	CLuaValue * pValue = it->second;
 	if ( pValue && pValue->GetType() == CLuaValue::String ) {
 		return pValue->GetString();
 	}
 	else {
-		return "";
+		return szDefault;
 	}
 }
 
-int CLuaTable::GetInt(const char * szKey) const {
+int CLuaTable::GetInt(const char * szKey, int nDefault /*= 0*/) const {
 	if (0 == szKey)
-		return 0;
+		return nDefault;
 
 	std::map<std::string, CLuaValue *>::const_iterator it;
 	it = m_table.find(szKey);
 	if (it == m_table.end())
-		return 0;
+		return nDefault;
 
 	CLuaValue * pValue = it->second;
 	if (pValue && pValue->GetType() == CLuaValue::Integer) {
 		return pValue->GetInt();
 	}
 	else {
-		return 0;
+		return nDefault;
 	}
 }
 
-BOOL CLuaTable::GetBoolean(const char * szKey) const {
+BOOL CLuaTable::GetBoolean(const char * szKey, BOOL bDefault /*= FALSE */) const {
 	if (0 == szKey)
-		return FALSE;
+		return bDefault;
 
 	std::map<std::string, CLuaValue *>::const_iterator it;
 	it = m_table.find(szKey);
 	if (it == m_table.end())
-		return FALSE;
+		return bDefault;
 
 	CLuaValue * pValue = it->second;
 	if (pValue && pValue->GetType() == CLuaValue::Boolean) {
 		return pValue->GetBoolean();
 	}
 	else {
-		return FALSE;
+		return bDefault;
 	}
 }
 
@@ -605,12 +605,12 @@ void CLuaCfg::DeInit() {
 }
 
 // pathÀýÈç: a.1.b.x
-int  CLuaCfg::GetInt(const char * szPath) {
+int  CLuaCfg::GetInt(const char * szPath, int nDefault /*= 0*/) {
 	if (0 == szPath)
-		return 0;
+		return nDefault;
 
 	if (m_pRootTable == 0)
-		return 0;
+		return nDefault;
 
 	SplitString split;
 	split.Split(szPath, ".");
@@ -622,23 +622,23 @@ int  CLuaCfg::GetInt(const char * szPath) {
 		if ( i < dwSize - 1 ) {
 			pTable = pTable->GetTable(key);
 			if (0 == pTable) {
-				return 0;
+				return nDefault;
 			}
 		}
 		else {
-			return pTable->GetInt(key);
+			return pTable->GetInt(key, nDefault);
 		}
 	}
 
-	return 0;
+	return nDefault;
 }
 
-BOOL CLuaCfg::GetBoolean(const char * szPath) {
+BOOL CLuaCfg::GetBoolean(const char * szPath, BOOL bDefault /*= 0*/) {
 	if (0 == szPath)
-		return FALSE;
+		return bDefault;
 
 	if (m_pRootTable == 0)
-		return FALSE;
+		return bDefault;
 
 	SplitString split;
 	split.Split(szPath, ".");
@@ -650,23 +650,23 @@ BOOL CLuaCfg::GetBoolean(const char * szPath) {
 		if (i < dwSize - 1) {
 			pTable = pTable->GetTable(key);
 			if (0 == pTable) {
-				return FALSE;
+				return bDefault;
 			}
 		}
 		else {
-			return pTable->GetBoolean(key);
+			return pTable->GetBoolean(key, bDefault);
 		}
 	}
 
-	return FALSE;
+	return bDefault;
 }
 
-const char * CLuaCfg::GetString(const char * szPath) {
+const char * CLuaCfg::GetString(const char * szPath, const char * szDefault /*= ""*/) {
 	if (0 == szPath)
-		return "";
+		return szDefault;
 
 	if (m_pRootTable == 0)
-		return "";
+		return szDefault;
 
 	SplitString split;
 	split.Split(szPath, ".");
@@ -678,15 +678,15 @@ const char * CLuaCfg::GetString(const char * szPath) {
 		if (i < dwSize - 1) {
 			pTable = pTable->GetTable(key);
 			if (0 == pTable) {
-				return "";
+				return szDefault;
 			}
 		}
 		else {
-			return pTable->GetString(key);
+			return pTable->GetString(key, szDefault);
 		}
 	}
 
-	return "";
+	return szDefault;
 }
 
 void  CLuaCfg::SetInt(const char * szPath, int nValue) {

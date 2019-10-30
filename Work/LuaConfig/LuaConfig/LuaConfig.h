@@ -42,9 +42,9 @@ public:
 	CLuaTable();
 	~CLuaTable();
 
-	const char * GetString(const char * szKey) const;
-	int  GetInt(const char * szKey) const;
-	BOOL GetBoolean(const char * szKey) const;
+	const char * GetString(const char * szKey, const char * szDefault = "") const;
+	int  GetInt(const char * szKey, int nDefault = 0) const;
+	BOOL GetBoolean(const char * szKey, BOOL bDefault = FALSE) const;
 	CLuaTable *  GetTable(const char * szKey);
 	
 	void SetString(const char * szKey, const char * szValue);
@@ -87,9 +87,9 @@ public:
 
 	// path例如: a.1.b.x
 	// 所以要求配置lua的key不要有关键'.'点号
-	int  GetInt(const char * szPath);
-	BOOL GetBoolean(const char * szPath);
-	const char * GetString(const char * szPath);
+	int  GetInt(const char * szPath, int nDefault = 0);
+	BOOL GetBoolean(const char * szPath, BOOL bDefault = 0);
+	const char * GetString(const char * szPath, const char * szDefault = "");
 
 	void  SetInt(const char * szPath, int nValue);
 	void  SetBoolean(const char * szPath, BOOL bValue);
