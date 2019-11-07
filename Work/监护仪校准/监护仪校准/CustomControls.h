@@ -18,6 +18,11 @@ public:
 	int   GetDutyCycle() const;
 	BOOL  IsChecked() const;
 	void  SetChecked(BOOL bChecked);
+	void  SetHighlight(BOOL bHighlight);
+
+	void  SetSelected();
+	void  Upper();
+	void  Downer();
 
 private:
 	LPCTSTR GetClass() const;

@@ -24,6 +24,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_btnAdjustAll = 0;
 	m_btnDiff = 0;
 	m_waiting_bar = 0;
+	m_nHighlightIndex = -1;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -72,6 +73,8 @@ void  CDuiFrameWnd::InitWindow() {
 
 	CheckDevice();     
 	WindowImplBase::InitWindow();
+
+	m_PaintManager.AddPreMessageFilter(&m_filter);
 }
  
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
@@ -95,7 +98,8 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 	}
 	else if (msg.sType == "adjust") {
-		OnAdjust(msg);
+		int nIndex = msg.pSender->GetTag();
+		OnAdjust(nIndex);
 	}
 	else if (msg.sType == "click") {
 		if (name == "btnDiff") {
@@ -109,6 +113,20 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnAdjustAll") {
 			OnAdjustAll();
+		}
+	}
+	else if (msg.sType == "myselected") {
+		if (m_nHighlightIndex >= 0) {
+			m_temp_items[m_nHighlightIndex]->SetHighlight(FALSE);
+		}
+		m_nHighlightIndex = msg.pSender->GetTag();
+		m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+	}
+	else if (msg.sType == "myunselected") {
+		int nIndex = msg.pSender->GetTag();
+		m_temp_items[nIndex]->SetHighlight(FALSE);
+		if (nIndex == m_nHighlightIndex) {
+			m_nHighlightIndex = -1;
 		}
 	}
 	WindowImplBase::Notify(msg);                
@@ -140,6 +158,76 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		CheckDevice();
+	}
+	else if (uMsg == WM_KEYDOWN) {
+		if (wParam == VK_DOWN) {
+			if (m_nHighlightIndex < 0) {
+				m_nHighlightIndex = 0;
+				m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+			}
+			else {
+				if ( m_nHighlightIndex < MAX_TEMP_ITEMS_CNT - 1 ) {
+					m_nHighlightIndex++;
+					m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+					m_temp_items[m_nHighlightIndex-1]->SetHighlight(FALSE);
+				}
+			}
+		}
+		else if (wParam == VK_UP) {
+			if (m_nHighlightIndex < 0) {
+				m_nHighlightIndex = MAX_TEMP_ITEMS_CNT - 1;
+				m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+			}
+			else {
+				if (m_nHighlightIndex > 0) {
+					m_nHighlightIndex--;
+					m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+					m_temp_items[m_nHighlightIndex + 1]->SetHighlight(FALSE);
+				}
+			}
+		}
+		else if (wParam == VK_LEFT) {
+			if ( m_nHighlightIndex >= 0 ) {
+				int nRows = MAX_TEMP_ITEMS_CNT / m_nCurColumns;
+				int nColumnIndex = m_nHighlightIndex / nRows;
+				if ( nColumnIndex > 0 ) {
+					m_nHighlightIndex -= nRows;
+					m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+					m_temp_items[m_nHighlightIndex + nRows]->SetHighlight(FALSE);
+				}
+			}
+		}
+		else if (wParam == VK_RIGHT) {
+			if (m_nHighlightIndex >= 0) {
+				int nRows = MAX_TEMP_ITEMS_CNT / m_nCurColumns;
+				int nColumnIndex = m_nHighlightIndex / nRows;
+				if (nColumnIndex < m_nCurColumns - 1) {
+					m_nHighlightIndex += nRows;
+					m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
+					m_temp_items[m_nHighlightIndex - nRows]->SetHighlight(FALSE);
+				}
+			}
+		}
+		else if (wParam == 'S') {
+			if (m_nHighlightIndex >= 0 && !m_bBusy) {
+				m_temp_items[m_nHighlightIndex]->SetSelected();
+			}
+		}
+		else if (wParam == VK_RETURN) {
+			if (m_nHighlightIndex >= 0 && !m_bBusy) {
+				OnAdjust(m_nHighlightIndex);
+			}
+		}
+		else if (wParam == VK_ADD || wParam == VK_OEM_PLUS) {
+			if (m_nHighlightIndex >= 0 && !m_bBusy ) {
+				m_temp_items[m_nHighlightIndex]->Upper();
+			}
+		}
+		else if (wParam == VK_SUBTRACT || wParam == VK_OEM_MINUS) {
+			if (m_nHighlightIndex >= 0 && !m_bBusy ) {
+				m_temp_items[m_nHighlightIndex]->Downer();   
+			}
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -311,8 +399,7 @@ void  CDuiFrameWnd::OnMachineChanged() {
 	m_cmbFiles->SelectItem(0);
 }
 
-void  CDuiFrameWnd::OnAdjust(TNotifyUI& msg) {
-	int nIndex = msg.pSender->GetTag();
+void  CDuiFrameWnd::OnAdjust(int nIndex) {	
 	assert(nIndex >= 0 && nIndex < MAX_TEMP_ITEMS_CNT);
 	CBusiness::GetInstance()->AdjustAsyn(GetComPort(), m_temp_items[nIndex]->GetTemp(), 
 		m_temp_items[nIndex]->GetDutyCycle());

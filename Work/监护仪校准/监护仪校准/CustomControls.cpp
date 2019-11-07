@@ -111,9 +111,9 @@ void  CTempItemUI::SetChecked() {
 		m_opBasePoint->Selected(false);
 }
 
-void CTempItemUI::DoEvent(DuiLib::TEventUI& event) {
-	if ( event.Type == UIEVENT_MOUSEENTER ) {
-		if ( !m_bHighlight ) {
+void  CTempItemUI::SetHighlight(BOOL bHighlight) {
+	if (bHighlight) {
+		if (!m_bHighlight) {
 			bool bSelected = m_opBasePoint->IsSelected();
 			if (bSelected) {
 				m_btnDown->SetVisible(true);
@@ -122,18 +122,64 @@ void CTempItemUI::DoEvent(DuiLib::TEventUI& event) {
 			m_btnAdjust->SetVisible(true);
 			this->SetBkColor(0x30000000);
 			m_bHighlight = TRUE;
-		}		
+		}
 	}
-	else if ( event.Type == UIEVENT_MOUSELEAVE ) {
+	else {
 		if (m_bHighlight) {
 			m_btnDown->SetVisible(false);
 			m_btnUp->SetVisible(false);
 			m_btnAdjust->SetVisible(false);
 			this->SetBkColor(0x00000000);
 			m_bHighlight = FALSE;
-		}		
+		}
+	}
+}
+
+void CTempItemUI::DoEvent(DuiLib::TEventUI& event) {
+	if ( event.Type == UIEVENT_MOUSEENTER ) {
+		if ( !m_bHighlight ) {
+			m_pManager->SendNotify(this, "myselected");
+		}
+		//SetHighlight(TRUE);		
+	}
+	else if ( event.Type == UIEVENT_MOUSELEAVE ) {
+		// SetHighlight(FALSE);
+		if (m_bHighlight) {
+			m_pManager->SendNotify(this, "myunselected");
+		}
 	}	
 	CContainerUI::DoEvent(event);
+}
+
+void CTempItemUI::SetSelected() {
+	bool bSelected = !m_opBasePoint->IsSelected();
+
+	if ( bSelected ) {
+		m_opBasePoint->Selected(true);
+	}
+	else {
+		m_opBasePoint->Selected(false);
+	}
+}
+
+void  CTempItemUI::Upper() {
+	if ( !m_btnUp->IsVisible() ) {
+		return;
+	}
+
+	int nDutyCycle = GetDutyCycle();
+	nDutyCycle++;
+	SetDutyCycle(nDutyCycle);
+}
+
+void  CTempItemUI::Downer() {
+	if (!m_btnDown->IsVisible()) {
+		return;
+	}
+
+	int nDutyCycle = GetDutyCycle();
+	nDutyCycle--;
+	SetDutyCycle(nDutyCycle);
 }
 
 void CTempItemUI::Notify(TNotifyUI& msg) {

@@ -10,6 +10,19 @@ using namespace DuiLib;
 #include "CustomControls.h"
 #include "WaitingBarUI.h"
 
+class MyFilter : public IMessageFilterUI
+{
+public:
+	LRESULT MessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) {
+		if (uMsg == WM_KEYDOWN || uMsg == WM_KEYUP) {
+			if (wParam == VK_TAB) {
+				bHandled = TRUE;
+			}
+		}
+		return 0;
+	}
+};
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -59,6 +72,9 @@ private:
 	CButtonUI *            m_btnDiff;
 	CProgressUI *          m_waiting_bar;
 
+	MyFilter               m_filter;
+	int                    m_nHighlightIndex;          // 高亮的item，从0开始，-1是无效值
+
 private:
 	void  OnWindowInit();
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -67,7 +83,7 @@ private:
 	void  CheckDevice();
 	void  OnFileChanged();
 	void  OnMachineChanged();
-	void  OnAdjust(TNotifyUI& msg);
+	void  OnAdjust(int nIndex);
 	void  OnDiff();
 	void  OnSaveAs();
 	void  OnSave();	
