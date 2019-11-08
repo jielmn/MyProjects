@@ -147,7 +147,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_ADJUST_ALL_RET) {
 		SetBusy(FALSE, TRUE);
 		if (wParam != 0) {
-			MessageBox(m_hWnd, "全部校准失败!", "失败", 0);
+			MessageBox(m_hWnd, "数据上传失败!", "失败", 0); 
 		}		
 	}
 	else if (uMsg == UM_ADJUST_ALL_PROGRESS) {

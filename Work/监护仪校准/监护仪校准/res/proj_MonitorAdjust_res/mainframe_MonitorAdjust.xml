@@ -50,13 +50,13 @@
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="35" inset="10,5,10,5">
-					<Button name="btnDiff" text="自动计算" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Button name="btnDiff" text="自动计算(&A)" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " shortcut="A" />
 					<Control width="20" />
-					<Button name="btnAdjustAll" text="数据上传" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					<Button name="btnAdjustAll" text="数据上传(&U)" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " shortcut="U" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="35" inset="10,5,10,5">
-					<Text text="快捷键提示：上、下、左、右箭头选择小项目；S选中/不选中；+增加；-减少；回车校准" font="1" textcolor="#FF0000ff" />
+					<Text text="快捷键提示：上、下、左、右箭头选择小项目；S选中/不选中；+增加；-减少；回车校准；Alt+A自动计算；Alt+U数据上传" font="1" textcolor="#FF0000ff" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout inset="10,5,10,5" vscrollbar="true">
