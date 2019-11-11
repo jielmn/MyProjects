@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "模拟读卡器", "模拟读卡器\模拟读卡器.vcxproj", "{307C8E7D-FE44-4EB0-8FFE-125752FC32C6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "术中监控_多窗口_4.3.1_handan", "术中监控_多窗口_4.3.1_handan\术中监控_多窗口_4.3.1_handan.vcxproj", "{66EC914D-3DCE-4B44-9864-DD3B9BA2C462}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "术中监控_多窗口_4.3.1_handan", "术中监控2.x\术中监控2.x.vcxproj", "{66EC914D-3DCE-4B44-9864-DD3B9BA2C462}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
