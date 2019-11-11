@@ -98,7 +98,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>duilibd.lib;Xml2ChartD.lib;Gdi32.lib;tinyxml.lib;LmnCommonXD.lib;sqliteD.lib;legacy_stdio_definitions.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\Xml2Chart\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res ..\Debug\res /dseiy</Command>
