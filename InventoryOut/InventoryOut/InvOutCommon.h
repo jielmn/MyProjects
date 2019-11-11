@@ -228,8 +228,6 @@ const char * GetErrorDescription(int ret);
 extern char * DateTime2String(char * szDest, DWORD dwDestSize, const time_t * t);
 extern time_t  String2DateTime(const char * szDatetime);
 
-time_t SystemTime2Time(const SYSTEMTIME & t);
-SYSTEMTIME Time2SystemTime(time_t  t);
 
 // templates
 template <class T>
