@@ -4,6 +4,7 @@
 #include "ReaderUI.h"
 #include "ModeButtonUI.h"
 #include "MyImageUI.h"
+#include "SixGridsUI.h"
 
 class CGridUI : public CContainerUI, INotifyUI
 {
@@ -124,6 +125,10 @@ private:
 	CControlUI *                                m_bedImg;
 	CControlUI *                                m_patientImg;
 	CControlUI *                                m_sperate;
+
+#if TRI_TAGS_FLAG
+	CHumanUI *                                  m_human;
+#endif
 
 private:
 	// 最后一次的温度数据

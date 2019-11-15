@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	<VerticalLayout bordersize="1" bordercolor="#FFCCCCCC" inset="1,1,1,1" >
+		<HorizontalLayout />
+		<HorizontalLayout height="500">	
+			<Control bordercolor="#FFff0000" />
+			<Control bkimage="human.png" width="212" height="500" />
+			<Control bordercolor="#FFff0000" />
+		</HorizontalLayout>
+		<HorizontalLayout />
+	</VerticalLayout>	
+</Window>

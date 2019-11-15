@@ -234,3 +234,13 @@ private:
 	BOOL                         m_bSetSecondsPerPixel;
 	HWND                         m_hWnd;
 };
+
+class CHumanUI : public  CContainerUI {
+public:
+	CHumanUI();
+	~CHumanUI();
+
+private:
+	LPCTSTR GetClass() const;
+	void DoInit();
+};

@@ -125,6 +125,11 @@ void CGridUI::DoInit() {
 	m_cstPatientName = static_cast<CEditableButtonUI *>(m_pManager->FindControl(CST_PATIENT_NAME));
 	m_cstPatientNameM = static_cast<CEditableButtonUI *>(m_pManager->FindControl(CST_PATIENT_NAME_M));
 
+#if TRI_TAGS_FLAG
+	m_human = new CHumanUI;
+	m_layReaders->Add(m_human);         
+#endif
+
 	OnModeChanged(0);
 
 	m_bInited = TRUE;
@@ -195,6 +200,9 @@ void CGridUI::OnModeChanged(int nSource) {
 			m_readers[i]->SetVisible(false);
 		}
 		m_CurReaderState->SetVisible(false);
+#if TRI_TAGS_FLAG
+		m_human->SetVisible(false);
+#endif
 
 		m_lblReaderNo->SetText("");
 		m_dwSelSurReaderIndex = 0;
@@ -228,6 +236,9 @@ void CGridUI::OnModeChanged(int nSource) {
 				m_readers[i]->SetVisible(false);
 		}
 		m_CurReaderState->SetVisible(true);
+#if TRI_TAGS_FLAG
+		m_human->SetVisible(false);
+#endif
 		
 		OnSurReaderSelected(0);
 
@@ -246,7 +257,11 @@ void CGridUI::OnModeChanged(int nSource) {
 		m_hand_reader->SetVisible(false);
 		int  nSel = -1;
 		for (DWORD i = 0; i < MAX_READERS_PER_GRID; i++) {
+#if !TRI_TAGS_FLAG
 			m_readers[i]->SetVisible(true);
+#else
+			m_readers[i]->SetVisible(false); 
+#endif
 			if (0==i)
 				m_readers[i]->m_optSelected->SetVisible(true);
 
@@ -264,6 +279,9 @@ void CGridUI::OnModeChanged(int nSource) {
 			m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 		}
 		m_CurReaderState->SetVisible(true);
+#if TRI_TAGS_FLAG
+		m_human->SetVisible(true);
+#endif
 		
 		if (nSel < 0)
 			nSel = 0;

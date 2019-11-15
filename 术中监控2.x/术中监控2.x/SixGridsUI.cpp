@@ -1469,3 +1469,29 @@ int CPatientImg::GetDbClickTemp() {
 	float  cursot_temp = nMaxTemp + (float)(top_left.y - cursor_point.y) / nHeightPerCelsius;
 	return (int)(cursot_temp * 100.0f);
 }
+
+CHumanUI::CHumanUI() {
+
+}
+
+CHumanUI::~CHumanUI() {
+
+}
+
+LPCTSTR  CHumanUI::GetClass() const {
+	return "HumanUI";
+}
+
+void CHumanUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("human.xml"), (UINT)0, 0, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}
+
+	this->SetFixedHeight(600); 
+}
