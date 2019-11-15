@@ -34,6 +34,11 @@ using namespace DuiLib;
 
 #define  HANDLE_WRONG_FORMAT_1     1             // 主要针对连续测温，结束字符不是FF
 
+#define  TRI_TAGS_FLAG             1              // 三联
+#define  TRI_TAGS_COLOR_0          0xFFFFFFFF
+#define  TRI_TAGS_COLOR_1          0xFF999999
+#define  TRI_TAGS_COLOR_2          0xFF00FF00
+
 
 // 窗格温度文字透明度
 #define   GRID_LABLE_TRANSPARENT_PARAM       0xCC

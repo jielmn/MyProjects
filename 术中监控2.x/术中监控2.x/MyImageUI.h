@@ -98,6 +98,8 @@ protected:
 		              int nMaxTemp, int nHeightPerCelsius, POINT  top_left,
 		              const std::vector<TempItem * > & v, const RECT & rValid);
 
+	void  ResetColors();
+
 protected:
 	enum   E_STATE {
 		STATE_7_DAYS = 0,

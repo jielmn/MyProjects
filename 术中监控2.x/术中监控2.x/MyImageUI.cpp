@@ -54,6 +54,8 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
 	//SET_CLIP_REGION_ON_PAINT(rcPaint);
 
+	ResetColors();
+
 	if (m_state == STATE_7_DAYS) {
 		DoPaint_7Days(hDC, rcPaint, pStopControl);
 	}
@@ -1080,6 +1082,7 @@ void   CMyImageUI::PaintForLabelUI(HDC hDC, int width, int height, const RECT & 
 	DWORD  i = GetGridIndex();
 	DWORD  j = GetReaderIndex();
 	CModeButton::Mode mode = GetMode();
+	ResetColors();
 
 	// 显示的最低温度和最高温度
 	int  nMinTemp, nMaxTemp;
@@ -1581,6 +1584,25 @@ void  CMyImageUI::DrawRemark( HDC hDC, Graphics & g, time_t tFirstTime, float fS
 		 
 		::ExtTextOut(hDC, rectRemark.left + EDT_REMARK_WIDTH / 2 - w / 2, rectRemark.top + EDT_REMARK_HEIGHT / 2 - h / 2, ETO_CLIPPED, &rValid, strText, strText.GetLength(), 0);
 	}
+}
+
+void  CMyImageUI::ResetColors() {	
+#if TRI_TAGS_FLAG
+	CModeButton::Mode mode = GetMode();
+	if (mode == CModeButton::Mode_Multiple) {
+		DWORD  arColors[3] = { TRI_TAGS_COLOR_0, TRI_TAGS_COLOR_1, TRI_TAGS_COLOR_2 };
+		for (int i = 0; i < 3; i++) {
+			m_temperature_pen[i]->SetColor(arColors[i]);
+			m_temperature_brush[i]->SetColor(arColors[i]);
+		}
+	}
+	else {
+		for (int i = 0; i < 3; i++) {
+			m_temperature_pen[i]->SetColor(g_ReaderIndicator[i]);
+			m_temperature_brush[i]->SetColor(g_ReaderIndicator[i]);
+		}
+	}
+#endif
 }
 
 
