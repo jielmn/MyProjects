@@ -2667,7 +2667,7 @@ void CDuiFrameWnd::OnQueryOutHospitalNotify(const std::vector<OutHospitalItem*>&
                       
 
   
-          
+         
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }
