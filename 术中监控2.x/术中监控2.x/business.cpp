@@ -503,9 +503,19 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 
 	// 如果是多点连续术中读卡器
 	for ( DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
+#if !TRI_TAGS_FLAG
 		// 如果Reader开关已经打开
 		if ( cfg.m_ReaderCfg[j].m_bSwitch )
 			GetGridTemperature( i,j, byArea, cfg.m_dwGridMode );
+#else
+		if (j < 3) {
+			GetGridTemperature(i, j, byArea, cfg.m_dwGridMode);
+		}			
+		else {
+			if (cfg.m_ReaderCfg[j].m_bSwitch)
+				GetGridTemperature(i, j, byArea, cfg.m_dwGridMode);
+		}		
+#endif
 	}
 	GetGridTemperatureAsyn(i, dwDelay);
 }
@@ -569,11 +579,18 @@ void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldM
 				}
 				// 多点模式
 				else {
+#if !TRI_TAGS_FLAG
 					// 如果开关关闭
 					if (!g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
 						m_sigTrySurReader.emit(wBed, FALSE);
 						return;
 					}
+#else
+					if ( j >= 3 && !g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
+						m_sigTrySurReader.emit(wBed, FALSE);
+						return;
+					}
+#endif
 				}
 			}
 
