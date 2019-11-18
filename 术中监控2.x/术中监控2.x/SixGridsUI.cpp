@@ -1509,3 +1509,13 @@ void  CHumanUI::SetTemp(int nIndex, CDuiString strText) {
 
 	m_lblTemp[nIndex]->SetText(strText);
 }
+
+void  CHumanUI::SetTempColor(int nIndex, DWORD  dwColor) {
+	if (!m_bInitiated)
+		return;
+
+	if (nIndex < 0 || nIndex > 2)
+		return;
+
+	m_lblTemp[nIndex]->SetTextColor(dwColor);
+}

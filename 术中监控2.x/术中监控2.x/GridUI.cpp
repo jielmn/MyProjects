@@ -426,6 +426,11 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 
 	if (dwTemp >= dwHighAlarm) {
 		m_readers[j]->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+#if TRI_TAGS_FLAG
+		if (j < 3) {
+			m_human->SetTempColor(j, HIGH_TEMP_TEXT_COLOR);
+		}
+#endif
 
 		time_t now = time(0);
 		time_t diff_t = GetTimeDiff(t, now);
@@ -434,6 +439,11 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 	}
 	else if (dwTemp <= dwLowAlarm) {
 		m_readers[j]->m_lblTemp->SetTextColor(LOW_TEMP_TEXT_COLOR);
+#if TRI_TAGS_FLAG
+		if (j < 3) {
+			m_human->SetTempColor(j, LOW_TEMP_TEXT_COLOR);
+		}
+#endif
 
 		time_t now = time(0);
 		time_t diff_t = GetTimeDiff(t, now);
@@ -442,6 +452,11 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 	}
 	else {
 		m_readers[j]->m_lblTemp->SetTextColor(NORMAL_TEMP_TEXT_COLOR);
+#if TRI_TAGS_FLAG
+		if (j < 3) {
+			m_human->SetTempColor(j, NORMAL_TEMP_TEXT_COLOR); 
+		}
+#endif
 	}
 }
 

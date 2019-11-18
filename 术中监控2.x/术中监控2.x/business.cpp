@@ -512,8 +512,8 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 			GetGridTemperature(i, j, byArea, cfg.m_dwGridMode);
 		}			
 		else {
-			if (cfg.m_ReaderCfg[j].m_bSwitch)
-				GetGridTemperature(i, j, byArea, cfg.m_dwGridMode);
+			//if (cfg.m_ReaderCfg[j].m_bSwitch)
+			//	GetGridTemperature(i, j, byArea, cfg.m_dwGridMode);
 		}		
 #endif
 	}

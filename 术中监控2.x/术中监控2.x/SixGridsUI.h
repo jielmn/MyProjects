@@ -240,6 +240,7 @@ public:
 	CHumanUI();
 	~CHumanUI();
 	void  SetTemp(int nIndex, CDuiString strText);
+	void  SetTempColor(int nIndex, DWORD  dwColor);
 
 private:
 	LPCTSTR GetClass() const;
