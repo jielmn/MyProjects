@@ -6,6 +6,9 @@
 			<Control bordercolor="#FFff0000" />
 			<Control bkimage="human.png" width="212" height="500" />
 			<Control bordercolor="#FFff0000" />
+			<Label text="-/36.80" textcolor="#FF00FF00" font="12" float="true" pos="150,50,360,120"  width="220" height="70" align="center"  />
+			<Label text="-/36.10" textcolor="#FF00FF00" font="12" float="true" pos="10,435,360,390"  width="220" height="70" align="right" />
+			<Label text="-/36.50" textcolor="#FF00FF00" font="12" float="true" pos="300,435,560,390" width="220" height="70" align="left" />
 		</HorizontalLayout>
 		<HorizontalLayout />
 	</VerticalLayout>	
