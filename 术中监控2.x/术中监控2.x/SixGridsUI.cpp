@@ -1493,5 +1493,19 @@ void CHumanUI::DoInit() {
 		return;
 	}
 
+	m_lblTemp[0] = static_cast<CLabelUI*>(m_pManager->FindControl("t1"));
+	m_lblTemp[1] = static_cast<CLabelUI*>(m_pManager->FindControl("t2"));
+	m_lblTemp[2] = static_cast<CLabelUI*>(m_pManager->FindControl("t3"));
+
 	this->SetFixedHeight(600); 
+}
+
+void  CHumanUI::SetTemp(int nIndex, CDuiString strText) {
+	if (!m_bInitiated)
+		return;
+
+	if (nIndex < 0 || nIndex > 2)
+		return;
+
+	m_lblTemp[nIndex]->SetText(strText);
 }

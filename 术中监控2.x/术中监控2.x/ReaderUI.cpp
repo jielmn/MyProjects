@@ -193,6 +193,10 @@ void  CReaderUI::SetTemp(DWORD dwTemp) {
 	m_lblTemp->SetText(strText);
 }
 
+CDuiString CReaderUI::GetTemp() const {
+	return m_lblTemp->GetText();
+}
+
 CControlUI *  CReaderUI::GetGridUI() {
 	CControlUI * pParent = GetParent();
 	DWORD  i = 0;

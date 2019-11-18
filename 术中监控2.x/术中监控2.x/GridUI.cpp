@@ -418,6 +418,11 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 	//strText.Format("%.2f", dwTemp / 100.0);
 	//m_readers[j]->m_lblTemp->SetText(strText);
 	m_readers[j]->SetTemp(dwTemp);
+#if TRI_TAGS_FLAG
+	if (j < 3) {
+		m_human->SetTemp(j, m_readers[j]->GetTemp());
+	}
+#endif
 
 	if (dwTemp >= dwHighAlarm) {
 		m_readers[j]->m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);

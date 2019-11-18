@@ -22,6 +22,7 @@ public:
 	//void  SetDisconnectedTemp(DWORD dwTemp);
 	// 显示温度(断线状态和非断线状态不一样)
 	void  SetTemp(DWORD dwTemp);
+	CDuiString GetTemp() const;
 
 private:
 	LPCTSTR GetClass() const;

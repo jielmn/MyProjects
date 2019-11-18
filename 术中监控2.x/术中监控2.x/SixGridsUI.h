@@ -239,8 +239,12 @@ class CHumanUI : public  CContainerUI {
 public:
 	CHumanUI();
 	~CHumanUI();
+	void  SetTemp(int nIndex, CDuiString strText);
 
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
+
+private:
+	CLabelUI *                m_lblTemp[3];
 };
