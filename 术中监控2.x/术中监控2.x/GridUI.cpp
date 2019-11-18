@@ -458,6 +458,17 @@ void CGridUI::SetReaderTemp(DWORD j, DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwL
 		}
 #endif
 	}
+
+#if TRI_TAGS_FLAG
+	if (j < 3) {
+		for (int k = 0; k < 3; k++) {
+			if ( k == j )
+				continue;
+			m_human->SetDelta(j, k, m_readers[j]->IsConnected(), m_readers[k]->IsConnected(),
+				m_readers[j]->GetIntTemp(), m_readers[k]->GetIntTemp());
+		}
+	}
+#endif
 }
 
 void CGridUI::SetHandReaderTemp(DWORD  dwTemp, DWORD dwHighAlarm, DWORD dwLowAlarm, time_t t) {

@@ -241,6 +241,7 @@ public:
 	~CHumanUI();
 	void  SetTemp(int nIndex, CDuiString strText);
 	void  SetTempColor(int nIndex, DWORD  dwColor);
+	void  SetDelta(int nIndex1, int nIndex2, BOOL bConnected1, BOOL bConnected2, int nTemp1, int nTemp2);
 
 private:
 	LPCTSTR GetClass() const;
@@ -248,4 +249,5 @@ private:
 
 private:
 	CLabelUI *                m_lblTemp[3];
+	CLabelUI *                m_lblDeltaTemp[3];
 };

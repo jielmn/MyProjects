@@ -1497,6 +1497,10 @@ void CHumanUI::DoInit() {
 	m_lblTemp[1] = static_cast<CLabelUI*>(m_pManager->FindControl("t2"));
 	m_lblTemp[2] = static_cast<CLabelUI*>(m_pManager->FindControl("t3"));
 
+	m_lblDeltaTemp[0] = static_cast<CLabelUI*>(m_pManager->FindControl("dt1"));
+	m_lblDeltaTemp[1] = static_cast<CLabelUI*>(m_pManager->FindControl("dt2"));
+	m_lblDeltaTemp[2] = static_cast<CLabelUI*>(m_pManager->FindControl("dt3"));
+
 	this->SetFixedHeight(600); 
 }
 
@@ -1518,4 +1522,91 @@ void  CHumanUI::SetTempColor(int nIndex, DWORD  dwColor) {
 		return;
 
 	m_lblTemp[nIndex]->SetTextColor(dwColor);
+}
+
+void  CHumanUI::SetDelta(int nIndex1, int nIndex2, BOOL bConnected1, BOOL bConnected2, int nTemp1, int nTemp2) {
+	if (!m_bInitiated)
+		return;
+
+	if (nIndex1 < 0 || nIndex1 > 2)
+		return;
+
+	if (nIndex2 < 0 || nIndex2 > 2)
+		return;
+
+	if (nIndex1 == nIndex2)
+		return;	
+
+	// 如果顺序不是从小打到，交互
+	if (nIndex1 > nIndex2) {
+		int nIndex = 0;
+		BOOL bConnected = FALSE;
+		int nTemp = 0;
+
+		bConnected = bConnected1;
+		bConnected1 = bConnected2;
+		bConnected2 = bConnected;
+
+		nTemp = nTemp1;
+		nTemp1 = nTemp2;
+		nTemp2 = nTemp;
+
+		nIndex = nIndex1;
+		nIndex1 = nIndex2;
+		nIndex2 = nIndex;
+	}
+
+	CDuiString strText;
+	int nDelta = 0;
+
+	if (0 == nIndex1) {
+		if (nIndex2 == 1) {
+			if ( !bConnected1 || !bConnected2 ) {
+				m_lblDeltaTemp[0]->SetText("");
+			}
+			else {
+				if (g_data.m_bDelta[0]) {
+					nDelta = nTemp1 - nTemp2;
+				}
+				else {
+					nDelta = nTemp2 - nTemp1;
+				}
+				strText.Format("%.2f", nDelta / 100.0f);
+				m_lblDeltaTemp[0]->SetText(strText);
+			}			
+		}
+		else if (nIndex2 == 2) {
+			if (!bConnected1 || !bConnected2) {
+				m_lblDeltaTemp[1]->SetText("");
+			}
+			else {
+				if (g_data.m_bDelta[1]) {
+					nDelta = nTemp1 - nTemp2;
+				}
+				else {
+					nDelta = nTemp2 - nTemp1;
+				}
+				strText.Format("%.2f", nDelta / 100.0f);
+				m_lblDeltaTemp[1]->SetText(strText);
+			}
+		}
+	}
+	else if (1 == nIndex1) {
+		if (nIndex2 == 2) {
+			if (!bConnected1 || !bConnected2) {
+				m_lblDeltaTemp[2]->SetText("");
+			}
+			else {
+				if (g_data.m_bDelta[2]) {
+					nDelta = nTemp1 - nTemp2;
+				}
+				else {
+					nDelta = nTemp2 - nTemp1;
+				}
+				strText.Format("%.2f", nDelta / 100.0f);
+				m_lblDeltaTemp[2]->SetText(strText);
+			}
+		}
+	}
+
 }

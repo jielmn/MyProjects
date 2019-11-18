@@ -352,6 +352,8 @@ public:
 	// ÌåÎÂµ¥½Å×¢
 	char                      m_TempChartFooter[20];
 
+	BOOL                      m_bDelta[3];
+
 public:
 	CGlobalData() {
 		m_log = 0;
@@ -372,6 +374,8 @@ public:
 		m_nScreenWidth = 0;
 		m_nScreenHeight = 0;
 		memset(m_TempChartFooter, 0, sizeof(m_TempChartFooter));
+
+		memset(m_bDelta, 0, sizeof(m_bDelta));
 	}
 };
 

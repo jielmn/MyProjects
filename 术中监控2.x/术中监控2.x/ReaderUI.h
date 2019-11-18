@@ -23,6 +23,7 @@ public:
 	// 显示温度(断线状态和非断线状态不一样)
 	void  SetTemp(DWORD dwTemp);
 	CDuiString GetTemp() const;
+	int   GetIntTemp() const;
 
 private:
 	LPCTSTR GetClass() const;
@@ -46,6 +47,7 @@ private:
 	CControlUI *                                m_indicator;              // 颜色指示器
 	ReaderType                                  m_type; 
 	BOOL                                        m_bConnected;             // 连接状态
+	DWORD                                       m_dwTemp;
 
 public:
 	COptionUI *                                 m_optSelected;            // 选择框

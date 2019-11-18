@@ -14,6 +14,7 @@ CReaderUI::CReaderUI(ReaderType e /*= Hand*/) : m_callback( m_pManager ) {
 	m_lblReaderId = 0;
 	m_lblTagId = 0;
 	m_bConnected = FALSE;
+	m_dwTemp = 0;
 }
 
 CReaderUI::~CReaderUI() {
@@ -180,6 +181,10 @@ void  CReaderUI::SetTemp(DWORD dwTemp) {
 
 	CDuiString  strText;
 
+#if TRI_TAGS_FLAG
+	m_dwTemp = dwTemp;
+#endif
+
 	if (m_type == Surgency) {
 		if (!m_bConnected)
 			strText.Format("-/%.2f", dwTemp / 100.0);
@@ -195,6 +200,10 @@ void  CReaderUI::SetTemp(DWORD dwTemp) {
 
 CDuiString CReaderUI::GetTemp() const {
 	return m_lblTemp->GetText();
+}
+
+int   CReaderUI::GetIntTemp() const {
+	return m_dwTemp;
 }
 
 CControlUI *  CReaderUI::GetGridUI() {
