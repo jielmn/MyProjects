@@ -1,0 +1,274 @@
+a{color:#000;text-decoration: none;}
+a:hover{text-decoration: none;color:#bd3a5b}
+
+body{ margin: 0px; }
+
+.w1200 {
+    width: 1200px;
+    margin: 0 auto;
+	padding: 0px 140px 0px 160px;
+}
+
+.container-fluid {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.div-logo{
+	width: 200px;
+	padding: 0px 0px 0px 120px
+}
+
+.div-inline{ display:inline-block;} 
+
+.nav_list {
+    float: left;
+    height: 90px;
+    position: relative;
+    width: 170px;
+    text-align: right;
+}
+
+.nav_list .one {
+    display: inline-block;
+    font-size: 23px;
+    height: 40px;
+    line-height: 20px;
+    margin-top: 32px;
+}
+
+#body1 .nav_list:nth-child(1) .one{color:#bf3d5f;border-bottom:2px solid #bf3d5f;line-height:20px;}
+#body2 .nav_list:nth-child(2) .one{color:#bf3d5f;border-bottom:2px solid #bf3d5f;line-height:20px;}
+#body3 .nav_list:nth-child(3) .one{color:#bf3d5f;border-bottom:2px solid #bf3d5f;line-height:20px;}
+#body4 .nav_list:nth-child(4) .one{color:#bf3d5f;border-bottom:2px solid #bf3d5f;line-height:20px;}
+
+.nav_list .one .div-top {
+    text-align:center;
+}
+
+.nav_list .one .div-bottom {
+    text-align:center;
+	font-size:12px;
+}
+
+.div-brief{
+	height: 777px;
+	background-color: #CA587A;
+}
+
+.div-brief .content{
+	width: 1200px;
+	margin:0 auto;
+	color:white;
+}
+
+.div-brief .content .title{
+	padding:0px 0px 0px 140px;
+}
+
+.div-brief .content .title .top{
+	font-size: 40px;
+    height: 60px;
+    line-height: 40px;
+	padding:40px 0px 0px 0px;
+}
+
+.div-brief .content .title .bottom{
+	font-size: 18px;
+    height: 44px;
+    line-height: 18px;
+	letter-spacing:6px;
+	padding:0px 0px 0px 20px;
+}
+
+.R{
+	font-size: 20px;
+	display: inline-block;
+	height:20px;
+	line-height: 20px;
+	vertical-align:top;
+}
+
+.R1{
+	font-size: 12px;
+	display: inline-block;
+	height:24px;
+	line-height: 12px;
+	vertical-align:top;
+	padding:4px 0px 0px 0px
+}
+
+.div-brief .content .picture{
+	padding:0px 0px 0px 200px;
+}
+
+.div-brief .content .text{
+	padding:20px 0px 0px 200px;
+	font-size: 16px;
+	line-height:32px;
+	letter-spacing:4px;
+	width:890px;
+}
+
+.div-brief .content .certificate{
+	padding:50px 0px 0px 200px;
+	font-size: 16px;
+	line-height:32px;
+	letter-spacing:4px;
+}
+
+.div-profession{
+	height: 770px;
+	background-color: #E3F4FE;
+}
+
+.div-profession .content{
+	width: 1200px;
+	margin:0 auto;
+	color:#666666;
+	position: relative;
+}
+
+.div-profession .content .title{
+	padding: 60px 0px 0px 30px;
+}
+
+.div-profession .content .title .text{
+	display: inline-block;
+	width: 660px;
+	vertical-align:top;
+}
+
+.div-profession .content .title .text .top{
+	font-size: 20px;
+    height: 30px;
+    line-height: 30px;
+	text-align:center;
+	padding: 20px 0px 0px 0px;
+	letter-spacing:2px;
+}
+
+.div-profession .content .title .text .bottom{
+	font-size: 40px;
+    height: 90px;
+    line-height: 90px;
+	text-align:center;
+	letter-spacing:16px;
+}
+
+.R2{
+	font-size: 12px;
+	display: inline-block;
+	height:24px;
+	line-height: 12px;
+	vertical-align:top;
+	padding:3px 0px 0px 0px;
+}
+
+.div-profession .content .more{
+	width: 1000px;
+	text-align:right;
+	padding:20px 0px 0px 0px;
+	letter-spacing:8px;
+	font-size: 20px;
+}
+
+.div-prediction{
+	height: 870px;
+	position: relative;
+}
+
+.div-prediction .left{
+	width: calc(50% - 60px);
+	height:870px;
+	background-color: #EDEDED;
+	display:inline-block;
+	position: relative;
+}
+
+.div-prediction .right{
+	background-color: #fff;
+	display:inline-block;
+	vertical-align:top;
+	color: #4D4D4D;
+}
+
+.div-prediction .right .top{
+	width:580px;
+	padding: 70px 0px 0px 15px;
+	font-size: 24px;
+	height:24px;
+	line-height: 42px;
+	letter-spacing:8px;
+}
+
+.div-prediction .right .seperate{
+	width:580px;
+	padding: 180px 0px 0px 15px;
+	font-size: 46px;
+	height:46px;
+	line-height: 46px;
+	letter-spacing:8px;
+}
+
+.div-prediction .right .bottom{
+	width:540px;
+	padding: 30px 0px 0px 35px;
+	font-size: 16px;
+	height:24px;
+	line-height: 36px;
+	letter-spacing:3px;
+}
+
+.div-prediction .right .more{
+	text-align:right;
+	padding:420px 80px 0px 0px;
+	letter-spacing:8px;
+	font-size: 20px;
+}
+
+.div-prediction .right .bracket{
+	position:absolute;
+	top:120px;left:calc(50% + 530px);
+}
+
+.R3{
+	font-size: 10px;
+	display: inline-block;
+	height:16px;
+	line-height: 12px;
+	vertical-align:top;
+	padding:4px 0px 0px 0px;
+}
+
+.div-healthcare{
+	height: 780px;
+	background-color: #E3F4FE;
+}
+
+.div-healthcare .content{
+	width: 1200px;
+	margin:0 auto;
+	color:#666564;
+	position: relative;
+}
+
+.div-healthcare .content .left{
+	display:inline-block;
+	width: 280px;
+	padding:0px 0px 0px 0px;
+	background-color: blue;
+}
+
+.div-healthcare .content .right{
+	display:inline-block;
+	background-color: green;
+}
+
+.div-healthcare .content .middle{
+	display:inline-block;
+	width:650px;
+	background-color: red;
+}
