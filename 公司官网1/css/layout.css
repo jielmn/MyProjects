@@ -6,6 +6,7 @@ a.white:hover{text-decoration: none;color:#fff}
 a.white:visited{text-decoration: none;color:#fff}
 a.white:link{text-decoration: none;color:#fff}
 
+
 body{ margin: 0px; }
 
 .w1200 {
@@ -381,4 +382,124 @@ body{ margin: 0px; }
 	line-height: 60px;
 	height:60px;
 	padding:0px 0px 0px 610px;
+}
+
+.div-wish{
+	height: 770px;
+	background-color: #CE587A;
+}
+
+.div-wish .content{
+	width: 1200px;
+	margin:0 auto;
+	color:#FFF;
+}
+
+.div-wish .content .title{
+	padding: 80px 0px 0px 0px;
+}
+
+.div-wish .content .title .top{
+	text-align:center;
+	font-size: 44px;
+	line-height: 80px;
+	height:80px;
+}
+
+.R4{
+	font-size: 20px;
+	display: inline-block;
+	height:40px;
+	line-height: 40px;
+	vertical-align:top;
+	padding:8px 0px 0px 0px;
+}
+
+.div-wish .content .title .bottom{
+	text-align:center;
+	font-size: 30px;
+	line-height: 68px;
+	height:68px;
+	letter-spacing:20px;	
+}
+
+.div-wish .content .picture{
+	padding: 60px 0px 0px 520px;
+}
+
+.div-about{
+	height: 1660px;
+	background-color: #F1F1F1;
+}
+
+.div-about .content{
+	width: 1200px;
+	margin:0 auto;
+	color:#666666;
+	position: relative;
+}
+
+.div-about .content .top{
+	width: 866px;
+	height:360px;
+	position:absolute; 
+	left:120px; 
+	top:108px;
+	background-color:#fff;
+	padding:50px;
+}
+
+.div-about .content .top .header{
+	font-size: 22px;
+	line-height: 22px;
+	height:22px;
+	letter-spacing:6px;	
+}
+
+.div-about .content .top .body{
+	font-size: 18px;
+	line-height: 34px;
+	height:270px;
+	letter-spacing:6px;	
+	padding:10px 10px 10px 10px
+}
+
+.div-about .content .top .footer{
+	font-size: 28px;
+	line-height: 28px;
+	height:28px;
+	text-align:right;
+}
+
+.R5{
+	font-size: 20px;
+	display: inline-block;
+	height:28px;
+	line-height: 20px;
+	vertical-align:top;
+	padding:0px 0px 0px 0px;
+}
+
+.div-about .content .bottom{
+	width: 966px;
+	height:920px;
+	position:absolute; 
+	left:120px; 
+	top:660px;
+}
+
+.div-about .content .bottom .certificate{
+	width: 560px;
+}
+
+.div-about .content .bottom .certificate .title{
+	font-size: 20px;
+	height:20px;
+	line-height: 20px;
+	padding:0px 0px 0px 20px;
+	letter-spacing:6px;	
+}
+
+.div-about .content .bottom .certificate .picture{
+	background-color:green;
 }
