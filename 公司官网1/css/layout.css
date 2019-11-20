@@ -257,18 +257,32 @@ body{ margin: 0px; }
 
 .div-healthcare .content .left{
 	display:inline-block;
-	width: 280px;
-	padding:0px 0px 0px 0px;
-	background-color: blue;
+	width: 240px;
+	padding:486px 0px 0px 0px;
 }
 
 .div-healthcare .content .right{
 	display:inline-block;
-	background-color: green;
+	vertical-align:top;
 }
 
 .div-healthcare .content .middle{
 	display:inline-block;
-	width:650px;
-	background-color: red;
+	width:680px;
+	height:780;
+	vertical-align:top;
+}
+
+.div-healthcare .content .middle .title{
+	text-align:center;
+	font-size: 44px;
+	height:230px;
+	line-height: 280px;
+	letter-spacing:24px;
+}
+
+.div-healthcare .content .middle .bottom{
+	font-size: 20px;
+	line-height: 42px;
+	padding: 24px 0px 0px 0px;
 }
