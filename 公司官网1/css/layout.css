@@ -490,16 +490,61 @@ body{ margin: 0px; }
 
 .div-about .content .bottom .certificate{
 	width: 560px;
+	display:inline-block;
+	vertical-align:top;
 }
 
 .div-about .content .bottom .certificate .title{
 	font-size: 20px;
-	height:20px;
-	line-height: 20px;
+	height:60px;
+	line-height: 60px;
 	padding:0px 0px 0px 20px;
 	letter-spacing:6px;	
 }
 
 .div-about .content .bottom .certificate .picture{
-	background-color:green;
+	
+}
+
+.div-about .content .bottom .seperate{
+	display:inline-block;
+	width:5px;
+	height:740px;
+	background-image:url('../images/seperate.png');
+	background-repeat: repeat-y;
+	margin: 70px 0px 0px 5px;
+}
+
+.div-about .content .bottom .value{
+	display:inline-block;
+	width:370px;
+	vertical-align:top;
+	padding: 50px 0px 0px 10px;
+}
+
+.div-about .content .bottom .value .title{
+	font-size: 20px;
+	height:60px;
+	line-height: 60px;
+	letter-spacing:6px;	
+	color:#CE587B;
+}
+
+.div-about .content .bottom .value .text{
+	font-size: 18px;
+	height:130px;
+	line-height: 30px;
+}
+
+.div-contact{
+	height: 790px;
+	background-color: #E6ABBD;
+}
+
+.div-contact .content{
+	width: 1200px;
+	margin:0 auto;
+	height:100%;
+	background-image:url('../images/contact_bg.png');
+	position: relative;
 }
