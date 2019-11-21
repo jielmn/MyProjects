@@ -625,6 +625,7 @@ body{ margin: 0px; }
 .div-suits .content{
 	width: 1200px;
 	margin:0 auto;
+	position: relative;
 }
 
 .div-suits .content .top{
