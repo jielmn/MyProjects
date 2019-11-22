@@ -5,6 +5,34 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>武汉泰利美信科技有限公司</title>
 	<link href="css/layout.css" rel="stylesheet" />
+	<script src="js/jquery-3.3.1.min.js" ></script>
+	<script type="text/javascript">
+		function showImg(i){			
+			$("#slider")[0].innerHTML = '<img src="' + 'images/slider' + i + '.png' + '" width="244" height="420" />'; 
+			$("#slider").show();
+			
+			$("#btn1").css('background-color','');
+			$("#btn2").css('background-color','');
+			$("#btn3").css('background-color','');
+			$("#btn"+i).css('background-color','#bbb');
+		} 
+		
+		$(document).ready(function(){
+			$("#btn1").click(function(){
+			  showImg(1);
+			});
+			
+			$("#btn2").click(function(){
+			  showImg(2);
+			});
+			
+			$("#btn3").click(function(){
+			  showImg(3);
+			});
+			
+			showImg(1);
+		})
+	</script>
 </head>
 
 <body id="body3" >
@@ -180,6 +208,27 @@
 						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作为某种“疾病”存在的“物”，比如来自易温<div class="R10">®</div>EasyTemp关于发热的信息，不但可以自我表达和自我解释，同时也是能够演化的。这些关于疾病的信息通过物联网技术接入系统，虽然“疾病”本身不能交谈，但通过这种方式它们可以被其他节点访问，例如一个强大的中央服务器。从而实现与CDC的有效连通，实现防疫资源的协同调度，实现医疗力量纵向到底，横向到边，夯实多层面的医疗卫生服务保障！
 					</div>
 				</div>				
+			</div>
+			
+			<div style="position:absolute;top:-27px;left:450px;">
+				<img src="images/patient_to_profession.png" />
+			</div>
+			
+			<div class="slide">
+				<div class="top">
+				</div>
+				<div class="middle">
+					<div class="picture" id="slider">
+						
+					</div>
+					<div class="buttons">
+						<span class="dot" id="btn1" ></span> 
+						<span class="dot" id="btn2"></span>
+						<span class="dot" id="btn3"></span>
+					</div>
+				</div>
+				<div class="bottom">
+				</div>
 			</div>
 			
 		</div>

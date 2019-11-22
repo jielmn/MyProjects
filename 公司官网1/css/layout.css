@@ -1022,3 +1022,46 @@ body{ margin: 0px; }
 	padding: 40px;
 }
 
+.div-epidemic-detailed .content .slide{
+	position:absolute;
+	left:860px;
+	top:-40px;
+	width:260px;
+	height:470px;
+}
+
+.div-epidemic-detailed .content .slide .top{
+	margin: 0px 76px 0px 76px;
+	background-color:#666666;
+	height:10px;
+}
+
+.div-epidemic-detailed .content .slide .middle{
+	background-color:#fff;
+	height:450px;
+}
+
+.div-epidemic-detailed .content .slide .bottom{
+	margin: 0px 76px 0px 76px;
+	background-color:#666666;
+	height:10px;
+}
+
+.div-epidemic-detailed .content .slide .middle .picture{
+	padding: 8px 8px 0px 8px;
+	height:422px;
+}
+
+.div-epidemic-detailed .content .slide .middle .buttons{
+	text-align:center;
+}
+
+.div-epidemic-detailed .content .slide .middle .buttons .dot{
+	cursor:pointer;
+	height: 11px;
+	width:  11px;
+	margin: 0 12px 1px 12px;
+	border-radius: 50%;
+	border:1px solid #CACACA;
+	display: inline-block;
+}
