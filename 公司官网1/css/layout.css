@@ -779,3 +779,246 @@ body{ margin: 0px; }
 	font-size: 20px;
 	line-height:30px;
 }
+
+.div-epidemic-detailed{
+	height: 2650px;
+	background-color: #F0F0F0;
+}
+
+.div-epidemic-detailed .content{
+	width: 1200px;
+	margin:0 auto;
+	position: relative;
+}
+
+.div-epidemic-detailed .content .step1{
+	width:850px;
+	position:absolute;
+	left:100px;
+	top:120px;
+}
+
+.div-epidemic-detailed .content .step1 .left{
+	display:inline-block;
+}
+
+.div-epidemic-detailed .content .step1 .right{
+	display:inline-block;
+	padding:0px 0px 0px 10px;
+	vertical-align:top;
+}
+
+.div-epidemic-detailed .content .step1 .left .top .left{
+	display:inline-block;
+	color:#969696;
+	font-size: 20px;
+	line-height:60px;
+	height:60px;
+}
+
+.div-epidemic-detailed .content .step1 .left .top .right{
+	display:inline-block;
+	vertical-align:top;
+}
+
+.div-epidemic-detailed .content .step1 .right .top{
+	color:#CB597A;
+	font-size: 24px;
+	line-height:24px;
+	height:24px;
+}
+
+.div-epidemic-detailed .content .step1 .right .middle{
+	color:#666666;
+	font-size: 20px;
+	line-height:40px;
+	width:600px;
+	padding:20px 0px 0px 0px;
+}
+
+.R10{
+	font-size: 12px;
+	display: inline-block;
+	height:38px;
+	line-height: 20px;
+	vertical-align:top;
+	padding:2px 0px 0px 0px;
+}
+
+.div-epidemic-detailed .content .step1 .right .bottom{
+	color:#FFF;
+	font-size: 20px;
+	line-height:44px;	
+	height:44px;
+	margin: 20px 0px 0px 0px;
+	padding:0px 0px 0px 12px;
+	letter-spacing:6px;
+	background-image:url('../images/abstract_bg.png');
+	background-repeat:no-repeat;
+}
+
+.div-epidemic-detailed .content .step2{
+	position:absolute;
+	left:260px;
+	top:540px;
+}
+
+.div-epidemic-detailed .content .step2 .left{
+	display:inline-block;
+}
+
+.div-epidemic-detailed .content .step2 .left .top{
+	color:#CB597A;
+	text-align:right;
+	font-size: 24px;
+	line-height:24px;
+	height:24px;
+}
+
+.div-epidemic-detailed .content .step2 .left .bottom{
+	padding:20px 0px 0px 0px;
+}
+
+.div-epidemic-detailed .content .step2 .right{	
+	display:inline-block;
+	vertical-align:top;
+	padding: 0px 0px 0px 10px;
+}
+
+.div-epidemic-detailed .content .step2 .right .top .right{	
+	display:inline-block;
+	color:#969696;
+	font-size: 20px;
+	line-height:60px;
+	height:60px;
+}
+
+.div-epidemic-detailed .content .step2 .right .bottom{	
+	padding: 0px 0px 0px 20px;
+}
+
+.div-epidemic-detailed .content .step3{
+	position:absolute;
+	left:100px;
+	top:1160px;
+}
+
+.div-epidemic-detailed .content .step3 .left{
+	display:inline-block;
+}
+
+.div-epidemic-detailed .content .step3 .right{
+	display:inline-block;
+	padding:0px 0px 0px 10px;
+	vertical-align:top;
+}
+
+.div-epidemic-detailed .content .step3 .left .top .left{
+	display:inline-block;
+	color:#969696;
+	font-size: 20px;
+	line-height:60px;
+	height:60px;
+}
+
+.div-epidemic-detailed .content .step3 .left .top .right{
+	display:inline-block;
+	vertical-align:top;
+}
+
+.div-epidemic-detailed .content .step3 .right .top{
+	color:#CB597A;
+	font-size: 24px;
+	line-height:24px;
+	height:24px;
+}
+
+.div-epidemic-detailed .content .step3 .right .middle{
+	color:#666666;
+	font-size: 20px;
+	line-height:40px;
+	width:1020px;
+	padding:20px 0px 0px 0px;
+}
+
+.div-epidemic-detailed .content .step3 .right .bottom{
+	color:#FFF;
+	font-size: 20px;
+	line-height:44px;	
+	height:44px;
+	margin: 20px 0px 0px 0px;
+	padding:0px 0px 0px 12px;
+	letter-spacing:6px;
+	background-image:url('../images/abstract_bg.png');
+	background-repeat:no-repeat;
+}
+
+.div-epidemic-detailed .content .step4{
+	position:absolute;
+	left:240px;
+	top:1540px;
+}
+
+.div-epidemic-detailed .content .step4 .left{
+	display:inline-block;
+}
+
+.div-epidemic-detailed .content .step4 .left .top{
+	color:#CB597A;
+	text-align:right;
+	font-size: 24px;
+	line-height:24px;
+	height:24px;
+}
+
+.div-epidemic-detailed .content .step4 .left .bottom{
+	padding:20px 0px 0px 0px;
+}
+
+.div-epidemic-detailed .content .step4 .right{	
+	display:inline-block;
+	vertical-align:top;
+	padding: 0px 0px 0px 10px;
+}
+
+.div-epidemic-detailed .content .step4 .right .top .right{	
+	display:inline-block;
+	color:#969696;
+	font-size: 20px;
+	line-height:60px;
+	height:60px;
+}
+
+.div-epidemic-detailed .content .step4 .right .bottom{	
+	padding: 0px 0px 0px 20px;
+}
+
+.div-epidemic-detailed .content .final{
+	position:absolute;
+	left:140px;
+	top:2200px;	
+	height:300px;
+	width:950px;
+	background-image:url('../images/title_bg.png');
+	background-repeat:no-repeat;
+}
+
+.div-epidemic-detailed .content .one{
+	background-color:#F8F8F8;
+}
+
+.div-epidemic-detailed .content .final .title{
+	color:#CB597A;
+	font-size: 28px;
+	line-height:30px;
+	height:30px;	
+	margin:40px 40px 0px 40px;
+}
+
+.div-epidemic-detailed .content .final .text{
+	color:#7B7B7B;
+	font-size: 18px;
+	line-height:40px;
+	padding: 40px;
+}
+
