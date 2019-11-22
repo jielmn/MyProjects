@@ -61,6 +61,7 @@ body{ margin: 0px; }
 
 .div-brief{
 	height: 777px;
+	min-width:1440px;
 	background-color: #CA587A;
 }
 
@@ -127,6 +128,7 @@ body{ margin: 0px; }
 
 .div-profession{
 	height: 770px;
+	min-width:1440px;
 	background-color: #E3F4FE;
 }
 
@@ -183,6 +185,7 @@ body{ margin: 0px; }
 
 .div-prediction{
 	height: 870px;
+	min-width:1440px;
 	position: relative;
 }
 
@@ -251,6 +254,7 @@ body{ margin: 0px; }
 
 .div-healthcare{
 	height: 780px;
+	min-width:1440px;
 	background-color: #E3F4FE;
 }
 
@@ -295,6 +299,7 @@ body{ margin: 0px; }
 
 .div-footer{
 	height: 378px;
+	min-width:1440px;
 	background-color: #333333;
 }
 
@@ -359,6 +364,7 @@ body{ margin: 0px; }
 
 .div-beian{
 	height: 64px;
+	min-width:1440px;
 	background-color: #BF3D5F;
 }
 
@@ -386,6 +392,7 @@ body{ margin: 0px; }
 
 .div-wish{
 	height: 770px;
+	min-width:1440px;
 	background-color: #CE587A;
 }
 
@@ -429,6 +436,7 @@ body{ margin: 0px; }
 
 .div-about{
 	height: 1660px;
+	min-width:1440px;
 	background-color: #F1F1F1;
 }
 
@@ -538,6 +546,7 @@ body{ margin: 0px; }
 
 .div-contact{
 	height: 790px;
+	min-width:1440px;
 	background-color: #E6ABBD;
 }
 
@@ -551,6 +560,7 @@ body{ margin: 0px; }
 
 .div-characteristic{
 	height: 740px;
+	min-width:1440px;
 	background-color: #CE587A;
 }
 
@@ -619,6 +629,7 @@ body{ margin: 0px; }
 
 .div-suits{
 	height: 750px;
+	min-width:1440px;
 	background-color: #F2F2F2;
 }
 
@@ -699,6 +710,7 @@ body{ margin: 0px; }
 
 .div-story{
 	height: 2520px;
+	min-width:1440px;
 	background-color: #fff;
 }
 
@@ -713,6 +725,7 @@ body{ margin: 0px; }
 
 .div-epidemic{
 	height: 780px;
+	min-width:1440px;
 	background-color: #CC597A;
 }
 
@@ -782,6 +795,7 @@ body{ margin: 0px; }
 
 .div-epidemic-detailed{
 	height: 2650px;
+	min-width:1440px;
 	background-color: #F0F0F0;
 }
 
