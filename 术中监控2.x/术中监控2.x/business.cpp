@@ -471,6 +471,7 @@ void   CBusiness::RestartLaunch() {
 
 // »ñÈ¡ÎÂ¶È
 void  CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
+#if !TRI_TAGS_FLAG
 	if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
 		return;
 	}
@@ -481,6 +482,7 @@ void  CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
 	else {
 		g_data.m_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
 	}
+#endif
 }
 
 void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {

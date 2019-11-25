@@ -278,7 +278,9 @@ void CGridUI::OnModeChanged(int nSource) {
 			m_readers[i]->SetTemp(m_aLastTemp[i].m_dwTemp);
 			m_readers[i]->m_cstBodyPart->SetText(g_data.m_CfgData.m_GridCfg[dwIndex].m_ReaderCfg[i].m_szReaderName);
 		}
+#if !TRI_TAGS_FLAG 
 		m_CurReaderState->SetVisible(true);
+#endif
 #if TRI_TAGS_FLAG
 		m_human->SetVisible(true);
 #endif
