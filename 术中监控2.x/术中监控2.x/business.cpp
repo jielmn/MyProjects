@@ -500,7 +500,9 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 
 	// 如果是单点连续术中读卡器
 	if ( cfg.m_dwGridMode == CModeButton::Mode_Single ) {
+#if !TRI_TAGS_FLAG
 		GetGridTemperature( i, 0, byArea, cfg.m_dwGridMode);
+#endif
 		GetGridTemperatureAsyn(i, dwDelay);
 		return;
 	}
