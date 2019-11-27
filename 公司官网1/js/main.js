@@ -28,11 +28,17 @@ function OnProductLoad() {
 }
 
 function showImg(index){			
-	$("#show").children().eq(0).children().eq(0).attr('src','images/suit' + (index + 1) + '.jpg');	
-	var lst = $("#show").children().eq(1).children().eq(0);
-	lst.children().remove();
-	var item;
+	$("#imgShow").children().eq(0).attr('src','images/suit' + (index + 1) + '.jpg');	
+	$("#imgTitle").text($("#suits").children().eq(index).text());
+	$('#indicator').css('z-index','0');
+	$("#imgShow").css('z-index','1');
+	$("#imgText").children().remove();
+	$("#imgText").text('');
 	
+	var lst = $("<ul></ul>");
+	$("#imgText").append(lst);
+	
+	var item;	
 	switch( index ){
 		case 0:
 		item=$("<li></li>").text("测温传感器使用高弹性泡棉作为赋型材料，并配合3M医用水凝硅双面胶用于辅助固定于测温位置。").attr('class', 'itemShow');
@@ -42,7 +48,7 @@ function showImg(index){
 		item=$("<li></li>").text("环形天线可延伸到胸前或手臂开阔位置，无需被试者大幅度移动身体即可用读卡器进行扫描。").attr('class', 'itemShow');
 		lst.append(item);
 		item=$("<li></li>").text("绿色电子温度计的传感器精度可达到0.01℃，蓝色测温传感器精度为0.1℃，可以满足不同用户的测温需求。").attr('class', 'itemShow');
-		lst.append(item);
+		lst.append(item);		
 		break;
 		
 		case 1:
@@ -89,11 +95,15 @@ function showImg(index){
 	}
 	
 	$('#suits').children().eq(index).css('background-color','#CE587A');
-	$("#show").show();
 } 
 		
 function hideImg(index) {
-	$("#show").hide();
+	$("#imgShow").children().eq(0).attr('src','images/tag_2.png');	
+	$("#imgTitle").text('无源测温芯片');
+	$('#indicator').css('z-index','1');
+	$("#imgShow").css('z-index','0');
+	$("#imgText").children().remove();
+	$("#imgText").html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;体温，作为人体代谢的伴生产物，是医生对疾病种类、程度和关联性等作出判断的基本凭借。易温<div class="R">®</div>	EasyTemp是一款革新性的体温测量产品，实现了体温测量和记录与现有数字化医疗环境的无缝集成，以及对发热病人身份的标志、识别。采集精确、完整、有病理学循证价值的最基础体征信息--体温，为病人提供预防、筛查、干预、治疗、护理、康复全程防治。');
 	$('#suits').children().eq(index).css('background-color','#ccc');
 }
 
