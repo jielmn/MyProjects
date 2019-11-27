@@ -6,69 +6,49 @@
 	<title>武汉泰利美信科技有限公司</title>
 	<link href="css/layout.css" rel="stylesheet" />
 	<script src="js/jquery-3.3.1.min.js" ></script>
-	<script type="text/javascript">
-		function showImg(i){			
-			$("#slider")[0].innerHTML = '<img src="' + 'images/slider' + i + '.png' + '" width="244" height="420" />'; 
-			$("#slider").show();
-			
-			$("#btn1").css('background-color','');
-			$("#btn2").css('background-color','');
-			$("#btn3").css('background-color','');
-			$("#btn"+i).css('background-color','#bbb');
-		} 
-		
+	<script src="js/main.js" ></script>
+	<script type="text/javascript">	
 		$(document).ready(function(){
-			$("#btn1").click(function(){
-			  showImg(1);
-			});
-			
-			$("#btn2").click(function(){
-			  showImg(2);
-			});
-			
-			$("#btn3").click(function(){
-			  showImg(3);
-			});
-			
-			showImg(1);
+			OnSolutionLoad();
 		})
 	</script>
 </head>
 
-<body id="body3" >
-	<nav class="w1200">
-		
-		<div class="div-logo div-inline">
-			<img src="images/logo.png" />
-		</div>
-		
-		<div class="div-inline">
-			<div class="nav_list">
-				<a href="index.html" class="one">
-					<div class="div-top">首页</div>
-					<div class="div-bottom">HOME</div>
-				</a>
+<body>
+	<nav class="nav">
+		<div class="content">
+			<div class="div-logo">
+				<img src="images/logo.png" />
 			</div>
 			
-			<div class="nav_list">
-				<a href="product.html" class="one">
-					<div class="div-top">产品介绍</div>
-					<div class="div-bottom">PRODUCT INTRO</div>
-				</a>
-			</div>
-			
-			<div class="nav_list">
-				<a href="solution.html" class="one">
-					<div class="div-top">技术方案</div>
-					<div class="div-bottom">TECH SOLUTION</div>
-				</a>
-			</div>
-			
-			<div class="nav_list">
-				<a href="about.html" class="one">
-					<div class="div-top">关于我们</div>
-					<div class="div-bottom">ABOUT US</div>
-				</a>
+			<div class="div-navs" id="divNavs" >
+				<div class="item">
+					<a href="index.html" class="ref">
+						<div class="div-top">首页</div>
+						<div class="div-bottom">HOME</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="product.html" class="ref">
+						<div class="div-top">产品介绍</div>
+						<div class="div-bottom">PRODUCT INTRO</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="solution.html" class="ref">
+						<div class="div-top">技术方案</div>
+						<div class="div-bottom">TECH SOLUTION</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="about.html" class="ref">
+						<div class="div-top">关于我们</div>
+						<div class="div-bottom">ABOUT US</div>
+					</a>
+				</div>
 			</div>
 		</div>
 	</nav>
@@ -76,35 +56,61 @@
 	<div class="div-epidemic">
 		<div class="content">
 			<div class="title">
-				易温<div class="R8">®</div>	EasyTemp
+				易温<div class="R">®</div>	EasyTemp
 			</div>
 			<div class="subtitle">
 				在疫情防控工作中的探索实践
 			</div>
-			<div class="text">
-				&nbsp;&nbsp;&nbsp;&nbsp;体温，是临床进行感染排查、疫情研判和进一步开展疫情防控工作的基础。通过易温<div class="R9">®</div><br/>	EasyTemp对发热病人体温的动态监测和对病人身份的标记识别，精确采集热量信息。依照疾病<br/>
-				&nbsp;预防控制中心(CDC)发热上报流程，以“有温度的物联网--热量地图”为载体，建立区<br/>
-				&nbsp;&nbsp;域内疫情可视化实时监控和多层级防疫资源协同调度系统，为应对区域内突发公共卫生事<br/>
-				&nbsp;&nbsp;&nbsp;件提供基础性“工具”。
+			<div class="text-bg">
+				<div class="text">
+					&nbsp;&nbsp;&nbsp;&nbsp;体温，是临床进行感染排查、疫情研判和进一步开展疫情防控工作的基础。通过易温<div class="R">®</div><br/>	EasyTemp对发热病人体温的动态监测和对病人身份的标记识别，精确采集热量信息。依照疾病<br/>
+					&nbsp;预防控制中心(CDC)发热上报流程，以“有温度的物联网--热量地图”为载体，建立区<br/>
+					&nbsp;&nbsp;域内疫情可视化实时监控和多层级防疫资源协同调度系统，为应对区域内突发公共卫生事<br/>
+					&nbsp;&nbsp;&nbsp;件提供基础性“工具”。
+				</div>
 			</div>
 			<div class="characteristic">
-				<div class="item"><img src="images/checked.png" style="vertical-align:top;padding:0px 10px 0px 0px"/>疫情热量可视化</div>
-				<div class="item"><img src="images/checked.png" style="vertical-align:top;padding:0px 10px 0px 0px"/>业务逻辑结构化</div>
-				<div class="item"><img src="images/checked.png" style="vertical-align:top;padding:0px 10px 0px 0px"/>应用场景模块化</div>
+				<div class="item">
+					<div class="image">
+						<img src="images/checked.png" />
+					</div>
+					<div class="textChar">
+						疫情热量可视化
+					</div>
+				</div>
+				<div class="item">
+					<div class="image">
+						<img src="images/checked.png" />
+					</div>
+					<div class="textChar">
+						业务逻辑结构化
+					</div>
+				</div>
+				<div class="item">
+					<div class="image">
+						<img src="images/checked.png" />
+					</div>
+					<div class="textChar">
+						应用场景模块化
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 	
+	
 	<div class="div-epidemic-detailed">
+	
 		<div class="content">
+		
 			<div class="step1">
 				<div class="left">
 					<div class="top">
-						<div class="left">
+						<div class="num">
 							01
 						</div>
-						<div class="right">
-							<img src="images/bar.png" />
+						<div class="bar">
+							
 						</div>
 					</div>
 					<div class="bottom">
@@ -112,33 +118,32 @@
 					</div>
 				</div>
 				<div class="right">
-					<div class="top">
+					<div class="title">
 						热量信息采集
 					</div>
-					<div class="middle">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;易温<div class="R10">®</div>EasyTemp的临床应用，特别是基层医疗机构作为疫情感知窗口的底层数据支持。广泛覆盖体温数据接口，为收集全面精准“热量信息”拓宽渠道。
+					<div class="text">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;易温<div class="R">®</div>EasyTemp的临床应用，特别是基层医疗机构作为疫情感知窗口的底层数据支持。广泛覆盖体温数据接口，为收集全面精准“热量信息”拓宽渠道。
 					</div>
-					<div class="bottom">
+					<div class="board">
 						标识识别&nbsp;精准采集
 					</div>
 				</div>
-			</div>
-			
+			</div>	
+
 			<div class="step2">
 				<div class="left">
 					<div class="top">
 						CDC和医疗机构应用模块部署，建立疫情防控整体信息化操作环境
 					</div>
 					<div class="bottom">
-						<img src="images/map1.png" />
+						<img src="images/map1.png" class="image" />
 					</div>
 				</div>
 				<div class="right">
 					<div class="top">
-						<div class="left">
-							<img src="images/bar.png" />
+						<div class="bar">
 						</div>
-						<div class="right">
+						<div class="num">
 							02
 						</div>
 					</div>
@@ -151,11 +156,11 @@
 			<div class="step3">
 				<div class="left">
 					<div class="top">
-						<div class="left">
+						<div class="num">
 							03
 						</div>
-						<div class="right">
-							<img src="images/bar.png" />
+						<div class="bar">
+							
 						</div>
 					</div>
 					<div class="bottom">
@@ -163,13 +168,13 @@
 					</div>
 				</div>
 				<div class="right">
-					<div class="top">
+					<div class="title">
 						技术红利支撑疫情防控
 					</div>
-					<div class="middle">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过易温<div class="R10">®</div>EasyTemp的广泛部署，掌握个体发热病人的“小信息”，采用“物联网”作为开展疫情防护工作的技术手段。依照CDC发热上报流程，提供符合疫情防控业务逻辑的连接通信能力，实现“体温小信息”收集和“疫情大数据”运用的紧密结合。一旦发生突发事件，不但能快速定位某类群体，同时科学决策被即刻翻译成指令数据下发至医疗机构，实现防疫资源的协同调度，满足感染或疑似感染群体的医疗需求和跟踪跟进。
+					<div class="text">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;通过易温<div class="R">®</div>EasyTemp的广泛部署，掌握个体发热病人的“小信息”，采用“物联网”作为开展疫情防护工作的技术手段。依照CDC发热上报流程，提供符合疫情防控业务逻辑的连接通信能力，实现“体温小信息”收集和“疫情大数据”运用的紧密结合。一旦发生突发事件，不但能快速定位某类群体，同时科学决策被即刻翻译成指令数据下发至医疗机构，实现防疫资源的协同调度，满足感染或疑似感染群体的医疗需求和跟踪跟进。
 					</div>
-					<div class="bottom">
+					<div class="board">
 						广泛覆盖&nbsp;部署有序
 					</div>
 				</div>
@@ -181,15 +186,14 @@
 						独立扩展的业务增值能力，单病种追踪研究
 					</div>
 					<div class="bottom">
-						<img src="images/map2.png" />
+						<img src="images/map2.png" class="image" />
 					</div>
 				</div>
 				<div class="right">
 					<div class="top">
-						<div class="left">
-							<img src="images/bar.png" />
+						<div class="bar">
 						</div>
-						<div class="right">
+						<div class="num">
 							04
 						</div>
 					</div>
@@ -199,32 +203,36 @@
 				</div>
 			</div>
 			
+			<div class="title-bg">				
+			</div>
+			
+			<div class="title-bg1">				
+			</div>
+			
 			<div class="final">
-				<div class="one" >
-					<div class="title">
-						4.0时代疫情防控工作的数字化转型
-					</div>
-					<div class="text">
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作为某种“疾病”存在的“物”，比如来自易温<div class="R10">®</div>EasyTemp关于发热的信息，不但可以自我表达和自我解释，同时也是能够演化的。这些关于疾病的信息通过物联网技术接入系统，虽然“疾病”本身不能交谈，但通过这种方式它们可以被其他节点访问，例如一个强大的中央服务器。从而实现与CDC的有效连通，实现防疫资源的协同调度，实现医疗力量纵向到底，横向到边，夯实多层面的医疗卫生服务保障！
-					</div>
-				</div>				
+				<div class="title">
+					4.0时代疫情防控工作的数字化转型
+				</div>
+				<div class="text">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作为某种“疾病”存在的“物”，比如来自易温<div class="R">®</div>EasyTemp关于发热的信息，不但可以自我表达和自我解释，同时也是能够演化的。这些关于疾病的信息通过物联网技术接入系统，虽然“疾病”本身不能交谈，但通过这种方式它们可以被其他节点访问，例如一个强大的中央服务器。从而实现与CDC的有效连通，实现防疫资源的协同调度，实现医疗力量纵向到底，横向到边，夯实多层面的医疗卫生服务保障！
+				</div>
 			</div>
 			
-			<div style="position:absolute;top:-27px;left:450px;">
-				<img src="images/patient_to_profession.png" />
+			<div class="board1">
+				Patient&nbsp;to&nbsp;Profession
 			</div>
-			
+
 			<div class="slide">
 				<div class="top">
 				</div>
 				<div class="middle">
-					<div class="picture" id="slider">
-						
+					<div class="picture" >
+						<img src="" style="height:329px;width:208px;" id="slider" />
 					</div>
-					<div class="buttons">
-						<span class="dot" id="btn1" ></span> 
-						<span class="dot" id="btn2"></span>
-						<span class="dot" id="btn3"></span>
+					<div class="buttons" id="btns">
+						<span class="dot"></span> 
+						<span class="dot"></span>
+						<span class="dot"></span>
 					</div>
 				</div>
 				<div class="bottom">
@@ -232,6 +240,7 @@
 			</div>
 			
 		</div>
+		
 	</div>
 	
 	
@@ -239,21 +248,38 @@
 		<div class="content">
 			<div class="top">
 				<div class="logo"><img src="images/logo.png" /></div>
-				<div class="index">
-					<a href="index.html" class="white">首页</a>
+				<div class="navs" id="divNavsFoot" >
+					<div class="item">
+						<a href="index.html" class="white">首页</a>
+					</div>
+					<div class="item">
+						<a href="product.html" class="white">产品介绍</a>
+					</div>
+					<div class="item">
+						<a href="solution.html" class="white">技术方案</a>
+					</div>
+					<div class="item">
+						<a href="about.html" class="white">关于我们</a>
+					</div>
 				</div>
-				<div class="product"><a href="product.html" class="white">产品介绍</a></div>				
-				<div class="solution"><a href="solution.html" class="white" style="border-bottom:2px solid #bf3d5f;padding:0px 0px 6px 0px;">技术方案</a></div>
-				<div class="about"><a href="about.html" class="white">关于我们</a></div>
 			</div>
+			
 			<div class="bottom">
 				<div class="left">
-					<img src="images/foot-bg.png" />
+					<img src="images/foot-bg.png" style="width:450px;height:148px;" />
 				</div>
 				<div class="right">
-					<img src="images/icon_wechat.png" style="padding:120px 0px 0px 80px" />
-					<img src="images/icon_qq.png" style="padding:120px 0px 0px 15px" />
-					<img src="images/icon_mail.png" style="padding:120px 0px 0px 15px" />
+					<div class="item">
+						<img src="images/icon_wechat.png" style="width:50px;height:50px;"  />
+					</div>
+					
+					<div class="item">
+						<img src="images/icon_qq.png" style="width:50px;height:50px;"  />
+					</div>
+					
+					<div class="item">
+						<img src="images/icon_mail.png" style="width:50px;height:50px;" />
+					</div>			
 				</div>
 			</div>
 		</div>		
@@ -272,6 +298,7 @@
 			</div>
 		</div>
 	</div>
+	
 </body>
 
 </html>

@@ -5,42 +5,50 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>武汉泰利美信科技有限公司</title>
 	<link href="css/layout.css" rel="stylesheet" />
+	<script src="js/jquery-3.3.1.min.js" ></script>
+	<script src="js/main.js" ></script>
+	<script type="text/javascript">	
+		$(document).ready(function(){
+			OnAboutLoad();
+		})
+	</script>
 </head>
 
-<body id="body4" >
-	<nav class="w1200">
-		
-		<div class="div-logo div-inline">
-			<img src="images/logo.png" />
-		</div>
-		
-		<div class="div-inline">
-			<div class="nav_list">
-				<a href="index.html" class="one">
-					<div class="div-top">首页</div>
-					<div class="div-bottom">HOME</div>
-				</a>
+<body>
+	<nav class="nav">
+		<div class="content">
+			<div class="div-logo">
+				<img src="images/logo.png" />
 			</div>
 			
-			<div class="nav_list">
-				<a href="product.html" class="one">
-					<div class="div-top">产品介绍</div>
-					<div class="div-bottom">PRODUCT INTRO</div>
-				</a>
-			</div>
-			
-			<div class="nav_list">
-				<a href="solution.html" class="one">
-					<div class="div-top">技术方案</div>
-					<div class="div-bottom">TECH SOLUTION</div>
-				</a>
-			</div>
-			
-			<div class="nav_list">
-				<a href="about.html" class="one">
-					<div class="div-top">关于我们</div>
-					<div class="div-bottom">ABOUT US</div>
-				</a>
+			<div class="div-navs" id="divNavs" >
+				<div class="item">
+					<a href="index.html" class="ref">
+						<div class="div-top">首页</div>
+						<div class="div-bottom">HOME</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="product.html" class="ref">
+						<div class="div-top">产品介绍</div>
+						<div class="div-bottom">PRODUCT INTRO</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="solution.html" class="ref">
+						<div class="div-top">技术方案</div>
+						<div class="div-bottom">TECH SOLUTION</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="about.html" class="ref">
+						<div class="div-top">关于我们</div>
+						<div class="div-bottom">ABOUT US</div>
+					</a>
+				</div>
 			</div>
 		</div>
 	</nav>
@@ -49,7 +57,7 @@
 		<div class="content" >
 			<div class="title">
 				<div class="top">
-					易温<div class="R4">®</div>EasyTemp
+					易温<div class="R">®</div>EasyTemp
 				</div>
 				<div class="bottom">
 					满满<img src="images/conceits.png" style="vertical-align:top;" />让医疗更简单
@@ -63,9 +71,10 @@
 	
 	<div class="div-about">
 		<div class="content">
-			<div style="position:absolute; left:0px; top:0px;"><img src="images/bracket_4.png"/></div>
-			<div style="position:absolute; left:0px; top:1150px;"><img src="images/bracket_6.png"  /></div>
-			<div style="position:absolute; left:1123px; top:1132px;"><img src="images/bracket_5.png" /></div>
+			<img src="images/bracket_4.png" class="pic1" />
+			<img src="images/bracket_6.png" class="pic2"  />
+			<img src="images/bracket_5.png" class="pic3" />
+			
 			<div class="top">
 				<div class="header">
 					关于我们
@@ -73,58 +82,61 @@
 				<div class="body">&nbsp;&nbsp;&nbsp;&nbsp;武汉泰利美信医疗科技有限公司(Telemed)是一家在智慧医疗领域迅速崛起的产品和方案供应商。我们创新性的提出，“物联网”中的“物”既可以是普通物体，也可以是能独立行使功能的某种疾病，致力于推动物联网大数据技术在医疗卫生领域的“跨界”应用，致力于实现公司由产品和技术方案提供商向医疗卫生服务数据运营商的转型。<br/>&nbsp;&nbsp;&nbsp;&nbsp;我们始终遵循公司的企业精神，不断追求更有意义的创新、更佳的应用和更高的质量。我们愿景为我们指明，我们将以饱满的热情和创造力，为顾客创造价值，成就我们最好的业务结果！
 				</div>
 				<div class="footer">
-					易温<div class="R5">®</div>EasyTemp
+					易温<div class="R">®</div>EasyTemp
 				</div>
 			</div>
-			<div class="bottom" >
-				<div class="certificate" >
-					<div class="title" >
-						资质证书
-					</div>
-					<div class="picture">
-						<table cellpadding="0" cellspacing="0" border="0">
-							<tr>
-								<td><img src="images/zhuce.png" style="width:280px;height:368px;" /></td>
-								<td><img src="images/shengchan.png" style="width:280px;height:368px;" /></td>
-							</tr>
-							<tr>
-								<td><img src="images/ios.png" style="width:280px;height:368px;" /></td>
-								<td><img src="images/gaoxin.png" style="width:280px;height:368px;" /></td>
-							</tr>
-						</table>
-					</div>					
+			
+			<div class="cer-title">
+				资质证书
+			</div>
+			
+			<div class="cer">
+				<table cellpadding="0" cellspacing="0">
+					<tr>
+						<td><img src="images/zhuce.png" class="cerPic" /></td>
+						<td><img src="images/shengchan.png" class="cerPic" /></td>
+					</tr>
+					<tr>
+						<td><img src="images/ios.png" class="cerPic" /></td>
+						<td><img src="images/gaoxin.png" class="cerPic" /></td>
+					</tr>
+				</table>
+			</div>
+			
+			<div class="seperate">
+				<div class="sepItem"></div>
+				<div class="sepItem"></div>
+				<div class="sepItem"></div>
+				<div class="sepItem"></div>
+			</div>
+			
+			<div class="value">
+				<div class="title">
+					持续改进
 				</div>
-				<div class="seperate" >
-						
+				<div class="text">
+					我们以法律法规为准绳，实施有效的质量管理体系。我们对我们的工作感到自豪，并不断完善，持续改进。
 				</div>
-				<div class="value">
-					<div class="title">
-						持续改进
-					</div>
-					<div class="text">
-						我们以法律法规为准绳，实施有效的质量管理体系。我们对我们的工作感到自豪，并不断完善，持续改进。
-					</div>
-					
-					<div class="title">
-						创新价值
-					</div>
-					<div class="text">
-						卓越是我们永恒的追求。我们坚信，创新是企业持续致胜的关键，公司的技术与商业运营便是以此为基础。
-					</div>
-					
-					<div class="title">
-						超越期望
-					</div>
-					<div class="text">
-						我们竭尽全力，客服困难，公平竞争，提供高品质的产品、服务和解决方案，超越客户期望，为客户创造价值。
-					</div>
-					
-					<div class="title">
-						客户至上
-					</div>
-					<div class="text">
-						帮助我们的客户获得成功是我们的终极目标。我们采取对客户有价值的方式来满足他们的要求，使他们获得成功。
-					</div>
+				
+				<div class="title">
+					创新价值
+				</div>
+				<div class="text">
+					卓越是我们永恒的追求。我们坚信，创新是企业持续致胜的关键，公司的技术与商业运营便是以此为基础。
+				</div>
+				
+				<div class="title">
+					超越期望
+				</div>
+				<div class="text">
+					我们竭尽全力，客服困难，公平竞争，提供高品质的产品、服务和解决方案，超越客户期望，为客户创造价值。
+				</div>
+				
+				<div class="title">
+					客户至上
+				</div>
+				<div class="text">
+					帮助我们的客户获得成功是我们的终极目标。我们采取对客户有价值的方式来满足他们的要求，使他们获得成功。
 				</div>
 			</div>
 		</div>
@@ -132,12 +144,8 @@
 	
 	<div class="div-contact">
 		<div class="content">
-			<div style="position:absolute;left:230px;top:120px;">
-				<img src="images/map.png" />
-			</div>
-			<div style="position:absolute;left:680px;top:520px;">
-				<img src="images/contact_info.png" />
-			</div>
+			<img src="images/map.png" class="pic1" />
+			<img src="images/contact_info.png" class="pic2" />
 		</div>
 	</div>
 	
@@ -145,25 +153,42 @@
 		<div class="content">
 			<div class="top">
 				<div class="logo"><img src="images/logo.png" /></div>
-				<div class="index">
-					<a href="index.html" class="white">首页</a>
+				<div class="navs" id="divNavsFoot" >
+					<div class="item">
+						<a href="index.html" class="white">首页</a>
+					</div>
+					<div class="item">
+						<a href="product.html" class="white">产品介绍</a>
+					</div>
+					<div class="item">
+						<a href="solution.html" class="white">技术方案</a>
+					</div>
+					<div class="item">
+						<a href="about.html" class="white">关于我们</a>
+					</div>
 				</div>
-				<div class="product"><a href="product.html" class="white">产品介绍</a></div>				
-				<div class="solution"><a href="solution.html" class="white">技术方案</a></div>
-				<div class="about"><a href="about.html" class="white" style="border-bottom:2px solid #bf3d5f;padding:0px 0px 6px 0px;" >关于我们</a></div>
 			</div>
+			
 			<div class="bottom">
 				<div class="left">
-					<img src="images/foot-bg.png" />
+					<img src="images/foot-bg.png" style="width:450px;height:148px;" />
 				</div>
 				<div class="right">
-					<img src="images/icon_wechat.png" style="padding:120px 0px 0px 80px" />
-					<img src="images/icon_qq.png" style="padding:120px 0px 0px 15px" />
-					<img src="images/icon_mail.png" style="padding:120px 0px 0px 15px" />
+					<div class="item">
+						<img src="images/icon_wechat.png" style="width:50px;height:50px;"  />
+					</div>
+					
+					<div class="item">
+						<img src="images/icon_qq.png" style="width:50px;height:50px;"  />
+					</div>
+					
+					<div class="item">
+						<img src="images/icon_mail.png" style="width:50px;height:50px;" />
+					</div>			
 				</div>
 			</div>
 		</div>		
-	</div>	
+	</div>
 	
 	<div class="div-beian">
 		<div class="content" >

@@ -6,97 +6,49 @@
 	<title>武汉泰利美信科技有限公司</title>
 	<link href="css/layout.css" rel="stylesheet" />
 	<script src="js/jquery-3.3.1.min.js" ></script>
-	<script type="text/javascript">
-		function showImg(i,l,t){			
-			$("#show")[0].innerHTML = '<img src="' + 'images/suit' + i + '.jpg' + '" width="400" height="300" />'; 
-			$("#show").css('left', '' + (l+70) + 'px' ); 
-			$("#show").css('top','' + (t+50) + 'px'); 			
-			$("#show").show();
-		} 
-		
-		function hideImg() {
-			$("#show")[0].innerHTML = "";
-			$("#show").hide();
-		}
-		
+	<script src="js/main.js" ></script>
+	<script type="text/javascript">		
 		$(document).ready(function(){
-			$("#suit1").mouseover(function(){
-			  showImg(1,$("#suit1").position().left,$("#suit1").position().top);			  
-			});
-			
-			$("#suit1").mouseleave(function(){
-			  hideImg();			  
-			});
-			
-			$("#suit2").mouseover(function(){
-			  showImg(2,$("#suit2").position().left,$("#suit2").position().top);			  
-			});
-			
-			$("#suit2").mouseleave(function(){
-			  hideImg();			  
-			});
-			
-			$("#suit3").mouseover(function(){
-			  showImg(3,$("#suit3").position().left,$("#suit3").position().top);			  
-			});
-			
-			$("#suit3").mouseleave(function(){
-			  hideImg();			  
-			});
-			
-			$("#suit4").mouseover(function(){
-			  showImg(4,$("#suit4").position().left,$("#suit4").position().top);			  
-			});
-			
-			$("#suit4").mouseleave(function(){
-			  hideImg();			  
-			});
-			
-			$("#suit5").mouseover(function(){
-			  showImg(5,$("#suit5").position().left,$("#suit5").position().top);			  
-			});
-			
-			$("#suit5").mouseleave(function(){
-			  hideImg();			  
-			});
+			OnProductLoad();
 		});
 	</script>
 </head>
 
-<body id="body2" >
-	<nav class="w1200">
-		
-		<div class="div-logo div-inline">
-			<img src="images/logo.png" />
-		</div>
-		
-		<div class="div-inline">
-			<div class="nav_list">
-				<a href="index.html" class="one">
-					<div class="div-top">首页</div>
-					<div class="div-bottom">HOME</div>
-				</a>
+<body>
+	<nav class="nav">
+		<div class="content">
+			<div class="div-logo">
+				<img src="images/logo.png" />
 			</div>
 			
-			<div class="nav_list">
-				<a href="product.html" class="one">
-					<div class="div-top">产品介绍</div>
-					<div class="div-bottom">PRODUCT INTRO</div>
-				</a>
-			</div>
-			
-			<div class="nav_list">
-				<a href="solution.html" class="one">
-					<div class="div-top">技术方案</div>
-					<div class="div-bottom">TECH SOLUTION</div>
-				</a>
-			</div>
-			
-			<div class="nav_list">
-				<a href="about.html" class="one">
-					<div class="div-top">关于我们</div>
-					<div class="div-bottom">ABOUT US</div>
-				</a>
+			<div class="div-navs" id="divNavs" >
+				<div class="item">
+					<a href="index.html" class="ref">
+						<div class="div-top">首页</div>
+						<div class="div-bottom">HOME</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="product.html" class="ref">
+						<div class="div-top">产品介绍</div>
+						<div class="div-bottom">PRODUCT INTRO</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="solution.html" class="ref">
+						<div class="div-top">技术方案</div>
+						<div class="div-bottom">TECH SOLUTION</div>
+					</a>
+				</div>
+				
+				<div class="item">
+					<a href="about.html" class="ref">
+						<div class="div-top">关于我们</div>
+						<div class="div-bottom">ABOUT US</div>
+					</a>
+				</div>
 			</div>
 		</div>
 	</nav>
@@ -104,7 +56,7 @@
 	<div class="div-characteristic">
 		<div class="content">
 			<div class="title">
-				易温<div class="R6">®</div>EasyTemp
+				易温<div class="R">®</div>EasyTemp
 			</div>
 			<div class="subtitle">
 				床旁护理的超级助手
@@ -112,101 +64,169 @@
 			<div class="bottom">
 				<div class="left">
 					<div class="item">
-						<img src="images/checked.png" />&nbsp;身份标识、识别
+						<div class="image">
+							<img src="images/checked.png"/>
+						</div>
+						<div class="text">
+							身份标识、识别
+						</div>						
 					</div>
+					
 					<div class="item">
-						<img src="images/checked.png" />&nbsp;无电池&nbsp;不含汞
+						<div class="image">
+							<img src="images/checked.png"/>
+						</div>
+						<div class="text">
+							无电池&nbsp;不含汞
+						</div>						
 					</div>
+					
 					<div class="item">
-						<img src="images/checked.png" />&nbsp;分离式设计
+						<div class="image">
+							<img src="images/checked.png"/>
+						</div>
+						<div class="text">
+							分离式设计
+						</div>						
 					</div>
+					
 					<div class="item">
-						<img src="images/checked.png" />&nbsp;无缝集成实时发布
+						<div class="image">
+							<img src="images/checked.png"/>
+						</div>
+						<div class="text">
+							无缝集成实时发布
+						</div>						
 					</div>
+					
 					<div class="item">
-						<img src="images/checked.png" />&nbsp;时间、精度敏感
+						<div class="image">
+							<img src="images/checked.png"/>
+						</div>
+						<div class="text">
+							时间、精度敏感
+						</div>						
 					</div>
 				</div>
+				
 				<div class="right">
-					<img src="images/quote_left.png" />
-					<div class="video">
-						<video width="500" height="280" controls="controls">
+					<div class="zuo">
+						<img src="images/quote_left.png" />
+					</div>
+					
+					<div class="middle">
+						<video width="400" height="300" controls="controls">
 						  <source src="video/promo.mp4" type="video/mp4" />
 						</video>
 					</div>
-					<img src="images/quote_right.png" style="position:absolute;left:555px;top:105px;" />
-				</div>
+					
+					<div class="you">
+						<img src="images/quote_right.png" />
+					</div>
+										
+				</div>				
 			</div>
 		</div>
 	</div>
+	
 	
 	<div class="div-suits">
 		<div class="content">
-			<div class="top">
-				<div class="item" id="suit1">A套装</div>
-				<div class="item" id="suit2">B套装</div>
-				<div class="item" id="suit3">C套装</div>
-				<div class="item" id="suit4">D套装</div>
-				<div class="item" id="suit5">E套装</div>
+			<div class="top" id="suits">
+				<div class="item">成人测温套件</div>
+				<div class="item">儿童测温套件</div>
+				<div class="item">腔内测温套件</div>
+				<div class="item">末梢皮温套件</div>
+				<div class="item">连续测温套件</div>
 			</div>
 			
 			<div class="bottom">
-				<div style="position:absolute;left:0px;top:100px;"><img src="images/bracket_7.png" /></div>
-				<div style="position:absolute;left:100px;top:200px;width:440;height:260px;background-color:#ccc;padding:10px;">
-					<img src="images/tag_2.png" style="width:440px;height:260px;" />
+				<div class="img1">
+					<img src="images/bracket_7.png" style="width:300px;height:327px;" />
 				</div>
-				<div style="position:absolute;left:450px;top:180px;">
-					<img src="images/indicator.png" />
+				
+				<div class="img2">
+					<img src="images/tag_2.png" style="width:320px;height:192px;" />
 				</div>
+				
+				<div class="img3">
+					<img src="images/indicator.png" style="300px;height:76px;" />
+				</div>
+				
 				<div class="chip">
 					无源测温芯片
 				</div>
+				
 				<div class="chip-desc">
 					完全自主知识产权、原研专利
 				</div>
+				
 				<div class="text">
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;体温，作为人体代谢的伴生产物，是医生对疾病种类、程度和关联性等作出判断的基本凭借。易温<div class="R7">®</div>	EasyTemp是一款革新性的体温测量产品，实现了体温测量和记录与现有数字化医疗环境的无缝集成，以及对发热病人身份的标志、识别。采集精确、完整、有病理学循证价值的最基础体征信息--体温，为病人提供预防、筛查、干预、治疗、护理、康复全程防治。
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;体温，作为人体代谢的伴生产物，是医生对疾病种类、程度和关联性等作出判断的基本凭借。易温<div class="R">®</div>	EasyTemp是一款革新性的体温测量产品，实现了体温测量和记录与现有数字化医疗环境的无缝集成，以及对发热病人身份的标志、识别。采集精确、完整、有病理学循证价值的最基础体征信息--体温，为病人提供预防、筛查、干预、治疗、护理、康复全程防治。
 				</div>
 			</div>
 			
-			<div style="position:absolute;top:-27px;left:450px;">
-				<img src="images/patient_to_profession.png" />
+			<div class="board">
+				Patient&nbsp;to&nbsp;Profession
 			</div>
 			
-			<div id="show" style="display:none;position:absolute;left:0px;top:0px;width:400px;height:300px;padding:10px;background-color:#B3B3B3;">
+			<div id="show">
+				<div class="imgShow">
+					<img src="images/suit1.jpg" style="width:400px;height:300px;" />
+				</div>
 				
+				<div class="textShow">
+					<ul>
+					</ul>
+				</div>
 			</div>
 		</div>
-	</div>	
+	</div>
 	
 	<div class="div-story">
 		<div class="content">
-			<div class="item"><img src="images/story1.jpg"/></div>
-			<div class="item"><img src="images/story2.jpg"/></div>
-			<div class="item"><img src="images/story3.jpg"/></div>
+			<div class="item"><img src="images/story1.jpg" class="image" /></div>
+			<div class="item"><img src="images/story2.jpg" class="image" /></div>
+			<div class="item"><img src="images/story3.jpg" class="image" /></div>
 		</div>
 	</div>
-
 	
 	<div class="div-footer">
 		<div class="content">
 			<div class="top">
 				<div class="logo"><img src="images/logo.png" /></div>
-				<div class="index">
-					<a href="index.html" class="white">首页</a>
+				<div class="navs" id="divNavsFoot" >
+					<div class="item">
+						<a href="index.html" class="white">首页</a>
+					</div>
+					<div class="item">
+						<a href="product.html" class="white">产品介绍</a>
+					</div>
+					<div class="item">
+						<a href="solution.html" class="white">技术方案</a>
+					</div>
+					<div class="item">
+						<a href="about.html" class="white">关于我们</a>
+					</div>
 				</div>
-				<div class="product"><a href="product.html" class="white" style="border-bottom:2px solid #bf3d5f;padding:0px 0px 6px 0px;">产品介绍</a></div>				
-				<div class="solution"><a href="solution.html" class="white">技术方案</a></div>
-				<div class="about"><a href="about.html" class="white">关于我们</a></div>
 			</div>
+			
 			<div class="bottom">
 				<div class="left">
-					<img src="images/foot-bg.png" />
+					<img src="images/foot-bg.png" style="width:450px;height:148px;" />
 				</div>
 				<div class="right">
-					<img src="images/icon_wechat.png" style="padding:120px 0px 0px 80px" />
-					<img src="images/icon_qq.png" style="padding:120px 0px 0px 15px" />
-					<img src="images/icon_mail.png" style="padding:120px 0px 0px 15px" />
+					<div class="item">
+						<img src="images/icon_wechat.png" style="width:50px;height:50px;"  />
+					</div>
+					
+					<div class="item">
+						<img src="images/icon_qq.png" style="width:50px;height:50px;"  />
+					</div>
+					
+					<div class="item">
+						<img src="images/icon_mail.png" style="width:50px;height:50px;" />
+					</div>			
 				</div>
 			</div>
 		</div>		
