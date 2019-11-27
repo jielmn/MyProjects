@@ -188,12 +188,14 @@ void  CLaunch::ProcSurReader(const BYTE * pData, DWORD dwDataLen) {
 	BYTE   byAreaNo = pData[4];
 	DWORD  dwTemp   = pData[24] * 1000 + pData[25] * 100 + pData[26] * 10 + pData[27];
 
+#if !TRI_TAGS_FLAG
 	// 如果病区号不同
 	if (byAreaNo != g_data.m_CfgData.m_dwAreaNo) {
 		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
 		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "病区号和设置的不匹配：\n%s\n", debug_buf);
 		return;
 	}
+#endif
 
 	// 床位号太大
 	if (wBedNo > MAX_READERS_PER_GRID * MAX_GRID_COUNT) {
