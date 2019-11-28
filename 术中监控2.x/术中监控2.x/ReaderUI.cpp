@@ -63,6 +63,10 @@ void CReaderUI::DoInit() {
 		m_state->SetVisible(false); 
 	}
 
+#if TRI_TAGS_FLAG
+	m_state->SetVisible(false);
+#endif
+
 	m_bInited = TRUE;
 }
 

@@ -235,7 +235,10 @@ void CGridUI::OnModeChanged(int nSource) {
 			else
 				m_readers[i]->SetVisible(false);
 		}
+#if !TRI_TAGS_FLAG
 		m_CurReaderState->SetVisible(true);
+#endif
+
 #if TRI_TAGS_FLAG
 		m_human->SetVisible(false);
 #endif

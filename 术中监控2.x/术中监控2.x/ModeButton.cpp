@@ -24,7 +24,7 @@ LPCTSTR CModeButton::GetClass() const {
 }
 
 void CModeButton::SwitchMode() {
-#if !TRI_TAGS_FLAG
+
 	switch (m_mode)
 	{
 	case CModeButton::Mode_Hand:
@@ -42,21 +42,6 @@ void CModeButton::SwitchMode() {
 	default:
 		break;
 	}
-#else
-	switch (m_mode)
-	{
-	case CModeButton::Mode_Hand:
-		m_mode = Mode_Multiple;
-		this->SetBkImage("file='multiple.png' dest='2,2,28,28'");
-		break;
-	case CModeButton::Mode_Multiple:
-		m_mode = Mode_Hand;
-		this->SetBkImage("file='hand.png' dest='2,2,28,28'");
-		break;
-	default:
-		break;
-	}
-#endif
 
 	m_pManager->SendNotify(this, "ModeChanged");;
 }
