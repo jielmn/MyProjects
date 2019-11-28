@@ -307,7 +307,11 @@ void CGridUI::OnModeChanged(int nSource) {
 	strText.Format("%s %lu", CFG_GRID_MODE, dwIndex+1);
 
 	g_data.m_CfgData.m_GridCfg[dwIndex].m_dwGridMode = (DWORD)m_cstModeBtn->GetMode();
+#if !TRI_TAGS_FLAG
 	DWORD dwDefValue = CModeButton::Mode_Hand;
+#else
+	DWORD dwDefValue = CModeButton::Mode_Multiple;
+#endif
 	g_data.m_cfg->SetConfig(strText, g_data.m_CfgData.m_GridCfg[dwIndex].m_dwGridMode, &dwDefValue);
 }
 
