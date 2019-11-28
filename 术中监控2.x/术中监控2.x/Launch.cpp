@@ -120,6 +120,8 @@ int  CLaunch::ReadComData() {
 	//     信道 地址      SN码                 TagID               温度                             白卡ID
 
 	char debug_buf[8192];
+
+#if !TRI_TAGS_FLAG
 	const int MIN_DATA_LENGTH = 29;
 	const int SURGENCY_TEMP_DATA_LENGTH = 29;
 	const int HAND_TEMP_DATA_LENGTH     = 32;
@@ -162,7 +164,109 @@ int  CLaunch::ReadComData() {
 		// 清除结尾可能存在的"dd aa"
 		ProcTail();
 	}
+#else
+
+	const int MIN_DATA_LENGTH = 16;
+	const int BATERRY_TEMP_DATAl_LENGTH = 16;       // 有源tag
+	const int SURGENCY_TEMP_DATA_LENGTH = 29;
+	const int HAND_TEMP_DATA_LENGTH = 32;
+
+	if (m_recv_buf.GetDataLength() < MIN_DATA_LENGTH) {
+		return 0;
+	}
+	m_recv_buf.Read(buf, MIN_DATA_LENGTH);
+
+	if (buf[0] != 0x55) {
+		DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf);
+		CloseLaunch();
+		return 0;
+	}
+
+	// 如果是有源数据
+	if (buf[1] == 0x0D) {
+		m_recv_buf.Reform();
+		ProcBatteryTemp(buf, BATERRY_TEMP_DATAl_LENGTH);
+		ProcTail();
+	}
+	// 如果是术中读卡器温度数据
+	else if (buf[1] == 0x1A) {
+		DWORD  dwExtraLength = SURGENCY_TEMP_DATA_LENGTH - MIN_DATA_LENGTH;
+		DWORD  dwExpectedLength = SURGENCY_TEMP_DATA_LENGTH;
+
+		// 如果没有足够数据
+		if (m_recv_buf.GetDataLength() < dwExtraLength ) {
+			m_recv_buf.ResetReadPos();
+			return 0;
+		}
+
+		// 读出完整的数据 
+		m_recv_buf.Read(buf + MIN_DATA_LENGTH, dwExtraLength);
+
+		m_recv_buf.Reform();
+		ProcSurReader(buf, dwExpectedLength);
+		ProcTail();
+	}
+	// 如果是手持温度数据
+	else if (buf[1] == 0x1E) {
+		DWORD  dwExtraLength = HAND_TEMP_DATA_LENGTH - MIN_DATA_LENGTH;
+		DWORD  dwExpectedLength = HAND_TEMP_DATA_LENGTH;
+
+		// 如果没有足够数据
+		if (m_recv_buf.GetDataLength() < dwExtraLength) {
+			m_recv_buf.ResetReadPos();
+			return 0;
+		}
+
+		// 读出完整的数据 
+		m_recv_buf.Read(buf + MIN_DATA_LENGTH, dwExtraLength);
+		m_recv_buf.Reform();
+
+		ProcHandeReader(buf, dwExpectedLength);
+		// 清除结尾可能存在的"dd aa"
+		ProcTail();
+	}
+
+#endif
 	return 0;
+}
+
+// 处理有源数据
+// 协议：  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+//        55 0D 01 02 E1 01 FF DA A1 05 12 41 23 14 00 FF
+void   CLaunch::ProcBatteryTemp(const BYTE * pData, DWORD dwDataLen) {
+	char debug_buf[8192];
+
+	if (pData[15] != (BYTE)'\xFF') {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(跳过，不处理)：\n%s\n", debug_buf);
+		return;
+	}
+
+	BYTE   byIndex = pData[3];
+	DWORD  dwTemp = pData[12] * 100 + pData[13];
+
+	TempItem temp_item;
+	memset(&temp_item, 0, sizeof(temp_item));
+
+	temp_item.m_dwTemp = dwTemp;
+	temp_item.m_time = time(0);
+
+	Bytes2String(temp_item.m_szTagId, sizeof(temp_item.m_szTagId), pData+4, 8);
+
+	char szDeviceId[20] = {0};
+	Bytes2String(szDeviceId, sizeof(szDeviceId), pData + 4, 4);
+
+	WORD  wBedNo = 0;
+	for ( DWORD i = 0; i < g_data.m_dwBatteryBindCnt; i++ ) {
+		if (   0 == strcmp(g_data.m_battery_binding[i].m_szDeviceId, szDeviceId) 
+			&& g_data.m_battery_binding[i].m_nIndex == (int)byIndex ) {
+			wBedNo = (g_data.m_battery_binding[i].m_nGridIndex - 1) * MAX_READERS_PER_GRID + 1;
+		}
+	}
+
+	if ( wBedNo > 0 )
+		m_sigReaderTemp.emit(wBedNo, temp_item);
 }
 
 // 术中读卡器温度

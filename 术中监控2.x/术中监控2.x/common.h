@@ -325,6 +325,15 @@ typedef struct tagCfgData {
 	DWORD     m_dwHandReaderHighTempAlarm;              // 手持读卡器高温报警	
 }CfgData;
 
+#if TRI_TAGS_FLAG
+// 有源tag绑定
+typedef  struct tagBatteryBinding {
+	char     m_szDeviceId[20];
+	int      m_nIndex;
+	int      m_nGridIndex;
+} BatteryBinding;
+#endif
+
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
@@ -353,6 +362,10 @@ public:
 	char                      m_TempChartFooter[20];
 
 	BOOL                      m_bDelta[3];
+#if TRI_TAGS_FLAG
+	BatteryBinding            m_battery_binding[MAX_GRID_COUNT];
+	DWORD                     m_dwBatteryBindCnt;
+#endif
 
 public:
 	CGlobalData() {
@@ -376,6 +389,10 @@ public:
 		memset(m_TempChartFooter, 0, sizeof(m_TempChartFooter));
 
 		memset(m_bDelta, 0, sizeof(m_bDelta));
+#if TRI_TAGS_FLAG
+		memset(m_battery_binding, 0, sizeof(m_battery_binding));
+		m_dwBatteryBindCnt = 0;
+#endif
 	}
 };
 

@@ -30,6 +30,8 @@ private:
 	void   ProcTail();
 	// 处理手持读卡器数据
 	void   ProcHandeReader(const BYTE * pData, DWORD dwDataLen);
+	// 处理有源数据
+	void   ProcBatteryTemp(const BYTE * pData, DWORD dwDataLen);
 
 private:
 	CDataBuf   m_recv_buf;

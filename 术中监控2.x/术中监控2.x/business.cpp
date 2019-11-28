@@ -394,6 +394,49 @@ void CBusiness::GetGridsCfg() {
 
 		strText.Format("%s %lu", CFG_PATIENT_NAME, i + 1);
 		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_szPatientName, MAX_TAG_PNAME_LENGTH, 0);
+
+#if TRI_TAGS_FLAG
+		strText.Format("bed %lu", i + 1);
+		char szTemp[1024];
+		g_data.m_cfg->GetConfig(strText, szTemp, sizeof(szTemp), 0);
+		StrTrim(szTemp);
+		if (szTemp[0] != '\0') {
+			SplitString split;
+			split.Split(szTemp, ',');
+			if ( split.Size() == 2 ) {
+				BatteryBinding bind;
+				memset(&bind, 0, sizeof(bind));
+
+				CLmnString sDeviceId = split[0];
+				CLmnString sIndex    = split[1];
+
+				sDeviceId.Trim();
+				sDeviceId.MakeLower();
+				sIndex.Trim();
+
+				STRNCPY( bind.m_szDeviceId, sDeviceId, sizeof(bind.m_szDeviceId) );
+				sscanf(sIndex, "%d", &bind.m_nIndex);
+				bind.m_nGridIndex = i + 1;
+
+				DWORD j = 0;
+				for ( j = 0; j < g_data.m_dwBatteryBindCnt; j++ ) {
+					if ( 0 == strcmp(g_data.m_battery_binding[i].m_szDeviceId, bind.m_szDeviceId)
+						&& g_data.m_battery_binding[i].m_nIndex == bind.m_nIndex ) {
+						g_data.m_battery_binding[i].m_nIndex = i + 1;
+						break;
+					}
+				}
+
+				if (j >= g_data.m_dwBatteryBindCnt) {
+					if ( g_data.m_dwBatteryBindCnt < MAX_GRID_COUNT ) {
+						memcpy(&g_data.m_battery_binding[g_data.m_dwBatteryBindCnt], 
+							&bind, sizeof(BatteryBinding));
+						g_data.m_dwBatteryBindCnt++;
+					}
+				}
+			}
+		}
+#endif
 	}
 }
 
