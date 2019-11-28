@@ -335,7 +335,11 @@ void CBusiness::GetGridsCfg() {
 		}
 
 		strText.Format("%s %lu", CFG_GRID_MODE, i + 1);
+#if !TRI_TAGS_FLAG
 		dwValue = CModeButton::Mode_Hand;
+#else
+		dwValue = CModeButton::Mode_Multiple;
+#endif
 		g_data.m_cfg->GetConfig(strText, g_data.m_CfgData.m_GridCfg[i].m_dwGridMode, dwValue);
 		if (g_data.m_CfgData.m_GridCfg[i].m_dwGridMode > CModeButton::Mode_Multiple) {
 			g_data.m_CfgData.m_GridCfg[i].m_dwGridMode = CModeButton::Mode_Hand;
