@@ -28,6 +28,8 @@
 #define   MAX_GRID                  64
 #define   MAX_HAND_TAG_COUNT        10
 
+#define  TRI_TAG_FLAG               1
+
 typedef  struct  tagMyListItem {
 	BYTE        m_data[128];
 	DWORD       m_dwDataLen;

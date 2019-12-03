@@ -208,6 +208,7 @@ void  CBusiness::SendHandTemp(const CSendHandTempParam * pParam) {
 	BYTE   byIndex = (BYTE)pParam->m_dwIndex;
 	BYTE   bySend[128];
 	DWORD  dwDataLen = 32;
+#if !TRI_TAG_FLAG
 	memcpy(bySend, "\x55\x1E\x0B\x02\x00\x00\x00\x01\x34\x4C\x8C\x7E\xE3\x59\x02\xE0\x10\x5A\x00\x00\x00\x00\x2E\xF1\x79\xA4\x00\x01\x04\xE0\x00\xFF", dwDataLen);
 	memcpy(bySend + 8,  "\x01\x00\x00\x00\x00\x00\x30\xe1", 8);
 	bySend[8] += byIndex;
@@ -240,6 +241,21 @@ void  CBusiness::SendHandTemp(const CSendHandTempParam * pParam) {
 	DWORD dwTemp = m_arrHandTemp[byIndex];
 	bySend[16] = (BYTE)(dwTemp / 100);
 	bySend[17] = (BYTE)(dwTemp % 100);
+#else
+	dwDataLen = 29;
+	if (byIndex >= 3)
+		return;
+
+	memcpy(bySend, "\x55\x1A\x00\x06\x01\x45\x52\x00\x00\x03\x00\x00\x00\x00\x00\x01\x8F\x50\xD9\x93\xCD\x59\x02\xE0\x02\x07\x08\x05\xFF", dwDataLen);
+	bySend[3] = byIndex + 1;
+	DWORD  dwTemp = GetRand(3520, 3720);
+	bySend[24] = (BYTE)(dwTemp / 1000);
+	bySend[25] = ( dwTemp / 100 ) % 10;
+	bySend[26] = ( dwTemp / 10 ) % 10;
+	bySend[27] = dwTemp % 10;
+	bySend[16] = byIndex;
+#endif
+
 	m_serial_port.Write(bySend, dwDataLen);
 
 	BYTE * pNewData = new BYTE[dwDataLen];
