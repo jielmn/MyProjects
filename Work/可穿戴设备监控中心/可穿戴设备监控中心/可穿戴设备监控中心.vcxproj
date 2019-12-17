@@ -90,11 +90,12 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\LuaConfig\LuaConfig;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;Ws2_32.lib;LuaConfigD.lib;liblua.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;Ws2_32.lib;LuaConfigD.lib;liblua.dll.a;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\LuaConfig\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -157,13 +158,21 @@
   <ItemGroup>
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="DuiMenu.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyControls.cpp" />
+    <ClCompile Include="MyTreeCfgUI.cpp" />
+    <ClCompile Include="SettingDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="DuiMenu.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="MyControls.h" />
+    <ClInclude Include="MyTreeCfgUI.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SettingDlg.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="可穿戴设备监控中心.rc" />

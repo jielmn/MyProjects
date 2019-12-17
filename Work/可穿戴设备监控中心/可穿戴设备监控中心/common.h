@@ -9,6 +9,8 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 #include "LuaConfig.h"
+#include "UIlib.h"
+using namespace DuiLib;
 
 #define   PROJ_NAME               "wearable_monitor"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
@@ -23,12 +25,16 @@ public:
 	ILog    *                 m_log;
 	CLuaCfg *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
+	HWND                      m_hWnd;
+	int                       m_nComPort;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
 		m_thrd_db = 0;
+		m_hWnd = 0;
+		m_nComPort = 0;
 	}
 };
 

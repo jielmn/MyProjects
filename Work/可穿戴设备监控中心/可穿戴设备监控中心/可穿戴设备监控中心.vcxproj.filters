@@ -24,6 +24,18 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SettingDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DuiMenu.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTreeCfgUI.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyControls.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -36,6 +48,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SettingDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DuiMenu.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyTreeCfgUI.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyControls.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

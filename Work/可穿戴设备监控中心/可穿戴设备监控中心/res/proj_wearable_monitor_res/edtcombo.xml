@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	<HorizontalLayout>
+		<Combo name="cmb" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="2" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" />
+		<Edit name="edt" float="true" pos="2,2,100,28" font="2"  textcolor="#FF386382"  />
+	</HorizontalLayout>
+</Window>

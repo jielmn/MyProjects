@@ -9,6 +9,8 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include "SettingDlg.h"
+#include "DuiMenu.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
 
@@ -17,8 +19,18 @@ CDuiFrameWnd::CDuiFrameWnd() {
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
-
+   
 void  CDuiFrameWnd::InitWindow() {
+	g_data.m_hWnd = m_hWnd;
+	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+	m_layGrids = (DuiLib::CTileLayoutUI *)m_PaintManager.FindControl("layGrids");
+	m_layList = (DuiLib::CVerticalLayoutUI *)m_PaintManager.FindControl("layList");
+	m_btnExpand = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnExpand");
+	m_btnMenu = (DuiLib::CButtonUI *)m_PaintManager.FindControl("menubtn");
+
+	m_layList->SetVisible(false);
+	m_btnExpand->SetText("<"); 
+	m_btnExpand->SetTag(FALSE);
 	WindowImplBase::InitWindow();
 }
 
@@ -27,6 +39,17 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if (msg.sType == "click") {
+		if (msg.pSender->GetName() == "btnExpand") {
+			OnExpand();
+		}
+		else if (msg.pSender->GetName() == "menubtn") {
+			OnMainMenu(msg);
+		}
+	}
+	else if (msg.sType == "setting") {
+		OnSetting();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -34,13 +57,44 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
+void CDuiFrameWnd::OnExpand() {
+	BOOL  bExpanded = (BOOL)m_btnExpand->GetTag();
+	if (bExpanded) {
+		m_btnExpand->SetText("<");
+		m_layList->SetVisible(false);
+	}
+	else {
+		m_btnExpand->SetText(">");
+		m_layList->SetVisible(true);
+	}
+	m_btnExpand->SetTag(!bExpanded);
+}
 
+void  CDuiFrameWnd::OnMainMenu(TNotifyUI& msg) {
+	RECT r = m_btnMenu->GetPos();
+	POINT pt = { r.left, r.bottom };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE); 
+}
 
+void  CDuiFrameWnd::OnSetting() {
+	CSettingDlg * pSettingDlg = new CSettingDlg;
+	pSettingDlg->Create(this->m_hWnd, _T("ÉèÖÃ"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pSettingDlg->CenterWindow();
+	int ret = pSettingDlg->ShowModal();
+	if (0 == ret) {
+
+	}
+	delete pSettingDlg;
+}
 
 
 
 
    
+
+              
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,

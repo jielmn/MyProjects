@@ -2,9 +2,6 @@
 
 #include "common.h"
 
-#include "UIlib.h"
-using namespace DuiLib;
-
 #include "resource.h"
 
 class CDuiFrameWnd : public WindowImplBase
@@ -37,4 +34,15 @@ public:
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+private:	
+	DuiLib::CTileLayoutUI *                     m_layGrids;
+	DuiLib::CVerticalLayoutUI *                 m_layList;
+	DuiLib::CButtonUI *                         m_btnExpand;
+	// ²Ëµ¥°´Å¥
+	DuiLib::CButtonUI *                         m_btnMenu;
+
+private:
+	void  OnExpand();
+	void  OnMainMenu(TNotifyUI& msg);
+	void  OnSetting();
 };

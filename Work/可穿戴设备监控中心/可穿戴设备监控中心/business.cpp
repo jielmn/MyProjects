@@ -38,7 +38,7 @@ int CBusiness::Init() {
 	}
 
 #ifdef _DEBUG
-	g_data.m_log->Init(LOG_FILE_NAME);
+	g_data.m_log->Init(LOG_FILE_NAME); 
 #else
 	g_data.m_log->Init(LOG_FILE_NAME, 0, ILog::LOG_SEVERITY_INFO, TRUE);
 #endif
