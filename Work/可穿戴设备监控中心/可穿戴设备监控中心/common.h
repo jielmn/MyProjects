@@ -19,6 +19,12 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
+typedef struct tagWearableData {
+	int    nBeat;
+	int    nOxy;
+	int    nTemp;
+}WearableData;
+
 
 class  CGlobalData {
 public:

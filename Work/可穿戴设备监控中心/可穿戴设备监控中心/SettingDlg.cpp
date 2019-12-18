@@ -11,6 +11,11 @@ void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
 	if (msg.sType == "windowinit") {
 		OnMyInited();
 	}
+	else if (msg.sType == "click") {
+		if ( msg.pSender->GetName() == "btnOK") {
+			OnMyOk();
+		}
+	}
 	WindowImplBase::Notify(msg);                 
 }
 
@@ -52,5 +57,43 @@ DuiLib::CControlUI * CSettingDlg::CreateControl(LPCTSTR pstrClass) {
 		return new CMyTreeCfgUI(100); 
 	}
 	return WindowImplBase::CreateControl(pstrClass);
+}
+
+int   CSettingDlg::GetComPort(CDuiString strCom) {
+	char buf[256];
+	Str2Lower(strCom, buf, sizeof(buf));
+	int nComPort = 0;
+	int ret = sscanf(buf, "com%d", &nComPort);
+	if (ret == 1) {
+		return nComPort;
+	}
+	else {
+		return 0;
+	}
+}
+
+void  CSettingDlg::OnMyOk() {
+	CDuiString strComPort = m_comport->m_edt->GetText();
+	int nSel = m_comport->m_cmb->GetCurSel();
+	if ( nSel >= 0 ) {
+		CListLabelElementUI * pElement = (CListLabelElementUI *)m_comport->m_cmb->GetItemAt(nSel);
+		CDuiString strComPort_1 = pElement->GetText();
+		if ( strComPort_1 == strComPort ) {
+			m_nComPort = pElement->GetTag();
+		}
+		else {
+			m_nComPort = GetComPort(strComPort);
+		}
+	}
+	else {
+		m_nComPort = GetComPort(strComPort);
+	}
+
+	if (m_nComPort <= 0) {
+		MessageBox(GetHWND(), "串口格式不对", "错误", 0);
+		return;
+	}
+
+	PostMessage(WM_CLOSE);   
 }
 

@@ -40,9 +40,12 @@ private:
 	DuiLib::CButtonUI *                         m_btnExpand;
 	// ≤Àµ•∞¥≈•
 	DuiLib::CButtonUI *                         m_btnMenu;
+	// Grids Pages“≥
+	DuiLib::CHorizontalLayoutUI *               m_layGridsPages;
 
 private:
 	void  OnExpand();
 	void  OnMainMenu(TNotifyUI& msg);
 	void  OnSetting();
+	bool  OnGridsLayoutSize(void * pParam);
 };

@@ -24,5 +24,10 @@ private:
 
 private:
 	void  OnMyInited();
+	void  OnMyOk();
+	int   GetComPort(CDuiString strCom);
+
+public:
+	int                       m_nComPort;
 };
 

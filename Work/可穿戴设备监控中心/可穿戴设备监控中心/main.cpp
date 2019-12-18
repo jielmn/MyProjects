@@ -11,9 +11,17 @@
 #include "resource.h"
 #include "SettingDlg.h"
 #include "DuiMenu.h"
+#include "MyControls.h"
+
+#define   GRID_WIDTH      160
+#define   GRID_HEIGHT     160                                
 
 CDuiFrameWnd::CDuiFrameWnd() {
-
+	m_layGrids = 0;
+	m_layList = 0;
+	m_btnExpand = 0;
+	m_btnMenu = 0;
+	m_layGridsPages = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -27,10 +35,19 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layList = (DuiLib::CVerticalLayoutUI *)m_PaintManager.FindControl("layList");
 	m_btnExpand = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnExpand");
 	m_btnMenu = (DuiLib::CButtonUI *)m_PaintManager.FindControl("menubtn");
+	m_layGridsPages = (DuiLib::CHorizontalLayoutUI *)m_PaintManager.FindControl("layGridsPages");
 
 	m_layList->SetVisible(false);
 	m_btnExpand->SetText("<"); 
 	m_btnExpand->SetTag(FALSE);
+
+	for (int i = 0; i < 300; i++) {
+		CGridUI * p = new CGridUI;
+		m_layGrids->Add(p); 
+	}
+
+	m_layGrids->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsLayoutSize);
+
 	WindowImplBase::InitWindow();
 }
 
@@ -87,6 +104,30 @@ void  CDuiFrameWnd::OnSetting() {
 
 	}
 	delete pSettingDlg;
+}
+
+bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
+	RECT r = m_layGrids->GetPos();
+	int width = r.right - r.left;
+	int height = r.bottom - r.top;
+
+	int nColumns = width / GRID_WIDTH;
+	if (nColumns <= 0)
+		nColumns = 1;
+
+	int nRows = height / GRID_HEIGHT;
+	if (nRows <= 0)
+		nRows = 1;
+
+	m_layGrids->SetFixedColumns(nColumns); 
+
+	SIZE  s;
+	s.cx = width / nColumns;
+	s.cy = height / nRows;
+
+	m_layGrids->SetItemSize(s);
+
+	return true;   
 }
 
 

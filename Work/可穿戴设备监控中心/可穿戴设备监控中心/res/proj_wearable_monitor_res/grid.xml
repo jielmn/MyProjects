@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<VerticalLayout inset="6,6,6,6" bkcolor="#FF4AB20A" bordersize="6" bordercolor="#FF434248" name="main">	
+		<VerticalLayout inset="10,0,10,0">
+			<HorizontalLayout height="40">
+				<Label name="lblIndex" text="01" align="center" textcolor="#FFFFFFFF" font="2"  />
+			</HorizontalLayout>
+			
+			<HorizontalLayout inset="5,0,5,4" height="28">
+				<Control width="24" height="24" bkimage="heartbeat.png" />
+				<Control width="20" />
+				<Label name="lblBeat" textcolor="#FFFFFFFF" font="2" text="120" />					
+			</HorizontalLayout>
+			
+			<HorizontalLayout inset="5,0,5,4" height="28">
+				<Control width="24" height="24" bkimage="oxy.png" />
+				<Control width="20" />
+				<Label name="lblOxy"  textcolor="#FFFFFFFF" font="2" text="100" />				
+			</HorizontalLayout>
+			
+			<HorizontalLayout inset="5,0,5,4" height="28">
+				<Control width="24" height="24" bkimage="temp.png" />
+				<Control width="20" />
+				<Label name="lblTemp"  textcolor="#FFFFFFFF" font="2" text="36.8℃" />
+			</HorizontalLayout>			
+			
+			<HorizontalLayout inset="5,0,5,4" height="28">
+				<Control width="24" height="24" bkimage="device.png" />
+				<Control width="20" />
+				<Label name="lblNo"  textcolor="#FFFFFFFF" font="2" text="19" />
+			</HorizontalLayout>
+			
+		</VerticalLayout>		
+	</VerticalLayout>
+</Window>
