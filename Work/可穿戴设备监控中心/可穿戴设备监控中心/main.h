@@ -42,6 +42,7 @@ private:
 	DuiLib::CButtonUI *                         m_btnMenu;
 	// Grids PagesÒ³
 	DuiLib::CHorizontalLayoutUI *               m_layGridsPages;
+	DuiLib::CTabLayoutUI *                      m_tabs;
 
 private:
 	void  OnExpand();
@@ -52,4 +53,6 @@ private:
 	void  OnWarningPrepose();
 	void  OnRecycle();
 	void  OnAbout();
+	// Ë«»÷ÊÂ¼þ
+	void   OnDbClick(BOOL & bHandled);
 };

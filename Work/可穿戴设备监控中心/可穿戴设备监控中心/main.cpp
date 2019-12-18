@@ -23,6 +23,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_btnExpand = 0;
 	m_btnMenu = 0;
 	m_layGridsPages = 0;
+	m_tabs = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -37,6 +38,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnExpand = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnExpand");
 	m_btnMenu = (DuiLib::CButtonUI *)m_PaintManager.FindControl("menubtn");
 	m_layGridsPages = (DuiLib::CHorizontalLayoutUI *)m_PaintManager.FindControl("layGridsPages");
+	m_tabs = (DuiLib::CTabLayoutUI *)m_PaintManager.FindControl("switch");
 
 	m_layList->SetVisible(false);
 	m_btnExpand->SetText("<"); 
@@ -84,6 +86,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if (uMsg == WM_LBUTTONDBLCLK) {
+		BOOL bHandled = FALSE;
+		OnDbClick(bHandled);
+		if (bHandled)
+			return 0;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -171,6 +179,50 @@ void  CDuiFrameWnd::OnAbout() {
 	delete pAboutDlg;
 }
 
+// 双击事件
+void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
+	bHandled = FALSE;
+
+	POINT point;
+	GetCursorPos(&point);
+	::ScreenToClient(m_hWnd, &point);
+
+	// 没有点击到控件
+	CControlUI * pFindControl = m_PaintManager.FindSubControlByPoint(0, point);
+	if (0 == pFindControl) { 
+		return;
+	}
+	
+	DuiLib::CDuiString  clsName = pFindControl->GetClass();
+	// 如果双击一些按钮，滑动条类的，不处理
+	if (0 == strcmp(clsName, DUI_CTR_BUTTON)) {
+		return;
+	}
+	else if (0 == strcmp(clsName, DUI_CTR_OPTION)) {
+		return;
+	}
+	else if (0 == strcmp(clsName, DUI_CTR_SCROLLBAR)) {
+		return;
+	}
+
+	DuiLib::CDuiString  strName;
+	while (pFindControl) {
+		clsName = pFindControl->GetClass();
+		strName = pFindControl->GetName();
+		if ( clsName == "Grid" ) {
+			m_tabs->SelectItem(1);
+			bHandled = TRUE;
+			break;
+		}
+		else if (strName == "layCurve") {
+			m_tabs->SelectItem(0);
+			bHandled = TRUE;
+			break;
+		}
+		pFindControl = pFindControl->GetParent();
+	}
+}
+  
 
 
 
