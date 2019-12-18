@@ -156,6 +156,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="business.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="DuiMenu.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="SettingDlg.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="business.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="DuiMenu.h" />

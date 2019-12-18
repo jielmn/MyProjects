@@ -9,6 +9,8 @@ protected:
 	DuiLib::CControlUI * m_pOwner;
 	DWORD      m_dwParam0;
 	DWORD      m_dwParam1;
+	DuiLib::CDuiString  m_strCheckedImg;        // checkboxѡ�е�ͼƬ
+	std::vector<std::string>  m_CheckedItems;   // checked menu items
 
 public:
 	explicit CDuiMenu(LPCTSTR pszXMLPath, DuiLib::CControlUI * pOwner) : m_strXMLPath(pszXMLPath), m_pOwner(pOwner), m_dwParam0(0), m_dwParam1(0) {}
@@ -19,7 +21,8 @@ public:
 	virtual void       OnFinalMessage(HWND hWnd) { delete this; }
 
 	virtual LRESULT OnKillFocus(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-	void Init(HWND hWndParent, POINT ptPos);
+	void Init(HWND hWndParent, POINT ptPos, const char * szCheckImg = 0);
 	virtual void  Notify(DuiLib::TNotifyUI& msg);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	void  SetCheckedItem(const char * szItem);
 };

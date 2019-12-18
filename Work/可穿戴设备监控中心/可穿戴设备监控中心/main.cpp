@@ -12,6 +12,7 @@
 #include "SettingDlg.h"
 #include "DuiMenu.h"
 #include "MyControls.h"
+#include "AboutDlg.h"
 
 #define   GRID_WIDTH      160
 #define   GRID_HEIGHT     160                                
@@ -67,6 +68,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "setting") {
 		OnSetting();
 	}
+	else if (msg.sType == "historydata") {
+		OnCheckHistory();
+	}
+	else if (msg.sType == "warningprepose") {
+		OnWarningPrepose();		
+	}
+	else if (msg.sType == "recycle") {
+		OnRecycle();
+	}
+	else if (msg.sType == "about") {
+		OnAbout();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -91,8 +104,14 @@ void  CDuiFrameWnd::OnMainMenu(TNotifyUI& msg) {
 	RECT r = m_btnMenu->GetPos();
 	POINT pt = { r.left, r.bottom };
 	CDuiMenu *pMenu = new CDuiMenu(_T("menu.xml"), msg.pSender);
-	pMenu->Init(*this, pt);
-	pMenu->ShowWindow(TRUE); 
+	pMenu->Init(*this, pt, "checked.png");
+	if (g_data.m_bShowHistory)
+		pMenu->SetCheckedItem("historycheck");    
+	if (g_data.m_bWarningPrepose)
+		pMenu->SetCheckedItem("chwarningprepose");
+	if (g_data.m_bRecycle)
+		pMenu->SetCheckedItem("chrecycle");
+	pMenu->ShowWindow(TRUE);           
 }
 
 void  CDuiFrameWnd::OnSetting() {
@@ -127,7 +146,29 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 
 	m_layGrids->SetItemSize(s);
 
-	return true;   
+	return true;          
+}
+
+void  CDuiFrameWnd::OnCheckHistory() {
+	g_data.m_bShowHistory = !g_data.m_bShowHistory;
+}
+
+void  CDuiFrameWnd::OnWarningPrepose() {
+	g_data.m_bWarningPrepose = !g_data.m_bWarningPrepose;
+}
+
+void  CDuiFrameWnd::OnRecycle() {
+	g_data.m_bRecycle = !g_data.m_bRecycle;
+}
+
+void  CDuiFrameWnd::OnAbout() {
+	CAboutDlg * pAboutDlg = new CAboutDlg;
+
+	pAboutDlg->Create(this->m_hWnd, _T("¹ØÓÚ"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pAboutDlg->CenterWindow();
+	pAboutDlg->ShowModal();
+
+	delete pAboutDlg;
 }
 
 

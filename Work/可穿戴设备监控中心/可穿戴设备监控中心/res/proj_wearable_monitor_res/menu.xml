@@ -1,10 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window size="150,48">
+<Window size="150,120">
 <VerticalLayout bkimage="file='menu_bk.png' corner='30,8,8,8' mask='#FFFF0000' " hole="false" bkcolor="#FFCCCCCC">
     <List header="hidden" inset="1,1,1,1" itemhotimage="file='menu_hot_bk.png' corner='2,2,2,2'">
 	
         <ListContainerElement name="setting" height="22" inset="40,0,0,0">
             <Label text="设置" mouse="false"/>
+        </ListContainerElement>
+		
+		<ListContainerElement name="historydata" height="22" inset="0,0,0,0">
+			<HorizontalLayout>
+				<VerticalLayout width="40" inset="6,0,0,0">
+					<Control />
+					<Control width="12" height="12" name="historycheck" bkimage="" />
+					<Control />
+				</VerticalLayout>		
+				
+				<Label text="显示历史数据" mouse="false"/>
+			</HorizontalLayout>			
+        </ListContainerElement>
+		
+		<ListContainerElement name="warningprepose" height="22" inset="0,0,0,0">
+			<HorizontalLayout>
+				<VerticalLayout width="40" inset="6,0,0,0">
+					<Control />
+					<Control width="12" height="12" name="chwarningprepose" bkimage="" />
+					<Control />
+				</VerticalLayout>		
+				
+				<Label text="异常情况前置" mouse="false"/>
+			</HorizontalLayout>			
+        </ListContainerElement>
+		
+		<ListContainerElement name="recycle" height="22" inset="0,0,0,0">
+			<HorizontalLayout>
+				<VerticalLayout width="40" inset="6,0,0,0">
+					<Control />
+					<Control width="12" height="12" name="chrecycle" bkimage="" />
+					<Control />
+				</VerticalLayout>		
+				
+				<Label text="循环跳转一页" mouse="false"/>
+			</HorizontalLayout>			
         </ListContainerElement>
 		
         <ListContainerElement name="about" height="22" inset="40,0,0,0">

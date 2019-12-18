@@ -48,4 +48,8 @@ private:
 	void  OnMainMenu(TNotifyUI& msg);
 	void  OnSetting();
 	bool  OnGridsLayoutSize(void * pParam);
+	void  OnCheckHistory();
+	void  OnWarningPrepose();
+	void  OnRecycle();
+	void  OnAbout();
 };

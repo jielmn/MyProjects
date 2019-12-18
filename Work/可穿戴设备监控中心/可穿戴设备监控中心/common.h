@@ -19,6 +19,9 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
+#define   VERSION                     "1.0"
+#define   COMPILE_TIME                "2019-12-18 16:00"
+
 typedef struct tagWearableData {
 	int    nBeat;
 	int    nOxy;
@@ -33,6 +36,9 @@ public:
 	LmnToolkits::Thread *     m_thrd_db;
 	HWND                      m_hWnd;
 	int                       m_nComPort;
+	BOOL                      m_bShowHistory;
+	BOOL                      m_bWarningPrepose;
+	BOOL                      m_bRecycle;
 
 public:
 	CGlobalData() {
@@ -41,6 +47,9 @@ public:
 		m_thrd_db = 0;
 		m_hWnd = 0;
 		m_nComPort = 0;
+		m_bShowHistory = FALSE;
+		m_bWarningPrepose = TRUE;
+		m_bRecycle = FALSE;
 	}
 };
 
