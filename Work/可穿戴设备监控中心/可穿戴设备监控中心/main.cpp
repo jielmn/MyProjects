@@ -24,10 +24,16 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_btnMenu = 0;
 	m_layGridsPages = 0;
 	m_tabs = 0;
+	m_lstItems = 0;
+	m_edName = 0;
+	m_nEditingNameIndex = -1;
+	m_nCurPageFirstItemIndex = 0;
+	m_btnPrev = 0;
+	m_btnNext = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
-
+	ClearVector(m_data);
 }
   
 void  CDuiFrameWnd::InitWindow() {
@@ -39,14 +45,38 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnMenu = (DuiLib::CButtonUI *)m_PaintManager.FindControl("menubtn");
 	m_layGridsPages = (DuiLib::CHorizontalLayoutUI *)m_PaintManager.FindControl("layGridsPages");
 	m_tabs = (DuiLib::CTabLayoutUI *)m_PaintManager.FindControl("switch");
+	m_lstItems = (DuiLib::CListUI *)m_PaintManager.FindControl("lstItems");
+	m_edName = (DuiLib::CEditUI *)m_PaintManager.FindControl("edName");
+	m_btnPrev = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnPrevPage");
+	m_btnNext = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnNextPage");
 
 	m_layList->SetVisible(false);
-	m_btnExpand->SetText("<"); 
-	m_btnExpand->SetTag(FALSE);
+	m_btnExpand->SetText("<");   
+	m_btnExpand->SetTag(FALSE); 
 
-	for (int i = 0; i < 300; i++) {
-		CGridUI * p = new CGridUI;
-		m_layGrids->Add(p); 
+	for (int i = 0; i < 120; i++) {
+		CWearItem * p = new CWearItem;
+		SNPRINTF( p->m_szDeviceId, sizeof(p->m_szDeviceId), "%d", i + 1);
+		SNPRINTF( p->m_szName, sizeof(p->m_szName), "%d", i + 1);
+
+		DataItem * q = 0;
+
+		q = new DataItem;
+		q->nData = i + 1;
+		q->tTime = 0;
+		p->m_vHearbeat.push_back(q);
+
+		q = new DataItem;
+		q->nData = i + 100;
+		q->tTime = 0;
+		p->m_vOxy.push_back(q);
+
+		q = new DataItem;
+		q->nData = i + 1000;
+		q->tTime = 0;
+		p->m_vTemp.push_back(q);
+
+		m_data.push_back(p);
 	}
 
 	m_layGrids->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsLayoutSize);
@@ -81,6 +111,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "about") {
 		OnAbout();
+	}
+	else if (msg.sType == "killfocus" ) {
+		if (msg.pSender == m_edName) {
+			OnEdNameKillFocus();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -134,6 +169,7 @@ void  CDuiFrameWnd::OnSetting() {
 }
 
 bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
+	// 设置每个格子大小
 	RECT r = m_layGrids->GetPos();
 	int width = r.right - r.left;
 	int height = r.bottom - r.top;
@@ -154,7 +190,50 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 
 	m_layGrids->SetItemSize(s);
 
+	// 创建格子满足显示
+	m_layGrids->RemoveAll();
+	m_lstItems->RemoveAll();
+	
+	// 如果没有数据
+	if (m_data.size() == 0) {
+		m_nCurPageFirstItemIndex = 0;
+		return true;
+	}
+
+	// 每页多少格子
+	int nItemsCntPerPage = nRows * nColumns;
+	// 总页数
+	int nPagesCnt = ( m_data.size() - 1 ) / nItemsCntPerPage + 1;
+	// 计算当前页
+	int nCurPage = m_nCurPageFirstItemIndex / nItemsCntPerPage;
+	// 重新计算 m_nCurPageFirstItemIndex
+	m_nCurPageFirstItemIndex = nCurPage * nPagesCnt;
+
+	int nMaxItemIndex = (int)m_data.size() < (nCurPage + 1) * nItemsCntPerPage 
+		? m_data.size() : (nCurPage + 1) * nItemsCntPerPage;
+
+	for ( int i = m_nCurPageFirstItemIndex; i < nMaxItemIndex; i++ ) {
+		CGridUI * pGrid = new CGridUI;
+		m_layGrids->Add(pGrid);
+
+		CListTextElementUI * pListItem = new CListTextElementUI;
+		m_lstItems->Add(pListItem);
+	}
+
+	if (nCurPage > 0) {
+		m_btnPrev->SetEnabled(true);
+	}
+
+	if ( nCurPage < nPagesCnt - 1 ) {
+		m_btnNext->SetEnabled(true);
+	}
+
+	FillData();
 	return true;          
+}
+
+void  CDuiFrameWnd::FillData() {
+
 }
 
 void  CDuiFrameWnd::OnCheckHistory() {
@@ -219,8 +298,46 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 			bHandled = TRUE;
 			break;
 		}
+		else if (clsName == "ListTextElement") {
+			if (pFindControl->GetParent()->GetParent()->GetName() == "lstItems") {
+				POINT cursor_point;
+				GetCursorPos(&cursor_point);
+				::ScreenToClient(m_hWnd, &cursor_point);
+
+				CListHeaderUI * header = m_lstItems->GetHeader();
+				CControlUI * colName = header->GetItemAt(1);
+				CListTextElementUI * pListItem = (CListTextElementUI *)pFindControl;
+				
+				RECT rcName  = colName->GetPos();
+				// 如果点击了名字列
+				if ( cursor_point.x >= rcName.left && cursor_point.x <= rcName.right ) {					
+					RECT rcFindCtl = pFindControl->GetPos();
+					RECT rcList = m_lstItems->GetPos();
+					RECT rcNew = { rcName.left - rcList.left, rcFindCtl.top - rcList.top, 
+						rcName.right - rcList.left, rcFindCtl.bottom - rcList.top };
+
+					m_edName->SetVisible(true);
+					m_edName->SetPos(rcNew); 
+					m_edName->SetFocus();   
+					m_edName->SetText(pListItem->GetText(1));
+					m_nEditingNameIndex = pListItem->GetIndex();
+				}
+			}
+		}
 		pFindControl = pFindControl->GetParent();
 	}
+}
+
+void  CDuiFrameWnd::OnEdNameKillFocus() {
+	if (m_nEditingNameIndex >= 0) {
+		CListTextElementUI * pListItem = (CListTextElementUI *)m_lstItems->GetItemAt(m_nEditingNameIndex);
+		if ( pListItem ) {
+			pListItem->SetText(1, m_edName->GetText());
+		}		
+	}
+
+	m_nEditingNameIndex = -1;
+	m_edName->SetVisible(false);   
 }
   
 

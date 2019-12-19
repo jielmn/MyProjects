@@ -35,11 +35,26 @@ public:
 	DuiLib::CPaintManagerUI *  m_pManager;
 };
 
-typedef struct tagWearableData {
-	int    nBeat;
-	int    nOxy;
-	int    nTemp;
-}WearableData;
+#define  MAX_DEVICE_ID_LEN  20
+#define  MAX_NAME_LEN       20
+
+typedef  struct  tagDataItem {
+	int     nData;
+	time_t  tTime;
+}DataItem;
+
+class CWearItem {
+public:
+	char  m_szDeviceId[MAX_DEVICE_ID_LEN];
+	char  m_szName[MAX_NAME_LEN];
+	std::vector<DataItem *>   m_vHearbeat;    // ÐÄÂÊ
+	std::vector<DataItem *>   m_vOxy;         // ÑªÑõ
+	std::vector<DataItem *>   m_vTemp;        // ÌåÎÂ
+
+public:
+	CWearItem();
+	~CWearItem();
+};
 
 
 class  CGlobalData {

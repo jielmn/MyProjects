@@ -10,3 +10,14 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	}
 	return NULL;
 }
+
+CWearItem::CWearItem() {
+	memset(m_szDeviceId, 0, sizeof(m_szDeviceId));
+	memset(m_szName, 0, sizeof(m_szName));
+}
+
+CWearItem::~CWearItem() {
+	ClearVector(m_vHearbeat);
+	ClearVector(m_vOxy);
+	ClearVector(m_vTemp);
+}

@@ -43,6 +43,15 @@ private:
 	// Grids Pages页
 	DuiLib::CHorizontalLayoutUI *               m_layGridsPages;
 	DuiLib::CTabLayoutUI *                      m_tabs;
+	DuiLib::CListUI *                           m_lstItems;
+	DuiLib::CEditUI *                           m_edName;
+	int                                         m_nEditingNameIndex; // 正在编辑的列表的姓名的index
+	CButtonUI *                                 m_btnPrev;
+	CButtonUI *                                 m_btnNext;
+
+private:
+	std::vector<CWearItem *>                    m_data;
+	int                                         m_nCurPageFirstItemIndex;   // 当前页的第一项的index
 
 private:
 	void  OnExpand();
@@ -54,5 +63,7 @@ private:
 	void  OnRecycle();
 	void  OnAbout();
 	// 双击事件
-	void   OnDbClick(BOOL & bHandled);
+	void  OnDbClick(BOOL & bHandled);
+	void  OnEdNameKillFocus();
+	void  FillData();
 };

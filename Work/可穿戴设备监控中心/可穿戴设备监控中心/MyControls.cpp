@@ -50,7 +50,16 @@ void CEdtComboUI::Notify(TNotifyUI& msg) {
 
 
 CGridUI::CGridUI() : m_callback(m_pManager) {
+	m_cstName = 0;
+	m_lblHeartBeat = 0;
+	m_lblOxy = 0;
+	m_lblTemp = 0;
+	m_lblDeviceId = 0;
 
+	m_nIndex = 0;
+	m_nHeartBeat = 0;
+	m_nOxy = 0;
+	m_nTemp = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -72,8 +81,123 @@ void CGridUI::DoInit() {
 		this->RemoveAll();
 		return;
 	}
+
+	m_cstName = (CEdtComboUI *)m_pManager->FindControl("cstEdtBtnName");
+	m_lblHeartBeat = (CLabelUI *)m_pManager->FindControl("lblBeat");
+	m_lblOxy = (CLabelUI *)m_pManager->FindControl("lblOxy");
+	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp");
+	m_lblDeviceId = (CLabelUI *)m_pManager->FindControl("lblDeviceId");
+	m_lblIndex = (CLabelUI *)m_pManager->FindControl("lblIndex");
+
+	SetIndex();
+	SetUserName();
+	SetHeartBeat();
+	SetOxy();
+	SetTemp();
+	SetDeviceId();
 }
 
 void CGridUI::Notify(TNotifyUI& msg) {
 
+}
+
+void CGridUI::SetIndex(int nIndex) {
+	m_nIndex = nIndex;
+	SetIndex();
+}
+
+void CGridUI::SetIndex() {
+	if (m_bInitiated) {
+		CDuiString strText;
+		if ( m_nIndex > 0 )
+			strText.Format("%d", m_nIndex);
+		m_lblIndex->SetText(strText);
+	}
+}
+
+int  CGridUI::GetIndex() {
+	return m_nIndex;
+}
+
+void CGridUI::SetUserName(CDuiString strName) {
+	m_strName = strName;
+}
+
+void CGridUI::SetUserName() {
+	if (m_bInitiated) {
+		m_cstName->SetText(m_strName);
+	}
+}
+
+CDuiString  CGridUI::GetUserName() {
+	return m_strName;
+}
+
+void CGridUI::SetHeartBeat(int nHeartBeat) {
+	m_nHeartBeat = nHeartBeat;
+	SetHeartBeat();
+}
+
+void CGridUI::SetHeartBeat() {
+	if (m_bInitiated) {
+		CDuiString strText;
+		if (m_nHeartBeat > 0)
+			strText.Format("%d", m_nHeartBeat);
+		m_lblHeartBeat->SetText(strText);
+	}
+}
+
+int  CGridUI::GetHeartBeat() {
+	return m_nHeartBeat;
+}
+
+void CGridUI::SetOxy(int nOxy) {
+	m_nOxy = nOxy;
+	SetOxy();
+}
+
+void CGridUI::SetOxy() {
+	if (m_bInitiated) {
+		CDuiString strText;
+		if (m_nOxy > 0)
+			strText.Format("%d", m_nOxy);
+		m_lblOxy->SetText(strText);
+	}
+}
+
+int  CGridUI::GetOxy() {
+	return m_nOxy;
+}
+
+void CGridUI::SetTemp(int nTemp) {
+	m_nTemp = nTemp;
+	SetTemp();
+}
+
+void CGridUI::SetTemp() {
+	if (m_bInitiated) {
+		CDuiString strText;
+		if (m_nTemp > 0)
+			strText.Format("%d", m_nTemp);
+		m_lblTemp->SetText(strText);
+	}
+}
+
+int  CGridUI::GetTemp() {
+	return m_nTemp;
+}
+
+void CGridUI::SetDeviceId(CDuiString strId) {
+	m_strDeviceId = strId;
+	SetDeviceId();
+}
+
+void CGridUI::SetDeviceId() {
+	if (m_bInitiated) {
+		m_lblDeviceId->SetText(m_strDeviceId);
+	}
+}
+
+CDuiString  CGridUI::GetDeviceId() {
+	return m_strDeviceId;
 }
