@@ -22,6 +22,19 @@ using namespace DuiLib;
 #define   VERSION                     "1.0"
 #define   COMPILE_TIME                "2019-12-18 16:00"
 
+// 创建duilib控件的回调
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+
+public:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
+
 typedef struct tagWearableData {
 	int    nBeat;
 	int    nOxy;

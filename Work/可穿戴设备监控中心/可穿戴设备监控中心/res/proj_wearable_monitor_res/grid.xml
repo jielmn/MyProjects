@@ -2,8 +2,14 @@
 <Window>	
 	<VerticalLayout inset="6,6,6,6" bkcolor="#FF4AB20A" bordersize="6" bordercolor="#FF434248" name="main">	
 		<VerticalLayout inset="10,0,10,0">
-			<HorizontalLayout height="40">
+			<HorizontalLayout height="30">
 				<Label name="lblIndex" text="01" align="center" textcolor="#FFFFFFFF" font="2"  />
+			</HorizontalLayout>
+			
+			<HorizontalLayout inset="5,0,5,4" height="28">
+				<Control width="24" height="24" bkimage="user.png" />
+				<Control width="16" />
+				<EditableButton name="cstEdtBtnName" width="80" btncolor="#FFFFFFFF" btnfont="2" editfont="2" hotimage="file='btn_hot.png' corner='2,8,2,2'" />					
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="5,0,5,4" height="28">

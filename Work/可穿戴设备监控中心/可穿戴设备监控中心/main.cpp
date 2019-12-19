@@ -15,7 +15,7 @@
 #include "AboutDlg.h"
 
 #define   GRID_WIDTH      160
-#define   GRID_HEIGHT     160                                
+#define   GRID_HEIGHT     180                                  
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_layGrids = 0;
@@ -29,7 +29,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
-   
+  
 void  CDuiFrameWnd::InitWindow() {
 	g_data.m_hWnd = m_hWnd;
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);

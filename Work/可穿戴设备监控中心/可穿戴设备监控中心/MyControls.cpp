@@ -49,7 +49,7 @@ void CEdtComboUI::Notify(TNotifyUI& msg) {
 }
 
 
-CGridUI::CGridUI() {
+CGridUI::CGridUI() : m_callback(m_pManager) {
 
 }
 
@@ -63,10 +63,10 @@ LPCTSTR CGridUI::GetClass() const {
 
 void CGridUI::DoInit() {
 	CDialogBuilder builder;
-	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create("grid.xml", (UINT)0, 0, m_pManager));
+	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create("grid.xml", (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
-		m_pManager->AddNotifier(this);
+		m_pManager->AddNotifier(this);       
 	}
 	else {
 		this->RemoveAll();

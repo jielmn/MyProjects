@@ -26,4 +26,7 @@ private:
 	LPCTSTR GetClass() const;
 	void DoInit();
 	void Notify(TNotifyUI& msg);
+
+private:
+	CDialogBuilderCallbackEx                    m_callback;
 };
