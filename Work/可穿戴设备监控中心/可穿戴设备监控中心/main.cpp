@@ -264,13 +264,29 @@ void  CDuiFrameWnd::FillData() {
 
 		pGrid->SetIndex(m_nCurPageFirstItemIndex + i + 1);
 		pGrid->SetUserName(pItem->m_szName);
-		pGrid->SetDeviceId(pItem->m_szDeviceId);
+		pGrid->SetDeviceId(pItem->m_szDeviceId);		
 
 		CDuiString strText;
 		strText.Format("%d", m_nCurPageFirstItemIndex + i + 1);
 		pListItem->SetText(0, strText);
 		pListItem->SetText(1, pItem->m_szName);
 		pListItem->SetText(5, pItem->m_szDeviceId);       
+
+		if (pItem->m_vHearbeat.size() > 0) {
+			pGrid->SetHeartBeat(pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
+			strText.Format("%d", pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
+			pListItem->SetText(2, strText);
+		}
+		if (pItem->m_vOxy.size() > 0) {
+			pGrid->SetOxy(pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
+			strText.Format("%d", pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
+			pListItem->SetText(3, strText);
+		}
+		if (pItem->m_vTemp.size() > 0) {
+			pGrid->SetTemp(pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData);
+			strText.Format("%.2f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
+			pListItem->SetText(4, strText);
+		}
 	}
 }
 

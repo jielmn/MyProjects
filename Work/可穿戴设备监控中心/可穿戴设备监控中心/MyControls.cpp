@@ -179,7 +179,7 @@ void CGridUI::SetTemp() {
 	if (m_bInitiated) {
 		CDuiString strText;
 		if (m_nTemp > 0)
-			strText.Format("%d", m_nTemp);
+			strText.Format("%.2f", m_nTemp / 100.0f );
 		m_lblTemp->SetText(strText);
 	}
 }
