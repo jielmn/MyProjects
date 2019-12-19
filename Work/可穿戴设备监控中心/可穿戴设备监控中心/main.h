@@ -52,6 +52,8 @@ private:
 private:
 	std::vector<CWearItem *>                    m_data;
 	int                                         m_nCurPageFirstItemIndex;   // 当前页的第一项的index
+	int                                         m_nItemsPerPage;
+	RECT                                        m_rcLayGrids;
 
 private:
 	void  OnExpand();
@@ -66,4 +68,6 @@ private:
 	void  OnDbClick(BOOL & bHandled);
 	void  OnEdNameKillFocus();
 	void  FillData();
+	void  OnPrevPage();
+	void  OnNextPage();
 };

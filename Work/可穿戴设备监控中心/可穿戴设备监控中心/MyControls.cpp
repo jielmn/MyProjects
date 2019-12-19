@@ -121,6 +121,7 @@ int  CGridUI::GetIndex() {
 
 void CGridUI::SetUserName(CDuiString strName) {
 	m_strName = strName;
+	SetUserName();
 }
 
 void CGridUI::SetUserName() {

@@ -30,6 +30,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_nCurPageFirstItemIndex = 0;
 	m_btnPrev = 0;
 	m_btnNext = 0;
+	m_nItemsPerPage = 0;
+	memset(&m_rcLayGrids, 0, sizeof(m_rcLayGrids));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -95,6 +97,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (msg.pSender->GetName() == "menubtn") {
 			OnMainMenu(msg);
+		}
+		else if (msg.pSender->GetName() == "btnPrevPage") {
+			OnPrevPage();
+		}
+		else if (msg.pSender->GetName() == "btnNextPage") {
+			OnNextPage();
 		}
 	}
 	else if (msg.sType == "setting") {
@@ -174,6 +182,13 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	int width = r.right - r.left;
 	int height = r.bottom - r.top;
 
+	if ( (width == m_rcLayGrids.right - m_rcLayGrids.left )
+		&& (height == m_rcLayGrids.bottom - m_rcLayGrids.top) ) {
+		return true;
+	}
+
+	memcpy(&m_rcLayGrids, &r, sizeof(RECT));
+
 	int nColumns = width / GRID_WIDTH;
 	if (nColumns <= 0)
 		nColumns = 1;
@@ -201,16 +216,16 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	}
 
 	// 每页多少格子
-	int nItemsCntPerPage = nRows * nColumns;
+	m_nItemsPerPage = nRows * nColumns;
 	// 总页数
-	int nPagesCnt = ( m_data.size() - 1 ) / nItemsCntPerPage + 1;
+	int nPagesCnt = ( m_data.size() - 1 ) / m_nItemsPerPage + 1;
 	// 计算当前页
-	int nCurPage = m_nCurPageFirstItemIndex / nItemsCntPerPage;
+	int nCurPage = m_nCurPageFirstItemIndex / m_nItemsPerPage;
 	// 重新计算 m_nCurPageFirstItemIndex
-	m_nCurPageFirstItemIndex = nCurPage * nPagesCnt;
+	m_nCurPageFirstItemIndex = nCurPage * m_nItemsPerPage;
 
-	int nMaxItemIndex = (int)m_data.size() < (nCurPage + 1) * nItemsCntPerPage 
-		? m_data.size() : (nCurPage + 1) * nItemsCntPerPage;
+	int nMaxItemIndex = (int)m_data.size() < m_nCurPageFirstItemIndex + m_nItemsPerPage
+		? m_data.size() : m_nCurPageFirstItemIndex + m_nItemsPerPage;
 
 	for ( int i = m_nCurPageFirstItemIndex; i < nMaxItemIndex; i++ ) {
 		CGridUI * pGrid = new CGridUI;
@@ -223,9 +238,15 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	if (nCurPage > 0) {
 		m_btnPrev->SetEnabled(true);
 	}
+	else {
+		m_btnPrev->SetEnabled(false);
+	}
 
 	if ( nCurPage < nPagesCnt - 1 ) {
 		m_btnNext->SetEnabled(true);
+	}
+	else {
+		m_btnNext->SetEnabled(false);
 	}
 
 	FillData();
@@ -233,7 +254,70 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 }
 
 void  CDuiFrameWnd::FillData() {
+	int nItemCnt = m_layGrids->GetCount();
+	assert(m_nCurPageFirstItemIndex + nItemCnt <= (int)m_data.size());
 
+	for ( int i = 0; i < nItemCnt; i++ ) {
+		CWearItem * pItem = m_data[m_nCurPageFirstItemIndex + i];
+		CGridUI * pGrid = (CGridUI *)m_layGrids->GetItemAt(i);
+		CListTextElementUI * pListItem = (CListTextElementUI *)m_lstItems->GetItemAt(i);
+
+		pGrid->SetIndex(m_nCurPageFirstItemIndex + i + 1);
+		pGrid->SetUserName(pItem->m_szName);
+		pGrid->SetDeviceId(pItem->m_szDeviceId);
+
+		CDuiString strText;
+		strText.Format("%d", m_nCurPageFirstItemIndex + i + 1);
+		pListItem->SetText(0, strText);
+		pListItem->SetText(1, pItem->m_szName);
+		pListItem->SetText(5, pItem->m_szDeviceId);       
+	}
+}
+
+void  CDuiFrameWnd::OnPrevPage() {
+	assert(m_nItemsPerPage > 0);
+	m_nCurPageFirstItemIndex -= m_nItemsPerPage;
+	assert(m_nCurPageFirstItemIndex >= 0);	
+
+	int nItemsCnt = m_layGrids->GetCount();
+	// 如果格子数不够
+	for (int i = nItemsCnt; i < m_nItemsPerPage; i++) {
+		CGridUI * pGrid = new CGridUI;
+		m_layGrids->Add(pGrid);
+
+		CListTextElementUI * pListItem = new CListTextElementUI;
+		m_lstItems->Add(pListItem);
+	}
+
+	if ( m_nCurPageFirstItemIndex == 0 ) {
+		m_btnPrev->SetEnabled(false);
+	}
+
+	m_btnNext->SetEnabled(true);
+
+	FillData();
+}
+
+void  CDuiFrameWnd::OnNextPage() {
+	assert(m_nItemsPerPage > 0);
+	m_nCurPageFirstItemIndex += m_nItemsPerPage;
+	assert(m_nCurPageFirstItemIndex < (int)m_data.size());
+
+	// 如果是最后一页
+	if ( m_nCurPageFirstItemIndex + m_nItemsPerPage >= (int)m_data.size() ) {
+		int nLeft = (int)m_data.size() - m_nCurPageFirstItemIndex;
+		int nItemsCnt = m_layGrids->GetCount();
+
+		for ( int i = nLeft; i < nItemsCnt; i++ ) {
+			m_layGrids->RemoveAt(0);
+			m_lstItems->RemoveAt(0);
+		}
+
+		m_btnNext->SetEnabled(false);
+	}
+	m_btnPrev->SetEnabled(true);
+
+	FillData();
 }
 
 void  CDuiFrameWnd::OnCheckHistory() {
