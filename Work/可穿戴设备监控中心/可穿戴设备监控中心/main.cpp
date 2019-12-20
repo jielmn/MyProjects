@@ -79,6 +79,9 @@ void  CDuiFrameWnd::InitWindow() {
 		p->m_vTemp.push_back(q);
 
 		m_data.push_back(p);
+
+		CListTextElementUI * pListItem = new CListTextElementUI;
+		m_lstItems->Add(pListItem); 
 	}
 
 	m_layGrids->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsLayoutSize);
@@ -207,7 +210,6 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 
 	// 创建格子满足显示
 	m_layGrids->RemoveAll();
-	m_lstItems->RemoveAll();
 	
 	// 如果没有数据
 	if (m_data.size() == 0) {
@@ -230,9 +232,6 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	for ( int i = m_nCurPageFirstItemIndex; i < nMaxItemIndex; i++ ) {
 		CGridUI * pGrid = new CGridUI;
 		m_layGrids->Add(pGrid);
-
-		CListTextElementUI * pListItem = new CListTextElementUI;
-		m_lstItems->Add(pListItem);
 	}
 
 	if (nCurPage > 0) {
@@ -264,42 +263,27 @@ void  CDuiFrameWnd::FillData() {
 
 		pGrid->SetIndex(m_nCurPageFirstItemIndex + i + 1);
 		pGrid->SetUserName(pItem->m_szName);
-		pGrid->SetDeviceId(pItem->m_szDeviceId);		
-
-		CDuiString strText;
-		strText.Format("%d", m_nCurPageFirstItemIndex + i + 1);
-		pListItem->SetText(0, strText);
-		pListItem->SetText(1, pItem->m_szName);
-		pListItem->SetText(5, pItem->m_szDeviceId);       
+		pGrid->SetDeviceId(pItem->m_szDeviceId);		      
 
 		if (pItem->m_vHearbeat.size() > 0) {
 			pGrid->SetHeartBeat(pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
-			strText.Format("%d", pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
-			pListItem->SetText(2, strText);
 		}
 		else {
 			pGrid->SetHeartBeat(0);
-			pListItem->SetText(2, "");
 		}
 
 		if (pItem->m_vOxy.size() > 0) {
 			pGrid->SetOxy(pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
-			strText.Format("%d", pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
-			pListItem->SetText(3, strText);
 		}
 		else {
 			pGrid->SetOxy(0);
-			pListItem->SetText(3, "");
 		}
 
 		if (pItem->m_vTemp.size() > 0) {
 			pGrid->SetTemp(pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData);
-			strText.Format("%.2f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
-			pListItem->SetText(4, strText);
 		}
 		else {
-			pGrid->SetTemp(0);
-			pListItem->SetText(4, "");
+			pGrid->SetTemp(0); 
 		}
 
 	}

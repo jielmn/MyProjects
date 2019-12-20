@@ -67,6 +67,7 @@ private:
 	// 双击事件
 	void  OnDbClick(BOOL & bHandled);
 	void  OnEdNameKillFocus();
+	// 更新grids数据
 	void  FillData();
 	void  OnPrevPage();
 	void  OnNextPage();
