@@ -277,16 +277,31 @@ void  CDuiFrameWnd::FillData() {
 			strText.Format("%d", pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
 			pListItem->SetText(2, strText);
 		}
+		else {
+			pGrid->SetHeartBeat(0);
+			pListItem->SetText(2, "");
+		}
+
 		if (pItem->m_vOxy.size() > 0) {
 			pGrid->SetOxy(pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
 			strText.Format("%d", pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
 			pListItem->SetText(3, strText);
 		}
+		else {
+			pGrid->SetOxy(0);
+			pListItem->SetText(3, "");
+		}
+
 		if (pItem->m_vTemp.size() > 0) {
 			pGrid->SetTemp(pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData);
 			strText.Format("%.2f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
 			pListItem->SetText(4, strText);
 		}
+		else {
+			pGrid->SetTemp(0);
+			pListItem->SetText(4, "");
+		}
+
 	}
 }
 
