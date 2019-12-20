@@ -79,12 +79,10 @@ void  CDuiFrameWnd::InitWindow() {
 		p->m_vTemp.push_back(q);
 
 		m_data.push_back(p);
-
-		CListTextElementUI * pListItem = new CListTextElementUI;
-		m_lstItems->Add(pListItem); 
 	}
 
 	m_layGrids->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsLayoutSize);
+	UpdateList();
 
 	WindowImplBase::InitWindow();
 }
@@ -207,9 +205,6 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	s.cy = height / nRows;
 
 	m_layGrids->SetItemSize(s);
-
-	// 创建格子满足显示
-	m_layGrids->RemoveAll();
 	
 	// 如果没有数据
 	if (m_data.size() == 0) {
@@ -226,14 +221,6 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	// 重新计算 m_nCurPageFirstItemIndex
 	m_nCurPageFirstItemIndex = nCurPage * m_nItemsPerPage;
 
-	int nMaxItemIndex = (int)m_data.size() < m_nCurPageFirstItemIndex + m_nItemsPerPage
-		? m_data.size() : m_nCurPageFirstItemIndex + m_nItemsPerPage;
-
-	for ( int i = m_nCurPageFirstItemIndex; i < nMaxItemIndex; i++ ) {
-		CGridUI * pGrid = new CGridUI;
-		m_layGrids->Add(pGrid);
-	}
-
 	if (nCurPage > 0) {
 		m_btnPrev->SetEnabled(true);
 	}
@@ -248,43 +235,40 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 		m_btnNext->SetEnabled(false);
 	}
 
-	FillData();
+	UpdateGrids();
 	return true;          
 }
 
-void  CDuiFrameWnd::FillData() {
-	int nItemCnt = m_layGrids->GetCount();
-	assert(m_nCurPageFirstItemIndex + nItemCnt <= (int)m_data.size());
+void  CDuiFrameWnd::UpdateGrids() {
 
-	for ( int i = 0; i < nItemCnt; i++ ) {
+	int nCurPageItemsCnt = (int)m_data.size() < m_nCurPageFirstItemIndex + m_nItemsPerPage
+		? (m_data.size() - m_nCurPageFirstItemIndex) : m_nItemsPerPage;
+
+	int nItemCnt = m_layGrids->GetCount();
+
+	// 如果实际的items过多
+	if ( nItemCnt > nCurPageItemsCnt ) {
+		for ( int i = 0; i < (nItemCnt - nCurPageItemsCnt); i++ ) {
+			m_layGrids->RemoveAt(0);
+		}
+	}
+	// 如果实际的items比需要的少
+	else {
+		for ( int i = 0; i < (nCurPageItemsCnt - nItemCnt); i++ ) {
+			CGridUI * pGrid = new CGridUI;
+			m_layGrids->Add(pGrid);
+		}
+	}
+
+	for ( int i = 0; i < nCurPageItemsCnt; i++ ) {
 		CWearItem * pItem = m_data[m_nCurPageFirstItemIndex + i];
 		CGridUI * pGrid = (CGridUI *)m_layGrids->GetItemAt(i);
-		CListTextElementUI * pListItem = (CListTextElementUI *)m_lstItems->GetItemAt(i);
 
 		pGrid->SetIndex(m_nCurPageFirstItemIndex + i + 1);
 		pGrid->SetUserName(pItem->m_szName);
 		pGrid->SetDeviceId(pItem->m_szDeviceId);		      
-
-		if (pItem->m_vHearbeat.size() > 0) {
-			pGrid->SetHeartBeat(pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
-		}
-		else {
-			pGrid->SetHeartBeat(0);
-		}
-
-		if (pItem->m_vOxy.size() > 0) {
-			pGrid->SetOxy(pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
-		}
-		else {
-			pGrid->SetOxy(0);
-		}
-
-		if (pItem->m_vTemp.size() > 0) {
-			pGrid->SetTemp(pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData);
-		}
-		else {
-			pGrid->SetTemp(0); 
-		}
+		pGrid->SetHeartBeat(pItem);
+		pGrid->SetOxy(pItem);		
 
 	}
 }
@@ -294,23 +278,12 @@ void  CDuiFrameWnd::OnPrevPage() {
 	m_nCurPageFirstItemIndex -= m_nItemsPerPage;
 	assert(m_nCurPageFirstItemIndex >= 0);	
 
-	int nItemsCnt = m_layGrids->GetCount();
-	// 如果格子数不够
-	for (int i = nItemsCnt; i < m_nItemsPerPage; i++) {
-		CGridUI * pGrid = new CGridUI;
-		m_layGrids->Add(pGrid);
-
-		CListTextElementUI * pListItem = new CListTextElementUI;
-		m_lstItems->Add(pListItem);
-	}
-
 	if ( m_nCurPageFirstItemIndex == 0 ) {
 		m_btnPrev->SetEnabled(false);
 	}
-
 	m_btnNext->SetEnabled(true);
 
-	FillData();
+	UpdateGrids();
 }
 
 void  CDuiFrameWnd::OnNextPage() {
@@ -320,19 +293,70 @@ void  CDuiFrameWnd::OnNextPage() {
 
 	// 如果是最后一页
 	if ( m_nCurPageFirstItemIndex + m_nItemsPerPage >= (int)m_data.size() ) {
-		int nLeft = (int)m_data.size() - m_nCurPageFirstItemIndex;
-		int nItemsCnt = m_layGrids->GetCount();
-
-		for ( int i = nLeft; i < nItemsCnt; i++ ) {
-			m_layGrids->RemoveAt(0);
-			m_lstItems->RemoveAt(0);
-		}
-
 		m_btnNext->SetEnabled(false);
 	}
 	m_btnPrev->SetEnabled(true);
 
-	FillData();
+	UpdateGrids();
+}
+
+CDuiString  CDuiFrameWnd::GetHeartBeatStr(CWearItem * pItem) {
+	CDuiString  strText;
+	if (pItem->m_vHearbeat.size() > 0) {
+		strText.Format("%d", pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
+	}
+	return strText;
+}
+
+CDuiString  CDuiFrameWnd::GetOxyStr(CWearItem * pItem) {
+	CDuiString  strText;
+	if (pItem->m_vOxy.size() > 0) {
+		strText.Format("%d", pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
+	}
+	return strText;
+}
+
+CDuiString  CDuiFrameWnd::GetTempStr(CWearItem * pItem) {
+	CDuiString  strText;
+	if (pItem->m_vTemp.size() > 0) {
+		strText.Format("%.2f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
+	}
+	return strText;
+}
+
+// 更新List
+void  CDuiFrameWnd::UpdateList() {
+	std::vector<CWearItem *>::iterator it;
+	int nItemsCnt = m_lstItems->GetCount();
+	int nSize = m_data.size();
+
+	// 如果list items的个数不够
+	if ( nSize > nItemsCnt ) {
+		for ( int i = 0; i < nSize - nItemsCnt; i++ ) {
+			CListTextElementUI * pListItem = new CListTextElementUI;
+			m_lstItems->Add(pListItem);
+		}
+	}
+	// 如果list items的个数过多
+	else {
+		for (int i = 0; i < nItemsCnt - nSize; i++) {
+			m_lstItems->RemoveAt(0);
+		}
+	}
+
+	CDuiString strText;
+	for (int i = 0; i < nSize; i++) {
+		CWearItem * pItem = m_data[i];
+		CListTextElementUI * pListItem = (CListTextElementUI *)m_lstItems->GetItemAt(i);
+
+		strText.Format("%d", i + 1);
+		pListItem->SetText(0, strText);
+		pListItem->SetText(1, pItem->m_szName);
+		pListItem->SetText(2, GetHeartBeatStr(pItem));
+		pListItem->SetText(3, GetOxyStr(pItem));
+		pListItem->SetText(4, GetTempStr(pItem));
+		pListItem->SetText(5, pItem->m_szDeviceId);
+	}
 }
 
 void  CDuiFrameWnd::OnCheckHistory() {

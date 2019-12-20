@@ -29,12 +29,15 @@ public:
 	CDuiString  GetUserName();
 
 	void SetHeartBeat(int nHeartBeat);
+	void SetHeartBeat(CWearItem * pItem);
 	int  GetHeartBeat();
 
 	void SetOxy(int nOxy);
+	void SetOxy(CWearItem * pItem);
 	int  GetOxy();
 
 	void SetTemp(int nTemp);
+	void SetTemp(CWearItem * pItem);
 	int  GetTemp();
 
 	void SetDeviceId(CDuiString strId);

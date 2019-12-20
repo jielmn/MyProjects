@@ -68,7 +68,12 @@ private:
 	void  OnDbClick(BOOL & bHandled);
 	void  OnEdNameKillFocus();
 	// 更新grids数据
-	void  FillData();
+	void  UpdateGrids();
 	void  OnPrevPage();
 	void  OnNextPage();
+	// 更新List
+	void  UpdateList();
+	CDuiString  GetHeartBeatStr(CWearItem * pItem);
+	CDuiString  GetOxyStr(CWearItem * pItem);
+	CDuiString  GetTempStr(CWearItem * pItem);
 };
