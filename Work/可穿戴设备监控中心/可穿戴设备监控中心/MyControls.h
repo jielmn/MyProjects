@@ -40,6 +40,9 @@ public:
 	void SetTemp(CWearItem * pItem);
 	int  GetTemp();
 
+	void SetPose(int nPose);
+	int  GetPose();
+
 	void SetDeviceId(CDuiString strId);
 	CDuiString  GetDeviceId();
 
@@ -54,6 +57,7 @@ private:
 	void SetOxy();
 	void SetTemp();
 	void SetDeviceId();
+	void SetPose();          
 
 private:
 	CDialogBuilderCallbackEx                    m_callback;
@@ -63,6 +67,7 @@ private:
 	CLabelUI *                                  m_lblOxy;
 	CLabelUI *                                  m_lblTemp;
 	CLabelUI *                                  m_lblDeviceId;
+	CLabelUI *                                  m_lblPose;
 
 private:
 	int           m_nIndex;
@@ -70,5 +75,6 @@ private:
 	int           m_nHeartBeat;
 	int           m_nOxy;
 	int           m_nTemp;
+	int           m_nPose;
 	CDuiString    m_strDeviceId;
 };

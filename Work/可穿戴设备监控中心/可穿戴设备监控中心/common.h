@@ -50,6 +50,7 @@ public:
 	std::vector<DataItem *>   m_vHearbeat;    // ĞÄÂÊ
 	std::vector<DataItem *>   m_vOxy;         // ÑªÑõ
 	std::vector<DataItem *>   m_vTemp;        // ÌåÎÂ
+	int   m_nPose;
 
 public:
 	CWearItem();

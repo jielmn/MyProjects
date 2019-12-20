@@ -14,6 +14,7 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 CWearItem::CWearItem() {
 	memset(m_szDeviceId, 0, sizeof(m_szDeviceId));
 	memset(m_szName, 0, sizeof(m_szName));
+	m_nPose = 0;
 }
 
 CWearItem::~CWearItem() {

@@ -14,7 +14,7 @@
 #include "MyControls.h"
 #include "AboutDlg.h"
 
-#define   GRID_WIDTH      160
+#define   GRID_WIDTH      180                          
 #define   GRID_HEIGHT     180                                  
 
 CDuiFrameWnd::CDuiFrameWnd() {
@@ -78,6 +78,7 @@ void  CDuiFrameWnd::InitWindow() {
 		q->tTime = 0;
 		p->m_vTemp.push_back(q);
 
+		p->m_nPose = i + 60;
 		m_data.push_back(p);
 	}
 
@@ -269,7 +270,8 @@ void  CDuiFrameWnd::UpdateGrids() {
 		pGrid->SetDeviceId(pItem->m_szDeviceId);		      
 		pGrid->SetHeartBeat(pItem);
 		pGrid->SetOxy(pItem);		
-
+		pGrid->SetTemp(pItem); 
+		pGrid->SetPose(pItem->m_nPose);
 	}
 }
 
@@ -319,9 +321,9 @@ CDuiString  CDuiFrameWnd::GetOxyStr(CWearItem * pItem) {
 CDuiString  CDuiFrameWnd::GetTempStr(CWearItem * pItem) {
 	CDuiString  strText;
 	if (pItem->m_vTemp.size() > 0) {
-		strText.Format("%.2f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
+		strText.Format("%.1f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
 	}
-	return strText;
+	return strText;         
 }
 
 // ¸üÐÂList
@@ -355,7 +357,7 @@ void  CDuiFrameWnd::UpdateList() {
 		pListItem->SetText(2, GetHeartBeatStr(pItem));
 		pListItem->SetText(3, GetOxyStr(pItem));
 		pListItem->SetText(4, GetTempStr(pItem));
-		pListItem->SetText(5, pItem->m_szDeviceId);
+		pListItem->SetText(5, pItem->m_szDeviceId);  
 	}
 }
 
@@ -455,7 +457,7 @@ void  CDuiFrameWnd::OnEdNameKillFocus() {
 	if (m_nEditingNameIndex >= 0) {
 		CListTextElementUI * pListItem = (CListTextElementUI *)m_lstItems->GetItemAt(m_nEditingNameIndex);
 		if ( pListItem ) {
-			pListItem->SetText(1, m_edName->GetText());
+			pListItem->SetText(1, m_edName->GetText());        
 		}		
 	}
 

@@ -4,7 +4,7 @@
 	<!-- 伸缩按钮 -->
 	<Font id="1" name="宋体" size="12" bold="false" />
 	<!-- grid 字体大小 -->
-	<Font id="2" name="宋体" size="15" bold="false" />
+	<Font id="2" name="宋体" size="18" bold="false" />
 	<!-- list 字体大小 -->
 	<Font id="3" name="宋体" size="15" bold="false" />
 	
@@ -57,7 +57,7 @@
 						<Button width="16" text="<" font="1" name="btnExpand" bkcolor="#FFCCCCCC" />	
 						
 						<VerticalLayout bkcolor="#FF00FF00" name="layList" width="510" >
-							<List name="lstItems" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="3" itemtextcolor="#FF386382"  >
+							<List name="lstItems" bkcolor="#FFCCCCCC" inset="1,1,1,1" itemshowhtml="false" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="true" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="3" itemtextcolor="#FF386382"  >
 								<ListHeader height="24" menu="true">
 									<ListHeaderItem text="序号"      font="3" width="50"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 									<ListHeaderItem text="姓名"    font="3" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>

@@ -55,11 +55,13 @@ CGridUI::CGridUI() : m_callback(m_pManager) {
 	m_lblOxy = 0;
 	m_lblTemp = 0;
 	m_lblDeviceId = 0;
+	m_lblPose = 0;
 
 	m_nIndex = 0;
 	m_nHeartBeat = 0;
 	m_nOxy = 0;
 	m_nTemp = 0;
+	m_nPose = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -88,6 +90,7 @@ void CGridUI::DoInit() {
 	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp");
 	m_lblDeviceId = (CLabelUI *)m_pManager->FindControl("lblDeviceId");
 	m_lblIndex = (CLabelUI *)m_pManager->FindControl("lblIndex");
+	m_lblPose = (CLabelUI *)m_pManager->FindControl("lblPose");
 
 	SetIndex();
 	SetUserName();
@@ -95,6 +98,7 @@ void CGridUI::DoInit() {
 	SetOxy();
 	SetTemp();
 	SetDeviceId();
+	SetPose();
 }
 
 void CGridUI::Notify(TNotifyUI& msg) {
@@ -207,7 +211,7 @@ void CGridUI::SetTemp() {
 	if (m_bInitiated) {
 		CDuiString strText;
 		if (m_nTemp > 0)
-			strText.Format("%.2f", m_nTemp / 100.0f );
+			strText.Format("%.1f", m_nTemp / 100.0f );
 		m_lblTemp->SetText(strText);
 	}
 }
@@ -229,4 +233,22 @@ void CGridUI::SetDeviceId() {
 
 CDuiString  CGridUI::GetDeviceId() {
 	return m_strDeviceId;
+}
+
+void CGridUI::SetPose(int nPose) {
+	m_nPose = nPose;
+	SetPose();
+}
+
+void CGridUI::SetPose() {
+	if (m_bInitiated) {
+		CDuiString strText;
+		if (m_nPose > 0)
+			strText.Format("%d", m_nPose);
+		m_lblPose->SetText(strText);
+	}
+}
+
+int  CGridUI::GetPose() {
+	return m_nPose;
 }
