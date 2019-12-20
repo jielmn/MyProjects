@@ -57,7 +57,7 @@ private:
 	void SetOxy();
 	void SetTemp();
 	void SetDeviceId();
-	void SetPose();          
+	void SetPose();            
 
 private:
 	CDialogBuilderCallbackEx                    m_callback;
