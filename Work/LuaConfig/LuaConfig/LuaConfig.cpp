@@ -406,8 +406,9 @@ void  LuaCfgDeinit() {
 
 CLuaTable * LoadLuaCfgFile(const char * szFilePath) {
 	FILE * fp = fopen(szFilePath, "rb");
-	if (0 == fp)
-		return 0;
+	if (0 == fp) {
+		return LoadLuaCfgString("{}");
+	}
 	
 	fseek(fp, 0, SEEK_END);
 	long ret = ftell(fp);
