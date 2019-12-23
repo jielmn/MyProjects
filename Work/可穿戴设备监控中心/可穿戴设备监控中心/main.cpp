@@ -193,6 +193,16 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "cancelsort") {
 		CancelSort();
 	}
+	else if (msg.sType == "textchanged") {
+		if (msg.pSender->GetClass() == "EditableButton" ) {
+			if (name == "cstEdtBtnName") {
+				CWearItem * pItem = (CWearItem *)msg.pSender->GetParent()->GetParent()->GetParent()->GetParent()->GetTag();
+				assert(pItem);
+				STRNCPY(pItem->m_szName, msg.pSender->GetText(), sizeof(pItem->m_szName));
+				UpdateList();
+			}
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -338,6 +348,8 @@ void  CDuiFrameWnd::UpdateGrids() {
 		pGrid->SetOxy(pItem);		
 		pGrid->SetTemp(pItem); 
 		pGrid->SetPose(pItem->m_nPose);
+
+		pGrid->SetTag((int)pItem);
 	}
 }
 
@@ -424,6 +436,8 @@ void  CDuiFrameWnd::UpdateList() {
 		pListItem->SetText(3, GetOxyStr(pItem));
 		pListItem->SetText(4, GetTempStr(pItem));
 		pListItem->SetText(5, pItem->m_szDeviceId);  
+
+		pListItem->SetTag((int)pItem);
 	}
 }
 
@@ -527,7 +541,11 @@ void  CDuiFrameWnd::OnEdNameKillFocus() {
 	if (m_nEditingNameIndex >= 0) {
 		CListTextElementUI * pListItem = (CListTextElementUI *)m_lstItems->GetItemAt(m_nEditingNameIndex);
 		if ( pListItem ) {
-			pListItem->SetText(1, m_edName->GetText());        
+			pListItem->SetText(1, m_edName->GetText());  
+			CWearItem * pItem = (CWearItem *)pListItem->GetTag();
+			assert(pItem);
+			STRNCPY(pItem->m_szName, m_edName->GetText(), sizeof(pItem->m_szName));
+			UpdateGrids();
 		}		
 	}
 
