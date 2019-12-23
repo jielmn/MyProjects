@@ -185,6 +185,11 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_lblStatus->SetText(strText);
 		}
 	}
+	else if (uMsg == UM_DATA_ITEM) {
+		CWearItem * pItem = (CWearItem *)wParam;
+		assert(pItem);
+		OnNewWearItem(pItem);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -264,12 +269,6 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	s.cy = height / nRows;
 
 	m_layGrids->SetItemSize(s);
-	
-	// 如果没有数据
-	if (m_data.size() == 0) {
-		m_nCurPageFirstItemIndex = 0;
-		return true;
-	}
 
 	// 每页多少格子
 	m_nItemsPerPage = nRows * nColumns;
@@ -535,7 +534,7 @@ void  CDuiFrameWnd::OnEdNameKillFocus() {
 	m_edName->SetVisible(false);   
 }
 
-void  CDuiFrameWnd::Sort(int nIndex) {
+void  CDuiFrameWnd::Sort(int nIndex, BOOL bNeedUpdate /*= TRUE*/) {
 	if (0 == nIndex) {
 		std::sort( m_data.begin(), m_data.end(), CSortName(m_Sort[nIndex].bAscend) );
 	}
@@ -566,8 +565,10 @@ void  CDuiFrameWnd::Sort(int nIndex) {
 		}
 	}	
 
-	UpdateList();
-	UpdateGrids(); 
+	if (bNeedUpdate) {
+		UpdateList();
+		UpdateGrids();
+	}	
 }
 
 void  CDuiFrameWnd::CancelSort() {
@@ -575,6 +576,34 @@ void  CDuiFrameWnd::CancelSort() {
 		m_Sort[i].bSorted = FALSE;
 		m_Header[i]->SetBkImage("file='list_header_bg.png' corner='0,0,10,0'");
 		m_Header[i]->SetHotImage("file='list_header_hot.png' corner='0,0,10,0'");
+	}
+}
+
+void  CDuiFrameWnd::OnNewWearItem(CWearItem * pItem) {
+	std::vector<CWearItem *>::iterator it;
+	it = std::find_if(m_data.begin(), m_data.end(), CFindWearItem(pItem));
+
+	// 如果找到了
+	if ( it != m_data.end() ) {
+		CWearItem * p = *it;
+		*p = *pItem;
+		delete pItem;
+
+		UpdateList();
+		UpdateGrids();
+	}
+	else {
+		m_data.push_back(pItem);
+
+		for (int i = 0; i < 4; i++) {
+			if ( m_Sort[i].bSorted ) {
+				Sort(i, FALSE);
+				break;
+			}
+		}
+
+		UpdateList();
+		UpdateGrids();
 	}
 }
 

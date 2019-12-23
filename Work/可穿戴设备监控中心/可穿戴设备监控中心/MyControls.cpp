@@ -151,9 +151,10 @@ void CGridUI::SetHeartBeat(CWearItem * pItem) {
 void CGridUI::SetHeartBeat() {
 	if (m_bInitiated) {
 		CDuiString strText;
-		if (m_nHeartBeat > 0)
+		if (m_nHeartBeat > 0) {
 			strText.Format("%d", m_nHeartBeat);
-		m_lblHeartBeat->SetText(strText);
+			m_lblHeartBeat->SetText(strText);
+		}		
 	}
 }
 
@@ -173,9 +174,10 @@ void CGridUI::SetOxy(CWearItem * pItem) {
 void CGridUI::SetOxy() {
 	if (m_bInitiated) {
 		CDuiString strText;
-		if (m_nOxy > 0)
+		if (m_nOxy > 0) {
 			strText.Format("%d", m_nOxy);
-		m_lblOxy->SetText(strText);
+			m_lblOxy->SetText(strText);
+		}		
 	}
 }
 
@@ -195,9 +197,10 @@ void CGridUI::SetTemp(CWearItem * pItem) {
 void CGridUI::SetTemp() {
 	if (m_bInitiated) {
 		CDuiString strText;
-		if (m_nTemp > 0)
-			strText.Format("%.1f", m_nTemp / 100.0f );
-		m_lblTemp->SetText(strText);
+		if (m_nTemp > 0) {
+			strText.Format("%.1f", m_nTemp / 100.0f);
+			m_lblTemp->SetText(strText);
+		}		
 	}
 }
 

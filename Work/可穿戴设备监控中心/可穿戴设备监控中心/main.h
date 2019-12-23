@@ -80,8 +80,9 @@ private:
 	CDuiString  GetOxyStr(CWearItem * pItem);
 	CDuiString  GetTempStr(CWearItem * pItem);
 	// 姓名，心率，血氧，体温
-	void  Sort(int nIndex);
+	void  Sort(int nIndex, BOOL bNeedUpdate = TRUE);
 	void  CancelSort();
+	void  OnNewWearItem(CWearItem * pItem);
 };
 
 class CSortName {
@@ -159,5 +160,24 @@ public:
 
 private:
 	BOOL   m_bAscend;
+};
+
+class CFindWearItem {
+public:
+	CFindWearItem(CWearItem * pItem) {
+		m_pItem = pItem;
+	}
+
+	bool operator() (CWearItem * p) {
+		if (0 == strcmp(p->m_szDeviceId, m_pItem->m_szDeviceId)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+private:
+	CWearItem *   m_pItem;
 };
 

@@ -3,7 +3,7 @@
 	<VerticalLayout inset="6,6,6,6" bkcolor="#FF4AB20A" bordersize="6" bordercolor="#FF434248" name="main">	
 		<VerticalLayout inset="0,0,0,0">
 			<HorizontalLayout height="40" inset="0,5,0,5">
-				<Label name="lblIndex" text="01" align="center" textcolor="#FF666666" font="2"  />
+				<Label name="lblIndex" text="" align="center" textcolor="#FF666666" font="2"  />
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="10,0,10,4" height="28">
@@ -15,26 +15,26 @@
 			<HorizontalLayout inset="10,0,10,4" height="28">
 				<Control width="24" height="24" bkimage="heartbeat.png" />
 				<Control width="10" />
-				<Label name="lblBeat" textcolor="#FFFFFFFF" font="2" text="120" width="44"/>					
+				<Label name="lblBeat" textcolor="#FFFFFFFF" font="2" text="" width="44"/>					
 				<Control width="24" height="24" bkimage="oxy.png" />
 				<Control width="10" />
-				<Label name="lblOxy"  textcolor="#FFFFFFFF" font="2" text="100" width="44" />				
+				<Label name="lblOxy"  textcolor="#FFFFFFFF" font="2" text="" width="44" />				
 			</HorizontalLayout>
 		
 			
 			<HorizontalLayout inset="10,0,10,4" height="28">
 				<Control width="24" height="24" bkimage="temp.png" />
 				<Control width="10" />
-				<Label name="lblTemp"  textcolor="#FFFFFFFF" font="2" text="36.8℃" width="44" />
+				<Label name="lblTemp"  textcolor="#FFFFFFFF" font="2" text="" width="44" />
 				<Control width="24" height="24" bkimage="pose.png" />
 				<Control width="10" />
-				<Label name="lblPose" textcolor="#FFFFFFFF" font="2" text="1" width="44" />				
+				<Label name="lblPose" textcolor="#FFFFFFFF" font="2" text="" width="44" />				
 			</HorizontalLayout>			
 			
 			<HorizontalLayout inset="10,0,10,4" height="28" visible="true">
 				<Control width="24" height="24" bkimage="device.png" />
 				<Control width="10" />
-				<Label name="lblDeviceId"  textcolor="#FFFFFFFF" font="2" text="19" />
+				<Label name="lblDeviceId"  textcolor="#FFFFFFFF" font="2" text="" />
 			</HorizontalLayout>
 			
 		</VerticalLayout>		

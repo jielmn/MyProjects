@@ -19,6 +19,9 @@ public:
 	void  ReconnectAsyn(BOOL bCloseFirst = FALSE);
 	void  Reconnect();
 
+	void  ReadDataAsyn(DWORD  dwDelay = 0);
+	void  ReadData();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -29,6 +32,7 @@ private:
 
 private:
 	CLmnSerialPort     m_com;
+	CDataBuf           m_buf;
 };
 
 

@@ -98,8 +98,60 @@ void  CBusiness::ReconnectAsyn(BOOL bCloseFirst /*= FALSE*/) {
 
 void  CBusiness::Reconnect() {
 	m_com.CloseUartPort();
+	m_buf.Clear();
+
 	BOOL bRet = m_com.OpenUartPort(g_data.m_nComPort);
 	::PostMessage(g_data.m_hWnd, UM_RECONNECT_RET, bRet, 0);
+	if ( bRet ) {
+		ReadDataAsyn();
+	}
+}
+
+void  CBusiness::ReadDataAsyn(DWORD  dwDelay /*= 0*/) {
+	if (dwDelay == 0) {
+		g_data.m_thrd_com->PostMessage(this, MSG_READ_DATA);
+	}
+	else {
+		g_data.m_thrd_com->PostDelayMessage( dwDelay, this, MSG_READ_DATA);
+	}
+}
+
+void  CBusiness::ReadData() {
+	BYTE   achData[8192];
+	DWORD  dwLen = sizeof(achData);
+	BOOL   bRet  = m_com.Read(achData, dwLen);
+	// 读取所有的数据
+	while (bRet && dwLen > 0) {
+		m_buf.Append(achData, dwLen);
+		dwLen = sizeof(achData);
+		bRet = m_com.Read(achData, dwLen);
+	}
+
+	const DWORD  DATA_ITEM_LENGTH = 13;
+
+	while ( m_buf.GetDataLength() >= DATA_ITEM_LENGTH ) {
+		// 读取一项数据
+		m_buf.Read( achData, DATA_ITEM_LENGTH );
+
+		CWearItem * pItem = new CWearItem;
+
+		if (achData[3] > 0) {
+			pItem->m_nHearbeat = achData[2];
+		}
+
+		if (achData[5] > 0) {
+			pItem->m_nOxy = achData[4];
+		}
+
+		pItem->m_nTemp = achData[6] * 100 + achData[7];
+		pItem->m_nPose = achData[8];
+		SNPRINTF(pItem->m_szDeviceId, sizeof(pItem->m_szDeviceId), "%d", (int)achData[10]);
+
+		::PostMessage(g_data.m_hWnd, UM_DATA_ITEM, (WPARAM)pItem, 0);
+	}
+	m_buf.Reform();
+
+	ReadDataAsyn(100);
 }
 
 
@@ -111,6 +163,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_RECONNECT:
 	{
 		Reconnect();
+	}
+	break;
+
+	case MSG_READ_DATA:
+	{
+		ReadData();
 	}
 	break;
 

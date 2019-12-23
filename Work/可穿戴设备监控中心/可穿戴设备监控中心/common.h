@@ -23,8 +23,10 @@ using namespace DuiLib;
 #define   COMPILE_TIME                "2019-12-18 16:00"
 
 #define   MSG_RECONNECT               1
+#define   MSG_READ_DATA               2
 
 #define   UM_RECONNECT_RET            (WM_USER+1)
+#define   UM_DATA_ITEM                (WM_USER+2)
 
 // 创建duilib控件的回调
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
