@@ -5,6 +5,7 @@
 CSettingDlg::CSettingDlg() {
 	m_tree = 0;
 	m_comport = 0;
+	m_nComPort = 0;
 }
 
 void   CSettingDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -23,7 +24,8 @@ void   CSettingDlg::InitWindow() {
 	m_tree = (CMyTreeCfgUI *)m_PaintManager.FindControl("CfgTree");
 
 	m_comport = new CEdtComboUI;
-	m_tree->AddNode("´®¿Ú", 0, 0, m_comport, 3, 0xFF666666, 0, 0, 36);
+	m_tree->AddNode("´®¿Ú", 0, 0, m_comport, 3, 0xFF666666, 0, 0, 36);	
+
 	WindowImplBase::InitWindow();  
 }
 
@@ -36,6 +38,7 @@ void  CSettingDlg::OnMyInited() {
 	GetAllSerialPorts(ComPorts);
 
 	std::map<int, std::string>::iterator it;
+	int nSel = -1;
 	int i = 0;
 	for (it = ComPorts.begin(); it != ComPorts.end(); it++, i++) {
 		std::string & s = it->second;
@@ -45,6 +48,23 @@ void  CSettingDlg::OnMyInited() {
 		pElement->SetText(s.c_str());
 		pElement->SetTag(nComPort);
 		pCombo->Add(pElement);
+
+		if ( nComPort == m_nComPort ) {
+			nSel = i;
+		}
+	}
+
+	if ( nSel >= 0 ) {
+		pCombo->SelectItem(nSel);
+		CListLabelElementUI * pElement = (CListLabelElementUI *)pCombo->GetItemAt(nSel);
+		m_comport->m_edt->SetText(pElement->GetText());
+	}
+	else {
+		if (m_nComPort > 0) {
+			CDuiString strText;
+			strText.Format("com%d", m_nComPort);
+			m_comport->SetText(strText);
+		}
 	}
 }
 

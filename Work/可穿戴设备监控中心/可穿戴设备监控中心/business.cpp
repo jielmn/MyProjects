@@ -49,6 +49,18 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
+	const char * str = 0;
+	int nValue = 0;
+	int ret = 0;
+	char buf[1024];
+
+	str = g_data.m_cfg->GetString("serial port");
+	Str2Lower(str, buf, sizeof(buf));
+	ret = sscanf( buf, "com%d", &nValue );
+	if (1 == ret) {
+		g_data.m_nComPort = nValue;
+	}
+
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
 		return -1;
@@ -59,6 +71,7 @@ int CBusiness::Init() {
 }
 
 int CBusiness::DeInit() {
+	g_data.m_cfg->Save();
 
 	if (g_data.m_thrd_db) {
 		g_data.m_thrd_db->Stop();

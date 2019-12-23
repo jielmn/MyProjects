@@ -62,40 +62,6 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnExpand->SetText("<");   
 	m_btnExpand->SetTag(FALSE); 
 
-	for (int i = 0; i < 120; i++) {
-		CWearItem * p = new CWearItem;
-		SNPRINTF( p->m_szDeviceId, sizeof(p->m_szDeviceId), "%d", i + 1);
-		if ( 0 == i )
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "张三");
-		else if ( 1== i )
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "李四");
-		else if (2 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "王五");
-		else if (3 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "张麻子");
-		else if (4 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "李宝");
-		else if (5 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿万");
-		else if (6 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "方大同");
-		else if (7 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿狸");
-		else if (8 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿猫");
-		else if (9 == i)
-			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿狗");
-		else
-			SNPRINTF( p->m_szName, sizeof(p->m_szName), "%d", i + 1); 
-
-		p->m_nHearbeat = i + 1;
-		p->m_nOxy = i + 100;
-		p->m_nTemp = i + 1000;
-		p->m_nPose = i + 60;
-
-		m_data.push_back(p);
-	}
-
 	m_layGrids->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsLayoutSize);
 	UpdateList();
 
@@ -234,9 +200,18 @@ void  CDuiFrameWnd::OnSetting() {
 	CSettingDlg * pSettingDlg = new CSettingDlg;
 	pSettingDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
 	pSettingDlg->CenterWindow();
+	pSettingDlg->m_nComPort = g_data.m_nComPort;
 	int ret = pSettingDlg->ShowModal();
 	if (0 == ret) {
-
+		CDuiString strText;
+		// 串口不同
+		if (pSettingDlg->m_nComPort != g_data.m_nComPort) {		
+			g_data.m_nComPort = pSettingDlg->m_nComPort;
+			strText.Format("com%d", g_data.m_nComPort);
+			g_data.m_cfg->SetString("serial port", strText);			
+			// 重连串口
+		}
+		g_data.m_cfg->Save();
 	}
 	delete pSettingDlg;
 }
