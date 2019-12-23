@@ -145,12 +145,7 @@ void CGridUI::SetHeartBeat(int nHeartBeat) {
 
 void CGridUI::SetHeartBeat(CWearItem * pItem) {
 	assert(pItem);
-	if (pItem->m_vHearbeat.size() > 0) {
-		SetHeartBeat(pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
-	}
-	else {
-		SetHeartBeat(0);
-	}
+	SetHeartBeat(pItem->m_nHearbeat);
 }
 
 void CGridUI::SetHeartBeat() {
@@ -172,12 +167,7 @@ void CGridUI::SetOxy(int nOxy) {
 }
 
 void CGridUI::SetOxy(CWearItem * pItem) {
-	if (pItem->m_vOxy.size() > 0) {
-		SetOxy(pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
-	}
-	else {
-		SetOxy(0);
-	}
+	SetOxy(pItem->m_nOxy);
 }
 
 void CGridUI::SetOxy() {
@@ -199,12 +189,7 @@ void CGridUI::SetTemp(int nTemp) {
 }
 
 void CGridUI::SetTemp(CWearItem * pItem) {
-	if (pItem->m_vTemp.size() > 0) {
-		SetTemp(pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData);
-	}
-	else {
-		SetTemp(0);
-	}
+	SetTemp(pItem->m_nTemp);
 }
 
 void CGridUI::SetTemp() {

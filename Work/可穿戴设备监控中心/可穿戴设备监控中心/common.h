@@ -47,9 +47,9 @@ class CWearItem {
 public:
 	char  m_szDeviceId[MAX_DEVICE_ID_LEN];
 	char  m_szName[MAX_NAME_LEN];
-	std::vector<DataItem *>   m_vHearbeat;    // 心率
-	std::vector<DataItem *>   m_vOxy;         // 血氧
-	std::vector<DataItem *>   m_vTemp;        // 体温
+	int   m_nHearbeat;    // 心率
+	int   m_nOxy;         // 血氧
+	int   m_nTemp;        // 体温
 	int   m_nPose;
 
 public:

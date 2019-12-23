@@ -88,24 +88,11 @@ void  CDuiFrameWnd::InitWindow() {
 		else
 			SNPRINTF( p->m_szName, sizeof(p->m_szName), "%d", i + 1); 
 
-		DataItem * q = 0;
-
-		q = new DataItem;
-		q->nData = i + 1;
-		q->tTime = 0;
-		p->m_vHearbeat.push_back(q);
-
-		q = new DataItem;
-		q->nData = i + 100;
-		q->tTime = 0;
-		p->m_vOxy.push_back(q);
-
-		q = new DataItem;
-		q->nData = i + 1000;
-		q->tTime = 0;
-		p->m_vTemp.push_back(q);
-
+		p->m_nHearbeat = i + 1;
+		p->m_nOxy = i + 100;
+		p->m_nTemp = i + 1000;
 		p->m_nPose = i + 60;
+
 		m_data.push_back(p);
 	}
 
@@ -382,24 +369,24 @@ void  CDuiFrameWnd::OnNextPage() {
 
 CDuiString  CDuiFrameWnd::GetHeartBeatStr(CWearItem * pItem) {
 	CDuiString  strText;
-	if (pItem->m_vHearbeat.size() > 0) {
-		strText.Format("%d", pItem->m_vHearbeat[pItem->m_vHearbeat.size() - 1]->nData);
+	if (pItem->m_nHearbeat > 0) {
+		strText.Format("%d", pItem->m_nHearbeat);
 	}
 	return strText;
 }
 
 CDuiString  CDuiFrameWnd::GetOxyStr(CWearItem * pItem) {
 	CDuiString  strText;
-	if (pItem->m_vOxy.size() > 0) {
-		strText.Format("%d", pItem->m_vOxy[pItem->m_vOxy.size() - 1]->nData);
+	if (pItem->m_nOxy > 0) {
+		strText.Format("%d", pItem->m_nOxy);
 	}
 	return strText;
 }
 
 CDuiString  CDuiFrameWnd::GetTempStr(CWearItem * pItem) {
 	CDuiString  strText;
-	if (pItem->m_vTemp.size() > 0) {
-		strText.Format("%.1f", pItem->m_vTemp[pItem->m_vTemp.size() - 1]->nData / 100.0f);
+	if (pItem->m_nTemp > 0) {
+		strText.Format("%.1f", pItem->m_nTemp / 100.0f);
 	}
 	return strText;         
 }

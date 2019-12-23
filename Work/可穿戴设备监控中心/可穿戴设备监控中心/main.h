@@ -107,8 +107,8 @@ public:
 	}
 
 	bool operator() (CWearItem * p1, CWearItem * p2) {
-		int n1 = p1->m_vHearbeat.size() > 0 ? p1->m_vHearbeat[p1->m_vHearbeat.size() - 1]->nData : 0;
-		int n2 = p2->m_vHearbeat.size() > 0 ? p2->m_vHearbeat[p2->m_vHearbeat.size() - 1]->nData : 0;
+		int n1 = p1->m_nHearbeat;
+		int n2 = p2->m_nHearbeat;
 
 		if (m_bAscend)
 			return  n1 < n2 ? true : false;
@@ -127,8 +127,8 @@ public:
 	}
 
 	bool operator() (CWearItem * p1, CWearItem * p2) {
-		int n1 = p1->m_vOxy.size() > 0 ? p1->m_vOxy[p1->m_vOxy.size() - 1]->nData : 0;
-		int n2 = p2->m_vOxy.size() > 0 ? p2->m_vOxy[p2->m_vOxy.size() - 1]->nData : 0;
+		int n1 = p1->m_nOxy;
+		int n2 = p2->m_nOxy;
 
 		if (m_bAscend)
 			return  n1 < n2 ? true : false;
@@ -147,8 +147,8 @@ public:
 	}
 
 	bool operator() (CWearItem * p1, CWearItem * p2) {
-		int n1 = p1->m_vTemp.size() > 0 ? p1->m_vTemp[p1->m_vTemp.size() - 1]->nData : 0;
-		int n2 = p2->m_vTemp.size() > 0 ? p2->m_vTemp[p2->m_vTemp.size() - 1]->nData : 0;
+		int n1 = p1->m_nTemp;
+		int n2 = p2->m_nTemp;
 
 		if (m_bAscend)
 			return  n1 < n2 ? true : false;
