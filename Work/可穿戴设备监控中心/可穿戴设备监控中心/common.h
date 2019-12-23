@@ -22,6 +22,10 @@ using namespace DuiLib;
 #define   VERSION                     "1.0"
 #define   COMPILE_TIME                "2019-12-18 16:00"
 
+#define   MSG_RECONNECT               1
+
+#define   UM_RECONNECT_RET            (WM_USER+1)
+
 // 创建duilib控件的回调
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
@@ -67,7 +71,7 @@ class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	CLuaCfg *                 m_cfg;
-	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_com;
 	HWND                      m_hWnd;
 	int                       m_nComPort;
 	BOOL                      m_bShowHistory;
@@ -78,7 +82,7 @@ public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_db = 0;
+		m_thrd_com = 0;
 		m_hWnd = 0;
 		m_nComPort = 0;
 		m_bShowHistory = FALSE;

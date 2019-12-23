@@ -61,11 +61,11 @@ int CBusiness::Init() {
 		g_data.m_nComPort = nValue;
 	}
 
-	g_data.m_thrd_db = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_db) {
+	g_data.m_thrd_com = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_com) {
 		return -1;
 	}
-	g_data.m_thrd_db->Start();
+	g_data.m_thrd_com->Start();
 
 	return 0;
 }
@@ -73,19 +73,48 @@ int CBusiness::Init() {
 int CBusiness::DeInit() {
 	g_data.m_cfg->Save();
 
-	if (g_data.m_thrd_db) {
-		g_data.m_thrd_db->Stop();
-		delete g_data.m_thrd_db;
-		g_data.m_thrd_db = 0;
+	if (g_data.m_thrd_com) {
+		g_data.m_thrd_com->Stop();
+		delete g_data.m_thrd_com;
+		g_data.m_thrd_com = 0;
 	}
 
 	Clear();
 	return 0;
 }
 
+void  CBusiness::ReconnectAsyn(BOOL bCloseFirst /*= FALSE*/) {
+
+	if (!bCloseFirst) {
+		// 如果已经连接串口
+		if (m_com.GetStatus() == CLmnSerialPort::OPEN) {
+			return;
+		}
+	}	
+
+	g_data.m_thrd_com->DeleteMessages();
+	g_data.m_thrd_com->PostMessage(this, MSG_RECONNECT);
+}
+
+void  CBusiness::Reconnect() {
+	m_com.CloseUartPort();
+	BOOL bRet = m_com.OpenUartPort(g_data.m_nComPort);
+	::PostMessage(g_data.m_hWnd, UM_RECONNECT_RET, bRet, 0);
+}
+
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_RECONNECT:
+	{
+		Reconnect();
+	}
+	break;
 
+	default:
+		break;
+	}
 }

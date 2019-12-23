@@ -34,6 +34,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	memset(&m_rcLayGrids, 0, sizeof(m_rcLayGrids));
 	memset(m_Sort, 0, sizeof(m_Sort));
 	memset(m_Header, 0, sizeof(m_Header));
+	m_lblStatus = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -57,6 +58,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_Header[1] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdHeartBeat");
 	m_Header[2] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdOxy");
 	m_Header[3] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdTemp");
+	m_lblStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblStatus");
 
 	m_layList->SetVisible(false); 
 	m_btnExpand->SetText("<");   
@@ -156,15 +158,32 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			}
 		}
 	}
+	else if (msg.sType == "windowinit") {
+		CBusiness::GetInstance()->ReconnectAsyn();
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	CDuiString strText;
+	BOOL bRet;
+
 	if (uMsg == WM_LBUTTONDBLCLK) {
 		BOOL bHandled = FALSE;
 		OnDbClick(bHandled);
 		if (bHandled)
 			return 0;
+	}
+	else if (uMsg == UM_RECONNECT_RET) {
+		bRet = wParam;
+		if (bRet) {
+			strText.Format("连接串口com%d成功", g_data.m_nComPort);
+			m_lblStatus->SetText(strText);
+		}
+		else {
+			strText.Format("连接串口com%d失败", g_data.m_nComPort);
+			m_lblStatus->SetText(strText);
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -210,6 +229,7 @@ void  CDuiFrameWnd::OnSetting() {
 			strText.Format("com%d", g_data.m_nComPort);
 			g_data.m_cfg->SetString("serial port", strText);			
 			// 重连串口
+			CBusiness::GetInstance()->ReconnectAsyn(TRUE);
 		}
 		g_data.m_cfg->Save();
 	}

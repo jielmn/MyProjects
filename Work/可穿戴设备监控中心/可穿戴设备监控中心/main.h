@@ -49,6 +49,7 @@ private:
 	CButtonUI *                                 m_btnPrev;
 	CButtonUI *                                 m_btnNext;
 	CListHeaderItemUI *                         m_Header[4];      // 姓名，心率，血氧，体温
+	CLabelUI *                                  m_lblStatus;
 
 private:
 	std::vector<CWearItem *>                    m_data;
