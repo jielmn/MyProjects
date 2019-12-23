@@ -57,6 +57,11 @@ public:
 	~CWearItem();
 };
 
+typedef struct tagSort {
+	BOOL     bSorted;
+	BOOL     bAscend;
+}Sort;
+
 
 class  CGlobalData {
 public:
@@ -83,6 +88,8 @@ public:
 };
 
 extern CGlobalData  g_data;
+
+extern int  CharacterCompare(const char * s1, const char * s2);
 
 
 // templates

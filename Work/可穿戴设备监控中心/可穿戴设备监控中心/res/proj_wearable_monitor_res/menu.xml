@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Window size="150,120">
+<Window size="150,68">
 <VerticalLayout bkimage="file='menu_bk.png' corner='30,8,8,8' mask='#FFFF0000' " hole="false" bkcolor="#FFCCCCCC">
     <List header="hidden" inset="1,1,1,1" itemhotimage="file='menu_hot_bk.png' corner='2,2,2,2'">
 	
@@ -7,6 +7,13 @@
             <Label text="设置" mouse="false"/>
         </ListContainerElement>
 		
+		<!--
+		<ListContainerElement name="cancelsort" height="22" inset="40,0,0,0">
+            <Label text="取消排序" mouse="false"/>
+        </ListContainerElement>
+		-->
+		
+		<!--
 		<ListContainerElement name="historydata" height="22" inset="0,0,0,0">
 			<HorizontalLayout>
 				<VerticalLayout width="40" inset="6,0,0,0">
@@ -18,6 +25,7 @@
 				<Label text="显示历史数据" mouse="false"/>
 			</HorizontalLayout>			
         </ListContainerElement>
+		-->
 		
 		<ListContainerElement name="warningprepose" height="22" inset="0,0,0,0">
 			<HorizontalLayout>
@@ -31,6 +39,7 @@
 			</HorizontalLayout>			
         </ListContainerElement>
 		
+		<!--
 		<ListContainerElement name="recycle" height="22" inset="0,0,0,0">
 			<HorizontalLayout>
 				<VerticalLayout width="40" inset="6,0,0,0">
@@ -42,6 +51,7 @@
 				<Label text="循环跳转一页" mouse="false"/>
 			</HorizontalLayout>			
         </ListContainerElement>
+		-->
 		
         <ListContainerElement name="about" height="22" inset="40,0,0,0">
             <Label text="关于" mouse="false"/>

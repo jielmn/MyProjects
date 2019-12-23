@@ -32,6 +32,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_btnNext = 0;
 	m_nItemsPerPage = 0;
 	memset(&m_rcLayGrids, 0, sizeof(m_rcLayGrids));
+	memset(m_Sort, 0, sizeof(m_Sort));
+	memset(m_Header, 0, sizeof(m_Header));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -51,15 +53,40 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edName = (DuiLib::CEditUI *)m_PaintManager.FindControl("edName");
 	m_btnPrev = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnPrevPage");
 	m_btnNext = (DuiLib::CButtonUI *)m_PaintManager.FindControl("btnNextPage");
+	m_Header[0] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdName");
+	m_Header[1] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdHeartBeat");
+	m_Header[2] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdOxy");
+	m_Header[3] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdTemp");
 
-	m_layList->SetVisible(false);
+	m_layList->SetVisible(false); 
 	m_btnExpand->SetText("<");   
 	m_btnExpand->SetTag(FALSE); 
 
 	for (int i = 0; i < 120; i++) {
 		CWearItem * p = new CWearItem;
 		SNPRINTF( p->m_szDeviceId, sizeof(p->m_szDeviceId), "%d", i + 1);
-		SNPRINTF( p->m_szName, sizeof(p->m_szName), "%d", i + 1);
+		if ( 0 == i )
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "张三");
+		else if ( 1== i )
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "李四");
+		else if (2 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "王五");
+		else if (3 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "张麻子");
+		else if (4 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "李宝");
+		else if (5 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿万");
+		else if (6 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "方大同");
+		else if (7 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿狸");
+		else if (8 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿猫");
+		else if (9 == i)
+			SNPRINTF(p->m_szName, sizeof(p->m_szName), "阿狗");
+		else
+			SNPRINTF( p->m_szName, sizeof(p->m_szName), "%d", i + 1); 
 
 		DataItem * q = 0;
 
@@ -93,17 +120,18 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	CDuiString name = msg.pSender->GetName();
 	if (msg.sType == "click") {
-		if (msg.pSender->GetName() == "btnExpand") {
+		if (name == "btnExpand") {
 			OnExpand();
 		}
-		else if (msg.pSender->GetName() == "menubtn") {
+		else if (name == "menubtn") {
 			OnMainMenu(msg);
 		}
-		else if (msg.pSender->GetName() == "btnPrevPage") {
+		else if (name == "btnPrevPage") {
 			OnPrevPage();
 		}
-		else if (msg.pSender->GetName() == "btnNextPage") {
+		else if (name == "btnNextPage") {
 			OnNextPage();
 		}
 	}
@@ -126,6 +154,44 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (msg.pSender == m_edName) {
 			OnEdNameKillFocus();
 		}
+	}
+	else if (msg.sType == "headerclick") {
+		int nIndex = -1;
+		if (name == "hdName") {
+			nIndex = 0;			
+		}
+		else if (name == "hdHeartBeat") {
+			nIndex = 1;
+		}
+		else if (name == "hdOxy") {
+			nIndex = 2;
+		}
+		else if (name == "hdTemp") {
+			nIndex = 3;
+		}
+
+		if (nIndex >= 0 && nIndex <= 3) {
+			for ( int i = 0; i < 4; i++ ) {
+				if ( i == nIndex )
+					continue;
+				m_Sort[i].bSorted = FALSE;
+			}
+			g_data.m_bWarningPrepose = FALSE; 
+
+			if ( !m_Sort[nIndex].bSorted ) {
+				m_Sort[nIndex].bSorted = TRUE;
+				m_Sort[nIndex].bAscend = TRUE;
+				Sort(nIndex);
+			}
+			else {
+				m_Sort[nIndex].bAscend = !m_Sort[nIndex].bAscend;
+				Sort(nIndex);
+			}    
+
+		}		
+	}
+	else if (msg.sType == "cancelsort") {
+		CancelSort();
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -367,6 +433,10 @@ void  CDuiFrameWnd::OnCheckHistory() {
 
 void  CDuiFrameWnd::OnWarningPrepose() {
 	g_data.m_bWarningPrepose = !g_data.m_bWarningPrepose;
+	// 如果异常前置，取消排序
+	if (g_data.m_bWarningPrepose) {
+		CancelSort();
+	}
 }
 
 void  CDuiFrameWnd::OnRecycle() {
@@ -464,9 +534,49 @@ void  CDuiFrameWnd::OnEdNameKillFocus() {
 	m_nEditingNameIndex = -1;
 	m_edName->SetVisible(false);   
 }
-  
 
+void  CDuiFrameWnd::Sort(int nIndex) {
+	if (0 == nIndex) {
+		std::sort( m_data.begin(), m_data.end(), CSortName(m_Sort[nIndex].bAscend) );
+	}
+	else if (1 == nIndex) {
+		std::sort(m_data.begin(), m_data.end(), CSortHeartBeat(m_Sort[nIndex].bAscend));
+	}
+	else if (2 == nIndex) {
+		std::sort(m_data.begin(), m_data.end(), CSortOxy(m_Sort[nIndex].bAscend));
+	}
+	else if (3 == nIndex) {
+		std::sort(m_data.begin(), m_data.end(), CSortTemp(m_Sort[nIndex].bAscend));
+	}
 
+	for (int i = 0; i < 4; i++) {
+		if ( i == nIndex ) {
+			if (m_Sort[nIndex].bAscend) {
+				m_Header[nIndex]->SetBkImage("file='list_header_bg_sort_1.png' corner='0,0,10,0'");
+				m_Header[nIndex]->SetHotImage("file='list_header_hot_sort_1.png' corner='0,0,10,0'");
+			}
+			else {
+				m_Header[nIndex]->SetBkImage("file='list_header_bg_sort.png' corner='0,0,10,0'");
+				m_Header[nIndex]->SetHotImage("file='list_header_hot_sort.png' corner='0,0,10,0'");
+			}
+		}
+		else {
+			m_Header[i]->SetBkImage("file='list_header_bg.png' corner='0,0,10,0'");
+			m_Header[i]->SetHotImage("file='list_header_hot.png' corner='0,0,10,0'");
+		}
+	}	
+
+	UpdateList();
+	UpdateGrids(); 
+}
+
+void  CDuiFrameWnd::CancelSort() {
+	for (int i = 0; i < 4; i++) {
+		m_Sort[i].bSorted = FALSE;
+		m_Header[i]->SetBkImage("file='list_header_bg.png' corner='0,0,10,0'");
+		m_Header[i]->SetHotImage("file='list_header_hot.png' corner='0,0,10,0'");
+	}
+}
 
    
 
