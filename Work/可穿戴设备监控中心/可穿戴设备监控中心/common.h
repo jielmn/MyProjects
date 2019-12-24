@@ -79,6 +79,7 @@ public:
 	ILog    *                 m_log;
 	CLuaCfg *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_com;
+	LmnToolkits::Thread *     m_thrd_db;
 	HWND                      m_hWnd;
 	int                       m_nComPort;
 	BOOL                      m_bShowHistory;
@@ -95,6 +96,7 @@ public:
 		m_log = 0;
 		m_cfg = 0;
 		m_thrd_com = 0;
+		m_thrd_db = 0;
 		m_hWnd = 0;
 		m_nComPort = 0;
 		m_bShowHistory = FALSE;

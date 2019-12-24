@@ -74,6 +74,12 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_com->Start();
 
+	g_data.m_thrd_db = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_db) {
+		return -1;
+	}
+	g_data.m_thrd_db->Start();
+
 	return 0;
 }
 
@@ -84,6 +90,12 @@ int CBusiness::DeInit() {
 		g_data.m_thrd_com->Stop();
 		delete g_data.m_thrd_com;
 		g_data.m_thrd_com = 0;
+	}
+
+	if (g_data.m_thrd_db) {
+		g_data.m_thrd_db->Stop();
+		delete g_data.m_thrd_db;
+		g_data.m_thrd_db = 0;
 	}
 
 	Clear();
