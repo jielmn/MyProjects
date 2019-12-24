@@ -128,7 +128,7 @@ public:
 		m_hWnd = 0;
 		m_nComPort = 0;
 		m_bShowHistory = FALSE;
-		m_bWarningPrepose = TRUE;
+		m_bWarningPrepose = FALSE;
 		m_bRecycle = FALSE;
 		m_nMaxHeartBeat = 0;
 		m_nMinHeartBeat = 0;
