@@ -110,8 +110,8 @@ public:
 
 extern CGlobalData  g_data;
 
-extern int  CharacterCompare(const char * s1, const char * s2);
-
+extern int   CharacterCompare(const char * s1, const char * s2);
+extern BOOL  IsWarningItem(CWearItem * pItem);
 
 // templates
 template <class T>

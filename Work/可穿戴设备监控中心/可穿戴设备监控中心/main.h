@@ -81,6 +81,7 @@ private:
 	CDuiString  GetTempStr(CWearItem * pItem);
 	// 姓名，心率，血氧，体温
 	void  Sort(int nIndex, BOOL bNeedUpdate = TRUE);
+	void  SortByWarn();
 	void  CancelSort();
 	void  OnNewWearItem(CWearItem * pItem);
 	void  CheckListItemWarning(CListTextElementUI * pListItem);
@@ -161,6 +162,15 @@ public:
 
 private:
 	BOOL   m_bAscend;
+};
+
+class CSortWarnPrepose {
+public:
+	bool operator() (CWearItem * p1, CWearItem * p2) {
+		int n1 = IsWarningItem(p1) ? 0 : 1;
+		int n2 = IsWarningItem(p2) ? 0 : 1;
+		return n1 < n2 ? true : false;
+	}
 };
 
 class CFindWearItem {

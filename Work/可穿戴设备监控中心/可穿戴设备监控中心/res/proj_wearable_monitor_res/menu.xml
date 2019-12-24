@@ -35,7 +35,7 @@
 					<Control />
 				</VerticalLayout>		
 				
-				<Label text="异常情况前置" mouse="false"/>
+				<Label text="异常置顶" mouse="false"/>
 			</HorizontalLayout>			
         </ListContainerElement>
 		

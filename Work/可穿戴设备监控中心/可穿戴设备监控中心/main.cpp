@@ -434,6 +434,9 @@ void  CDuiFrameWnd::OnWarningPrepose() {
 	// 如果异常前置，取消排序
 	if (g_data.m_bWarningPrepose) {
 		CancelSort();
+		SortByWarn();
+		UpdateList();
+		UpdateGrids();
 	}
 }
 
@@ -549,29 +552,34 @@ void  CDuiFrameWnd::Sort(int nIndex, BOOL bNeedUpdate /*= TRUE*/) {
 	}
 	else if (3 == nIndex) {
 		std::sort(m_data.begin(), m_data.end(), CSortTemp(m_Sort[nIndex].bAscend));
-	}
-
-	for (int i = 0; i < 4; i++) {
-		if ( i == nIndex ) {
-			if (m_Sort[nIndex].bAscend) {
-				m_Header[nIndex]->SetBkImage("file='list_header_bg_sort_1.png' corner='0,0,10,0'");
-				m_Header[nIndex]->SetHotImage("file='list_header_hot_sort_1.png' corner='0,0,10,0'");
-			}
-			else {
-				m_Header[nIndex]->SetBkImage("file='list_header_bg_sort.png' corner='0,0,10,0'");
-				m_Header[nIndex]->SetHotImage("file='list_header_hot_sort.png' corner='0,0,10,0'");
-			}
-		}
-		else {
-			m_Header[i]->SetBkImage("file='list_header_bg.png' corner='0,0,10,0'");
-			m_Header[i]->SetHotImage("file='list_header_hot.png' corner='0,0,10,0'");
-		}
-	}	
+	}		
 
 	if (bNeedUpdate) {
+
+		for (int i = 0; i < 4; i++) {
+			if (i == nIndex) {
+				if (m_Sort[nIndex].bAscend) {
+					m_Header[nIndex]->SetBkImage("file='list_header_bg_sort_1.png' corner='0,0,10,0'");
+					m_Header[nIndex]->SetHotImage("file='list_header_hot_sort_1.png' corner='0,0,10,0'");
+				}
+				else {
+					m_Header[nIndex]->SetBkImage("file='list_header_bg_sort.png' corner='0,0,10,0'");
+					m_Header[nIndex]->SetHotImage("file='list_header_hot_sort.png' corner='0,0,10,0'");
+				}
+			}
+			else {
+				m_Header[i]->SetBkImage("file='list_header_bg.png' corner='0,0,10,0'");
+				m_Header[i]->SetHotImage("file='list_header_hot.png' corner='0,0,10,0'");
+			}
+		}
+
 		UpdateList();
 		UpdateGrids();
 	}	
+}
+
+void  CDuiFrameWnd::SortByWarn() {
+	std::sort(m_data.begin(), m_data.end(), CSortWarnPrepose() );
 }
 
 void  CDuiFrameWnd::CancelSort() {
@@ -590,24 +598,34 @@ void  CDuiFrameWnd::OnNewWearItem(CWearItem * pItem) {
 	if ( it != m_data.end() ) {
 		CWearItem * p = *it;
 		*p = *pItem;
-		delete pItem;
-
-		UpdateList();
-		UpdateGrids();
+		delete pItem;		
 	}
 	else {
-		m_data.push_back(pItem);
+		if ( g_data.m_bWarningPrepose ) {
+			if (IsWarningItem(pItem))
+				m_data.insert(m_data.begin(), pItem);
+			else
+				m_data.push_back(pItem);
+		}
+		else {
+			m_data.push_back(pItem);
+		}
+	}
 
+	if (g_data.m_bWarningPrepose) {
+		SortByWarn();
+	}
+	else {
 		for (int i = 0; i < 4; i++) {
-			if ( m_Sort[i].bSorted ) {
+			if (m_Sort[i].bSorted) {
 				Sort(i, FALSE);
 				break;
 			}
 		}
-
-		UpdateList();
-		UpdateGrids();
 	}
+
+	UpdateList();
+	UpdateGrids();
 }
 
 void  CDuiFrameWnd::CheckListItemWarning(CListTextElementUI * pListItem) {
@@ -652,7 +670,6 @@ void  CDuiFrameWnd::CheckListItemWarning(CListTextElementUI * pListItem) {
 		pListItem->SetText(6, "");
 	}
 }
-
    
  
               

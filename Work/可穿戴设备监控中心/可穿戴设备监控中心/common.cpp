@@ -29,9 +29,16 @@ CWearItem::~CWearItem() {
 CWearItem & CWearItem::operator =(const CWearItem & item) {
 	memcpy(m_szDeviceId, item.m_szDeviceId, sizeof(m_szDeviceId));
 	m_nPose = item.m_nPose;
-	m_nHearbeat = item.m_nHearbeat;
-	m_nOxy = item.m_nOxy;
-	m_nTemp = item.m_nTemp;       
+
+	if (item.m_nHearbeat > 0)
+		m_nHearbeat = item.m_nHearbeat;
+
+	if (item.m_nOxy > 0)
+		m_nOxy = item.m_nOxy;
+	
+	if (item.m_nTemp > 0)
+		m_nTemp = item.m_nTemp;     
+
 	return *this;
 }
 
@@ -51,4 +58,32 @@ int  CharacterCompare(const char * s1, const char * s2) {
 	int len1 = strlen(s1);
 	int len2 = strlen(s2);
 	return zh_CN_collate.compare(s1, s1+len1, s2, s2+len2);
+}
+
+BOOL  IsWarningItem(CWearItem * pItem) {
+	assert(pItem);
+
+	int nHeartBeat = pItem->m_nHearbeat;
+	int nOxy = pItem->m_nOxy;
+	int nTemp = pItem->m_nTemp;
+
+	if (nHeartBeat > 0) {
+		if ((nHeartBeat >= g_data.m_nMaxHeartBeat) || (nHeartBeat <= g_data.m_nMinHeartBeat)) {
+			return TRUE;
+		}
+	}
+
+	if (nOxy > 0) {
+		if (nOxy <= g_data.m_nMinOxy) {
+			return TRUE;
+		}
+	}
+
+	if (nTemp > 0) {
+		if (nTemp <= g_data.m_nMinTemp || nTemp >= g_data.m_nMaxTemp) {
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
