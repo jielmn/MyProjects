@@ -471,11 +471,13 @@ static void LoadLuaTable(lua_State* L, CLuaTable * pTable) {
 }
 
 CLuaTable * LoadLuaCfgString(const char * szLua) {
+	CLuaTable * pTable = new CLuaTable;
+
 	if (0 == szLua)
-		return 0;
+		return pTable;
 
 	if ( s_L == 0 )
-		return 0;
+		return pTable;
 
 	std::string s = "return ";
 	s += szLua;
@@ -483,21 +485,20 @@ CLuaTable * LoadLuaCfgString(const char * szLua) {
 	int ret = lua_pcall(s_L, 0, LUA_MULTRET, 0);
 	// lua字符串有误
 	if (0 != ret) {
-		return 0;
+		return pTable;
 	}
 
 	int nTop = lua_gettop(s_L);
 	if (nTop != 1) {
-		return 0;
+		return pTable;
 	}
 
 	int nType = lua_type(s_L, -1);
 	// 如果不是table
 	if (nType != LUA_TTABLE) {
-		return 0;
+		return pTable;
 	}
 
-	CLuaTable * pTable = new CLuaTable;
 	LoadLuaTable(s_L, pTable);
 
 	return pTable;
