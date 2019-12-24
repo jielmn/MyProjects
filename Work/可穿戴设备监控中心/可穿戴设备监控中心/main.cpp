@@ -273,7 +273,7 @@ bool CDuiFrameWnd::OnGridsLayoutSize(void * pParam) {
 	// 每页多少格子
 	m_nItemsPerPage = nRows * nColumns;
 	// 总页数
-	int nPagesCnt = ( m_data.size() - 1 ) / m_nItemsPerPage + 1;
+	int nPagesCnt = m_data.size() > 0 ? ( m_data.size() - 1 ) / m_nItemsPerPage + 1 : 0;
 	// 计算当前页
 	int nCurPage = m_nCurPageFirstItemIndex / m_nItemsPerPage;
 	// 重新计算 m_nCurPageFirstItemIndex
