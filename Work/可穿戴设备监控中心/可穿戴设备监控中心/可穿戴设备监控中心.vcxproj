@@ -164,6 +164,7 @@
     <ClCompile Include="EditableButtonUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyControls.cpp" />
+    <ClCompile Include="MyDatabase.cpp" />
     <ClCompile Include="MyTreeCfgUI.cpp" />
     <ClCompile Include="SettingDlg.cpp" />
   </ItemGroup>
@@ -175,6 +176,7 @@
     <ClInclude Include="EditableButtonUI.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MyControls.h" />
+    <ClInclude Include="MyDatabase.h" />
     <ClInclude Include="MyTreeCfgUI.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SettingDlg.h" />

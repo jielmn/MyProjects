@@ -149,6 +149,14 @@ void  CBusiness::ReadData() {
 		bRet = m_com.Read(achData, dwLen);
 	}
 
+	// 如果读取失败，串口断开
+	if ( !bRet ) {
+		m_com.CloseUartPort();
+		m_buf.Clear();
+		::PostMessage(g_data.m_hWnd, UM_RECONNECT_RET, FALSE, 0);
+		return;
+	}
+
 	const DWORD  DATA_ITEM_LENGTH = 13;
 
 	while ( m_buf.GetDataLength() >= DATA_ITEM_LENGTH ) {

@@ -35,6 +35,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	memset(m_Sort, 0, sizeof(m_Sort));
 	memset(m_Header, 0, sizeof(m_Header));
 	m_lblStatus = 0;
+	m_bComOpened = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -179,16 +180,21 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (bRet) {
 			strText.Format("连接串口com%d成功", g_data.m_nComPort);
 			m_lblStatus->SetText(strText);
+			m_bComOpened = TRUE;
 		}
 		else {
 			strText.Format("连接串口com%d失败", g_data.m_nComPort);
 			m_lblStatus->SetText(strText);
+			m_bComOpened = FALSE;
 		}
 	}
 	else if (uMsg == UM_DATA_ITEM) {
 		CWearItem * pItem = (CWearItem *)wParam;
 		assert(pItem);
 		OnNewWearItem(pItem);
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		OnDeviceChanged();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -670,7 +676,26 @@ void  CDuiFrameWnd::CheckListItemWarning(CListTextElementUI * pListItem) {
 		pListItem->SetText(6, "");
 	}
 }
-   
+
+void  CDuiFrameWnd::OnDeviceChanged() {
+	// 如果串口已经打开
+	if (m_bComOpened) {
+		return;
+	}
+
+	std::map<int, std::string> ComPorts;
+	GetAllSerialPorts(ComPorts);
+
+	std::map<int, std::string>::iterator it;
+	for (it = ComPorts.begin(); it != ComPorts.end(); it++) {
+		int nComPort = it->first;
+
+		if ( nComPort == g_data.m_nComPort ) {
+			CBusiness::GetInstance()->ReconnectAsyn();
+			break;
+		}
+	}
+}
  
               
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,

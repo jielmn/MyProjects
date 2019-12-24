@@ -57,6 +57,7 @@ private:
 	int                                         m_nItemsPerPage;
 	RECT                                        m_rcLayGrids;
 	Sort                                        m_Sort[4];    // 姓名，心率，血氧，体温
+	BOOL                                        m_bComOpened;  // 串口是否打开
 
 private:
 	void  OnExpand();
@@ -85,6 +86,7 @@ private:
 	void  CancelSort();
 	void  OnNewWearItem(CWearItem * pItem);
 	void  CheckListItemWarning(CListTextElementUI * pListItem);
+	void  OnDeviceChanged();
 };
 
 class CSortName {
