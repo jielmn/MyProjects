@@ -432,7 +432,7 @@ void  CDuiFrameWnd::OnCheckHistory() {
 void  CDuiFrameWnd::OnWarningPrepose() {
 	g_data.m_bWarningPrepose = !g_data.m_bWarningPrepose;
 	// 如果异常前置，取消排序
-	if (g_data.m_bWarningPrepose) {
+	if (g_data.m_bWarningPrepose) { 
 		CancelSort();
 		SortByWarn();
 		UpdateList();

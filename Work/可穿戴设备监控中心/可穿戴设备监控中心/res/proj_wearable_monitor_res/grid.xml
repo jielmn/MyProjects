@@ -7,32 +7,32 @@
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="10,0,10,4" height="28">
-				<Control width="24" height="24" bkimage="user.png" />
+				<Control width="24" height="24" bkimage="user.png" tooltip="姓名" />
 				<Control width="6" />
 				<EditableButton name="cstEdtBtnName" width="80" btncolor="#FFFFFFFF" btnfont="2" editfont="2" hotimage="file='btn_hot.png' corner='2,8,2,2'" />					
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="10,0,10,4" height="28">
-				<Control width="24" height="24" bkimage="heartbeat.png" />
+				<Control width="24" height="24" bkimage="heartbeat.png" tooltip="心率" />
 				<Control width="10" />
 				<Label name="lblBeat" textcolor="#FFFFFFFF" font="2" text="" width="44"/>					
-				<Control width="24" height="24" bkimage="oxy.png" />
+				<Control width="24" height="24" bkimage="oxy.png" tooltip="血氧" />
 				<Control width="10" />
 				<Label name="lblOxy"  textcolor="#FFFFFFFF" font="2" text="" width="44" />				
 			</HorizontalLayout>
 		
 			
 			<HorizontalLayout inset="10,0,10,4" height="28">
-				<Control width="24" height="24" bkimage="temp.png" />
+				<Control width="24" height="24" bkimage="temp.png" tooltip="体温" />
 				<Control width="10" />
 				<Label name="lblTemp"  textcolor="#FFFFFFFF" font="2" text="" width="44" />
-				<Control width="24" height="24" bkimage="pose.png" />
+				<Control width="24" height="24" bkimage="pose.png" tooltip="人体姿势" />
 				<Control width="10" />
 				<Label name="lblPose" textcolor="#FFFFFFFF" font="2" text="" width="44" />				
 			</HorizontalLayout>			
 			
 			<HorizontalLayout inset="10,0,10,4" height="28" visible="true">
-				<Control width="24" height="24" bkimage="device.png" />
+				<Control width="24" height="24" bkimage="device.png" tooltip="设备编号" />
 				<Control width="10" />
 				<Label name="lblDeviceId"  textcolor="#FFFFFFFF" font="2" text="" />
 			</HorizontalLayout>
