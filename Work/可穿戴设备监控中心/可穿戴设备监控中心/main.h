@@ -83,6 +83,7 @@ private:
 	void  Sort(int nIndex, BOOL bNeedUpdate = TRUE);
 	void  CancelSort();
 	void  OnNewWearItem(CWearItem * pItem);
+	void  CheckListItemWarning(CListTextElementUI * pListItem);
 };
 
 class CSortName {

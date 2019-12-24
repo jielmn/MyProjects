@@ -60,11 +60,12 @@ public:
 	int   m_nHearbeat;    // ĞÄÂÊ
 	int   m_nOxy;         // ÑªÑõ
 	int   m_nTemp;        // ÌåÎÂ
-	int   m_nPose;
+	int   m_nPose;	
 
 public:
 	CWearItem();
 	~CWearItem();
+	CWearItem & operator =( const CWearItem & item );
 };
 
 typedef struct tagSort {

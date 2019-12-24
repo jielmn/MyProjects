@@ -26,6 +26,15 @@ CWearItem::~CWearItem() {
 
 }
 
+CWearItem & CWearItem::operator =(const CWearItem & item) {
+	memcpy(m_szDeviceId, item.m_szDeviceId, sizeof(m_szDeviceId));
+	m_nPose = item.m_nPose;
+	m_nHearbeat = item.m_nHearbeat;
+	m_nOxy = item.m_nOxy;
+	m_nTemp = item.m_nTemp;       
+	return *this;
+}
+
 
 // Linux g++ locale 名称: "zh_CN.utf"
 // VC2010 locale 名称：    "Chinese"或者"Chinese_china"

@@ -421,6 +421,7 @@ void  CDuiFrameWnd::UpdateList() {
 		pListItem->SetText(5, pItem->m_szDeviceId);  
 
 		pListItem->SetTag((int)pItem);
+		CheckListItemWarning(pListItem);
 	}
 }
 
@@ -606,6 +607,49 @@ void  CDuiFrameWnd::OnNewWearItem(CWearItem * pItem) {
 
 		UpdateList();
 		UpdateGrids();
+	}
+}
+
+void  CDuiFrameWnd::CheckListItemWarning(CListTextElementUI * pListItem) {
+	assert(pListItem);
+
+	BOOL  bHeartWarning = FALSE;
+	BOOL  bOxyWarning = FALSE;
+	BOOL  bTempWarning = FALSE;
+
+	int nHeartBeat = 0;
+	int nOxy = 0;
+	int nTemp = 0;
+	float fTemp = 0.0f;
+
+	sscanf(pListItem->GetText(2), "%d", &nHeartBeat);
+	sscanf(pListItem->GetText(3), "%d", &nOxy);
+	sscanf(pListItem->GetText(4), "%f", &fTemp);
+	nTemp = (int)round(fTemp * 100);
+
+	if (nHeartBeat > 0) {
+		if ((nHeartBeat >= g_data.m_nMaxHeartBeat) || (nHeartBeat <= g_data.m_nMinHeartBeat)) {
+			bHeartWarning = TRUE;
+		}
+	}
+
+	if (nOxy > 0) {
+		if (nOxy <= g_data.m_nMinOxy) {
+			bOxyWarning = TRUE;
+		}
+	}
+
+	if (nTemp > 0) {
+		if (nTemp <= g_data.m_nMinTemp || nTemp >= g_data.m_nMaxTemp) {
+			bTempWarning = TRUE;
+		}
+	}
+
+	if (bHeartWarning || bOxyWarning || bTempWarning) {
+		pListItem->SetText(6, "¡Ì");
+	}
+	else {
+		pListItem->SetText(6, "");
 	}
 }
 
