@@ -28,6 +28,10 @@ using namespace DuiLib;
 #define   UM_RECONNECT_RET            (WM_USER+1)
 #define   UM_DATA_ITEM                (WM_USER+2)
 
+#define   ABNORMAL_COLOR          0xFFFBE044
+#define   NORMAL_COLOR            0xFF4AB20A
+#define   ABNORMAL_TEXT_COLOR     0xFFFF0000
+
 // 创建duilib控件的回调
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {
@@ -79,6 +83,11 @@ public:
 	BOOL                      m_bShowHistory;
 	BOOL                      m_bWarningPrepose;
 	BOOL                      m_bRecycle;
+	int                       m_nMaxHeartBeat;
+	int                       m_nMinHeartBeat;
+	int                       m_nMinOxy;
+	int                       m_nMaxTemp;
+	int                       m_nMinTemp;
 
 public:
 	CGlobalData() {
@@ -90,6 +99,11 @@ public:
 		m_bShowHistory = FALSE;
 		m_bWarningPrepose = TRUE;
 		m_bRecycle = FALSE;
+		m_nMaxHeartBeat = 0;
+		m_nMinHeartBeat = 0;
+		m_nMinOxy = 0;
+		m_nMaxTemp = 0;
+		m_nMinTemp = 0;
 	}
 };
 

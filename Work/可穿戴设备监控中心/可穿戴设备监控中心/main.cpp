@@ -331,6 +331,8 @@ void  CDuiFrameWnd::UpdateGrids() {
 		pGrid->SetPose(pItem->m_nPose);
 
 		pGrid->SetTag((int)pItem);
+
+		pGrid->CheckWarning();
 	}
 }
 

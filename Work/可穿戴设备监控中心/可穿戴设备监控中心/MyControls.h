@@ -46,6 +46,8 @@ public:
 	void SetDeviceId(CDuiString strId);
 	CDuiString  GetDeviceId();
 
+	void CheckWarning();
+
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
@@ -68,6 +70,7 @@ private:
 	CLabelUI *                                  m_lblTemp;
 	CLabelUI *                                  m_lblDeviceId;
 	CLabelUI *                                  m_lblPose;
+	CVerticalLayoutUI *                         m_layMain;
 
 private:
 	int           m_nIndex;

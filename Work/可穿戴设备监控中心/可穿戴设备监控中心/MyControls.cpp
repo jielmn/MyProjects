@@ -1,4 +1,5 @@
 #include "MyControls.h"
+#include "EditableButtonUI.h"
 
 CEdtComboUI::CEdtComboUI() {
 	m_cmb = 0;
@@ -62,6 +63,7 @@ CGridUI::CGridUI() : m_callback(m_pManager) {
 	m_nOxy = 0;
 	m_nTemp = 0;
 	m_nPose = 0;
+	m_layMain = 0;
 }
 
 CGridUI::~CGridUI() {
@@ -91,6 +93,7 @@ void CGridUI::DoInit() {
 	m_lblDeviceId = (CLabelUI *)m_pManager->FindControl("lblDeviceId");
 	m_lblIndex = (CLabelUI *)m_pManager->FindControl("lblIndex");
 	m_lblPose = (CLabelUI *)m_pManager->FindControl("lblPose");
+	m_layMain = (CVerticalLayoutUI *)m_pManager->FindControl("main");
 
 	SetIndex();
 	SetUserName();
@@ -239,4 +242,59 @@ void CGridUI::SetPose() {
 
 int  CGridUI::GetPose() {
 	return m_nPose;
+}
+
+static DuiLib::CControlUI* CALLBACK CS_FINDCONTROLPROC(DuiLib::CControlUI* pSubControl, LPVOID lpData) {
+	CDuiString strText;
+	if (0 == strcmp(pSubControl->GetClass(), DUI_CTR_LABEL)) {
+		((CLabelUI *)pSubControl)->SetTextColor((DWORD)lpData);
+	}
+	else if ( 0 == strcmp(pSubControl->GetClass(),"EditableButton") ) {
+		CEditableButtonUI * btn = (CEditableButtonUI *)pSubControl;		
+		strText.Format("#%X", (DWORD)lpData);
+		btn->SetAttribute("btncolor", strText);
+	}
+	return 0;
+}
+
+void  CGridUI::CheckWarning() {
+	BOOL  bHeartWarning = FALSE;
+	BOOL  bOxyWarning = FALSE;
+	BOOL  bTempWarning = FALSE;
+
+	if ( m_nHeartBeat > 0 ) {
+		if ( (m_nHeartBeat >= g_data.m_nMaxHeartBeat) || (m_nHeartBeat <= g_data.m_nMinHeartBeat) ) {
+			bHeartWarning = TRUE;
+		}
+	}
+
+	if ( m_nOxy > 0) {
+		if ( m_nOxy <= g_data.m_nMinOxy ) {
+			bOxyWarning = TRUE;
+		}
+	}
+
+	if (m_nTemp > 0) {
+		if ( m_nTemp <= g_data.m_nMinTemp || m_nTemp >= g_data.m_nMaxTemp ) {
+			bTempWarning= TRUE;
+		}
+	}
+
+	if ( bHeartWarning || bOxyWarning || bTempWarning ) {
+		m_layMain->SetBkColor(ABNORMAL_COLOR);
+		m_layMain->FindControl(CS_FINDCONTROLPROC, (LPVOID)0xFF333333, 0);
+		if (bHeartWarning) {
+			m_lblHeartBeat->SetTextColor(ABNORMAL_TEXT_COLOR);
+		}
+		if (bOxyWarning) {
+			m_lblOxy->SetTextColor(ABNORMAL_TEXT_COLOR);
+		}
+		if (bTempWarning) {
+			m_lblTemp->SetTextColor(ABNORMAL_TEXT_COLOR);
+		}
+	}
+	else {
+		m_layMain->SetBkColor(NORMAL_COLOR);
+		m_layMain->FindControl(CS_FINDCONTROLPROC, (LPVOID)0xFFFFFFFF, 0);
+	}
 }

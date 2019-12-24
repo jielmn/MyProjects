@@ -61,6 +61,13 @@ int CBusiness::Init() {
 		g_data.m_nComPort = nValue;
 	}
 
+	
+	g_data.m_nMaxHeartBeat = g_data.m_cfg->GetInt("warning.max heart beat", 120);
+	g_data.m_nMinHeartBeat = g_data.m_cfg->GetInt("warning.min heart beat", 60);
+	g_data.m_nMinOxy = g_data.m_cfg->GetInt("warning.min blood oxygen", 95);
+	g_data.m_nMaxTemp = g_data.m_cfg->GetInt("warning.max temperature", 3800);
+	g_data.m_nMinTemp = g_data.m_cfg->GetInt("warning.max heart beat", 3500);
+
 	g_data.m_thrd_com = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_com) {
 		return -1;
@@ -91,6 +98,9 @@ void  CBusiness::ReconnectAsyn(BOOL bCloseFirst /*= FALSE*/) {
 			return;
 		}
 	}	
+
+	if (g_data.m_nComPort <= 0)
+		return;
 
 	g_data.m_thrd_com->DeleteMessages();
 	g_data.m_thrd_com->PostMessage(this, MSG_RECONNECT);

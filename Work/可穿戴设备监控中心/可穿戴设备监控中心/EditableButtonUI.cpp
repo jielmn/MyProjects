@@ -60,6 +60,9 @@ void CEditableButtonUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 	}
 	else if (0 == StrICmp(pstrName, "btncolor")) {    
 		sscanf(pstrValue, "#%x", &m_dwBtnColor); 
+		if ( m_bInited ) {
+			m_btn->SetTextColor(m_dwBtnColor);
+		}
 	}
 	else if (0 == StrICmp(pstrName, "editfont")) {
 		sscanf(pstrValue, "%d", &m_nEdtFont);
