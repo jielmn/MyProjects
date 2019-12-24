@@ -61,12 +61,13 @@ int CBusiness::Init() {
 		g_data.m_nComPort = nValue;
 	}
 
-	
 	g_data.m_nMaxHeartBeat = g_data.m_cfg->GetInt("warning.max heart beat", 120);
 	g_data.m_nMinHeartBeat = g_data.m_cfg->GetInt("warning.min heart beat", 60);
 	g_data.m_nMinOxy = g_data.m_cfg->GetInt("warning.min blood oxygen", 95);
 	g_data.m_nMaxTemp = g_data.m_cfg->GetInt("warning.max temperature", 3800);
 	g_data.m_nMinTemp = g_data.m_cfg->GetInt("warning.max heart beat", 3500);
+
+	m_sqlite.InitDb();
 
 	g_data.m_thrd_com = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_com) {
@@ -99,6 +100,7 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+	m_sqlite.DeinitDb();
 	return 0;
 }
 
@@ -184,6 +186,24 @@ void  CBusiness::ReadData() {
 	ReadDataAsyn(100);
 }
 
+void  CBusiness::GetDeviceUserNameAsyn(const char * szDeviceId) {
+	g_data.m_thrd_db->PostMessage(this, MSG_GET_NAME, new CGetNameParam(szDeviceId) );
+}
+
+void  CBusiness::GetDeviceUserName(const CGetNameParam * pParam) {
+	QueryNameRet * pRet = new QueryNameRet;
+	STRNCPY(pRet->szDeviceId, pParam->m_szDeviceId, sizeof(pRet->szDeviceId));
+	BOOL bRet = m_sqlite.GetDeviceUserName(pParam, pRet->szName, sizeof(pRet->szName));
+	::PostMessage(g_data.m_hWnd, UM_GET_NAME_RET, bRet, (LPARAM)pRet);		
+}
+
+void  CBusiness::SaveDeviceUserNameAsyn(const char * szDeviceId, const char * szName) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SAVE_NAME, new CSaveNameParam(szDeviceId, szName));
+}
+
+void  CBusiness::SaveDeviceUserName(const CSaveNameParam * pParam) {
+	m_sqlite.SaveDeviceUserName(pParam);
+}
 
 
 // 消息处理
@@ -199,6 +219,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_DATA:
 	{
 		ReadData();
+	}
+	break;
+
+	case MSG_GET_NAME:
+	{
+		CGetNameParam * pParam = (CGetNameParam *)pMessageData;
+		GetDeviceUserName(pParam);
+	}
+	break;
+
+	case MSG_SAVE_NAME:
+	{
+		CSaveNameParam * pParam = (CSaveNameParam *)pMessageData;
+		SaveDeviceUserName(pParam);
 	}
 	break;
 

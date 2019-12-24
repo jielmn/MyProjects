@@ -5,6 +5,7 @@
 #include "common.h"
 #include "sigslot.h"
 #include "LmnSerialPort.h"
+#include "MyDatabase.h"
 
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
 
@@ -22,6 +23,12 @@ public:
 	void  ReadDataAsyn(DWORD  dwDelay = 0);
 	void  ReadData();
 
+	void  GetDeviceUserNameAsyn(const char * szDeviceId);
+	void  GetDeviceUserName(const CGetNameParam * pParam);
+
+	void  SaveDeviceUserNameAsyn(const char * szDeviceId, const char * szName);
+	void  SaveDeviceUserName(const CSaveNameParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -33,6 +40,7 @@ private:
 private:
 	CLmnSerialPort     m_com;
 	CDataBuf           m_buf;
+	CMySqliteDatabase  m_sqlite;
 };
 
 

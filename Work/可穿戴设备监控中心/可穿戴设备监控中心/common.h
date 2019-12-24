@@ -24,9 +24,12 @@ using namespace DuiLib;
 
 #define   MSG_RECONNECT               1
 #define   MSG_READ_DATA               2
+#define   MSG_GET_NAME                3
+#define   MSG_SAVE_NAME               4
 
 #define   UM_RECONNECT_RET            (WM_USER+1)
 #define   UM_DATA_ITEM                (WM_USER+2)
+#define   UM_GET_NAME_RET             (WM_USER+3)
 
 #define   ABNORMAL_COLOR          0xFFFBE044
 #define   NORMAL_COLOR            0xFF4AB20A
@@ -73,6 +76,31 @@ typedef struct tagSort {
 	BOOL     bAscend;
 }Sort;
 
+class CGetNameParam : public LmnToolkits::MessageData {
+public:
+	CGetNameParam(const char * szDeviceId) { 
+		STRNCPY( m_szDeviceId, szDeviceId, MAX_DEVICE_ID_LEN );
+	}
+	
+	char m_szDeviceId[MAX_DEVICE_ID_LEN];
+};
+
+typedef  struct  tagQueryNameRet {
+	char    szDeviceId[MAX_DEVICE_ID_LEN];
+	char    szName[MAX_NAME_LEN];
+}QueryNameRet;
+
+class CSaveNameParam : public LmnToolkits::MessageData {
+public:
+	CSaveNameParam(const char * szDeviceId, const char * szName) {
+		STRNCPY(m_szDeviceId, szDeviceId, MAX_DEVICE_ID_LEN);
+		STRNCPY(m_szName, szName, MAX_NAME_LEN);
+	}
+
+	char m_szDeviceId[MAX_DEVICE_ID_LEN];
+	char m_szName[MAX_NAME_LEN];
+};
+
 
 class  CGlobalData {
 public:
@@ -112,8 +140,9 @@ public:
 
 extern CGlobalData  g_data;
 
-extern int   CharacterCompare(const char * s1, const char * s2);
-extern BOOL  IsWarningItem(CWearItem * pItem);
+extern int     CharacterCompare(const char * s1, const char * s2);
+extern BOOL    IsWarningItem(CWearItem * pItem);
+extern time_t  GetTodayZeroTime();
 
 // templates
 template <class T>

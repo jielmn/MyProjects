@@ -87,3 +87,16 @@ BOOL  IsWarningItem(CWearItem * pItem) {
 
 	return FALSE;
 }
+
+time_t  GetTodayZeroTime() {
+	time_t now = time(0);
+
+	struct tm tTmTime;
+	localtime_s(&tTmTime, &now);
+
+	tTmTime.tm_hour = 0;
+	tTmTime.tm_min = 0;
+	tTmTime.tm_sec = 0;
+
+	return mktime(&tTmTime);
+}

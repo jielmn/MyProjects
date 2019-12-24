@@ -156,6 +156,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 				assert(pItem);
 				STRNCPY(pItem->m_szName, msg.pSender->GetText(), sizeof(pItem->m_szName));
 				UpdateList();
+
+				CBusiness::GetInstance()->SaveDeviceUserNameAsyn(pItem->m_szDeviceId, pItem->m_szName);
+				m_Names[pItem->m_szDeviceId] = pItem->m_szName;
 			}
 		}
 	}
@@ -195,6 +198,28 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		OnDeviceChanged();
+	}
+	else if (uMsg == UM_GET_NAME_RET) {
+		bRet = wParam;
+		QueryNameRet * pRet = (QueryNameRet *)lParam;
+		assert(pRet);
+
+		if ( bRet ) {
+			m_Names.insert(std::pair<std::string, std::string>(pRet->szDeviceId, pRet->szName));
+			std::vector<CWearItem *>::iterator it = std::find_if(m_data.begin(), m_data.end(), 
+				CFindWearItemByName(pRet->szDeviceId));
+			if (it != m_data.end()) {
+				CWearItem * pItem = *it;
+				STRNCPY(pItem->m_szName, pRet->szName, sizeof(pItem->m_szName));
+				UpdateList();
+				UpdateGrids();
+			}
+		}
+		else {
+			m_Names.insert(std::pair<std::string, std::string>(pRet->szDeviceId, ""));
+		}		
+
+		delete pRet;
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -539,6 +564,9 @@ void  CDuiFrameWnd::OnEdNameKillFocus() {
 			assert(pItem);
 			STRNCPY(pItem->m_szName, m_edName->GetText(), sizeof(pItem->m_szName));
 			UpdateGrids();
+
+			CBusiness::GetInstance()->SaveDeviceUserNameAsyn(pItem->m_szDeviceId, pItem->m_szName);
+			m_Names[pItem->m_szDeviceId] = pItem->m_szName;
 		}		
 	}
 
@@ -615,6 +643,11 @@ void  CDuiFrameWnd::OnNewWearItem(CWearItem * pItem) {
 		}
 		else {
 			m_data.push_back(pItem);
+		}
+
+		std::string device_id = pItem->m_szDeviceId;
+		if ( m_Names.find(device_id) == m_Names.end() ) {
+			CBusiness::GetInstance()->GetDeviceUserNameAsyn(device_id.c_str());
 		}
 	}
 

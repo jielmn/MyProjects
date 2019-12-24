@@ -58,6 +58,7 @@ private:
 	RECT                                        m_rcLayGrids;
 	Sort                                        m_Sort[4];    // 姓名，心率，血氧，体温
 	BOOL                                        m_bComOpened;  // 串口是否打开
+	std::map<std::string, std::string>          m_Names;      // <deviceId, user name>
 
 private:
 	void  OnExpand();
@@ -192,5 +193,24 @@ public:
 
 private:
 	CWearItem *   m_pItem;
+};
+
+class CFindWearItemByName {
+public:
+	CFindWearItemByName(const char * szId) {
+		m_szDeviceId = szId;
+	}
+
+	bool operator() (CWearItem * p) {
+		if (0 == strcmp(p->m_szDeviceId, m_szDeviceId)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+private:
+	CDuiString    m_szDeviceId;
 };
 
