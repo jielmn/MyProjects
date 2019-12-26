@@ -102,8 +102,11 @@ private:
 	float                            m_fSecondsPerPixel;
 
 private:
-	HPEN                             m_hCommonThreadPen;
+	HPEN                             m_hCommonThreadPen;	
+	HBRUSH                           m_hCommonBrush;
 	HPEN                             m_hDaySplitThreadPen;
+	Pen *                            m_temperature_pen;
+	SolidBrush *                     m_temperature_brush;
 
 private:
 	int   GetMyWidth();
@@ -112,7 +115,15 @@ private:
 	int   GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin = MYIMAGE_V_MARGIN);
 	void  DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
 		             const RECT & rectScale1, const RECT & rectScale2, int width );
+	// ср╠ъ©л╤х
+	void  DrawScale2 (HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
+		const RECT & rectScale1, const RECT & rectScale2, int width);
+
 	BOOL  HasData();
 	void  GetTimeRange( time_t & tFirst, time_t & tLast );
 	void  DrawDaySplit( HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin);
+	void  DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+		int nMaxValue, float fHeightPerUnit, POINT  tTopLeft, Graphics & graphics,
+		const std::vector<DataItem * > & vData, Pen * pen, SolidBrush * brush);
+	void  DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
 };

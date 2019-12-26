@@ -301,8 +301,12 @@ void  CGridUI::CheckWarning() {
 
 CMyImageUI::CMyImageUI() {
 	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
+	m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
-	m_fSecondsPerPixel = 200.0f;
+	m_temperature_pen = new Pen(Gdiplus::Color(0,255,0), 1.0);
+	m_temperature_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(0, 255, 0)));
+
+	m_fSecondsPerPixel = 100.0f;
 
 	DataItem * pItem = 0;
 
@@ -329,7 +333,11 @@ CMyImageUI::CMyImageUI() {
 
 CMyImageUI::~CMyImageUI() {
 	DeleteObject(m_hCommonThreadPen);
+	DeleteObject(m_hCommonBrush);
 	DeleteObject(m_hDaySplitThreadPen);
+
+	delete m_temperature_pen;
+	delete m_temperature_brush;
 
 	ClearVector(m_vHeartBeat);
 	ClearVector(m_vOxy);
@@ -376,9 +384,8 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rcScale2.left   = rcScale1.left + width - MYIMAGE_H_MARGIN;
 	rcScale2.top    = rect.top;
 	rcScale2.right  = rcScale2.left + MYIMAGE_H_MARGIN;
-	rcScale2.bottom = rect.bottom;
+	rcScale2.bottom = rect.bottom;	
 
-	// 画刻度线
 	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 
 	if (!HasData())
@@ -388,6 +395,13 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	GetTimeRange(tFirst, tLast);
 
 	DrawDaySplit(hDC, tFirst, tLast, rcScale1.right, rcScale1.top, rcScale1.bottom - 1, nVMargin);
+
+	POINT tTopLeft = { rcScale1.right, nMaxY };
+	DrawPolyline(tFirst, tLast, m_fSecondsPerPixel, nMaxTemp * 100, nHeightPerCelsius / 100.0f, 
+		tTopLeft, graphics, m_vTemp, m_temperature_pen, m_temperature_brush );
+
+	// 画刻度线
+	DrawScale2(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 
 	return true;
 }
@@ -480,19 +494,7 @@ void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeight
 	::LineTo(hDC, rcScale1.left, rcScale1.bottom);
 
 	::MoveToEx(hDC, rcScale1.right, rcScale1.top, 0);
-	::LineTo(hDC, rcScale1.right, rcScale1.bottom);
-
-	::MoveToEx(hDC, rcScale2.left, rcScale2.top, 0);
-	::LineTo(hDC, rcScale2.left, rcScale2.bottom);
-
-	::MoveToEx(hDC, rcScale2.right - 1, rcScale2.top, 0);
-	::LineTo(hDC, rcScale2.right - 1, rcScale2.bottom);
-
-	::MoveToEx(hDC, rcScale1.left, rcScale1.top, 0);
-	::LineTo(hDC, rcScale2.right - 1, rcScale2.top);
-
-	::MoveToEx(hDC, rcScale1.left, rcScale1.bottom - 1, 0);
-	::LineTo(hDC, rcScale2.right - 1, rcScale2.bottom - 1);
+	::LineTo(hDC, rcScale1.right, rcScale1.bottom);		
 
 	::SetTextColor(hDC, RGB(255, 255, 255));
 	CDuiString strText;
@@ -512,6 +514,39 @@ void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeight
 			strText, strText.GetLength());
 	}	
 
+	SelectObject(hDC, hOldPen);
+}
+
+// 右边刻度
+void  CMyImageUI::DrawScale2(HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
+	const RECT & rcScale1, const RECT & rcScale2, int width) {
+	HPEN hOldPen = (HPEN)SelectObject(hDC, m_hCommonThreadPen);
+
+	::FillRect(hDC, &rcScale2, m_hCommonBrush);
+
+	::MoveToEx(hDC, rcScale2.left, rcScale2.top, 0);
+	::LineTo(hDC, rcScale2.left, rcScale2.bottom);
+
+	::MoveToEx(hDC, rcScale2.right - 1, rcScale2.top, 0);
+	::LineTo(hDC, rcScale2.right - 1, rcScale2.bottom);
+
+	::MoveToEx(hDC, rcScale1.left, rcScale1.top, 0);
+	::LineTo(hDC, rcScale2.right - 1, rcScale2.top);
+
+	::MoveToEx(hDC, rcScale1.left, rcScale1.bottom - 1, 0);
+	::LineTo(hDC, rcScale2.right - 1, rcScale2.bottom - 1);
+
+	::SetTextColor(hDC, RGB(255, 255, 255));
+	CDuiString strText;
+	for (int i = 0; i <= nCelsiusCnt; i++) {
+		int nY = nMaxY + nHeightPerCelsius * i;
+		int nTemp = nMaxTemp - i;
+
+		int nScale = (nTemp - 37) * 10 + 100;
+		strText.Format("%d", nScale);
+		::TextOut(hDC, rcScale2.left + (10), nY + (-8),
+			strText, strText.GetLength());
+	}
 
 	SelectObject(hDC, hOldPen);
 }
@@ -623,4 +658,107 @@ void  CMyImageUI::DrawDaySplit(HDC  hDC, time_t tFirst, time_t tLast, int nLeft,
 	}
 
 	SelectObject(hDC, hOldPen);
+}
+
+
+// 画折线图 范围[tFirstTime, tLastTime]，只画单个vector
+void  CMyImageUI::DrawPolyline( time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
+	int   nMaxValue, float fHeightPerUnit, POINT  tTopLeft, Graphics & graphics,
+	const std::vector<DataItem * > & vData, Pen * pen, SolidBrush * brush ) {
+
+	DWORD  dwMaxCnt = vData.size();
+	Gdiplus::Point * points = new Gdiplus::Point[dwMaxCnt];
+	vector<DataItem *>::const_iterator it;
+
+	// 找到第一个点
+	for (it = vData.begin(); it != vData.end(); it++) {
+		DataItem * pItem = *it;
+		if (pItem->tTime >= tFirstTime) {
+			break;
+		}
+	}
+
+	// 找到第一个点后，其他的点不在和起始时间点比较
+	// 临时存储相同x坐标的vector
+	vector<DataItem *>  vTmp;
+	// 临时vector的item有共同的点，它们的x坐标相同
+	int nTmpX = 0;
+	// points数组的大小
+	int cnt = 0;
+
+	for (; it != vData.end(); it++) {
+		DataItem * pItem = *it;
+		// 如果最后时间有值
+		if (tLastTime > 0) {
+			// 如果超出范围
+			if (pItem->tTime > tLastTime) {
+				break;
+			}
+		}
+
+		int  nX = (int)((pItem->tTime - tFirstTime) / fSecondsPerPixel);
+
+		if (vTmp.size() == 0) {
+			vTmp.push_back(pItem);
+			nTmpX = nX;
+		}
+		else {
+			// 如果偏移量和上次的相同，放置在临时vector中
+			if (nX <= nTmpX + 1) {
+				vTmp.push_back(pItem);
+			}
+			else {
+				vector<DataItem *>::iterator  it_tmp;
+				int  sum = 0;
+				for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+					DataItem * pTmpItem = *it_tmp;
+					sum += pTmpItem->nData;
+				}
+				// 求平均值
+				float  ave = (float)sum / vTmp.size();
+
+				points[cnt].X = nTmpX + tTopLeft.x;
+				points[cnt].Y = tTopLeft.y + (int)( (nMaxValue - ave) * fHeightPerUnit );
+				cnt++;
+
+				vTmp.clear();
+				vTmp.push_back(pItem);
+				nTmpX = nX;
+			}
+		}
+	}
+
+	if (vTmp.size() > 0) {
+		vector<DataItem *>::iterator  it_tmp;
+		int  sum = 0;
+		for (it_tmp = vTmp.begin(); it_tmp != vTmp.end(); ++it_tmp) {
+			DataItem * pTmpItem = *it_tmp;
+			sum += pTmpItem->nData;
+		}
+		// 求平均值
+		float  ave = (float)sum / vTmp.size();
+
+		points[cnt].X = nTmpX + tTopLeft.x;
+		points[cnt].Y = tTopLeft.y + (int)( (nMaxValue - ave) * fHeightPerUnit );
+		cnt++;
+
+		vTmp.clear();
+	}
+
+	if ( fSecondsPerPixel > 0.0f && fSecondsPerPixel < 6.0f ) {
+		for (int m = 0; m < cnt; ++m) {
+			DrawPoint(brush, graphics, points[m].X, points[m].Y, 0, 3);
+		}
+	}
+
+	if (cnt > 1)
+		graphics.DrawLines(pen, points, cnt);
+	else if (1 == cnt)
+		DrawPoint(brush, graphics, points[0].X, points[0].Y, 0, 3);
+
+	delete[] points;
+}
+
+void   CMyImageUI::DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius) {
+	g.FillEllipse(brush, x - radius, y - radius, 2 * radius, 2 * radius);
 }
