@@ -107,4 +107,6 @@ private:
 	int   GetMyScrollX();
 	void  GetMaxMinScale(int & nMinTemp, int & nMaxTemp, int & nMinScale, int & nMaxScale);
 	int   GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin = MYIMAGE_V_MARGIN);
+	void  DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
+		             const RECT & rectScale1, const RECT & rectScale2, int width );
 };

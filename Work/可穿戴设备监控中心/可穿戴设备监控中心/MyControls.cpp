@@ -353,8 +353,8 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rcScale2.right  = rect.right;
 	rcScale2.bottom = rect.bottom;
 
-	
-
+	// »­¿Ì¶ÈÏß
+	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 
 	return true;
 }
@@ -437,4 +437,36 @@ int  CMyImageUI::GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin /*
 		h -= nSpared;
 	}
 	return h;
+}
+
+void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
+	                         const RECT & rcScale1, const RECT & rcScale2, int width ) {
+	HPEN hOldPen = (HPEN)SelectObject(hDC, m_hCommonThreadPen);
+
+	::MoveToEx(hDC, rcScale1.right, rcScale1.top, 0);
+	::LineTo(hDC, rcScale1.right, rcScale1.bottom);
+
+	::MoveToEx(hDC, rcScale2.left, rcScale2.top, 0);
+	::LineTo(hDC, rcScale2.left, rcScale2.bottom);
+
+	CDuiString strText;
+	for ( int i = 0; i <= nCelsiusCnt; i++ ) {
+		int nY = nMaxY + nHeightPerCelsius * i;
+		::MoveToEx(hDC, rcScale1.right, nY, 0);
+		::LineTo(hDC, rcScale2.left, nY);
+
+		int nTemp = nMaxTemp - i;
+		strText.Format("%d¡æ", nTemp);
+		::TextOut( hDC, rcScale1.right + (-40), nY + (-8),
+			strText, strText.GetLength());
+
+		int nScale = (nTemp - 37) * 10 + 100;
+		strText.Format("%d", nScale);
+		::TextOut(hDC, rcScale2.left + (10), nY + (-8),
+			strText, strText.GetLength());
+	}
+
+
+
+	SelectObject(hDC, hOldPen);
 }
