@@ -91,9 +91,12 @@
 							<Label text="测试" font="4" textcolor="#FFFFFFFF" name="lblNameCurve" />
 						</HorizontalLayout>	
 						
-						<HorizontalLayout hscrollbar="true" vscrollbar="false" sepheight="4" inset="10,10,10,10" >
-							<MyImage name="cstMyImage" bordercolor="#FF666666" bordersize="1" /> 
-						</HorizontalLayout>
+						<VerticalLayout inset="10,10,10,10">						
+							<HorizontalLayout hscrollbar="true" vscrollbar="false" sepheight="4" inset="0,0,0,0" >
+								<MyImage name="cstMyImage" bordercolor="#FF666666" bordersize="0" /> 
+							</HorizontalLayout>							
+						</VerticalLayout>
+						
 					</VerticalLayout>					
 				</VerticalLayout>				
 			</TabLayout>				

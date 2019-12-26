@@ -99,8 +99,11 @@ private:
 	std::vector<DataItem *>          m_vOxy;
 	std::vector<DataItem *>          m_vTemp;
 
+	float                            m_fSecondsPerPixel;
+
 private:
 	HPEN                             m_hCommonThreadPen;
+	HPEN                             m_hDaySplitThreadPen;
 
 private:
 	int   GetMyWidth();
@@ -109,4 +112,7 @@ private:
 	int   GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin = MYIMAGE_V_MARGIN);
 	void  DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeightPerCelsius, int nMaxY,
 		             const RECT & rectScale1, const RECT & rectScale2, int width );
+	BOOL  HasData();
+	void  GetTimeRange( time_t & tFirst, time_t & tLast );
+	void  DrawDaySplit( HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin);
 };

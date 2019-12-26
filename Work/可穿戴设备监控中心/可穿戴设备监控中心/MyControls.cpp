@@ -63,7 +63,7 @@ CGridUI::CGridUI() : m_callback(m_pManager) {
 	m_nOxy = 0;
 	m_nTemp = 0;
 	m_nPose = 0;
-	m_layMain = 0;
+	m_layMain = 0;	
 }
 
 CGridUI::~CGridUI() {
@@ -301,10 +301,35 @@ void  CGridUI::CheckWarning() {
 
 CMyImageUI::CMyImageUI() {
 	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
+	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
+	m_fSecondsPerPixel = 200.0f;
+
+	DataItem * pItem = 0;
+
+	pItem = new DataItem;
+	pItem->tTime = 1577347800;
+	pItem->nData = 3210;
+	m_vTemp.push_back(pItem);
+
+	pItem = new DataItem;
+	pItem->tTime = 1577413260;
+	pItem->nData = 3320;
+	m_vTemp.push_back(pItem);
+
+	pItem = new DataItem;
+	pItem->tTime = 1577502060;
+	pItem->nData = 3430;
+	m_vTemp.push_back(pItem);
+
+	pItem = new DataItem;
+	pItem->tTime = 1577594700;
+	pItem->nData = 3530;
+	m_vTemp.push_back(pItem);
 }
 
 CMyImageUI::~CMyImageUI() {
 	DeleteObject(m_hCommonThreadPen);
+	DeleteObject(m_hDaySplitThreadPen);
 
 	ClearVector(m_vHeartBeat);
 	ClearVector(m_vOxy);
@@ -320,11 +345,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	// self rectangle and width, height
 	RECT rect   = GetPos();
-	int  width  = GetMyWidth();
+	int  width  = GetMyWidth(); 
 	int  height = rect.bottom - rect.top;
 	// 水平滑动条位置
 	int  nScrollX = GetMyScrollX();
-
+	 
 	// 显示的最低温度和最高温度
 	int  nMinTemp,  nMaxTemp;              // 左边温度刻度
 	int  nMinScale, nMaxScale;             // 右边数值刻度
@@ -348,13 +373,21 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rcScale1.bottom = rect.bottom;
 
 	RECT rcScale2;
-	rcScale2.left   = rect.right - MYIMAGE_H_MARGIN;
+	rcScale2.left   = rcScale1.left + width - MYIMAGE_H_MARGIN;
 	rcScale2.top    = rect.top;
-	rcScale2.right  = rect.right;
+	rcScale2.right  = rcScale2.left + MYIMAGE_H_MARGIN;
 	rcScale2.bottom = rect.bottom;
 
 	// 画刻度线
 	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
+
+	if (!HasData())
+		return true;
+
+	time_t   tFirst = 0, tLast = 0;
+	GetTimeRange(tFirst, tLast);
+
+	DrawDaySplit(hDC, tFirst, tLast, rcScale1.right, rcScale1.top, rcScale1.bottom - 1, nVMargin);
 
 	return true;
 }
@@ -381,7 +414,7 @@ int CMyImageUI::GetMyScrollX() {
 }
 
 void  CMyImageUI::GetMaxMinScale( int & nMinTemp, int & nMaxTemp, int & nMinScale, int & nMaxScale ) {
-	nMinTemp = 34;
+	nMinTemp = 36;
 	nMaxTemp = 37;
 
 	int nMinTemperature = nMinTemp * 100;
@@ -443,12 +476,25 @@ void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeight
 	                         const RECT & rcScale1, const RECT & rcScale2, int width ) {
 	HPEN hOldPen = (HPEN)SelectObject(hDC, m_hCommonThreadPen);
 
+	::MoveToEx(hDC, rcScale1.left, rcScale1.top, 0);
+	::LineTo(hDC, rcScale1.left, rcScale1.bottom);
+
 	::MoveToEx(hDC, rcScale1.right, rcScale1.top, 0);
 	::LineTo(hDC, rcScale1.right, rcScale1.bottom);
 
 	::MoveToEx(hDC, rcScale2.left, rcScale2.top, 0);
 	::LineTo(hDC, rcScale2.left, rcScale2.bottom);
 
+	::MoveToEx(hDC, rcScale2.right - 1, rcScale2.top, 0);
+	::LineTo(hDC, rcScale2.right - 1, rcScale2.bottom);
+
+	::MoveToEx(hDC, rcScale1.left, rcScale1.top, 0);
+	::LineTo(hDC, rcScale2.right - 1, rcScale2.top);
+
+	::MoveToEx(hDC, rcScale1.left, rcScale1.bottom - 1, 0);
+	::LineTo(hDC, rcScale2.right - 1, rcScale2.bottom - 1);
+
+	::SetTextColor(hDC, RGB(255, 255, 255));
 	CDuiString strText;
 	for ( int i = 0; i <= nCelsiusCnt; i++ ) {
 		int nY = nMaxY + nHeightPerCelsius * i;
@@ -464,9 +510,117 @@ void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeight
 		strText.Format("%d", nScale);
 		::TextOut(hDC, rcScale2.left + (10), nY + (-8),
 			strText, strText.GetLength());
+	}	
+
+
+	SelectObject(hDC, hOldPen);
+}
+
+BOOL  CMyImageUI::HasData() {
+	if (m_vHeartBeat.size() > 0)
+		return TRUE;
+
+	if (m_vOxy.size() > 0)
+		return TRUE;
+
+	if (m_vTemp.size() > 0)
+		return TRUE;
+
+	return FALSE;
+}
+
+void  CMyImageUI::GetTimeRange(time_t & tFirst, time_t & tLast) {
+	std::vector<DataItem *>::iterator it;
+	tFirst = tLast = 0;
+	BOOL  bFind = FALSE;
+
+	if ( m_vHeartBeat.size() > 0 ) {
+		DataItem * pItem = 0;
+		if (!bFind) {
+			pItem = m_vHeartBeat[0];
+			tFirst = pItem->tTime;
+			tLast = pItem->tTime;
+			bFind = TRUE;
+		}
+
+		pItem = m_vHeartBeat[m_vHeartBeat.size()-1];
+		tLast = pItem->tTime;
+	}
+
+	if (m_vOxy.size() > 0) {
+		DataItem * pItem = 0;
+		if (!bFind) {
+			pItem = m_vOxy[0];
+			tFirst = pItem->tTime;
+			tLast = pItem->tTime;
+			bFind = TRUE;
+		}
+		else {
+			pItem = m_vOxy[0];
+			if (pItem->tTime < tFirst) {
+				tFirst = pItem->tTime;
+			}
+		}
+
+		pItem = m_vOxy[m_vOxy.size() - 1];
+		if ( pItem->tTime > tLast ) {
+			tLast = pItem->tTime;
+		}
 	}
 
 
+	if (m_vTemp.size() > 0) {
+		DataItem * pItem = 0;
+		if (!bFind) {
+			pItem = m_vTemp[0];
+			tFirst = pItem->tTime;
+			tLast = pItem->tTime;
+			bFind = TRUE;
+		}
+		else {
+			pItem = m_vTemp[0];
+			if (pItem->tTime < tFirst) {
+				tFirst = pItem->tTime;
+			}
+		}
+
+		pItem = m_vTemp[m_vTemp.size() - 1];
+		if (pItem->tTime > tLast) {
+			tLast = pItem->tTime;
+		}
+	}
+
+}
+
+void  CMyImageUI::DrawDaySplit(HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin) {
+	HPEN hOldPen = (HPEN)SelectObject(hDC, m_hDaySplitThreadPen);
+
+	// 画上天间隔符号
+	time_t tFirstZeroTime = GetAdZeroTime(tFirst);
+	if (tFirstZeroTime < tFirst) {
+		tFirstZeroTime += 86400;
+	}
+
+	time_t tLastZeroTime = GetAdZeroTime(tLast);
+	if (tLastZeroTime <= tLast) {
+		tLastZeroTime += 86400;
+	}
+
+	int nLastX = nLeft;
+	char szTime[256];
+
+	for (time_t t = tFirstZeroTime; t <= tLastZeroTime; t += 86400) {
+		int nDeltaX = (int)((t - tFirst) / m_fSecondsPerPixel);
+		int nX = nLeft + nDeltaX;
+		::MoveToEx(hDC, nX, nTop, 0);
+		::LineTo(hDC, nX, nBottom);
+
+		RECT rc = { nLastX, nTop, nX, nTop + nVMargin };		
+		LmnFormatTime(szTime, sizeof(szTime), t - 86400, "%m-%d");
+		::DrawText(hDC, szTime, strlen(szTime), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE );
+
+		nLastX = nX;
+	}
 
 	SelectObject(hDC, hOldPen);
 }
