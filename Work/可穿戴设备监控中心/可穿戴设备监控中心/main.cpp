@@ -36,6 +36,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	memset(m_Header, 0, sizeof(m_Header));
 	m_lblStatus = 0;
 	m_bComOpened = FALSE;
+	m_lblNameCurve = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -60,6 +61,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_Header[2] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdOxy");
 	m_Header[3] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdTemp");
 	m_lblStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblStatus");
+	m_lblNameCurve = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblNameCurve");
 
 	m_layList->SetVisible(false); 
 	m_btnExpand->SetText("<");   
@@ -72,6 +74,9 @@ void  CDuiFrameWnd::InitWindow() {
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	if (0 == strcmp(pstrClass, "MyImage")) {
+		return new CMyImageUI; 
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -518,6 +523,8 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 		if ( clsName == "Grid" ) {
 			m_tabs->SelectItem(1);
 			bHandled = TRUE;
+			CWearItem * pItem = (CWearItem *)pFindControl->GetTag();
+			OnShowCurve(pItem); 
 			break;
 		}
 		else if (strName == "layCurve") {
@@ -729,8 +736,15 @@ void  CDuiFrameWnd::OnDeviceChanged() {
 		}
 	}
 }
+
+// ÏÔÊ¾ÕÛÏßÍ¼
+void  CDuiFrameWnd::OnShowCurve(CWearItem * pItem) {
+	assert(pItem);
+
+	m_lblNameCurve->SetText(pItem->m_szName);
+}
  
-              
+                      
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,

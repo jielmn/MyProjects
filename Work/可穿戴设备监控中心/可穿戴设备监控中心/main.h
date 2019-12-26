@@ -50,6 +50,7 @@ private:
 	CButtonUI *                                 m_btnNext;
 	CListHeaderItemUI *                         m_Header[4];      // 姓名，心率，血氧，体温
 	CLabelUI *                                  m_lblStatus;
+	CLabelUI *                                  m_lblNameCurve;
 
 private:
 	std::vector<CWearItem *>                    m_data;
@@ -88,6 +89,8 @@ private:
 	void  OnNewWearItem(CWearItem * pItem);
 	void  CheckListItemWarning(CListTextElementUI * pListItem);
 	void  OnDeviceChanged();
+	// 显示折线图
+	void  OnShowCurve(CWearItem * pItem);
 };
 
 class CSortName {

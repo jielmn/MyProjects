@@ -298,3 +298,143 @@ void  CGridUI::CheckWarning() {
 		m_layMain->FindControl(CS_FINDCONTROLPROC, (LPVOID)0xFFFFFFFF, 0);
 	}
 }
+
+CMyImageUI::CMyImageUI() {
+	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
+}
+
+CMyImageUI::~CMyImageUI() {
+	DeleteObject(m_hCommonThreadPen);
+
+	ClearVector(m_vHeartBeat);
+	ClearVector(m_vOxy);
+	ClearVector(m_vTemp);
+}
+
+bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
+	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
+
+	// GDI+
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	// self rectangle and width, height
+	RECT rect   = GetPos();
+	int  width  = GetMyWidth();
+	int  height = rect.bottom - rect.top;
+	// 水平滑动条位置
+	int  nScrollX = GetMyScrollX();
+
+	// 显示的最低温度和最高温度
+	int  nMinTemp,  nMaxTemp;              // 左边温度刻度
+	int  nMinScale, nMaxScale;             // 右边数值刻度
+	// 34℃ -- 70刻度，  37℃ -- 100刻度，也就是1℃高度对应10刻度高度
+	GetMaxMinScale( nMinTemp, nMaxTemp, nMinScale, nMaxScale );
+
+	// 摄氏度个数
+	int  nCelsiusCount = nMaxTemp - nMinTemp;
+	// 每个摄氏度的高度
+	int  nHeightPerCelsius = GetCelsiusHeight(height, nCelsiusCount);
+	// 垂直留白
+	int  nVMargin = (height - nHeightPerCelsius * nCelsiusCount) / 2;
+	// 最高温度的Y坐标系值
+	int  nMaxY = rect.top + nVMargin;
+
+	// 全图分为左边温度刻度区域，中间折线图区域和右边刻度区域
+	RECT rcScale1;
+	rcScale1.left   = rect.left + nScrollX;
+	rcScale1.top    = rect.top;
+	rcScale1.right  = rcScale1.left + MYIMAGE_H_MARGIN;
+	rcScale1.bottom = rect.bottom;
+
+	RECT rcScale2;
+	rcScale2.left   = rect.right - MYIMAGE_H_MARGIN;
+	rcScale2.top    = rect.top;
+	rcScale2.right  = rect.right;
+	rcScale2.bottom = rect.bottom;
+
+	
+
+
+	return true;
+}
+
+void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
+	CControlUI::DoEvent(event);
+}
+
+LPCTSTR CMyImageUI::GetClass() const {
+	return "MyImage";
+}
+
+int CMyImageUI::GetMyWidth() {
+	CControlUI * pParent = GetParent();
+	assert(pParent);
+	return pParent->GetWidth();
+}
+
+int CMyImageUI::GetMyScrollX() {
+	CContainerUI * pParent = (CContainerUI *)GetParent();
+	assert(pParent);
+	SIZE s = pParent->GetScrollPos();
+	return s.cx;
+}
+
+void  CMyImageUI::GetMaxMinScale( int & nMinTemp, int & nMaxTemp, int & nMinScale, int & nMaxScale ) {
+	nMinTemp = 34;
+	nMaxTemp = 37;
+
+	int nMinTemperature = nMinTemp * 100;
+	int nMaxTemperature = nMaxTemp * 100;
+
+	std::vector<DataItem *>::iterator it;
+	for ( it = m_vTemp.begin(); it != m_vTemp.end(); ++it ) {
+		DataItem * pItem = *it;
+		if ( pItem->nData < nMinTemperature ) {
+			nMinTemperature = pItem->nData / 100 * 100;
+		}
+		else if (pItem->nData > nMaxTemperature) {
+			nMaxTemperature = ( ( pItem->nData - 1 ) / 100 + 1 ) * 100;
+		}
+	}
+
+	// 转化为scale刻度
+	nMinScale = (nMinTemperature - 3700) / 100 * 10 + 100;
+	nMaxScale = (nMaxTemperature - 3700) / 100 * 10 + 100;
+
+	for ( it = m_vHeartBeat.begin(); it != m_vHeartBeat.end(); ++it ) {
+		DataItem * pItem = *it;
+		if (pItem->nData < nMinScale) {
+			nMinScale = pItem->nData / 10 * 10;
+		}
+		else if (pItem->nData > nMaxScale) {
+			nMaxScale = ((pItem->nData - 1) / 10 + 1) * 10;
+		}
+	}
+
+	for (it = m_vOxy.begin(); it != m_vOxy.end(); ++it) {
+		DataItem * pItem = *it;
+		if (pItem->nData < nMinScale) {
+			nMinScale = pItem->nData / 10 * 10;
+		}
+		else if (pItem->nData > nMaxScale) {
+			nMaxScale = ((pItem->nData - 1) / 10 + 1) * 10;
+		}
+	}
+
+	// 转化为温度刻度
+	nMinTemp = (nMinScale - 100) / 10 + 37;
+	nMaxTemp = (nMaxScale - 100) / 10 + 37;
+}
+
+int  CMyImageUI::GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin /*= MYIMAGE_V_MARGIN*/) {
+	int h = height / nCelsiusCount;
+	int r = height % nCelsiusCount;
+	// int nVMargin = MIN_MYIMAGE_VMARGIN;
+
+	if (nVMargin * 2 > r) {
+		int nSpared = (nVMargin * 2 - r - 1) / nCelsiusCount + 1;
+		h -= nSpared;
+	}
+	return h;
+}

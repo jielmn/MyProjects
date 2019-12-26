@@ -81,3 +81,30 @@ private:
 	int           m_nPose;
 	CDuiString    m_strDeviceId;
 };
+
+#define  MYIMAGE_V_MARGIN      40
+#define  MYIMAGE_H_MARGIN      50
+
+class CMyImageUI : public DuiLib::CControlUI {
+public:
+	CMyImageUI();
+	~CMyImageUI();
+
+	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
+	void DoEvent(DuiLib::TEventUI& event);
+	LPCTSTR GetClass() const;
+
+private:
+	std::vector<DataItem *>          m_vHeartBeat;
+	std::vector<DataItem *>          m_vOxy;
+	std::vector<DataItem *>          m_vTemp;
+
+private:
+	HPEN                             m_hCommonThreadPen;
+
+private:
+	int   GetMyWidth();
+	int   GetMyScrollX();
+	void  GetMaxMinScale(int & nMinTemp, int & nMaxTemp, int & nMinScale, int & nMaxScale);
+	int   GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin = MYIMAGE_V_MARGIN);
+};
