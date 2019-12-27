@@ -29,6 +29,9 @@ public:
 	void  SaveDeviceUserNameAsyn(const char * szDeviceId, const char * szName);
 	void  SaveDeviceUserName(const CSaveNameParam * pParam);
 
+	void  SaveItemAsyn(CWearItem * pItem);
+	void  SaveItem(const CSaveItemParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

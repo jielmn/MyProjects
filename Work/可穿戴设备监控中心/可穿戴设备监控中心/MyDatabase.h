@@ -11,6 +11,7 @@ public:
 
 	BOOL  GetDeviceUserName(const CGetNameParam * pParam, char * szName, DWORD  dwNameSize);
 	void  SaveDeviceUserName(const CSaveNameParam * pParam);
+	void  SaveItem(const CSaveItemParam * pParam);
 
 private:
 	sqlite3 *                         m_db;

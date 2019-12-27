@@ -180,6 +180,8 @@ void  CBusiness::ReadData() {
 		SNPRINTF(pItem->m_szDeviceId, sizeof(pItem->m_szDeviceId), "%d", (int)achData[10]);
 
 		::PostMessage(g_data.m_hWnd, UM_DATA_ITEM, (WPARAM)pItem, 0);
+
+		SaveItemAsyn(pItem);
 	}
 	m_buf.Reform();
 
@@ -203,6 +205,14 @@ void  CBusiness::SaveDeviceUserNameAsyn(const char * szDeviceId, const char * sz
 
 void  CBusiness::SaveDeviceUserName(const CSaveNameParam * pParam) {
 	m_sqlite.SaveDeviceUserName(pParam);
+}
+
+void  CBusiness::SaveItemAsyn(CWearItem * pItem) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SAVE_ITEM, new CSaveItemParam(pItem));
+}
+
+void  CBusiness::SaveItem(const CSaveItemParam * pParam) {
+	m_sqlite.SaveItem(pParam);
 }
 
 
@@ -233,6 +243,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveNameParam * pParam = (CSaveNameParam *)pMessageData;
 		SaveDeviceUserName(pParam);
+	}
+	break;
+
+	case MSG_SAVE_ITEM:
+	{
+		CSaveItemParam * pParam = (CSaveItemParam *)pMessageData;
+		SaveItem(pParam);
 	}
 	break;
 

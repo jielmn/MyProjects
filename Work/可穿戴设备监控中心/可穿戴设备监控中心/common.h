@@ -27,6 +27,7 @@ using namespace DuiLib;
 #define   MSG_READ_DATA               2
 #define   MSG_GET_NAME                3
 #define   MSG_SAVE_NAME               4
+#define   MSG_SAVE_ITEM               5
 
 #define   UM_RECONNECT_RET            (WM_USER+1)
 #define   UM_DATA_ITEM                (WM_USER+2)
@@ -102,6 +103,16 @@ public:
 	char m_szName[MAX_NAME_LEN];
 };
 
+class CSaveItemParam : public LmnToolkits::MessageData {
+public:
+	CSaveItemParam(CWearItem * pItem) {
+		m_item = *pItem;
+		m_time = time(0);
+	}
+
+	CWearItem   m_item;
+	time_t      m_time;
+};
 
 class  CGlobalData {
 public:

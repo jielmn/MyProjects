@@ -37,6 +37,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_lblStatus = 0;
 	m_bComOpened = FALSE;
 	m_lblNameCurve = 0;
+	m_img = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -62,6 +63,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_Header[3] = (DuiLib::CListHeaderItemUI *)m_PaintManager.FindControl("hdTemp");
 	m_lblStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblStatus");
 	m_lblNameCurve = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblNameCurve");
+	m_img = (CMyImageUI *)m_PaintManager.FindControl("cstMyImage");
 
 	m_layList->SetVisible(false); 
 	m_btnExpand->SetText("<");   
@@ -742,6 +744,7 @@ void  CDuiFrameWnd::OnShowCurve(CWearItem * pItem) {
 	assert(pItem);
 
 	m_lblNameCurve->SetText(pItem->m_szName);
+	m_img->m_strDeviceId = pItem->m_szDeviceId;
 }
  
                       

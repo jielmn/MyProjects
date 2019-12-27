@@ -112,6 +112,9 @@ private:
 	Pen *                            m_oxy_pen;
 	SolidBrush *                     m_oxy_brush;
 
+public:
+	CDuiString                       m_strDeviceId;
+
 private:
 	int   GetMyWidth();
 	int   GetMyScrollX();

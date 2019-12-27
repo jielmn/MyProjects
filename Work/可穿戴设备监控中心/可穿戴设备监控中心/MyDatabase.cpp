@@ -21,17 +21,20 @@ int  CMySqliteDatabase::InitDb() {
 		"user_name  varchar(20)  NOT NULL " );		
 
 	CreateTable(TEMP_TABLE,
-		"device_id  varchar(20)  NOT NULL  PRIMARY KEY," \
+		"id         INTEGER      PRIMARY KEY     AUTOINCREMENT," \
+		"device_id  varchar(20)  NOT NULL,"  \
 		"temp       int          NOT NULL, " \
 		"time       int          NOT NULL  " );
 
 	CreateTable(HEART_BEAT_TABLE,
-		"device_id  varchar(20)  NOT NULL  PRIMARY KEY," \
+		"id         INTEGER      PRIMARY KEY     AUTOINCREMENT," \
+		"device_id  varchar(20)  NOT NULL,"  \
 		"heartbeat  int          NOT NULL, " \
 		"time       int          NOT NULL  ");
 
 	CreateTable(BLOOD_OXYGEN_TABLE,
-		"device_id  varchar(20)  NOT NULL  PRIMARY KEY," \
+		"id         INTEGER      PRIMARY KEY     AUTOINCREMENT," \
+		"device_id  varchar(20)  NOT NULL,"  \
 		"oxy        int          NOT NULL, " \
 		"time       int          NOT NULL  ");
 
@@ -143,4 +146,26 @@ void  CMySqliteDatabase::SaveDeviceUserName(const CSaveNameParam * pParam) {
 		sqlite3_exec(m_db, sql, 0, 0, 0);
 	}
 	sqlite3_free_table(azResult);
+}
+
+void  CMySqliteDatabase::SaveItem(const CSaveItemParam * pParam) {
+	char sql[8192];
+
+	if ( pParam->m_item.m_nHearbeat > 0 ) {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s values ( null, '%s', %d, %lu ) ", HEART_BEAT_TABLE,
+			pParam->m_item.m_szDeviceId, pParam->m_item.m_nHearbeat, (DWORD)pParam->m_time );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+
+	if (pParam->m_item.m_nOxy > 0) {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s values ( null, '%s', %d, %lu ) ", BLOOD_OXYGEN_TABLE,
+			pParam->m_item.m_szDeviceId, pParam->m_item.m_nOxy, (DWORD)pParam->m_time);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+
+	if (pParam->m_item.m_nTemp > 0) {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s values ( null, '%s', %d, %lu ) ", TEMP_TABLE,
+			pParam->m_item.m_szDeviceId, pParam->m_item.m_nTemp, (DWORD)pParam->m_time);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "MyControls.h"
 
 #include "resource.h"
 
@@ -51,6 +52,7 @@ private:
 	CListHeaderItemUI *                         m_Header[4];      // 姓名，心率，血氧，体温
 	CLabelUI *                                  m_lblStatus;
 	CLabelUI *                                  m_lblNameCurve;
+	CMyImageUI *                                m_img;
 
 private:
 	std::vector<CWearItem *>                    m_data;
