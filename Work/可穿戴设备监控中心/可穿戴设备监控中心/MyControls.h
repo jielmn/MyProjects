@@ -107,6 +107,10 @@ private:
 	HPEN                             m_hDaySplitThreadPen;
 	Pen *                            m_temperature_pen;
 	SolidBrush *                     m_temperature_brush;
+	Pen *                            m_heartbeat_pen;
+	SolidBrush *                     m_heartbeat_brush;
+	Pen *                            m_oxy_pen;
+	SolidBrush *                     m_oxy_brush;
 
 private:
 	int   GetMyWidth();
@@ -121,7 +125,7 @@ private:
 
 	BOOL  HasData();
 	void  GetTimeRange( time_t & tFirst, time_t & tLast );
-	void  DrawDaySplit( HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin);
+	void  DrawDaySplit( HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin, int nMaxX);
 	void  DrawPolyline(time_t tFirstTime, time_t tLastTime, float fSecondsPerPixel,
 		int nMaxValue, float fHeightPerUnit, POINT  tTopLeft, Graphics & graphics,
 		const std::vector<DataItem * > & vData, Pen * pen, SolidBrush * brush);

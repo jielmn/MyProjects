@@ -305,30 +305,12 @@ CMyImageUI::CMyImageUI() {
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
 	m_temperature_pen = new Pen(Gdiplus::Color(0,255,0), 1.0);
 	m_temperature_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(0, 255, 0)));
+	m_heartbeat_pen = new Pen(Gdiplus::Color(255, 0, 0), 1.0);
+	m_heartbeat_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(255, 0, 0)));
+	m_oxy_pen = new Pen(Gdiplus::Color(202, 81, 0), 1.0);
+	m_oxy_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(202, 81, 0)));
 
-	m_fSecondsPerPixel = 100.0f;
-
-	DataItem * pItem = 0;
-
-	pItem = new DataItem;
-	pItem->tTime = 1577347800;
-	pItem->nData = 3210;
-	m_vTemp.push_back(pItem);
-
-	pItem = new DataItem;
-	pItem->tTime = 1577413260;
-	pItem->nData = 3320;
-	m_vTemp.push_back(pItem);
-
-	pItem = new DataItem;
-	pItem->tTime = 1577502060;
-	pItem->nData = 3430;
-	m_vTemp.push_back(pItem);
-
-	pItem = new DataItem;
-	pItem->tTime = 1577594700;
-	pItem->nData = 3530;
-	m_vTemp.push_back(pItem);
+	m_fSecondsPerPixel = 200.0f;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -338,6 +320,12 @@ CMyImageUI::~CMyImageUI() {
 
 	delete m_temperature_pen;
 	delete m_temperature_brush;
+
+	delete m_heartbeat_pen;
+	delete m_heartbeat_brush;
+
+	delete m_oxy_pen;
+	delete m_oxy_brush;
 
 	ClearVector(m_vHeartBeat);
 	ClearVector(m_vOxy);
@@ -388,17 +376,26 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 
-	if (!HasData())
+	if (!HasData()) {
+		// 画刻度线
+		DrawScale2(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 		return true;
+	}
 
 	time_t   tFirst = 0, tLast = 0;
 	GetTimeRange(tFirst, tLast);
 
-	DrawDaySplit(hDC, tFirst, tLast, rcScale1.right, rcScale1.top, rcScale1.bottom - 1, nVMargin);
+	DrawDaySplit(hDC, tFirst, tLast, rcScale1.right, rcScale1.top, rcScale1.bottom - 1, nVMargin, rcScale2.left);
 
 	POINT tTopLeft = { rcScale1.right, nMaxY };
 	DrawPolyline(tFirst, tLast, m_fSecondsPerPixel, nMaxTemp * 100, nHeightPerCelsius / 100.0f, 
 		tTopLeft, graphics, m_vTemp, m_temperature_pen, m_temperature_brush );
+
+	DrawPolyline(tFirst, tLast, m_fSecondsPerPixel, nMaxScale, nHeightPerCelsius / 10.0f,
+		tTopLeft, graphics, m_vHeartBeat, m_heartbeat_pen, m_heartbeat_brush);
+
+	DrawPolyline(tFirst, tLast, m_fSecondsPerPixel, nMaxScale, nHeightPerCelsius / 10.0f,
+		tTopLeft, graphics, m_vOxy, m_oxy_pen, m_oxy_brush);
 
 	// 画刻度线
 	DrawScale2(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
@@ -428,8 +425,8 @@ int CMyImageUI::GetMyScrollX() {
 }
 
 void  CMyImageUI::GetMaxMinScale( int & nMinTemp, int & nMaxTemp, int & nMinScale, int & nMaxScale ) {
-	nMinTemp = 36;
-	nMaxTemp = 37;
+	nMinTemp = 34;
+	nMaxTemp = 38;
 
 	int nMinTemperature = nMinTemp * 100;
 	int nMaxTemperature = nMaxTemp * 100;
@@ -573,34 +570,73 @@ void  CMyImageUI::GetTimeRange(time_t & tFirst, time_t & tLast) {
 		DataItem * pItem = 0;
 		if (!bFind) {
 			pItem = m_vHeartBeat[0];
-			tFirst = pItem->tTime;
-			tLast = pItem->tTime;
-			bFind = TRUE;
+			
+			if ( g_data.m_bShowHistory ) {
+				tFirst = pItem->tTime;
+				tLast = pItem->tTime;
+				bFind = TRUE;
+			}
+			else {
+				for ( it = m_vHeartBeat.begin(); it != m_vHeartBeat.end(); ++it ) {
+					pItem = *it;
+					if ( pItem->tTime >= g_data.m_tStartTime ) {
+						tFirst = pItem->tTime;
+						tLast = tFirst;
+						bFind = TRUE;
+						break;
+					}
+				}
+			}
 		}
 
-		pItem = m_vHeartBeat[m_vHeartBeat.size()-1];
-		tLast = pItem->tTime;
+		if (bFind) {
+			pItem = m_vHeartBeat[m_vHeartBeat.size() - 1];
+			tLast = pItem->tTime;
+		}
 	}
 
 	if (m_vOxy.size() > 0) {
 		DataItem * pItem = 0;
 		if (!bFind) {
 			pItem = m_vOxy[0];
-			tFirst = pItem->tTime;
-			tLast = pItem->tTime;
-			bFind = TRUE;
+
+			if (g_data.m_bShowHistory) {
+				tFirst = pItem->tTime;
+				tLast = pItem->tTime;
+				bFind = TRUE;
+			}
+			else {
+				for (it = m_vOxy.begin(); it != m_vOxy.end(); ++it) {
+					pItem = *it;
+					if (pItem->tTime >= g_data.m_tStartTime) {
+						tFirst = pItem->tTime;
+						tLast = tFirst;
+						bFind = TRUE;
+						break;
+					}
+				}
+			}
 		}
 		else {
 			pItem = m_vOxy[0];
 			if (pItem->tTime < tFirst) {
-				tFirst = pItem->tTime;
-			}
+				if (g_data.m_bShowHistory) {
+					tFirst = pItem->tTime;
+				}
+				else {
+					if ( pItem->tTime >= g_data.m_tStartTime ) {
+						tFirst = pItem->tTime;
+					}
+				}
+			}			
 		}
 
-		pItem = m_vOxy[m_vOxy.size() - 1];
-		if ( pItem->tTime > tLast ) {
-			tLast = pItem->tTime;
-		}
+		if (bFind) {
+			pItem = m_vOxy[m_vOxy.size() - 1];
+			if (pItem->tTime > tLast) {
+				tLast = pItem->tTime;
+			}
+		}		
 	}
 
 
@@ -608,26 +644,49 @@ void  CMyImageUI::GetTimeRange(time_t & tFirst, time_t & tLast) {
 		DataItem * pItem = 0;
 		if (!bFind) {
 			pItem = m_vTemp[0];
-			tFirst = pItem->tTime;
-			tLast = pItem->tTime;
-			bFind = TRUE;
+
+			if (g_data.m_bShowHistory) {
+				tFirst = pItem->tTime;
+				tLast = pItem->tTime;
+				bFind = TRUE;
+			}
+			else {
+				for (it = m_vTemp.begin(); it != m_vTemp.end(); ++it) {
+					pItem = *it;
+					if (pItem->tTime >= g_data.m_tStartTime) {
+						tFirst = pItem->tTime;
+						tLast = tFirst;
+						bFind = TRUE;
+						break;
+					}
+				}
+			}
 		}
 		else {
 			pItem = m_vTemp[0];
 			if (pItem->tTime < tFirst) {
-				tFirst = pItem->tTime;
+				if (g_data.m_bShowHistory) {
+					tFirst = pItem->tTime;
+				}
+				else {
+					if (pItem->tTime >= g_data.m_tStartTime) {
+						tFirst = pItem->tTime;
+					}
+				}
 			}
 		}
 
-		pItem = m_vTemp[m_vTemp.size() - 1];
-		if (pItem->tTime > tLast) {
-			tLast = pItem->tTime;
-		}
-	}
+		if (bFind) {
+			pItem = m_vTemp[m_vTemp.size() - 1];
+			if (pItem->tTime > tLast) {
+				tLast = pItem->tTime;
+			}
+		}		
+	}	
 
 }
 
-void  CMyImageUI::DrawDaySplit(HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin) {
+void  CMyImageUI::DrawDaySplit(HDC  hDC, time_t tFirst, time_t tLast, int nLeft, int nTop, int nBottom, int nVMargin, int nMaxX) {
 	HPEN hOldPen = (HPEN)SelectObject(hDC, m_hDaySplitThreadPen);
 
 	// 画上天间隔符号
@@ -650,9 +709,13 @@ void  CMyImageUI::DrawDaySplit(HDC  hDC, time_t tFirst, time_t tLast, int nLeft,
 		::MoveToEx(hDC, nX, nTop, 0);
 		::LineTo(hDC, nX, nBottom);
 
-		RECT rc = { nLastX, nTop, nX, nTop + nVMargin };		
-		LmnFormatTime(szTime, sizeof(szTime), t - 86400, "%m-%d");
-		::DrawText(hDC, szTime, strlen(szTime), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE );
+		RECT rc = { nLastX, nTop, nX, nTop + nVMargin };
+		if ( rc.left < nMaxX ) {
+			if ( rc.right > nMaxX )
+				rc.right = nMaxX;
+			LmnFormatTime(szTime, sizeof(szTime), t - 86400, "%m-%d");
+			::DrawText(hDC, szTime, strlen(szTime), &rc, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+		}		
 
 		nLastX = nX;
 	}

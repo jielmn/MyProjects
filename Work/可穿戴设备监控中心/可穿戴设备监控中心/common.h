@@ -11,6 +11,7 @@
 #include "LuaConfig.h"
 #include "UIlib.h"
 using namespace DuiLib;
+#include <time.h>
 
 #define   PROJ_NAME               "wearable_monitor"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
@@ -118,6 +119,7 @@ public:
 	int                       m_nMinOxy;
 	int                       m_nMaxTemp;
 	int                       m_nMinTemp;
+	time_t                    m_tStartTime;
 
 public:
 	CGlobalData() {
@@ -135,6 +137,7 @@ public:
 		m_nMinOxy = 0;
 		m_nMaxTemp = 0;
 		m_nMinTemp = 0;
+		m_tStartTime = GetTdZeroTime();
 	}
 };
 
