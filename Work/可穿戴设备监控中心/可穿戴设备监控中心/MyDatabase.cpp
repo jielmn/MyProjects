@@ -169,3 +169,70 @@ void  CMySqliteDatabase::SaveItem(const CSaveItemParam * pParam) {
 		sqlite3_exec(m_db, sql, 0, 0, 0);
 	}
 }
+
+void  CMySqliteDatabase::GetData(const CGetDataParam * pParam, std::vector<DataItem *> & vHeartBeat,
+	std::vector<DataItem *> & vOxy, std::vector<DataItem *> & vTemp) {
+
+	char szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where device_id = '%s' order by time",
+		HEART_BEAT_TABLE, pParam->m_szDeviceId );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	DWORD  dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		DataItem * pItem = new DataItem;
+		memset(pItem, 0, sizeof(DataItem));
+
+		sscanf_s(azResult[(i + 1)*ncolumn + 2], "%d",  &pItem->nData);
+		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
+		pItem->tTime = (time_t)dwValue;
+
+		vHeartBeat.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+
+
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where device_id = '%s' order by time",
+		BLOOD_OXYGEN_TABLE, pParam->m_szDeviceId);
+
+	nrow = ncolumn = 0;
+	azResult = 0;
+	dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		DataItem * pItem = new DataItem;
+		memset(pItem, 0, sizeof(DataItem));
+
+		sscanf_s(azResult[(i + 1)*ncolumn + 2], "%d",  &pItem->nData);
+		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
+		pItem->tTime = (time_t)dwValue;
+
+		vOxy.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+
+
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where device_id = '%s' order by time",
+		TEMP_TABLE, pParam->m_szDeviceId);
+
+	nrow = ncolumn = 0;
+	azResult = 0;
+	dwValue = 0;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		DataItem * pItem = new DataItem;
+		memset(pItem, 0, sizeof(DataItem));
+
+		sscanf_s(azResult[(i + 1)*ncolumn + 2], "%d", &pItem->nData);
+		sscanf_s(azResult[(i + 1)*ncolumn + 3], "%lu", &dwValue);
+		pItem->tTime = (time_t)dwValue;
+
+		vTemp.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+}

@@ -28,10 +28,12 @@ using namespace DuiLib;
 #define   MSG_GET_NAME                3
 #define   MSG_SAVE_NAME               4
 #define   MSG_SAVE_ITEM               5
+#define   MSG_GET_DATA                6
 
 #define   UM_RECONNECT_RET            (WM_USER+1)
 #define   UM_DATA_ITEM                (WM_USER+2)
 #define   UM_GET_NAME_RET             (WM_USER+3)
+#define   UM_GET_DATA_RET             (WM_USER+4)
 
 #define   ABNORMAL_COLOR          0xFFFBE044
 #define   NORMAL_COLOR            0xFF4AB20A
@@ -112,6 +114,25 @@ public:
 
 	CWearItem   m_item;
 	time_t      m_time;
+};
+
+class CGetDataParam : public LmnToolkits::MessageData {
+public:
+	CGetDataParam(const char * szDeviceId) {
+		STRNCPY(m_szDeviceId, szDeviceId, MAX_DEVICE_ID_LEN);
+	}
+
+	char  m_szDeviceId[MAX_DEVICE_ID_LEN];
+};
+
+class  CGetDataRet {
+public:
+	std::vector<DataItem * > *     m_pvHeatBeat;
+	std::vector<DataItem * > *     m_pvOxy;
+	std::vector<DataItem * > *     m_pvTemp;
+	char  m_szDeviceId[MAX_DEVICE_ID_LEN];
+
+	~CGetDataRet();
 };
 
 class  CGlobalData {

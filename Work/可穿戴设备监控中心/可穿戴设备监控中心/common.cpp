@@ -100,3 +100,18 @@ time_t  GetTodayZeroTime() {
 
 	return mktime(&tTmTime);
 }
+
+CGetDataRet::~CGetDataRet() {
+	if (m_pvHeatBeat) {
+		delete m_pvHeatBeat;
+	}
+
+	if (m_pvOxy) {
+		delete m_pvOxy;
+	}
+
+	if (m_pvTemp) {
+		delete m_pvTemp;
+	}
+
+}

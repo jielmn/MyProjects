@@ -93,6 +93,8 @@ public:
 	bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	void DoEvent(DuiLib::TEventUI& event);
 	LPCTSTR GetClass() const;
+	void Clear();
+	void OnGetDataRet(CGetDataRet * pRet);
 
 private:
 	std::vector<DataItem *>          m_vHeartBeat;

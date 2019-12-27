@@ -228,6 +228,11 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		delete pRet;
 	}
+	else if (uMsg == UM_GET_DATA_RET) {
+		CGetDataRet * pRet = (CGetDataRet *)wParam;
+		OnGetDataRet(pRet);
+		delete pRet;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -745,6 +750,14 @@ void  CDuiFrameWnd::OnShowCurve(CWearItem * pItem) {
 
 	m_lblNameCurve->SetText(pItem->m_szName);
 	m_img->m_strDeviceId = pItem->m_szDeviceId;
+	m_img->Clear();
+
+	CBusiness::GetInstance()->GetDataAsyn(pItem->m_szDeviceId);
+}
+
+void  CDuiFrameWnd::OnGetDataRet(CGetDataRet * pRet) {
+	m_img->OnGetDataRet(pRet);
+	m_img->Invalidate();
 }
  
                       

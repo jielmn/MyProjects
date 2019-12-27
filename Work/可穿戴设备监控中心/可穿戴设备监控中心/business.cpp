@@ -215,6 +215,27 @@ void  CBusiness::SaveItem(const CSaveItemParam * pParam) {
 	m_sqlite.SaveItem(pParam);
 }
 
+void  CBusiness::GetDataAsyn(const char *szDeviceId) {
+	g_data.m_thrd_db->PostMessage(this, MSG_GET_DATA, new CGetDataParam(szDeviceId));
+}
+
+void  CBusiness::GetData(const CGetDataParam * pParam) {
+	std::vector<DataItem *> * pvHeatBeat = new std::vector<DataItem *>;
+	std::vector<DataItem *> * pvOxy      = new std::vector<DataItem *>;
+	std::vector<DataItem *> * pvTemp     = new std::vector<DataItem *>;
+
+	m_sqlite.GetData(pParam, *pvHeatBeat, *pvOxy, *pvTemp);
+
+	CGetDataRet * pRet = new CGetDataRet;
+	pRet->m_pvHeatBeat = pvHeatBeat;
+	pRet->m_pvOxy = pvOxy;
+	pRet->m_pvTemp = pvTemp;
+
+	STRNCPY(pRet->m_szDeviceId, pParam->m_szDeviceId, MAX_DEVICE_ID_LEN);
+
+	::PostMessage(g_data.m_hWnd, UM_GET_DATA_RET, (WPARAM)pRet, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -250,6 +271,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveItemParam * pParam = (CSaveItemParam *)pMessageData;
 		SaveItem(pParam);
+	}
+	break;
+
+	case MSG_GET_DATA:
+	{
+		CGetDataParam * pParam = (CGetDataParam *)pMessageData;
+		GetData(pParam);
 	}
 	break;
 

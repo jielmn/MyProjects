@@ -93,6 +93,7 @@ private:
 	void  OnDeviceChanged();
 	// œ‘ æ’€œﬂÕº
 	void  OnShowCurve(CWearItem * pItem);
+	void  OnGetDataRet(CGetDataRet * pRet);
 };
 
 class CSortName {

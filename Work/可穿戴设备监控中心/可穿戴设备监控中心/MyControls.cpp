@@ -1,5 +1,6 @@
 #include "MyControls.h"
 #include "EditableButtonUI.h"
+#include <iterator>
 
 CEdtComboUI::CEdtComboUI() {
 	m_cmb = 0;
@@ -310,7 +311,7 @@ CMyImageUI::CMyImageUI() {
 	m_oxy_pen = new Pen(Gdiplus::Color(202, 81, 0), 1.0);
 	m_oxy_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(202, 81, 0)));
 
-	m_fSecondsPerPixel = 200.0f;
+	m_fSecondsPerPixel = 5.0f;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -327,9 +328,21 @@ CMyImageUI::~CMyImageUI() {
 	delete m_oxy_pen;
 	delete m_oxy_brush;
 
+	Clear();
+}
+
+void CMyImageUI::Clear() {
 	ClearVector(m_vHeartBeat);
 	ClearVector(m_vOxy);
 	ClearVector(m_vTemp);
+}
+
+void CMyImageUI::OnGetDataRet(CGetDataRet * pRet) {
+	Clear();
+
+	std::copy(pRet->m_pvHeatBeat->begin(), pRet->m_pvHeatBeat->end(), std::back_inserter(m_vHeartBeat));
+	std::copy(pRet->m_pvOxy->begin(), pRet->m_pvOxy->end(), std::back_inserter(m_vOxy));
+	std::copy(pRet->m_pvTemp->begin(), pRet->m_pvTemp->end(), std::back_inserter(m_vTemp));
 }
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {

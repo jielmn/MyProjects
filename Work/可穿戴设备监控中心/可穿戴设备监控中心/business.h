@@ -32,6 +32,9 @@ public:
 	void  SaveItemAsyn(CWearItem * pItem);
 	void  SaveItem(const CSaveItemParam * pParam);
 
+	void  GetDataAsyn(const char *szDeviceId);
+	void  GetData(const CGetDataParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
