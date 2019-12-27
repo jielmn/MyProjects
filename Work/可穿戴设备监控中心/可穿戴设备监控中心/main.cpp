@@ -751,13 +751,14 @@ void  CDuiFrameWnd::OnShowCurve(CWearItem * pItem) {
 	m_lblNameCurve->SetText(pItem->m_szName);
 	m_img->m_strDeviceId = pItem->m_szDeviceId;
 	m_img->Clear();
+	m_img->m_bSetSecondsPerPixel = FALSE;
 
 	CBusiness::GetInstance()->GetDataAsyn(pItem->m_szDeviceId);
 }
 
 void  CDuiFrameWnd::OnGetDataRet(CGetDataRet * pRet) {
 	m_img->OnGetDataRet(pRet);
-	m_img->Invalidate();
+	m_img->MyInvalidate();
 }
  
                       

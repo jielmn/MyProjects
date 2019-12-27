@@ -85,6 +85,9 @@ private:
 #define  MYIMAGE_V_MARGIN      40
 #define  MYIMAGE_H_MARGIN      50
 
+#define  MAX_SECONDS_PER_PIXEL               200.0f
+#define  MIN_SECONDS_PER_PIXEL               1.0f
+
 class CMyImageUI : public DuiLib::CControlUI {
 public:
 	CMyImageUI();
@@ -95,6 +98,7 @@ public:
 	LPCTSTR GetClass() const;
 	void Clear();
 	void OnGetDataRet(CGetDataRet * pRet);
+	void MyInvalidate();
 
 private:
 	std::vector<DataItem *>          m_vHeartBeat;
@@ -102,6 +106,9 @@ private:
 	std::vector<DataItem *>          m_vTemp;
 
 	float                            m_fSecondsPerPixel;
+
+public:
+	BOOL                             m_bSetSecondsPerPixel;
 
 private:
 	HPEN                             m_hCommonThreadPen;	
@@ -135,4 +142,7 @@ private:
 		int nMaxValue, float fHeightPerUnit, POINT  tTopLeft, Graphics & graphics,
 		const std::vector<DataItem * > & vData, Pen * pen, SolidBrush * brush);
 	void  DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius);
+
+	//  Û¬÷ª¨∂Ø
+	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
 };

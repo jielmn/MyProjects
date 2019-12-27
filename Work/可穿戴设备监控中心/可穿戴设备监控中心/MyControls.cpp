@@ -311,7 +311,8 @@ CMyImageUI::CMyImageUI() {
 	m_oxy_pen = new Pen(Gdiplus::Color(202, 81, 0), 1.0);
 	m_oxy_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(202, 81, 0)));
 
-	m_fSecondsPerPixel = 5.0f;
+	m_fSecondsPerPixel = 1.0f;
+	m_bSetSecondsPerPixel = FALSE;
 }
 
 CMyImageUI::~CMyImageUI() {
@@ -385,12 +386,11 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	rcScale2.left   = rcScale1.left + width - MYIMAGE_H_MARGIN;
 	rcScale2.top    = rect.top;
 	rcScale2.right  = rcScale2.left + MYIMAGE_H_MARGIN;
-	rcScale2.bottom = rect.bottom;	
-
-	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
+	rcScale2.bottom = rect.bottom;		
 
 	if (!HasData()) {
 		// 画刻度线
+		DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 		DrawScale2(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 		return true;
 	}
@@ -400,7 +400,7 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 
 	DrawDaySplit(hDC, tFirst, tLast, rcScale1.right, rcScale1.top, rcScale1.bottom - 1, nVMargin, rcScale2.left);
 
-	POINT tTopLeft = { rcScale1.right, nMaxY };
+	POINT tTopLeft = { rect.left + MYIMAGE_H_MARGIN, nMaxY };
 	DrawPolyline(tFirst, tLast, m_fSecondsPerPixel, nMaxTemp * 100, nHeightPerCelsius / 100.0f, 
 		tTopLeft, graphics, m_vTemp, m_temperature_pen, m_temperature_brush );
 
@@ -411,12 +411,16 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		tTopLeft, graphics, m_vOxy, m_oxy_pen, m_oxy_brush);
 
 	// 画刻度线
+	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 	DrawScale2(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 
 	return true;
 }
 
 void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_SCROLLWHEEL) {
+		OnMyMouseWheel(event.wParam, event.lParam);
+	}
 	CControlUI::DoEvent(event);
 }
 
@@ -500,6 +504,8 @@ void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeight
 	                         const RECT & rcScale1, const RECT & rcScale2, int width ) {
 	HPEN hOldPen = (HPEN)SelectObject(hDC, m_hCommonThreadPen);
 
+	::FillRect(hDC, &rcScale1, m_hCommonBrush);
+
 	::MoveToEx(hDC, rcScale1.left, rcScale1.top, 0);
 	::LineTo(hDC, rcScale1.left, rcScale1.bottom);
 
@@ -516,11 +522,6 @@ void  CMyImageUI::DrawScale( HDC hDC, int nMaxTemp, int nCelsiusCnt, int nHeight
 		int nTemp = nMaxTemp - i;
 		strText.Format("%d℃", nTemp);
 		::TextOut( hDC, rcScale1.right + (-40), nY + (-8),
-			strText, strText.GetLength());
-
-		int nScale = (nTemp - 37) * 10 + 100;
-		strText.Format("%d", nScale);
-		::TextOut(hDC, rcScale2.left + (10), nY + (-8),
 			strText, strText.GetLength());
 	}	
 
@@ -716,6 +717,8 @@ void  CMyImageUI::DrawDaySplit(HDC  hDC, time_t tFirst, time_t tLast, int nLeft,
 	int nLastX = nLeft;
 	char szTime[256];
 
+	::SetTextColor(hDC, RGB(255, 255, 255));
+
 	for (time_t t = tFirstZeroTime; t <= tLastZeroTime; t += 86400) {
 		int nDeltaX = (int)((t - tFirst) / m_fSecondsPerPixel);
 		int nX = nLeft + nDeltaX;
@@ -837,4 +840,62 @@ void  CMyImageUI::DrawPolyline( time_t tFirstTime, time_t tLastTime, float fSeco
 
 void   CMyImageUI::DrawPoint(SolidBrush * brush, Graphics & g, int x, int y, HDC hDc, int radius) {
 	g.FillEllipse(brush, x - radius, y - radius, 2 * radius, 2 * radius);
+}
+
+// 鼠轮滑动
+void   CMyImageUI::OnMyMouseWheel(WPARAM wParam, LPARAM lParam) {
+	if ( !m_bSetSecondsPerPixel ) {
+		return;
+	}
+
+	int nDirectory = (int)wParam;
+	if (nDirectory > 0) {
+		m_fSecondsPerPixel *= 1.2f;
+	}
+	else {
+		m_fSecondsPerPixel /= 1.2f;
+	}
+
+	if (m_fSecondsPerPixel < MIN_SECONDS_PER_PIXEL) {
+		m_fSecondsPerPixel = MIN_SECONDS_PER_PIXEL;
+	}
+	else if (m_fSecondsPerPixel > MAX_SECONDS_PER_PIXEL) {
+		m_fSecondsPerPixel = MAX_SECONDS_PER_PIXEL;
+	}
+
+	MyInvalidate();
+}
+
+void CMyImageUI::MyInvalidate() {
+	time_t   tFirstTime = 0, tLastTime = 0;	
+
+	BOOL bHasData = HasData();
+	if ( bHasData ) {
+		GetTimeRange(tFirstTime, tLastTime);
+	}
+
+	int  widthParent = GetMyWidth();
+	int  width = 0;
+
+	if (!m_bSetSecondsPerPixel) {
+		if (bHasData) {
+			m_fSecondsPerPixel = (float)(tLastTime - tFirstTime) / (widthParent - MYIMAGE_H_MARGIN * 2);
+			if (m_fSecondsPerPixel < MIN_SECONDS_PER_PIXEL) {
+				m_fSecondsPerPixel = MIN_SECONDS_PER_PIXEL;
+			}
+			else if (m_fSecondsPerPixel > MAX_SECONDS_PER_PIXEL) {
+				m_fSecondsPerPixel = MAX_SECONDS_PER_PIXEL;
+			}
+			m_bSetSecondsPerPixel = TRUE;
+		}
+	}
+	else {
+		width = (int)((tLastTime - tFirstTime) / m_fSecondsPerPixel) + MYIMAGE_H_MARGIN * 2;
+	}
+
+	if ( width > widthParent )
+		this->SetFixedWidth(width);
+	else 
+		this->SetFixedWidth(widthParent);
+	Invalidate();
 }
