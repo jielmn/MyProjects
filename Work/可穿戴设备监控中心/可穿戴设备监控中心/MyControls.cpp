@@ -414,6 +414,10 @@ bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	DrawScale(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 	DrawScale2(hDC, nMaxTemp, nCelsiusCount, nHeightPerCelsius, nMaxY, rcScale1, rcScale2, width);
 
+	tTopLeft.y = nMaxY + nHeightPerCelsius * nCelsiusCount;
+	RECT  rcValid = { rcScale1.right, rcScale1.top, rcScale2.left, rcScale2.bottom };
+	DrawTimeText(hDC, tFirst, tLast, m_fSecondsPerPixel, tTopLeft, rcValid);
+
 	return true;
 }
 
@@ -898,4 +902,52 @@ void CMyImageUI::MyInvalidate() {
 	else 
 		this->SetFixedWidth(widthParent);
 	Invalidate();
+}
+
+// 画时间文本
+void    CMyImageUI::DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
+	float fSecondsPerPixel, POINT  top_left, const RECT & rValid) {
+
+	char szTime[256];
+	::SetTextColor(hDC, RGB(255, 255, 255));
+	const int OFFSET_Y = 5;
+	const int TIME_TEXT_INTERVAL = 80;
+	const int TIME_TEXT_WIDTH = 60;
+	BOOL  bFirst = TRUE;
+
+	int  remainder = tFirstTime % 60;
+	time_t  time_point = tFirstTime + (60 - remainder);
+	int  time_width = (int)((time_point - tFirstTime) / fSecondsPerPixel);
+
+	// 如果宽度足够大，开始画text
+	if (time_width >= TIME_TEXT_INTERVAL / 2) {
+		LmnFormatTime(szTime, sizeof(szTime), time_point, "%H:%M:%S");
+		::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
+		bFirst = FALSE;
+	}
+
+	int last_time_width = time_width;
+	time_point += 60;
+	while (time_point <= tLastTime) {
+		time_width = (int)((time_point - tFirstTime) / fSecondsPerPixel);
+		if (bFirst) {
+			// 如果宽度足够大，开始画text
+			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL / 2) {
+				LmnFormatTime(szTime, sizeof(szTime), time_point, "%H:%M:%S");
+				::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
+				last_time_width = time_width;
+				bFirst = FALSE;
+			}
+		}
+		else {
+			// 如果宽度足够大，开始画text
+			if ((time_width - last_time_width) >= TIME_TEXT_INTERVAL) {
+				LmnFormatTime(szTime, sizeof(szTime), time_point, "%H:%M:%S");
+				::ExtTextOut(hDC, top_left.x + time_width - TIME_TEXT_WIDTH / 2, top_left.y + OFFSET_Y, ETO_CLIPPED, &rValid, szTime, strlen(szTime), 0);
+				last_time_width = time_width;
+			}
+		}
+
+		time_point += 60;
+	}
 }

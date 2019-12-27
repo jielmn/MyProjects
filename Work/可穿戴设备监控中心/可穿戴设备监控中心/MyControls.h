@@ -145,4 +145,6 @@ private:
 
 	//  Û¬÷ª¨∂Ø
 	void   OnMyMouseWheel(WPARAM wParam, LPARAM lParam);
+	void   DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
+		float fSecondsPerPixel, POINT  top_left, const RECT & rValid);
 };
