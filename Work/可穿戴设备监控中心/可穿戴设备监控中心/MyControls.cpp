@@ -304,12 +304,12 @@ CMyImageUI::CMyImageUI() {
 	m_hCommonThreadPen = ::CreatePen(PS_SOLID, 1, RGB(0x66, 0x66, 0x66));
 	m_hCommonBrush = ::CreateSolidBrush(RGB(0x43, 0x42, 0x48));
 	m_hDaySplitThreadPen = ::CreatePen(PS_DASHDOTDOT, 1, RGB(0x99, 0x99, 0x99));
-	m_temperature_pen = new Pen(Gdiplus::Color(0,255,0), 1.0);
-	m_temperature_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(0, 255, 0)));
-	m_heartbeat_pen = new Pen(Gdiplus::Color(255, 0, 0), 1.0);
-	m_heartbeat_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(255, 0, 0)));
-	m_oxy_pen = new Pen(Gdiplus::Color(202, 81, 0), 1.0);
-	m_oxy_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(202, 81, 0)));
+	m_temperature_pen = new Pen(Gdiplus::Color(TEMP_COLOR), 1.0);
+	m_temperature_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(TEMP_COLOR)));
+	m_heartbeat_pen = new Pen(Gdiplus::Color(HEARTBEAT_COLOR), 1.0);
+	m_heartbeat_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(HEARTBEAT_COLOR)));
+	m_oxy_pen = new Pen(Gdiplus::Color(OXY_COLOR), 1.0);
+	m_oxy_brush = new SolidBrush(Gdiplus::Color(Gdiplus::Color(OXY_COLOR)));
 
 	m_fSecondsPerPixel = 1.0f;
 	m_bSetSecondsPerPixel = FALSE;

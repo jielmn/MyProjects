@@ -53,6 +53,9 @@ private:
 	CLabelUI *                                  m_lblStatus;
 	CLabelUI *                                  m_lblNameCurve;
 	CMyImageUI *                                m_img;
+	CControlUI *                                m_HeartBeatIndicator;
+	CControlUI *                                m_OxyIndicator;
+	CControlUI *                                m_TempIndicator;
 
 private:
 	std::vector<CWearItem *>                    m_data;

@@ -82,7 +82,26 @@
 						<HorizontalLayout height="40">
 							<Control bkimage="zhexian.png" width="40" height="40" />
 							<Control width="10" />
-							<Label text="体征数据折线图" textcolor="#FFFFFFFF" font="4" />
+							<Label text="体征数据折线图(" textcolor="#FFFFFFFF" font="4" width="160" />
+							<VerticalLayout width="50" inset="0,0,10,0">
+								<Control />
+								<Control height="2" bkcolor="#FFFF0000" name="cHeartBeat" />
+								<Control />
+							</VerticalLayout>											
+							<Label text="心率" width="60" font="4" textcolor="#FFFFFFFF" />
+							<VerticalLayout width="50" inset="0,0,10,0">
+								<Control />
+								<Control height="2" bkcolor="#FF00FF00" name="cOxy" />
+								<Control />
+							</VerticalLayout>	
+							<Label text="血氧" width="60" font="4" textcolor="#FFFFFFFF" />
+							<VerticalLayout width="50" inset="0,0,10,0">
+								<Control />
+								<Control height="2" bkcolor="#FF0000FF" name="cTemp" />
+								<Control />
+							</VerticalLayout>	
+							<Label text="体温" width="50" font="4" textcolor="#FFFFFFFF" />
+							<Label text=")" textcolor="#FFFFFFFF" font="4" />
 						</HorizontalLayout>												
 						
 						<HorizontalLayout height="24">

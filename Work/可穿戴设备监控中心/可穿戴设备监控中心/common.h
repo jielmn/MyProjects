@@ -39,6 +39,10 @@ using namespace DuiLib;
 #define   NORMAL_COLOR            0xFF4AB20A
 #define   ABNORMAL_TEXT_COLOR     0xFFFF0000
 
+#define   HEARTBEAT_COLOR         0xFFFF0000
+#define   OXY_COLOR               0xFFCA5100
+#define   TEMP_COLOR              0xFF00FF00
+
 // 创建duilib控件的回调
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback
 {

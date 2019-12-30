@@ -64,6 +64,13 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblStatus = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblStatus");
 	m_lblNameCurve = (DuiLib::CLabelUI *)m_PaintManager.FindControl("lblNameCurve");
 	m_img = (CMyImageUI *)m_PaintManager.FindControl("cstMyImage");
+	m_HeartBeatIndicator = m_PaintManager.FindControl("cHeartBeat");
+	m_OxyIndicator = m_PaintManager.FindControl("cOxy");
+	m_TempIndicator = m_PaintManager.FindControl("cTemp");
+
+	m_HeartBeatIndicator->SetBkColor(HEARTBEAT_COLOR);
+	m_OxyIndicator->SetBkColor(OXY_COLOR);
+	m_TempIndicator->SetBkColor(TEMP_COLOR);
 
 	m_layList->SetVisible(false); 
 	m_btnExpand->SetText("<");   
@@ -766,7 +773,7 @@ void  CDuiFrameWnd::OnGetDataRet(CGetDataRet * pRet) {
 	m_img->MyInvalidate();
 }
  
-                      
+        
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
