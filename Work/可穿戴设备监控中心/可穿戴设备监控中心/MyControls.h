@@ -99,6 +99,7 @@ public:
 	void Clear();
 	void OnGetDataRet(CGetDataRet * pRet);
 	void MyInvalidate();
+	void OnNewWearItem(CWearItem * pItem);
 
 private:
 	std::vector<DataItem *>          m_vHeartBeat;

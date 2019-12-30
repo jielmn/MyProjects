@@ -951,3 +951,31 @@ void    CMyImageUI::DrawTimeText(HDC hDC, time_t  tFirstTime, time_t tLastTime,
 		time_point += 60;
 	}
 }
+
+void   CMyImageUI::OnNewWearItem(CWearItem * pItem) {
+	time_t now = time(0);
+	DataItem * pData = 0;
+
+	if (pItem->m_nHearbeat) {
+		pData = new DataItem;
+		pData->nData = pItem->m_nHearbeat;
+		pData->tTime = now;
+		m_vHeartBeat.push_back(pData);
+	}
+
+	if (pItem->m_nOxy) {
+		pData = new DataItem;
+		pData->nData = pItem->m_nOxy;
+		pData->tTime = now;
+		m_vOxy.push_back(pData);
+	}
+
+	if (pItem->m_nTemp) {
+		pData = new DataItem;
+		pData->nData = pItem->m_nTemp;
+		pData->tTime = now;
+		m_vTemp.push_back(pData);
+	}
+
+	MyInvalidate();
+}

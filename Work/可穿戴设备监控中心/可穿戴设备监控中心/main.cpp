@@ -639,6 +639,11 @@ void  CDuiFrameWnd::CancelSort() {
 }
 
 void  CDuiFrameWnd::OnNewWearItem(CWearItem * pItem) {
+
+	if (m_img->m_strDeviceId == pItem->m_szDeviceId) {
+		m_img->OnNewWearItem(pItem);
+	}
+
 	std::vector<CWearItem *>::iterator it;
 	it = std::find_if(m_data.begin(), m_data.end(), CFindWearItem(pItem));
 
@@ -678,7 +683,7 @@ void  CDuiFrameWnd::OnNewWearItem(CWearItem * pItem) {
 	}
 
 	UpdateList();
-	UpdateGrids();
+	UpdateGrids();	
 }
 
 void  CDuiFrameWnd::CheckListItemWarning(CListTextElementUI * pListItem) {
