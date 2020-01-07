@@ -1,0 +1,5 @@
+<!--pages/welcome.wxml-->
+<view class='main' style='background-image:url(/images/banner.png);' >  
+  <button class='start' open-type="getUserInfo" bindgetuserinfo="onStart"  >开始测温吧</button>
+</view>
+

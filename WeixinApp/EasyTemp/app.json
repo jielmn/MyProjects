@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/thermo/thermo"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "backgroundColor": "#ffffff",
+    "selectedColor": "#3dc5a2",
+    "color": "#000",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/device_u.png",
+        "selectedIconPath": "images/device.png",
+        "text": "连接"
+      },
+      {
+        "pagePath": "pages/thermo/thermo",
+        "iconPath": "images/thermo_u.png",
+        "selectedIconPath": "images/thermo.png",
+        "text": "测温"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
