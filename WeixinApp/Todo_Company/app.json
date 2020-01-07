@@ -1,5 +1,5 @@
 {
-  "pages":[
+  "pages": [
     "pages/cover/cover",
     "pages/mine/mine",
     "pages/group/group",
@@ -9,11 +9,11 @@
     "pages/front/front",
     "pages/weibo_item/weibo_item"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "泰利美信ToDoList",
-    "navigationBarTextStyle":"black",
+    "navigationBarTextStyle": "black",
     "enablePullDownRefresh": false
   },
   "tabBar": {
@@ -40,5 +40,6 @@
         "selectedIconPath": "images/sales.png"
       }
     ]
-  }
+  },
+  "sitemapLocation": "sitemap.json"
 }
