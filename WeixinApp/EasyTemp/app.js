@@ -1,6 +1,6 @@
 //app.js
 App({
-  onLaunch: function () {
+  onLaunch: function() {
     // 保存变量
     var app_obj = this;
 
@@ -40,7 +40,7 @@ App({
   },
 
   // 获取open_id
-  getOpenid: function (code) {
+  getOpenid: function(code) {
     console.log("== getting openid");
 
     var that = this;
@@ -48,11 +48,11 @@ App({
       url: that.globalData.serverAddr + '?type=get_openid&code=' + encodeURIComponent(code),
       data: {},
       method: 'GET',
-      success: function (res) {
+      success: function(res) {
 
         console.log("== get openid success")
         that.globalData.openid = res.data.openid;
-      },   // success
+      }, // success
 
       // 获取openid失败
       fail() {
@@ -62,9 +62,29 @@ App({
     }); // wx.request
   },
 
+  inArray: function(arr, key, val) {
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i][key] === val) {
+        return i;
+      }
+    }
+    return -1;
+  },
+
+  // ArrayBuffer转16进度字符串示例
+  ab2hex: function(buffer) {
+    var hexArr = Array.prototype.map.call(
+      new Uint8Array(buffer),
+      function(bit) {
+        return ('00' + bit.toString(16)).slice(-2)
+      }
+    )
+    return hexArr.join('');
+  },
+
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
-    openid:null
+    openid: null
   }
 })
