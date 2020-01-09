@@ -27,3 +27,8 @@
   font-size: 30rpx;
   width: 400rpx;
 }
+
+.itemimage{
+  width: 40rpx;
+  height: 40rpx;
+}

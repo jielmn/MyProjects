@@ -82,6 +82,26 @@ App({
     return hexArr.join('');
   },
 
+  // 字符串转byte
+  stringToBytes: function(str) {
+    var strArray = new Uint8Array(str.length);
+    for (var i = 0; i < str.length; i++) {
+      strArray[i] = str.charCodeAt(i);
+    }
+    const array = new Uint8Array(strArray.length)
+    strArray.forEach((item, index) => array[index] = item)
+    return array.buffer;
+  },
+
+  log: function(str, obj) {
+    str = "== " + str;
+    if (obj) {
+      console.log(str, obj);
+    } else {
+      console.log(str)
+    }
+  },
+
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",

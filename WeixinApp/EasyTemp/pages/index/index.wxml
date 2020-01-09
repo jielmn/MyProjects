@@ -9,7 +9,21 @@
 </view>
 
 <view class="weui-panel">
+  <!--已发现头-->
   <view class="weui-panel__hd">已发现 {{devices.length}} 个EasyTemp设备
     <view class="weui-loading" fix wx:if="{{ spinShow }}"></view>
   </view>
+
+  <!--发现详细-->
+  <view class="weui-panel__bd">
+    <view wx:for="{{devices}}" wx:key="index" class="weui-media-box weui-media-box_text" data-device-id="{{item.deviceId}}" data-name="{{item.name || item.localName}}" bindtap="createBLEConnection">
+      <view class="weui-media-box__title weui-media-box__title_in-text">{{item.name || item.localName}}
+      <image class="itemimage" src="/images/s{{item.image}}.png"></image>
+      </view>
+      <view class="weui-media-box__desc">设备编号: {{item.deviceId}}
+        <view class="weui-loading" fix wx:if="{{ item.spinShow }}"></view>
+      </view>      
+    </view>
+  </view>
+
 </view>

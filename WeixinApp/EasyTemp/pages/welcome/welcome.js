@@ -1,18 +1,37 @@
 // pages/welcome.js
+
+const app = getApp()
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    var that = this;
+    this._timerid = setTimeout( function() {
+      wx.getUserInfo({
+        success:function(res){
+          wx.switchTab({
+            url: '../thermo/thermo'
+          });
+        },
+        fail:function(res) {
+          wx.showToast({
+            title: '获取用户信息失败',
+            duration: 2000
+          })
+          return;
+        }
+      })
+    }, 5000)
   },
 
   /**
@@ -40,7 +59,7 @@ Page({
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
+    clearTimeout(this._timerid);
   },
 
   /**
@@ -65,15 +84,18 @@ Page({
   },
 
   onStart: function(e) {
-    console.log("== onStart");
-    // console.log(e);
+    app.log("onStart");
     
     if ( e.detail.errMsg != "getUserInfo:ok") {
+      wx.showToast({
+        title: '获取用户信息失败',
+        duration: 2000
+      })
       return;
     }
 
     wx.switchTab({
-      url: '../index/index'
+      url: '../thermo/thermo'
     });
 
   }
