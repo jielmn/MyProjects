@@ -1,13 +1,25 @@
-<!--index.wxml-->
-<view class="container">
-  <view class="userinfo">
-    <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
-    <block wx:else>
-      <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-      <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-    </block>
+<view class="upview">
+  <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+  <block wx:else>
+    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+    <text class="userinfo-nickname">{{userInfo.nickName}}</text>
+  </block>
+</view>
+
+<view class="middleview">
+  <view class="x1">用户管理</view>
+  <view class="x2"><image class='edit' src='/images/add.png' ></image></view>
+</view>
+
+<view class="weui-panel">
+  <view class="weui-panel__hd itemview">
+    <view class="v1">小咪</view>
+    <view class="v2"><image class='edit' src='/images/edit.png' ></image></view>    
+    <view class="v3"><image class='del' src='/images/recycle.png' ></image></view>
   </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+  <view class="weui-panel__hd itemview">
+    <view class="v1">小明</view>
+    <view class="v2"><image class='edit' src='/images/edit.png'  ></image></view>    
+    <view class="v3"><image class='del' src='/images/recycle.png' ></image></view>
   </view>
 </view>

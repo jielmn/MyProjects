@@ -7,10 +7,17 @@
   </view>
 
   <view class="tempview">
-    <view class='v1'>收到温度 (℃)</view>
-    <view class='v2'>{{ tools.toFixed(curtemp,2) }}</view>
-    <view class='v3'>我</view>
-    <view class='v4'>绑定</view>
+    <view class='v1'>收到温度(℃):</view>
+    <view class='x1'>
+      <view class='v2'>{{ tools.toFixed(curtemp,1) }}</view>
+      <view class='v3'>
+        <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+          <view class="picker">
+            {{array[index]}}
+          </view>
+        </picker>
+      </view>
+    </view>
   </view>
 
 </view>
@@ -18,8 +25,19 @@
 <view class="middleview">上一次测量温读</view>
 
 <view class="weui-panel">
-  <view class="weui-panel__hd">我</view>
-  <view class="weui-panel__hd">小咪</view>
-  <view class="weui-panel__hd">小明</view>
-
+  <view class="weui-panel__hd itemview">
+    <view class="y1">我</view>
+    <view class="y2">36.8℃</view>
+    <view class="y3">2019-11-20 19:08</view>
+  </view>
+  <view class="weui-panel__hd itemview">
+    <view class="y1">小咪</view>
+    <view class="y2">37.8℃</view>
+    <view class="y3">2020-01-11 09:28</view>
+  </view>
+  <view class="weui-panel__hd itemview">
+    <view class="y1">小明</view>
+    <view class="y2"></view>
+    <view class="y3"></view>
+  </view>
 </view>

@@ -4,7 +4,9 @@ const app = getApp()
 
 Page({
   data: {
-    curtemp:0
+    curtemp:0,
+    array: ['我', '小咪', '小明'],
+    index:0
   },
 
   onLoad: function (options) {
