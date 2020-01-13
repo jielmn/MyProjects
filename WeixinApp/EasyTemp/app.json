@@ -10,7 +10,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#3dc5a2",
-    "navigationBarTitleText": "WeChat",
+    "navigationBarTitleText": "易温",
     "navigationBarTextStyle": "white"
   },
   "tabBar": {
@@ -26,18 +26,17 @@
         "text": "测温"
       },
       {
-        "pagePath": "pages/record/record",
-        "iconPath": "images/record_u.png",
-        "selectedIconPath": "images/record.png",
-        "text": "记录"
-      },
-      {
         "pagePath": "pages/setting/setting",
         "iconPath": "images/user_u.png",
         "selectedIconPath": "images/user.png",
         "text": "设置"
       }
     ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于温度大数据平台"
+    }
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

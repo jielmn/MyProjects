@@ -17,6 +17,17 @@ Page({
   onLoad: function (options) {
     var that = this;
     this._timerid = setTimeout( function() {
+
+      if (!app.globalData.openid) {
+        /*
+        wx.showToast({
+          title: '未获取到open id',
+          duration: 2000
+        })
+        */
+        return;
+      }
+      
       wx.getUserInfo({
         success:function(res){
           wx.switchTab({
@@ -24,10 +35,12 @@ Page({
           });
         },
         fail:function(res) {
+          /*
           wx.showToast({
             title: '获取用户信息失败',
             duration: 2000
           })
+          */
           return;
         }
       })
@@ -89,6 +102,14 @@ Page({
     if ( e.detail.errMsg != "getUserInfo:ok") {
       wx.showToast({
         title: '获取用户信息失败',
+        duration: 2000
+      })
+      return;
+    }
+
+    if ( !app.globalData.openid ) {
+      wx.showToast({
+        title: '未获取到open id',
         duration: 2000
       })
       return;

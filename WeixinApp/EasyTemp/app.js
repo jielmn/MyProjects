@@ -8,7 +8,7 @@ App({
     // var logs = wx.getStorageSync('logs') || []
     // logs.unshift(Date.now())
     // wx.setStorageSync('logs', logs)
-
+    
     // 登录
     wx.login({
       success: res => {
@@ -17,6 +17,8 @@ App({
         app_obj.getOpenid(res.code);
       }
     })
+
+    
     // 获取用户信息
     wx.getSetting({
       success: res => {
@@ -34,7 +36,14 @@ App({
               }
             }
           })
-        }
+        }        
+      }
+    })
+
+    wx.getLocation({
+      type: 'wgs84',
+      success(res) {
+        console.log("== get location", res);
       }
     })
   },
