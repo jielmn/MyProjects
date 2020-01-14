@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/welcome/welcome",
-    "pages/index/index",
-    "pages/logs/logs",
+    "pages/welcome/welcome",    
     "pages/thermo/thermo",
+    "pages/index/index",    
+    "pages/logs/logs",    
     "pages/setting/setting"
   ],
   "window": {

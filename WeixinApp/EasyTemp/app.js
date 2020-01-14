@@ -8,17 +8,17 @@ App({
     // var logs = wx.getStorageSync('logs') || []
     // logs.unshift(Date.now())
     // wx.setStorageSync('logs', logs)
-    
+
     // 登录
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        console.log("== wx.login success!");
+        app_obj.log("wx.login success!");
         app_obj.getOpenid(res.code);
       }
     })
 
-    
+
     // 获取用户信息
     wx.getSetting({
       success: res => {
@@ -36,21 +36,21 @@ App({
               }
             }
           })
-        }        
+        }
       }
     })
 
     wx.getLocation({
       type: 'wgs84',
       success(res) {
-        console.log("== get location", res);
+        app_obj.log("get location", res);
       }
     })
   },
 
   // 获取open_id
   getOpenid: function(code) {
-    console.log("== getting openid");
+    this.log("getting openid");
 
     var that = this;
     wx.request({
@@ -59,13 +59,13 @@ App({
       method: 'GET',
       success: function(res) {
 
-        console.log("== get openid success")
+        that.log("get openid success")
         that.globalData.openid = res.data.openid;
       }, // success
 
       // 获取openid失败
       fail() {
-        console.log("== get openid failed");
+        that.log("get openid failed");
       },
 
     }); // wx.request
@@ -82,6 +82,8 @@ App({
 
   // ArrayBuffer转16进度字符串示例
   ab2hex: function(buffer) {
+    this.log("typeof:", typeof(buffer));
+    this.log("buffer:", buffer);
     var hexArr = Array.prototype.map.call(
       new Uint8Array(buffer),
       function(bit) {
@@ -111,9 +113,312 @@ App({
     }
   },
 
+  userInfoReadyCallback: null,
+  bluetoothCallback: null,
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
-    openid: null
+    openid: null,
+
+    // 蓝牙状态
+    discoveryStarted: false,
+    stopDiscover: false,
+    timerid: null,
+    devices: null,
+    device: null
+  },
+
+  /*蓝牙操作*/
+  openBluetoothAdapter() {
+    var app = this;
+    var that = this;
+
+    this.globalData.discoveryStarted = false
+    this.globalData.stopDiscover = false;
+    this.globalData.timerid = null
+    this.globalData.devices = new Array();
+    this.globalData.device = null
+
+    app.log("openBluetoothAdapter");
+    wx.openBluetoothAdapter({
+      success: (res) => {
+        app.log('openBluetoothAdapter success', res);
+        that.startBluetoothDevicesDiscovery()
+      },
+      fail: (res) => {
+        app.log("openBluetoothAdapter failed", res);
+        // 10001错误是手机没有开蓝牙开关
+        if (res.errCode === 10001) {
+          wx.onBluetoothAdapterStateChange(function(res) {
+            app.log('onBluetoothAdapterStateChange', res)
+            if (res.available && !res.discovering && !that.globalData.stopDiscover) {
+              that.startBluetoothDevicesDiscovery()
+            }
+          })
+        } else {
+          if (that.bluetoothCallback) {
+            if (!res.errCode)
+              res.errCode = -1;
+            that.bluetoothCallback(res);
+          }
+        }
+      }
+    })
+
+  },
+
+  startBluetoothDevicesDiscovery() {
+    var app = this;
+    var that = this;
+
+    if (this.globalData.discoveryStarted) {
+      this.log("already started, return");
+      return
+    }
+
+    this.globalData.discoveryStarted = true
+    this.globalData.timerid = setTimeout(this.onBluetoothDevicesDiscoveryTimeout, 6000);
+
+    wx.startBluetoothDevicesDiscovery({
+      allowDuplicatesKey: true,
+      success: (res) => {
+        app.log('startBluetoothDevicesDiscovery success', res)
+        that.onBluetoothDeviceFound()
+      },
+    })
+  },
+
+  onBluetoothDeviceFound() {
+    var app = this;
+    var that = this;
+
+    wx.onBluetoothDeviceFound((res) => {
+      res.devices.forEach(device => {
+
+        if (!device.name && !device.localName) {
+          return
+        }
+
+        if (device.name.substring(0, 7).toLowerCase() != 'telemed') {
+          return;
+        }
+
+        var foundDevices = that.globalData.devices
+        const idx = app.inArray(foundDevices, 'deviceId', device.deviceId)
+
+        if (idx === -1) {
+          foundDevices.push(device);
+        } else {
+          foundDevices[idx] = device
+        }
+
+      })
+    })
+  },
+
+  onBluetoothDevicesDiscoveryTimeout() {
+    var app = this;
+    var that = this;
+
+    app.log("onBluetoothDevicesDiscoveryTimeout");
+    this.stopBluetoothDevicesDiscovery();
+
+    this.log("found devices", this.globalData.devices);
+    var device = this.getNearestDevice();
+    this.globalData.device = device;
+
+    if (device == null) {
+      this.log("not found telemed device!");
+      if (this.bluetoothCallback) {
+        var res;
+        res.errCode = -1;
+        res.errMsg = "没有找到易温读卡器"
+        that.bluetoothCallback(res);
+      }
+
+      this.globalData.discoveryStarted = false
+      this.globalData.stopDiscover = false;
+      this.globalData.timerid = null
+      this.globalData.devices = new Array();
+      this.globalData.device = null
+      setTimeout(that.startBluetoothDevicesDiscovery, 10000);
+
+    } else {
+      this.createBLEConnection();
+    }
+  },
+
+  stopBluetoothDevicesDiscovery() {
+    var app = this;
+    var that = this;
+
+    if (!this.globalData.discoveryStarted)
+      return;
+
+    app.log("stopBluetoothDevicesDiscovery");
+    wx.stopBluetoothDevicesDiscovery();
+    clearTimeout(this.globalData.timerid);
+    this.globalData.discoveryStarted = false;
+    // 手动停止标志
+    this.globalData.stopDiscover = true;
+  },
+
+  getNearestDevice() {
+    var devices = this.globalData.devices;
+    var foundDevice = null;
+    devices.forEach(device => {
+      if (device) {
+        foundDevice = device;
+      } else if (device.RSSI > foundDevice.RSSI) {
+        foundDevice = device;
+      }
+    })
+    return foundDevice;
+  },
+
+  createBLEConnection(e) {
+    var app = this;
+    var that = this;
+
+    app.log("createBLEConnection");
+    const deviceId = this.globalData.device.deviceId
+    wx.createBLEConnection({
+      deviceId,
+      success: (res) => {
+        app.log("createBLEConnection success");
+        that.getBLEDeviceServices(deviceId)
+      },
+      fail: (err) => {
+        if (this.bluetoothCallback) {
+          that.bluetoothCallback(err);
+        }
+      }
+    })
+    that.stopBluetoothDevicesDiscovery()
+  },
+
+  closeBLEConnection() {
+    wx.closeBLEConnection({
+      deviceId: this.globalData.device.deviceId
+    })
+  },
+
+  getBLEDeviceServices(deviceId) {
+    var that = this;
+    var app = this;
+
+    wx.getBLEDeviceServices({
+      deviceId,
+      success: (res) => {
+        for (let i = 0; i < res.services.length; i++) {
+          /*
+          if (res.services[i].isPrimary) {
+            app.log("== primary service" + res.services[i].uuid);
+            this.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid)
+            return
+          }
+          */
+
+          /*易温的服务*/
+          if (res.services[i].uuid.substring(0, 8).toLowerCase() == 'f000fff0') {
+            that.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid)
+          }
+
+        }
+      }
+    })
+  },
+
+  getBLEDeviceCharacteristics(deviceId, serviceId) {
+    var that = this;
+    var app = this;
+
+    wx.getBLEDeviceCharacteristics({
+      deviceId,
+      serviceId,
+      success: (res) => {
+        app.log('getBLEDeviceCharacteristics success', res)
+        for (let i = 0; i < res.characteristics.length; i++) {
+          let item = res.characteristics[i]
+
+          if (item.properties.read) {
+            /*
+            wx.readBLECharacteristicValue({
+              deviceId,
+              serviceId,
+              characteristicId: item.uuid,
+            })
+            */
+          }
+
+          if (item.properties.write) {
+            // that.writeBLECharacteristicValue(deviceId, serviceId, item.uuid, app.stringToBytes("56"))
+          }
+
+          if (item.properties.notify || item.properties.indicate) {
+            wx.notifyBLECharacteristicValueChange({
+              deviceId,
+              serviceId,
+              characteristicId: item.uuid,
+              state: true,
+              success: function(res) {
+                that.onBLECharacteristicValueChange();
+              },
+              fail: function(res) {
+                if (that.bluetoothCallback) {
+                  that.bluetoothCallback(res);
+                }
+              }
+            })
+
+          }
+        }
+
+        if (that.bluetoothCallback) {
+          that.bluetoothCallback(res);
+        }
+      },
+      fail(res) {
+        app.error('getBLEDeviceCharacteristics', res)
+        if (that.bluetoothCallback) {
+          that.bluetoothCallback(res);
+        }
+      }
+    })
+  },
+
+  writeBLECharacteristicValue: function(deviceId, serviceId, characterId, order) {
+    var app = this;
+    var that = this;
+
+    wx.writeBLECharacteristicValue({
+      deviceId: deviceId,
+      serviceId: serviceId,
+      characteristicId: characterId,
+      // 这里的value是ArrayBuffer类型
+      value: order.slice(0, 20),
+      success: function(res) {
+        app.log("write characterid success");
+      },
+
+      fail: function(res) {
+        app.log("write characterid failed");
+      }
+    })
+  },
+
+  onBLECharacteristicValueChange: function() {
+    var app = this;
+    wx.onBLECharacteristicValueChange(function(res) {
+      app.log("onBLECharacteristicValueChange", res);
+      var resValue = app.ab2hex(res.value);
+      app.log("received: ", resValue);
+    })
+  },
+
+  onHide: function() {
+    // Do something when hide.
+    wx.closeBluetoothAdapter();
   }
+
 })

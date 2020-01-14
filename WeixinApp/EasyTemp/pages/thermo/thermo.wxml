@@ -2,8 +2,8 @@
 
 <view class="upview">
   <view class="connectview">
-    <view class="left">正在连接易温读卡器</view>
-    <view class="weui-loading" fix></view>
+    <view class="left">{{bluetoothStr}}</view>
+    <view class="weui-loading" fix wx:if="{{ spinShow }}" ></view>
   </view>
 
   <view class="tempview">

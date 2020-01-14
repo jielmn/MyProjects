@@ -32,7 +32,7 @@ Page({
         success:function(res){
           wx.switchTab({
             url: '../thermo/thermo'
-          });
+          })
         },
         fail:function(res) {
           /*
@@ -117,7 +117,7 @@ Page({
 
     wx.switchTab({
       url: '../thermo/thermo'
-    });
+    });    
 
   }
 })
