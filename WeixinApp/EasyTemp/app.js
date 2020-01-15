@@ -9,6 +9,12 @@ App({
     // logs.unshift(Date.now())
     // wx.setStorageSync('logs', logs)
 
+    //this.innerAudioContext = wx.createInnerAudioContext(); //新建一个createInnerAudioContext();
+    //this.innerAudioContext.autoplay = true; //音频自动播放设置
+    //this.innerAudioContext.src = null,
+    //this.innerAudioContext.volume = 0.1;
+    //this.innerAudioContext.onPlay(() => { }); //播放音效
+
     // 登录
     wx.login({
       success: res => {
@@ -82,8 +88,6 @@ App({
 
   // ArrayBuffer转16进度字符串示例
   ab2hex: function(buffer) {
-    this.log("typeof:", typeof(buffer));
-    this.log("buffer:", buffer);
     var hexArr = Array.prototype.map.call(
       new Uint8Array(buffer),
       function(bit) {
@@ -115,6 +119,8 @@ App({
 
   userInfoReadyCallback: null,
   bluetoothCallback: null,
+  temperatureCallback:null,
+  innerAudioContext:null,
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
@@ -132,12 +138,6 @@ App({
   openBluetoothAdapter() {
     var app = this;
     var that = this;
-
-    this.globalData.discoveryStarted = false
-    this.globalData.stopDiscover = false;
-    this.globalData.timerid = null
-    this.globalData.devices = new Array();
-    this.globalData.device = null
 
     app.log("openBluetoothAdapter");
     wx.openBluetoothAdapter({
@@ -171,9 +171,16 @@ App({
     var app = this;
     var that = this;
 
-    if (this.globalData.discoveryStarted) {
-      this.log("already started, return");
-      return
+    this.globalData.discoveryStarted = false
+    this.globalData.stopDiscover = false;
+    this.globalData.timerid = null
+    this.globalData.devices = new Array();
+    this.globalData.device = null
+
+    if (this.bluetoothCallback) {
+      var res = {}
+      res.myCode = 1;
+      that.bluetoothCallback(res);
     }
 
     this.globalData.discoveryStarted = true
@@ -230,17 +237,12 @@ App({
     if (device == null) {
       this.log("not found telemed device!");
       if (this.bluetoothCallback) {
-        var res;
+        var res = {}
         res.errCode = -1;
         res.errMsg = "没有找到易温读卡器"
         that.bluetoothCallback(res);
       }
 
-      this.globalData.discoveryStarted = false
-      this.globalData.stopDiscover = false;
-      this.globalData.timerid = null
-      this.globalData.devices = new Array();
-      this.globalData.device = null
       setTimeout(that.startBluetoothDevicesDiscovery, 10000);
 
     } else {
@@ -291,6 +293,7 @@ App({
       fail: (err) => {
         if (this.bluetoothCallback) {
           that.bluetoothCallback(err);
+          setTimeout(that.startBluetoothDevicesDiscovery, 10000);
         }
       }
     })
@@ -325,6 +328,12 @@ App({
           }
 
         }
+      },
+      failed:(res) => {
+        if (that.bluetoothCallback) {
+          that.bluetoothCallback(res);
+        }
+        setTimeout(that.startBluetoothDevicesDiscovery, 10000);
       }
     })
   },
@@ -381,8 +390,9 @@ App({
       fail(res) {
         app.error('getBLEDeviceCharacteristics', res)
         if (that.bluetoothCallback) {
-          that.bluetoothCallback(res);
+          that.bluetoothCallback(res);          
         }
+        setTimeout(that.startBluetoothDevicesDiscovery, 10000);
       }
     })
   },
@@ -409,10 +419,24 @@ App({
 
   onBLECharacteristicValueChange: function() {
     var app = this;
+    var that = this;
+
     wx.onBLECharacteristicValueChange(function(res) {
       app.log("onBLECharacteristicValueChange", res);
       var resValue = app.ab2hex(res.value);
       app.log("received: ", resValue);
+
+      var data = new Uint8Array(res.value);
+      var item = {};
+      item.tagid = resValue.substr(2,16);
+      item.temperature = data[9] + data[10] / 100;
+      item.battery = data[13] * 100 + data[14] * 10 + data[15];
+      app.log("formated item: ", item);
+
+      if (that.temperatureCallback) {
+        that.temperatureCallback(item);
+      }
+
     })
   },
 

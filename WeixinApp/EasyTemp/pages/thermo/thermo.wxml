@@ -9,7 +9,7 @@
   <view class="tempview">
     <view class='v1'>收到温度(℃):</view>
     <view class='x1'>
-      <view class='v2'>{{ tools.toFixed(curtemp,1) }}</view>
+      <view class='v2' style='color:{{curtempColor}};'>{{ tools.toFixed(curtemp,1) }}</view>
       <view class='v3'>
         <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
           <view class="picker">
