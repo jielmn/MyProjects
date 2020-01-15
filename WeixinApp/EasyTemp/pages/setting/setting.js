@@ -6,8 +6,13 @@ Page({
   data: {
     userInfo: {},
     hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    members: [],
+    hidden:true,
+    newMemberName:'',
   },
+
+  newMemberName:'',
 
   onLoad: function () {
     if (app.globalData.userInfo) {
@@ -36,7 +41,24 @@ Page({
         }
       })
     }
+
+    this.setData({
+      members: app.globalData.members
+    })
+
+    app.addMemberCallback = function(res) {
+      if ( res.errCode != 0 ) {
+        wx.showToast({
+          title: res.errMsg,
+          icon:'none',
+          duration: 2000
+        })
+      }  else {
+
+      }    
+    }
   },
+
   getUserInfo: function(e) {
     console.log(e)
     app.globalData.userInfo = e.detail.userInfo
@@ -44,5 +66,30 @@ Page({
       userInfo: e.detail.userInfo,
       hasUserInfo: true
     })
+  },
+
+  onAddMember() {
+    this.setData({
+      newMemberName:'',
+      hidden:!this.data.hidden
+    })
+  },
+
+  confirmMember:function(e) {
+    this.setData({
+      hidden: !this.data.hidden
+    })
+    // app.log("new member:", this.newMemberName);
+    app.addMember(this.newMemberName);
+  },
+
+  cancelMember: function (e){
+    this.setData({
+      hidden: !this.data.hidden
+    })
+  },
+
+  inputMemberName:function(e) {
+    this.newMemberName = e.detail.value;
   }
 })

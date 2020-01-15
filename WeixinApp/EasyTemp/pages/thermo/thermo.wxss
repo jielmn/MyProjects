@@ -42,7 +42,7 @@
   vertical-align: top;
   height: 60rpx;
   line-height: 60rpx;
-  width:500rpx;
+  width:420rpx;
   color: #fff;
   text-align: center;
 }

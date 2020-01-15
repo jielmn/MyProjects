@@ -1,5 +1,26 @@
 //app.js
 App({
+
+  userInfoReadyCallback: null,
+  bluetoothCallback: null,
+  temperatureCallback: null,
+  innerAudioContext: null,
+  addMemberCallback:null,
+  globalData: {
+    userInfo: null,
+    serverAddr: "https://telemed-healthcare.cn/easytemp/main",
+    openid: null,
+    logined: false,
+    members: [],
+
+    // 蓝牙状态
+    discoveryStarted: false,
+    stopDiscover: false,
+    timerid: null,
+    devices: null,
+    device: null
+  },
+
   onLaunch: function() {
     // 保存变量
     var app_obj = this;
@@ -65,8 +86,10 @@ App({
       method: 'GET',
       success: function(res) {
 
-        that.log("get openid success")
+        that.log("get openid success", res);
         that.globalData.openid = res.data.openid;
+        that.globalData.logined = res.data.logined || false;
+        that.globalData.members = res.data.members || [];
       }, // success
 
       // 获取openid失败
@@ -115,24 +138,7 @@ App({
     } else {
       console.log(str)
     }
-  },
-
-  userInfoReadyCallback: null,
-  bluetoothCallback: null,
-  temperatureCallback:null,
-  innerAudioContext:null,
-  globalData: {
-    userInfo: null,
-    serverAddr: "https://telemed-healthcare.cn/easytemp/main",
-    openid: null,
-
-    // 蓝牙状态
-    discoveryStarted: false,
-    stopDiscover: false,
-    timerid: null,
-    devices: null,
-    device: null
-  },
+  },  
 
   /*蓝牙操作*/
   openBluetoothAdapter() {
@@ -329,7 +335,7 @@ App({
 
         }
       },
-      failed:(res) => {
+      failed: (res) => {
         if (that.bluetoothCallback) {
           that.bluetoothCallback(res);
         }
@@ -390,7 +396,7 @@ App({
       fail(res) {
         app.error('getBLEDeviceCharacteristics', res)
         if (that.bluetoothCallback) {
-          that.bluetoothCallback(res);          
+          that.bluetoothCallback(res);
         }
         setTimeout(that.startBluetoothDevicesDiscovery, 10000);
       }
@@ -428,7 +434,7 @@ App({
 
       var data = new Uint8Array(res.value);
       var item = {};
-      item.tagid = resValue.substr(2,16);
+      item.tagid = resValue.substr(2, 16);
       item.temperature = data[9] + data[10] / 100;
       item.battery = data[13] * 100 + data[14] * 10 + data[15];
       app.log("formated item: ", item);
@@ -443,6 +449,52 @@ App({
   onHide: function() {
     // Do something when hide.
     wx.closeBluetoothAdapter();
+  },
+
+  addMember: function(newMemberName) {
+    var that = this;
+    var app = this;
+    var ret = {errCode:-1,errMsg:"添加成员失败!"};
+
+    if (!this.globalData.logined) {
+      this.log("not logined, give up to add member!");
+      if (this.addMemberCallback) {
+        this.addMemberCallback(ret);
+      }
+      return;
+    }
+
+    var members = this.globalData.members;
+    var found = false;
+    members.forEach( member => {
+      if ( member.name == newMemberName ) {
+        found = true;
+        return;
+      }
+    })
+
+    if ( found ) {
+      this.log("duplicated member name, give up to add member!");
+      if (this.addMemberCallback) {
+        this.addMemberCallback(ret);
+      }
+      return;
+    }
+
+    wx.request({
+      url: app.globalData.serverAddr + '?type=addmember&openid=' + encodeURIComponent(this.globalData.openid) + '&membername=' + encodeURIComponent(newMemberName),
+      method: 'GET',
+      success: (res) => {
+        if ( res.data.error != null && res.data.error == 0 ) {
+          that.log("addmember success", res);
+        } else {
+          that.log("addmember failed", res);
+        }
+      },
+      fail: (res) => {
+        that.log("addmember failed to wx.request",res);
+      }
+    })
   }
 
 })

@@ -22,6 +22,7 @@ Page({
         /*
         wx.showToast({
           title: '未获取到open id',
+          icon:'none',
           duration: 2000
         })
         */
@@ -38,6 +39,7 @@ Page({
           /*
           wx.showToast({
             title: '获取用户信息失败',
+            icon:'none',
             duration: 2000
           })
           */
@@ -102,6 +104,7 @@ Page({
     if ( e.detail.errMsg != "getUserInfo:ok") {
       wx.showToast({
         title: '获取用户信息失败',
+        icon: 'none',
         duration: 2000
       })
       return;
@@ -110,6 +113,7 @@ Page({
     if ( !app.globalData.openid ) {
       wx.showToast({
         title: '未获取到open id',
+        icon: 'none',
         duration: 2000
       })
       return;

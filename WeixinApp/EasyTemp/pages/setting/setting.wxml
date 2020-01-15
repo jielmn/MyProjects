@@ -8,18 +8,17 @@
 
 <view class="middleview">
   <view class="x1">用户管理</view>
-  <view class="x2"><image class='edit' src='/images/add.png' ></image></view>
+  <view class="x2" ><image class='edit' src='/images/add.png' bindtap="onAddMember"  ></image></view>
 </view>
 
 <view class="weui-panel">
-  <view class="weui-panel__hd itemview">
-    <view class="v1">小咪</view>
+  <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index"  >
+    <view class="v1">{{item.name}}</view>
     <view class="v2"><image class='edit' src='/images/edit.png' ></image></view>    
     <view class="v3"><image class='del' src='/images/recycle.png' ></image></view>
   </view>
-  <view class="weui-panel__hd itemview">
-    <view class="v1">小明</view>
-    <view class="v2"><image class='edit' src='/images/edit.png'  ></image></view>    
-    <view class="v3"><image class='del' src='/images/recycle.png' ></image></view>
-  </view>
 </view>
+
+<modal hidden="{{hidden}}"  title="请输入家庭成员"  confirm-text="确定"  cancel-text="取消"  bindcancel="cancelMember"    bindconfirm="confirmMember" >
+  <input value='{{newMemberName}}' id="membername" bindinput="inputMemberName" type='text' placeholder="请输入内容" auto-focus/>
+</modal>
