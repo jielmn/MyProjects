@@ -27,27 +27,17 @@ Page({
         that.setData({
           curtempColor:'#a5eddf'
         });
-      }, 10000);      
+      }, 5000);      
     }
-  },
 
-  onShow: function (options){
-    var that = this;
-
-    this.setData({
-      bluetoothStr: "没有连接易温读卡器",
-      spinShow: false
-    });
-
-    app.openBluetoothAdapter();
     app.bluetoothCallback = function (res) {
-      if (res.errCode && res.errCode != 0 ) {
+      if (res.errCode && res.errCode != 0) {
         that.setData({
           bluetoothStr: "连接易温读卡器失败:" + res.errMsg,
           spinShow: false
         });
       } else {
-        if ( res.myCode && res.myCode != 0  ) {
+        if (res.myCode && res.myCode != 0) {
           that.setData({
             bluetoothStr: "正在连接易温读卡器...",
             spinShow: true
@@ -57,9 +47,24 @@ Page({
             bluetoothStr: "连接易温读卡器成功",
             spinShow: false
           });
-        }        
+        }
       }
     }
+
+  },
+
+  onShow: function (options){
+    var that = this;    
+
+    if ( app.isBluetoothStoped ) {
+
+      this.setData({
+        bluetoothStr: "没有连接易温读卡器",
+        spinShow: false
+      });
+
+      app.openBluetoothAdapter();
+    }    
 
     var members = [{ id: 0, name: '我' }];
     app.globalData.members.forEach(item => {

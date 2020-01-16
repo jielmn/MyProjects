@@ -8,6 +8,7 @@ App({
   addMemberCallback: null,
   updateMemberCallback: null,
   deleteMemberCallback: null,
+  isBluetoothStoped: true,
 
   globalData: {
     userInfo: null,
@@ -15,7 +16,7 @@ App({
     openid: null,
     logined: false,
     members: [],
-    tagsbinding:[],
+    tagsbinding: [],
 
     // 蓝牙状态
     discoveryStarted: false,
@@ -150,6 +151,11 @@ App({
     var app = this;
     var that = this;
 
+    if ( !this.isBluetoothStoped ) {
+      this.log("isBluetoothStoped is false, openBluetoothAdapter return");
+      return;
+    }
+
     app.log("openBluetoothAdapter");
     wx.openBluetoothAdapter({
       success: (res) => {
@@ -196,6 +202,7 @@ App({
 
     this.globalData.discoveryStarted = true
     this.globalData.timerid = setTimeout(this.onBluetoothDevicesDiscoveryTimeout, 6000);
+    this.isBluetoothStoped = false;
 
     wx.startBluetoothDevicesDiscovery({
       allowDuplicatesKey: true,
@@ -254,7 +261,7 @@ App({
         that.bluetoothCallback(res);
       }
 
-      setTimeout(that.startBluetoothDevicesDiscovery, 10000);
+      setTimeout(that.startBluetoothDevicesDiscovery, 5000);
 
     } else {
       this.createBLEConnection();
@@ -454,6 +461,11 @@ App({
   onHide: function() {
     // Do something when hide.
     wx.closeBluetoothAdapter();
+    this.isBluetoothStoped = true;
+  },
+
+  onShow: function() {
+    
   },
 
   addMember: function(newMemberName) {
@@ -472,7 +484,7 @@ App({
       return;
     }
 
-    if ( newMemberName == '' ) {
+    if (newMemberName == '') {
       if (this.addMemberCallback) {
         this.addMemberCallback(ret);
       }
@@ -482,7 +494,7 @@ App({
     var members = this.globalData.members;
     var found = false;
     members.forEach(member => {
-      if ( !found && member.name == newMemberName ) {
+      if (!found && member.name == newMemberName) {
         found = true;
       }
     })
@@ -505,15 +517,15 @@ App({
             id: res.data.id,
             name: newMemberName
           })
-          ret.errCode = 0;          
+          ret.errCode = 0;
         } else {
           that.log("addmember failed", res);
         }
       },
       fail: (res) => {
-        that.log("addmember failed to wx.request", res);        
+        that.log("addmember failed to wx.request", res);
       },
-      complete:() =>{
+      complete: () => {
         if (that.addMemberCallback) {
           that.addMemberCallback(ret);
         }
@@ -521,7 +533,7 @@ App({
     })
   },
 
-  updateMember:function(member, newName){
+  updateMember: function(member, newName) {
     var that = this;
     var app = this;
     var ret = {
@@ -530,7 +542,7 @@ App({
     };
 
     // this.log("update to " + newName + ": ", member);
-    
+
     if (!this.globalData.logined) {
       this.log("not logined, give up to update member!");
       if (this.updateMemberCallback) {
@@ -547,7 +559,7 @@ App({
     }
 
     // 如果名字没有变动
-    if ( member.name == newName ) {
+    if (member.name == newName) {
       if (this.updateMemberCallback) {
         this.updateMemberCallback(ret);
       }
@@ -556,8 +568,8 @@ App({
 
     var members = this.globalData.members;
     var found = false;
-    members.forEach( item => {
-      if ( !found && item.id != member.id && item.name == newName ) {
+    members.forEach(item => {
+      if (!found && item.id != member.id && item.name == newName) {
         found = true;
       }
     })
@@ -582,7 +594,7 @@ App({
               item.name = newName;
             }
           })
-          ret.errCode = 0;          
+          ret.errCode = 0;
         } else {
           that.log("update member failed", res);
         }
@@ -590,7 +602,7 @@ App({
       fail: (res) => {
         that.log("update member failed to wx.request", res);
       },
-      complete:() =>{
+      complete: () => {
         if (that.updateMemberCallback) {
           that.updateMemberCallback(ret);
         }
@@ -598,7 +610,7 @@ App({
     })
   },
 
-  delMember : function( memberId ) {
+  delMember: function(memberId) {
     var that = this;
     var app = this;
     var ret = {
@@ -616,7 +628,7 @@ App({
           that.log("delete member success", res);
           var members = that.globalData.members;
           var index = app.inArray(members, 'id', memberId)
-          members.splice(index,1);
+          members.splice(index, 1);
           ret.errCode = 0;
         } else {
           that.log("delete member failed", res);
