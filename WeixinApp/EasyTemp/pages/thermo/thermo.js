@@ -29,19 +29,6 @@ Page({
         });
       }, 10000);      
     }
-
-    var members = [{ id: 0, name: '我'}];
-    app.globalData.members.forEach(item => {
-      var member = {};
-      member.id = item.id;
-      member.name = item.name;
-      members.push(member);
-    })
-    // app.log("members", app.globalData.members)
-    // app.log("members", members)
-    this.setData({
-      members: members
-    })
   },
 
   onShow: function (options){
@@ -73,6 +60,18 @@ Page({
         }        
       }
     }
+
+    var members = [{ id: 0, name: '我' }];
+    app.globalData.members.forEach(item => {
+      var member = {};
+      member.id = item.id;
+      member.name = item.name;
+      members.push(member);
+    })
+    this.setData({
+      members: members
+    })
+
   },
 
 

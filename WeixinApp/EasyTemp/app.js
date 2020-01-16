@@ -8,12 +8,14 @@ App({
   addMemberCallback: null,
   updateMemberCallback: null,
   deleteMemberCallback: null,
+
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
     openid: null,
     logined: false,
     members: [],
+    tagsbinding:[],
 
     // 蓝牙状态
     discoveryStarted: false,
@@ -92,6 +94,7 @@ App({
         that.globalData.openid = res.data.openid;
         that.globalData.logined = res.data.logined || false;
         that.globalData.members = res.data.members || [];
+        that.globalData.tagsbinding = res.data.tagsbinding || [];
       }, // success
 
       // 获取openid失败
@@ -479,9 +482,8 @@ App({
     var members = this.globalData.members;
     var found = false;
     members.forEach(member => {
-      if (member.name == newMemberName) {
+      if ( !found && member.name == newMemberName ) {
         found = true;
-        return;
       }
     })
 
@@ -555,9 +557,8 @@ App({
     var members = this.globalData.members;
     var found = false;
     members.forEach( item => {
-      if ( item.id != member.id && item.name == newName ) {
+      if ( !found && item.id != member.id && item.name == newName ) {
         found = true;
-        return;
       }
     })
 
@@ -579,7 +580,6 @@ App({
           members.forEach(item => {
             if (item.id == member.id) {
               item.name = newName;
-              return;
             }
           })
           ret.errCode = 0;          
@@ -615,13 +615,7 @@ App({
         if (res.data.error != null && res.data.error == 0) {
           that.log("delete member success", res);
           var members = that.globalData.members;
-          var index = -1;
-          members.forEach(item => {
-            index++;
-            if (item.id == memberId) {              
-              return;
-            }            
-          })
+          var index = app.inArray(members, 'id', memberId)
           members.splice(index,1);
           ret.errCode = 0;
         } else {

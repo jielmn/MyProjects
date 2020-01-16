@@ -174,8 +174,10 @@ public class MainServlet extends HttpServlet {
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select * from users where open_id='" + open_id_sql + "';" );
 			JSONArray members = new JSONArray();
+			JSONArray tagsbinding = new JSONArray();
 			object.put("logined", true);
 			object.put("members", members);
+			object.put("tagsbinding", tagsbinding);
 			
 			// 如果已经注册
 			if ( rs.next() ) {
@@ -186,6 +188,15 @@ public class MainServlet extends HttpServlet {
 					member.put("id",   rs.getInt(1));
 					member.put("name", rs.getString(3));
 					members.put(member);
+				}
+				
+				rs.close();
+				rs = stmt.executeQuery("select a.tagid, a.memberid from binding a inner join family b on a.memberid = b.memberid where b.open_id='" + open_id_sql + "'" );
+				while ( rs.next() ) {
+					JSONObject binding = new JSONObject();					
+					binding.put("tagid",     rs.getString(1));
+					binding.put("memberid",  rs.getInt(2));
+					tagsbinding.put(binding);
 				}
 			} 
 			// 没有注册
