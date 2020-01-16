@@ -11,7 +11,7 @@
     <view class='x1'>
       <view class='v2' style='color:{{curtempColor}};'>{{ tools.toFixed(curtemp,1) }}</view>
       <view class='v3'>
-        <picker bindchange="bindPickerChange" value="{{index}}" range="{{ tools.toMembers(members) }}">
+        <picker bindchange="bindPickerChange" value="{{index}}" range="{{ tools.toMembers(members) }}" disabled="{{!curtagId}}" >
           <view class="picker">
             {{members[index].name}}
           </view>

@@ -5,32 +5,37 @@ const app = getApp()
 Page({
   data: {
     curtemp: 0,
-    curtempColor:'#a5eddf',
+    curtempColor: '#a5eddf',
     members: [],
     index: 0,
+    curtagId: null,
     bluetoothStr: "正在连接易温读卡器...",
     spinShow: true
   },
 
-  timerId: null,
+  timerId: null,  
 
   onLoad: function(options) {
-    var that = this;    
-    app.temperatureCallback = function(item) {      
+    var that = this;
+    app.temperatureCallback = function(item) {
 
       // app.innerAudioContext.src = '/sound/bongo.mp3'; //链接到音频的地址
       // app.innerAudioContext.play();
 
-      that.setData({ curtemp: item.temperature, curtempColor:'white' });
+      that.setData({
+        curtemp: item.temperature,
+        curtempColor: 'white',
+        curtagId:item.tagid
+      });
       clearTimeout(that.timerId);
-      that.timerId = setTimeout(function(){
+      that.timerId = setTimeout(function() {
         that.setData({
-          curtempColor:'#a5eddf'
+          curtempColor: '#a5eddf'
         });
-      }, 5000);      
+      }, 5000);
     }
 
-    app.bluetoothCallback = function (res) {
+    app.bluetoothCallback = function(res) {
       if (res.errCode && res.errCode != 0) {
         that.setData({
           bluetoothStr: "连接易温读卡器失败:" + res.errMsg,
@@ -53,10 +58,10 @@ Page({
 
   },
 
-  onShow: function (options){
-    var that = this;    
+  onShow: function(options) {
+    var that = this;
 
-    if ( app.isBluetoothStoped ) {
+    if (app.isBluetoothStoped) {
 
       this.setData({
         bluetoothStr: "没有连接易温读卡器",
@@ -64,9 +69,12 @@ Page({
       });
 
       app.openBluetoothAdapter();
-    }    
+    }
 
-    var members = [{ id: 0, name: '我' }];
+    var members = [{
+      id: 0,
+      name: '我'
+    }];
     app.globalData.members.forEach(item => {
       var member = {};
       member.id = item.id;
@@ -78,6 +86,18 @@ Page({
     })
 
   },
+
+  bindPickerChange: function(e) {
+    // app.log("bindPickerChange",e);
+    var index = parseInt(e.detail.value);
+
+    this.setData({
+      index: index
+    })
+
+
+
+  }
 
 
 
