@@ -27,12 +27,15 @@ Page({
         curtempColor: 'white',
         curtagId:item.tagid
       });
+
       clearTimeout(that.timerId);
       that.timerId = setTimeout(function() {
         that.setData({
           curtempColor: '#a5eddf'
         });
       }, 5000);
+
+      app.uploadTemperature(item);
     }
 
     app.bluetoothCallback = function(res) {

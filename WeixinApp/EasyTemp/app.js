@@ -9,6 +9,9 @@ App({
   updateMemberCallback: null,
   deleteMemberCallback: null,
   isBluetoothStoped: true,
+  uploadMinTemperature: 0.0,
+  lat: 0,
+  lng: 0,
 
   globalData: {
     userInfo: null,
@@ -76,6 +79,8 @@ App({
       type: 'wgs84',
       success(res) {
         app_obj.log("get location", res);
+        app_obj.lat = res.latitude;
+        app_obj.lng = res.longitude;
       }
     })
   },
@@ -151,7 +156,7 @@ App({
     var app = this;
     var that = this;
 
-    if ( !this.isBluetoothStoped ) {
+    if (!this.isBluetoothStoped) {
       this.log("isBluetoothStoped is false, openBluetoothAdapter return");
       return;
     }
@@ -465,7 +470,7 @@ App({
   },
 
   onShow: function() {
-    
+
   },
 
   addMember: function(newMemberName) {
@@ -643,7 +648,38 @@ App({
         }
       }
     })
+  },
 
+  uploadTemperature: function(item) {
+    var that = this;
+    var app = this;
+
+    if (item.temperature <= this.uploadMinTemperature) {
+      this.log("uploadTemperature temperature " + item.temperature + " < min temperature " + this.uploadMinTemperature + ", return");
+      return;
+    }
+
+    var url = app.globalData.serverAddr + '?type=uploadtemperature&openid=' + encodeURIComponent(this.globalData.openid) + '&tagid=' + item.tagid + "&temperature=" + item.temperature + "&lat=" + this.lat + "&lng=" + this.lng;
+    // this.log("uplodate temperature url is: " + url );
+
+    wx.request({
+      url: url,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          that.log("upload temperature success", res);
+          ret.errCode = 0;
+        } else {
+          that.log("upload temperature failed", res);
+        }
+      },
+      fail: (res) => {
+        that.log("upload temperature failed to wx.request", res);
+      },
+      complete: () => {
+
+      }
+    })
   }
 
 })
