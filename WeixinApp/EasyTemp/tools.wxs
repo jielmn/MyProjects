@@ -1,6 +1,16 @@
 var toFixed = function (f,n) {
   return f.toFixed(n);
 }
+
+var toMembers = function( members ) {
+  var array = [];
+  members.forEach( function(item) {
+    array.push(item.name);
+  })
+  return array;
+}
+
 module.exports = {
-  toFixed: toFixed
+  toFixed: toFixed,
+  toMembers: toMembers
 };

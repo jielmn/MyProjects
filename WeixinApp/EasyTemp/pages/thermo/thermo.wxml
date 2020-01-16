@@ -11,9 +11,9 @@
     <view class='x1'>
       <view class='v2' style='color:{{curtempColor}};'>{{ tools.toFixed(curtemp,1) }}</view>
       <view class='v3'>
-        <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}">
+        <picker bindchange="bindPickerChange" value="{{index}}" range="{{ tools.toMembers(members) }}">
           <view class="picker">
-            {{array[index]}}
+            {{members[index].name}}
           </view>
         </picker>
       </view>
@@ -25,19 +25,9 @@
 <view class="middleview">上一次测量温读</view>
 
 <view class="weui-panel">
-  <view class="weui-panel__hd itemview">
-    <view class="y1">我</view>
+  <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index">
+    <view class="y1">{{item.name}}</view>
     <view class="y2">36.8℃</view>
     <view class="y3">2019-11-20 19:08</view>
-  </view>
-  <view class="weui-panel__hd itemview">
-    <view class="y1">小咪</view>
-    <view class="y2">37.8℃</view>
-    <view class="y3">2020-01-11 09:28</view>
-  </view>
-  <view class="weui-panel__hd itemview">
-    <view class="y1">小明</view>
-    <view class="y2"></view>
-    <view class="y3"></view>
   </view>
 </view>

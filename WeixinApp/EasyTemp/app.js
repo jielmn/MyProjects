@@ -7,6 +7,7 @@ App({
   innerAudioContext: null,
   addMemberCallback: null,
   updateMemberCallback: null,
+  deleteMemberCallback: null,
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
@@ -595,6 +596,48 @@ App({
         }
       }
     })
+  },
+
+  delMember : function( memberId ) {
+    var that = this;
+    var app = this;
+    var ret = {
+      errCode: -1,
+      errMsg: "删除成员失败!"
+    };
+
+    // this.log("delMember: " + memberId);
+
+    wx.request({
+      url: app.globalData.serverAddr + '?type=delmember&openid=' + encodeURIComponent(this.globalData.openid) + '&memberid=' + memberId,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          that.log("delete member success", res);
+          var members = that.globalData.members;
+          var index = -1;
+          members.forEach(item => {
+            index++;
+            if (item.id == memberId) {              
+              return;
+            }            
+          })
+          members.splice(index,1);
+          ret.errCode = 0;
+        } else {
+          that.log("delete member failed", res);
+        }
+      },
+      fail: (res) => {
+        that.log("delete member failed to wx.request", res);
+      },
+      complete: () => {
+        if (that.deleteMemberCallback) {
+          that.deleteMemberCallback(ret);
+        }
+      }
+    })
+
   }
 
 })

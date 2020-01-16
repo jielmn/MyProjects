@@ -1,4 +1,3 @@
-
 //获取应用实例
 const app = getApp()
 
@@ -8,15 +7,17 @@ Page({
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     members: [],
-    hidden:true,
-    newMemberName:'',
-    hidden1:true,
+    hidden: true,
+    newMemberName: '',
+    hidden1: true,
+    hidden2: true,
   },
 
-  newMemberName:'',
-  updateIndex:null,
+  newMemberName: '',
+  updateIndex: null,
+  delIndex:null,
 
-  onLoad: function () {
+  onLoad: function() {
     var that = this;
 
     if (app.globalData.userInfo) {
@@ -24,7 +25,7 @@ Page({
         userInfo: app.globalData.userInfo,
         hasUserInfo: true
       })
-    } else if (this.data.canIUse){
+    } else if (this.data.canIUse) {
       // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
       // 所以此处加入 callback 以防止这种情况
       app.userInfoReadyCallback = res => {
@@ -51,20 +52,34 @@ Page({
     })
 
     app.addMemberCallback = function(res) {
-      if ( res.errCode != 0 ) {
+      if (res.errCode != 0) {
         wx.showToast({
           title: res.errMsg,
-          icon:'none',
+          icon: 'none',
           duration: 2000
         })
-      }  else {
+      } else {
         that.setData({
           members: app.globalData.members
         })
-      }    
+      }
     }
 
     app.updateMemberCallback = function(res) {
+      if (res.errCode != 0) {
+        wx.showToast({
+          title: res.errMsg,
+          icon: 'none',
+          duration: 2000
+        })
+      } else {
+        that.setData({
+          members: app.globalData.members
+        })
+      }
+    }
+
+    app.deleteMemberCallback = function(res) {
       if (res.errCode != 0) {
         wx.showToast({
           title: res.errMsg,
@@ -91,13 +106,13 @@ Page({
   onAddMember() {
     this.newMemberName = '';
     this.setData({
-      newMemberName:'',
-      hidden:!this.data.hidden
+      newMemberName: '',
+      hidden: !this.data.hidden
     })
   },
 
-  confirmMember:function(e) {
-    if ( this.newMemberName == '') {
+  confirmMember: function(e) {
+    if (this.newMemberName == '') {
       return;
     }
 
@@ -108,28 +123,28 @@ Page({
     app.addMember(this.newMemberName);
   },
 
-  cancelMember: function (e){
+  cancelMember: function(e) {
     this.setData({
       hidden: !this.data.hidden
     })
   },
 
-  inputMemberName:function(e) {
+  inputMemberName: function(e) {
     this.newMemberName = e.detail.value;
   },
 
-  onEditMember:function(e) {
+  onEditMember: function(e) {
     var index = e.target.dataset.index;
     this.updateIndex = index;
-    // app.log("onEditMember",e);
+    // app.log("onEditMember: " +index);
     this.newMemberName = this.data.members[index].name;
     this.setData({
-      oldMemberName:this.data.members[index].name,
+      oldMemberName: this.data.members[index].name,
       hidden1: !this.data.hidden1
     })
   },
 
-  cancelMember1() {    
+  cancelMember1() {
     this.setData({
       hidden1: !this.data.hidden1
     })
@@ -153,7 +168,31 @@ Page({
   },
 
   updateMemberName(e) {
-    this.newMemberName = e.detail.value;    
+    this.newMemberName = e.detail.value;
+  },
+
+  onDelMember(e) {
+    var index = e.target.dataset.index;
+    this.delIndex = index;
+    // app.log("del member : " + index);
+
+    this.setData({
+      hidden2: !this.data.hidden2
+    })
+  },
+
+  confirmMember2:function() {
+    this.setData({
+      hidden2: !this.data.hidden2
+    })
+
+    app.delMember( this.data.members[this.delIndex].id );
+  },
+
+  cancelMember2:function() {
+    this.setData({
+      hidden2: !this.data.hidden2
+    })    
   }
 
 })

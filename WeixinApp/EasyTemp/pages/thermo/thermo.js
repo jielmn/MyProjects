@@ -6,7 +6,7 @@ Page({
   data: {
     curtemp: 0,
     curtempColor:'#a5eddf',
-    array: ['我', '小咪', '小明'],
+    members: [],
     index: 0,
     bluetoothStr: "正在连接易温读卡器...",
     spinShow: true
@@ -27,8 +27,21 @@ Page({
         that.setData({
           curtempColor:'#a5eddf'
         });
-      }, 10000);
+      }, 10000);      
     }
+
+    var members = [{ id: 0, name: '我'}];
+    app.globalData.members.forEach(item => {
+      var member = {};
+      member.id = item.id;
+      member.name = item.name;
+      members.push(member);
+    })
+    // app.log("members", app.globalData.members)
+    // app.log("members", members)
+    this.setData({
+      members: members
+    })
   },
 
   onShow: function (options){

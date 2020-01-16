@@ -103,6 +103,17 @@ public class MainServlet extends HttpServlet {
 				}
 				updateMember(out,openid, newMemberName, memberId);
 			}
+			else if ( type.equals("delmember") ) {
+				String openid = new String();
+				int memberId = 0;
+				if ( null != req.getParameter("openid") ) {
+					openid = req.getParameter("openid");
+				}
+				if ( null != req.getParameter("memberid") ) {
+					memberId = Integer.parseInt(req.getParameter("memberid"));
+				}
+				deleteMember(out, openid, memberId);
+			}
 		}
 		
 		//test(out);
@@ -270,6 +281,35 @@ public class MainServlet extends HttpServlet {
            out.print(ex.getMessage());
         }
 	}
+	
+	public void deleteMember(PrintWriter out, String openid, int memberId) {
+		// String openid_sql        = openid.replace("'","''");
+		
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONObject rsp_obj = new JSONObject();
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate("delete from family where memberid=" + memberId);
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());
+			
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	
+	
 	
 
 	public void test( PrintWriter out) {
