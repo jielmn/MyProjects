@@ -5,7 +5,8 @@ App({
   bluetoothCallback: null,
   temperatureCallback: null,
   innerAudioContext: null,
-  addMemberCallback:null,
+  addMemberCallback: null,
+  updateMemberCallback: null,
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
@@ -138,7 +139,7 @@ App({
     } else {
       console.log(str)
     }
-  },  
+  },
 
   /*蓝牙操作*/
   openBluetoothAdapter() {
@@ -454,7 +455,10 @@ App({
   addMember: function(newMemberName) {
     var that = this;
     var app = this;
-    var ret = {errCode:-1,errMsg:"添加成员失败!"};
+    var ret = {
+      errCode: -1,
+      errMsg: "添加成员失败!"
+    };
 
     if (!this.globalData.logined) {
       this.log("not logined, give up to add member!");
@@ -464,16 +468,23 @@ App({
       return;
     }
 
+    if ( newMemberName == '' ) {
+      if (this.addMemberCallback) {
+        this.addMemberCallback(ret);
+      }
+      return;
+    }
+
     var members = this.globalData.members;
     var found = false;
-    members.forEach( member => {
-      if ( member.name == newMemberName ) {
+    members.forEach(member => {
+      if (member.name == newMemberName) {
         found = true;
         return;
       }
     })
 
-    if ( found ) {
+    if (found) {
       this.log("duplicated member name, give up to add member!");
       if (this.addMemberCallback) {
         this.addMemberCallback(ret);
@@ -485,14 +496,103 @@ App({
       url: app.globalData.serverAddr + '?type=addmember&openid=' + encodeURIComponent(this.globalData.openid) + '&membername=' + encodeURIComponent(newMemberName),
       method: 'GET',
       success: (res) => {
-        if ( res.data.error != null && res.data.error == 0 ) {
+        if (res.data.error != null && res.data.error == 0) {
           that.log("addmember success", res);
+          that.globalData.members.push({
+            id: res.data.id,
+            name: newMemberName
+          })
+          ret.errCode = 0;          
         } else {
           that.log("addmember failed", res);
         }
       },
       fail: (res) => {
-        that.log("addmember failed to wx.request",res);
+        that.log("addmember failed to wx.request", res);        
+      },
+      complete:() =>{
+        if (that.addMemberCallback) {
+          that.addMemberCallback(ret);
+        }
+      }
+    })
+  },
+
+  updateMember:function(member, newName){
+    var that = this;
+    var app = this;
+    var ret = {
+      errCode: -1,
+      errMsg: "更新成员失败!"
+    };
+
+    // this.log("update to " + newName + ": ", member);
+    
+    if (!this.globalData.logined) {
+      this.log("not logined, give up to update member!");
+      if (this.updateMemberCallback) {
+        this.updateMemberCallback(ret);
+      }
+      return;
+    }
+
+    if (newName == '') {
+      if (this.addMemberCallback) {
+        this.addMemberCallback(ret);
+      }
+      return;
+    }
+
+    // 如果名字没有变动
+    if ( member.name == newName ) {
+      if (this.updateMemberCallback) {
+        this.updateMemberCallback(ret);
+      }
+      return;
+    }
+
+    var members = this.globalData.members;
+    var found = false;
+    members.forEach( item => {
+      if ( item.id != member.id && item.name == newName ) {
+        found = true;
+        return;
+      }
+    })
+
+    // 如果发现重名
+    if (found) {
+      this.log("duplicated member name, give up to add member!");
+      if (this.updateMemberCallback) {
+        this.updateMemberCallback(ret);
+      }
+      return;
+    }
+
+    wx.request({
+      url: app.globalData.serverAddr + '?type=updatemember&openid=' + encodeURIComponent(this.globalData.openid) + '&membername=' + encodeURIComponent(newName) + '&memberid=' + member.id,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          that.log("upate member success", res);
+          members.forEach(item => {
+            if (item.id == member.id) {
+              item.name = newName;
+              return;
+            }
+          })
+          ret.errCode = 0;          
+        } else {
+          that.log("update member failed", res);
+        }
+      },
+      fail: (res) => {
+        that.log("update member failed to wx.request", res);
+      },
+      complete:() =>{
+        if (that.updateMemberCallback) {
+          that.updateMemberCallback(ret);
+        }
       }
     })
   }

@@ -14,11 +14,15 @@
 <view class="weui-panel">
   <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index"  >
     <view class="v1">{{item.name}}</view>
-    <view class="v2"><image class='edit' src='/images/edit.png' ></image></view>    
+    <view class="v2"><image class='edit' src='/images/edit.png' bindtap="onEditMember" data-index="{{index}}" ></image></view>    
     <view class="v3"><image class='del' src='/images/recycle.png' ></image></view>
   </view>
 </view>
 
 <modal hidden="{{hidden}}"  title="请输入家庭成员"  confirm-text="确定"  cancel-text="取消"  bindcancel="cancelMember"    bindconfirm="confirmMember" >
-  <input value='{{newMemberName}}' id="membername" bindinput="inputMemberName" type='text' placeholder="请输入内容" auto-focus/>
+  <input value='{{newMemberName}}' id="membername" bindinput="inputMemberName" type='text' placeholder="请输入姓名" auto-focus/>
+</modal>
+
+<modal hidden="{{hidden1}}"  title="更新家庭成员"  confirm-text="确定"  cancel-text="取消"  bindcancel="cancelMember1"    bindconfirm="confirmMember1" >
+  <input value='{{oldMemberName}}' id="oldmembername" bindinput="updateMemberName" type='text' placeholder="请输入新姓名" auto-focus/>
 </modal>

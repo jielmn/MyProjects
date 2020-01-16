@@ -10,11 +10,15 @@ Page({
     members: [],
     hidden:true,
     newMemberName:'',
+    hidden1:true,
   },
 
   newMemberName:'',
+  updateIndex:null,
 
   onLoad: function () {
+    var that = this;
+
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
@@ -54,8 +58,24 @@ Page({
           duration: 2000
         })
       }  else {
-
+        that.setData({
+          members: app.globalData.members
+        })
       }    
+    }
+
+    app.updateMemberCallback = function(res) {
+      if (res.errCode != 0) {
+        wx.showToast({
+          title: res.errMsg,
+          icon: 'none',
+          duration: 2000
+        })
+      } else {
+        that.setData({
+          members: app.globalData.members
+        })
+      }
     }
   },
 
@@ -69,6 +89,7 @@ Page({
   },
 
   onAddMember() {
+    this.newMemberName = '';
     this.setData({
       newMemberName:'',
       hidden:!this.data.hidden
@@ -76,6 +97,10 @@ Page({
   },
 
   confirmMember:function(e) {
+    if ( this.newMemberName == '') {
+      return;
+    }
+
     this.setData({
       hidden: !this.data.hidden
     })
@@ -91,5 +116,44 @@ Page({
 
   inputMemberName:function(e) {
     this.newMemberName = e.detail.value;
+  },
+
+  onEditMember:function(e) {
+    var index = e.target.dataset.index;
+    this.updateIndex = index;
+    // app.log("onEditMember",e);
+    this.newMemberName = this.data.members[index].name;
+    this.setData({
+      oldMemberName:this.data.members[index].name,
+      hidden1: !this.data.hidden1
+    })
+  },
+
+  cancelMember1() {    
+    this.setData({
+      hidden1: !this.data.hidden1
+    })
+  },
+
+  confirmMember1() {
+    if (this.newMemberName == '') {
+      return;
+    }
+
+    if (this.newMemberName == this.data.members[this.updateIndex].name) {
+      return;
+    }
+
+    this.setData({
+      hidden1: !this.data.hidden1
+    })
+    // app.log("update name:", this.newMemberName);
+    // app.log("update item:", this.data.members[this.updateIndex]);
+    app.updateMember(this.data.members[this.updateIndex], this.newMemberName);
+  },
+
+  updateMemberName(e) {
+    this.newMemberName = e.detail.value;    
   }
+
 })

@@ -88,6 +88,21 @@ public class MainServlet extends HttpServlet {
 				}
 				addNewMember(out,openid, newMemberName);
 			}
+			else if ( type.equals("updatemember") ) {
+				String openid = new String();
+				String newMemberName = new String();
+				int memberId = 0;
+				if ( null != req.getParameter("openid") ) {
+					openid = req.getParameter("openid");
+				}
+				if ( null != req.getParameter("membername") ) {
+					newMemberName = req.getParameter("membername");
+				}
+				if ( null != req.getParameter("memberid") ) {
+					memberId = Integer.parseInt(req.getParameter("memberid"));
+				}
+				updateMember(out,openid, newMemberName, memberId);
+			}
 		}
 		
 		//test(out);
@@ -222,6 +237,33 @@ public class MainServlet extends HttpServlet {
 			out.print(rsp_obj.toString());
 			
 			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void updateMember(PrintWriter out, String openid, String newMemberName, int memberId) {
+		// String openid_sql        = openid.replace("'","''");
+		String newMemberName_sql = newMemberName.replace("'","''");
+		
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONObject rsp_obj = new JSONObject();
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate("update family set membername='" + newMemberName + "' where memberid=" + memberId);
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());
+			
 			stmt.close();
 			con.close();
         } catch (Exception ex ) {
