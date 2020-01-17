@@ -659,7 +659,7 @@ App({
       return;
     }
 
-    var url = app.globalData.serverAddr + '?type=uploadtemperature&openid=' + encodeURIComponent(this.globalData.openid) + '&tagid=' + item.tagid + "&temperature=" + item.temperature + "&lat=" + this.lat + "&lng=" + this.lng;
+    var url = app.globalData.serverAddr + '?type=uploadtemperature&openid=' + encodeURIComponent(this.globalData.openid) + '&tagid=' + item.tagid + "&temperature=" + item.temperature.toFixed(1) + "&lat=" + this.lat + "&lng=" + this.lng;
     // this.log("uplodate temperature url is: " + url );
 
     wx.request({

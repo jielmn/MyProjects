@@ -13,7 +13,7 @@ insert into config (value0) values ( 1 );
 create table users ( open_id varchar(64) primary key not null ) DEFAULT CHARSET=utf8;
 
 -- 体温表
-create table temperature( id int primary key not null auto_increment, open_id varchar(64) not null, tagid varchar(20) not null, temp int not null, ctime datetime not null, lat float null, lng float null ) DEFAULT CHARSET=utf8;
+create table temperature( id int primary key not null auto_increment, open_id varchar(64) not null, tagid varchar(20) not null, temp float(3,1) not null, ctime datetime not null, lat double(9,6) null, lng double(9,6) null ) DEFAULT CHARSET=utf8;
 
 -- 家庭成员
 create table family ( memberid int primary key not null auto_increment, open_id varchar(64) not null, membername varchar(20) ) DEFAULT CHARSET=utf8;

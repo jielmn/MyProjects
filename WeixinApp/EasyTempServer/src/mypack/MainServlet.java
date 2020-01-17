@@ -114,6 +114,31 @@ public class MainServlet extends HttpServlet {
 				}
 				deleteMember(out, openid, memberId);
 			}
+			else if ( type.equals("uploadtemperature") ) {
+				String openid = new String();
+				String tagid = new String();
+				double lat = 0;
+				double lng = 0;
+				float temperature = 0;
+				
+				if ( null != req.getParameter("openid") ) {
+					openid = req.getParameter("openid");
+				}				
+				if ( null != req.getParameter("tagid") ) {
+					tagid = req.getParameter("tagid");
+				}
+				if ( null != req.getParameter("temperature") ) {
+					temperature = Float.parseFloat(req.getParameter("temperature"));
+				}
+				if ( null != req.getParameter("lat") ) {
+					lat = Double.parseDouble(req.getParameter("lat"));
+				}
+				if ( null != req.getParameter("lng") ) {
+					lng = Double.parseDouble(req.getParameter("lng"));
+				}			
+				
+				uploadTemperature(out, openid, tagid, temperature, lat, lng );
+			}
 		}
 		
 		//test(out);
@@ -309,6 +334,32 @@ public class MainServlet extends HttpServlet {
 			JSONObject rsp_obj = new JSONObject();
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("delete from family where memberid=" + memberId);
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());
+			
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void uploadTemperature(PrintWriter out, String openid, String tagid,  float temperature, double lat, double lng) {
+		String openid_sql        = openid.replace("'","''");
+		
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONObject rsp_obj = new JSONObject();
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate("insert into temperature values(null, '" + openid_sql + "', '" + tagid + "', " + temperature + ",NOW()," + lat + "," + lng + ")");
 			rsp_obj.put("error", 0);
 			out.print(rsp_obj.toString());
 			
