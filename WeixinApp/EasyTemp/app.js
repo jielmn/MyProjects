@@ -106,24 +106,7 @@ App({
         that.globalData.tagsbinding = res.data.tagsbinding || [];
         var lastTemp = res.data.lasttemperature || [];
 
-        var members = that.globalData.members;
-        members.forEach(member => {
-          var idx = that.inArray(lastTemp, 'memberid', member.id);
-          if ( idx >= 0 ) {
-            member.lasttemperature = lastTemp[idx].temperature;
-            member.time = lastTemp[idx].time;
-          }
-        })
-
-        // that.log("members: ", that.globalData.members);
-        var idx = that.inArray(lastTemp, 'memberid', 0);
-        if ( idx >= 0 ) {
-          that.globalData.mine.lasttemperature = lastTemp[idx].temperature;
-          that.globalData.mine.time = lastTemp[idx].time;
-        }
-        // that.log("mine: ", that.globalData.mine);
-
-
+        that.fetchLastTemp(lastTemp);
       }, // success
 
       // 获取openid失败
@@ -844,6 +827,9 @@ App({
       if (idx >= 0) {
         member.lasttemperature = lastTemp[idx].temperature;
         member.time = lastTemp[idx].time;
+      } else {
+        member.lasttemperature = null;
+        member.time = null;
       }
     })
 
@@ -851,6 +837,9 @@ App({
     if (idx >= 0) {
       this.globalData.mine.lasttemperature = lastTemp[idx].temperature;
       this.globalData.mine.time = lastTemp[idx].time;
+    } else {
+      this.globalData.mine.lasttemperature = null;
+      this.globalData.mine.time = null;
     }
   }
 
