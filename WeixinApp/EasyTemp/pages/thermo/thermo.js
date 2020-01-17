@@ -125,9 +125,13 @@ Page({
     })
 
     if (this.data.curtagId) {
-      var index = app.inArray(app.globalData.tagsbinding, 'tagid', this.data.curtagId);
-      if (index <0) {
-        index = 0;
+      var index = 0;
+      var bindindex = app.inArray(app.globalData.tagsbinding, 'tagid', that.data.curtagId);
+      if (bindindex >= 0) {
+        index = app.inArray(that.data.members, 'id', app.globalData.tagsbinding[bindindex].memberid);
+        if (index < 0) {
+          index = 0;
+        }
       }
       this.setData({
         index: index
