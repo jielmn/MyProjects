@@ -8,12 +8,13 @@ Page({
     curtempColor: '#a5eddf',
     members: [],
     index: 0,
-    curtagId: null,
+    curtagId: null,    
     bluetoothStr: "正在连接易温读卡器...",
     spinShow: true
   },
 
   timerId: null,  
+  curTempItem: null,
 
   onLoad: function(options) {
     var that = this;
@@ -33,6 +34,7 @@ Page({
         index: index
       });
 
+      that.curTempItem = item;
       clearTimeout(that.timerId);
       that.timerId = setTimeout(function() {
         that.setData({
@@ -41,6 +43,17 @@ Page({
       }, 5000);
 
       app.uploadTemperature(item);
+    }
+
+    app.uploadTemperatureCallback = function(res) {
+      if ( res.errCode == 0 ) {
+        var tmp = [];
+        tmp.push(app.globalData.mine);
+        var members = tmp.concat(app.globalData.members);
+        that.setData({
+          members: members
+        })
+      }
     }
 
     app.bluetoothCallback = function(res) {
@@ -71,7 +84,12 @@ Page({
             duration: 2000
           })
         } else {
-          
+          var tmp = [];
+          tmp.push(app.globalData.mine);
+          var members = tmp.concat(app.globalData.members);
+          that.setData({
+            members: members
+          })
         }
       }
     }
@@ -117,7 +135,7 @@ Page({
       index: index
     })
 
-    app.binding(this.data.curtagId,this.data.members[index]);
+    app.binding(this.data.curtagId, this.data.members[index], this.curTempItem);
 
 
   }

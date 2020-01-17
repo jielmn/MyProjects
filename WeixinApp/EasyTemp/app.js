@@ -9,6 +9,7 @@ App({
   updateMemberCallback: null,
   deleteMemberCallback: null,
   bindingCallback:null,
+  uploadTemperatureCallback:null,
   isBluetoothStoped: true,
   uploadMinTemperature: 0.0,
   lat: 0,
@@ -692,14 +693,24 @@ App({
   uploadTemperature: function(item) {
     var that = this;
     var app = this;
+    var ret = {
+      errCode: -1,
+      errMsg: "上传温读失败!"
+    };
 
     if (!this.globalData.logined) {
       this.log("not logined, give up to upload temperature!");
+      if ( this.uploadTemperatureCallback ) {
+        this.uploadTemperatureCallback(ret);
+      }
       return;
     }
 
     if (item.temperature <= this.uploadMinTemperature) {
       this.log("uploadTemperature temperature " + item.temperature + " < min temperature " + this.uploadMinTemperature + ", return");
+      if (this.uploadTemperatureCallback) {
+        this.uploadTemperatureCallback(ret);
+      }
       return;
     }
 
@@ -712,8 +723,26 @@ App({
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
           that.log("upload temperature success", res);
+          ret.errCode = 0;
           // var date = new Date(res.data.time);
           // that.log("time is: ", that.formatTime(date));
+          item.time = res.data.time;
+
+          var tagsbinding = that.globalData.tagsbinding;
+          var idx = that.inArray(tagsbinding, 'tagid', item.tagid);
+          if ( idx < 0 ) {
+            that.globalData.mine.lasttemperature = item.temperature;
+            that.globalData.mine.time = item.time;
+          }
+          else {
+            var memberid = tagsbinding[idx].memberid;
+            idx = that.inArray(that.globalData.members, 'id', memberid);
+            if ( idx >= 0 ) {
+              that.globalData.members[idx].lasttemperature = item.temperature;
+              that.globalData.members[idx].time = item.time;
+            }
+          }
+          
         } else {
           that.log("upload temperature failed", res);
         }
@@ -722,7 +751,9 @@ App({
         that.log("upload temperature failed to wx.request", res);
       },
       complete: () => {
-
+        if (this.uploadTemperatureCallback) {
+          this.uploadTemperatureCallback(ret);
+        }
       }
     })
   },
@@ -743,7 +774,7 @@ App({
     return n[1] ? n : '0' + n
   },
 
-  binding:function(tagid, member) {
+  binding:function(tagid, member, tempItem) {
     var that = this;
     var app = this;
     var ret = {
@@ -771,6 +802,35 @@ App({
         if (res.data.error != null && res.data.error == 0) {
           that.log("bind tag to member success", res);
           ret.errCode = 0;
+
+          var tagsbinding = that.globalData.tagsbinding;
+          var idx = that.inArray(tagsbinding, 'tagid', tagid);
+          if ( idx < 0 ) {
+            if ( member.id > 0 ) {
+              tagsbinding.push({
+                tagid: tagid,
+                memberid: member.id
+              })
+            }            
+          } else{
+            if ( member.id == 0 ) {
+              tagsbinding.splice(idx,1);
+            } else {
+              tagsbinding[idx].memberid = member.id;
+            }
+          }
+
+          if ( member.id == 0 ) {
+            that.globalData.mine.lasttemperature = tempItem.temperature;
+            that.globalData.mine.time = tempItem.time;
+          } else {
+            var idx = that.inArray(that.globalData.members, 'id', member.id);
+            if ( idx >= 0 ) {
+              that.globalData.members[idx].lasttemperature = tempItem.temperature;
+              that.globalData.members[idx].time = tempItem.time;
+            }
+          }
+          
         } else {
           that.log("bind tag to member failed", res);
         }
