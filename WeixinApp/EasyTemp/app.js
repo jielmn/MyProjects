@@ -668,7 +668,8 @@ App({
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
           that.log("upload temperature success", res);
-          ret.errCode = 0;
+          // var date = new Date(res.data.time);
+          // that.log("time is: ", that.formatTime(date));
         } else {
           that.log("upload temperature failed", res);
         }
@@ -680,6 +681,22 @@ App({
 
       }
     })
-  }
+  },
+
+  formatTime: function (date) {
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    const day = date.getDate()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const second = date.getSeconds()
+
+    return [year, month, day].map(this.formatNumber).join('-') + ' ' + [hour, minute, second].map(this.formatNumber).join(':')
+  },
+
+  formatNumber: function (n) {
+    n = n.toString()
+    return n[1] ? n : '0' + n
+  },
 
 })

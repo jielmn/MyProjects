@@ -361,7 +361,9 @@ public class MainServlet extends HttpServlet {
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("insert into temperature values(null, '" + openid_sql + "', '" + tagid + "', " + temperature + ",NOW()," + lat + "," + lng + ")");
 			rsp_obj.put("error", 0);
-			out.print(rsp_obj.toString());
+			Date now = new Date();
+			rsp_obj.put("time", now.getTime());
+			out.print(rsp_obj.toString());			
 			
 			stmt.close();
 			con.close();
