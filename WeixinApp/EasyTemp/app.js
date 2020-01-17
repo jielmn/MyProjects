@@ -646,17 +646,9 @@ App({
         if (res.data.error != null && res.data.error == 0) {
           that.log("delete member success", res);
           var members = that.globalData.members;
-          var index = app.inArray(members, 'id', memberId)
-          var member = members[index];
-          var mine = that.globalData.mine;
-          if ( !mine.lasttemperature ) {
-            mine.time = member.time;
-            mine.lasttemperature = member.lasttemperature;
-          } else if ( member.lasttemperature && member.time > mine.time ) {
-            mine.time = member.time;
-            mine.lasttemperature = member.lasttemperature;
-          }
+          var index = app.inArray(members, 'id', memberId)          
           members.splice(index, 1);
+          that.fetchLastTemp(res.data.lasttemperature);
           ret.errCode = 0;
         } else {
           that.log("delete member failed", res);

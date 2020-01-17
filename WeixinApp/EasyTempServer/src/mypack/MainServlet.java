@@ -353,7 +353,7 @@ public class MainServlet extends HttpServlet {
 	}
 	
 	public void deleteMember(PrintWriter out, String openid, int memberId) {
-		// String openid_sql        = openid.replace("'","''");
+		String open_id_sql        = openid.replace("'","''");
 		
 		try {			
 			Connection con = null;
@@ -366,12 +366,31 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			JSONObject rsp_obj = new JSONObject();
+			JSONArray lasttemperature = new JSONArray();
+			rsp_obj.put("lasttemperature", lasttemperature);
+			
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("delete from family where memberid=" + memberId);
 			stmt.executeUpdate("delete from binding where memberid=" + memberId );
+			
+			ResultSet rs = stmt.executeQuery("select a.temp, a.ctime, b.memberid from temperature a left join binding b on a.tagid = b.tagid where a.open_id='" + open_id_sql + "' order by b.memberid, a.ctime desc;");
+			int lastMemberId = -1;
+			while ( rs.next() ) {
+				int memid = rs.getInt(3);
+				if ( memid != lastMemberId ) {
+					JSONObject item = new JSONObject();					
+					item.put("temperature",     rs.getFloat(1));
+					item.put("time",            rs.getTimestamp(2).getTime());
+					item.put("memberid",        memid);
+					lasttemperature.put(item);
+					lastMemberId = memid;
+				}
+			}
+			
 			rsp_obj.put("error", 0);
 			out.print(rsp_obj.toString());
 			
+			rs.close();
 			stmt.close();
 			con.close();
         } catch (Exception ex ) {
