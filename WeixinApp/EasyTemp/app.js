@@ -820,16 +820,7 @@ App({
             }
           }
 
-          if ( member.id == 0 ) {
-            that.globalData.mine.lasttemperature = tempItem.temperature;
-            that.globalData.mine.time = tempItem.time;
-          } else {
-            var idx = that.inArray(that.globalData.members, 'id', member.id);
-            if ( idx >= 0 ) {
-              that.globalData.members[idx].lasttemperature = tempItem.temperature;
-              that.globalData.members[idx].time = tempItem.time;
-            }
-          }
+          that.fetchLastTemp(res.data.lasttemperature);
           
         } else {
           that.log("bind tag to member failed", res);
@@ -845,5 +836,22 @@ App({
       }
     })
   },
+
+  fetchLastTemp: function (lastTemp) {    
+    var members = this.globalData.members;
+    members.forEach(member => {
+      var idx = this.inArray(lastTemp, 'memberid', member.id);
+      if (idx >= 0) {
+        member.lasttemperature = lastTemp[idx].temperature;
+        member.time = lastTemp[idx].time;
+      }
+    })
+
+    var idx = this.inArray(lastTemp, 'memberid', 0);
+    if (idx >= 0) {
+      this.globalData.mine.lasttemperature = lastTemp[idx].temperature;
+      this.globalData.mine.time = lastTemp[idx].time;
+    }
+  }
 
 })

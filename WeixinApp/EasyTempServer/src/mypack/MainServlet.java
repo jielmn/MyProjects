@@ -408,7 +408,7 @@ public class MainServlet extends HttpServlet {
 	}
 	
 	public void binding(PrintWriter out, String openid, String tagid,  int memberId) {
-		// String openid_sql        = openid.replace("'","''");
+		String open_id_sql        = openid.replace("'","''");
 		
 		try {			
 			Connection con = null;
@@ -421,6 +421,9 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			JSONObject rsp_obj = new JSONObject();
+			JSONArray lasttemperature = new JSONArray();
+			rsp_obj.put("lasttemperature", lasttemperature);
+			
 			Statement stmt = con.createStatement();      
 			ResultSet rs = stmt.executeQuery("select * from binding where tagid='" + tagid + "'" );
 			
@@ -436,6 +439,21 @@ public class MainServlet extends HttpServlet {
 			else {
 				if ( memberId > 0 ) {
 					stmt.executeUpdate("insert into binding values('" + tagid + "', " + memberId + ")");
+				}
+			}
+			
+			rs.close();
+			rs = stmt.executeQuery("select a.temp, a.ctime, b.memberid from temperature a left join binding b on a.tagid = b.tagid where a.open_id='" + open_id_sql + "' order by b.memberid, a.ctime desc;");
+			int lastMemberId = -1;
+			while ( rs.next() ) {
+				int memid = rs.getInt(3);
+				if ( memid != lastMemberId ) {
+					JSONObject item = new JSONObject();					
+					item.put("temperature",     rs.getFloat(1));
+					item.put("time",            rs.getTimestamp(2).getTime());
+					item.put("memberid",        memid);
+					lasttemperature.put(item);
+					lastMemberId = memid;
 				}
 			}
 			

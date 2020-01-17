@@ -22,10 +22,18 @@ Page({
 
       // app.innerAudioContext.src = '/sound/bongo.mp3'; //链接到音频的地址
       // app.innerAudioContext.play();
-      var index = app.inArray(app.globalData.tagsbinding, 'tagid', item.tagid);
-      if (index < 0) {
-        index = 0;
+      var index = 0;
+      var bindindex = app.inArray(app.globalData.tagsbinding, 'tagid', item.tagid);
+      if ( bindindex >= 0 ) {
+        index = app.inArray(that.data.members, 'id', app.globalData.tagsbinding[bindindex].memberid );
+        if ( index < 0 ) {
+          index = 0;
+        }
       }
+
+      // app.log("tagsbinding:", app.globalData.tagsbinding);
+      // app.log("tagid is " + item.tagid );
+      // app.log("index is " + index );
 
       that.setData({
         curtemp: item.temperature,
