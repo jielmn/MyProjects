@@ -98,6 +98,7 @@ Page({
       index: index
     })
 
+    app.binding(this.data.curtagId,this.data.members[index]);
 
 
   }

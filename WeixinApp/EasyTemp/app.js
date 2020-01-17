@@ -623,6 +623,14 @@ App({
       errMsg: "删除成员失败!"
     };
 
+    if (!this.globalData.logined) {
+      this.log("not logined, give up to delete member!");
+      if (this.deleteMemberCallback) {
+        this.deleteMemberCallback(ret);
+      }
+      return;
+    }
+
     // this.log("delMember: " + memberId);
 
     wx.request({
@@ -653,6 +661,11 @@ App({
   uploadTemperature: function(item) {
     var that = this;
     var app = this;
+
+    if (!this.globalData.logined) {
+      this.log("not logined, give up to upload temperature!");
+      return;
+    }
 
     if (item.temperature <= this.uploadMinTemperature) {
       this.log("uploadTemperature temperature " + item.temperature + " < min temperature " + this.uploadMinTemperature + ", return");
@@ -697,6 +710,40 @@ App({
   formatNumber: function (n) {
     n = n.toString()
     return n[1] ? n : '0' + n
+  },
+
+  binding:function(tagid, member) {
+    var that = this;
+    var app = this;
+
+    if (!this.globalData.logined) {
+      this.log("not logined, give up to bind tag!");
+      return;
+    }
+
+    this.log("binding tag " + tagid + " to " + member.name + "[" + member.id + "]");
+
+    var url = app.globalData.serverAddr + '?type=binding&openid=' + encodeURIComponent(this.globalData.openid) + '&tagid=' + tagid + "&memberid=" + member.id;
+    // this.log("binding url is: " + url );
+
+    wx.request({
+      url: url,
+      method: 'GET',
+      success: (res) => {
+        if (res.data.error != null && res.data.error == 0) {
+          that.log("bind tag to member success", res);
+        } else {
+          that.log("bind tag to member failed", res);
+        }
+      },
+      fail: (res) => {
+        that.log("bind tag to member failed to wx.request", res);
+      },
+      complete: () => {
+
+      }
+    })
+
   },
 
 })

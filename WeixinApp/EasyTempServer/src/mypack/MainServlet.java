@@ -139,6 +139,23 @@ public class MainServlet extends HttpServlet {
 				
 				uploadTemperature(out, openid, tagid, temperature, lat, lng );
 			}
+			else if ( type.equals("binding") ) {
+				String openid = new String();
+				String tagid = new String();
+				int memberId = 0;
+				
+				if ( null != req.getParameter("openid") ) {
+					openid = req.getParameter("openid");
+				}				
+				if ( null != req.getParameter("tagid") ) {
+					tagid = req.getParameter("tagid");
+				}
+				if ( null != req.getParameter("memberid") ) {
+					memberId = Integer.parseInt(req.getParameter("memberid"));
+				}		
+				
+				binding(out, openid, tagid, memberId );
+			}
 		}
 		
 		//test(out);
@@ -200,9 +217,11 @@ public class MainServlet extends HttpServlet {
 			ResultSet rs = stmt.executeQuery("select * from users where open_id='" + open_id_sql + "';" );
 			JSONArray members = new JSONArray();
 			JSONArray tagsbinding = new JSONArray();
+			JSONArray lasttemperature = new JSONArray();
 			object.put("logined", true);
 			object.put("members", members);
 			object.put("tagsbinding", tagsbinding);
+			object.put("lasttemperature", lasttemperature);
 			
 			// 如果已经注册
 			if ( rs.next() ) {
@@ -222,6 +241,21 @@ public class MainServlet extends HttpServlet {
 					binding.put("tagid",     rs.getString(1));
 					binding.put("memberid",  rs.getInt(2));
 					tagsbinding.put(binding);
+				}
+				
+				rs.close();
+				rs = stmt.executeQuery("select a.temp, a.ctime, b.memberid from temperature a left join binding b on a.tagid = b.tagid where a.open_id='" + open_id_sql + "' order by b.memberid, a.ctime desc;");
+				int lastMemberId = -1;
+				while ( rs.next() ) {
+					int memberId = rs.getInt(3);
+					if ( memberId != lastMemberId ) {
+						JSONObject item = new JSONObject();					
+						item.put("temperature",     rs.getFloat(1));
+						item.put("time",            rs.getTimestamp(2).getTime());
+						item.put("memberid",        memberId);
+						lasttemperature.put(item);
+						lastMemberId = memberId;
+					}
 				}
 			} 
 			// 没有注册
@@ -365,6 +399,49 @@ public class MainServlet extends HttpServlet {
 			rsp_obj.put("time", now.getTime());
 			out.print(rsp_obj.toString());			
 			
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void binding(PrintWriter out, String openid, String tagid,  int memberId) {
+		// String openid_sql        = openid.replace("'","''");
+		
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONObject rsp_obj = new JSONObject();
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select * from binding where tagid='" + tagid + "'" );
+			
+			// 如果已经有绑定关系
+			if ( rs.next() ) {
+				if ( memberId <= 0 ) {
+					stmt.executeUpdate("delete from binding where tagid='" + tagid + "'");
+				} else {
+					stmt.executeUpdate("update binding set memberid=" + memberId + " where tagid='" + tagid + "'");
+				}
+			}
+			// 如果没有绑定关系
+			else {
+				if ( memberId > 0 ) {
+					stmt.executeUpdate("insert into binding values('" + tagid + "', " + memberId + ")");
+				}
+			}
+			
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());			
+			
+			rs.close();
 			stmt.close();
 			con.close();
         } catch (Exception ex ) {
