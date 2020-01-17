@@ -21,11 +21,16 @@ Page({
 
       // app.innerAudioContext.src = '/sound/bongo.mp3'; //链接到音频的地址
       // app.innerAudioContext.play();
+      var index = app.inArray(app.globalData.tagsbinding, 'tagid', item.tagid);
+      if (index < 0) {
+        index = 0;
+      }
 
       that.setData({
         curtemp: item.temperature,
         curtempColor: 'white',
-        curtagId:item.tagid
+        curtagId:item.tagid,
+        index: index
       });
 
       clearTimeout(that.timerId);
@@ -92,6 +97,16 @@ Page({
     this.setData({
       members: members
     })
+
+    if (this.data.curtagId) {
+      var index = app.inArray(app.globalData.tagsbinding, 'tagid', this.data.curtagId);
+      if (index <0) {
+        index = 0;
+      }
+      this.setData({
+        index: index
+      })
+    }
   },
 
   bindPickerChange: function(e) {

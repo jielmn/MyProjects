@@ -368,6 +368,7 @@ public class MainServlet extends HttpServlet {
 			JSONObject rsp_obj = new JSONObject();
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("delete from family where memberid=" + memberId);
+			stmt.executeUpdate("delete from binding where memberid=" + memberId );
 			rsp_obj.put("error", 0);
 			out.print(rsp_obj.toString());
 			
