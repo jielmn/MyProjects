@@ -57,6 +57,18 @@ Page({
           });
         }
       }
+
+      app.bindingCallback = function(res) {
+        if (res.errCode != 0) {
+          wx.showToast({
+            title: res.errMsg,
+            icon: 'none',
+            duration: 2000
+          })
+        } else {
+          
+        }
+      }
     }
 
   },

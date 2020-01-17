@@ -8,6 +8,7 @@ App({
   addMemberCallback: null,
   updateMemberCallback: null,
   deleteMemberCallback: null,
+  bindingCallback:null,
   isBluetoothStoped: true,
   uploadMinTemperature: 0.0,
   lat: 0,
@@ -736,9 +737,16 @@ App({
   binding:function(tagid, member) {
     var that = this;
     var app = this;
+    var ret = {
+      errCode: -1,
+      errMsg: "绑定家庭成员到温度贴失败!"
+    };
 
     if (!this.globalData.logined) {
       this.log("not logined, give up to bind tag!");
+      if (this.bindingCallback) {
+        this.bindingCallback(ret);
+      }
       return;
     }
 
@@ -753,6 +761,7 @@ App({
       success: (res) => {
         if (res.data.error != null && res.data.error == 0) {
           that.log("bind tag to member success", res);
+          ret.errCode = 0;
         } else {
           that.log("bind tag to member failed", res);
         }
@@ -761,10 +770,11 @@ App({
         that.log("bind tag to member failed to wx.request", res);
       },
       complete: () => {
-
+        if (this.bindingCallback) {
+          this.bindingCallback(ret);
+        }
       }
     })
-
   },
 
 })

@@ -27,7 +27,7 @@
 <view class="weui-panel">
   <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index">
     <view class="y1">{{item.name}}</view>
-    <view class="y2">{{tools.toFixed(item.lasttemperature,1)}}</view>
-    <view class="y3">{{tools.formatTime(item.time)}}</view>
+    <view class="y2">{{item.lasttemperature?tools.toFixed(item.lasttemperature,1):'无'}}</view>
+    <view class="y3">{{item.time?tools.formatTime(item.time):''}}</view>
   </view>
 </view>
