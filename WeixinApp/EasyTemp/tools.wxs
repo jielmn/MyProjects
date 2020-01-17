@@ -10,7 +10,26 @@ var toMembers = function( members ) {
   return array;
 }
 
+var formatTime = function (t) {
+  var date = getDate(t);
+  var year = date.getFullYear()
+  var month = date.getMonth() + 1
+  var day = date.getDate()
+  var hour = date.getHours()
+  var minute = date.getMinutes()
+  var second = date.getSeconds()
+
+  var formatNumber = function (n) {
+    n = n.toString()
+    return n[1] ? n : '0' + n
+  }
+
+  return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+}
+
+
 module.exports = {
   toFixed: toFixed,
-  toMembers: toMembers
+  toMembers: toMembers,
+  formatTime: formatTime
 };

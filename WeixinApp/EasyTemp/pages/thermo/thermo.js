@@ -74,20 +74,12 @@ Page({
       app.openBluetoothAdapter();
     }
 
-    var members = [{
-      id: 0,
-      name: '我'
-    }];
-    app.globalData.members.forEach(item => {
-      var member = {};
-      member.id = item.id;
-      member.name = item.name;
-      members.push(member);
-    })
+    var tmp = [];
+    tmp.push(app.globalData.mine);
+    var members = tmp.concat(app.globalData.members);
     this.setData({
       members: members
     })
-
   },
 
   bindPickerChange: function(e) {

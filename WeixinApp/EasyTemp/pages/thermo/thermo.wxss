@@ -77,12 +77,12 @@
 
 .y1 {
   display: inline-block;
-  width:200rpx;
+  width:180rpx;
 }
 
 .y2 {
   display: inline-block;
-  width:200rpx;
+  width:180rpx;
 }
 
 .y3 {

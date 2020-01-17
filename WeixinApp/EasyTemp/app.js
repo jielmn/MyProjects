@@ -20,6 +20,7 @@ App({
     logined: false,
     members: [],
     tagsbinding: [],
+    mine:{id:0,name:'我'},
 
     // 蓝牙状态
     discoveryStarted: false,
@@ -101,6 +102,26 @@ App({
         that.globalData.logined = res.data.logined || false;
         that.globalData.members = res.data.members || [];
         that.globalData.tagsbinding = res.data.tagsbinding || [];
+        var lastTemp = res.data.lasttemperature || [];
+
+        var members = that.globalData.members;
+        members.forEach(member => {
+          var idx = that.inArray(lastTemp, 'memberid', member.id);
+          if ( idx >= 0 ) {
+            member.lasttemperature = lastTemp[idx].temperature;
+            member.time = lastTemp[idx].time;
+          }
+        })
+
+        // that.log("members: ", that.globalData.members);
+        var idx = that.inArray(lastTemp, 'memberid', 0);
+        if ( idx >= 0 ) {
+          that.globalData.mine.lasttemperature = lastTemp[idx].temperature;
+          that.globalData.mine.time = lastTemp[idx].time;
+        }
+        // that.log("mine: ", that.globalData.mine);
+
+
       }, // success
 
       // 获取openid失败
