@@ -61,6 +61,12 @@ Page({
         that.setData({
           members: members
         })
+      } else {
+        wx.showToast({
+          title: res.errMsg,
+          icon: 'none',
+          duration: 2000
+        })
       }
     }
 
@@ -150,7 +156,12 @@ Page({
     app.binding(this.data.curtagId, this.data.members[index], this.curTempItem);
 
 
-  }
+  },
+
+  onPullDownRefresh: function () {
+    app.refresh();
+    wx.stopPullDownRefresh(); 
+  },
 
 
 

@@ -475,6 +475,12 @@ App({
     this.isBluetoothStoped = true;
   },
 
+  refresh:function(){
+    wx.closeBluetoothAdapter();
+    this.isBluetoothStoped = true;
+    this.openBluetoothAdapter();
+  },
+
   onShow: function() {
 
   },
