@@ -166,6 +166,15 @@ Page({
   onRefreshBluetooth:function() {
     app.refresh();
     wx.stopPullDownRefresh(); 
+    // this.test();
+  },
+
+  test:function() {
+    wx.chooseLocation({
+      success: function (res){
+        app.log("wx.chooseLocation success", res)
+      }
+    })
   }
 
 

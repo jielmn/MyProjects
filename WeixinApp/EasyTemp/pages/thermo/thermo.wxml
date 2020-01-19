@@ -25,7 +25,7 @@
 
 </view>
 
-<view class="middleview">上一次测量温读</view>
+<view class="middleview">上一次测量温度</view>
 
 <view class="weui-panel">
   <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index">

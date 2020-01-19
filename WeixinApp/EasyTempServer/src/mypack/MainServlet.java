@@ -159,6 +159,9 @@ public class MainServlet extends HttpServlet {
 				
 				binding(out, openid, tagid, memberId );
 			}
+			else if ( type.equals("datavtest0") ) {
+				datavtest0(out);
+			}
 		}
 		
 		//test(out);
@@ -480,6 +483,45 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());			
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void datavtest0(PrintWriter out) {
+		
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONArray rsp_obj = new JSONArray();			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select open_id, lat, lng  from temperature order by open_id, ctime desc" );
+			
+			String lastopenid = "";
+			while ( rs.next() ) {
+				String itemid = rs.getString(1);
+				if ( !itemid.equals(lastopenid) ) {
+					JSONObject item = new JSONObject();					
+					item.put("lat",     rs.getDouble(2));
+					item.put("lng",     rs.getDouble(3));
+					item.put("value",   1);
+					rsp_obj.put(item);
+					lastopenid = itemid;
+				}
+			}
+			
 			out.print(rsp_obj.toString());			
 			
 			rs.close();

@@ -28,6 +28,10 @@ Page({
         */
         return;
       }
+
+      if ( !(app.lat && app.lng) ) {
+        return;
+      }
       
       wx.getUserInfo({
         success:function(res){
@@ -113,6 +117,15 @@ Page({
     if ( !app.globalData.openid ) {
       wx.showToast({
         title: '登录失败',
+        icon: 'none',
+        duration: 2000
+      })
+      return;
+    }
+
+    if (!(app.lat && app.lng)) {
+      wx.showToast({
+        title: '请稍候，正在获取位置信息',
         icon: 'none',
         duration: 2000
       })

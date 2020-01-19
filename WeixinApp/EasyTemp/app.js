@@ -12,8 +12,8 @@ App({
   uploadTemperatureCallback:null,
   isBluetoothStoped: true,
   uploadMinTemperature: 0.0,
-  lat: 0,
-  lng: 0,
+  lat: null,
+  lng: null,
 
   globalData: {
     userInfo: null,
@@ -79,7 +79,9 @@ App({
     })
 
     wx.getLocation({
-      type: 'wgs84',
+      type: 'gcj02',
+      isHighAccuracy: true,
+      highAccuracyExpireTime:5000,
       success(res) {
         app_obj.log("get location", res);
         app_obj.lat = res.latitude;
