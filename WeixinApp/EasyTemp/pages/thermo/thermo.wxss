@@ -18,6 +18,18 @@
   height: 60rpx;
   line-height: 60rpx;
   color: #FD7432;
+  max-width:630rpx;
+  overflow: hidden;/*超出部分隐藏*/
+  white-space: nowrap;/*不换行*/
+  text-overflow:ellipsis;/*超出部分文字以...显示*/
+}
+
+.connectview .right{
+  display: inline-block;
+  vertical-align: top;
+  height: 60rpx;
+  padding-top: 10rpx;
+  padding-left: 20rpx;
 }
 
 .tempview{
@@ -87,4 +99,9 @@
 
 .y3 {
   display: inline-block;
+}
+
+.update{
+  width: 40rpx;
+  height: 40rpx;
 }

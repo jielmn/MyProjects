@@ -24,7 +24,24 @@ var formatTime = function (t) {
     return n[1] ? n : '0' + n
   }
 
-  return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+  var now = getDate().getTime();
+  var span = 86400000;
+  var r = t % span;
+  t -= r;
+  var diff = now - t;
+  if ( diff > 0 ) {
+    if ( diff < span ) {
+      return '今天' + ' ' + [hour, minute, second].map(formatNumber).join(':')
+    } else if ( diff < 2 * span ) {
+      return '昨天' + ' ' + [hour, minute, second].map(formatNumber).join(':')
+    } else if ( diff < 3 * span ) {
+      return '前天' + ' ' + [hour, minute, second].map(formatNumber).join(':') 
+    } else {
+      return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+    }
+  } else {
+    return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+  }  
 }
 
 

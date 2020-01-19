@@ -163,6 +163,11 @@ Page({
     wx.stopPullDownRefresh(); 
   },
 
+  onRefreshBluetooth:function() {
+    app.refresh();
+    wx.stopPullDownRefresh(); 
+  }
+
 
 
 

@@ -112,7 +112,7 @@ Page({
 
     if ( !app.globalData.openid ) {
       wx.showToast({
-        title: '未获取到open id',
+        title: '登录失败',
         icon: 'none',
         duration: 2000
       })
