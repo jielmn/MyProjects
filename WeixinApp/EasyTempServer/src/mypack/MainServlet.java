@@ -52,8 +52,11 @@ import java.text.SimpleDateFormat;
 
 public class MainServlet extends HttpServlet {
 	
-	String appid = "wx692cfffa15fdf5d9";
-	String secret = "fabdcb7f72cf10cf0bde84e04fb28814";
+	//String appid = "wx692cfffa15fdf5d9";
+	//String secret = "fabdcb7f72cf10cf0bde84e04fb28814";
+	
+	String appid = "wx23bed15f4ab06c8b";
+	String secret = "fdee94a77e0a4eaf41759dd87b7a0cfd";
     
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
     {       
