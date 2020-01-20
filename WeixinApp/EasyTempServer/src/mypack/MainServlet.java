@@ -55,11 +55,11 @@ public class MainServlet extends HttpServlet {
 	//String appid = "wx692cfffa15fdf5d9";
 	//String secret = "fabdcb7f72cf10cf0bde84e04fb28814";
 	
-	static String appid = "wx23bed15f4ab06c8b";
-	static String secret = "fdee94a77e0a4eaf41759dd87b7a0cfd";
-	static float feverThreshold = 37.3f;
-	static float uploadThreshold = 35.0f;
-	static int   maxFeverSpan = 7;        
+	String appid = "wx23bed15f4ab06c8b";
+	String secret = "fdee94a77e0a4eaf41759dd87b7a0cfd";
+	float feverThreshold = 37.3f;
+	float uploadThreshold = 35.0f;
+	int   maxFeverSpan = 7;        
     
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
     {       
