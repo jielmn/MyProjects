@@ -22,7 +22,7 @@ create table family ( memberid int primary key not null auto_increment, open_id 
 create table binding ( tagid varchar(20) not null primary key,  memberid int not null ) DEFAULT CHARSET=utf8;
 
 -- 地区上报数目
-create table areaupload ( adcode int primary key not null, areaname varchar(20) not null, yesterdayupload int not null default 0, lastweekupload int not null default 0) DEFAULT CHARSET=utf8;
+create table areaupload ( adcode int primary key not null, areaname varchar(20) not null, yesterdayupload int not null default 0, yesterdayadded int not null default 0) DEFAULT CHARSET=utf8;
 insert into areaupload(adcode, areaname) values (110101, '东城区' );
 insert into areaupload(adcode, areaname) values (110102, '西城区' );
 insert into areaupload(adcode, areaname) values (110105, '朝阳区' );

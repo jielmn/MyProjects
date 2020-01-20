@@ -11,7 +11,7 @@ App({
   bindingCallback:null,
   uploadTemperatureCallback:null,
   isBluetoothStoped: true,
-  uploadMinTemperature: 0.0,
+  uploadMinTemperature: 35.0,
   lat: null,
   lng: null,
 
@@ -691,6 +691,8 @@ App({
 
     if (item.temperature <= this.uploadMinTemperature) {
       this.log("uploadTemperature temperature " + item.temperature + " < min temperature " + this.uploadMinTemperature + ", return");
+      ret.errMsg = "您的温度小于" + this.uploadMinTemperature + ",请夹好易温贴,保证封闭性好,再测量一次"
+      ret.duration = 5000;
       if (this.uploadTemperatureCallback) {
         this.uploadTemperatureCallback(ret);
       }

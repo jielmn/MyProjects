@@ -62,10 +62,11 @@ Page({
           members: members
         })
       } else {
+        var duration = res.duration || 2000;
         wx.showToast({
           title: res.errMsg,
           icon: 'none',
-          duration: 2000
+          duration: duration
         })
       }
     }
