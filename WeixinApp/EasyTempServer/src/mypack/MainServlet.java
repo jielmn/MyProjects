@@ -55,8 +55,11 @@ public class MainServlet extends HttpServlet {
 	//String appid = "wx692cfffa15fdf5d9";
 	//String secret = "fabdcb7f72cf10cf0bde84e04fb28814";
 	
-	String appid = "wx23bed15f4ab06c8b";
-	String secret = "fdee94a77e0a4eaf41759dd87b7a0cfd";
+	static String appid = "wx23bed15f4ab06c8b";
+	static String secret = "fdee94a77e0a4eaf41759dd87b7a0cfd";
+	static float feverThreshold = 37.3f;
+	static float uploadThreshold = 35.0f;
+	static int   maxFeverSpan = 7;        
     
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
     {       
@@ -167,6 +170,9 @@ public class MainServlet extends HttpServlet {
 			}
 			else if ( type.equals("tagscnt") ) {
 				tagscnt(out);
+			}
+			else if ( type.equals("feverpeople") ) {
+				feverpeople(out);
 			}
 		}
 		
@@ -424,6 +430,15 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			JSONObject rsp_obj = new JSONObject();
+			// 如果上传温度小于阈值
+			if ( temperature < uploadThreshold ) {
+				rsp_obj.put("error", 0);
+				Date now = new Date();
+				rsp_obj.put("time", now.getTime());
+				out.print(rsp_obj.toString());
+				return;
+			}
+			
 			Statement stmt = con.createStatement();      
 			stmt.executeUpdate("insert into temperature values(null, '" + openid_sql + "', '" + tagid + "', " + temperature + ",NOW()," + lat + "," + lng + ")");
 			rsp_obj.put("error", 0);
@@ -595,6 +610,54 @@ public class MainServlet extends HttpServlet {
            out.print(ex.getMessage());
         }
 	}
+	
+	public void feverpeople(PrintWriter out) {
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONArray rsp_obj = new JSONArray();			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select a.open_id, a.temp, a.ctime, a.lat, a.lng, b.memberid from temperature a left join binding b on a.tagid = b.tagid where datediff(now(),a.ctime) < " + maxFeverSpan + " order by a.open_id, b.memberid, a.ctime desc;" );
+			
+			String lastOpenId = new String();
+			int lastMemberId = 0;
+			
+			while ( rs.next() ) {
+				String openid = rs.getString(1);
+				int memberId = rs.getInt(6);
+				// 如果不是同一个人
+				if ( !openid.equals(lastOpenId) || memberId != lastMemberId ) {
+					float  temperature = rs.getFloat(2);
+					// 如果是发热
+					if ( temperature >= feverThreshold ) {
+						JSONObject item = new JSONObject();					
+						item.put("lat",     rs.getDouble(4));
+						item.put("lng",     rs.getDouble(5));
+						item.put("value",   1);
+						rsp_obj.put(item);
+					}
+					lastOpenId = openid;
+					lastMemberId = memberId;
+				}
+			}
+						
+			out.print(rsp_obj.toString());			
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
 	
 	
 	
