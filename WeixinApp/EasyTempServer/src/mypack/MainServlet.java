@@ -162,6 +162,12 @@ public class MainServlet extends HttpServlet {
 			else if ( type.equals("datavtest0") ) {
 				datavtest0(out);
 			}
+			else if ( type.equals("userscnt") ) {
+				userscnt(out);
+			}
+			else if ( type.equals("tagscnt") ) {
+				tagscnt(out);
+			}
 		}
 		
 		//test(out);
@@ -531,6 +537,65 @@ public class MainServlet extends HttpServlet {
            out.print(ex.getMessage());
         }
 	}
+	
+	public void userscnt(PrintWriter out) {
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONArray rsp_obj = new JSONArray();			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select count(*) from users" );
+			if ( rs.next() ) {
+				JSONObject item = new JSONObject();
+				item.put("value",     rs.getInt(1));
+				rsp_obj.put(item);
+			}	
+			out.print(rsp_obj.toString());			
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void tagscnt(PrintWriter out) {
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONArray rsp_obj = new JSONArray();			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select count(distinct tagid) from temperature" );
+			if ( rs.next() ) {
+				JSONObject item = new JSONObject();
+				item.put("value",     rs.getInt(1));
+				rsp_obj.put(item);
+			}	
+			out.print(rsp_obj.toString());			
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
 	
 	
 	
