@@ -60,6 +60,51 @@ public class MainServlet extends HttpServlet {
 	float feverThreshold = 37.3f;
 	float uploadThreshold = 35.0f;
 	int   maxFeverSpan = 7;        
+	
+	private class FeverPerson {
+		String   openId   = "";
+		int      memberId = 0;
+		
+		public FeverPerson( String id, int mid ) {
+			openId = id;
+			memberId = mid;
+		}
+		
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			FeverPerson person = (FeverPerson)o;
+			if ( !openId.equals(person.openId)) return false;
+			return true;
+		}
+		
+		@Override
+		public int hashCode() {
+			return openId.hashCode() + memberId;
+		}
+		
+		@Override
+		public String toString(){
+			return "{open id: " + openId + ",member id: " + memberId + "}";
+		}
+
+	}
+	
+	private class FeverPersonData {
+		double     lat  = 0.0;
+		double     lng  = 0.0;
+		int      adCode = 0;
+		public FeverPersonData( double a, double b, int c ) {
+			lat = a;
+			lng = b;
+			adCode = c;
+		}
+	}
+	
+	
+	
+	
     
     public void doGet(HttpServletRequest req, HttpServletResponse rsp) throws ServletException, IOException
     {       
@@ -177,9 +222,13 @@ public class MainServlet extends HttpServlet {
 			else if ( type.equals("rotation") ) {
 				rotation(out);
 			}
+			else if ( type.equals("updaterotation") ) {
+				updaterotation(out);
+			}
+			else if ( type.equals("test") ) {
+				// test(out);
+			}
 		}
-		
-		//test(out);
 		
 		out.close();
     }   
@@ -693,8 +742,53 @@ public class MainServlet extends HttpServlet {
         }
 	}
 	
-	
-	
+	// 更新昨日发热总数，新增数
+	public void updaterotation(PrintWriter out) {
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONArray rsp_obj = new JSONArray();
+			Map<Object,Object>  yesterday = new HashMap<Object,Object>();
+			Statement stmt = con.createStatement();      
+			// 昨天的总发热人数
+			ResultSet rs = stmt.executeQuery("select a.open_id, a.temp, a.ctime, a.lat, a.lng, b.memberid from temperature a left join binding b on a.tagid = b.tagid where datediff(now(),a.ctime) < " + (maxFeverSpan +1) + " and datediff(now(),a.ctime) > 0  order by a.open_id, b.memberid, a.ctime desc;" );
+			
+			String lastOpenId = new String();
+			int lastMemberId = 0;
+			
+			while ( rs.next() ) {
+				String openid = rs.getString(1);
+				int memberId = rs.getInt(6);
+				// 如果不是同一个人
+				if ( !openid.equals(lastOpenId) || memberId != lastMemberId ) {
+					float  temperature = rs.getFloat(2);
+					// 如果是发热
+					if ( temperature >= feverThreshold ) {
+						FeverPerson item = new FeverPerson(openid, memberId);
+						yesterday.put(item, 0);
+					}
+					lastOpenId = openid;
+					lastMemberId = memberId;
+				}
+			}
+			
+						
+			out.print(rsp_obj.toString());						
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
 	
 	
 	
@@ -702,24 +796,16 @@ public class MainServlet extends HttpServlet {
 	
 
 	public void test( PrintWriter out) {
-		JSONObject object = new JSONObject();
-		Object nullObj = null;
-		try {
-			object.put("name", "王小二");
-			object.put("age", 25.2);
-			object.put("birthday", "1990-01-01");
-			object.put("school", "蓝翔");
-			object.put("major", new String[] {"理发", "挖掘机"});
-			object.put("has_girlfriend", false);
-			object.put("car", nullObj);
-			object.put("house", nullObj);
-			object.put("comment", "这是一个注释");
-
-			out.print(object.toString());
-
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		/*
+		Map<Object,Object> m1 = new HashMap<Object,Object>(); 
+		FeverPerson a = new FeverPerson( "abc", 100 );
+		m1.put( a, "88");
+		m1.put("Mahnaz", "131");
+		m1.put("Ayan", "112");
+		m1.put("Daisy", "114");
+		out.print(m1);
+		out.print(a.openId);
+		*/
 	}
 	
 	public void setContentError(PrintWriter out, int errCode) {
