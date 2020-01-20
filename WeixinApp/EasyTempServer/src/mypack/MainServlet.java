@@ -95,10 +95,14 @@ public class MainServlet extends HttpServlet {
 		double     lat  = 0.0;
 		double     lng  = 0.0;
 		int      adCode = 0;
-		public FeverPersonData( double a, double b, int c ) {
+		public FeverPersonData( double a, double b) {
 			lat = a;
 			lng = b;
-			adCode = c;
+		}
+		
+		@Override
+		public String toString(){
+			return "{lat: " + lat + ",lng: " + lng + ",adcode: " + adCode + "}";
 		}
 	}
 	
@@ -226,7 +230,7 @@ public class MainServlet extends HttpServlet {
 				updaterotation(out);
 			}
 			else if ( type.equals("test") ) {
-				// test(out);
+				test(out);
 			}
 		}
 		
@@ -755,7 +759,7 @@ public class MainServlet extends HttpServlet {
 			}
 			
 			JSONArray rsp_obj = new JSONArray();
-			Map<Object,Object>  yesterday = new HashMap<Object,Object>();
+			Map<FeverPerson,FeverPersonData>  yesterday = new HashMap<FeverPerson,FeverPersonData>();
 			Statement stmt = con.createStatement();      
 			// 昨天的总发热人数
 			ResultSet rs = stmt.executeQuery("select a.open_id, a.temp, a.ctime, a.lat, a.lng, b.memberid from temperature a left join binding b on a.tagid = b.tagid where datediff(now(),a.ctime) < " + (maxFeverSpan +1) + " and datediff(now(),a.ctime) > 0  order by a.open_id, b.memberid, a.ctime desc;" );
@@ -772,8 +776,50 @@ public class MainServlet extends HttpServlet {
 					// 如果是发热
 					if ( temperature >= feverThreshold ) {
 						FeverPerson item = new FeverPerson(openid, memberId);
-						yesterday.put(item, 0);
+						yesterday.put(item, new FeverPersonData(rs.getDouble(4), rs.getDouble(5)) );
 					}
+					lastOpenId = openid;
+					lastMemberId = memberId;
+				}
+			}
+			
+			// 获取区域号码adcode
+			Iterator<Entry<FeverPerson, FeverPersonData>> entries = yesterday.entrySet().iterator();
+			while(entries.hasNext()){
+				Entry<FeverPerson, FeverPersonData> entry = entries.next();
+				FeverPerson key = entry.getKey();
+				FeverPersonData value = entry.getValue();
+				getAdCode(value);
+				/*
+				JSONObject item = new JSONObject();					
+				item.put("lat",     value.lat);
+				item.put("lng",     value.lng);
+				item.put("adcode",  value.adCode );
+				item.put("test", value.lat + "," + value.lng );
+				rsp_obj.put(item);
+				*/
+			}	
+			
+			// 前天的总发热人数
+			Map<FeverPerson, FeverPersonData>  added = new HashMap<FeverPerson,FeverPersonData>();
+			added.putAll(yesterday);
+			
+			rs.close();
+			rs = stmt.executeQuery("select a.open_id, a.temp, a.ctime, a.lat, a.lng, b.memberid from temperature a left join binding b on a.tagid = b.tagid where datediff(now(),a.ctime) < " + (maxFeverSpan +2) + " and datediff(now(),a.ctime) > 1  order by a.open_id, b.memberid, a.ctime desc;" );
+			
+			lastOpenId = "";
+			lastMemberId = 0;
+			
+			while ( rs.next() ) {
+				String openid = rs.getString(1);
+				int memberId = rs.getInt(6);
+				// 如果不是同一个人
+				if ( !openid.equals(lastOpenId) || memberId != lastMemberId ) {
+					FeverPerson p = new FeverPerson(openid, memberId);
+					if ( added.containsKey(p) ) {
+						added.remove(p);
+					}
+				
 					lastOpenId = openid;
 					lastMemberId = memberId;
 				}
@@ -790,6 +836,23 @@ public class MainServlet extends HttpServlet {
         }
 	}
 	
+	private void getAdCode(FeverPersonData value) {
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("ak",          "wWYw0yCb8ntXmSgTxTx40vKR");  
+		params.put("location",    value.lat + "," + value.lng);  
+		params.put("output",      "json");  
+
+		String ret = HttpHelper.sendGetByHttpUrlConnection("http://api.map.baidu.com/geocoder/v2/", params, "utf-8");
+		JSONObject object = new JSONObject(ret);		
+		JSONObject subObject = object.getJSONObject("result");
+		if ( subObject != null ) {
+			subObject = subObject.getJSONObject("addressComponent");
+			if ( subObject != null ) {
+				value.adCode = subObject.getInt("adcode");
+			}
+		}
+	}
+	
 	
 	
 	
@@ -797,15 +860,35 @@ public class MainServlet extends HttpServlet {
 
 	public void test( PrintWriter out) {
 		/*
-		Map<Object,Object> m1 = new HashMap<Object,Object>(); 
-		FeverPerson a = new FeverPerson( "abc", 100 );
-		m1.put( a, "88");
-		m1.put("Mahnaz", "131");
-		m1.put("Ayan", "112");
-		m1.put("Daisy", "114");
-		out.print(m1);
-		out.print(a.openId);
+		Map<FeverPerson,FeverPersonData>  yesterday = new HashMap<FeverPerson,FeverPersonData>();
+		FeverPerson item = new FeverPerson("abc", 100);
+		yesterday.put(item, new FeverPersonData(1.0, 2.0 ));
+		
+		Iterator<Entry<FeverPerson, FeverPersonData>> entries = yesterday.entrySet().iterator();
+		while(entries.hasNext()){
+			Entry<FeverPerson, FeverPersonData> entry = entries.next();
+			FeverPerson key = entry.getKey();
+			FeverPersonData value = entry.getValue();
+			value.adCode += 10;
+		}
+		
+		entries = yesterday.entrySet().iterator();
+		while(entries.hasNext()){
+			Entry<FeverPerson, FeverPersonData> entry = entries.next();
+			FeverPerson key = entry.getKey();
+			FeverPersonData value = entry.getValue();
+			out.print(key+":"+value);
+		}
 		*/
+		
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("ak",          "wWYw0yCb8ntXmSgTxTx40vKR");  
+		params.put("location",    "39.915156,116.401394");  
+		params.put("output",      "json");  
+
+		String ret = HttpHelper.sendGetByHttpUrlConnection("http://api.map.baidu.com/geocoder/v2/", params, "utf-8");
+		JSONObject object = new JSONObject(ret);		
+		out.print(object.getJSONObject("result").getJSONObject("addressComponent").getString("adcode"));
 	}
 	
 	public void setContentError(PrintWriter out, int errCode) {
