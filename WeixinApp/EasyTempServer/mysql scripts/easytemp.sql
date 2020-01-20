@@ -20,3 +20,22 @@ create table family ( memberid int primary key not null auto_increment, open_id 
 
 -- 体温贴绑定
 create table binding ( tagid varchar(20) not null primary key,  memberid int not null ) DEFAULT CHARSET=utf8;
+
+-- 地区上报数目
+create table areaupload ( adcode int primary key not null, areaname varchar(20) not null, yesterdayupload int not null default 0, lastweekupload int not null default 0) DEFAULT CHARSET=utf8;
+insert into areaupload(adcode, areaname) values (110101, '东城区' );
+insert into areaupload(adcode, areaname) values (110102, '西城区' );
+insert into areaupload(adcode, areaname) values (110105, '朝阳区' );
+insert into areaupload(adcode, areaname) values (110106, '丰台区' );
+insert into areaupload(adcode, areaname) values (110107, '石景山区' );
+insert into areaupload(adcode, areaname) values (110108, '海淀区' );
+insert into areaupload(adcode, areaname) values (110109, '门头沟区' );
+insert into areaupload(adcode, areaname) values (110111, '房山区' );
+insert into areaupload(adcode, areaname) values (110112, '通州区' );
+insert into areaupload(adcode, areaname) values (110113, '顺义区' );
+insert into areaupload(adcode, areaname) values (110114, '昌平区' );
+insert into areaupload(adcode, areaname) values (110115, '大兴区' );
+insert into areaupload(adcode, areaname) values (110116, '怀柔区' );
+insert into areaupload(adcode, areaname) values (110117, '平谷区' );
+insert into areaupload(adcode, areaname) values (110118, '密云区' );
+insert into areaupload(adcode, areaname) values (110119, '延庆区' );

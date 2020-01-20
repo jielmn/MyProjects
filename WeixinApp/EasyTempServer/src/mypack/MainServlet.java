@@ -174,6 +174,9 @@ public class MainServlet extends HttpServlet {
 			else if ( type.equals("feverpeople") ) {
 				feverpeople(out);
 			}
+			else if ( type.equals("rotation") ) {
+				rotation(out);
+			}
 		}
 		
 		//test(out);
@@ -657,6 +660,40 @@ public class MainServlet extends HttpServlet {
            out.print(ex.getMessage());
         }
 	}
+	
+	public void rotation(PrintWriter out) {
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONArray rsp_obj = new JSONArray();			
+			Statement stmt = con.createStatement();      
+			ResultSet rs = stmt.executeQuery("select * from areaupload" );
+			while ( rs.next() ) {
+				JSONObject item = new JSONObject();					
+				item.put("area",     rs.getString(2));
+				item.put("num",      rs.getInt(3));
+				item.put("num1",     rs.getInt(4));
+				rsp_obj.put(item);
+			}
+						
+			out.print(rsp_obj.toString());			
+			
+			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	
 	
 	
 	
