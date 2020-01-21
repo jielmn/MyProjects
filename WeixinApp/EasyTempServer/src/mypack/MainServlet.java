@@ -106,6 +106,16 @@ public class MainServlet extends HttpServlet {
 		}
 	}
 	
+	private  class  AreaData {
+		String  name = "";
+		int     num  = 0;
+		int     num1 = 0;
+		
+		public AreaData(String n) {
+			name = n;
+		}
+	}
+	
 	
 	
 	
@@ -815,14 +825,67 @@ public class MainServlet extends HttpServlet {
 				int memberId = rs.getInt(6);
 				// 如果不是同一个人
 				if ( !openid.equals(lastOpenId) || memberId != lastMemberId ) {
-					FeverPerson p = new FeverPerson(openid, memberId);
-					if ( added.containsKey(p) ) {
-						added.remove(p);
-					}
+					float  temperature = rs.getFloat(2);
+					// 如果是发热
+					if ( temperature >= feverThreshold ) {
+						FeverPerson p = new FeverPerson(openid, memberId);
+						if ( added.containsKey(p) ) {
+							added.remove(p);
+						}
+					}					
 				
 					lastOpenId = openid;
 					lastMemberId = memberId;
 				}
+			}
+			
+			Map<Integer,AreaData>  areas = new HashMap<Integer,AreaData>();
+			areas.put(110101, new AreaData("东城区"));
+			areas.put(110102, new AreaData("西城区"));
+			areas.put(110105, new AreaData("朝阳区"));
+			areas.put(110106, new AreaData("丰台区"));
+			areas.put(110107, new AreaData("石景山区"));
+			areas.put(110108, new AreaData("海淀区"));
+			areas.put(110109, new AreaData("门头沟区"));
+			areas.put(110111, new AreaData("房山区"));
+			areas.put(110112, new AreaData("通州区"));
+			areas.put(110113, new AreaData("顺义区"));
+			areas.put(110114, new AreaData("昌平区"));
+			areas.put(110115, new AreaData("大兴区"));
+			areas.put(110116, new AreaData("怀柔区"));
+			areas.put(110117, new AreaData("平谷区"));
+			areas.put(110118, new AreaData("密云区"));
+			areas.put(110119, new AreaData("延庆区"));
+			
+			entries = yesterday.entrySet().iterator();
+			while(entries.hasNext()){
+				Entry<FeverPerson, FeverPersonData> entry = entries.next();
+				FeverPerson key = entry.getKey();
+				FeverPersonData value = entry.getValue();		
+				if ( areas.containsKey(value.adCode) ) {
+					AreaData data = (AreaData)areas.get(value.adCode);
+					data.num += 1;
+				}
+			}
+			
+			entries = added.entrySet().iterator();
+			while(entries.hasNext()){
+				Entry<FeverPerson, FeverPersonData> entry = entries.next();
+				FeverPerson key = entry.getKey();
+				FeverPersonData value = entry.getValue();		
+				if ( areas.containsKey(value.adCode) ) {
+					AreaData data = (AreaData)areas.get(value.adCode);
+					data.num1 += 1;
+				}
+			}
+			
+			// 更新昨日发热总数，新增数
+			Iterator<Entry<Integer,AreaData>> entries_1 = areas.entrySet().iterator();
+			while(entries_1.hasNext()){
+				Entry<Integer,AreaData> entry = entries_1.next();
+				int key = entry.getKey();
+				AreaData value = entry.getValue();						
+				stmt.executeUpdate("update areaupload set yesterdayupload=" + value.num + ", yesterdayadded=" + value.num1 + " where adcode="+key);
 			}
 			
 						
