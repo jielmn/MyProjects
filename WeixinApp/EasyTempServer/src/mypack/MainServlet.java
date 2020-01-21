@@ -707,6 +707,13 @@ public class MainServlet extends HttpServlet {
 						item.put("lat",     rs.getDouble(4));
 						item.put("lng",     rs.getDouble(5));
 						item.put("value",   1);
+						if ( temperature >= 39.0f ) {
+							item.put("type",   "high");
+						} else if ( temperature >= 38.0f ) {
+							item.put("type",   "middle");
+						} else {
+							item.put("type",   "low");
+						}
 						rsp_obj.put(item);
 					}
 					lastOpenId = openid;
