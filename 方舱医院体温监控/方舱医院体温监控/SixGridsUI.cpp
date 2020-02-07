@@ -1610,3 +1610,36 @@ void  CHumanUI::SetDelta(int nIndex1, int nIndex2, BOOL bConnected1, BOOL bConne
 	}
 
 }
+
+
+CCubeItemUI::CCubeItemUI() {
+	m_bed = 0;
+	m_name = 0;
+	m_phone_no = 0;
+}
+
+CCubeItemUI::~CCubeItemUI() {
+
+}
+
+LPCTSTR CCubeItemUI::GetClass() const {
+	return _T("CuteItem");
+}
+
+void CCubeItemUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("CubeItem.xml"), (UINT)0, NULL, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow); 
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}
+
+	this->SetFixedHeight(30); 
+}
+
+void CCubeItemUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
+
+}

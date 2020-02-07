@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>	
+	<HorizontalLayout bkcolor="#FF434248">
+		<VerticalLayout>		
+			<VerticalLayout>
+				<HorizontalLayout height="35" inset="10,10,0,0" >
+					<Label text="床号" textcolor="#FFFFFFFF" font="101" width="100" />
+					<Label text="姓名" textcolor="#FFFFFFFF" font="101" width="100" />
+					<Label text="手机号" textcolor="#FFFFFFFF" font="101" width="150" />
+					<Label text="体温(℃)" textcolor="#FFFFFFFF" font="101" width="120" />
+					<Label text="时间" textcolor="#FFFFFFFF" font="101" width="100" />
+				</HorizontalLayout>
+				
+				<VerticalLayout name="layCubeItems_1" inset="10,10,0,0" >
+				</VerticalLayout>
+				
+			</VerticalLayout>
+			
+			<VerticalLayout height="200" inset="10,10,0,10" bordersize="0,1,0,0" bordercolor="#FFD1E8F5"  >
+				<HorizontalLayout height="40" >
+					<Label text="新体温贴" textcolor="#FFFFFFFF" font="103" />
+				</HorizontalLayout>			
+				
+				<HorizontalLayout>
+					<VerticalLayout width="100">
+						<Control />
+							<Control bkimage="tag_1.png" width="64" height="64" />
+						<Control />
+					</VerticalLayout>	
+
+					<Label text="36.5℃" textcolor="#FFFFFFFF" font="104" width="200"  />
+					
+					<Label text="2020-01-01 09:00:00" textcolor="#FFFFFFFF" font="105" width="200"  />
+					
+					
+				</HorizontalLayout>				
+			</VerticalLayout>
+		</VerticalLayout>
+		
+		<HorizontalLayout inset="4,0,0,0" sepimm="false" sepwidth="-4" bordercolor="#FFD1E8F5" bordersize="2,0,0,0" >
+			<VerticalLayout>
+				<HorizontalLayout height="50" inset="10,10,0,10" bordersize="0,0,0,1" bordercolor="#FFD1E8F5" >
+					<Label text="床号" textcolor="#FFFFFFFF" font="100" width="60" />
+					<Edit font="100" width="100" />
+					<Control width="50" />
+					<Label text="姓名" textcolor="#FFFFFFFF" font="100" width="60" />
+					<Edit font="100" width="100" />
+					<Control width="50" />
+					<Label text="手机号" textcolor="#FFFFFFFF" font="100" width="60" />
+					<Edit font="100" width="150" />
+					<Control width="50" />
+					<Button name="btnAdd" text="添加" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+				</HorizontalLayout>
+				
+				<HorizontalLayout height="55" inset="10,30,0,0" >
+					<Label text="床号" textcolor="#FFFFFFFF" font="101" width="100" />
+					<Label text="姓名" textcolor="#FFFFFFFF" font="101" width="100" />
+					<Label text="手机号" textcolor="#FFFFFFFF" font="101" width="150" />
+					<Label text="体温(℃)" textcolor="#FFFFFFFF" font="101" width="120" />
+					<Label text="时间" textcolor="#FFFFFFFF" font="101" width="100" />
+				</HorizontalLayout>
+				
+				<VerticalLayout name="layCubeItems" inset="10,10,0,0" >
+				</VerticalLayout>
+				
+			</VerticalLayout>
+		</HorizontalLayout>
+	</HorizontalLayout>	
+</Window>

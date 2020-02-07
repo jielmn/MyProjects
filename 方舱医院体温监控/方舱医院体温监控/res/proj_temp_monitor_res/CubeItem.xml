@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout bordersize="0" bordercolor="#FF000000" inset="0"  >
+		<Label text="1" textcolor="#FFFFFFFF" font="102" width="100" />
+		<Label text="张三" textcolor="#FFFFFFFF" font="102" width="100" />
+		<Label text="19801234567" textcolor="#FFFFFFFF" font="102" width="150" />
+		<Label text="36.5" textcolor="#FFFFFFFF" font="102" width="120" />
+		<Label text="2020-02-07 17:30:00" textcolor="#FFFFFFFF" font="102" width="200" />
+	</HorizontalLayout>
+</Window>

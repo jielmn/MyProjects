@@ -251,3 +251,21 @@ private:
 	CLabelUI *                m_lblTemp[3];
 	CLabelUI *                m_lblDeltaTemp[3];
 };
+
+class CCubeItemUI : public CContainerUI
+{
+public:
+	CCubeItemUI();
+	~CCubeItemUI();
+
+private:
+	LPCTSTR GetClass() const;
+
+	void DoInit();
+	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+
+private:
+	CLabelUI *             m_bed;
+	CLabelUI *             m_name;
+	CLabelUI *             m_phone_no;
+};

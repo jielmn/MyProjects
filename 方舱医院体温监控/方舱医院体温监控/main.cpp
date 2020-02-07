@@ -77,6 +77,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 	m_optInHospital = 0;
 	m_optOutHospital = 0;
+
+	m_CuteItems = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -197,13 +199,25 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_lblQueryRet1->SetText("");
 	m_btnQPrev1->SetEnabled(false);
-	m_btnQNext1->SetEnabled(false);
+	m_btnQNext1->SetEnabled(false); 
 	m_datInHospitalStart1->SetTime(&s);
 	m_datInHospitalStart1->SetText(szDate);
 	m_datOutHospitalStart1->SetTime(&s);
 	m_datOutHospitalStart1->SetText(szDate);
 	m_q_waiting_bar1->SetBkImage("file='progress_back_1.png' corner='5,5,5,5'");
 
+	m_CuteItems = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems"));
+	m_CuteItems_high_temp = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems_1"));
+
+	m_CuteItems->Add(new CCubeItemUI);
+	m_CuteItems->Add(new CCubeItemUI);
+	m_CuteItems->Add(new CCubeItemUI);  
+
+	m_CuteItems_high_temp->Add(new CCubeItemUI);
+	m_CuteItems_high_temp->Add(new CCubeItemUI);
+	m_CuteItems_high_temp->Add(new CCubeItemUI);                  
+
+	
 	/*************  end »ñÈ¡¿Ø¼þ *****************/
 
 	m_cstHandImg->m_sigTagErased.connect(this, &CDuiFrameWnd::OnHandTagErasedNotify);
@@ -2672,7 +2686,7 @@ void CDuiFrameWnd::OnQueryOutHospitalNotify(const std::vector<OutHospitalItem*>&
                       
 
   
-                                            
+                                           
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }

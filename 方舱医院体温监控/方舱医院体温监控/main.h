@@ -321,4 +321,9 @@ private:
 private:
 	COptionUI *                                 m_optInHospital;
 	COptionUI *                                 m_optOutHospital;
+
+	// ·½²Õ
+private:
+	CVerticalLayoutUI *                         m_CuteItems;
+	CVerticalLayoutUI *                         m_CuteItems_high_temp;
 };
