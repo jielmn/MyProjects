@@ -326,4 +326,5 @@ private:
 private:
 	CVerticalLayoutUI *                         m_CuteItems;
 	CVerticalLayoutUI *                         m_CuteItems_high_temp;
+	CTabLayoutUI *                              m_SubSwitch;
 };

@@ -131,33 +131,55 @@ CControlUI * CMyImageUI::GetGrid() {
 		i++;
 	}
 
-	if (pParent)
-		return pParent;
+	if (pParent) {
+		CDuiString strClass = pParent->GetClass();
+		if (strClass == "GridUI") {
+			return pParent;
+		}
+		else {
+			// assert(0);
+			return 0;
+		}
+	}
 	else {
-		assert(0);
+		// assert(0);
 		return 0;
 	}
 }
 
 DWORD   CMyImageUI::GetGridIndex() {
 	CControlUI * pParent = GetGrid();
-	assert(pParent);
-	return pParent->GetTag();
+	// assert(pParent);
+	if (pParent)
+		return pParent->GetTag();
+	else
+		return 0;
 }
 
 DWORD   CMyImageUI::GetReaderIndex() {
 	CGridUI * pParent = (CGridUI *)GetGrid();
-	return pParent->GetReaderIndex();
+	if (pParent)
+		return pParent->GetReaderIndex();
+	else
+		return 0;
 }
 
 const   std::vector<TempItem * > & CMyImageUI::GetTempData(DWORD j) {
 	CGridUI * pParent = (CGridUI *)GetGrid();
-	return pParent->GetTempData(j);
+	if (pParent)
+		return pParent->GetTempData(j);
+	else
+		return m_no_use;
 }
 
 CModeButton::Mode  CMyImageUI::GetMode() {
 	CGridUI * pParent = (CGridUI *)GetGrid();
-	return pParent->GetMode();
+	if ( 0 == pParent ) {
+		return CModeButton::Mode_Hand;
+	}
+	else {
+		return pParent->GetMode();
+	}	
 }
 
 int   CMyImageUI::GetCelsiusHeight(int height, int nCelsiusCount, int nVMargin /*= MIN_MYIMAGE_VMARGIN*/) {
@@ -1295,7 +1317,7 @@ void  CMyImageUI::EndDragDrop(const POINT & pt) {
 
 	// 显示的最低温度和最高温度
 	int  nMinTemp, nMaxTemp;
-	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode);
+	GetMaxMinShowTemp(nMinTemp, nMaxTemp, i, j, mode); 
 	// 摄氏度个数
 	int  nCelsiusCount = nMaxTemp - nMinTemp;
 	// 每个摄氏度的高度

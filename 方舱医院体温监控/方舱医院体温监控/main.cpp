@@ -206,8 +206,11 @@ void  CDuiFrameWnd::InitWindow() {
 	m_datOutHospitalStart1->SetText(szDate);
 	m_q_waiting_bar1->SetBkImage("file='progress_back_1.png' corner='5,5,5,5'");
 
+
+	/////////////////// 方舱
 	m_CuteItems = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems"));
 	m_CuteItems_high_temp = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems_1"));
+	m_SubSwitch = static_cast<CTabLayoutUI *>(m_PaintManager.FindControl("subswitch"));
 
 	for (int i = 0; i < 100; i++) {
 		CCubeItemUI * item = new CCubeItemUI;  
@@ -218,11 +221,11 @@ void  CDuiFrameWnd::InitWindow() {
 		item->SetTime(now);
 		m_CuteItems->Add(item);
 	}
-	
 
 	m_CuteItems_high_temp->Add(new CCubeItemUI);
 	m_CuteItems_high_temp->Add(new CCubeItemUI);
 	m_CuteItems_high_temp->Add(new CCubeItemUI);                   
+	//////////// 
 
 	
 	/*************  end 获取控件 *****************/
@@ -935,6 +938,7 @@ void   CDuiFrameWnd::PrevPage() {
 void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 	POINT point;
 	CDuiString strName;
+	CDuiString strClass;
 	bHandled = FALSE;
 
 	GetCursorPos(&point);
@@ -965,6 +969,8 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 
 	while (pFindControl) {
 		strName = pFindControl->GetName();
+		strClass = pFindControl->GetClass();
+
 		if (0 == strcmp(strName, GRID_NAME)) {
 
 			if (m_eGridStatus == GRID_STATUS_GRIDS) {
@@ -985,6 +991,12 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 
 			bHandled = TRUE;
 			break;
+		}
+		else if ( 0 == strcmp(strClass, "CubeItem")) {
+			m_SubSwitch->SelectItem(1); 
+		}
+		else if (0 == strcmp(strName, "maxiumCube")) {
+			m_SubSwitch->SelectItem(0);
 		}
 		pFindControl = pFindControl->GetParent();
 	}
@@ -2693,7 +2705,7 @@ void CDuiFrameWnd::OnQueryOutHospitalNotify(const std::vector<OutHospitalItem*>&
                       
 
   
-                                           
+                                               
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }

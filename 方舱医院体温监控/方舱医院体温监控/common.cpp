@@ -79,6 +79,10 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp("NewTag", pstrClass)) {
 		return new CNewTagUI;
 	}
+	else if (0 == strcmp("MaxiumCube", pstrClass)) {
+		pUI = builder.Create("MaxiumCubeUI.xml", (UINT)0, this, m_pManager);
+		return pUI;  
+	}
 	return NULL;
 }
 

@@ -133,6 +133,9 @@ protected:
 
 	Pen *                 m_remark_pen;
 	SolidBrush *          m_remark_brush;
+
+private:
+	std::vector<TempItem * >     m_no_use;
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI
