@@ -129,7 +129,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	// Ìí¼Ó´°¸ñ
 	for ( DWORD i = 0; i < MAX_GRID_COUNT; i++ ) {
-		m_pGrids[i] = new CGridUI;
+		m_pGrids[i] = new CGridUI;                   
 		m_pGrids[i]->SetBorderSize(GRID_BORDER_SIZE);
 		m_pGrids[i]->SetBorderColor(GRID_BORDER_COLOR);
 		m_pGrids[i]->SetName(GRID_NAME);
@@ -233,6 +233,11 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 	}
 	else if (0 == strcmp("HandReaderTemp", pstrClass)) {
 		strText.Format("%s.xml", pstrClass);
+		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
+		return pUI;
+	}
+	else if (0 == strcmp("Cube", pstrClass)) {
+		strText.Format("%s.xml", pstrClass);                           
 		pUI = builder.Create((const char *)strText, (UINT)0, &m_callback, &m_PaintManager);
 		return pUI;
 	}
