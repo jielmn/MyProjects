@@ -76,6 +76,9 @@ CControlUI*  CDialogBuilderCallbackEx::CreateControl(LPCTSTR pstrClass) {
 	else if (0 == strcmp("WaitingBar", pstrClass)) {
 		return new CWaitingBarUI;
 	}
+	else if (0 == strcmp("NewTag", pstrClass)) {
+		return new CNewTagUI;
+	}
 	return NULL;
 }
 

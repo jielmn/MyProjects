@@ -1613,9 +1613,15 @@ void  CHumanUI::SetDelta(int nIndex1, int nIndex2, BOOL bConnected1, BOOL bConne
 
 
 CCubeItemUI::CCubeItemUI() {
-	m_bed = 0;
-	m_name = 0;
-	m_phone_no = 0;
+	m_lblBedNo = 0;
+	m_lblName = 0;
+	m_lblPhone = 0;
+	m_lblTemp = 0;
+	m_lblTime = 0;
+
+	m_nBedNo = 0;
+	m_nTemp = 0;
+	m_time = 0;
 }
 
 CCubeItemUI::~CCubeItemUI() {
@@ -1623,7 +1629,7 @@ CCubeItemUI::~CCubeItemUI() {
 }
 
 LPCTSTR CCubeItemUI::GetClass() const {
-	return _T("CuteItem");
+	return _T("CubeItem");
 }
 
 void CCubeItemUI::DoInit() {
@@ -1637,9 +1643,187 @@ void CCubeItemUI::DoInit() {
 		return;
 	}
 
+	m_lblBedNo = (CLabelUI *)m_pManager->FindControl("lblBedNo");
+	m_lblName  = (CLabelUI *)m_pManager->FindControl("lblName");
+	m_lblPhone = (CLabelUI *)m_pManager->FindControl("lblPhone");
+	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp");
+	m_lblTime = (CLabelUI *)m_pManager->FindControl("lblTime");
+
+	SetBedNo();
+	SetPatientName();
+	SetPhone();
+	SetTemperature();
+	SetTime();
+
 	this->SetFixedHeight(30); 
+	this->SetFixedWidth(670);  
 }
 
-void CCubeItemUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
+void  CCubeItemUI::SetBedNo(int nBedNo) {
+	m_nBedNo = nBedNo;
+}
 
+void  CCubeItemUI::SetBedNo() {
+	CDuiString  strText;
+	if (m_bInitiated) {
+		strText.Format("%d", m_nBedNo);
+		m_lblBedNo->SetText(strText);
+	}
+}
+
+int   CCubeItemUI::GetBedNo() {
+	return m_nBedNo;
+}
+
+void  CCubeItemUI::SetPatientName(const char * szName) {
+	m_strName = szName;
+	SetPatientName();
+}
+
+void CCubeItemUI::SetPatientName() {
+	if (m_bInitiated) {
+		m_lblName->SetText(m_strName);
+	}
+}
+
+CDuiString  CCubeItemUI::GetPatientName() {
+	return m_strName;
+}
+
+void  CCubeItemUI::SetPhone(const char * szPhone) {
+	m_strPhone = szPhone;
+	SetPhone();
+}
+
+void  CCubeItemUI::SetPhone() {
+	if (m_bInitiated) {
+		m_lblPhone->SetText(m_strPhone);
+	}
+}
+
+CDuiString  CCubeItemUI::GetPhone() {
+	return m_strPhone;
+}
+
+void  CCubeItemUI::SetTemperature(int nTemp) {
+	m_nTemp = nTemp;
+	SetTemperature();
+}
+
+int   CCubeItemUI::GetTemperature() {
+	return m_nTemp;
+}
+
+void  CCubeItemUI::SetTemperature() {
+	CDuiString  strText;
+	if (m_bInitiated) {
+		if (m_nTemp > 0) {
+			strText.Format("%.1f", m_nTemp / 100.0);
+			m_lblTemp->SetText(strText);
+		}
+		else {
+			m_lblTemp->SetText("");
+		}
+	}
+}
+
+void  CCubeItemUI::SetTime(time_t t) {
+	m_time = t;
+	SetTime();
+}
+
+time_t   CCubeItemUI::GetTime() {
+	return m_time;
+}
+
+void  CCubeItemUI::SetTime( ) {
+	char szTime[256] = {0};
+	if ( m_bInitiated ) {
+		if (m_time > 0) {
+			LmnFormatTime(szTime, sizeof(szTime), m_time, "%Y-%m-%d %H:%M:%S");
+			m_lblTime->SetText(szTime);
+		}
+		else {
+			m_lblTime->SetText("");
+		}
+	}
+}
+
+
+CNewTagUI::CNewTagUI() {
+	m_lblTemp = 0;
+	m_lblTime = 0;
+
+	m_nTemp = 0;
+	m_time = 0;
+}
+
+CNewTagUI::~CNewTagUI() {
+
+}
+
+LPCTSTR  CNewTagUI::GetClass() const {
+	return "NewTag";
+}
+
+void  CNewTagUI::DoInit() {
+	CDialogBuilder builder;
+	CContainerUI* pChildWindow = static_cast<CHorizontalLayoutUI*>(builder.Create(_T("NewTag.xml"), (UINT)0, NULL, m_pManager));
+	if (pChildWindow) {
+		this->Add(pChildWindow);
+	}
+	else {
+		this->RemoveAll();
+		return;
+	}
+
+	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp"); 
+	m_lblTime = (CLabelUI *)m_pManager->FindControl("lblTime");
+
+	SetTemperature();
+	SetTime();
+}
+
+void  CNewTagUI::SetTemperature(int nTemp) {
+	m_nTemp = nTemp;
+	SetTemperature();
+}
+
+void  CNewTagUI::SetTemperature() {
+	CDuiString  strText;
+	if (m_bInitiated) {
+		if (m_nTemp > 0) {
+			strText.Format("%.1f", m_nTemp / 100.0);
+			m_lblTemp->SetText(strText);
+		}
+		else {
+			m_lblTemp->SetText("Î´²âÁ¿");
+		}
+	}
+}
+
+int   CNewTagUI::GetTemperature() {
+	return m_nTemp;
+}
+
+void  CNewTagUI::SetTime(time_t t) {
+	m_time = t;
+	SetTime();
+}
+
+time_t   CNewTagUI::GetTime() {
+	return m_time;
+}
+
+void  CNewTagUI::SetTime() {
+	char szTime[256] = { 0 };
+	if (m_bInitiated) {
+		if (m_time > 0) {
+			LmnFormatTime(szTime, sizeof(szTime), m_time, "%Y-%m-%d %H:%M:%S");
+			m_lblTime->SetText(szTime);
+		}
+		else {
+			m_lblTime->SetText("");
+		}
+	}
 }

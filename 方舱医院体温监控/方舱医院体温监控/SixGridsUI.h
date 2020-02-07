@@ -258,14 +258,73 @@ public:
 	CCubeItemUI();
 	~CCubeItemUI();
 
+	void  SetBedNo(int nBedNo);
+	int   GetBedNo();
+
+	void  SetPatientName(const char * szName);
+	CDuiString  GetPatientName();
+
+	void  SetPhone(const char * szPhone);
+	CDuiString  GetPhone();
+
+	void  SetTemperature(int nTemp);
+	int   GetTemperature();
+
+	void  SetTime(time_t t);
+	time_t  GetTime();
+
 private:
 	LPCTSTR GetClass() const;
-
 	void DoInit();
-	virtual void SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue);
+
+	void  SetBedNo();
+	void  SetPatientName();
+	void  SetPhone();
+	void  SetTemperature();
+	void  SetTime();
 
 private:
-	CLabelUI *             m_bed;
-	CLabelUI *             m_name;
-	CLabelUI *             m_phone_no;
+	CLabelUI *             m_lblBedNo;
+	CLabelUI *             m_lblName;
+	CLabelUI *             m_lblPhone;
+	CLabelUI *             m_lblTemp;
+	CLabelUI *             m_lblTime;
+
+private:
+	int                    m_nBedNo;
+	CDuiString             m_strName;
+	CDuiString             m_strPhone;
+	int                    m_nTemp;
+	time_t                 m_time;
+};
+
+class CNewTagUI : public CContainerUI
+{
+public:
+	CNewTagUI();
+	~CNewTagUI();
+
+	void  SetTemperature(int nTemp);
+	int   GetTemperature();
+
+	void  SetTime(time_t t);
+	time_t  GetTime();
+
+public:
+	CDuiString     m_strTagId;
+
+private:
+	LPCTSTR GetClass() const;
+	void DoInit();
+
+	void  SetTemperature();
+	void  SetTime();
+
+private:
+	CLabelUI *             m_lblTemp;
+	CLabelUI *             m_lblTime;
+
+private:
+	int                    m_nTemp;
+	time_t                 m_time;
 };

@@ -209,13 +209,20 @@ void  CDuiFrameWnd::InitWindow() {
 	m_CuteItems = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems"));
 	m_CuteItems_high_temp = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems_1"));
 
-	m_CuteItems->Add(new CCubeItemUI);
-	m_CuteItems->Add(new CCubeItemUI);
-	m_CuteItems->Add(new CCubeItemUI);  
+	for (int i = 0; i < 100; i++) {
+		CCubeItemUI * item = new CCubeItemUI;  
+		item->SetBedNo(i + 1);
+		item->SetPatientName("张三1");
+		item->SetPhone("123xyz");
+		item->SetTemperature(3600 + i * 10);
+		item->SetTime(now);
+		m_CuteItems->Add(item);
+	}
+	
 
 	m_CuteItems_high_temp->Add(new CCubeItemUI);
 	m_CuteItems_high_temp->Add(new CCubeItemUI);
-	m_CuteItems_high_temp->Add(new CCubeItemUI);                  
+	m_CuteItems_high_temp->Add(new CCubeItemUI);                   
 
 	
 	/*************  end 获取控件 *****************/

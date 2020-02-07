@@ -21,19 +21,7 @@
 					<Label text="新体温贴" textcolor="#FFFFFFFF" font="103" />
 				</HorizontalLayout>			
 				
-				<HorizontalLayout>
-					<VerticalLayout width="100">
-						<Control />
-							<Control bkimage="tag_1.png" width="64" height="64" />
-						<Control />
-					</VerticalLayout>	
-
-					<Label text="36.5℃" textcolor="#FFFFFFFF" font="104" width="200"  />
-					
-					<Label text="2020-01-01 09:00:00" textcolor="#FFFFFFFF" font="105" width="200"  />
-					
-					
-				</HorizontalLayout>				
+				<NewTag />			
 			</VerticalLayout>
 		</VerticalLayout>
 		
@@ -60,7 +48,7 @@
 					<Label text="时间" textcolor="#FFFFFFFF" font="101" width="100" />
 				</HorizontalLayout>
 				
-				<VerticalLayout name="layCubeItems" inset="10,10,0,0" >
+				<VerticalLayout name="layCubeItems" inset="10,10,10,10" vscrollbar="true" hscrollbar="true" >
 				</VerticalLayout>
 				
 			</VerticalLayout>
