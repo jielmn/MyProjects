@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>
+	<VerticalLayout bordersize="1" bordercolor="#FFCCCCCC" inset="1,1,1,1" >
+		<HorizontalLayout height="20" />
+		<HorizontalLayout height="520">	
+			<Control bordercolor="#FFff0000" />
+			<Control bkimage="human.png" width="212" height="520" />
+			<Control bordercolor="#FFff0000" />
+			<Label text="" textcolor="#FFCCCCCC" font="12" float="true" pos="150,50,360,120"  width="220" height="70" align="center" name="t1"  />
+			<Label text="" textcolor="#FFCCCCCC" font="12" float="true" pos="10,435,360,390"  width="220" height="70" align="right" name="t2" />
+			<Label text="" textcolor="#FFCCCCCC" font="12" float="true" pos="300,435,560,390" width="220" height="70" align="left" name="t3" />
+			
+			<Label text="" textcolor="#FFF8992F" font="16" float="true" pos="0,295,360,390"  width="200" height="70" align="right" name="dt1" />
+			<Label text="" textcolor="#FFF8992F" font="16" float="true" pos="320,295,560,390" width="200" height="70" align="left" name="dt2" />			
+		</HorizontalLayout>
+		<HorizontalLayout />
+		<Label text="" textcolor="#FFF8992F" font="16" float="true" pos="170,530,360,390"  width="200" height="70" align="center" name="dt3" />
+	</VerticalLayout>	
+</Window>
