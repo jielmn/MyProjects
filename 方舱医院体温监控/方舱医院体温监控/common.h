@@ -192,7 +192,7 @@ using namespace DuiLib;
 #define   CFG_LOW_TEMP_ALARM                "low temperature alarm"
 #define   CFG_HIGH_TEMP_ALARM               "high temperature alarm"
 #define   CFG_GRID_MODE                     "grid mode"
-#define   CFG_LAUNCH_COM_PORT               "launch com port"
+#define   CFG_LAUNCH_COM_PORT               "launch com ports"
 #define   CFG_READER_NAME                   "reader name"
 #define   CFG_HAND_READER_LOW_TEMP_ALARM    "hand reader low temperature alarm"
 #define   CFG_HAND_READER_HIGH_TEMP_ALARM   "hand reader high temperature alarm"
@@ -334,6 +334,8 @@ typedef  struct tagBatteryBinding {
 } BatteryBinding;
 #endif
 
+#define   MAX_COM_PORTS_CNT            4
+
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
@@ -342,6 +344,14 @@ public:
 	LmnToolkits::Thread *     m_thrd_sqlite;
 	LmnToolkits::Thread *     m_thrd_work;
 	LmnToolkits::Thread *     m_thrd_excel;
+	// 方舱
+	LmnToolkits::Thread *     m_thrd_launch_cube;
+	LmnToolkits::Thread *     m_thrd_sqlite_cube;
+	BOOL                      m_bMultipleComport;                 // 是否可以多串口数据(不管是还是不是，自动找寻460com)
+	BOOL                      m_bSpecifiedComports;               // 是否使用指定串口
+	int                       m_nComports[MAX_COM_PORTS_CNT];     // 使用哪些指定串口
+	int                       m_nComportsCnt;
+
 	CfgData                   m_CfgData;
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
 	BOOL                      m_bClosing;              // 应用程序是否正在退出
@@ -375,6 +385,13 @@ public:
 		m_thrd_sqlite = 0;
 		m_thrd_work   = 0;
 		m_thrd_excel  = 0;
+		// 方舱
+		m_thrd_launch_cube = 0;
+		m_thrd_sqlite_cube = 0;
+		m_bMultipleComport = FALSE;
+		memset(m_nComports, 0, sizeof(m_nComports));
+		m_nComportsCnt = 0;
+
 		m_bClosing = FALSE;	
 		m_hWnd = 0;
 		m_hCursor = 0;

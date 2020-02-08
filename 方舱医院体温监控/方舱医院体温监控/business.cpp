@@ -17,9 +17,9 @@ CBusiness *  CBusiness::GetInstance() {
 
 CBusiness::CBusiness() {
 	LmnInitLock(&m_lock);
-	m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
-	m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
-	m_launch.m_sigHandReaderTemp.connect(this, &CBusiness::OnHandReaderTemp);
+	//m_launch.m_sigStatus.connect(this, &CBusiness::OnStatus);
+	//m_launch.m_sigReaderTemp.connect(this, &CBusiness::OnReaderTemp);
+	//m_launch.m_sigHandReaderTemp.connect(this, &CBusiness::OnHandReaderTemp);
 
 	m_bExcelSupport = CExcelEx::IfExcelInstalled();;
 	m_excel = 0;
@@ -30,6 +30,14 @@ CBusiness::CBusiness() {
 
 CBusiness::~CBusiness() {
 	Clear();
+
+	std::vector<CLmnSerialPort *>::iterator it_com;
+	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
+		CLmnSerialPort * pComPort = *it_com;
+		pComPort->CloseUartPort();
+		delete pComPort;
+	}
+
 	LmnDeinitLock(&m_lock);
 }
 
@@ -56,7 +64,7 @@ void CBusiness::Clear() {
 
 		delete it->second;
 	}
-	m_tag_patient_name.clear();
+	m_tag_patient_name.clear();	
 }
 
 int CBusiness::Init() {
@@ -145,16 +153,49 @@ int CBusiness::Init() {
 	// 病区
 	GetAreaCfg();
 
-	GetGridsCfg();
-
-	// 发射器端口
-	g_data.m_cfg->GetConfig(CFG_LAUNCH_COM_PORT, g_data.m_szLaunchPort, sizeof(g_data.m_szLaunchPort), "");
+	GetGridsCfg();	
 
 	g_data.m_cfg->GetConfig("temp char footer", g_data.m_TempChartFooter, sizeof(g_data.m_szLaunchPort), "A甲22051612");
 
 	g_data.m_cfg->GetBooleanConfig("t1-t2", g_data.m_bDelta[0], FALSE);
 	g_data.m_cfg->GetBooleanConfig("t1-t3", g_data.m_bDelta[1], FALSE);
 	g_data.m_cfg->GetBooleanConfig("t2-t3", g_data.m_bDelta[2], TRUE);
+
+	// 发射器端口
+	char  szComPorts[256];
+	g_data.m_cfg->GetConfig(CFG_LAUNCH_COM_PORT, szComPorts, sizeof(szComPorts), "");
+
+	// 如果没有指定读取的串口
+	if ( szComPorts[0] == '\0' ) {
+		g_data.m_bSpecifiedComports = FALSE;
+		g_data.m_cfg->GetBooleanConfig("multiple com port", g_data.m_bMultipleComport, FALSE);
+	}
+	else {
+		Str2Lower(szComPorts);
+		SplitString s;
+		s.Split(szComPorts, ',');
+		if ( s.Size() > 0 ) {
+			int m = s.Size() > MAX_COM_PORTS_CNT ? MAX_COM_PORTS_CNT : s.Size();
+			for (int i = 0; i < m; i++) {
+				int nCom = 0;
+				int ret = sscanf(s[i], " com%d", &nCom);
+				if ( 1 == ret ) {
+					g_data.m_nComports[g_data.m_nComportsCnt] = nCom;
+					g_data.m_nComportsCnt++;
+				}
+			}
+		}
+		
+		// 还是没有指定读取的串口
+		if ( g_data.m_nComportsCnt == 0 ) {
+			g_data.m_bSpecifiedComports = FALSE;
+			g_data.m_cfg->GetBooleanConfig("multiple com port", g_data.m_bMultipleComport, FALSE);
+		}
+		else {
+			g_data.m_bSpecifiedComports = TRUE;
+		}
+	}
+
 	/******************** end 配置项 **********************/
 
 
@@ -187,10 +228,23 @@ int CBusiness::Init() {
 	//	return -1;
 	//}
 	//g_data.m_thrd_excel->Start();
-	InitThreadExcelAsyn();
+	//InitThreadExcelAsyn();
 
 	// 开启定时检查tag patient name是否过期
-	CheckSqliteAsyn();
+	//CheckSqliteAsyn();
+
+	g_data.m_thrd_launch_cube = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_launch_cube) {
+		return -1;
+	}
+	g_data.m_thrd_launch_cube->Start();
+
+	g_data.m_thrd_sqlite_cube = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_sqlite_cube) {
+		return -1;
+	}
+	g_data.m_thrd_sqlite_cube->Start();
+
 	return 0;
 }
 
@@ -472,6 +526,19 @@ int CBusiness::DeInit() {
 		g_data.m_thrd_excel = 0;
 	}
 
+	// 方舱
+	if (g_data.m_thrd_launch_cube) {
+		g_data.m_thrd_launch_cube->Stop();
+		delete g_data.m_thrd_launch_cube;
+		g_data.m_thrd_launch_cube = 0;
+	}
+
+	if (g_data.m_thrd_sqlite_cube) {
+		g_data.m_thrd_sqlite_cube->Stop();
+		delete g_data.m_thrd_sqlite_cube;
+		g_data.m_thrd_sqlite_cube = 0;
+	}
+
 	Clear();
 
 	m_sqlite.DeinitDb();
@@ -500,10 +567,12 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 // 硬件改动，检查接收器串口状态
 void  CBusiness::CheckLaunchAsyn() {
 	//g_data.m_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
+	g_data.m_thrd_launch_cube->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
 }
 
 void  CBusiness::CheckLaunch() {
-	m_launch.CheckStatus();
+	//m_launch.CheckStatus();
+	// std::vector<CLmnSerialPort *>::iterator it_com;
 }
 
 // 重新连接接收器(因配置改动，grid count变化)
@@ -513,14 +582,14 @@ void   CBusiness::RestartLaunchAsyn() {
 }
 
 void   CBusiness::RestartLaunch() {
-	m_launch.Reconnect();
+	//m_launch.Reconnect();
 }
 
 // 获取温度
 void  CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
-	if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
-		return;
-	}
+	//if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
+	//	return;
+	//}
 
 	if (0 == dwDelay) {
 		//g_data.m_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
@@ -574,94 +643,94 @@ void  CBusiness::GetGridTemperature(const CGetGridTempParam * pParam) {
 }
 
 void  CBusiness::GetGridTemperature(DWORD i, DWORD j, BYTE byArea, DWORD  dwOldMode) {
-	DWORD  dwQueryTick   = 0;
-	DWORD  dwTryCnt      = 0;
-	DWORD  dwCurTick     = 0;
-
-	WORD   wBed = (WORD)(i * MAX_READERS_PER_GRID + j + 1);
-	m_sigTrySurReader.emit( wBed, TRUE );
-	do 
-	{		
-		dwQueryTick = LmnGetTickCount();
-		m_launch.QueryTemperature(byArea, wBed);		
-		m_launch.ReadComData();		
-
-		// 如果拿到数据
-		if ( m_bSurReaderTemp[i][j] ) {
-			m_sigTrySurReader.emit(wBed,FALSE);
-			return;
-		}
-
-		while (TRUE) {
-			LmnSleep(200);			
-			m_launch.ReadComData();
-
-			// 如果断开
-			if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
-				m_sigTrySurReader.emit(wBed, FALSE);				
-				return;
-			}
-
-			// 如果拿到数据
-			if ( m_bSurReaderTemp[i][j] ) {
-				m_sigTrySurReader.emit(wBed, FALSE);
-				return;
-			}
-			
-			// 如果应用程序正在关闭
-			if (g_data.m_bClosing) {
-				return;
-			}
-
-			DWORD  dwNewMode = g_data.m_CfgData.m_GridCfg[i].m_dwGridMode;			
-
-			// 如果模式改变( hand <---> single <--->  multiple )
-			if (dwOldMode != dwNewMode) {
-				// 手持模式
-				if (dwNewMode == CModeButton::Mode_Hand) {
-					m_sigTrySurReader.emit(wBed, FALSE);
-					return;
-				}
-				// 单点模式
-				else if (dwNewMode == CModeButton::Mode_Single) {
-					// 如果不是第一个读卡器
-					if (0 != j) {
-						m_sigTrySurReader.emit(wBed, FALSE);
-						return;
-					}
-				}
-				// 多点模式
-				else {
-#if !TRI_TAGS_FLAG
-					// 如果开关关闭
-					if (!g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
-						m_sigTrySurReader.emit(wBed, FALSE);
-						return;
-					}
-#else
-					if ( j >= 3 && !g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
-						m_sigTrySurReader.emit(wBed, FALSE);
-						return;
-					}
-#endif
-				}
-			}
-
-			dwCurTick = LmnGetTickCount();
-			// 如果超时
-			if ( dwCurTick - dwQueryTick >= MAX_TIME_NEEDED_BY_SUR_TEMP) {
-				dwTryCnt++;
-				break;
-			}
-		}
-	} while (dwTryCnt < 3);	
-
-	// 3次超时
-	if ( g_data.m_bSurReaderConnected[i][j]) {
-		g_data.m_bSurReaderConnected[i][j] = FALSE;
-		m_sigSurReaderStatus.emit(wBed, FALSE);
-	}	
-	m_sigTrySurReader.emit(wBed, FALSE);
+//	DWORD  dwQueryTick   = 0;
+//	DWORD  dwTryCnt      = 0;
+//	DWORD  dwCurTick     = 0;
+//
+//	WORD   wBed = (WORD)(i * MAX_READERS_PER_GRID + j + 1);
+//	m_sigTrySurReader.emit( wBed, TRUE );
+//	do 
+//	{		
+//		dwQueryTick = LmnGetTickCount();
+//		//m_launch.QueryTemperature(byArea, wBed);		
+//		//m_launch.ReadComData();		
+//
+//		// 如果拿到数据
+//		if ( m_bSurReaderTemp[i][j] ) {
+//			m_sigTrySurReader.emit(wBed,FALSE);
+//			return;
+//		}
+//
+//		while (TRUE) {
+//			LmnSleep(200);			
+//			//m_launch.ReadComData();
+//
+//			// 如果断开
+//			if ( m_launch.GetStatus() == CLmnSerialPort::CLOSE ) {
+//				m_sigTrySurReader.emit(wBed, FALSE);				
+//				return;
+//			}
+//
+//			// 如果拿到数据
+//			if ( m_bSurReaderTemp[i][j] ) {
+//				m_sigTrySurReader.emit(wBed, FALSE);
+//				return;
+//			}
+//			
+//			// 如果应用程序正在关闭
+//			if (g_data.m_bClosing) {
+//				return;
+//			}
+//
+//			DWORD  dwNewMode = g_data.m_CfgData.m_GridCfg[i].m_dwGridMode;			
+//
+//			// 如果模式改变( hand <---> single <--->  multiple )
+//			if (dwOldMode != dwNewMode) {
+//				// 手持模式
+//				if (dwNewMode == CModeButton::Mode_Hand) {
+//					m_sigTrySurReader.emit(wBed, FALSE);
+//					return;
+//				}
+//				// 单点模式
+//				else if (dwNewMode == CModeButton::Mode_Single) {
+//					// 如果不是第一个读卡器
+//					if (0 != j) {
+//						m_sigTrySurReader.emit(wBed, FALSE);
+//						return;
+//					}
+//				}
+//				// 多点模式
+//				else {
+//#if !TRI_TAGS_FLAG
+//					// 如果开关关闭
+//					if (!g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
+//						m_sigTrySurReader.emit(wBed, FALSE);
+//						return;
+//					}
+//#else
+//					if ( j >= 3 && !g_data.m_CfgData.m_GridCfg[i].m_ReaderCfg[j].m_bSwitch) {
+//						m_sigTrySurReader.emit(wBed, FALSE);
+//						return;
+//					}
+//#endif
+//				}
+//			}
+//
+//			dwCurTick = LmnGetTickCount();
+//			// 如果超时
+//			if ( dwCurTick - dwQueryTick >= MAX_TIME_NEEDED_BY_SUR_TEMP) {
+//				dwTryCnt++;
+//				break;
+//			}
+//		}
+//	} while (dwTryCnt < 3);	
+//
+//	// 3次超时
+//	if ( g_data.m_bSurReaderConnected[i][j]) {
+//		g_data.m_bSurReaderConnected[i][j] = FALSE;
+//		m_sigSurReaderStatus.emit(wBed, FALSE);
+//	}	
+//	m_sigTrySurReader.emit(wBed, FALSE);
 }
 
 void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
@@ -727,7 +796,7 @@ void  CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 }
 
 void  CBusiness::ReadLaunch() {
-	m_launch.ReadComData();
+	// m_launch.ReadComData();
 	ReadLaunchAsyn(READ_LAUNCH_INTERVAL_TIME);
 }
 
@@ -850,46 +919,48 @@ void  CBusiness::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 // 软件运行的时候，先从数据库获取上一次的有用信息
 void  CBusiness::PrepareAsyn() {
 	//g_data.m_thrd_sqlite->PostMessage( this, MSG_PREPARE );
+
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_PREPARE);
 }
 
 void  CBusiness::Prepare() {
-	/********************  查询术中上一次的温度数据  **********************/
-	std::vector<LastSurTagItem *> vLastSurTags;
-	m_sqlite.GetAllLastSurTags(vLastSurTags);
+	///********************  查询术中上一次的温度数据  **********************/
+	//std::vector<LastSurTagItem *> vLastSurTags;
+	//m_sqlite.GetAllLastSurTags(vLastSurTags);
 
-	std::vector<LastSurTagItem *>::iterator it;
-	for ( it = vLastSurTags.begin(); it != vLastSurTags.end(); ++it ) {
-		LastSurTagItem * pItem = *it;
+	//std::vector<LastSurTagItem *>::iterator it;
+	//for ( it = vLastSurTags.begin(); it != vLastSurTags.end(); ++it ) {
+	//	LastSurTagItem * pItem = *it;
 
-		std::vector<TempItem*> * pvRet = new std::vector<TempItem*>;
-		m_sqlite.QueryTempByTag(pItem->m_szTagId, *pvRet);
-		m_sigQueyTemp.emit(pItem->m_szTagId, pItem->m_wBedId, pvRet);
-	}
+	//	std::vector<TempItem*> * pvRet = new std::vector<TempItem*>;
+	//	m_sqlite.QueryTempByTag(pItem->m_szTagId, *pvRet);
+	//	m_sigQueyTemp.emit(pItem->m_szTagId, pItem->m_wBedId, pvRet);
+	//}
 
-	ClearVector(vLastSurTags);	
-	/******************** end  查询术中上一次的温度数据  **********************/
+	//ClearVector(vLastSurTags);	
+	///******************** end  查询术中上一次的温度数据  **********************/
 
 
-	/********************  查询手持温度数据  **********************/
-	std::vector<HandTagResult *> * pvHandTagRet = new std::vector<HandTagResult *>;
-	m_sqlite.GetAllHandTagTempData(*pvHandTagRet);
-	m_sigAllHandTagTempData.emit(pvHandTagRet);
-	time_t now = time(0);
+	///********************  查询手持温度数据  **********************/
+	//std::vector<HandTagResult *> * pvHandTagRet = new std::vector<HandTagResult *>;
+	//m_sqlite.GetAllHandTagTempData(*pvHandTagRet);
+	//m_sigAllHandTagTempData.emit(pvHandTagRet);
+	//time_t now = time(0);
 
-	CFuncLock cLock(&m_lock);	
-	std::vector<HandTagResult *>::iterator ix;
-	for ( ix = pvHandTagRet->begin(); ix != pvHandTagRet->end(); ++ix ) {
-		HandTagResult * p = *ix;
+	//CFuncLock cLock(&m_lock);	
+	//std::vector<HandTagResult *>::iterator ix;
+	//for ( ix = pvHandTagRet->begin(); ix != pvHandTagRet->end(); ++ix ) {
+	//	HandTagResult * p = *ix;
 
-		if ( p->m_szTagId[0] != '\0') {
-			TagPName* pTagName = new TagPName;
-			STRNCPY(pTagName->m_szPName, p->m_szTagPName, MAX_TAG_PNAME_LENGTH);
-			pTagName->m_time = now;
-			pTagName->m_nParam0 = p->m_nBindingGridIndex;
-			m_tag_patient_name[p->m_szTagId] = pTagName;
-		}
-	}
-	/******************** end  查询手持温度数据  **********************/
+	//	if ( p->m_szTagId[0] != '\0') {
+	//		TagPName* pTagName = new TagPName;
+	//		STRNCPY(pTagName->m_szPName, p->m_szTagPName, MAX_TAG_PNAME_LENGTH);
+	//		pTagName->m_time = now;
+	//		pTagName->m_nParam0 = p->m_nBindingGridIndex;
+	//		m_tag_patient_name[p->m_szTagId] = pTagName;
+	//	}
+	//}
+	///******************** end  查询手持温度数据  **********************/
 
 	m_prepared.emit();
 }

@@ -146,7 +146,7 @@ private:
 
 private:
 	CMySqliteDatabase             m_sqlite;
-	CLaunch                       m_launch;
+	// CLaunch                       m_launch;
 	sigslot::signal1<CLmnSerialPort::PortStatus>    m_sigLanchStatus;
 	sigslot::signal2<WORD,BOOL>                     m_sigTrySurReader;         // param: bed no, is try read
 	sigslot::signal2<WORD,BOOL>                     m_sigSurReaderStatus;      // param: bed no, connected
@@ -195,6 +195,11 @@ public:
 public:
 	sigslot::signal2<PatientInfo *, const std::vector<PatientEvent * > & >   m_sigPatientInfo;
 	sigslot::signal3<PatientData *, DWORD, const std::vector<TempItem *> &>  m_sigPatientData;
+
+
+private:
+	// ·½²Õ
+	std::vector<CLmnSerialPort *>   m_vSerialPorts;
 };
 
 

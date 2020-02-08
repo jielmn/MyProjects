@@ -1336,14 +1336,26 @@ void   CDuiFrameWnd::OnHelp() {
 void  CDuiFrameWnd::CheckDevice() {
 	char szComPort[16];
 	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
-	if (nFindCount > 1) {
-		m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
-	}
-	else if (0 == nFindCount) {
-		m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+
+	// 单个串口
+	if (!g_data.m_bMultipleComport) {
+		if (nFindCount > 1) {
+			m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+		}
+		else if (0 == nFindCount) {
+			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+		}
+		else {
+			m_lblBarTips->SetText("");
+		}
 	}
 	else {
-		m_lblBarTips->SetText("");
+		if (0 == nFindCount) {
+			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+		}
+		else {
+			m_lblBarTips->SetText("");
+		}
 	}
 
 	CBusiness::GetInstance()->CheckLaunchAsyn();
