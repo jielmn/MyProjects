@@ -572,7 +572,89 @@ void  CBusiness::CheckLaunchAsyn() {
 
 void  CBusiness::CheckLaunch() {
 	//m_launch.CheckStatus();
-	// std::vector<CLmnSerialPort *>::iterator it_com;
+
+	// 获取当前机器的所有串口(串口号，描述字符串)
+	std::map<int, std::string>  all_ports;
+	GetAllSerialPorts(all_ports);
+
+	// 计算交集，多出来，缺少的部分
+	std::map<int, std::string>   m1;
+	std::map<int, std::string>   m2;
+	std::vector<int>             v3;
+
+	std::vector<CLmnSerialPort *>::iterator it_com;
+	std::map<int, std::string>::iterator it;
+
+	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
+		CLmnSerialPort * pComPort = *it_com;
+		assert(pComPort->GetStatus() == CLmnSerialPort::OPEN);
+
+		it = all_ports.find( pComPort->GetPort() );
+		if ( it != all_ports.end() ) {
+			m1.insert(std::make_pair(it->first, it->second));
+			all_ports.erase(it);
+		}
+		else {
+			v3.push_back(pComPort->GetPort());
+		}
+	}
+
+	// 把v3里的串口关闭掉
+	std::vector<int>::iterator ix;
+	for (ix = v3.begin(); ix != v3.end(); ++ix) {
+		int nCom = *ix;
+		for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
+			CLmnSerialPort * pComPort = *it_com;
+			if ( pComPort->GetPort() == nCom ) {
+				pComPort->CloseUartPort();
+				m_vSerialPorts.erase(it_com);
+				break;
+			}
+		}
+	}	
+
+	// 如果是指定多个串口获取数据
+	if ( g_data.m_bSpecifiedComports ) {		
+		for (it = all_ports.begin(); it != all_ports.end(); ++it) {
+			int nCom = it->first;
+			// 看看新的串口是否要打开
+			for (int i = 0; i < g_data.m_nComportsCnt; i++) {
+				if (nCom == g_data.m_nComports[i]) {
+					CLmnSerialPort * pPort = new CLmnSerialPort;
+					BOOL bRet = pPort->OpenUartPort(nCom);
+					if (bRet) {
+						m_vSerialPorts.push_back(pPort);
+					}
+					else {
+						pPort->CloseUartPort();
+						delete pPort;
+					}
+					break;
+				}
+			}
+		}
+	}
+	else {
+		for (it = all_ports.begin(); it != all_ports.end(); ++it) {
+			int nCom = it->first;
+			std::string & s = it->second;
+
+			char buf[256];
+			Str2Lower(s.c_str(), buf, sizeof(buf));
+
+			if ( 0 == strstr(buf, "usb-serial ch340")) {
+				CLmnSerialPort * pPort = new CLmnSerialPort;
+				BOOL bRet = pPort->OpenUartPort(nCom);
+				if (bRet) {
+					m_vSerialPorts.push_back(pPort);
+				}
+				else {
+					pPort->CloseUartPort();
+					delete pPort;
+				}
+			}
+		}
+	}
 }
 
 // 重新连接接收器(因配置改动，grid count变化)
@@ -803,6 +885,7 @@ void  CBusiness::ReadLaunch() {
 // 打印状态(调试用)
 void   CBusiness::PrintStatusAsyn() {
 	//g_data.m_thrd_work->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
+	g_data.m_thrd_launch_cube->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
 }
 
 void  CBusiness::PrintStatus() {
@@ -812,6 +895,12 @@ void  CBusiness::PrintStatus() {
 	//}
 	//JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
 	//JTelSvrPrint("work messages count: %lu", g_data.m_thrd_work->GetMessagesCount());
+
+	std::vector<CLmnSerialPort *>::iterator it_com;
+	for ( it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com ) {
+		CLmnSerialPort * pCom = *it_com;
+		JTelSvrPrint("com[%d] status: %s", pCom->GetPort(), pCom->GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+	}
 }
 
 // 保存温度数据
