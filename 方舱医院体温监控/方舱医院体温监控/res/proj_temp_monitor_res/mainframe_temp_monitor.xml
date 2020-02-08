@@ -137,7 +137,7 @@
 		
 		<!-- 状态栏 -->
 		<HorizontalLayout name="layStatus" height="30" bkcolor="#FF3A4F67" inset="10,3,10,3">
-			<Label name="lblLaunchStatus"  text="发射器连接断开"  font="2" textcolor="#FFFFFFFF" width="130" />
+			<Label name="lblLaunchStatus"  text=""  font="2" textcolor="#FFFFFFFF" width="220" />
 			<Control width="1" bkimage="sep.png" />
 			<Control width="20" />
 			<Label name="lblBarTips"  text=""  font="2" textcolor="#FFF8992F" width="450"  />

@@ -338,4 +338,5 @@ private:
 	void   StopMoveNewTag();
 	bool   OnMain1Size(void * pParam);
 
+	void   OnChecComPortsRet(WPARAM, LPARAM);
 };

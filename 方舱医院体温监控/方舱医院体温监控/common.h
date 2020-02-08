@@ -251,6 +251,10 @@ using namespace DuiLib;
 #define UM_QUERY_INHOSPITAL_RET              (WM_USER+16)
 #define UM_QUERY_OUTHOSPITAL_RET             (WM_USER+17)
 
+// 检查打开了哪些串口
+#define UM_CHECK_COM_PORTS_RET               (WM_USER+18)
+
+
 #define XML_CHART_WIDTH              764
 #define XML_CHART_HEIGHT             1080
 

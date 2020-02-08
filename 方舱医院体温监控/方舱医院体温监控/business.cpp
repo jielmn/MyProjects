@@ -642,7 +642,7 @@ void  CBusiness::CheckLaunch() {
 			char buf[256];
 			Str2Lower(s.c_str(), buf, sizeof(buf));
 
-			if ( 0 == strstr(buf, "usb-serial ch340")) {
+			if ( 0 != strstr(buf, "usb-serial ch340")) {
 				CLmnSerialPort * pPort = new CLmnSerialPort;
 				BOOL bRet = pPort->OpenUartPort(nCom);
 				if (bRet) {
@@ -650,11 +650,19 @@ void  CBusiness::CheckLaunch() {
 				}
 				else {
 					pPort->CloseUartPort();
-					delete pPort;
+					delete pPort; 
 				}
 			}
 		}
 	}
+
+	std::vector<int> * pvRet = new std::vector<int>;
+	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
+		CLmnSerialPort * pCom = *it_com;
+		pvRet->push_back(pCom->GetPort());
+	}
+
+	::PostMessage(g_data.m_hWnd, UM_CHECK_COM_PORTS_RET, (WPARAM)pvRet, 0);
 }
 
 // 重新连接接收器(因配置改动，grid count变化)

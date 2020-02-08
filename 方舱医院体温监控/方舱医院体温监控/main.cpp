@@ -494,6 +494,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_QUERY_OUTHOSPITAL_RET) {
 		OnQueryOutHospitalRet(wParam, lParam);
 	}
+	else if (uMsg == UM_CHECK_COM_PORTS_RET) {
+		OnChecComPortsRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1350,7 +1353,7 @@ void  CDuiFrameWnd::CheckDevice() {
 		}
 	}
 	else {
-		if (0 == nFindCount) {
+		if (0 == nFindCount) { 
 			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
 		}
 		else {
@@ -2826,6 +2829,33 @@ bool CDuiFrameWnd::OnMain1Size(void * pParam) {
 	int w = m_layMain1->GetWidth();
 	m_layRight->SetMaxWidth(w);
 	return true;
+}
+
+void   CDuiFrameWnd::OnChecComPortsRet(WPARAM wParam, LPARAM lParam) {
+	std::vector<int> * pvRet = (std::vector<int> *)wParam;
+	assert(pvRet);
+
+	if (pvRet->size() == 0) {
+		m_lblLaunchStatus->SetText("没有打开任何接收基站");
+	}
+	else {
+		std::vector<int>::iterator it;
+		CDuiString strText = "打开了";
+		int i = 0;
+		for (it = pvRet->begin(); it != pvRet->end(); ++it, i++) {
+			if (i > 0) {
+				strText += ",";
+			}
+			CDuiString item;
+			item.Format("com%d", *it);
+			strText += item;
+		}
+		m_lblLaunchStatus->SetText(strText);
+	}
+
+	if (pvRet) {
+		delete pvRet;
+	}
 }
                       
 
