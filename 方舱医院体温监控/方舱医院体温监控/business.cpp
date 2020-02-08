@@ -1415,6 +1415,14 @@ void  CBusiness::QueryOutHospital(const CQueryOutHospital * pParam) {
 	ClearVector(vRet);
 }
 
+void   CBusiness::SaveCubeBedAsyn(int nBedNo, const char * szName, const char * szPhone) {
+
+}
+
+void   CBusiness::SaveCubeBed() {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {

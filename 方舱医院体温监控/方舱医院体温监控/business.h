@@ -130,6 +130,10 @@ public:
 	void  QueryOutHospitalAsyn(const TQueryOutHospital * pQuery);
 	void  QueryOutHospital(const CQueryOutHospital * pParam);
 
+	//  ·½²Õ
+	void   SaveCubeBedAsyn(int nBedNo, const char * szName, const char * szPhone);
+	void   SaveCubeBed();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

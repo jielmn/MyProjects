@@ -324,13 +324,18 @@ private:
 
 	// ·½²Õ
 private:
-	CVerticalLayoutUI *                         m_CuteItems;
-	CVerticalLayoutUI *                         m_CuteItems_high_temp;
+	CVerticalLayoutUI *                         m_CubeItems;
+	CVerticalLayoutUI *                         m_CubeItems_high_temp;
 	CTabLayoutUI *                              m_SubSwitch;
 	BOOL                                        m_bNewTagDragDrop;
 	CCubeItemUI *                               m_HightLightItem;
 	CHorizontalLayoutUI *                       m_layRight;
 	CHorizontalLayoutUI *                       m_layMain1;
+	CEditUI *                                   m_edtBedNo1;
+	CEditUI *                                   m_edtName1;
+	CEditUI *                                   m_edtPhone1;
+
+	std::vector<CubeItem * >                    m_cube_items;
 
 private:
 	void   MoveNewTag(const POINT & pt);
@@ -339,4 +344,5 @@ private:
 	bool   OnMain1Size(void * pParam);
 
 	void   OnChecComPortsRet(WPARAM, LPARAM);
+	void   OnAddCubeItem();
 };

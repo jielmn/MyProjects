@@ -78,16 +78,23 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_optInHospital = 0;
 	m_optOutHospital = 0;
 
-	m_CuteItems = 0;
+	m_CubeItems = 0;
+	m_CubeItems_high_temp = 0;
 	m_bNewTagDragDrop = FALSE;
 	m_HightLightItem = 0;
 	m_layRight = 0;
 	m_layMain1 = 0;
+
+	m_edtBedNo1 = 0;
+	m_edtName1 = 0;
+	m_edtPhone1 = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
 	ClearVector(m_vQRet);
 	ClearVector(m_vQRet1);
+
+	ClearVector(m_cube_items);
 }
 
 void  CDuiFrameWnd::RemoveAllGrids() {
@@ -212,33 +219,16 @@ void  CDuiFrameWnd::InitWindow() {
 
 
 	/////////////////// 方舱
-	m_CuteItems = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems"));
-	m_CuteItems_high_temp = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems_1"));
+	m_CubeItems = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems"));
+	m_CubeItems_high_temp = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems_1"));
 	m_SubSwitch = static_cast<CTabLayoutUI *>(m_PaintManager.FindControl("subswitch"));
 	m_layRight = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layRight"));
 	m_layMain1 = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layMain_1"));
+	m_edtBedNo1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtBedNo1"));
+	m_edtName1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtName1"));
+	m_edtPhone1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtPhone1"));
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
-
-	for (int i = 0; i < 100; i++) {
-		CCubeItemUI * item = new CCubeItemUI;  
-		item->SetBedNo(i + 1);
-		item->SetPatientName("张三1");
-		item->SetPhone("123xyz");
-		item->SetTemperature(3600 + i * 10);
-		item->SetTime(now);
-		m_CuteItems->Add(item);
-	}
-
-	for (int i = 0; i < 3; i++) {
-		CCubeItemUI * item = new CCubeItemUI;
-		item->SetBedNo(i + 100);
-		item->SetPatientName("张三1");
-		item->SetPhone("123xyz");
-		item->SetTemperature(3600 + i * 10);
-		item->SetTime(now);
-		m_CuteItems_high_temp->Add(item);
-	}
                   
 	//////////// 
 
@@ -249,7 +239,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	RefreshGridsPage();
 
-	m_hand_tabs->SelectItem(1);	
+	m_hand_tabs->SelectItem(1);	 
 
 	// 放在prepared后
 	//CheckDevice();
@@ -358,6 +348,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (name == "btnQPrePage1") {
 			PrevOutHospitalPage();
+		}
+		else if ( name == "btnAdd1" ) {
+			OnAddCubeItem();
 		}
 	}
 	else if (msg.sType == "setting") {
@@ -834,7 +827,7 @@ void  CDuiFrameWnd::StopMoveGrid() {
 }
 
 void  CDuiFrameWnd::OnMoveNewTag(const POINT & pt) {
-	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(m_CuteItems, pt);
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(m_CubeItems, pt);
 
 	CCubeItemUI * pHighLight = 0;
 
@@ -1431,48 +1424,48 @@ void   CDuiFrameWnd::OnGridSizeChanged(const SIZE & s) {
 
 //  1分钟定时器( 1. 定时更新逝去时间; 2. 删除一周前的温度数据 )
 void   CDuiFrameWnd::On60SecondsTimer() {
-	for (int i = 0; i < MAX_GRID_COUNT; i++) {
-		m_pGrids[i]->UpdateElapsed();
-		m_pGrids[i]->PruneData();
-		m_pGrids[i]->Invalidate();
-	}
+	//for (int i = 0; i < MAX_GRID_COUNT; i++) {
+	//	m_pGrids[i]->UpdateElapsed();
+	//	m_pGrids[i]->PruneData();
+	//	m_pGrids[i]->Invalidate();
+	//}
 
-	m_cstHandImg->PruneData();
+	//m_cstHandImg->PruneData();
 
-	CDuiString  strCurHandTag = m_cstHandImg->GetCurTagId();
-	if ( strCurHandTag.GetLength() > 0 ) {
-		std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find((const char *)strCurHandTag);
-		// 如果该tag已经删除
-		if ( it == m_tags_ui.end() ) {
-			// 如果还有tag
-			if ( m_layTags->GetCount() > 0 ) {
-				CControlUI * pChildUI = m_layTags->GetItemAt(0);
-				OnHandTagSelected(pChildUI);
-			}
-			// 如果没有tag
-			else {
-				m_cstHandImg->SetCurTag("");
-			}
-		}
-	}
+	//CDuiString  strCurHandTag = m_cstHandImg->GetCurTagId();
+	//if ( strCurHandTag.GetLength() > 0 ) {
+	//	std::map<std::string, CTagUI *>::iterator it = m_tags_ui.find((const char *)strCurHandTag);
+	//	// 如果该tag已经删除
+	//	if ( it == m_tags_ui.end() ) {
+	//		// 如果还有tag
+	//		if ( m_layTags->GetCount() > 0 ) {
+	//			CControlUI * pChildUI = m_layTags->GetItemAt(0);
+	//			OnHandTagSelected(pChildUI);
+	//		}
+	//		// 如果没有tag
+	//		else {
+	//			m_cstHandImg->SetCurTag("");
+	//		}
+	//	}
+	//}
 
-	/*********** 定时保存excel *************/
-	time_t now = time(0);
-	struct tm  tmp;
-	localtime_s(&tmp, &now);
+	///*********** 定时保存excel *************/
+	//time_t now = time(0);
+	//struct tm  tmp;
+	//localtime_s(&tmp, &now);
 
-	// CBusiness::GetInstance()->SaveExcelAsyn();   用于调试用
+	//// CBusiness::GetInstance()->SaveExcelAsyn();   用于调试用
 
-	// 实际用法
-	if ((tmp.tm_hour == 8 || tmp.tm_hour == 12 || tmp.tm_hour == 18 || tmp.tm_hour == 0)
-		&& (tmp.tm_min >= 0 && tmp.tm_min <= 1)) {		
-		// 两次间隔时间最少30分钟
-		if (now - m_LastSaveExcelTime >= 1800) {
-			// 保存
-			CBusiness::GetInstance()->SaveExcelAsyn();
-			m_LastSaveExcelTime = now;
-		}
-	}	
+	//// 实际用法
+	//if ((tmp.tm_hour == 8 || tmp.tm_hour == 12 || tmp.tm_hour == 18 || tmp.tm_hour == 0)
+	//	&& (tmp.tm_min >= 0 && tmp.tm_min <= 1)) {		
+	//	// 两次间隔时间最少30分钟
+	//	if (now - m_LastSaveExcelTime >= 1800) {
+	//		// 保存
+	//		CBusiness::GetInstance()->SaveExcelAsyn();
+	//		m_LastSaveExcelTime = now;
+	//	}
+	//}		
 }
 
 // 查询温度结果
@@ -2855,6 +2848,32 @@ void   CDuiFrameWnd::OnChecComPortsRet(WPARAM wParam, LPARAM lParam) {
 
 	if (pvRet) {
 		delete pvRet;
+	}
+}
+
+void   CDuiFrameWnd::OnAddCubeItem() {
+	CDuiString  strBedNo;
+	CDuiString  strName;
+	CDuiString  strPhone;
+
+	strBedNo = m_edtBedNo1->GetText();
+	strName = m_edtName1->GetText();
+	strPhone = m_edtPhone1->GetText();
+
+	strBedNo.Trim();
+	strName.Trim();
+	strPhone.Trim();
+
+	int  nBedNo = 0;
+	int ret = sscanf(strBedNo, " %d", &nBedNo);
+	if ( 1 != ret ) {
+		MessageBox(GetHWND(), "请输入床号!", "错误", 0);
+		return;
+	}
+
+	if (strName.GetLength() == 0) {
+		MessageBox(GetHWND(), "请输入姓名!", "错误", 0);
+		return;
 	}
 }
                       

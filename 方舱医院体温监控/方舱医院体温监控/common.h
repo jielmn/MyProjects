@@ -789,6 +789,18 @@ public:
 	TQueryOutHospital        m_query;
 };
 
+#define  MAX_CUBE_NAME_LENGTH   20
+#define  MAX_CUBE_PHONE_LENGTH  20
+
+typedef struct tagCubeItem {
+	int     nBedNo;
+	char    szName[MAX_CUBE_NAME_LENGTH];
+	char    szPhone[MAX_CUBE_PHONE_LENGTH];
+	int     nTemp;
+	time_t  time;
+	char    szTagId[MAX_TAG_ID_LENGTH];
+}CubeItem;
+
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
