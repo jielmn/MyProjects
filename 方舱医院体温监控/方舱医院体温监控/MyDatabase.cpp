@@ -325,6 +325,8 @@ void  CMySqliteDatabase::PruneOldData() {
 }
 
 void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
+	return;
+
 	char sql[8192];
 	int  ret = 0;
 	int  nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
@@ -355,6 +357,8 @@ void  CMySqliteDatabase::SaveSurTemp(CSaveSurTempParam * pParam) {
 
 // 保存手持温度数据
 void  CMySqliteDatabase::SaveHandTemp(CSaveHandTempParam * pParam) {
+	return;
+
 	char sql[8192];
 	int  ret = 0;
 	int  nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
@@ -384,6 +388,7 @@ void  CMySqliteDatabase::SaveHandTemp(CSaveHandTempParam * pParam) {
 }
 
 void  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempItem*> & vRet) {
+	return;
 
 	time_t today_zero_time = GetTodayZeroTime();
 	// 一周前0点时分
@@ -417,6 +422,8 @@ void  CMySqliteDatabase::QueryTempByTag(const char * szTagId, std::vector<TempIt
 
 // 保存注释
 void  CMySqliteDatabase::SaveRemark(const CSaveRemarkParam * pParam) {
+	return;
+
 	char sql[8192];
 	char szRemark[256];
 	StrReplaceAll(szRemark, sizeof(szRemark), pParam->m_szRemark, "'", "''");
@@ -431,6 +438,8 @@ void  CMySqliteDatabase::SaveRemark(const CSaveRemarkParam * pParam) {
 
 // 根据TagID查询Tag的病人姓名
 void  CMySqliteDatabase::QueryTagPNameByTagId(const char * szTagId, char * szPName, DWORD  dwPNameLen) {
+	return;
+
 	assert(szPName && dwPNameLen > 0);
 
 	char szSql[8192];
@@ -453,6 +462,8 @@ void  CMySqliteDatabase::QueryTagPNameByTagId(const char * szTagId, char * szPNa
 
 // 保存最后的术中tag id
 void CMySqliteDatabase::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
+	return;
+
 
 	char szSql[8192];
 	SNPRINTF(szSql, sizeof(szSql), "select * from %s where bed_id = %lu", LAST_SUR_TAGS, (DWORD)pParam->m_wBedId );
@@ -489,6 +500,8 @@ void CMySqliteDatabase::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 
 // 获取最后一次的术中TagId
 void CMySqliteDatabase::GetAllLastSurTags(std::vector<LastSurTagItem *> & vRet) {
+	return;
+
 	char szSql[8192];
 	SNPRINTF(szSql, sizeof(szSql), "select * from %s", LAST_SUR_TAGS);
 
@@ -522,6 +535,8 @@ void CMySqliteDatabase::GetAllLastSurTags(std::vector<LastSurTagItem *> & vRet) 
 
 // 获取所有的手持Tag温度数据
 void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vHandTagRet) {
+	return;
+
 	time_t today_zero_time = GetTodayZeroTime();
 	// 一周前0点时分
 	time_t tWeekBegin = today_zero_time - 3600 * 24 * 6;
@@ -597,6 +612,8 @@ void  CMySqliteDatabase::GetAllHandTagTempData(std::vector<HandTagResult *> & vH
 // 保存Tag和窗格绑定
 void  CMySqliteDatabase::TagBindingGrid( const CBindingTagGrid * pParam, std::string & old_tagid,
 	                                     int & old_grid_index ) {
+	return;
+
 	char sql[8192];
 	int  ret = 0;
 
@@ -656,6 +673,8 @@ void  CMySqliteDatabase::TagBindingGrid( const CBindingTagGrid * pParam, std::st
 
 // 根据TagID查询绑定的grid index(Return: 0 notfound, > 0 found)
 int  CMySqliteDatabase::QueryBindingGridIndexByTagId(const char * szTagId) {
+	return 0;
+
 	assert(szTagId);
 
 	char szSql[8192];
@@ -676,6 +695,8 @@ int  CMySqliteDatabase::QueryBindingGridIndexByTagId(const char * szTagId) {
 
 // 删除格子的手持Tag绑定
 void  CMySqliteDatabase::RemoveGridBinding(const CRemoveGridBindingParam * pParam) {
+	return;
+
 	char sql[8192];
 	int  ret = 0;
 
@@ -686,6 +707,8 @@ void  CMySqliteDatabase::RemoveGridBinding(const CRemoveGridBindingParam * pPara
 
 // 保存Tag的patient name
 void  CMySqliteDatabase::SaveTagPName(const CSaveTagPNameParam * pParam) {
+	return;
+
 	char sql[8192];
 	char szName[256];
 	char szTemp[256];
@@ -717,6 +740,8 @@ void  CMySqliteDatabase::SaveTagPName(const CSaveTagPNameParam * pParam) {
 
 // 查询tag绑定的grid index
 int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
+	return 0;
+
 	assert(szTagId);
 
 	char sql[8192];
@@ -740,6 +765,8 @@ int CMySqliteDatabase::QueryBindingIndexByTag(const char * szTagId) {
 // 查询PatientInfo
 void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam, 
 	PatientInfo * pRet, std::vector<PatientEvent * > & vEvents) {
+	return;
+
 	memset(pRet, 0, sizeof(PatientInfo));
 
 	char sql[8192];
@@ -828,6 +855,8 @@ void  CMySqliteDatabase::QueryPatientInfo(const CQueryPatientInfoParam * pParam,
 
 // 保存info
 void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
+	return;
+
 	char sql[8192];
 	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ", 
 		PATIENT_INFO_TABLE, pParam->m_info.m_szTagId );
@@ -891,6 +920,8 @@ void CMySqliteDatabase::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 
 // 保存patient events
 void CMySqliteDatabase::SavePatientEvents(const CSavePatientEventsParam * pParam) {
+	return;
+
 	// 原来的事件
 	char sql[8192];
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
@@ -986,6 +1017,8 @@ void CMySqliteDatabase::SavePatientEvents(const CSavePatientEventsParam * pParam
 // 查询PatientData
 void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam, 
 	                   PatientData * pData, DWORD dwSize, std::vector<TempItem *> & vTemp ) {
+	return;
+
 	assert(dwSize >= 7);
 	memset(pData, 0, sizeof(PatientData) * 7);
 	ClearVector(vTemp);
@@ -1080,6 +1113,8 @@ void CMySqliteDatabase::QueryPatientData(const CQueryPatientDataParam * pParam,
 
 // 保存data
 void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
+	return;
+
 	PatientData data;
 	memcpy(&data, &pParam->m_data, sizeof(PatientData));
 	data.m_date = GetAnyDayZeroTime(pParam->m_data.m_date); 
@@ -1158,6 +1193,8 @@ void CMySqliteDatabase::SavePatientData(const CSavePatientDataParam * pParam) {
 
 // 删除tag
 void CMySqliteDatabase::DelTag(const CDelTag * pParam) {
+	return;
+
 	char *zErrMsg = 0;
 	char szSql[8192];
 	int  ret = 0;
@@ -1202,6 +1239,8 @@ void CMySqliteDatabase::DelTag(const CDelTag * pParam) {
 
 // 是否出院
 BOOL CMySqliteDatabase::IsOutHospital(const char * szTagId) {
+	return FALSE;
+
 	assert(szTagId);
 
 	char sql[8192];
@@ -1225,6 +1264,8 @@ BOOL CMySqliteDatabase::IsOutHospital(const char * szTagId) {
 // 查询住院信息
 void  CMySqliteDatabase::QueryInHospital( const CQueryInHospital * pParam, 
 	                                      std::vector<InHospitalItem * > & vRet ) {
+	return;
+
 	CDuiString  strSql;
 	CDuiString  strClause;
 	CDuiString  strItem;
@@ -1453,6 +1494,8 @@ void  CMySqliteDatabase::ConvertTagNames() {
 // 查询出院信息
 void CMySqliteDatabase::QueryOutHospital( const CQueryOutHospital * pParam, 
 	                                      std::vector<OutHospitalItem * > & vRet ) {
+	return;
+
 	CDuiString  strSql;
 	CDuiString  strClause;
 	CDuiString  strItem;

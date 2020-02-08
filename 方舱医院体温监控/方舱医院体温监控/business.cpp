@@ -164,29 +164,29 @@ int CBusiness::Init() {
 
 
 	/******** 线程 ********/
-	g_data.m_thrd_launch = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_launch) {
-		return -1;
-	}
-	g_data.m_thrd_launch->Start();
+	//g_data.m_thrd_launch = new LmnToolkits::Thread();
+	//if (0 == g_data.m_thrd_launch) {
+	//	return -1;
+	//}
+	//g_data.m_thrd_launch->Start();
 
-	g_data.m_thrd_sqlite = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_sqlite) {
-		return -1;
-	}
-	g_data.m_thrd_sqlite->Start();
+	//g_data.m_thrd_sqlite = new LmnToolkits::Thread();
+	//if (0 == g_data.m_thrd_sqlite) {
+	//	return -1;
+	//}
+	//g_data.m_thrd_sqlite->Start();
 
-	g_data.m_thrd_work = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_work) {
-		return -1;
-	}
-	g_data.m_thrd_work->Start();
+	//g_data.m_thrd_work = new LmnToolkits::Thread();
+	//if (0 == g_data.m_thrd_work) {
+	//	return -1;
+	//}
+	//g_data.m_thrd_work->Start();
 
-	g_data.m_thrd_excel = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_excel) {
-		return -1;
-	}
-	g_data.m_thrd_excel->Start();
+	//g_data.m_thrd_excel = new LmnToolkits::Thread();
+	//if (0 == g_data.m_thrd_excel) {
+	//	return -1;
+	//}
+	//g_data.m_thrd_excel->Start();
 	InitThreadExcelAsyn();
 
 	// 开启定时检查tag patient name是否过期
@@ -464,7 +464,7 @@ int CBusiness::DeInit() {
 		// post save 消息
 		SaveExcelAsyn();
 		// post quit 消息
-		g_data.m_thrd_excel->PostMessage(this, LmnToolkits::Thread::MESSAGE_ID_CLOSE_THREAD);
+		// g_data.m_thrd_excel->PostMessage(this, LmnToolkits::Thread::MESSAGE_ID_CLOSE_THREAD);
 		// NOT SET stop flag
 		g_data.m_thrd_excel->Stop( FALSE );
 
@@ -499,7 +499,7 @@ void CBusiness::InitSigslot(CDuiFrameWnd * pMainWnd) {
 
 // 硬件改动，检查接收器串口状态
 void  CBusiness::CheckLaunchAsyn() {
-	g_data.m_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
+	//g_data.m_thrd_launch->PostMessage(this, MSG_CHECK_LAUNCH_STATUS, 0, TRUE);
 }
 
 void  CBusiness::CheckLaunch() {
@@ -508,8 +508,8 @@ void  CBusiness::CheckLaunch() {
 
 // 重新连接接收器(因配置改动，grid count变化)
 void   CBusiness::RestartLaunchAsyn() {
-	g_data.m_thrd_launch->DeleteMessages();
-	g_data.m_thrd_launch->PostMessage(this, MSG_RESTART_LAUNCH);
+	//g_data.m_thrd_launch->DeleteMessages();
+	//g_data.m_thrd_launch->PostMessage(this, MSG_RESTART_LAUNCH);
 }
 
 void   CBusiness::RestartLaunch() {
@@ -523,10 +523,10 @@ void  CBusiness::GetGridTemperatureAsyn(DWORD  dwIndex, DWORD dwDelay /*= 0*/) {
 	}
 
 	if (0 == dwDelay) {
-		g_data.m_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
+		//g_data.m_thrd_launch->PostMessage(this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
 	}
 	else {
-		g_data.m_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
+		//g_data.m_thrd_launch->PostDelayMessage(dwDelay, this, MSG_GET_GRID_TEMP + dwIndex, new CGetGridTempParam(dwIndex), TRUE);
 	}
 }
 
@@ -676,7 +676,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 		ReadLaunchAsyn(1000);
 	}
 	else {
-		g_data.m_thrd_launch->DeleteMessages();
+		//g_data.m_thrd_launch->DeleteMessages();
 		memset(g_data.m_bSurReaderConnected, 0, sizeof(g_data.m_bSurReaderConnected));
 		for (DWORD i = 0; i < MAX_GRID_COUNT; i++) {
 			for (DWORD j = 0; j < MAX_READERS_PER_GRID; j++) {
@@ -686,7 +686,7 @@ void  CBusiness::OnStatus(CLmnSerialPort::PortStatus e) {
 		}
 
 		// 重连
-		g_data.m_thrd_launch->PostDelayMessage( 10000, this, MSG_RESTART_LAUNCH );
+		//g_data.m_thrd_launch->PostDelayMessage( 10000, this, MSG_RESTART_LAUNCH );
 	}
 }
 
@@ -719,10 +719,10 @@ void CBusiness::OnReaderTemp(WORD wBed, const TempItem & item) {
 
 void  CBusiness::ReadLaunchAsyn(DWORD dwDelayTime /*= 0*/) {
 	if (0 == dwDelayTime) {
-		g_data.m_thrd_launch->PostMessage(this, MSG_READ_LAUNCH);
+		//g_data.m_thrd_launch->PostMessage(this, MSG_READ_LAUNCH);
 	}
 	else {
-		g_data.m_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READ_LAUNCH);
+		//g_data.m_thrd_launch->PostDelayMessage(dwDelayTime, this, MSG_READ_LAUNCH);
 	}
 }
 
@@ -733,21 +733,21 @@ void  CBusiness::ReadLaunch() {
 
 // 打印状态(调试用)
 void   CBusiness::PrintStatusAsyn() {
-	g_data.m_thrd_work->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
+	//g_data.m_thrd_work->PostMessage(this, MSG_PRINT_STATUS, 0, TRUE);
 }
 
 void  CBusiness::PrintStatus() {
-	JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
-	if (m_launch.GetStatus() == CLmnSerialPort::OPEN) {
-		JTelSvrPrint("launch com port = com%d", m_launch.GetPort());
-	}
-	JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
-	JTelSvrPrint("work messages count: %lu", g_data.m_thrd_work->GetMessagesCount());
+	//JTelSvrPrint("launch status: %s", m_launch.GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+	//if (m_launch.GetStatus() == CLmnSerialPort::OPEN) {
+	//	JTelSvrPrint("launch com port = com%d", m_launch.GetPort());
+	//}
+	//JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
+	//JTelSvrPrint("work messages count: %lu", g_data.m_thrd_work->GetMessagesCount());
 }
 
 // 保存温度数据
 void  CBusiness::SaveSurTempAsyn(WORD wBedNo, const TempItem & item) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_SUR_TEMP, new CSaveSurTempParam(wBedNo, item));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_SUR_TEMP, new CSaveSurTempParam(wBedNo, item));
 }
 
 void  CBusiness::SaveSurTemp(CSaveSurTempParam * pParam) {
@@ -761,7 +761,7 @@ void  CBusiness::SaveSurTemp(CSaveSurTempParam * pParam) {
 
 // 保存手持温度数据
 void  CBusiness::SaveHandeTempAsyn(const TempItem & item) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_TEMP, new CSaveHandTempParam(item));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_HAND_TEMP, new CSaveHandTempParam(item));
 }
 
 void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
@@ -791,7 +791,7 @@ void  CBusiness::SaveHandTemp(CSaveHandTempParam * pParam) {
 }
 
 void  CBusiness::QueryTempByTagAsyn(const char * szTagId, WORD wBedNo) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_TAG, new CQueryTempByTagParam(szTagId, wBedNo));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_TAG, new CQueryTempByTagParam(szTagId, wBedNo));
 }
 
 void  CBusiness::QueryTempByTag(const CQueryTempByTagParam * pParam) {
@@ -802,7 +802,7 @@ void  CBusiness::QueryTempByTag(const CQueryTempByTagParam * pParam) {
 
 // 保存注释
 void  CBusiness::SaveRemarkAsyn(DWORD  dwDbId, const char * szRemark) {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_REMARK, new CSaveRemarkParam(dwDbId, szRemark) );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_REMARK, new CSaveRemarkParam(dwDbId, szRemark) );
 }
 
 void  CBusiness::SaveRemark(const CSaveRemarkParam * pParam) {
@@ -811,7 +811,7 @@ void  CBusiness::SaveRemark(const CSaveRemarkParam * pParam) {
 
 // 定时检查tag patient name有没有过期(在sqlite线程里 )
 void  CBusiness::CheckSqliteAsyn() {
-	g_data.m_thrd_sqlite->PostDelayMessage( CHECK_SQLITE_INTERVAL_TIME, this, MSG_CHECK_SQLITE );
+	//g_data.m_thrd_sqlite->PostDelayMessage( CHECK_SQLITE_INTERVAL_TIME, this, MSG_CHECK_SQLITE );
 }
 
 void  CBusiness::CheckSqlite() {
@@ -840,7 +840,7 @@ void  CBusiness::CheckSqlite() {
 
 // 保存最后的术中TagID到床位号
 void  CBusiness::SaveLastSurTagIdAsyn(WORD wBedId, const char * szTagId) {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_LAST_SUR_TAG_ID, new CSaveLastSurTagId(wBedId, szTagId) );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_LAST_SUR_TAG_ID, new CSaveLastSurTagId(wBedId, szTagId) );
 }
 
 void  CBusiness::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
@@ -849,7 +849,7 @@ void  CBusiness::SaveLastSurTagId(const CSaveLastSurTagId * pParam) {
 
 // 软件运行的时候，先从数据库获取上一次的有用信息
 void  CBusiness::PrepareAsyn() {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_PREPARE );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_PREPARE );
 }
 
 void  CBusiness::Prepare() {
@@ -896,7 +896,7 @@ void  CBusiness::Prepare() {
 
 // Tag绑定窗格
 void  CBusiness::TagBindingGridAsyn(const char * szTagId, int nGridIndex) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_BINDING_TAG_GRID, new CBindingTagGrid(szTagId, nGridIndex));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_BINDING_TAG_GRID, new CBindingTagGrid(szTagId, nGridIndex));
 }
 
 void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
@@ -916,8 +916,8 @@ void  CBusiness::TagBindingGrid(const CBindingTagGrid * pParam) {
 
 // 获取绑定窗格
 void  CBusiness::QueryBindingByTagIdAsyn(const char * szTagId) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_BINDING_BY_TAG, 
-		new CQueryBindingByTag(szTagId));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_BINDING_BY_TAG, 
+	//	new CQueryBindingByTag(szTagId));
 }
 
 void  CBusiness::QueryBindingByTagId(const CQueryBindingByTag * pParam) {
@@ -934,8 +934,8 @@ void  CBusiness::QueryBindingByTagId(const CQueryBindingByTag * pParam) {
 
 // 请求Hand Tag历史温度数据
 void  CBusiness::QueryTempByHandTagAsyn(const char * szTagId, int nGridIndex) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_HAND_TAG, 
-		new CQueryTempByHandTagParam(szTagId, nGridIndex));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_TEMP_BY_HAND_TAG, 
+	//	new CQueryTempByHandTagParam(szTagId, nGridIndex));
 }
 
 void  CBusiness::QueryTempByHandTag(const CQueryTempByHandTagParam * pParam) {
@@ -946,8 +946,8 @@ void  CBusiness::QueryTempByHandTag(const CQueryTempByHandTagParam * pParam) {
 
 // 删除格子的手持Tag绑定
 void  CBusiness::RemoveGridBindingAsyn(int nGridIndex) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_REMOVE_GRID_BINDING,
-		new CRemoveGridBindingParam(nGridIndex));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_REMOVE_GRID_BINDING,
+	//	new CRemoveGridBindingParam(nGridIndex));
 }
 
 void  CBusiness::RemoveGridBinding(const CRemoveGridBindingParam * pParam) {
@@ -956,8 +956,8 @@ void  CBusiness::RemoveGridBinding(const CRemoveGridBindingParam * pParam) {
 
 // 保存tag的patient name
 void  CBusiness::SaveTagPNameAsyn(const char * szTagId, const char * szPName) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_TAG_PNAME,
-		                 new CSaveTagPNameParam(szTagId, szPName));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_TAG_PNAME,
+	//	                 new CSaveTagPNameParam(szTagId, szPName));
 }
 
 void  CBusiness::SaveTagPName(const CSaveTagPNameParam * pParam) {
@@ -999,7 +999,7 @@ char *  CBusiness::GetTagPName(const char * szTagId, char * szPName, DWORD dwPNa
 
 // 报警声
 void  CBusiness::AlarmAsyn() {
-	g_data.m_thrd_work->PostMessage(this, MSG_ALARM, 0, TRUE);
+	//g_data.m_thrd_work->PostMessage(this, MSG_ALARM, 0, TRUE);
 }
 
 void  CBusiness::Alarm() {
@@ -1024,7 +1024,7 @@ void  CBusiness::SaveExcelAsyn() {
 		return;
 	}
 
-	g_data.m_thrd_excel->PostMessage(this, MSG_SAVE_EXCEL);
+	//g_data.m_thrd_excel->PostMessage(this, MSG_SAVE_EXCEL);
 }
 
 void  CBusiness::SaveExcel() {
@@ -1076,8 +1076,8 @@ void  CBusiness::WriteTemp2ExcelAsyn(DWORD i, DWORD  j, const TempItem * pTemp, 
 		return;
 	}
 
-	g_data.m_thrd_excel->PostMessage( this, MSG_WRITE_TEMP_2_EXCEL, 
-		new CWriteTemp2ExcelParam(i, j, pTemp, szPName) );
+	//g_data.m_thrd_excel->PostMessage( this, MSG_WRITE_TEMP_2_EXCEL, 
+	//	new CWriteTemp2ExcelParam(i, j, pTemp, szPName) );
 }
 
 void  CBusiness::WriteTemp2Excel(const CWriteTemp2ExcelParam * pParam) {
@@ -1148,7 +1148,7 @@ void  CBusiness::WriteTemp2Excel(const CWriteTemp2ExcelParam * pParam) {
 
 // 初始化excel线程(CoInitialize)
 void  CBusiness::InitThreadExcelAsyn() {
-	g_data.m_thrd_excel->PostMessage(this, MSG_INIT_EXCEL);
+	//g_data.m_thrd_excel->PostMessage(this, MSG_INIT_EXCEL);
 }
 
 void  CBusiness::InitThreadExcel() {
@@ -1157,8 +1157,8 @@ void  CBusiness::InitThreadExcel() {
 
 // 获取病人的基础信息
 void  CBusiness::QueryPatientInfoAsyn(const char * szTagId) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_INFO,
-		new CQueryPatientInfoParam(szTagId) );
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_INFO,
+	//	new CQueryPatientInfoParam(szTagId) );
 }
 
 void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
@@ -1171,8 +1171,8 @@ void  CBusiness::QueryPatientInfo(const CQueryPatientInfoParam * pParam) {
 
 // 保存基本信息
 void  CBusiness::SavePatientInfoAsyn(const PatientInfo * pInfo) {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_PATIENT_INFO,
-		new CSavePatientInfoParam(pInfo) );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_PATIENT_INFO,
+	//	new CSavePatientInfoParam(pInfo) );
 }
 
 void  CBusiness::SavePatientInfo(const CSavePatientInfoParam * pParam) {
@@ -1181,8 +1181,8 @@ void  CBusiness::SavePatientInfo(const CSavePatientInfoParam * pParam) {
 
 // 保存病人事件信息
 void  CBusiness::SavePatientEventsAsyn(const char * szTagId, const std::vector<PatientEvent*> & vEvents) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_PATIENT_EVENTS,
-		new CSavePatientEventsParam(szTagId, vEvents));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_SAVE_PATIENT_EVENTS,
+	//	new CSavePatientEventsParam(szTagId, vEvents));
 }
 
 void  CBusiness::SavePatientEvents(const CSavePatientEventsParam * pParam) {
@@ -1191,8 +1191,8 @@ void  CBusiness::SavePatientEvents(const CSavePatientEventsParam * pParam) {
 
 // 获取某天的病人的非体温数据信息
 void  CBusiness::QueryPatientDataAsyn(const char * szTagId, time_t tFirstDay) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_DATA,
-		new CQueryPatientDataParam(szTagId, tFirstDay));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_PATIENT_DATA,
+	//	new CQueryPatientDataParam(szTagId, tFirstDay));
 }
 
 void  CBusiness::QueryPatientData(const CQueryPatientDataParam * pParam) {
@@ -1205,8 +1205,8 @@ void  CBusiness::QueryPatientData(const CQueryPatientDataParam * pParam) {
 
 // 保存病人非温度数据
 void  CBusiness::SavePatientDataAsyn(const PatientData * pData) {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_PATIENT_DATA,
-		                               new CSavePatientDataParam(pData) );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_SAVE_PATIENT_DATA,
+	//	                               new CSavePatientDataParam(pData) );
 }
 
 void  CBusiness::SavePatientData(const CSavePatientDataParam * pParam) {
@@ -1215,7 +1215,7 @@ void  CBusiness::SavePatientData(const CSavePatientDataParam * pParam) {
 
 // 删除Tag数据
 void  CBusiness::DelTagAsyn(const char * szTagId) {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_DEL_TAG, new CDelTag(szTagId) );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_DEL_TAG, new CDelTag(szTagId) );
 }
 
 void  CBusiness::DelTag(const CDelTag * pParam) {
@@ -1225,7 +1225,7 @@ void  CBusiness::DelTag(const CDelTag * pParam) {
 
 // 查询住院信息
 void  CBusiness::QueryInHospitalAsyn(const TQueryInHospital * pQuery) {
-	g_data.m_thrd_sqlite->PostMessage( this, MSG_QUERY_INHOSPITAL, new CQueryInHospital(pQuery) );
+	//g_data.m_thrd_sqlite->PostMessage( this, MSG_QUERY_INHOSPITAL, new CQueryInHospital(pQuery) );
 }
 
 void  CBusiness::QueryInHospital(const CQueryInHospital * pParam) {
@@ -1237,7 +1237,7 @@ void  CBusiness::QueryInHospital(const CQueryInHospital * pParam) {
 
 // 查询出院信息
 void  CBusiness::QueryOutHospitalAsyn(const TQueryOutHospital * pQuery) {
-	g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_OUTHOSPITAL, new CQueryOutHospital(pQuery));
+	//g_data.m_thrd_sqlite->PostMessage(this, MSG_QUERY_OUTHOSPITAL, new CQueryOutHospital(pQuery));
 }
 
 void  CBusiness::QueryOutHospital(const CQueryOutHospital * pParam) {
