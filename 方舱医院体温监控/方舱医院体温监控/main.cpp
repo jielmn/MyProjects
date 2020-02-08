@@ -222,9 +222,16 @@ void  CDuiFrameWnd::InitWindow() {
 		m_CuteItems->Add(item);
 	}
 
-	m_CuteItems_high_temp->Add(new CCubeItemUI);
-	m_CuteItems_high_temp->Add(new CCubeItemUI);
-	m_CuteItems_high_temp->Add(new CCubeItemUI);                   
+	for (int i = 0; i < 3; i++) {
+		CCubeItemUI * item = new CCubeItemUI;
+		item->SetBedNo(i + 100);
+		item->SetPatientName("张三1");
+		item->SetPhone("123xyz");
+		item->SetTemperature(3600 + i * 10);
+		item->SetTime(now);
+		m_CuteItems_high_temp->Add(item);
+	}
+                  
 	//////////// 
 
 	
@@ -999,7 +1006,7 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 			m_SubSwitch->SelectItem(0);
 		}
 		pFindControl = pFindControl->GetParent();
-	}
+	}  
 }
 
 // 点击了“菜单”按钮

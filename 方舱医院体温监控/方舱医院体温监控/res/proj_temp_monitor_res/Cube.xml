@@ -3,8 +3,12 @@
 	<TabLayout name="subswitch">
 		<HorizontalLayout bkcolor="#FF434248">
 			<VerticalLayout>		
-				<VerticalLayout>
-					<HorizontalLayout height="35" inset="10,10,0,0" >
+				<VerticalLayout inset="10,10,0,10" >
+					<HorizontalLayout height="40"  >
+						<Label text="高温床位区" textcolor="#FFFFFFFF" font="103" />
+					</HorizontalLayout>
+					
+					<HorizontalLayout height="35" inset="0,10,0,0" >
 						<Label text="床号" textcolor="#FFFFFFFF" font="101" width="100" />
 						<Label text="姓名" textcolor="#FFFFFFFF" font="101" width="100" />
 						<Label text="手机号" textcolor="#FFFFFFFF" font="101" width="150" />

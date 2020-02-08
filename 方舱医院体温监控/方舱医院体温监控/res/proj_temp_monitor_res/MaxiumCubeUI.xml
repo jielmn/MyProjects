@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window>		
+	<HorizontalLayout inset="1,1,1,1" bordercolor="#FF768D9B" bordersize="1" >			
+	
+		<!-- 左边的grid属性 -->
+		<VerticalLayout width="530" bkcolor="#FF434248" bkcolor2="#FF293441" inset="0,10,0,10" >			
+			<HorizontalLayout height="30" inset="10,0,10,0" >
+				<Control bkimage="grid.png" width="30" />
+				<Control width="10" />
+				<Label text="床位信息"  textcolor="#FFCCCCCC" width="200" font="8" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="60"  inset="30,5,0,5" >
+				<Control bkimage="file='bed.png' dest='0,0,50,50'"  width="50" tooltip="床号" />
+				<Button name="btnBedM" textpadding="4,0,4,0" textcolor="#FFCCCCCC" text="01" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="150" font="9" tooltip="床号" />
+			</HorizontalLayout>
+			
+			<HorizontalLayout height="50" inset="30,5,0,5" >
+				<Control bkimage="file='user.png' dest='0,7,40,40'"  width="50" tooltip="病人姓名" />
+				<EditableButton name="cstEdtBtnPatientNameM" width="150" btncolor="#FFCCCCCC" btnfont="9" editfont="9" hotimage="file='btn_hot.png' corner='2,8,2,2'"  />
+			</HorizontalLayout>		
+
+			<HorizontalLayout height="70" inset="30,25,0,5" >
+				<Control bkimage="file='phone.png' dest='0,0,40,40'"  width="50" tooltip="手机" />
+			</HorizontalLayout>					
+			
+		</VerticalLayout>
+		
+		<!-- 右边的温度曲线 -->
+		<VerticalLayout inset="10,0,10,10" bkcolor="#FF434248" >
+			<HorizontalLayout height="40">
+				<Control bkimage="beat.png" width="40" />
+				<Control width="10" />
+				<Label text="温度曲线" textcolor="#FFCCCCCC" width="150" font="8" />
+			</HorizontalLayout>
+			<HorizontalLayout height="5" />
+			<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
+				<MyImage name="cstMyImage" bordercolor="#FF666666" bordersize="1" bkcolor="#FF434248" menu="true" /> 
+			</VerticalLayout>
+		</VerticalLayout>
+		
+	</HorizontalLayout>
+</Window>

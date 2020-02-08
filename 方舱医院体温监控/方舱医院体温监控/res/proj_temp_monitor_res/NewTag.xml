@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout>
+		<VerticalLayout width="100">
+			<Control />
+				<Control bkimage="tag_1.png" width="64" height="64" />
+			<Control />
+		</VerticalLayout>	
+
+		<Label text="36.5℃" textcolor="#FFFFFFFF" font="104" width="200" name="lblTemp"  />
+		
+		<Label text="2020-01-01 09:00:00" textcolor="#FFFFFFFF" font="105" width="220" name="lblTime"  />		
+	</HorizontalLayout>	
+</Window>
