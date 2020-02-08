@@ -490,6 +490,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_CHECK_COM_PORTS_RET) {
 		OnChecComPortsRet(wParam, lParam);
 	}
+	else if (uMsg == UM_GET_ALL_CUBE_ITEMS) {
+		OnGetAllCubeItems(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -2875,6 +2878,14 @@ void   CDuiFrameWnd::OnAddCubeItem() {
 		MessageBox(GetHWND(), "«Î ‰»Î–’√˚!", "¥ÌŒÛ", 0);
 		return;
 	}
+}
+
+void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
+	std::vector<CubeItem*> * pvRet = (std::vector<CubeItem*> *)wParam;
+	assert(pvRet);
+
+	std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_cube_items));
+	delete pvRet;
 }
                       
 

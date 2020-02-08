@@ -1608,3 +1608,45 @@ void CMySqliteDatabase::QueryOutHospital( const CQueryOutHospital * pParam,
 	}
 	sqlite3_free_table(azResult);
 }
+
+
+// 方舱获取所有床位号
+void  CMySqliteDatabase::GetAllCubeBeds(std::vector<CubeItem*> & vRet) {
+	char szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s order by bedno", BED_INFO_TABLE);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		CubeItem* pItem = new CubeItem;
+		memset(pItem, 0, sizeof(CubeItem));
+
+		pItem->nBedNo = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		GetStrFromdDb(pItem->szName,  MAX_CUBE_NAME_LENGTH,  azResult[(i + 1)*ncolumn + 1]);
+		GetStrFromdDb(pItem->szPhone, MAX_CUBE_PHONE_LENGTH, azResult[(i + 1)*ncolumn + 2]);
+		GetStrFromdDb(pItem->szTagId, MAX_TAG_ID_LENGTH, azResult[(i + 1)*ncolumn + 3]);
+
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+
+	std::vector<CubeItem*>::iterator it;
+	for (it = vRet.begin(); it != vRet.end(); ++it) {
+		CubeItem* pItem = *it;
+
+		nrow = ncolumn = 0;
+		azResult = 0;
+
+		SNPRINTF(szSql, sizeof(szSql), "select * from %s where bedno=%d order by time desc limit 1", 
+			TEMP_TABLE_1, pItem->nBedNo);
+
+		sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+		if (nrow > 0) {
+			pItem->nTemp = GetIntFromDb(azResult[ ncolumn + 2] );
+			pItem->time  = (time_t)GetIntFromDb(azResult[ncolumn + 3]);
+		}
+		sqlite3_free_table(azResult);
+	}
+}

@@ -1059,6 +1059,11 @@ void  CBusiness::Prepare() {
 	//}
 	///******************** end  查询手持温度数据  **********************/
 
+	std::vector<CubeItem*> * pvRet = new std::vector<CubeItem*>;
+	m_sqlite.GetAllCubeBeds( *pvRet );
+
+	::PostMessage(g_data.m_hWnd, UM_GET_ALL_CUBE_ITEMS, (WPARAM)pvRet, 0);
+
 	m_prepared.emit();
 }
 

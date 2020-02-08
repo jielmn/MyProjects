@@ -253,6 +253,7 @@ using namespace DuiLib;
 
 // 检查打开了哪些串口
 #define UM_CHECK_COM_PORTS_RET               (WM_USER+18)
+#define UM_GET_ALL_CUBE_ITEMS                (WM_USER+19)
 
 
 #define XML_CHART_WIDTH              764
