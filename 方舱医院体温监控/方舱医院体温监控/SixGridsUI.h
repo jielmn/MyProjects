@@ -273,6 +273,9 @@ public:
 	void  SetTime(time_t t);
 	time_t  GetTime();
 
+	void  SetBinding(BOOL bBinding);
+	BOOL  GetBinding();
+
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
@@ -282,6 +285,7 @@ private:
 	void  SetPhone();
 	void  SetTemperature();
 	void  SetTime();
+	void  SetBinding();
 
 private:
 	CLabelUI *             m_lblBedNo;
@@ -289,6 +293,7 @@ private:
 	CLabelUI *             m_lblPhone;
 	CLabelUI *             m_lblTemp;
 	CLabelUI *             m_lblTime;
+	CLabelUI *             m_lblBinding;
 
 private:
 	int                    m_nBedNo;
@@ -296,6 +301,7 @@ private:
 	CDuiString             m_strPhone;
 	int                    m_nTemp;
 	time_t                 m_time;
+	BOOL                   m_bBinding;
 };
 
 class CNewTagUI : public CContainerUI

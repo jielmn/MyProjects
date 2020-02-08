@@ -79,6 +79,10 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_optOutHospital = 0;
 
 	m_CuteItems = 0;
+	m_bNewTagDragDrop = FALSE;
+	m_HightLightItem = 0;
+	m_layRight = 0;
+	m_layMain1 = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -211,6 +215,10 @@ void  CDuiFrameWnd::InitWindow() {
 	m_CuteItems = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems"));
 	m_CuteItems_high_temp = static_cast<CVerticalLayoutUI *>(m_PaintManager.FindControl("layCubeItems_1"));
 	m_SubSwitch = static_cast<CTabLayoutUI *>(m_PaintManager.FindControl("subswitch"));
+	m_layRight = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layRight"));
+	m_layMain1 = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layMain_1"));
+
+	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
 
 	for (int i = 0; i < 100; i++) {
 		CCubeItemUI * item = new CCubeItemUI;  
@@ -520,34 +528,44 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 	// 如果是第一Tab页
 	if ( nSelTab == TAB_INDEX_MONITOR ) {
-		// 如果是多格子状态
-		if (m_eGridStatus == GRID_STATUS_GRIDS) {
-			while (pCtl) {
-				if (pCtl->GetName() == GRID_NAME) {
-					// 如果不是点击修改名字按钮
-					if (0 != strcmp(pOriginalCtl->GetClass(), "Button")
-						&& 0 != strcmp(pOriginalCtl->GetClass(), "ModeButton")) {
-						m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
-						m_nDgDestIndex = -1;
-						m_dwDgStartTick = LmnGetTickCount();
-					}
-					break;
-				}
-				pCtl = pCtl->GetParent();
+		//// 如果是多格子状态
+		//if (m_eGridStatus == GRID_STATUS_GRIDS) {
+		//	while (pCtl) {
+		//		if (pCtl->GetName() == GRID_NAME) {
+		//			// 如果不是点击修改名字按钮
+		//			if (0 != strcmp(pOriginalCtl->GetClass(), "Button")
+		//				&& 0 != strcmp(pOriginalCtl->GetClass(), "ModeButton")) {
+		//				m_nDgSourceIndex = GetGridOrderByGridId(pCtl->GetTag());
+		//				m_nDgDestIndex = -1;
+		//				m_dwDgStartTick = LmnGetTickCount();
+		//			}
+		//			break;
+		//		}
+		//		pCtl = pCtl->GetParent();
+		//	}
+		//}
+		//// 如果是最大化状态
+		//else if (m_eGridStatus == GRID_STATUS_MAXIUM) {
+		//	while (pCtl) {
+		//		if (pCtl->GetName() == LAY_READER) {
+		//			CReaderUI * pReader = (CReaderUI *)pCtl;
+		//			DWORD i = pReader->GetGridIndex();
+		//			DWORD j = pReader->GetReaderIndex();
+		//			m_pGrids[i]->OnSurReaderSelected(j);
+		//			break;
+		//		}
+		//		pCtl = pCtl->GetParent();
+		//	}
+		//}
+
+		while (pCtl) {
+			if (pCtl->GetClass() == "NewTag") {
+				m_dwDgStartTick = LmnGetTickCount();
+				m_bNewTagDragDrop = TRUE;
+				m_HightLightItem = 0;      
+				break;
 			}
-		}
-		// 如果是最大化状态
-		else if (m_eGridStatus == GRID_STATUS_MAXIUM) {
-			while (pCtl) {
-				if (pCtl->GetName() == LAY_READER) {
-					CReaderUI * pReader = (CReaderUI *)pCtl;
-					DWORD i = pReader->GetGridIndex();
-					DWORD j = pReader->GetReaderIndex();
-					m_pGrids[i]->OnSurReaderSelected(j);
-					break;
-				}
-				pCtl = pCtl->GetParent();
-			}
+			pCtl = pCtl->GetParent();
 		}
 	}
 	else if (nSelTab == TAB_INDEX_READER) {
@@ -571,12 +589,15 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 }
 
 LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
-	if (m_nDgSourceIndex >= 0) {
-		StopMoveGrid();
-	}
-	// 正在拖动tag ui
-	else if (m_dragdrop_tag.GetLength() > 0) {
-		StopMoveTagUI();
+	//if (m_nDgSourceIndex >= 0) {
+	//	StopMoveGrid();
+	//}
+	//// 正在拖动tag ui
+	//else if (m_dragdrop_tag.GetLength() > 0) {
+	//	StopMoveTagUI();
+	//}
+	if (m_bNewTagDragDrop) {
+		StopMoveNewTag();
 	}
 	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
 }
@@ -585,7 +606,28 @@ LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 	POINT  pt;
 	DWORD  dwCurTick = 0;
 
-	if (m_nDgSourceIndex >= 0) {
+	//if (m_nDgSourceIndex >= 0) {
+	//	dwCurTick = LmnGetTickCount();
+	//	if (dwCurTick - m_dwDgStartTick < DRAG_DROP_DELAY_TIME) {
+	//		return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+	//	}
+
+	//	pt.x = LOWORD(lParam);
+	//	pt.y = HIWORD(lParam);
+	//	MoveGrid(pt);
+	//}
+	//// 正在拖动tag ui
+	//else if (m_dragdrop_tag.GetLength() > 0) {
+	//	dwCurTick = LmnGetTickCount();
+	//	// 超过1秒
+	//	if ( dwCurTick - m_dragdrop_tag_timetick >= 100 ) {
+	//		pt.x = LOWORD(lParam);
+	//		pt.y = HIWORD(lParam);
+	//		MoveTagUI(pt);
+	//	}
+	//}
+
+	if (m_bNewTagDragDrop) {
 		dwCurTick = LmnGetTickCount();
 		if (dwCurTick - m_dwDgStartTick < DRAG_DROP_DELAY_TIME) {
 			return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
@@ -593,17 +635,7 @@ LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
-		MoveGrid(pt);
-	}
-	// 正在拖动tag ui
-	else if (m_dragdrop_tag.GetLength() > 0) {
-		dwCurTick = LmnGetTickCount();
-		// 超过1秒
-		if ( dwCurTick - m_dragdrop_tag_timetick >= 100 ) {
-			pt.x = LOWORD(lParam);
-			pt.y = HIWORD(lParam);
-			MoveTagUI(pt);
-		}
+		MoveNewTag(pt);
 	}
 	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
 }
@@ -626,6 +658,25 @@ void   CDuiFrameWnd::MoveGrid(const POINT & pt) {
 
 	// 高亮经过的格子
 	OnMoveGrid(pt);
+}
+
+void   CDuiFrameWnd::MoveNewTag(const POINT & pt) {
+	if (!m_dragdropGrid->IsVisible()) {
+		m_dragdropGrid->SetVisible(true);
+	}
+
+	int x = 100 / 2;
+	int y = 100 / 2;
+
+	RECT r;
+	r.left = pt.x - x;
+	r.right = r.left + x * 2;
+	r.top = pt.y - y;
+	r.bottom = r.top + y * 2;
+	m_dragdropGrid->SetPos(r);
+
+	// 高亮经过的格子
+	OnMoveNewTag(pt);
 }
 
 // 格子移动过程中，经过的格子要高亮
@@ -777,6 +828,55 @@ void  CDuiFrameWnd::StopMoveGrid() {
 
 	m_nDgSourceIndex = -1;
 	m_nDgDestIndex = -1;
+}
+
+void  CDuiFrameWnd::OnMoveNewTag(const POINT & pt) {
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(m_CuteItems, pt);
+
+	CCubeItemUI * pHighLight = 0;
+
+	// 如果没有移动到任何控件上
+	if (0 == pCtl) {
+		if (m_HightLightItem) {
+			m_HightLightItem->SetBorderSize(0);
+		}
+		m_HightLightItem = 0;
+		return;
+	}
+
+	while (pCtl) {
+		if (pCtl->GetClass() == "CubeItem") {
+			pHighLight = (CCubeItemUI *)pCtl;
+			break;
+		}
+		pCtl = pCtl->GetParent();
+	}
+
+	if (pHighLight) {
+		if ( m_HightLightItem ) {
+			if (m_HightLightItem != pHighLight) {
+				pHighLight->SetBorderSize(1);
+				pHighLight->SetBorderColor(GRID_HILIGHT_BORDER_COLOR);
+				m_HightLightItem->SetBorderSize(0);
+			}
+		}
+		m_HightLightItem = pHighLight;
+	}
+	else {
+		if (m_HightLightItem) {
+			m_HightLightItem->SetBorderSize(0);
+		}
+		m_HightLightItem = 0;
+	}
+}
+
+void  CDuiFrameWnd::StopMoveNewTag() {
+	m_dragdropGrid->SetVisible(false);
+	m_bNewTagDragDrop = FALSE;
+
+	if (m_HightLightItem) {
+		m_HightLightItem->SetBorderSize(0);
+	}
 }
 
 // 拖动格子过程中，拖到最左或最右，导致翻页
@@ -2708,6 +2808,12 @@ void CDuiFrameWnd::OnQueryOutHospitalNotify(const std::vector<OutHospitalItem*>&
 		pRet->push_back(pNewItem);
 	}
 	::PostMessage(GetHWND(), UM_QUERY_OUTHOSPITAL_RET, (WPARAM)pRet, 0);
+}
+
+bool CDuiFrameWnd::OnMain1Size(void * pParam) {
+	int w = m_layMain1->GetWidth();
+	m_layRight->SetMaxWidth(w);
+	return true;
 }
                       
 

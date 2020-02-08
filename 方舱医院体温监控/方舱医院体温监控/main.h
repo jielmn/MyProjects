@@ -327,4 +327,15 @@ private:
 	CVerticalLayoutUI *                         m_CuteItems;
 	CVerticalLayoutUI *                         m_CuteItems_high_temp;
 	CTabLayoutUI *                              m_SubSwitch;
+	BOOL                                        m_bNewTagDragDrop;
+	CCubeItemUI *                               m_HightLightItem;
+	CHorizontalLayoutUI *                       m_layRight;
+	CHorizontalLayoutUI *                       m_layMain1;
+
+private:
+	void   MoveNewTag(const POINT & pt);
+	void   OnMoveNewTag(const POINT & pt);
+	void   StopMoveNewTag();
+	bool   OnMain1Size(void * pParam);
+
 };

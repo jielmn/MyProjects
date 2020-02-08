@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window>
 	<TabLayout name="subswitch">
-		<HorizontalLayout bkcolor="#FF434248">
+		<HorizontalLayout bkcolor="#FF434248" name="layMain_1">
 			<VerticalLayout>		
 				<VerticalLayout inset="10,10,0,10" >
 					<HorizontalLayout height="40"  >
@@ -30,7 +30,7 @@
 				</VerticalLayout>
 			</VerticalLayout>
 			
-			<HorizontalLayout inset="4,0,0,0" sepimm="false" sepwidth="-4" bordercolor="#FFD1E8F5" bordersize="2,0,0,0" >
+			<HorizontalLayout inset="4,0,0,0" sepimm="false" sepwidth="-4" bordercolor="#FFD1E8F5" bordersize="2,0,0,0" name="layRight" >
 				<VerticalLayout>
 					<HorizontalLayout height="50" inset="10,10,0,10" bordersize="0,0,0,1" bordercolor="#FFD1E8F5" >
 						<Label text="床号" textcolor="#FFFFFFFF" font="100" width="60" />
@@ -50,7 +50,8 @@
 						<Label text="姓名" textcolor="#FFFFFFFF" font="101" width="100" />
 						<Label text="手机号" textcolor="#FFFFFFFF" font="101" width="150" />
 						<Label text="体温(℃)" textcolor="#FFFFFFFF" font="101" width="120" />
-						<Label text="时间" textcolor="#FFFFFFFF" font="101" width="100" />
+						<Label text="时间" textcolor="#FFFFFFFF" font="101" width="170" />
+						<Label text="是否绑定Tag" textcolor="#FFFFFFFF" font="101" width="120" />
 					</HorizontalLayout>
 					
 					<VerticalLayout name="layCubeItems" inset="10,10,10,10" vscrollbar="true" hscrollbar="true" >

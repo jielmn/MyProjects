@@ -1618,10 +1618,12 @@ CCubeItemUI::CCubeItemUI() {
 	m_lblPhone = 0;
 	m_lblTemp = 0;
 	m_lblTime = 0;
+	m_lblBinding = 0;
 
 	m_nBedNo = 0;
 	m_nTemp = 0;
 	m_time = 0;
+	m_bBinding = FALSE;
 }
 
 CCubeItemUI::~CCubeItemUI() {
@@ -1648,15 +1650,17 @@ void CCubeItemUI::DoInit() {
 	m_lblPhone = (CLabelUI *)m_pManager->FindControl("lblPhone");
 	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp");
 	m_lblTime = (CLabelUI *)m_pManager->FindControl("lblTime");
+	m_lblBinding = (CLabelUI *)m_pManager->FindControl("lblBinding");
 
 	SetBedNo();
 	SetPatientName();
 	SetPhone();
 	SetTemperature();
 	SetTime();
+	SetBinding();
 
 	this->SetFixedHeight(30); 
-	this->SetFixedWidth(670);  
+	this->SetFixedWidth(760);   
 }
 
 void  CCubeItemUI::SetBedNo(int nBedNo) {
@@ -1747,6 +1751,26 @@ void  CCubeItemUI::SetTime( ) {
 			m_lblTime->SetText("");
 		}
 	}
+}
+
+void  CCubeItemUI::SetBinding(BOOL bBinding) {
+	m_bBinding = bBinding;
+	SetBinding();
+}
+
+void  CCubeItemUI::SetBinding() {
+	if ( m_bInitiated ) {
+		if (m_bBinding) {
+			m_lblBinding->SetText("");
+		}
+		else {
+			m_lblBinding->SetText("Î´°ó¶¨");
+		}
+	}
+}
+
+BOOL  CCubeItemUI::GetBinding() {
+	return m_bBinding;
 }
 
 

@@ -5,6 +5,7 @@
 		<Label text="张三" textcolor="#FFFFFFFF" font="102" width="100" name="lblName" />
 		<Label text="19801234567" textcolor="#FFFFFFFF" font="102" width="150" name="lblPhone" />
 		<Label text="36.5" textcolor="#FFFFFFFF" font="102" width="120" name="lblTemp" />
-		<Label text="2020-02-07 17:30:00" textcolor="#FFFFFFFF" font="102" width="200" name="lblTime" />
+		<Label text="2020-02-07 17:30:00" textcolor="#FFFFFFFF" font="102" width="170" name="lblTime" />
+		<Label text="是否" textcolor="#FFFFFFFF" font="102" width="120" name="lblBinding" />
 	</HorizontalLayout>
 </Window>
