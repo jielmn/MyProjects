@@ -350,3 +350,20 @@ private:
 
 	void   UpdateCubeItems();
 };
+
+
+
+
+class  FindCubeItemObj {
+public:
+	FindCubeItemObj(int nBedNO) {
+		m_nBedNo = nBedNO;
+	}
+	bool operator() (CubeItem * pItem) {
+		if (pItem->nBedNo == m_nBedNo)
+			return true;
+		return false;
+	}
+private:
+	int    m_nBedNo;
+};

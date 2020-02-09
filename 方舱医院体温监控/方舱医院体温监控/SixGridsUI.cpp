@@ -1763,9 +1763,11 @@ void  CCubeItemUI::SetBinding() {
 	if ( m_bInitiated ) {
 		if (m_bBinding) {
 			m_lblBinding->SetText("");
+			m_lblBinding->SetTextColor(0xFFFFFFFF);
 		}
 		else {
 			m_lblBinding->SetText("Î´°ó¶¨");
+			m_lblBinding->SetTextColor(CUBE_WARNING_COLOR);
 		}
 	}
 }

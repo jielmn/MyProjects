@@ -41,6 +41,7 @@ using namespace DuiLib;
 
 // #define  CUBE_TEST_FLAG            1
 #define  CUBE_ALTERNATIVE_BKCOLOR   0xFF666666
+#define  CUBE_WARNING_COLOR         0xFFF8992F
 
 
 // 窗格温度文字透明度

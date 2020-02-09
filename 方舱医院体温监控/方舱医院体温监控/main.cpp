@@ -2908,6 +2908,16 @@ void   CDuiFrameWnd::OnAddCubeItem() {
 		return;
 	}
 
+	std::vector<CubeItem * >::iterator it = std::find_if(m_cube_items.begin(), 
+		m_cube_items.end(), FindCubeItemObj(nBedNo));
+	// 找到了同床号的
+	if ( it != m_cube_items.end() ) {
+		if (IDNO == MessageBox( GetHWND(), "已经存在同样的床位号。要覆盖原床位号的所有数据吗？",
+			                    "创建新床位", MB_YESNO | MB_DEFBUTTON2)) {
+			return;
+		}
+	}
+
 	CBusiness::GetInstance()->SaveCubeBedAsyn(nBedNo, strName, strPhone);
 }
 
@@ -2925,21 +2935,19 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	CubeItem * pItem = (CubeItem *)wParam;
 
 	std::vector<CubeItem * >::iterator it;
-	for ( it = m_cube_items.begin(); it != m_cube_items.end(); ++it ) {
-		CubeItem * p = *it;
-		if ( p->nBedNo == pItem->nBedNo ) {
-			memcpy( p, pItem, sizeof(CubeItem) );
-			break;
-		}
-	}
+	it = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj(pItem->nBedNo));
 
 	// 如果是添加
 	if ( it == m_cube_items.end() ) {
 		m_cube_items.push_back(pItem);
 	}
 	else {
+		CubeItem * p = *it;
+		memcpy(p, pItem, sizeof(CubeItem));
 		delete pItem;
 	}
+
+	UpdateCubeItems();
 }
 
 void   CDuiFrameWnd::UpdateCubeItems() {
@@ -2976,7 +2984,7 @@ void   CDuiFrameWnd::UpdateCubeItems() {
 		item->SetTime(p->time);
 		item->SetBinding( (p->szTagId[0] == '\0') ? FALSE :TRUE);
 
-		if ( i % 2 == 1 ) {
+		if ( i % 2 == 0 ) {
 			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
 		}
 	}
