@@ -1450,13 +1450,136 @@ void   CBusiness::SaveCubeBed(const CSaveCubeBedParam * pParam) {
 
 // 读取所有的串口数据
 void   CBusiness::ReadAllComPorts() {
+	BYTE   buf[8192];
+	DWORD  dwBufLen = 0;
 	std::vector<CMyComPort *>::iterator  it_com;
-	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
+	char debug_buf[8192];
+
+	const int MIN_DATA_LENGTH = 16;
+	const int BATERRY_TEMP_DATAl_LENGTH = 16;       // 有源tag
+	const int SURGENCY_TEMP_DATA_LENGTH = 29;
+	const int HAND_TEMP_DATA_LENGTH = 32;
+
+	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ) {
 		CMyComPort * pItem = *it_com;
 		CLmnSerialPort * pCom = &pItem->m_com;
+		CDataBuf * pBuf = &pItem->m_buf;
+		
+		BOOL  bClosed = FALSE;
+		while (TRUE) {
+			dwBufLen = sizeof(buf);
+			if ( pCom->Read(buf, dwBufLen) ) {
+				if (dwBufLen > 0) {
+					pBuf->Append(buf, dwBufLen);
+				}
+				else {
+					break;
+				}
+			}
+			else {
+				pCom->CloseUartPort();
+				bClosed = TRUE;
+				break;
+			}
+		}
+
+		// 如果关闭
+		if ( bClosed ) {
+			delete pItem;
+			it_com = m_vSerialPorts.erase(it_com);
+			continue;
+		}
+		
+
+		// 如果没有关闭，处理数据
+		if ( pBuf->GetDataLength() < MIN_DATA_LENGTH ) {
+			++it_com;
+			continue;
+		}
+
+		while ( pBuf->Read(buf, MIN_DATA_LENGTH) ) {
+
+			if (buf[0] != 0x55) {
+				DebugStream(debug_buf, sizeof(debug_buf), buf, MIN_DATA_LENGTH);
+				g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据头：\n%s\n", debug_buf);
+				pCom->CloseUartPort();
+				bClosed = TRUE;
+				break;
+			}
+			
+			// 如果是手持温度数据
+			if (buf[1] == 0x1E) {
+				DWORD  dwExtraLength = HAND_TEMP_DATA_LENGTH - MIN_DATA_LENGTH;
+				DWORD  dwExpectedLength = HAND_TEMP_DATA_LENGTH;
+
+				// 如果没有足够数据
+				if ( pBuf->GetDataLength() < dwExtraLength ) {
+					pBuf->ResetReadPos();
+					break;
+				}
+
+				// 读出完整的数据 
+				pBuf->Read(buf + MIN_DATA_LENGTH, dwExtraLength);
+				pBuf->Reform();
+
+				TempItem item;
+				BOOL bHandled = ProcHandeReader( pCom, buf, dwExpectedLength, item);
+				// 清除结尾可能存在的"dd aa"
+				ProcTail(pBuf);
+
+				// 得到一条温度数据
+				if ( bHandled ) {
+
+				}
+			}
+		}		
+
+		// 如果关闭
+		if (bClosed) {
+			delete pItem;
+			it_com = m_vSerialPorts.erase(it_com);
+			continue;
+		}
+
+		++it_com;
 	}
 
 	g_data.m_thrd_launch_cube->PostDelayMessage( 1000, this, MSG_READ_COM_PORTS );
+}
+
+// 清除结尾可能存在的"dd aa"
+void  CBusiness::ProcTail(CDataBuf * pBuf) {
+	if (pBuf->GetDataLength() >= 2) {
+		BYTE  buf[32];
+		pBuf->Read(buf, 2);
+		// 如果是 dd aa结尾
+		if (buf[0] == 0xDD && buf[1] == 0xAA) {
+			pBuf->Reform();
+		}
+		else {
+			pBuf->ResetReadPos();
+		}
+	}
+}
+
+// 处理手持读卡器数据
+BOOL   CBusiness::ProcHandeReader( CLmnSerialPort * pCom, const BYTE * pData, DWORD dwDataLen, TempItem & item) {
+	char debug_buf[8192];
+
+	// 如果最后一个字节不是0xFF
+	if (pData[dwDataLen - 1] != 0xFF) {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(跳过，不处理)：\n%s\n", debug_buf);
+		return FALSE;
+	}
+
+	memset(&item, 0, sizeof(item));
+	item.m_dwTemp = pData[16] * 100 + pData[17];
+	item.m_time = time(0);
+	GetTagId(item.m_szTagId, sizeof(item.m_szTagId), pData + 8, 8);
+	GetHandReaderId(item.m_szReaderId, sizeof(item.m_szReaderId), pData + 4);
+
+	return TRUE;
 }
 
 

@@ -142,6 +142,10 @@ public:
 
 	// 读取所有的串口数据
 	void   ReadAllComPorts();
+	// 清除结尾可能存在的"dd aa"
+	void   ProcTail(CDataBuf * pBuf);
+	// 处理手持读卡器数据
+	BOOL   ProcHandeReader(CLmnSerialPort * pCom, const BYTE * pData, DWORD dwDataLen, TempItem & item);
 
 private:
 	static CBusiness *  pInstance;
