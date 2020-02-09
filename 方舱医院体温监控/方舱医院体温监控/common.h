@@ -40,6 +40,7 @@ using namespace DuiLib;
 #define  TRI_TAGS_COLOR_2          0xFF00FF00
 
 // #define  CUBE_TEST_FLAG            1
+#define  CUBE_ALTERNATIVE_BKCOLOR   0xFF666666
 
 
 // 窗格温度文字透明度

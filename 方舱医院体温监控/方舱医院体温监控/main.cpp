@@ -230,8 +230,6 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
 
-
-
 #if CUBE_TEST_FLAG
 	for (int i = 0; i < 1000; i++) {
 		CCubeItemUI * item = new CCubeItemUI;
@@ -2918,6 +2916,8 @@ void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
 	assert(pvRet);
 
 	std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_cube_items));
+	UpdateCubeItems();
+
 	delete pvRet;
 }
 
@@ -2940,6 +2940,47 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	else {
 		delete pItem;
 	}
+}
+
+void   CDuiFrameWnd::UpdateCubeItems() {
+	int nItemsCnt = m_cube_items.size();
+	int nUiItemsCnt = m_CubeItems->GetCount();
+	int nDiff = 0;
+
+	if ( nItemsCnt < nUiItemsCnt ) {		
+		nDiff = nUiItemsCnt - nItemsCnt;
+		for (int i = 0; i < nDiff; i++) {
+			m_CubeItems->RemoveAt(0);
+		}
+	}
+	else {
+		nDiff = nItemsCnt - nUiItemsCnt;
+		for (int i = 0; i < nDiff; i++) {
+			CCubeItemUI * item = new CCubeItemUI;
+			m_CubeItems->Add(item);
+		}
+	}
+	
+	nUiItemsCnt = m_CubeItems->GetCount();
+	// 数量一定相同
+	assert(nItemsCnt == m_CubeItems->GetCount());
+	
+	for ( int i = 0; i < nUiItemsCnt; i++ ) {
+		CCubeItemUI * item = (CCubeItemUI *)m_CubeItems->GetItemAt(i);
+		CubeItem * p = m_cube_items[i];
+
+		item->SetBedNo(p->nBedNo);
+		item->SetPatientName(p->szName);
+		item->SetPhone(p->szPhone);
+		item->SetTemperature(p->nTemp);
+		item->SetTime(p->time);
+		item->SetBinding( (p->szTagId[0] == '\0') ? FALSE :TRUE);
+
+		if ( i % 2 == 1 ) {
+			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+		}
+	}
+
 }
                       
 

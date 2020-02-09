@@ -1665,6 +1665,7 @@ void CCubeItemUI::DoInit() {
 
 void  CCubeItemUI::SetBedNo(int nBedNo) {
 	m_nBedNo = nBedNo;
+	SetBedNo();
 }
 
 void  CCubeItemUI::SetBedNo() {

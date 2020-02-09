@@ -5,7 +5,7 @@
 			<VerticalLayout>		
 				<VerticalLayout inset="10,10,0,10" >
 					<HorizontalLayout height="40"  >
-						<Label text="高温床位区" textcolor="#FFFFFFFF" font="103" />
+						<Label text="高度关注清单" textcolor="#FFFFFFFF" font="103" />
 					</HorizontalLayout>
 					
 					<HorizontalLayout height="35" inset="0,10,0,0" >
