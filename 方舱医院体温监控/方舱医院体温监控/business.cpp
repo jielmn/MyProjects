@@ -1421,11 +1421,21 @@ void  CBusiness::QueryOutHospital(const CQueryOutHospital * pParam) {
 }
 
 void   CBusiness::SaveCubeBedAsyn(int nBedNo, const char * szName, const char * szPhone) {
-
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_SAVE_CUBE_BED, 
+		new CSaveCubeBedParam(nBedNo, szName, szPhone) );
 }
 
-void   CBusiness::SaveCubeBed() {
+void   CBusiness::SaveCubeBed(const CSaveCubeBedParam * pParam) {
+	m_sqlite.SaveCubeBed(pParam);
 
+	CubeItem * pItem = new CubeItem;
+	memset(pItem, 0, sizeof(CubeItem));
+
+	pItem->nBedNo = pParam->m_nBedNo;
+	STRNCPY(pItem->szName,  pParam->m_szName, sizeof(pItem->szName));
+	STRNCPY(pItem->szPhone, pParam->m_szPhone, sizeof(pItem->szPhone));
+
+	::PostMessage(g_data.m_hWnd, UM_ADD_CUBE_ITEMS_RET, (WPARAM)pItem, 0);
 }
 
 
@@ -1617,6 +1627,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryOutHospital * pParam = (CQueryOutHospital *)pMessageData;
 		QueryOutHospital(pParam);
+	}
+	break;
+
+	case MSG_SAVE_CUBE_BED:
+	{
+		CSaveCubeBedParam * pParam = (CSaveCubeBedParam *)pMessageData;
+		SaveCubeBed(pParam);
 	}
 	break;
 

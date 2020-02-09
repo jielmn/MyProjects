@@ -1609,6 +1609,13 @@ void CMySqliteDatabase::QueryOutHospital( const CQueryOutHospital * pParam,
 	sqlite3_free_table(azResult);
 }
 
+char *  CMySqliteDatabase::Str2DbStr(char * szDest, DWORD dwDestSize, const char * szStr) {
+	char buf[1024];
+	StrReplaceAll( buf, sizeof(buf), szStr, "'", "''" );
+	AnsiToUtf8( szDest, dwDestSize, szStr );
+	return szDest;
+}
+
 
 // 方舱获取所有床位号
 void  CMySqliteDatabase::GetAllCubeBeds(std::vector<CubeItem*> & vRet) {
@@ -1649,4 +1656,48 @@ void  CMySqliteDatabase::GetAllCubeBeds(std::vector<CubeItem*> & vRet) {
 		}
 		sqlite3_free_table(azResult);
 	}
+}
+
+int  CMySqliteDatabase::SaveCubeBed(const CSaveCubeBedParam * pParam) {
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE bedno=%d ",
+		BED_INFO_TABLE, pParam->m_nBedNo );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	char szName[256];
+	char szPhone[256];
+	Str2DbStr( szName,  sizeof(szName),  pParam->m_szName );
+	Str2DbStr( szPhone, sizeof(szPhone), pParam->m_szPhone );
+
+	//CreateTable(
+	//	TEMP_TABLE_1,
+	//	"id         INTEGER        PRIMARY KEY     AUTOINCREMENT," \
+	//	"bedno      INTEGER        NOT NULL," \
+	//	"temp       int            NOT NULL," \
+	//	"time       int            NOT NULL"
+	//);
+
+	// 存在
+	if (nrow > 0) {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s SET name='%s', phone='%s', tag_id='' WHERE bedno=%d ",
+			BED_INFO_TABLE, szName, szPhone, pParam->m_nBedNo );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+
+		SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE bedno=%d ",
+			TEMP_TABLE_1, pParam->m_nBedNo);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	// 不存在
+	else {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(%d, '%s', '%s', '')",
+			BED_INFO_TABLE, pParam->m_nBedNo, szName, szPhone );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+
+	return 0;
 }

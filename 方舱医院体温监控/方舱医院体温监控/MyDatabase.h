@@ -73,10 +73,13 @@ private:
 	// 转换tag名称
 	void  ConvertTagNames();
 
+	char *  Str2DbStr(char * szDest, DWORD dwDestSize, const char * szStr);
+
 public:
 	// 根据TagID查询绑定的grid index(Return: 0 notfound, > 0 found)
 	int  QueryBindingGridIndexByTagId(const char * szTagId);
 
 	// 方舱获取所有床位号
 	void  GetAllCubeBeds(std::vector<CubeItem*> & vRet);
+	int  SaveCubeBed(const CSaveCubeBedParam * pParam);
 };

@@ -132,7 +132,7 @@ public:
 
 	//  ·½²Õ
 	void   SaveCubeBedAsyn(int nBedNo, const char * szName, const char * szPhone);
-	void   SaveCubeBed();
+	void   SaveCubeBed(const CSaveCubeBedParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

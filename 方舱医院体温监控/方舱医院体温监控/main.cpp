@@ -229,6 +229,34 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edtPhone1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtPhone1"));
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
+
+
+
+#if CUBE_TEST_FLAG
+	for (int i = 0; i < 1000; i++) {
+		CCubeItemUI * item = new CCubeItemUI;
+		CDuiString  s;
+
+		item->SetBedNo(i + 1);
+		s.Format("病人%d", i + 1);
+		item->SetPatientName(s);
+		s.Format("1981325%04d", i + 1);
+		item->SetPhone(s);
+		item->SetTemperature(3600 + (i * 10) % 400 );
+		item->SetTime(now);
+		m_CubeItems->Add(item);
+	}
+
+	for (int i = 0; i < 3; i++) {
+		CCubeItemUI * item = new CCubeItemUI;
+		item->SetBedNo(i + 100);
+		item->SetPatientName("张三1");
+		item->SetPhone("123xyz");
+		item->SetTemperature(3600 + i * 10);
+		item->SetTime(now);
+		m_CubeItems_high_temp->Add(item);
+	}
+#endif
                   
 	//////////// 
 
@@ -492,6 +520,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_GET_ALL_CUBE_ITEMS) {
 		OnGetAllCubeItems(wParam, lParam);
+	}
+	else if (uMsg == UM_ADD_CUBE_ITEMS_RET) {
+		OnAddCubeItemRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -2878,6 +2909,8 @@ void   CDuiFrameWnd::OnAddCubeItem() {
 		MessageBox(GetHWND(), "请输入姓名!", "错误", 0);
 		return;
 	}
+
+	CBusiness::GetInstance()->SaveCubeBedAsyn(nBedNo, strName, strPhone);
 }
 
 void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
@@ -2886,6 +2919,27 @@ void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
 
 	std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_cube_items));
 	delete pvRet;
+}
+
+void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
+	CubeItem * pItem = (CubeItem *)wParam;
+
+	std::vector<CubeItem * >::iterator it;
+	for ( it = m_cube_items.begin(); it != m_cube_items.end(); ++it ) {
+		CubeItem * p = *it;
+		if ( p->nBedNo == pItem->nBedNo ) {
+			memcpy( p, pItem, sizeof(CubeItem) );
+			break;
+		}
+	}
+
+	// 如果是添加
+	if ( it == m_cube_items.end() ) {
+		m_cube_items.push_back(pItem);
+	}
+	else {
+		delete pItem;
+	}
 }
                       
 

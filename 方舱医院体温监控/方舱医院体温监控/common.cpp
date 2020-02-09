@@ -1786,10 +1786,12 @@ DWORD GetIntFromDb(const char * szValue, int nDefault /*= 0*/) {
 
 char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue) {
 	assert(dwSize > 0);
-	if (szValue)
-		STRNCPY(buf, szValue, dwSize);
-	else if ( dwSize > 0 )
+	if (szValue) {
+		Utf8ToAnsi(buf, dwSize, szValue);
+	}		
+	else if (dwSize > 0) {
 		buf[0] = '\0';
+	}		
 	return buf;
 }
 

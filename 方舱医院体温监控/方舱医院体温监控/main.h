@@ -346,4 +346,5 @@ private:
 	void   OnChecComPortsRet(WPARAM, LPARAM);
 	void   OnAddCubeItem();
 	void   OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam);
+	void   OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam);
 };

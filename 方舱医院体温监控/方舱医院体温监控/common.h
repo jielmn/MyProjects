@@ -39,6 +39,8 @@ using namespace DuiLib;
 #define  TRI_TAGS_COLOR_1          0xFF999999
 #define  TRI_TAGS_COLOR_2          0xFF00FF00
 
+// #define  CUBE_TEST_FLAG            1
+
 
 // 窗格温度文字透明度
 #define   GRID_LABLE_TRANSPARENT_PARAM       0xCC
@@ -230,6 +232,7 @@ using namespace DuiLib;
 #define MSG_DEL_TAG                         2021
 #define MSG_QUERY_INHOSPITAL                2022
 #define MSG_QUERY_OUTHOSPITAL               2023
+#define MSG_SAVE_CUBE_BED                   2024
 
 
 // windows 消息
@@ -250,10 +253,10 @@ using namespace DuiLib;
 #define UM_DEL_TAG_RET                       (WM_USER+15)
 #define UM_QUERY_INHOSPITAL_RET              (WM_USER+16)
 #define UM_QUERY_OUTHOSPITAL_RET             (WM_USER+17)
-
 // 检查打开了哪些串口
 #define UM_CHECK_COM_PORTS_RET               (WM_USER+18)
 #define UM_GET_ALL_CUBE_ITEMS                (WM_USER+19)
+#define UM_ADD_CUBE_ITEMS_RET                (WM_USER+20)
 
 
 #define XML_CHART_WIDTH              764
@@ -802,6 +805,18 @@ typedef struct tagCubeItem {
 	char    szTagId[MAX_TAG_ID_LENGTH];
 }CubeItem;
 
+class CSaveCubeBedParam : public LmnToolkits::MessageData {
+public:
+	CSaveCubeBedParam(int nBedNo, const char * szName, const char * szPhone) {
+		m_nBedNo = nBedNo;
+		STRNCPY(m_szName,  szName,  MAX_CUBE_NAME_LENGTH);
+		STRNCPY(m_szPhone, szPhone, MAX_CUBE_PHONE_LENGTH);
+	}
+
+	int     m_nBedNo;
+	char    m_szName[MAX_CUBE_NAME_LENGTH];
+	char    m_szPhone[MAX_CUBE_PHONE_LENGTH];
+};
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;
