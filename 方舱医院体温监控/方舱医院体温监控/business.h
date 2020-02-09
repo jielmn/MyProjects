@@ -8,6 +8,12 @@
 #include "Launch.h"
 #include "LmnExcel.h"
 
+class CMyComPort {
+public:
+	CLmnSerialPort     m_com;
+	CDataBuf           m_buf;
+};
+
 
 class CDuiFrameWnd;
 class CBusiness : public LmnToolkits::MessageHandler, public sigslot::has_slots<> {
@@ -206,7 +212,7 @@ public:
 
 private:
 	// ·½²Õ
-	std::vector<CLmnSerialPort *>   m_vSerialPorts;
+	std::vector<CMyComPort *>   m_vSerialPorts;
 };
 
 

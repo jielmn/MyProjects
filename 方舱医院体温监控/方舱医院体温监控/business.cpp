@@ -31,11 +31,11 @@ CBusiness::CBusiness() {
 CBusiness::~CBusiness() {
 	Clear();
 
-	std::vector<CLmnSerialPort *>::iterator it_com;
+	std::vector<CMyComPort *>::iterator it_com;
 	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
-		CLmnSerialPort * pComPort = *it_com;
-		pComPort->CloseUartPort();
-		delete pComPort;
+		CMyComPort * pItem = *it_com;
+		pItem->m_com.CloseUartPort();
+		delete pItem;
 	}
 
 	LmnDeinitLock(&m_lock);
@@ -585,11 +585,12 @@ void  CBusiness::CheckLaunch() {
 	std::map<int, std::string>   m2;
 	std::vector<int>             v3;
 
-	std::vector<CLmnSerialPort *>::iterator it_com;
+	std::vector<CMyComPort *>::iterator it_com;
 	std::map<int, std::string>::iterator it;
 
 	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
-		CLmnSerialPort * pComPort = *it_com;
+		CMyComPort * pItem = *it_com;
+		CLmnSerialPort * pComPort = &pItem->m_com;
 		assert(pComPort->GetStatus() == CLmnSerialPort::OPEN);
 
 		it = all_ports.find( pComPort->GetPort() );
@@ -607,7 +608,8 @@ void  CBusiness::CheckLaunch() {
 	for (ix = v3.begin(); ix != v3.end(); ++ix) {
 		int nCom = *ix;
 		for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
-			CLmnSerialPort * pComPort = *it_com;
+			CMyComPort * pItem = *it_com;
+			CLmnSerialPort * pComPort = &pItem->m_com;
 			if ( pComPort->GetPort() == nCom ) {
 				pComPort->CloseUartPort();
 				m_vSerialPorts.erase(it_com);
@@ -623,14 +625,15 @@ void  CBusiness::CheckLaunch() {
 			// 看看新的串口是否要打开
 			for (int i = 0; i < g_data.m_nComportsCnt; i++) {
 				if (nCom == g_data.m_nComports[i]) {
-					CLmnSerialPort * pPort = new CLmnSerialPort;
+					CMyComPort * pItem = new CMyComPort;
+					CLmnSerialPort * pPort = &pItem->m_com;
 					BOOL bRet = pPort->OpenUartPort(nCom);
 					if (bRet) {
-						m_vSerialPorts.push_back(pPort);
+						m_vSerialPorts.push_back(pItem);
 					}
 					else {
 						pPort->CloseUartPort();
-						delete pPort;
+						delete pItem;
 					}
 					break;
 				}
@@ -646,14 +649,15 @@ void  CBusiness::CheckLaunch() {
 			Str2Lower(s.c_str(), buf, sizeof(buf));
 
 			if ( 0 != strstr(buf, "usb-serial ch340")) {
-				CLmnSerialPort * pPort = new CLmnSerialPort;
+				CMyComPort * pItem = new CMyComPort;
+				CLmnSerialPort * pPort = &pItem->m_com;
 				BOOL bRet = pPort->OpenUartPort(nCom);
 				if (bRet) {
-					m_vSerialPorts.push_back(pPort);
+					m_vSerialPorts.push_back(pItem);
 				}
 				else {
 					pPort->CloseUartPort();
-					delete pPort; 
+					delete pItem; 
 				}
 			}
 		}
@@ -661,7 +665,8 @@ void  CBusiness::CheckLaunch() {
 
 	std::vector<int> * pvRet = new std::vector<int>;
 	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
-		CLmnSerialPort * pCom = *it_com;
+		CMyComPort * pItem = *it_com;
+		CLmnSerialPort * pCom = &pItem->m_com;
 		pvRet->push_back(pCom->GetPort());
 	}
 
@@ -907,10 +912,12 @@ void  CBusiness::PrintStatus() {
 	//JTelSvrPrint("launch messages count: %lu", g_data.m_thrd_launch->GetMessagesCount());
 	//JTelSvrPrint("work messages count: %lu", g_data.m_thrd_work->GetMessagesCount());
 
-	std::vector<CLmnSerialPort *>::iterator it_com;
+	std::vector<CMyComPort *>::iterator it_com;
 	for ( it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com ) {
-		CLmnSerialPort * pCom = *it_com;
-		JTelSvrPrint("com[%d] status: %s", pCom->GetPort(), pCom->GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
+		CMyComPort * pItem = *it_com;
+		CLmnSerialPort * pCom = &pItem->m_com;
+		JTelSvrPrint("com[%d] status: %s", pCom->GetPort(), 
+			pCom->GetStatus() == CLmnSerialPort::OPEN ? "open" : "close");
 	}
 }
 
@@ -1443,10 +1450,10 @@ void   CBusiness::SaveCubeBed(const CSaveCubeBedParam * pParam) {
 
 // 读取所有的串口数据
 void   CBusiness::ReadAllComPorts() {
-	std::vector<CLmnSerialPort *>::iterator  it_com;
+	std::vector<CMyComPort *>::iterator  it_com;
 	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
-		CLmnSerialPort * pCom = *it_com;
-
+		CMyComPort * pItem = *it_com;
+		CLmnSerialPort * pCom = &pItem->m_com;
 	}
 
 	g_data.m_thrd_launch_cube->PostDelayMessage( 1000, this, MSG_READ_COM_PORTS );
