@@ -88,6 +88,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_edtBedNo1 = 0;
 	m_edtName1 = 0;
 	m_edtPhone1 = 0;
+
+	memset(&m_cur_tag, 0, sizeof(m_cur_tag));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -588,9 +590,12 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 		while (pCtl) {
 			if (pCtl->GetClass() == "NewTag") {
-				m_dwDgStartTick = LmnGetTickCount();
-				m_bNewTagDragDrop = TRUE;
-				m_HightLightItem = 0;      
+				// 如果当前有新tag，才开始拖动
+				if (m_cur_tag.szTagId[0] != '\0') {
+					m_dwDgStartTick = LmnGetTickCount();
+					m_bNewTagDragDrop = TRUE;
+					m_HightLightItem = 0;
+				}
 				break;
 			}
 			pCtl = pCtl->GetParent();

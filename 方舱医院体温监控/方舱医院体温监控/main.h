@@ -336,6 +336,7 @@ private:
 	CEditUI *                                   m_edtPhone1;
 
 	std::vector<CubeItem * >                    m_cube_items;
+	CurTagData                                  m_cur_tag;
 
 private:
 	void   MoveNewTag(const POINT & pt);
