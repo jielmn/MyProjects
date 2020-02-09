@@ -245,6 +245,9 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_sqlite_cube->Start();
 
+	// 不停的读取串口数据
+	g_data.m_thrd_launch_cube->PostMessage( this, MSG_READ_COM_PORTS );
+
 	return 0;
 }
 
@@ -1438,6 +1441,17 @@ void   CBusiness::SaveCubeBed(const CSaveCubeBedParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_ADD_CUBE_ITEMS_RET, (WPARAM)pItem, 0);
 }
 
+// 读取所有的串口数据
+void   CBusiness::ReadAllComPorts() {
+	std::vector<CLmnSerialPort *>::iterator  it_com;
+	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ++it_com) {
+		CLmnSerialPort * pCom = *it_com;
+
+	}
+
+	g_data.m_thrd_launch_cube->PostDelayMessage( 1000, this, MSG_READ_COM_PORTS );
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1634,6 +1648,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveCubeBedParam * pParam = (CSaveCubeBedParam *)pMessageData;
 		SaveCubeBed(pParam);
+	}
+	break;
+
+	case MSG_READ_COM_PORTS:
+	{
+		ReadAllComPorts();
 	}
 	break;
 

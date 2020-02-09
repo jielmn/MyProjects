@@ -235,6 +235,7 @@ using namespace DuiLib;
 #define MSG_QUERY_INHOSPITAL                2022
 #define MSG_QUERY_OUTHOSPITAL               2023
 #define MSG_SAVE_CUBE_BED                   2024
+#define MSG_READ_COM_PORTS                  2025
 
 
 // windows ÏûÏ¢

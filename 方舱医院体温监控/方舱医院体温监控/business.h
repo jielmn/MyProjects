@@ -134,6 +134,9 @@ public:
 	void   SaveCubeBedAsyn(int nBedNo, const char * szName, const char * szPhone);
 	void   SaveCubeBed(const CSaveCubeBedParam * pParam);
 
+	// 读取所有的串口数据
+	void   ReadAllComPorts();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
