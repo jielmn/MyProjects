@@ -1724,3 +1724,14 @@ int  CMySqliteDatabase::CubeBindingTag(const CCubeBindTagParam * pParam) {
 
 	return 0;
 }
+
+// ±£´æÎÂ¶È
+int  CMySqliteDatabase::SaveCubeTemp(const CCubeSaveTempParam * pParam) {
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(null, %d, %d, %lu)",
+		TEMP_TABLE_1, pParam->m_nBedNo, pParam->m_nTemp, (DWORD)pParam->m_time );
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	return 0;
+}

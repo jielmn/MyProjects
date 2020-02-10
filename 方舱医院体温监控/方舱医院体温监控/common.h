@@ -239,6 +239,7 @@ using namespace DuiLib;
 #define MSG_SAVE_CUBE_BED                   2024
 #define MSG_READ_COM_PORTS                  2025
 #define MSG_CUBE_BINDING_TAG                2026
+#define MSG_CUBE_SAVE_TEMP                  2027
 
 
 // windows ÏûÏ¢
@@ -842,6 +843,19 @@ public:
 
 	int     m_nBedNo;
 	char    m_szTagId[MAX_TAG_ID_LENGTH];
+};
+
+class CCubeSaveTempParam : public LmnToolkits::MessageData {
+public:
+	CCubeSaveTempParam(int nBedNo, int nTemp, time_t time) {
+		m_nBedNo = nBedNo;
+		m_nTemp = nTemp;
+		m_time = time;
+	}
+
+	int     m_nBedNo;
+	int     m_nTemp;
+	time_t  m_time;
 };
 
 

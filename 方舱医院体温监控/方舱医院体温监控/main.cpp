@@ -3046,6 +3046,8 @@ void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
 		pFindItem->nTemp = pItem->m_dwTemp;
 		pFindItem->time = pItem->m_time;
 		UpdateCubeItems();
+		// 保存到数据库
+		CBusiness::GetInstance()->SaveCubeTempAsyn(pFindItem->nBedNo, pItem->m_dwTemp, pItem->m_time);
 	}
 
 	delete pItem;

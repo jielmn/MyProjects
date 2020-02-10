@@ -1602,6 +1602,16 @@ void   CBusiness::CubeBindingTag(const CCubeBindTagParam * pParam) {
 	}
 }
 
+// 保存温度数据
+void   CBusiness::SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time) {
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_CUBE_SAVE_TEMP,
+		new CCubeSaveTempParam(nBedNo, nTemp, time));
+}
+
+void   CBusiness::SaveCubeTemp(const CCubeSaveTempParam * pParam) {
+	m_sqlite.SaveCubeTemp(pParam);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1811,6 +1821,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CCubeBindTagParam * pParam = (CCubeBindTagParam *)pMessageData;
 		CubeBindingTag(pParam);
+	}
+	break;
+
+	case MSG_CUBE_SAVE_TEMP:
+	{
+		CCubeSaveTempParam * pParam = (CCubeSaveTempParam *)pMessageData;
+		SaveCubeTemp(pParam);
 	}
 	break;
 

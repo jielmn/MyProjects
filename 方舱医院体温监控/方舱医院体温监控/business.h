@@ -151,6 +151,10 @@ public:
 	void   CubeBindingTagAsyn(int nBedId, const char * szTagId);
 	void   CubeBindingTag(const CCubeBindTagParam * pParam);
 
+	// 保存温度数据
+	void   SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time);
+	void   SaveCubeTemp(const CCubeSaveTempParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

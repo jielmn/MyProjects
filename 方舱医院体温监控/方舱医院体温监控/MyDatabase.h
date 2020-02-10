@@ -84,5 +84,7 @@ public:
 	int   SaveCubeBed(const CSaveCubeBedParam * pParam);
 	// 床位绑定tag
 	int  CubeBindingTag(const CCubeBindTagParam * pParam);
+	// 保存温度
+	int  SaveCubeTemp(const CCubeSaveTempParam * pParam);
 
 };
