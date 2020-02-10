@@ -238,6 +238,7 @@ using namespace DuiLib;
 #define MSG_QUERY_OUTHOSPITAL               2023
 #define MSG_SAVE_CUBE_BED                   2024
 #define MSG_READ_COM_PORTS                  2025
+#define MSG_CUBE_BINDING_TAG                2026
 
 
 // windows ÏûÏ¢
@@ -830,6 +831,18 @@ typedef struct tagCurTagData {
 	int     nTemp;
 	time_t  time;
 }CurTagData;
+
+class CCubeBindTagParam : public LmnToolkits::MessageData {
+public:
+	CCubeBindTagParam(int nBedNo, const char * szTagId) {
+		m_nBedNo = nBedNo;
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+	}
+
+	int     m_nBedNo;
+	char    m_szTagId[MAX_TAG_ID_LENGTH];
+};
+
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

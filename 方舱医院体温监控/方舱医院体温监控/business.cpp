@@ -1584,6 +1584,18 @@ BOOL   CBusiness::ProcHandeReader( CLmnSerialPort * pCom, const BYTE * pData, DW
 	return TRUE;
 }
 
+// 方舱床位绑定tag
+void   CBusiness::CubeBindingTagAsyn(int nBedNo, const char * szTagId) {
+	assert(szTagId && szTagId[0] != '\0');
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_CUBE_BINDING_TAG,
+		new CCubeBindTagParam(nBedNo, szTagId));
+
+}
+
+void   CBusiness::CubeBindingTag(const CCubeBindTagParam * pParam) {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1786,6 +1798,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_COM_PORTS:
 	{
 		ReadAllComPorts();
+	}
+	break;
+
+	case MSG_CUBE_BINDING_TAG:
+	{
+		CCubeBindTagParam * pParam = (CCubeBindTagParam *)pMessageData;
+		CubeBindingTag(pParam);
 	}
 	break;
 

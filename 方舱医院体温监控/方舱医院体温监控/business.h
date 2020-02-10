@@ -147,6 +147,10 @@ public:
 	// 处理手持读卡器数据
 	BOOL   ProcHandeReader(CLmnSerialPort * pCom, const BYTE * pData, DWORD dwDataLen, TempItem & item);
 
+	// 方舱床位绑定tag
+	void   CubeBindingTagAsyn(int nBedId, const char * szTagId);
+	void   CubeBindingTag(const CCubeBindTagParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

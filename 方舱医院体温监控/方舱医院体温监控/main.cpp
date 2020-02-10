@@ -922,6 +922,11 @@ void  CDuiFrameWnd::StopMoveNewTag() {
 
 	if (m_HightLightItem) {
 		m_HightLightItem->SetBorderSize(0);
+
+		int nBedNo = m_HightLightItem->GetBedNo();
+		CBusiness::GetInstance()->CubeBindingTagAsyn(nBedNo, m_cur_tag.szTagId);
+
+		m_HightLightItem = 0;
 	}
 }
 
