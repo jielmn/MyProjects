@@ -81,5 +81,8 @@ public:
 
 	// 方舱获取所有床位号
 	void  GetAllCubeBeds(std::vector<CubeItem*> & vRet);
-	int  SaveCubeBed(const CSaveCubeBedParam * pParam);
+	int   SaveCubeBed(const CSaveCubeBedParam * pParam);
+	// 床位绑定tag
+	int  CubeBindingTag(const CCubeBindTagParam * pParam);
+
 };

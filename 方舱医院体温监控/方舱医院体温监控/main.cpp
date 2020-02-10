@@ -2942,6 +2942,10 @@ void   CDuiFrameWnd::OnAddCubeItem() {
 	}
 
 	CBusiness::GetInstance()->SaveCubeBedAsyn(nBedNo, strName, strPhone);
+
+	m_edtBedNo1->SetText("");
+	m_edtName1->SetText("");
+	m_edtPhone1->SetText("");
 }
 
 void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
