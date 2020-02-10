@@ -23,6 +23,10 @@
 #define   TIMER_60_SECONDS                       1002
 #define   INTERVAL_TIMER_60_SECONDS              60000
 
+// 更新新tag颜色定时器
+#define   TIMER_NEW_TAG                          1101
+#define   INTERVAL_TIMER_NEW_TAG                 5000
+
 //自定义事件排序
 static bool sortTagUI(CTagUI * p1, CTagUI * p2)
 {
@@ -88,6 +92,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_edtBedNo1 = 0;
 	m_edtName1 = 0;
 	m_edtPhone1 = 0;
+
+	m_CurTag = 0;
 
 	memset(&m_cur_tag, 0, sizeof(m_cur_tag));
 }
@@ -229,6 +235,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edtBedNo1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtBedNo1"));
 	m_edtName1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtName1"));
 	m_edtPhone1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtPhone1"));
+	m_CurTag = static_cast<CNewTagUI *>(m_PaintManager.FindControl("curtag"));
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
 
@@ -466,6 +473,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		else if (wParam == TIMER_60_SECONDS) {
 			On60SecondsTimer();
 		}
+		else if (wParam == TIMER_NEW_TAG) {
+			OnNewTagTimer();
+		}
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		CheckDevice();
@@ -523,6 +533,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_ADD_CUBE_ITEMS_RET) {
 		OnAddCubeItemRet(wParam, lParam);
+	}
+	else if (uMsg == UM_CUBE_TEMP_ITEM) {
+		OnCubeTempItem(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -2994,6 +3007,42 @@ void   CDuiFrameWnd::UpdateCubeItems() {
 		}
 	}
 
+}
+
+void   CDuiFrameWnd::UpdateNewTag() {
+	m_CurTag->SetTemperature(m_cur_tag.nTemp);
+	m_CurTag->SetTime(m_cur_tag.time);
+	m_CurTag->m_strTagId = m_cur_tag.szTagId;
+}
+
+void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
+	TempItem * pItem = (TempItem *)wParam;
+
+	std::vector<CubeItem * >::iterator it;
+	it = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemByTag(pItem->m_szTagId));
+	// 如果是新Tag
+	if ( it == m_cube_items.end() ) {
+		m_cur_tag.nTemp = pItem->m_dwTemp;
+		m_cur_tag.time = pItem->m_time;
+		STRNCPY( m_cur_tag.szTagId, pItem->m_szTagId, sizeof(m_cur_tag.szTagId) );
+		UpdateNewTag();
+		m_CurTag->Refresh();
+		SetTimer( GetHWND(), TIMER_NEW_TAG, INTERVAL_TIMER_NEW_TAG, 0 );
+	}
+	else {
+		CubeItem * pFindItem = *it;
+		pFindItem->nTemp = pItem->m_dwTemp;
+		pFindItem->time = pItem->m_time;
+		UpdateCubeItems();
+	}
+
+	delete pItem;
+}
+
+void   CDuiFrameWnd::OnNewTagTimer() {
+	m_CurTag->Fade();
+
+	KillTimer(GetHWND(), TIMER_NEW_TAG);
 }
                       
 

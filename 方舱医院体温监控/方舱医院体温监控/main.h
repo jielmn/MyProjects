@@ -334,6 +334,7 @@ private:
 	CEditUI *                                   m_edtBedNo1;
 	CEditUI *                                   m_edtName1;
 	CEditUI *                                   m_edtPhone1;
+	CNewTagUI *                                 m_CurTag;
 
 	std::vector<CubeItem * >                    m_cube_items;
 	CurTagData                                  m_cur_tag;
@@ -350,6 +351,9 @@ private:
 	void   OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam);
 
 	void   UpdateCubeItems();
+	void   OnCubeTempItem(WPARAM wParam, LPARAM  lParam);
+	void   UpdateNewTag();
+	void   OnNewTagTimer();
 };
 
 
@@ -367,4 +371,18 @@ public:
 	}
 private:
 	int    m_nBedNo;
+};
+
+class  FindCubeItemByTag {
+public:
+	FindCubeItemByTag(const char * szTagId) {
+		STRNCPY(m_szTagId, szTagId, MAX_TAG_ID_LENGTH);
+	}
+	bool operator() (CubeItem * pItem) {
+		if ( 0 == strcmp(pItem->szTagId, m_szTagId) ) {
+			return true;
+		}
+		return false;
+	}
+	char  m_szTagId[MAX_TAG_ID_LENGTH];
 };

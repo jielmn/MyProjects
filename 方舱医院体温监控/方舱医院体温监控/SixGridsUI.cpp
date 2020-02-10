@@ -1820,7 +1820,7 @@ void  CNewTagUI::SetTemperature() {
 	CDuiString  strText;
 	if (m_bInitiated) {
 		if (m_nTemp > 0) {
-			strText.Format("%.1f", m_nTemp / 100.0);
+			strText.Format("%.1f¡æ", m_nTemp / 100.0);
 			m_lblTemp->SetText(strText);
 		}
 		else {
@@ -1853,4 +1853,14 @@ void  CNewTagUI::SetTime() {
 			m_lblTime->SetText("");
 		}
 	}
+}
+
+void  CNewTagUI::Fade() {
+	m_lblTemp->SetTextColor(CUBE_FADE_TEXTCOLOR);
+	m_lblTime->SetTextColor(CUBE_FADE_TEXTCOLOR);
+}
+
+void  CNewTagUI::Refresh() {
+	m_lblTemp->SetTextColor(CUBE_REFRESH_TEXTCOLOR);
+	m_lblTime->SetTextColor(CUBE_REFRESH_TEXTCOLOR);
 }

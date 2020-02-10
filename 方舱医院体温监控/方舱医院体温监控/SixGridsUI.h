@@ -316,6 +316,9 @@ public:
 	void  SetTime(time_t t);
 	time_t  GetTime();
 
+	void  Fade();
+	void  Refresh();
+
 public:
 	CDuiString     m_strTagId;
 

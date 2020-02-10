@@ -42,6 +42,8 @@ using namespace DuiLib;
 // #define  CUBE_TEST_FLAG            1
 #define  CUBE_ALTERNATIVE_BKCOLOR   0xFF666666
 #define  CUBE_WARNING_COLOR         0xFFF8992F
+#define  CUBE_FADE_TEXTCOLOR        0xFF999999
+#define  CUBE_REFRESH_TEXTCOLOR     0xFFFFFFFF
 
 
 // 窗格温度文字透明度
@@ -260,6 +262,8 @@ using namespace DuiLib;
 #define UM_CHECK_COM_PORTS_RET               (WM_USER+18)
 #define UM_GET_ALL_CUBE_ITEMS                (WM_USER+19)
 #define UM_ADD_CUBE_ITEMS_RET                (WM_USER+20)
+// 串口数据
+#define UM_CUBE_TEMP_ITEM                    (WM_USER+21)
 
 
 #define XML_CHART_WIDTH              764

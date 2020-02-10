@@ -1529,7 +1529,9 @@ void   CBusiness::ReadAllComPorts() {
 
 				// 得到一条温度数据
 				if ( bHandled ) {
-
+					TempItem * pNewItem = new TempItem;
+					memcpy( pNewItem, &item, sizeof(TempItem) );
+					::PostMessage(g_data.m_hWnd, UM_CUBE_TEMP_ITEM, (WPARAM)pNewItem, 0);
 				}
 			}
 		}		
