@@ -354,6 +354,7 @@ private:
 	void   OnCubeTempItem(WPARAM wParam, LPARAM  lParam);
 	void   UpdateNewTag();
 	void   OnNewTagTimer();
+	void   OnCubeBindingTag(WPARAM wParam, LPARAM  lParam);
 };
 
 

@@ -265,6 +265,7 @@ using namespace DuiLib;
 #define UM_ADD_CUBE_ITEMS_RET                (WM_USER+20)
 // ´®¿ÚÊý¾Ý
 #define UM_CUBE_TEMP_ITEM                    (WM_USER+21)
+#define UM_CUBE_BINDING_RET                  (WM_USER+22)
 
 
 #define XML_CHART_WIDTH              764

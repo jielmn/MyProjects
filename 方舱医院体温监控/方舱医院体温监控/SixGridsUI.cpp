@@ -1762,7 +1762,7 @@ void  CCubeItemUI::SetBinding(BOOL bBinding) {
 void  CCubeItemUI::SetBinding() {
 	if ( m_bInitiated ) {
 		if (m_bBinding) {
-			m_lblBinding->SetText("");
+			m_lblBinding->SetText("ÒÑ°ó¶¨");
 			m_lblBinding->SetTextColor(0xFFFFFFFF);
 		}
 		else {

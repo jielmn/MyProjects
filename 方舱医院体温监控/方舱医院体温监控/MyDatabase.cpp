@@ -1696,16 +1696,14 @@ int  CMySqliteDatabase::SaveCubeBed(const CSaveCubeBedParam * pParam) {
 
 // 床位绑定tag
 int  CMySqliteDatabase::CubeBindingTag(const CCubeBindTagParam * pParam) {
-	//CreateTable(
-	//	BED_INFO_TABLE,
-	//	"bedno      INTEGER        PRIMARY KEY     NOT NULL," \
-	//	"name       varchar(24)    NOT NULL," \
-	//	"phone      varchar(24)    NOT NULL," \
-	//	"tag_id     CHAR(16)       NOT NULL"
-	//);
 
+	assert(pParam->m_szTagId[0] != '\0');
+	if (pParam->m_szTagId[0] == '\0') {
+		return -1;
+	}
+	
 	char sql[8192];
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id=%s ",
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE tag_id='%s' ",
 		BED_INFO_TABLE, pParam->m_szTagId );
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
@@ -1713,7 +1711,14 @@ int  CMySqliteDatabase::CubeBindingTag(const CCubeBindTagParam * pParam) {
 
 	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
 	if ( nrow > 0 ) {
-
+		assert(0);
+		sqlite3_free_table(azResult);
+		return -1;
+	}
+	else {
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s SET tag_id='%s' WHERE bedno=%d",
+			BED_INFO_TABLE, pParam->m_szTagId, pParam->m_nBedNo);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
 	}
 	sqlite3_free_table(azResult);
 

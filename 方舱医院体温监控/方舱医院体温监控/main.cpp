@@ -537,6 +537,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_CUBE_TEMP_ITEM) {
 		OnCubeTempItem(wParam, lParam);
 	}
+	else if (uMsg == UM_CUBE_BINDING_RET) {
+		OnCubeBindingTag(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -3052,6 +3055,27 @@ void   CDuiFrameWnd::OnNewTagTimer() {
 	m_CurTag->Fade();
 
 	KillTimer(GetHWND(), TIMER_NEW_TAG);
+}
+
+void   CDuiFrameWnd::OnCubeBindingTag(WPARAM wParam, LPARAM  lParam) {
+	int    nBedNo = wParam;
+	char * szTagId = (char *)lParam;
+
+	std::vector<CubeItem * >::iterator it;
+	it = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj(nBedNo));
+	assert(it != m_cube_items.end());
+	if (it != m_cube_items.end()) {
+		CubeItem * pItem = *it;
+		STRNCPY(pItem->szTagId, szTagId, sizeof(pItem->szTagId));
+		UpdateCubeItems();
+	}
+
+	m_cur_tag.nTemp = 0;
+	m_cur_tag.szTagId[0] = '\0';
+	m_cur_tag.time = 0;
+	UpdateNewTag();
+
+	delete szTagId;
 }
                       
 

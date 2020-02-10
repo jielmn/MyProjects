@@ -1593,7 +1593,13 @@ void   CBusiness::CubeBindingTagAsyn(int nBedNo, const char * szTagId) {
 }
 
 void   CBusiness::CubeBindingTag(const CCubeBindTagParam * pParam) {
+	int ret = m_sqlite.CubeBindingTag(pParam);
+	if (0 == ret) {
+		char * szTagId = new char[MAX_TAG_ID_LENGTH];
+		STRNCPY(szTagId, pParam->m_szTagId, MAX_TAG_ID_LENGTH);
 
+		::PostMessage(g_data.m_hWnd, UM_CUBE_BINDING_RET, pParam->m_nBedNo, (LPARAM)szTagId);
+	}
 }
 
 
