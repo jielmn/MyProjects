@@ -135,10 +135,11 @@ protected:
 	SolidBrush *          m_remark_brush;
 
 private:
-	std::vector<TempItem * >     m_no_use;
+	std::vector<TempItem * >     m_vTempData;
 
 public:
-	std::vector<TempItem * >     m_vTempData;
+	void   ClearCubeData();
+	void   LoadCubeData(std::vector<CubeTempItem *> & vData);
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

@@ -73,18 +73,18 @@ void CMyImageUI::DoEvent(DuiLib::TEventUI& event) {
 		OnDbClick();
 	}
 	else if (event.Type == UIEVENT_SCROLLWHEEL) {
-		OnMyMouseWheel(event.wParam, event.lParam);
+		OnMyMouseWheel(event.wParam, event.lParam); 
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
-		// 如果没有开始拖放操作
-		if ( !m_bDragDrop ) {
-			// 检查鼠标位置，在高温、低温报警附近时，改变鼠标状态
-			CheckCursor(event.ptMouse);
-		}
-		// 如果开始了鼠标拖放操作
-		else {
-			DragDropIng(event.ptMouse);
-		}
+		//// 如果没有开始拖放操作
+		//if ( !m_bDragDrop ) {
+		//	// 检查鼠标位置，在高温、低温报警附近时，改变鼠标状态
+		//	CheckCursor(event.ptMouse);
+		//}
+		//// 如果开始了鼠标拖放操作
+		//else {
+		//	DragDropIng(event.ptMouse);
+		//}
 
 		if (g_data.m_CfgData.m_bCrossAnchor)
 			this->Invalidate();
@@ -167,11 +167,13 @@ DWORD   CMyImageUI::GetReaderIndex() {
 }
 
 const   std::vector<TempItem * > & CMyImageUI::GetTempData(DWORD j) {
-	CGridUI * pParent = (CGridUI *)GetGrid();
-	if (pParent)
-		return pParent->GetTempData(j);
-	else
-		return m_no_use;
+	//CGridUI * pParent = (CGridUI *)GetGrid();
+	//if (pParent)
+	//	return pParent->GetTempData(j);
+	//else
+	//	return m_no_use;
+
+	return m_vTempData;
 }
 
 CModeButton::Mode  CMyImageUI::GetMode() {
@@ -571,7 +573,7 @@ void   CMyImageUI::DoPaint_7Days(HDC hDC, const RECT& rcPaint, CControlUI* pStop
 	DrawScale(hDC, nCelsiusCount, nHeightPerCelsius, nMaxY, nMaxTemp, rectScale, width);
 
 	// 画报警线
-	DrawWarning( hDC,i,j,nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width );
+	// DrawWarning( hDC,i,j,nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width );
 
 	// 计算温度曲线跨越几个日子
 	int  nDayCounts = GetDayCounts(i,j,mode);
@@ -811,7 +813,7 @@ void  CMyImageUI::DoPaint_SingleDay(HDC hDC, const RECT& rcPaint, CControlUI* pS
 	DrawBorder(hDC, rectScale, width);	
 
 	// 画报警线
-	DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
+	// DrawWarning(hDC, i, j, nMaxTemp, nHeightPerCelsius, nMaxY, rectScale, width);
 
 	// 查看有无数据
 	int nPointsCnt = GetTempCount(i, j, mode);
@@ -1627,6 +1629,23 @@ void  CMyImageUI::ResetColors() {
 		}
 	}
 #endif
+}
+
+void  CMyImageUI::ClearCubeData() {
+	ClearVector(m_vTempData);
+}
+
+void  CMyImageUI::LoadCubeData(std::vector<CubeTempItem *> & vData) {
+	ClearVector(m_vTempData);
+	std::vector<CubeTempItem *>::iterator it;
+	for (it = vData.begin(); it != vData.end(); ++it) {
+		CubeTempItem * pSrc = *it;
+		TempItem * pDst = new TempItem;
+		memset(pDst, 0, sizeof(TempItem));
+		pDst->m_dwTemp = pSrc->m_nTemp;
+		pDst->m_time = pSrc->m_time;
+		m_vTempData.push_back(pDst);
+	}
 }
 
 

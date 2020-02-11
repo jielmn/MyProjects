@@ -100,6 +100,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_btnCubeBed = 0;
 	m_lblCubePatientName = 0;
 	m_lblCubePhone = 0;
+
+	m_CubeImg = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -243,6 +245,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnCubeBed = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnBedCube"));
 	m_lblCubePatientName = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblPatientNameCube"));
 	m_lblCubePhone = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblPhoneCube"));
+	m_CubeImg = static_cast<CMyImageUI *>(m_PaintManager.FindControl("cstCubeImage"));
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
 
@@ -1173,6 +1176,8 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 			m_lblCubePhone->SetText(pItem->GetPhone());
 			CBusiness::GetInstance()->QueryCubeTempAsyn(pItem->GetBedNo());
 			// 清空image的温度数据
+			m_CubeImg->ClearCubeData();
+			m_CubeImg->MyInvalidate();
 		}
 		else if (0 == strcmp(strName, "maxiumCube")) {
 			m_SubSwitch->SelectItem(0);
@@ -3117,7 +3122,7 @@ void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
 		UpdateCubeItems();
 
 		// 如果是高温
-		if ( pItem->m_dwTemp >= g_data.m_nCubeHighTemp ) {
+		if ( (int)pItem->m_dwTemp >= g_data.m_nCubeHighTemp ) {
 			it = std::find_if( m_cube_items_high.begin(), m_cube_items_high.end(), 
 				               FindCubeItemObj(pFindItem->nBedNo));
 			// 如果高温区没有
@@ -3172,6 +3177,9 @@ void   CDuiFrameWnd::OnCubeBindingTag(WPARAM wParam, LPARAM  lParam) {
 
 void   CDuiFrameWnd::OnQueryCubeTempRet(WPARAM wParam, LPARAM  lParam) {
 	std::vector<CubeTempItem *> * pvRet = (std::vector<CubeTempItem *> *)wParam;
+
+	m_CubeImg->LoadCubeData(*pvRet);
+	m_CubeImg->MyInvalidate();
 
 	ClearVector(*pvRet);
 	delete pvRet;

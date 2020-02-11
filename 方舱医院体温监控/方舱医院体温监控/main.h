@@ -338,6 +338,7 @@ private:
 	CButtonUI *                                 m_btnCubeBed; 
 	CLabelUI  *                                 m_lblCubePatientName;
 	CLabelUI  *                                 m_lblCubePhone;
+	CMyImageUI *                                m_CubeImg;
 
 
 	std::vector<CubeItem * >                    m_cube_items;

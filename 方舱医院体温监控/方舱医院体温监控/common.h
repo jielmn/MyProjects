@@ -77,8 +77,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "2.2.0"
-#define   COMPILE_TIME                "2019-11-18 15:40"
+#define   VERSION                     "1.0.0"
+#define   COMPILE_TIME                "2020-02-11 18:00"
 #ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
 #else
