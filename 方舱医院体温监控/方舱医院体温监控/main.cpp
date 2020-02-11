@@ -96,6 +96,10 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_CurTag = 0;
 
 	memset(&m_cur_tag, 0, sizeof(m_cur_tag));
+
+	m_btnCubeBed = 0;
+	m_lblCubePatientName = 0;
+	m_lblCubePhone = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -236,6 +240,9 @@ void  CDuiFrameWnd::InitWindow() {
 	m_edtName1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtName1"));
 	m_edtPhone1 = static_cast<CEditUI *>(m_PaintManager.FindControl("edtPhone1"));
 	m_CurTag = static_cast<CNewTagUI *>(m_PaintManager.FindControl("curtag"));
+	m_btnCubeBed = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnBedCube"));
+	m_lblCubePatientName = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblPatientNameCube"));
+	m_lblCubePhone = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblPhoneCube"));
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
 
@@ -1155,11 +1162,17 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 		}
 		else if ( 0 == strcmp(strClass, "CubeItem")) {
 			m_SubSwitch->SelectItem(1); 
+			CCubeItemUI * pItem = (CCubeItemUI *)pFindControl;
+			CDuiString  strText;
+			strText.Format("%d", pItem->GetBedNo());
+			m_btnCubeBed->SetText(strText);
+			m_lblCubePatientName->SetText(pItem->GetPatientName());
+			m_lblCubePhone->SetText(pItem->GetPhone());
 		}
 		else if (0 == strcmp(strName, "maxiumCube")) {
 			m_SubSwitch->SelectItem(0);
 		}
-		pFindControl = pFindControl->GetParent();
+		pFindControl = pFindControl->GetParent();   
 	}  
 }
 

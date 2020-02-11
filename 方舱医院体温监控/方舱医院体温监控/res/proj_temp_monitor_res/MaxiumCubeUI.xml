@@ -12,16 +12,17 @@
 			
 			<HorizontalLayout height="60"  inset="30,5,0,5" >
 				<Control bkimage="file='bed.png' dest='0,0,50,50'"  width="50" tooltip="床号" />
-				<Button name="btnBedM" textpadding="4,0,4,0" textcolor="#FFCCCCCC" text="01" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="150" font="9" tooltip="床号" />
+				<Button name="btnBedCube" textpadding="4,0,4,0" textcolor="#FFCCCCCC" text="01" align="left" hotimage="file='btn_hot.png' corner='2,8,2,2'" width="150" font="9" tooltip="床号" />
 			</HorizontalLayout>
 			
 			<HorizontalLayout height="50" inset="30,5,0,5" >
 				<Control bkimage="file='user.png' dest='0,7,40,40'"  width="50" tooltip="病人姓名" />
-				<EditableButton name="cstEdtBtnPatientNameM" width="150" btncolor="#FFCCCCCC" btnfont="9" editfont="9" hotimage="file='btn_hot.png' corner='2,8,2,2'"  />
+				<Label text="100200" name="lblPatientNameCube" font="9" textcolor="#FFCCCCCC" />
 			</HorizontalLayout>		
 
 			<HorizontalLayout height="70" inset="30,25,0,5" >
 				<Control bkimage="file='phone.png' dest='0,0,40,40'"  width="50" tooltip="手机" />
+				<Label text="100200" name="lblPhoneCube" font="9" textcolor="#FFCCCCCC" />
 			</HorizontalLayout>					
 			
 		</VerticalLayout>

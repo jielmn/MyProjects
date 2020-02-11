@@ -335,6 +335,10 @@ private:
 	CEditUI *                                   m_edtName1;
 	CEditUI *                                   m_edtPhone1;
 	CNewTagUI *                                 m_CurTag;
+	CButtonUI *                                 m_btnCubeBed; 
+	CLabelUI  *                                 m_lblCubePatientName;
+	CLabelUI  *                                 m_lblCubePhone;
+
 
 	std::vector<CubeItem * >                    m_cube_items;
 	CurTagData                                  m_cur_tag;
