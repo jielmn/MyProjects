@@ -261,7 +261,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_CubeItems->Add(item);
 	}
 
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 1000; i++) {
 		CCubeItemUI * item = new CCubeItemUI;
 		item->SetBedNo(i + 100);
 		item->SetPatientName("张三1");
@@ -2969,7 +2969,10 @@ void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
 	assert(pvRet);
 
 	std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_cube_items));
-	UpdateCubeItems();
+	UpdateCubeItems();  
+
+	std::copy_if(pvRet->begin(), pvRet->end(), std::back_inserter(m_cube_items_high), CopyCubeHighItem(g_data.m_nCubeHighTemp));
+	UpdateCubeItemsHigh();
 
 	delete pvRet;
 }
@@ -2991,6 +2994,54 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	}
 
 	UpdateCubeItems();
+
+	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(pItem->nBedNo));
+	if ( it != m_cube_items_high.end() ) {
+		CubeItem * p = *it;
+		delete p;
+		m_cube_items_high.erase(it);
+		UpdateCubeItemsHigh();
+	}
+}
+
+void   CDuiFrameWnd::UpdateCubeItemsHigh() {
+	int nItemsCnt = m_cube_items_high.size();
+	int nUiItemsCnt = m_CubeItems_high_temp->GetCount();
+	int nDiff = 0;
+
+	if (nItemsCnt < nUiItemsCnt) {
+		nDiff = nUiItemsCnt - nItemsCnt;
+		for (int i = 0; i < nDiff; i++) {
+			m_CubeItems_high_temp->RemoveAt(0);
+		}
+	}
+	else {
+		nDiff = nItemsCnt - nUiItemsCnt;
+		for (int i = 0; i < nDiff; i++) {
+			CCubeItemUI * item = new CCubeItemUI;
+			m_CubeItems_high_temp->Add(item);
+		}
+	}
+
+	nUiItemsCnt = m_CubeItems_high_temp->GetCount();
+	// 数量一定相同
+	assert(nItemsCnt == m_CubeItems_high_temp->GetCount());
+
+	for (int i = 0; i < nUiItemsCnt; i++) {
+		CCubeItemUI * item = (CCubeItemUI *)m_CubeItems_high_temp->GetItemAt(i);
+		CubeItem * p = m_cube_items_high[i];
+
+		item->SetBedNo(p->nBedNo);
+		item->SetPatientName(p->szName);
+		item->SetPhone(p->szPhone);
+		item->SetTemperature(p->nTemp);
+		item->SetTime(p->time);
+		item->SetBinding((p->szTagId[0] == '\0') ? FALSE : TRUE);
+
+		if (i % 2 == 0) {
+			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+		}
+	}
 }
 
 void   CDuiFrameWnd::UpdateCubeItems() {
@@ -3059,6 +3110,27 @@ void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
 		pFindItem->nTemp = pItem->m_dwTemp;
 		pFindItem->time = pItem->m_time;
 		UpdateCubeItems();
+
+		// 如果是高温
+		if ( pItem->m_dwTemp >= g_data.m_nCubeHighTemp ) {
+			it = std::find_if( m_cube_items_high.begin(), m_cube_items_high.end(), 
+				               FindCubeItemObj(pFindItem->nBedNo));
+			// 如果高温区没有
+			if ( it == m_cube_items_high.end() ) {
+				m_cube_items_high.push_back(pFindItem);
+			}
+		}
+		// 如果是低温
+		else {
+			it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(),
+				FindCubeItemObj(pFindItem->nBedNo));
+			// 如果高温区有
+			if (it != m_cube_items_high.end()) {
+				m_cube_items_high.erase(it);
+			}
+		}
+		UpdateCubeItemsHigh();
+
 		// 保存到数据库
 		CBusiness::GetInstance()->SaveCubeTempAsyn(pFindItem->nBedNo, pItem->m_dwTemp, pItem->m_time);
 	}

@@ -3,7 +3,7 @@
 	<TabLayout name="subswitch">
 		<HorizontalLayout bkcolor="#FF434248" name="layMain_1">
 			<VerticalLayout>		
-				<VerticalLayout inset="10,10,0,10" >
+				<VerticalLayout inset="10,10,10,10" >
 					<HorizontalLayout height="40"  >
 						<Label text="高度关注清单" textcolor="#FFFFFFFF" font="103" />
 					</HorizontalLayout>
@@ -16,7 +16,7 @@
 						<Label text="时间" textcolor="#FFFFFFFF" font="101" width="100" />
 					</HorizontalLayout>
 					
-					<VerticalLayout name="layCubeItems_1" inset="10,10,0,0" >
+					<VerticalLayout name="layCubeItems_1" inset="10,10,0,0" vscrollbar="true" hscrollbar="true" >
 					</VerticalLayout>
 					
 				</VerticalLayout>

@@ -342,6 +342,7 @@ private:
 
 	std::vector<CubeItem * >                    m_cube_items;
 	CurTagData                                  m_cur_tag;
+	std::vector<CubeItem * >                    m_cube_items_high;
 
 private:
 	void   MoveNewTag(const POINT & pt);
@@ -355,6 +356,7 @@ private:
 	void   OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam);
 
 	void   UpdateCubeItems();
+	void   UpdateCubeItemsHigh();
 	void   OnCubeTempItem(WPARAM wParam, LPARAM  lParam);
 	void   UpdateNewTag();
 	void   OnNewTagTimer();
@@ -390,4 +392,19 @@ public:
 		return false;
 	}
 	char  m_szTagId[MAX_TAG_ID_LENGTH];
+};
+
+class  CopyCubeHighItem {
+public:
+	CopyCubeHighItem(int nHighTemp) {
+		m_nHighTemp = nHighTemp;
+	}
+	bool operator() (CubeItem * pItem) {
+		if (pItem->nTemp >= m_nHighTemp)
+			return true;
+		else
+			return false;
+	}
+private:
+	int     m_nHighTemp;
 };

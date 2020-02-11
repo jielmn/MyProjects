@@ -196,6 +196,9 @@ int CBusiness::Init() {
 		}
 	}
 
+	DWORD  dwValue = 0;
+	g_data.m_cfg->GetConfig("high temperature", dwValue, 3850);
+	g_data.m_nCubeHighTemp = dwValue;
 	/******************** end ≈‰÷√œÓ **********************/
 
 

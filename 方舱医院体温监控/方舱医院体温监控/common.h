@@ -369,6 +369,7 @@ public:
 	BOOL                      m_bSpecifiedComports;               // 是否使用指定串口
 	int                       m_nComports[MAX_COM_PORTS_CNT];     // 使用哪些指定串口
 	int                       m_nComportsCnt;
+	int                       m_nCubeHighTemp;                    // 多少温度以上认为高温区
 
 	CfgData                   m_CfgData;
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
@@ -409,6 +410,7 @@ public:
 		m_bMultipleComport = FALSE;
 		memset(m_nComports, 0, sizeof(m_nComports));
 		m_nComportsCnt = 0;
+		m_nCubeHighTemp = 0;
 
 		m_bClosing = FALSE;	
 		m_hWnd = 0;
