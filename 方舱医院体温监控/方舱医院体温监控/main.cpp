@@ -547,6 +547,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_CUBE_BINDING_RET) {
 		OnCubeBindingTag(wParam, lParam);
 	}
+	else if (uMsg == UM_CUBE_QUERY_TEMP_RET) {
+		OnQueryCubeTempRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -1168,6 +1171,8 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 			m_btnCubeBed->SetText(strText);
 			m_lblCubePatientName->SetText(pItem->GetPatientName());
 			m_lblCubePhone->SetText(pItem->GetPhone());
+			CBusiness::GetInstance()->QueryCubeTempAsyn(pItem->GetBedNo());
+			// 清空image的温度数据
 		}
 		else if (0 == strcmp(strName, "maxiumCube")) {
 			m_SubSwitch->SelectItem(0);
@@ -3163,6 +3168,13 @@ void   CDuiFrameWnd::OnCubeBindingTag(WPARAM wParam, LPARAM  lParam) {
 	UpdateNewTag();
 
 	delete szTagId;
+}
+
+void   CDuiFrameWnd::OnQueryCubeTempRet(WPARAM wParam, LPARAM  lParam) {
+	std::vector<CubeTempItem *> * pvRet = (std::vector<CubeTempItem *> *)wParam;
+
+	ClearVector(*pvRet);
+	delete pvRet;
 }
                       
 

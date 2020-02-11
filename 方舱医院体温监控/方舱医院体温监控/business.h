@@ -155,6 +155,10 @@ public:
 	void   SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time);
 	void   SaveCubeTemp(const CCubeSaveTempParam * pParam);
 
+	// 方舱请求温度曲线
+	void   QueryCubeTempAsyn(int nBedNo);
+	void   QueryCubeTemp(const CCubeQueryTempParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

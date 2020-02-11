@@ -1735,3 +1735,31 @@ int  CMySqliteDatabase::SaveCubeTemp(const CCubeSaveTempParam * pParam) {
 
 	return 0;
 }
+
+// 请求温度
+int  CMySqliteDatabase::QueryCubeTemp(const CCubeQueryTempParam * pParam, std::vector<CubeTempItem *> & vRet ) {
+
+	time_t today_zero_time = GetTodayZeroTime();
+	time_t tOneWeekAgo     = today_zero_time - 3600 * 24 * 6;
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE bedno=%d AND time>=%lu ORDER BY time ",
+		TEMP_TABLE_1, pParam->m_nBedNo, (DWORD)tOneWeekAgo );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, sql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		CubeTempItem * pItem = new CubeTempItem;
+		memset(pItem, 0, sizeof(CubeTempItem));
+
+		pItem->m_nTemp = GetIntFromDb(azResult[(i + 1)*ncolumn + 2]);
+		pItem->m_time  = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
+
+	return 0;
+}

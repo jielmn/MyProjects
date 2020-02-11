@@ -136,6 +136,9 @@ protected:
 
 private:
 	std::vector<TempItem * >     m_no_use;
+
+public:
+	std::vector<TempItem * >     m_vTempData;
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI

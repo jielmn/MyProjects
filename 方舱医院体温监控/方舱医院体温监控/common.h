@@ -240,6 +240,7 @@ using namespace DuiLib;
 #define MSG_READ_COM_PORTS                  2025
 #define MSG_CUBE_BINDING_TAG                2026
 #define MSG_CUBE_SAVE_TEMP                  2027
+#define MSG_CUBE_QUERY_TEMP                 2028
 
 
 // windows 消息
@@ -267,6 +268,8 @@ using namespace DuiLib;
 // 串口数据
 #define UM_CUBE_TEMP_ITEM                    (WM_USER+21)
 #define UM_CUBE_BINDING_RET                  (WM_USER+22)
+// 获取方舱床位号的温度数据
+#define UM_CUBE_QUERY_TEMP_RET               (WM_USER+23)
 
 
 #define XML_CHART_WIDTH              764
@@ -860,6 +863,19 @@ public:
 	time_t  m_time;
 };
 
+class CCubeQueryTempParam : public LmnToolkits::MessageData {
+public:
+	CCubeQueryTempParam(int nBedNo) {
+		m_nBedNo = nBedNo;
+	}
+	int     m_nBedNo;
+};
+
+// 方舱温度数据
+typedef struct  tagCubeTempItem {
+	int     m_nTemp;                                        // 温度
+	time_t  m_time;                                         // 时间	
+}CubeTempItem;
 
 extern CGlobalData  g_data;
 extern std::vector<TArea *>  g_vArea;

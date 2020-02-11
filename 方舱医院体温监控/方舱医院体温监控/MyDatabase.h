@@ -86,5 +86,7 @@ public:
 	int  CubeBindingTag(const CCubeBindTagParam * pParam);
 	// 保存温度
 	int  SaveCubeTemp(const CCubeSaveTempParam * pParam);
+	// 请求温度
+	int  QueryCubeTemp(const CCubeQueryTempParam * pParam, std::vector<CubeTempItem *> & vRet);
 
 };

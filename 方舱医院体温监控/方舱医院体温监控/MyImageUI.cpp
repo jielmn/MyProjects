@@ -48,6 +48,8 @@ CMyImageUI::~CMyImageUI() {
 
 	delete m_remark_pen;
 	delete m_remark_brush;
+
+	ClearVector(m_vTempData);
 }
 
 bool CMyImageUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {

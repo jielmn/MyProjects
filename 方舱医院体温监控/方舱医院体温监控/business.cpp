@@ -1615,6 +1615,18 @@ void   CBusiness::SaveCubeTemp(const CCubeSaveTempParam * pParam) {
 	m_sqlite.SaveCubeTemp(pParam);
 }
 
+// 方舱请求温度曲线
+void   CBusiness::QueryCubeTempAsyn(int nBedNo) {
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_CUBE_QUERY_TEMP,
+		new CCubeQueryTempParam(nBedNo) );
+}
+
+void   CBusiness::QueryCubeTemp(const CCubeQueryTempParam * pParam) {
+	std::vector<CubeTempItem *> * pvRet = new std::vector<CubeTempItem *>;
+	m_sqlite.QueryCubeTemp(pParam, *pvRet);
+	::PostMessage(g_data.m_hWnd, UM_CUBE_QUERY_TEMP_RET, (WPARAM)pvRet, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1831,6 +1843,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CCubeSaveTempParam * pParam = (CCubeSaveTempParam *)pMessageData;
 		SaveCubeTemp(pParam);
+	}
+	break;
+
+	case MSG_CUBE_QUERY_TEMP:
+	{
+		CCubeQueryTempParam * pParam = (CCubeQueryTempParam *)pMessageData;
+		QueryCubeTemp(pParam);
 	}
 	break;
 
