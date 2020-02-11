@@ -344,6 +344,7 @@ private:
 	std::vector<CubeItem * >                    m_cube_items;
 	CurTagData                                  m_cur_tag;
 	std::vector<CubeItem * >                    m_cube_items_high;
+	int                                         m_nMaxCubeBedNo;    // 最大化时的床位号
 
 private:
 	void   MoveNewTag(const POINT & pt);

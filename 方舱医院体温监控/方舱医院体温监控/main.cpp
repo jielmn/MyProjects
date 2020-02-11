@@ -102,6 +102,7 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_lblCubePhone = 0;
 
 	m_CubeImg = 0;
+	m_nMaxCubeBedNo = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -1178,9 +1179,11 @@ void  CDuiFrameWnd::OnDbClick(BOOL & bHandled) {
 			// 清空image的温度数据
 			m_CubeImg->ClearCubeData();
 			m_CubeImg->MyInvalidate();
+			m_nMaxCubeBedNo = pItem->GetBedNo();
 		}
 		else if (0 == strcmp(strName, "maxiumCube")) {
 			m_SubSwitch->SelectItem(0);
+			m_nMaxCubeBedNo = 0;
 		}
 		pFindControl = pFindControl->GetParent();   
 	}  
@@ -3140,6 +3143,11 @@ void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
 			}
 		}
 		UpdateCubeItemsHigh();
+
+		// 如果当前是最大化状态
+		if ( m_nMaxCubeBedNo > 0 && m_nMaxCubeBedNo == pFindItem->nBedNo ) {
+			m_CubeImg->AddCubeTemp(pItem);
+		}
 
 		// 保存到数据库
 		CBusiness::GetInstance()->SaveCubeTempAsyn(pFindItem->nBedNo, pItem->m_dwTemp, pItem->m_time);

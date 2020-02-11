@@ -1648,6 +1648,13 @@ void  CMyImageUI::LoadCubeData(std::vector<CubeTempItem *> & vData) {
 	}
 }
 
+void  CMyImageUI::AddCubeTemp(TempItem * pItem) {
+	TempItem * pNewItem = new TempItem;
+	memcpy(pNewItem, pItem, sizeof(TempItem));
+	m_vTempData.push_back(pNewItem);
+	this->MyInvalidate();
+}
+
 
 
 CImageLabelUI::CImageLabelUI() {
