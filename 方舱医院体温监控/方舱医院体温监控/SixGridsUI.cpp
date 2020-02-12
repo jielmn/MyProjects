@@ -1663,6 +1663,13 @@ void CCubeItemUI::DoInit() {
 	this->SetFixedWidth(760);   
 }
 
+void CCubeItemUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_RBUTTONDOWN) {
+		m_pManager->SendNotify(this, "cube_menu");
+	}
+	CContainerUI::DoEvent(event);
+}
+
 void  CCubeItemUI::SetBedNo(int nBedNo) {
 	m_nBedNo = nBedNo;
 	SetBedNo();

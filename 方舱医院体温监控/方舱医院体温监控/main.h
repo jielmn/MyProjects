@@ -345,6 +345,9 @@ private:
 	CurTagData                                  m_cur_tag;
 	std::vector<CubeItem * >                    m_cube_items_high;
 	int                                         m_nMaxCubeBedNo;    // 最大化时的床位号
+	CCubeItemUI *                               m_SelectedCubeItem;
+	CCubeItemUI *                               m_SelectedCubeItem_high_temp;	
+	CCubeItemUI *                               m_MenuCuteItem;
 
 private:
 	void   MoveNewTag(const POINT & pt);
@@ -364,6 +367,10 @@ private:
 	void   OnNewTagTimer();
 	void   OnCubeBindingTag(WPARAM wParam, LPARAM  lParam);
 	void   OnQueryCubeTempRet(WPARAM wParam, LPARAM  lParam);
+
+	void   OnCubeItemMenu(TNotifyUI& msg);
+	void   UpdateSelectedCubeItem();
+	void   UpdateSelectedCubeItem_high_temp();
 };
 
 
@@ -410,4 +417,20 @@ public:
 	}
 private:
 	int     m_nHighTemp;
+};
+
+
+
+
+class CCubeItemDlg : public DuiLib::WindowImplBase
+{
+public:
+	CCubeItemDlg();
+
+	virtual LPCTSTR    GetWindowClassName() const { return _T("CubeItemDlg"); }
+	virtual DuiLib::CDuiString GetSkinFile() { return _T("CubeItemDlg.xml"); }
+	virtual DuiLib::CDuiString GetSkinFolder() { return _T(SKIN_FOLDER); }
+
+	virtual void   Notify(DuiLib::TNotifyUI& msg); 
+	virtual void   InitWindow();
 };

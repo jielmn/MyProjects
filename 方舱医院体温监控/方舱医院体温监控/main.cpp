@@ -103,6 +103,10 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 
 	m_CubeImg = 0;
 	m_nMaxCubeBedNo = 0;
+
+	m_SelectedCubeItem = 0;
+	m_SelectedCubeItem_high_temp = 0;
+	m_MenuCuteItem = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -466,6 +470,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "menu_print_chart_3") {
 		OnBtnPrint3(msg);
+	}
+	else if (msg.sType == "cube_menu" ) {
+		OnCubeItemMenu(msg);
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -3054,6 +3061,9 @@ void   CDuiFrameWnd::UpdateCubeItemsHigh() {
 		if (i % 2 == 0) {
 			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
 		}
+		else {
+			item->SetBkColor(0);
+		}
 	}
 }
 
@@ -3093,6 +3103,9 @@ void   CDuiFrameWnd::UpdateCubeItems() {
 
 		if ( i % 2 == 0 ) {
 			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+		}
+		else {
+			item->SetBkColor(0);
 		}
 	}
 
@@ -3192,6 +3205,90 @@ void   CDuiFrameWnd::OnQueryCubeTempRet(WPARAM wParam, LPARAM  lParam) {
 	ClearVector(*pvRet);
 	delete pvRet;
 }
+
+void   CDuiFrameWnd::UpdateSelectedCubeItem_high_temp() {
+	int nCnt = m_CubeItems_high_temp->GetCount();
+	for (int i = 0; i < nCnt; i++) {
+		CCubeItemUI * pItem = (CCubeItemUI *)m_CubeItems_high_temp->GetItemAt(i);
+		if (pItem == m_SelectedCubeItem_high_temp) {
+			pItem->SetBkColor(0xFF007ACC);
+		}
+		else {
+			if (i % 2 == 0) {
+				pItem->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+			}
+			else {
+				pItem->SetBkColor(0);
+			}
+		}
+	}
+}
+
+void   CDuiFrameWnd::UpdateSelectedCubeItem() {
+	int nCnt = m_CubeItems->GetCount();
+	for (int i = 0; i < nCnt; i++) {
+		CCubeItemUI * pItem = (CCubeItemUI *)m_CubeItems->GetItemAt(i);
+		if ( pItem == m_SelectedCubeItem ) {
+			pItem->SetBkColor(0xFF007ACC);
+		}
+		else {
+			if (i % 2 == 0) {
+				pItem->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+			}
+			else {
+				pItem->SetBkColor(0);
+			}
+		}
+	}
+}
+
+void   CDuiFrameWnd::OnCubeItemMenu(TNotifyUI& msg) {
+	CCubeItemUI * pSelectedItem = (CCubeItemUI *)msg.pSender;
+	CControlUI * pParent = pSelectedItem->GetParent();
+	if ( pParent == m_CubeItems ) {
+		m_SelectedCubeItem = pSelectedItem;
+		UpdateSelectedCubeItem();
+	}
+	else if ( pParent == m_CubeItems_high_temp ) {
+		m_SelectedCubeItem_high_temp = pSelectedItem;
+		UpdateSelectedCubeItem_high_temp();
+	}	
+	
+	m_MenuCuteItem = pSelectedItem;
+
+	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_cube_item.xml"), pSelectedItem);
+
+	pMenu->Init(*this, pt);
+	pMenu->ShowWindow(TRUE);
+
+	//CCubeItemDlg * pDlg = new CCubeItemDlg;
+	//pDlg->Create(this->m_hWnd, _T("修改病号"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	//pDlg->CenterWindow();
+	//int ret = pDlg->ShowModal();
+
+	//// 如果不是click ok
+	//if (0 != ret) {
+	//	delete pDlg;
+	//	return;
+	//}
+
+	//delete pDlg;
+}
+
+
+CCubeItemDlg::CCubeItemDlg() {
+
+}
+
+void   CCubeItemDlg::Notify(DuiLib::TNotifyUI& msg) {
+	WindowImplBase::Notify(msg);
+}
+
+void   CCubeItemDlg::InitWindow() {
+	WindowImplBase::InitWindow();
+}
+
                       
 
   

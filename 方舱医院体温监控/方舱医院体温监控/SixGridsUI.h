@@ -279,6 +279,7 @@ public:
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
+	virtual void DoEvent(DuiLib::TEventUI& event);
 
 	void  SetBedNo();
 	void  SetPatientName();
