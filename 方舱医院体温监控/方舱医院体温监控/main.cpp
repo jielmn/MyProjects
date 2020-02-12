@@ -477,6 +477,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "cube_click") {
 		OnCubeItemClick(msg);
 	}
+	else if (msg.sType == "modify_cube_item") {
+		OnModifyCuteItem();
+	}
+	else if (msg.sType == "dismiss_binding") {
+		OnDismissBinding();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -3268,24 +3274,39 @@ void   CDuiFrameWnd::OnCubeItemMenu(TNotifyUI& msg) {
 
 	pMenu->Init(*this, pt);
 	pMenu->ShowWindow(TRUE);
+}
 
-	//CCubeItemDlg * pDlg = new CCubeItemDlg;
-	//pDlg->Create(this->m_hWnd, _T("修改病号"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
-	//pDlg->CenterWindow();
-	//int ret = pDlg->ShowModal();
+void   CDuiFrameWnd::OnModifyCuteItem() {
+	assert(m_MenuCuteItem);
 
-	//// 如果不是click ok
-	//if (0 != ret) {
-	//	delete pDlg;
-	//	return;
-	//}
+	CCubeItemDlg * pDlg = new CCubeItemDlg;
+	pDlg->m_data.nBedNo = m_MenuCuteItem->GetBedNo();
+	STRNCPY(pDlg->m_data.szName,  m_MenuCuteItem->GetPatientName(), sizeof(pDlg->m_data.szName));
+	STRNCPY(pDlg->m_data.szPhone, m_MenuCuteItem->GetPhone(),       sizeof(pDlg->m_data.szPhone));
 
-	//delete pDlg;
+	pDlg->Create(this->m_hWnd, _T("修改病号"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();               
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pDlg;
+		return;
+	}
+
+	delete pDlg;
+}
+
+void   CDuiFrameWnd::OnDismissBinding() {
+
 }
 
 
-CCubeItemDlg::CCubeItemDlg() {
 
+
+
+CCubeItemDlg::CCubeItemDlg() {
+	memset(&m_data, 0, sizeof(m_data));
 }
 
 void   CCubeItemDlg::Notify(DuiLib::TNotifyUI& msg) {

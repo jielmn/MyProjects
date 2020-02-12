@@ -372,6 +372,9 @@ private:
 	void   OnCubeItemClick(TNotifyUI& msg);
 	void   UpdateSelectedCubeItem();
 	void   UpdateSelectedCubeItem_high_temp();	
+
+	void   OnModifyCuteItem();
+	void   OnDismissBinding();
 };
 
 
@@ -434,4 +437,7 @@ public:
 
 	virtual void   Notify(DuiLib::TNotifyUI& msg); 
 	virtual void   InitWindow();
+
+public:
+	CubeItem           m_data;
 };
