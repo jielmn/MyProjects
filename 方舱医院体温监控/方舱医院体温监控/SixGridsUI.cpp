@@ -1725,6 +1725,12 @@ void  CCubeItemUI::SetTemperature() {
 		if (m_nTemp > 0) {
 			strText.Format("%.1f", m_nTemp / 100.0);
 			m_lblTemp->SetText(strText);
+			if ( m_nTemp >= g_data.m_nCubeHighTemp ) {
+				m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
+			}
+			else {
+				m_lblTemp->SetTextColor(0xFFFFFFFF);
+			}
 		}
 		else {
 			m_lblTemp->SetText("");
