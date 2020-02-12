@@ -474,6 +474,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "cube_menu" ) {
 		OnCubeItemMenu(msg);
 	}
+	else if (msg.sType == "cube_click") {
+		OnCubeItemClick(msg);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -3242,22 +3245,26 @@ void   CDuiFrameWnd::UpdateSelectedCubeItem() {
 	}
 }
 
-void   CDuiFrameWnd::OnCubeItemMenu(TNotifyUI& msg) {
+void   CDuiFrameWnd::OnCubeItemClick(TNotifyUI& msg) {
 	CCubeItemUI * pSelectedItem = (CCubeItemUI *)msg.pSender;
 	CControlUI * pParent = pSelectedItem->GetParent();
-	if ( pParent == m_CubeItems ) {
+	if (pParent == m_CubeItems) {
 		m_SelectedCubeItem = pSelectedItem;
 		UpdateSelectedCubeItem();
 	}
-	else if ( pParent == m_CubeItems_high_temp ) {
+	else if (pParent == m_CubeItems_high_temp) {
 		m_SelectedCubeItem_high_temp = pSelectedItem;
 		UpdateSelectedCubeItem_high_temp();
-	}	
+	}
+}
+
+void   CDuiFrameWnd::OnCubeItemMenu(TNotifyUI& msg) {
+	OnCubeItemClick(msg);
 	
-	m_MenuCuteItem = pSelectedItem;
+	m_MenuCuteItem = (CCubeItemUI *)msg.pSender;
 
 	POINT pt = { msg.ptMouse.x, msg.ptMouse.y };
-	CDuiMenu *pMenu = new CDuiMenu(_T("menu_cube_item.xml"), pSelectedItem);
+	CDuiMenu *pMenu = new CDuiMenu(_T("menu_cube_item.xml"), m_MenuCuteItem);
 
 	pMenu->Init(*this, pt);
 	pMenu->ShowWindow(TRUE);

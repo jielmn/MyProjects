@@ -369,8 +369,9 @@ private:
 	void   OnQueryCubeTempRet(WPARAM wParam, LPARAM  lParam);
 
 	void   OnCubeItemMenu(TNotifyUI& msg);
+	void   OnCubeItemClick(TNotifyUI& msg);
 	void   UpdateSelectedCubeItem();
-	void   UpdateSelectedCubeItem_high_temp();
+	void   UpdateSelectedCubeItem_high_temp();	
 };
 
 

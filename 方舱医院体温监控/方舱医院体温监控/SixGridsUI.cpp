@@ -1667,6 +1667,9 @@ void CCubeItemUI::DoEvent(DuiLib::TEventUI& event) {
 	if (event.Type == UIEVENT_RBUTTONDOWN) {
 		m_pManager->SendNotify(this, "cube_menu");
 	}
+	else if (event.Type == UIEVENT_BUTTONDOWN) {
+		m_pManager->SendNotify(this, "cube_click");
+	}
 	CContainerUI::DoEvent(event);
 }
 
