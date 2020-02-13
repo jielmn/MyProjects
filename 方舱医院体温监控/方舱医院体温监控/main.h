@@ -375,6 +375,8 @@ private:
 
 	void   OnModifyCuteItem();
 	void   OnDismissBinding();
+
+	void   OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam);
 };
 
 
@@ -440,4 +442,12 @@ public:
 
 public:
 	CubeItem           m_data;
+
+private:
+	CLabelUI *         m_lblBedNo;
+	CEditUI *          m_edtName;
+	CEditUI *          m_edtPhone;
+
+private:
+	void    OnMyOk();
 };

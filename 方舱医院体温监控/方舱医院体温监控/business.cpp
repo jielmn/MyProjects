@@ -1627,6 +1627,22 @@ void   CBusiness::QueryCubeTemp(const CCubeQueryTempParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_CUBE_QUERY_TEMP_RET, (WPARAM)pvRet, 0);
 }
 
+// 更改数据
+void   CBusiness::UpdateCubeItemAsyn(int nBedNo, const char * szName, const char * szPhone) {
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_UPDATE_CUBE_ITEM,
+		new CUpdateCubeItemParam(nBedNo, szName, szPhone) );
+}
+
+void   CBusiness::UpdateCubeItem(const CUpdateCubeItemParam * pParam) {
+	m_sqlite.UpdateCubeItem(pParam);
+	CubeItem * pItem = new CubeItem;
+	memset(pItem, 0, sizeof(CubeItem));
+	pItem->nBedNo = pParam->m_nBedNo;
+	STRNCPY(pItem->szName,  pParam->m_szName,  sizeof(pItem->szName));
+	STRNCPY(pItem->szPhone, pParam->m_szPhone, sizeof(pItem->szPhone));
+	::PostMessage(g_data.m_hWnd, UM_UPDATE_CUBE_ITEM_RET, (WPARAM)pItem, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1850,6 +1866,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CCubeQueryTempParam * pParam = (CCubeQueryTempParam *)pMessageData;
 		QueryCubeTemp(pParam);
+	}
+	break;
+
+	case MSG_UPDATE_CUBE_ITEM:
+	{
+		CUpdateCubeItemParam * pParam = (CUpdateCubeItemParam *)pMessageData;
+		UpdateCubeItem(pParam);
 	}
 	break;
 

@@ -88,5 +88,8 @@ public:
 	int  SaveCubeTemp(const CCubeSaveTempParam * pParam);
 	// 请求温度
 	int  QueryCubeTemp(const CCubeQueryTempParam * pParam, std::vector<CubeTempItem *> & vRet);
+	// 更新信息
+	int UpdateCubeItem(const CUpdateCubeItemParam * pParam);
+
 
 };

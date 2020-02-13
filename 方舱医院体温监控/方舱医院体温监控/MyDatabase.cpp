@@ -102,120 +102,7 @@ int CMySqliteDatabase::InitDb() {
 	int ret = sqlite3_open(DB_NAME, &m_db);
 	if ( ret != 0 ) {
 		return -1;
-	}
-
-	//// 创建温度表
-	//CreateTable( TEMP_TABLE,
-	//	"id         INTEGER        PRIMARY KEY     AUTOINCREMENT," \
-	//	"tag_id     CHAR(16)       NOT NULL," \
-	//	"temp       int            NOT NULL," \
-	//	"time       int            NOT NULL," \
-	//	"remark     varchar(28)    NOT NULL," \
-	//	"type       int            NOT NULL        DEFAULT 0," \
-	//    "readerid   CHAR(16)       NOT NULL" );
-
-
-	//BOOL  bCreateTagsTable = 
-	//CreateTable(TAGS_TABLE,
-	//	"tag_id         CHAR(16)           NOT NULL           PRIMARY KEY," \
-	//	"patient_name   VARCHAR(16)        NOT NULL," \
-	//	"time           int                NOT NULL" );
-
-	//CreateTable(GRID_BINDING_TABLE,
-	//	"grid_index     int         NOT NULL        PRIMARY KEY," \
-	//	"tag_id         CHAR(16)    NOT NULL" );
-
-	//CreateTable(LAST_SUR_TAGS,
-	//	"bed_id        int          NOT NULL        PRIMARY KEY," \
-	//	"tag_id        CHAR(16)     NOT NULL");
-
-	//CreateTable(PATIENT_INFO_TABLE,
-	//	"tag_id        CHAR(16)    NOT NULL         PRIMARY KEY," \
-	//	"sex           int," \
-	//    "age           varchar(20)," \
-	//    "outpatient_no varchar(20)," \
-	//    "hospital_admission_no varchar(20), " \
-	//    "in_hospital_date int," \
-	//	"out_hospital_date int," \
-	//    "medical_department varchar(20), " \
-	//    "ward varchar(20), " \
-	//    "bed_no varchar(20), " \
-	//	"medical_department2 varchar(20), " \
-	//	"ward2 varchar(20), " \
-	//	"bed_no2 varchar(20)" );
-
-	//CreateTable(PATIENT_EVENT_TABLE,
-	//	"id          INTEGER      PRIMARY KEY     AUTOINCREMENT," \
-	//	"tag_id      CHAR(16)     NOT NULL, " \
-	//	"type        int          NOT NULL," \
-	//	"date_1      int          NOT NULL," \
-	//	"date_2      int" );
-
-	//CreateTable(PATIENT_DATA_TABLE,
-	//	"tag_id      CHAR(16)     NOT NULL, " \
-	//    "date        int          NOT NULL, " \
-	//	"temp_1      int, " \
-	//	"temp_2      int, " \
-	//	"temp_3      int, " \
-	//	"temp_4      int, " \
-	//	"temp_5      int, " \
-	//	"temp_6      int, " \
-	//	"temp_1_d    int, " \
-	//	"temp_2_d    int, " \
-	//	"temp_3_d    int, " \
-	//	"temp_4_d    int, " \
-	//	"temp_5_d    int, " \
-	//	"temp_6_d    int, " \
-	//    "pulse_1     int, " \
-	//	"pulse_2     int, " \
-	//	"pulse_3     int, " \
-	//	"pulse_4     int, " \
-	//	"pulse_5     int, " \
-	//	"pulse_6     int, " \
-	//	"breath_1    varchar(20), " \
-	//	"breath_2    varchar(20), " \
-	//	"breath_3    varchar(20), " \
-	//	"breath_4    varchar(20), " \
-	//	"breath_5    varchar(20), " \
-	//	"breath_6    varchar(20), " \
-	//	"defecate    varchar(20), " \
-	//	"urine       varchar(20), " \
-	//	"total_income  varchar(20), " \
-	//	"total_output  varchar(20), " \
-	//	"blood_pressure varchar(20), " \
-	//	"weight varchar(20), " \
-	//	"irritability varchar(20), PRIMARY KEY(tag_id, date) ");
-	//
-	//int nDbVersion = GetVersion();
-
-	//// 如果tags数据库是原有的，不是此次运行时创建的
-	//// 需要把名字从gbk转为utf8
-	//if ( !bCreateTagsTable ) {
-	//	// 没有配置数据库，需要转换的版本
-	//	if ( nDbVersion == 0 ) {
-	//		ConvertTagNames();
-	//	}
-	//}
-
-	//BOOL  bCreateConfig =
-	//CreateTable(GLOBAL_CONFIG_TABLE,
-	//	"id          INTEGER      PRIMARY KEY," \
-	//	"param0      int          NOT NULL,"    \
-	//	"param1      int          NOT NULL,"    \
-	//	"param2      varchar(512) NOT NULL" );
-	//UpdateConfigVersion(bCreateConfig);
-
-
-
-	//// 删除过时的旧数据
-	//PruneOldData();
-
-	//// 删除超出的绑定
-	//char sql[8192];
-	//SNPRINTF( sql, sizeof(sql), "DELETE FROM %s WHERE grid_index > %lu ", GRID_BINDING_TABLE, 
-	//	      g_data.m_CfgData.m_dwLayoutGridsCnt );
-	//sqlite3_exec(m_db, sql, 0, 0, 0);
-
+	}	
 
 	// 创建床位信息表
 	CreateTable(
@@ -1760,6 +1647,22 @@ int  CMySqliteDatabase::QueryCubeTemp(const CCubeQueryTempParam * pParam, std::v
 		vRet.push_back(pItem);
 	}
 	sqlite3_free_table(azResult);
+
+	return 0;
+}
+
+// 更新信息
+int CMySqliteDatabase::UpdateCubeItem(const CUpdateCubeItemParam * pParam) {
+	char sql[8192];
+
+	char szName[256];
+	char szPhone[256];
+	Str2DbStr(szName, sizeof(szName), pParam->m_szName);
+	Str2DbStr(szPhone, sizeof(szPhone), pParam->m_szPhone);
+
+	SNPRINTF(sql, sizeof(sql), "UPDATE %s SET name='%s', phone='%s' WHERE bedno=%d ",
+		BED_INFO_TABLE, szName, szPhone, pParam->m_nBedNo );
+	sqlite3_exec(m_db, sql, 0, 0, 0);
 
 	return 0;
 }

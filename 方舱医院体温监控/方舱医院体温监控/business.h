@@ -159,6 +159,10 @@ public:
 	void   QueryCubeTempAsyn(int nBedNo);
 	void   QueryCubeTemp(const CCubeQueryTempParam * pParam);
 
+	// 更改数据
+	void   UpdateCubeItemAsyn(int nBedNo, const char * szName, const char * szPhone);
+	void   UpdateCubeItem(const CUpdateCubeItemParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

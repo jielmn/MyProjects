@@ -29,7 +29,7 @@
 			
 			<HorizontalLayout  height="40"  inset="10,5,10,5">
 				<Label text="姓名" width="80" font="1"  textcolor="#FFFFFFFF" />
-				<Edit  text=""     width="200" font="1"  name="edtBedNo" />
+				<Edit  text=""     width="200" font="1"  name="edtName" />
 			</HorizontalLayout>
 			
 			<HorizontalLayout  height="40"  inset="10,5,10,5" >

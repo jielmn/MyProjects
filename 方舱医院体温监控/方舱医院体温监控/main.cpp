@@ -570,6 +570,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_CUBE_QUERY_TEMP_RET) {
 		OnQueryCubeTempRet(wParam, lParam);
 	}
+	else if (uMsg == UM_UPDATE_CUBE_ITEM_RET) {
+		OnUpdateCubeItemRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -3067,12 +3070,14 @@ void   CDuiFrameWnd::UpdateCubeItemsHigh() {
 		item->SetTime(p->time);
 		item->SetBinding((p->szTagId[0] == '\0') ? FALSE : TRUE);
 
-		if (i % 2 == 0) {
-			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
-		}
-		else {
-			item->SetBkColor(0);
-		}
+		if (item != m_SelectedCubeItem_high_temp) {
+			if (i % 2 == 0) {
+				item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+			}
+			else {
+				item->SetBkColor(0);
+			}
+		}		
 	}
 }
 
@@ -3110,12 +3115,14 @@ void   CDuiFrameWnd::UpdateCubeItems() {
 		item->SetTime(p->time);
 		item->SetBinding( (p->szTagId[0] == '\0') ? FALSE :TRUE);
 
-		if ( i % 2 == 0 ) {
-			item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
-		}
-		else {
-			item->SetBkColor(0);
-		}
+		if (item != m_SelectedCubeItem) {
+			if (i % 2 == 0) {
+				item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+			}
+			else {
+				item->SetBkColor(0);
+			}
+		}		
 	}
 
 }
@@ -3294,6 +3301,8 @@ void   CDuiFrameWnd::OnModifyCuteItem() {
 		return;
 	}
 
+	CBusiness::GetInstance()->UpdateCubeItemAsyn(pDlg->m_data.nBedNo, pDlg->m_data.szName, pDlg->m_data.szPhone);
+
 	delete pDlg;
 }
 
@@ -3301,20 +3310,82 @@ void   CDuiFrameWnd::OnDismissBinding() {
 
 }
 
+void   CDuiFrameWnd::OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam) {
+	CubeItem * pItem = (CubeItem *)wParam;
+
+	std::vector<CubeItem * >::iterator it;
+	it = std::find_if( m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj(pItem->nBedNo) );
+	if ( it != m_cube_items.end() ) {
+		CubeItem * pFind = *it;
+		STRNCPY(pFind->szName,  pItem->szName,  sizeof(pFind->szName));
+		STRNCPY(pFind->szPhone, pItem->szPhone, sizeof(pFind->szPhone));
+	}
+	UpdateCubeItems();
+
+	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(pItem->nBedNo));
+	if (it != m_cube_items_high.end()) {
+		CubeItem * pFind = *it;
+		STRNCPY(pFind->szName, pItem->szName, sizeof(pFind->szName));
+		STRNCPY(pFind->szPhone, pItem->szPhone, sizeof(pFind->szPhone));
+	}
+	UpdateCubeItemsHigh();
+
+	delete pItem;
+}
 
 
 
 
 CCubeItemDlg::CCubeItemDlg() {
 	memset(&m_data, 0, sizeof(m_data));
+
+	m_lblBedNo = 0;
+	m_edtName = 0;
+	m_edtPhone = 0;
 }
 
 void   CCubeItemDlg::Notify(DuiLib::TNotifyUI& msg) {
+	if ( msg.sType == "click" ) {
+		if ( msg.pSender->GetName() == "btnOK" ) {
+			OnMyOk();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 void   CCubeItemDlg::InitWindow() {
 	WindowImplBase::InitWindow();
+
+	m_lblBedNo = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblBedNo"));
+	m_edtName = static_cast<CEditUI *>(m_PaintManager.FindControl("edtName"));
+	m_edtPhone = static_cast<CEditUI *>(m_PaintManager.FindControl("edtPhone"));
+
+	CDuiString strText;
+	strText.Format("%d", m_data.nBedNo);
+	m_lblBedNo->SetText(strText);
+	m_edtName->SetText(m_data.szName);
+	m_edtPhone->SetText(m_data.szPhone);
+}
+
+void  CCubeItemDlg::OnMyOk() {
+	CDuiString  strName;
+	CDuiString  strPhone;
+
+	strName = m_edtName->GetText();
+	strPhone = m_edtPhone->GetText();
+
+	strName.Trim();
+	strPhone.Trim();
+
+	if ( strName.GetLength() == 0 ) {
+		MessageBox(GetHWND(), "ÇëÊäÈë²¡ÈËÐÕÃû", "´íÎó", 0);
+		return;
+	}
+
+	STRNCPY(m_data.szName,  strName,  sizeof(m_data.szName));
+	STRNCPY(m_data.szPhone, strPhone, sizeof(m_data.szPhone));
+
+	this->PostMessage(WM_CLOSE);
 }
 
                       
