@@ -152,7 +152,7 @@ public:
 	void   CubeBindingTag(const CCubeBindTagParam * pParam);
 
 	// 保存温度数据
-	void   SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time);
+	void   SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time, BOOL bAdded, BOOL bChanged);
 	void   SaveCubeTemp(const CCubeSaveTempParam * pParam);
 
 	// 方舱请求温度曲线

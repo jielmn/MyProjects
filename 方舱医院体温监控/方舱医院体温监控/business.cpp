@@ -1606,9 +1606,9 @@ void   CBusiness::CubeBindingTag(const CCubeBindTagParam * pParam) {
 }
 
 // 保存温度数据
-void   CBusiness::SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time) {
+void   CBusiness::SaveCubeTempAsyn(int nBedNo, int nTemp, time_t time, BOOL bAdded, BOOL bChanged) {
 	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_CUBE_SAVE_TEMP,
-		new CCubeSaveTempParam(nBedNo, nTemp, time));
+		new CCubeSaveTempParam(nBedNo, nTemp, time, bAdded, bChanged));
 }
 
 void   CBusiness::SaveCubeTemp(const CCubeSaveTempParam * pParam) {

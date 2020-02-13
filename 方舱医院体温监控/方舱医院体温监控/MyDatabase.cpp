@@ -119,7 +119,8 @@ int CMySqliteDatabase::InitDb() {
 		"id         INTEGER        PRIMARY KEY     AUTOINCREMENT," \
 		"bedno      INTEGER        NOT NULL," \
 		"temp       int            NOT NULL," \
-		"time       int            NOT NULL"
+		"time       int            NOT NULL," \
+		"valid      int            NOT NULL DEFAULT 0" 
 	);
 	
 	return 0;
@@ -1533,7 +1534,7 @@ void  CMySqliteDatabase::GetAllCubeBeds(std::vector<CubeItem*> & vRet) {
 		nrow = ncolumn = 0;
 		azResult = 0;
 
-		SNPRINTF(szSql, sizeof(szSql), "select * from %s where bedno=%d order by time desc limit 1", 
+		SNPRINTF(szSql, sizeof(szSql), "select * from %s where bedno=%d AND valid=1 order by time desc limit 1", 
 			TEMP_TABLE_1, pItem->nBedNo);
 
 		sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
@@ -1614,11 +1615,27 @@ int  CMySqliteDatabase::CubeBindingTag(const CCubeBindTagParam * pParam) {
 
 // 保存温度
 int  CMySqliteDatabase::SaveCubeTemp(const CCubeSaveTempParam * pParam) {
-
 	char sql[8192];
-	SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(null, %d, %d, %lu)",
-		TEMP_TABLE_1, pParam->m_nBedNo, pParam->m_nTemp, (DWORD)pParam->m_time );
-	sqlite3_exec(m_db, sql, 0, 0, 0);
+	if (pParam->m_bAdded) {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(null, %d, %d, %lu, 1)",
+			TEMP_TABLE_1, pParam->m_nBedNo, pParam->m_nTemp, (DWORD)pParam->m_time);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	else if ( !pParam->m_bChanged ) {
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(null, %d, %d, %lu, 0)",
+			TEMP_TABLE_1, pParam->m_nBedNo, pParam->m_nTemp, (DWORD)pParam->m_time);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
+	else {		
+		// 更新15分钟内的其他数据为无效
+		SNPRINTF(sql, sizeof(sql), "UPDATE %s set valid=0 WHERE bedno=%d AND time<=%lu AND time>%lu ",
+			TEMP_TABLE_1, pParam->m_nBedNo, (DWORD)pParam->m_time, (DWORD)pParam->m_time - TAKE_TEMPERATURE_SPAN_TIME );
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+
+		SNPRINTF(sql, sizeof(sql), "INSERT INTO %s VALUES(null, %d, %d, %lu, 1)",
+			TEMP_TABLE_1, pParam->m_nBedNo, pParam->m_nTemp, (DWORD)pParam->m_time);
+		sqlite3_exec(m_db, sql, 0, 0, 0);
+	}
 
 	return 0;
 }
@@ -1630,7 +1647,7 @@ int  CMySqliteDatabase::QueryCubeTemp(const CCubeQueryTempParam * pParam, std::v
 	time_t tOneWeekAgo     = today_zero_time - 3600 * 24 * 6;
 
 	char sql[8192];
-	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE bedno=%d AND time>=%lu ORDER BY time ",
+	SNPRINTF(sql, sizeof(sql), "SELECT * FROM %s WHERE bedno=%d AND time>=%lu AND valid=1 ORDER BY time ",
 		TEMP_TABLE_1, pParam->m_nBedNo, (DWORD)tOneWeekAgo );
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数

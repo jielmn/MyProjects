@@ -1655,6 +1655,16 @@ void  CMyImageUI::AddCubeTemp(TempItem * pItem) {
 	this->MyInvalidate();
 }
 
+void   CMyImageUI::UpdateCubeLastTemp(TempItem * pItem) {
+	int cnt = m_vTempData.size();
+	if ( cnt > 0 ) {
+		TempItem * pLastItem = m_vTempData[cnt - 1];
+		pLastItem->m_dwTemp = pItem->m_dwTemp;
+		pLastItem->m_time = pItem->m_time;
+		this->MyInvalidate();
+	}
+}
+
 
 
 CImageLabelUI::CImageLabelUI() {

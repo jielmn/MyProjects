@@ -45,6 +45,13 @@ using namespace DuiLib;
 #define  CUBE_FADE_TEXTCOLOR        0xFF999999
 #define  CUBE_REFRESH_TEXTCOLOR     0xFFFFFFFF
 
+// 15分钟内测量算连续测量，次数为一次
+#ifdef _DEBUG
+#define  TAKE_TEMPERATURE_SPAN_TIME    60
+#else
+#define  TAKE_TEMPERATURE_SPAN_TIME    900
+#endif
+
 
 // 窗格温度文字透明度
 #define   GRID_LABLE_TRANSPARENT_PARAM       0xCC
@@ -858,15 +865,19 @@ public:
 
 class CCubeSaveTempParam : public LmnToolkits::MessageData {
 public:
-	CCubeSaveTempParam(int nBedNo, int nTemp, time_t time) {
+	CCubeSaveTempParam(int nBedNo, int nTemp, time_t time, BOOL bAdded, BOOL bChanged) {
 		m_nBedNo = nBedNo;
 		m_nTemp = nTemp;
 		m_time = time;
+		m_bAdded = bAdded;
+		m_bChanged = bChanged;
 	}
 
 	int     m_nBedNo;
 	int     m_nTemp;
 	time_t  m_time;
+	BOOL    m_bAdded;
+	BOOL    m_bChanged;
 };
 
 class CCubeQueryTempParam : public LmnToolkits::MessageData {

@@ -3151,37 +3151,67 @@ void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
 	}
 	else {
 		CubeItem * pFindItem = *it;
-		pFindItem->nTemp = pItem->m_dwTemp;
-		pFindItem->time = pItem->m_time;
-		UpdateCubeItems();
 
-		// 如果是高温
-		if ( (int)pItem->m_dwTemp >= g_data.m_nCubeHighTemp ) {
-			it = std::find_if( m_cube_items_high.begin(), m_cube_items_high.end(), 
-				               FindCubeItemObj(pFindItem->nBedNo));
-			// 如果高温区没有
-			if ( it == m_cube_items_high.end() ) {
-				m_cube_items_high.push_back(pFindItem);
+		// 比较温度是否出了15分钟范围
+		BOOL bChanged = FALSE;
+		BOOL bAdded  = FALSE;
+		time_t  time_diff = pItem->m_time - pFindItem->time;
+
+		// 和上一次时间比较，超出范围
+		if ( time_diff > TAKE_TEMPERATURE_SPAN_TIME ) {
+			bAdded = TRUE;
+		}	
+		// 和上一次时间比较，时间在15分钟内
+		else if (time_diff >= 0) {
+			// 如果温度高于之前的
+			if ( (int)pItem->m_dwTemp >= pFindItem->nTemp ) {
+				bChanged = TRUE;
 			}
 		}
-		// 如果是低温
-		else {
-			it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(),
-				FindCubeItemObj(pFindItem->nBedNo));
-			// 如果高温区有
-			if (it != m_cube_items_high.end()) {
-				m_cube_items_high.erase(it);
-			}
-		}
-		UpdateCubeItemsHigh();
 
-		// 如果当前是最大化状态
-		if ( m_nMaxCubeBedNo > 0 && m_nMaxCubeBedNo == pFindItem->nBedNo ) {
-			m_CubeImg->AddCubeTemp(pItem);
+		// 如果需要改变温度值和测温时间
+		if ( bAdded || bChanged) {
+			pFindItem->nTemp = pItem->m_dwTemp;
+			pFindItem->time = pItem->m_time;
+			UpdateCubeItems();
+
+			// 如果是高温
+			if ((int)pItem->m_dwTemp >= g_data.m_nCubeHighTemp) {
+				it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(),
+					FindCubeItemObj(pFindItem->nBedNo));
+				// 如果高温区没有
+				if (it == m_cube_items_high.end()) {
+					m_cube_items_high.push_back(pFindItem);
+				}
+			}
+			// 如果是低温
+			else {
+				it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(),
+					FindCubeItemObj(pFindItem->nBedNo));
+				// 如果高温区有
+				if (it != m_cube_items_high.end()) {
+					m_cube_items_high.erase(it);
+				}
+			}
+			UpdateCubeItemsHigh();
+
+			if ( bAdded ) {
+				// 如果当前是最大化状态
+				if (m_nMaxCubeBedNo > 0 && m_nMaxCubeBedNo == pFindItem->nBedNo) {
+					m_CubeImg->AddCubeTemp(pItem);
+				}				
+			}	
+			else if (bChanged) {
+				// 如果当前是最大化状态
+				if (m_nMaxCubeBedNo > 0 && m_nMaxCubeBedNo == pFindItem->nBedNo) {
+					m_CubeImg->UpdateCubeLastTemp(pItem);
+				}
+			}			
 		}
 
 		// 保存到数据库
-		CBusiness::GetInstance()->SaveCubeTempAsyn(pFindItem->nBedNo, pItem->m_dwTemp, pItem->m_time);
+		CBusiness::GetInstance()->SaveCubeTempAsyn(pFindItem->nBedNo, pItem->m_dwTemp, pItem->m_time,
+			bAdded, bChanged);
 	}
 
 	delete pItem;

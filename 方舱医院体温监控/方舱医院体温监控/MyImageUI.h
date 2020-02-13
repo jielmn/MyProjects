@@ -141,6 +141,7 @@ public:
 	void   ClearCubeData();
 	void   LoadCubeData(std::vector<CubeTempItem *> & vData);
 	void   AddCubeTemp(TempItem * pItem);
+	void   UpdateCubeLastTemp(TempItem * pItem);
 };
 
 class CImageLabelUI : public DuiLib::CLabelUI
