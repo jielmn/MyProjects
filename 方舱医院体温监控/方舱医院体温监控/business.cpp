@@ -1643,6 +1643,16 @@ void   CBusiness::UpdateCubeItem(const CUpdateCubeItemParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_UPDATE_CUBE_ITEM_RET, (WPARAM)pItem, 0);
 }
 
+// 解除绑定
+void   CBusiness::CubeDismissBindingAsyn(int nBedNo) {
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_CUBE_DISMISS_BINDING,
+		new CDismissBindingParam(nBedNo));
+}
+
+void   CBusiness::CubeDismissBinding(const CDismissBindingParam * pParam) {
+	m_sqlite.CubeDismissBinding(pParam);
+	::PostMessage(g_data.m_hWnd, UM_CUBE_DISMISS_BINDING_RET, pParam->m_nBedNo, 0);
+}
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -1873,6 +1883,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CUpdateCubeItemParam * pParam = (CUpdateCubeItemParam *)pMessageData;
 		UpdateCubeItem(pParam);
+	}
+	break;
+
+	case MSG_CUBE_DISMISS_BINDING:
+	{
+		CDismissBindingParam * pParam = (CDismissBindingParam *)pMessageData;
+		CubeDismissBinding(pParam);
 	}
 	break;
 

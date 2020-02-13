@@ -573,6 +573,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_UPDATE_CUBE_ITEM_RET) {
 		OnUpdateCubeItemRet(wParam, lParam);
 	}
+	else if (uMsg == UM_CUBE_DISMISS_BINDING_RET) {
+		OnDismissBindingRet(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -3011,6 +3014,7 @@ void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
 
 void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	CubeItem * pItem = (CubeItem *)wParam;
+	int nBedNo = pItem->nBedNo;
 
 	std::vector<CubeItem * >::iterator it;
 	it = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj(pItem->nBedNo));
@@ -3027,10 +3031,8 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 
 	UpdateCubeItems();
 
-	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(pItem->nBedNo));
+	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(nBedNo));
 	if ( it != m_cube_items_high.end() ) {
-		CubeItem * p = *it;
-		delete p;
 		m_cube_items_high.erase(it);
 		UpdateCubeItemsHigh();
 	}
@@ -3307,7 +3309,16 @@ void   CDuiFrameWnd::OnModifyCuteItem() {
 }
 
 void   CDuiFrameWnd::OnDismissBinding() {
+	assert(m_MenuCuteItem);
 
+	// 如果没有绑定
+	if ( !m_MenuCuteItem->GetBinding() ) {
+		return;
+	}
+
+	if ( IDYES == ::MessageBox(GetHWND(), "确定要解除Tag绑定吗?", "解除绑定", MB_YESNO | MB_DEFBUTTON2)) {
+		CBusiness::GetInstance()->CubeDismissBindingAsyn(m_MenuCuteItem->GetBedNo());
+	}
 }
 
 void   CDuiFrameWnd::OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam) {
@@ -3322,15 +3333,22 @@ void   CDuiFrameWnd::OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	}
 	UpdateCubeItems();
 
-	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(pItem->nBedNo));
-	if (it != m_cube_items_high.end()) {
-		CubeItem * pFind = *it;
-		STRNCPY(pFind->szName, pItem->szName, sizeof(pFind->szName));
-		STRNCPY(pFind->szPhone, pItem->szPhone, sizeof(pFind->szPhone));
-	}
 	UpdateCubeItemsHigh();
 
 	delete pItem;
+}
+
+void   CDuiFrameWnd::OnDismissBindingRet(WPARAM wParam, LPARAM  lParam) {
+	int nBedNo = wParam;
+
+	std::vector<CubeItem * >::iterator it;
+	it = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj(nBedNo));
+	if (it != m_cube_items.end()) {
+		CubeItem * pFind = *it;
+		pFind->szTagId[0] = '\0';
+	}
+	UpdateCubeItems();
+	UpdateCubeItemsHigh();
 }
 
 

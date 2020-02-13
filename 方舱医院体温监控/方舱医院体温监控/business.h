@@ -163,6 +163,10 @@ public:
 	void   UpdateCubeItemAsyn(int nBedNo, const char * szName, const char * szPhone);
 	void   UpdateCubeItem(const CUpdateCubeItemParam * pParam);
 
+	// ½â³ý°ó¶¨
+	void   CubeDismissBindingAsyn(int nBedNo);
+	void   CubeDismissBinding(const CDismissBindingParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

@@ -90,6 +90,7 @@ public:
 	int  QueryCubeTemp(const CCubeQueryTempParam * pParam, std::vector<CubeTempItem *> & vRet);
 	// 更新信息
 	int UpdateCubeItem(const CUpdateCubeItemParam * pParam);
-
+	// 解除绑定
+	int CubeDismissBinding(const CDismissBindingParam * pParam);
 
 };

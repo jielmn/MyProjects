@@ -377,6 +377,7 @@ private:
 	void   OnDismissBinding();
 
 	void   OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam);
+	void   OnDismissBindingRet(WPARAM wParam, LPARAM  lParam);
 };
 
 

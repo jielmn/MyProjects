@@ -1666,3 +1666,13 @@ int CMySqliteDatabase::UpdateCubeItem(const CUpdateCubeItemParam * pParam) {
 
 	return 0;
 }
+
+// ½â³ý°ó¶¨
+int CMySqliteDatabase::CubeDismissBinding(const CDismissBindingParam * pParam) {
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "UPDATE %s SET tag_id='' WHERE bedno=%d ",
+		BED_INFO_TABLE, pParam->m_nBedNo);
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	return 0;
+}
