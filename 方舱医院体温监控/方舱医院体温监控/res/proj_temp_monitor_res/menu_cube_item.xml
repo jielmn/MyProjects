@@ -8,7 +8,7 @@
         </ListContainerElement>
 		
         <ListContainerElement name="dismiss_binding" height="22" inset="40,0,0,0">
-            <Label text="接触Tag绑定" mouse="false"/>
+            <Label text="解除Tag绑定" mouse="false"/>
         </ListContainerElement>
 		
     </List>
