@@ -92,5 +92,7 @@ public:
 	int UpdateCubeItem(const CUpdateCubeItemParam * pParam);
 	// ½â³ý°ó¶¨
 	int CubeDismissBinding(const CDismissBindingParam * pParam);
+	// É¾³ý´²ºÅ
+	int DeleteCuteItem(const CDeleteCuteItemParam * pParam);
 
 };

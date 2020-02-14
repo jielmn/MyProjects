@@ -375,9 +375,11 @@ private:
 
 	void   OnModifyCuteItem();
 	void   OnDismissBinding();
+	void   OnDeleteCuteItem();
 
 	void   OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam);
 	void   OnDismissBindingRet(WPARAM wParam, LPARAM  lParam);
+	void   OnDeleteCuteItemRet(WPARAM wParam, LPARAM  lParam);
 };
 
 

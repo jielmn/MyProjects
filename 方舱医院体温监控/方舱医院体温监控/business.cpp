@@ -1654,6 +1654,17 @@ void   CBusiness::CubeDismissBinding(const CDismissBindingParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_CUBE_DISMISS_BINDING_RET, pParam->m_nBedNo, 0);
 }
 
+// 删除方舱床位
+void   CBusiness::DeleteCuteItemAsyn(int nBedNo) {
+	g_data.m_thrd_sqlite_cube->PostMessage(this, MSG_DELETE_CUBE_ITEM,
+		new CDeleteCuteItemParam(nBedNo));
+}
+
+void   CBusiness::DeleteCuteItem(const CDeleteCuteItemParam * pParam) {
+	m_sqlite.DeleteCuteItem(pParam);
+	::PostMessage(g_data.m_hWnd, UM_DELETE_CUBE_ITEM_RET, pParam->m_nBedNo, 0);
+}
+
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
@@ -1890,6 +1901,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CDismissBindingParam * pParam = (CDismissBindingParam *)pMessageData;
 		CubeDismissBinding(pParam);
+	}
+	break;
+
+	case MSG_DELETE_CUBE_ITEM:
+	{
+		CDeleteCuteItemParam * pParam = (CDeleteCuteItemParam *)pMessageData;
+		DeleteCuteItem(pParam);
 	}
 	break;
 

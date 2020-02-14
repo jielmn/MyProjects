@@ -489,6 +489,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "dismiss_binding") {
 		OnDismissBinding();
 	}
+	else if (msg.sType == "delete_cube_item") {
+		OnDeleteCuteItem();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -581,6 +584,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (uMsg == UM_CUBE_DISMISS_BINDING_RET) {
 		OnDismissBindingRet(wParam, lParam);
+	}
+	else if (uMsg == UM_DELETE_CUBE_ITEM_RET) {
+		OnDeleteCuteItemRet(wParam, lParam);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -3351,11 +3357,20 @@ void   CDuiFrameWnd::OnDismissBinding() {
 
 	// 如果没有绑定
 	if ( !m_MenuCuteItem->GetBinding() ) {
+		::MessageBox(GetHWND(), "没有绑定，无须解除绑定", "提示", 0);
 		return;
 	}
 
 	if ( IDYES == ::MessageBox(GetHWND(), "确定要解除Tag绑定吗?", "解除绑定", MB_YESNO | MB_DEFBUTTON2)) {
 		CBusiness::GetInstance()->CubeDismissBindingAsyn(m_MenuCuteItem->GetBedNo());
+	}
+}
+
+void   CDuiFrameWnd::OnDeleteCuteItem() {
+	assert(m_MenuCuteItem);
+
+	if (IDYES == ::MessageBox(GetHWND(), "确定要删除该床位吗?", "删除床位", MB_YESNO | MB_DEFBUTTON2)) {
+		CBusiness::GetInstance()->DeleteCuteItemAsyn( m_MenuCuteItem->GetBedNo() );
 	}
 }
 
@@ -3385,6 +3400,26 @@ void   CDuiFrameWnd::OnDismissBindingRet(WPARAM wParam, LPARAM  lParam) {
 		CubeItem * pFind = *it;
 		pFind->szTagId[0] = '\0';
 	}
+	UpdateCubeItems();
+	UpdateCubeItemsHigh();
+}
+
+void   CDuiFrameWnd::OnDeleteCuteItemRet(WPARAM wParam, LPARAM  lParam) {
+	int nBedNo = wParam;
+
+	std::vector<CubeItem * >::iterator it;
+	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(nBedNo));
+	if (it != m_cube_items_high.end()) {
+		m_cube_items_high.erase(it);
+	}
+
+	it = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj(nBedNo));
+	if (it != m_cube_items.end()) {
+		CubeItem * pFind = *it;
+		delete pFind;
+		m_cube_items.erase(it);
+	}
+
 	UpdateCubeItems();
 	UpdateCubeItemsHigh();
 }
@@ -3447,7 +3482,7 @@ void  CCubeItemDlg::OnMyOk() {
                       
 
   
-                                               
+                                              
 void PrintStatus(int nCnt, void * args[]) {
 	CBusiness::GetInstance()->PrintStatusAsyn();
 }

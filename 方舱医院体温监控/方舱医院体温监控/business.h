@@ -167,6 +167,10 @@ public:
 	void   CubeDismissBindingAsyn(int nBedNo);
 	void   CubeDismissBinding(const CDismissBindingParam * pParam);
 
+	// É¾³ý·½²Õ´²Î»
+	void   DeleteCuteItemAsyn(int nBedNo);
+	void   DeleteCuteItem(const CDeleteCuteItemParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

@@ -250,6 +250,7 @@ using namespace DuiLib;
 #define MSG_CUBE_QUERY_TEMP                 2028
 #define MSG_UPDATE_CUBE_ITEM                2029
 #define MSG_CUBE_DISMISS_BINDING            2030
+#define MSG_DELETE_CUBE_ITEM                2031
 
 
 // windows 消息
@@ -283,6 +284,8 @@ using namespace DuiLib;
 #define UM_UPDATE_CUBE_ITEM_RET              (WM_USER+24)
 // 解除绑定
 #define UM_CUBE_DISMISS_BINDING_RET          (WM_USER+25)
+// 删除床位
+#define UM_DELETE_CUBE_ITEM_RET              (WM_USER+26)
 
 
 #define XML_CHART_WIDTH              764
@@ -909,6 +912,14 @@ public:
 class CDismissBindingParam : public LmnToolkits::MessageData {
 public:
 	CDismissBindingParam(int nBedNo) {
+		m_nBedNo = nBedNo;
+	}
+	int     m_nBedNo;
+};
+
+class CDeleteCuteItemParam : public LmnToolkits::MessageData {
+public:
+	CDeleteCuteItemParam(int nBedNo) {
 		m_nBedNo = nBedNo;
 	}
 	int     m_nBedNo;

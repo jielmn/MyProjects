@@ -1693,3 +1693,18 @@ int CMySqliteDatabase::CubeDismissBinding(const CDismissBindingParam * pParam) {
 
 	return 0;
 }
+
+// É¾³ý´²ºÅ
+int CMySqliteDatabase::DeleteCuteItem(const CDeleteCuteItemParam * pParam) {
+
+	char sql[8192];
+	SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE bedno = %d ",
+		TEMP_TABLE_1, pParam->m_nBedNo);
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	SNPRINTF(sql, sizeof(sql), "DELETE FROM %s WHERE bedno = %d ",
+		BED_INFO_TABLE, pParam->m_nBedNo);
+	sqlite3_exec(m_db, sql, 0, 0, 0);
+
+	return 0;
+}
