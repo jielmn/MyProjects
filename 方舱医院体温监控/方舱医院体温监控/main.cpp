@@ -977,6 +977,10 @@ void  CDuiFrameWnd::OnMoveNewTag(const POINT & pt) {
 				m_HightLightItem->SetBorderSize(0);
 			}
 		}
+		else {
+			pHighLight->SetBorderSize(1);
+			pHighLight->SetBorderColor(GRID_HILIGHT_BORDER_COLOR);
+		}
 		m_HightLightItem = pHighLight;
 	}
 	else {
