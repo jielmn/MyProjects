@@ -45,6 +45,15 @@
 						<Button name="btnAdd1" text="添加" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
 					</HorizontalLayout>
 					
+					<HorizontalLayout height="65" inset="10,30,0,0" >
+						<Control width="200" />
+						<Label text="1"    textcolor="#FFFFFFFF" font="106" width="80" name="lblCubeStart" align="right" />
+						<Label text="床"   textcolor="#FFFFFFFF" font="106" width="50" />
+						<Label text="到"   textcolor="#FFFFFFFF" font="106" width="100" align="center" />
+						<Label text="1000" textcolor="#FFFFFFFF" font="106" width="80" name="lblCubeEnd" align="right"  />
+						<Label text="床"   textcolor="#FFFFFFFF" font="106" width="50" />
+					</HorizontalLayout>
+					
 					<HorizontalLayout height="55" inset="10,30,0,0" >
 						<Label text="床号" textcolor="#FFFFFFFF" font="101" width="100" />
 						<Label text="姓名" textcolor="#FFFFFFFF" font="101" width="100" />
@@ -56,6 +65,13 @@
 					
 					<VerticalLayout name="layCubeItems" inset="10,10,10,10" vscrollbar="true" hscrollbar="true" >
 					</VerticalLayout>
+					
+					<HorizontalLayout height="70" inset="10,30,10,10" >
+						<Control width="260" />
+						<Button name="btnNext1" text="上一页" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+						<Control width="100" />
+						<Button name="btnPrev1" text="下一页" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " />
+					</HorizontalLayout>
 					
 				</VerticalLayout>
 			</HorizontalLayout>

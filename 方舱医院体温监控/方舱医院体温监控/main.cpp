@@ -3417,7 +3417,7 @@ void   CDuiFrameWnd::OnDeleteCuteItemRet(WPARAM wParam, LPARAM  lParam) {
 	if (it != m_cube_items.end()) {
 		CubeItem * pFind = *it;
 		delete pFind;
-		m_cube_items.erase(it);
+		m_cube_items.erase(it);                   
 	}
 
 	UpdateCubeItems();
