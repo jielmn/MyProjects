@@ -27,6 +27,12 @@
 #define   TIMER_NEW_TAG                          1101
 #define   INTERVAL_TIMER_NEW_TAG                 5000
 
+bool compareCubeBed(CubeItem * p1, CubeItem * p2)
+{
+	return p1->nBedNo < p2->nBedNo;
+}
+
+
 //自定义事件排序
 static bool sortTagUI(CTagUI * p1, CTagUI * p2)
 {
@@ -3022,6 +3028,7 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	// 如果是添加
 	if ( it == m_cube_items.end() ) {
 		m_cube_items.push_back(pItem);
+		std::sort(m_cube_items.begin(), m_cube_items.end(), compareCubeBed);
 	}
 	else {
 		CubeItem * p = *it;
@@ -3182,6 +3189,7 @@ void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
 				// 如果高温区没有
 				if (it == m_cube_items_high.end()) {
 					m_cube_items_high.push_back(pFindItem);
+					std::sort(m_cube_items_high.begin(), m_cube_items_high.end(), compareCubeBed);
 				}
 			}
 			// 如果是低温

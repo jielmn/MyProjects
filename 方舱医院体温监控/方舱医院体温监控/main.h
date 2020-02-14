@@ -427,8 +427,6 @@ private:
 };
 
 
-
-
 class CCubeItemDlg : public DuiLib::WindowImplBase
 {
 public:
