@@ -199,6 +199,11 @@ int CBusiness::Init() {
 	DWORD  dwValue = 0;
 	g_data.m_cfg->GetConfig("high temperature", dwValue, 3850);
 	g_data.m_nCubeHighTemp = dwValue;
+
+	g_data.m_cfg->GetConfig("beds per page", g_data.m_dwCubeBedsPerPage, DEFAULT_CUBE_BEDS_COUNT_PER_PAGE);
+	if ( g_data.m_dwCubeBedsPerPage == 0 ) {
+		g_data.m_dwCubeBedsPerPage = DEFAULT_CUBE_BEDS_COUNT_PER_PAGE;
+	}
 	/******************** end ≈‰÷√œÓ **********************/
 
 

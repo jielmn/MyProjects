@@ -113,6 +113,14 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_SelectedCubeItem = 0;
 	m_SelectedCubeItem_high_temp = 0;
 	m_MenuCuteItem = 0;
+
+	m_nMaxBedNo = 0;
+	m_nCurPageIndex = 0;
+
+	m_lblCubeStart = 0;
+	m_lblCubeEnd = 0;
+	m_btnCubeNext = 0;
+	m_btnCubePrev = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -257,6 +265,12 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblCubePatientName = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblPatientNameCube"));
 	m_lblCubePhone = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblPhoneCube"));
 	m_CubeImg = static_cast<CMyImageUI *>(m_PaintManager.FindControl("cstCubeImage"));
+	m_lblCubeStart = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblCubeStart"));
+	m_lblCubeEnd = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblCubeEnd"));
+	m_btnCubeNext = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnNext1"));
+	m_btnCubePrev = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPrev1"));
+
+	UpdateCubePages();	
 
 	m_layMain1->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnMain1Size);
 
@@ -407,6 +421,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if ( name == "btnAdd1" ) {
 			OnAddCubeItem();
+		}
+		else if (name == "btnPrev1") {
+			OnPrevCubePage();
+		}
+		else if (name == "btnNext1") {
+			OnNextCubePage();
 		}
 	}
 	else if (msg.sType == "setting") {
@@ -3015,6 +3035,13 @@ void   CDuiFrameWnd::OnGetAllCubeItems(WPARAM wParam, LPARAM  lParam) {
 	std::vector<CubeItem*> * pvRet = (std::vector<CubeItem*> *)wParam;
 	assert(pvRet);
 
+	int nCnt = pvRet->size();
+	if ( nCnt > 0 ) {
+		CubeItem * pCubeItem = pvRet->at(nCnt - 1);
+		m_nMaxBedNo = pCubeItem->nBedNo;
+	}
+	UpdateCubePages();
+
 	std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_cube_items));
 	UpdateCubeItems();  
 
@@ -3035,6 +3062,8 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 	if ( it == m_cube_items.end() ) {
 		m_cube_items.push_back(pItem);
 		std::sort(m_cube_items.begin(), m_cube_items.end(), compareCubeBed);
+		int cnt = m_cube_items.size();
+		m_nMaxBedNo = m_cube_items[cnt - 1]->nBedNo;
 	}
 	else {
 		CubeItem * p = *it;
@@ -3042,6 +3071,7 @@ void   CDuiFrameWnd::OnAddCubeItemRet(WPARAM wParam, LPARAM  lParam) {
 		delete pItem;
 	}
 
+	UpdateCubePages();
 	UpdateCubeItems();
 
 	it = std::find_if(m_cube_items_high.begin(), m_cube_items_high.end(), FindCubeItemObj(nBedNo));
@@ -3097,9 +3127,26 @@ void   CDuiFrameWnd::UpdateCubeItemsHigh() {
 }
 
 void   CDuiFrameWnd::UpdateCubeItems() {
-	int nItemsCnt = m_cube_items.size();
+	// int nItemsCnt = m_cube_items.size();
+	int nItemsCnt = 0;
+	std::vector<CubeItem * >::iterator it_start;
+	std::vector<CubeItem * >::iterator it_end;
 	int nUiItemsCnt = m_CubeItems->GetCount();
 	int nDiff = 0;
+
+	int  nBed1 = m_nCurPageIndex * g_data.m_dwCubeBedsPerPage;
+	int  nBed2 = nBed1 + g_data.m_dwCubeBedsPerPage;
+
+	// 找到大于nBed1的第一个床位号
+	it_start = std::find_if(m_cube_items.begin(), m_cube_items.end(), FindCubeItemObj1(nBed1, nBed2));
+	// 如果没有找到
+	if (it_start == m_cube_items.end()) {
+		nItemsCnt = 0;
+	}
+	else {
+		it_end = std::find_if(it_start+1, m_cube_items.end(), FindCubeItemObj2(nBed2));
+		nItemsCnt = it_end - it_start;
+	}
 
 	if ( nItemsCnt < nUiItemsCnt ) {		
 		nDiff = nUiItemsCnt - nItemsCnt;
@@ -3121,7 +3168,8 @@ void   CDuiFrameWnd::UpdateCubeItems() {
 	
 	for ( int i = 0; i < nUiItemsCnt; i++ ) {
 		CCubeItemUI * item = (CCubeItemUI *)m_CubeItems->GetItemAt(i);
-		CubeItem * p = m_cube_items[i];
+		//CubeItem * p = m_cube_items[i];
+		CubeItem * p = *(it_start + i);
 
 		item->SetBedNo(p->nBedNo);
 		item->SetPatientName(p->szName);
@@ -3146,6 +3194,32 @@ void   CDuiFrameWnd::UpdateNewTag() {
 	m_CurTag->SetTemperature(m_cur_tag.nTemp);
 	m_CurTag->SetTime(m_cur_tag.time);
 	m_CurTag->m_strTagId = m_cur_tag.szTagId;
+}
+
+void   CDuiFrameWnd::UpdateCubePages() {
+	CDuiString strText;
+
+	strText.Format("%d床", m_nCurPageIndex * g_data.m_dwCubeBedsPerPage + 1);
+	m_lblCubeStart->SetText(strText);
+
+	strText.Format("%d床", (m_nCurPageIndex + 1) * g_data.m_dwCubeBedsPerPage);
+	m_lblCubeEnd->SetText(strText); 
+
+	assert(m_nCurPageIndex >= 0);
+	if (m_nCurPageIndex == 0) {
+		m_btnCubePrev->SetEnabled(false);
+	}
+	else {
+		m_btnCubePrev->SetEnabled(true);
+	}
+
+	// 如果是最后一页
+	if ( (m_nCurPageIndex + 1) * (int)g_data.m_dwCubeBedsPerPage >= m_nMaxBedNo ) {
+		m_btnCubeNext->SetEnabled(false);
+	}
+	else {
+		m_btnCubeNext->SetEnabled(true);
+	}
 }
 
 void   CDuiFrameWnd::OnCubeTempItem(WPARAM wParam, LPARAM  lParam) {
@@ -3254,6 +3328,8 @@ void   CDuiFrameWnd::OnCubeBindingTag(WPARAM wParam, LPARAM  lParam) {
 	m_cur_tag.szTagId[0] = '\0';
 	m_cur_tag.time = 0;
 	UpdateNewTag();
+	m_CurTag->Refresh();
+	KillTimer(GetHWND(), TIMER_NEW_TAG);
 
 	delete szTagId;
 }
@@ -3417,11 +3493,34 @@ void   CDuiFrameWnd::OnDeleteCuteItemRet(WPARAM wParam, LPARAM  lParam) {
 	if (it != m_cube_items.end()) {
 		CubeItem * pFind = *it;
 		delete pFind;
-		m_cube_items.erase(it);                   
+		m_cube_items.erase(it);                  
 	}
 
+	int nCnt = m_cube_items.size();
+	if ( nCnt > 0 ) {
+		m_nMaxBedNo = m_cube_items[nCnt - 1]->nBedNo;
+	}
+	else {
+		m_nMaxBedNo = 0;
+	}
+
+	UpdateCubePages();
 	UpdateCubeItems();
 	UpdateCubeItemsHigh();
+}
+
+void   CDuiFrameWnd::OnNextCubePage() {
+	m_nCurPageIndex++;
+	UpdateCubePages();
+	UpdateCubeItems();
+}
+
+void   CDuiFrameWnd::OnPrevCubePage() {
+	if (m_nCurPageIndex > 0) {
+		m_nCurPageIndex--;
+		UpdateCubePages();
+		UpdateCubeItems();
+	}	
 }
 
 

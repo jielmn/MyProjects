@@ -48,8 +48,10 @@ using namespace DuiLib;
 // 15分钟内测量算连续测量，次数为一次
 #ifdef _DEBUG
 #define  TAKE_TEMPERATURE_SPAN_TIME    60
+#define  DEFAULT_CUBE_BEDS_COUNT_PER_PAGE   2
 #else
 #define  TAKE_TEMPERATURE_SPAN_TIME    900
+#define  DEFAULT_CUBE_BEDS_COUNT_PER_PAGE   50
 #endif
 
 
@@ -84,8 +86,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "1.0.0"
-#define   COMPILE_TIME                "2020-02-11 18:00"
+#define   VERSION                     "1.0.1"
+#define   COMPILE_TIME                "2020-02-14 18:00"
 #ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
 #else
@@ -389,6 +391,7 @@ public:
 	int                       m_nComports[MAX_COM_PORTS_CNT];     // 使用哪些指定串口
 	int                       m_nComportsCnt;
 	int                       m_nCubeHighTemp;                    // 多少温度以上认为高温区
+	DWORD                     m_dwCubeBedsPerPage;                // 每页多少床位号
 
 	CfgData                   m_CfgData;
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
@@ -430,6 +433,7 @@ public:
 		memset(m_nComports, 0, sizeof(m_nComports));
 		m_nComportsCnt = 0;
 		m_nCubeHighTemp = 0;
+		m_dwCubeBedsPerPage = 0;
 
 		m_bClosing = FALSE;	
 		m_hWnd = 0;

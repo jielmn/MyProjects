@@ -348,6 +348,13 @@ private:
 	CCubeItemUI *                               m_SelectedCubeItem;
 	CCubeItemUI *                               m_SelectedCubeItem_high_temp;	
 	CCubeItemUI *                               m_MenuCuteItem;
+	CLabelUI *                                  m_lblCubeStart;
+	CLabelUI *                                  m_lblCubeEnd;
+	CButtonUI *                                 m_btnCubeNext;
+	CButtonUI *                                 m_btnCubePrev;
+
+	int                                         m_nMaxBedNo;
+	int                                         m_nCurPageIndex;
 
 private:
 	void   MoveNewTag(const POINT & pt);
@@ -362,6 +369,7 @@ private:
 
 	void   UpdateCubeItems();
 	void   UpdateCubeItemsHigh();
+	void   UpdateCubePages();
 	void   OnCubeTempItem(WPARAM wParam, LPARAM  lParam);
 	void   UpdateNewTag();
 	void   OnNewTagTimer();
@@ -380,6 +388,9 @@ private:
 	void   OnUpdateCubeItemRet(WPARAM wParam, LPARAM  lParam);
 	void   OnDismissBindingRet(WPARAM wParam, LPARAM  lParam);
 	void   OnDeleteCuteItemRet(WPARAM wParam, LPARAM  lParam);
+
+	void   OnNextCubePage();
+	void   OnPrevCubePage();
 };
 
 
@@ -426,6 +437,38 @@ public:
 	}
 private:
 	int     m_nHighTemp;
+};
+
+// 查找大于某个床位号但是小于或等于另一个床位号的
+class  FindCubeItemObj1 {
+public:
+	FindCubeItemObj1(int nBed1, int nBed2) {
+		m_nBedNo1 = nBed1;
+		m_nBedNo2 = nBed2;
+	}
+	bool operator() (CubeItem * pItem) {
+		if (pItem->nBedNo > m_nBedNo1 && pItem->nBedNo <= m_nBedNo2 )
+			return true;
+		return false;
+	}
+private:
+	int    m_nBedNo1;
+	int    m_nBedNo2;
+};
+
+// 查找大于某个床位号的
+class  FindCubeItemObj2 {
+public:
+	FindCubeItemObj2(int nBed) {
+		m_nBedNo = nBed;
+	}
+	bool operator() (CubeItem * pItem) {
+		if (pItem->nBedNo > m_nBedNo)
+			return true;
+		return false;
+	}
+private:
+	int    m_nBedNo;
 };
 
 
