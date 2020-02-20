@@ -30,6 +30,8 @@ typedef struct tagGridPulse {
 
 
 CGlobalData  g_data;
+CSkin        g_skin;
+
 std::vector<TArea *>  g_vArea;
 DWORD g_ReaderIndicator[MAX_READERS_PER_GRID] 
 	= { 0xFF00FF00, 0xFF1b9375, 0xFF00FFFF, 0xFF51786C, 0xFFFFFF00, 0xFFCA5100 };
@@ -2001,4 +2003,16 @@ char *  VlcTime2Str(char * szTime, DWORD dwTimeSize, int nTime) {
 	int tss = (tns % 60);
 	SNPRINTF(szTime, dwTimeSize, "%02d:%02d:%02d", thh, tmm, tss);
 	return szTime;
+}
+
+CSkin::CSkin(DWORD dwTheme /* =0 */) {
+	m_dwTheme = dwTheme;
+}
+
+void  CSkin::SetTheme(DWORD  dwTheme) {
+	m_dwTheme = dwTheme;
+}
+
+DWORD   CSkin::operator[] (DWORD  dwColorIndex) {
+	return 0;
 }

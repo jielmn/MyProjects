@@ -121,6 +121,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_lblCubeEnd = 0;
 	m_btnCubeNext = 0;
 	m_btnCubePrev = 0;
+
+	m_layCube = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -269,6 +271,10 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblCubeEnd = static_cast<CLabelUI *>(m_PaintManager.FindControl("lblCubeEnd"));
 	m_btnCubeNext = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnNext1"));
 	m_btnCubePrev = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPrev1"));
+	m_layCube = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layMain_1"));
+
+	// 改变字体颜色，背景色等
+	SetCubeTheme();
 
 	UpdateCubePages();	
 
@@ -3525,6 +3531,10 @@ void   CDuiFrameWnd::OnPrevCubePage() {
 		UpdateCubePages();
 		UpdateCubeItems();
 	}	
+}
+
+void   CDuiFrameWnd::SetCubeTheme() {
+
 }
 
 

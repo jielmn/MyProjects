@@ -929,7 +929,18 @@ public:
 	int     m_nBedNo;
 };
 
+class CSkin {
+public:
+	CSkin(DWORD  dwTheme = 0);
+	void  SetTheme(DWORD  dwTheme);
+	DWORD   operator[] (DWORD  dwColorIndex);
+
+private:
+	DWORD    m_dwTheme;
+};
+
 extern CGlobalData  g_data;
+extern CSkin        g_skin;
 extern std::vector<TArea *>  g_vArea;
 extern DWORD g_ReaderIndicator[MAX_READERS_PER_GRID];
 extern const char * g_BodyParts[MAX_READERS_PER_GRID];

@@ -204,6 +204,9 @@ int CBusiness::Init() {
 	if ( g_data.m_dwCubeBedsPerPage == 0 ) {
 		g_data.m_dwCubeBedsPerPage = DEFAULT_CUBE_BEDS_COUNT_PER_PAGE;
 	}
+
+	g_data.m_cfg->GetConfig("skin", dwValue, 0);
+	g_skin.SetTheme(dwValue);
 	/******************** end ≈‰÷√œÓ **********************/
 
 

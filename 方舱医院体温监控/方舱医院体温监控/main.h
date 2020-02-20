@@ -324,6 +324,7 @@ private:
 
 	// ·½²Õ
 private:
+	CHorizontalLayoutUI *                       m_layCube;
 	CVerticalLayoutUI *                         m_CubeItems;
 	CVerticalLayoutUI *                         m_CubeItems_high_temp;
 	CTabLayoutUI *                              m_SubSwitch;
@@ -391,6 +392,8 @@ private:
 
 	void   OnNextCubePage();
 	void   OnPrevCubePage();
+
+	void   SetCubeTheme();
 };
 
 
