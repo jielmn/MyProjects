@@ -207,6 +207,33 @@ int CBusiness::Init() {
 
 	g_data.m_cfg->GetConfig("skin", dwValue, 0);
 	g_skin.SetTheme(dwValue);
+
+	char szReaderRange[256];
+	g_data.m_cfg->GetConfig("reader range", szReaderRange, sizeof(szReaderRange), "" );
+	SplitString split;
+	split.Split(szReaderRange, ',');
+	if ( split.Size() > 0 ) {
+		if (split.Size() > 1) {
+			sscanf(split[0], " %d", &g_data.m_nReaderNoStart);
+			sscanf(split[1], " %d", &g_data.m_nReaderNoEnd);
+		}
+		else {
+			sscanf(split[0], " %d", &g_data.m_nReaderNoStart);
+			g_data.m_nReaderNoEnd = g_data.m_nReaderNoStart;
+		}
+	}
+	else {
+		g_data.m_nReaderNoStart = DEFAULT_READER_NO_START;
+		g_data.m_nReaderNoEnd = DEFAULT_READER_NO_END;
+	}
+
+	if ( g_data.m_nReaderNoStart <= 0) {
+		g_data.m_nReaderNoStart = DEFAULT_READER_NO_START;
+	}
+
+	if ( g_data.m_nReaderNoStart > g_data.m_nReaderNoEnd ) {
+		g_data.m_nReaderNoEnd = g_data.m_nReaderNoStart;
+	}
 	/******************** end ≈‰÷√œÓ **********************/
 
 

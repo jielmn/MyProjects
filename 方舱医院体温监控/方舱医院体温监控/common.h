@@ -374,6 +374,8 @@ typedef  struct tagBatteryBinding {
 #endif
 
 #define   MAX_COM_PORTS_CNT            4
+#define   DEFAULT_READER_NO_START     1
+#define   DEFAULT_READER_NO_END       10
 
 class  CGlobalData {
 public:
@@ -392,6 +394,8 @@ public:
 	int                       m_nComportsCnt;
 	int                       m_nCubeHighTemp;                    // 多少温度以上认为高温区
 	DWORD                     m_dwCubeBedsPerPage;                // 每页多少床位号
+	int                       m_nReaderNoStart;
+	int                       m_nReaderNoEnd;
 
 	CfgData                   m_CfgData;
 	char                      m_szLaunchPort[16];      // 配置的，调试用的串口
@@ -434,6 +438,8 @@ public:
 		m_nComportsCnt = 0;
 		m_nCubeHighTemp = 0;
 		m_dwCubeBedsPerPage = 0;
+		m_nReaderNoStart = 0;
+		m_nReaderNoEnd = 0;
 
 		m_bClosing = FALSE;	
 		m_hWnd = 0;
