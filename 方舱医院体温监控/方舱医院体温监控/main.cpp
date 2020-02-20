@@ -3540,7 +3540,9 @@ static CControlUI* CALLBACK MY_SET_SKIN_PROC (CControlUI* p, LPVOID data) {
 		pLabel->SetTextColor(g_skin[CSkin::LABEL]);
 	}
 	else if (0 == strcmp(p->GetClass(), "Edit")) {
-		p->SetBkColor(g_skin[CSkin::EDIT]);
+		CEditUI * pEdit = (CEditUI *)p;
+		pEdit->SetBkColor(g_skin[CSkin::EDIT]);
+		pEdit->SetNativeEditBkColor(g_skin[CSkin::EDIT]);
 	}
 	return 0;
 }

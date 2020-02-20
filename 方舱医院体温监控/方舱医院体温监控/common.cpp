@@ -2041,7 +2041,7 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 			return 0xFF000000;
 			break;
 		case CSkin::EDIT:
-			return 0xFFCCE3F0;
+			return 0xFFF0F0F0;
 			break;
 		default:
 			break;
