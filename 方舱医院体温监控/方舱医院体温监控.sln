@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "方舱医院体温监控", "方舱医院体温监控\方舱医院体温监控.vcxproj", "{C47AB44F-5EBC-4869-90DC-BAE43B511A67}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "方舱医院设备配置", "方舱医院设备配置\方舱医院设备配置.vcxproj", "{464ED293-6C2F-4744-9B9F-692015DED2D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{C47AB44F-5EBC-4869-90DC-BAE43B511A67}.Release|x64.Build.0 = Release|x64
 		{C47AB44F-5EBC-4869-90DC-BAE43B511A67}.Release|x86.ActiveCfg = Release|Win32
 		{C47AB44F-5EBC-4869-90DC-BAE43B511A67}.Release|x86.Build.0 = Release|Win32
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Debug|x64.ActiveCfg = Debug|x64
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Debug|x64.Build.0 = Debug|x64
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Debug|x86.ActiveCfg = Debug|Win32
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Debug|x86.Build.0 = Debug|Win32
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Release|x64.ActiveCfg = Release|x64
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Release|x64.Build.0 = Release|x64
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Release|x86.ActiveCfg = Release|Win32
+		{464ED293-6C2F-4744-9B9F-692015DED2D0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
