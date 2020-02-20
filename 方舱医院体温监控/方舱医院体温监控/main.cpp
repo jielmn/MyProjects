@@ -3533,8 +3533,21 @@ void   CDuiFrameWnd::OnPrevCubePage() {
 	}	
 }
 
-void   CDuiFrameWnd::SetCubeTheme() {
+static CControlUI* CALLBACK MY_SET_SKIN_PROC (CControlUI* p, LPVOID data) {
+	CDuiString b = p->GetClass();
+	if ( 0 == strcmp( p->GetClass(), "Label" ) ) {
+		CLabelUI * pLabel = (CLabelUI *)p;
+		pLabel->SetTextColor(g_skin[CSkin::LABEL]);
+	}
+	else if (0 == strcmp(p->GetClass(), "Edit")) {
+		p->SetBkColor(g_skin[CSkin::EDIT]);
+	}
+	return 0;
+}
 
+void   CDuiFrameWnd::SetCubeTheme() {
+	m_layCube->SetBkColor(g_skin[CSkin::MAIN_BACKGROUND]);
+	m_layCube->FindControl(MY_SET_SKIN_PROC, 0, 0);
 }
 
 

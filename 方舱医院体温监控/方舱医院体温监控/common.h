@@ -931,9 +931,16 @@ public:
 
 class CSkin {
 public:
+	enum COLOR_ENUM
+	{
+		MAIN_BACKGROUND = 0,
+		LABEL,
+		EDIT,
+	};
+
 	CSkin(DWORD  dwTheme = 0);
 	void  SetTheme(DWORD  dwTheme);
-	DWORD   operator[] (DWORD  dwColorIndex);
+	DWORD   operator[] (COLOR_ENUM  dwColorIndex);	
 
 private:
 	DWORD    m_dwTheme;

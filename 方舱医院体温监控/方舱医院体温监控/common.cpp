@@ -2013,6 +2013,39 @@ void  CSkin::SetTheme(DWORD  dwTheme) {
 	m_dwTheme = dwTheme;
 }
 
-DWORD   CSkin::operator[] (DWORD  dwColorIndex) {
+DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
+	// È±Ê¡Ö÷Ìâ
+	if ( m_dwTheme == 0 ) {
+		switch (dwColorIndex)
+		{
+		case CSkin::MAIN_BACKGROUND:
+			return 0xFF434248; 
+			break;
+		case CSkin::LABEL:
+			return 0xFFFFFFFF;
+			break;
+		case CSkin::EDIT:
+			return 0xFFFFFFFF;
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		switch (dwColorIndex)
+		{
+		case CSkin::MAIN_BACKGROUND:
+			return 0xFFFFFFFF;
+			break;
+		case CSkin::LABEL:
+			return 0xFF000000;
+			break;
+		case CSkin::EDIT:
+			return 0xFFCCE3F0;
+			break;
+		default:
+			break;
+		}
+	}
 	return 0;
 }
