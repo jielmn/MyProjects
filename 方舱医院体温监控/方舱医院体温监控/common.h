@@ -13,6 +13,7 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 #include "LmnTelSvr.h"
+#include "LmnSerialPort.h"
 #include "sigslot.h"
 
 #include "UIlib.h"
@@ -86,8 +87,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "1.0.1"
-#define   COMPILE_TIME                "2020-02-14 18:00"
+#define   VERSION                     "1.0.2"
+#define   COMPILE_TIME                "2020-02-20 22:00"
 #ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
 #else
@@ -1017,6 +1018,7 @@ extern void  SortGridEvent(GridEvent events_type2[6 * 7][2]);
 extern void  ConvertGridEvent(GridEvent events_type2[6 * 7][2], GridEvent events_type[6 * 7]);
 extern const char * GetEventTypeStr(int nType);
 extern char *  VlcTime2Str(char * szTime, DWORD dwTimeSize, int nTime);
+extern void InitComPort(CLmnSerialPort * pPort);
 
 // templates
 template <class T>

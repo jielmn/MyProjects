@@ -668,6 +668,7 @@ void  CBusiness::CheckLaunch() {
 					BOOL bRet = pPort->OpenUartPort(nCom);
 					if (bRet) {
 						m_vSerialPorts.push_back(pItem);
+						InitComPort(pPort);
 					}
 					else {
 						pPort->CloseUartPort();
@@ -692,6 +693,7 @@ void  CBusiness::CheckLaunch() {
 				BOOL bRet = pPort->OpenUartPort(nCom);
 				if (bRet) {
 					m_vSerialPorts.push_back(pItem);
+					InitComPort(pPort);
 				}
 				else {
 					pPort->CloseUartPort();
@@ -1495,8 +1497,7 @@ void   CBusiness::ReadAllComPorts() {
 
 	const int MIN_DATA_LENGTH = 16;
 	const int BATERRY_TEMP_DATAl_LENGTH = 16;       // 有源tag
-	const int SURGENCY_TEMP_DATA_LENGTH = 29;
-	const int HAND_TEMP_DATA_LENGTH = 32;
+	const int HAND_TEMP_DATA_LENGTH = 19;
 
 	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ) {
 		CMyComPort * pItem = *it_com;
@@ -1546,7 +1547,7 @@ void   CBusiness::ReadAllComPorts() {
 			}
 			
 			// 如果是手持温度数据
-			if (buf[1] == 0x1E) {
+			if (buf[1] == 0x11) {
 				DWORD  dwExtraLength = HAND_TEMP_DATA_LENGTH - MIN_DATA_LENGTH;
 				DWORD  dwExpectedLength = HAND_TEMP_DATA_LENGTH;
 

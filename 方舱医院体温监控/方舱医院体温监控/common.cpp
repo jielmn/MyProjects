@@ -2005,6 +2005,16 @@ char *  VlcTime2Str(char * szTime, DWORD dwTimeSize, int nTime) {
 	return szTime;
 }
 
+void InitComPort(CLmnSerialPort * pPort) {
+	BYTE buf[256] = { 0 };
+	//LmnSleep(1000);
+	memcpy(buf, "\x00\x01\x0A\x55\x01\x01\xDD\xAA", 8);
+	buf[1] = (BYTE)g_data.m_nReaderNoStart;
+	buf[2] = (BYTE)g_data.m_nReaderNoEnd;
+	DWORD  dwWriteSize = 8;
+	pPort->Write(buf, dwWriteSize);
+}
+
 CSkin::CSkin(DWORD dwTheme /* =0 */) {
 	m_dwTheme = dwTheme;
 }
