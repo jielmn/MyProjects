@@ -209,18 +209,17 @@ int  CBusiness::SetReceriverChannel(const CSetReceiverChannelParam * pParam) {
 	BYTE  byChannels[3] = { pParam->m_byChannelA, pParam->m_byChannelB, pParam->m_byChannelC };
 	int ret = 0;
 
-	for (int i = 0; i < 2; i++) {		
-		dwWriteLen = 5;
-		//                          пе╣ю
-		memcpy(write_data, "\xCC\x01\x01\xDD\xAA", dwWriteLen);
-		write_data[1] = (BYTE)(i+1);
-		write_data[2] = byChannels[i];		
+	for (int i = 0; i < 1; i++) {		
+		dwWriteLen = 7;
+		//memcpy(write_data, "\xCC\x01\x01\xDD\xAA", dwWriteLen);
+		memcpy(write_data, "\xC0\x01\x00\x05\xC0\xDD\xAA", dwWriteLen);		
+		write_data[3] = byChannels[i];		
 		serial_port.Write(write_data, dwWriteLen);
 		LmnSleep(1000);
 
 		dwWriteLen = sizeof(write_data);
 		serial_port.Read(write_data, dwWriteLen);
-		if ( !(dwWriteLen == 3 && write_data[0] == (BYTE)(i+1) && write_data[1] == 'O' && write_data[2] == 'K') ) {
+		if ( !(dwWriteLen == 2 && write_data[0] == 'O' && write_data[1] == 'K') ) {
 			ret = -1;
 			break;
 		}

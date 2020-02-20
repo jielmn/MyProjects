@@ -77,7 +77,7 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 #else
-	for (int i = 1; i <= 96; i++) {
+	for (int i = 1; i <= 50; i++) {
 		strText.Format("%d", i);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
@@ -85,14 +85,14 @@ void  CDuiFrameWnd::InitWindow() {
 		m_cmbHandReaderAddr->Add(pElement);
 	}
 
-	for (int i = 1; i <= 91; i += 10 ) {
+	for (int i = 1; i <= 10; i++ ) {
 		int k = i;
 
-#ifdef REMOVE_11_CHANNEL_FLAG
-		if ( k == 11 ) {
-			k = 12;
-		}
-#endif
+//#ifdef REMOVE_11_CHANNEL_FLAG
+//		if ( k == 11 ) {
+//			k = 12;
+//		}
+//#endif
 		strText.Format("%d", k);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
@@ -136,7 +136,7 @@ void  CDuiFrameWnd::InitWindow() {
 		pItem->SetTag(pArea->dwAreaNo);
 	}
 
-	for (int i = 1; i <= 81; i += 20) {
+	for (int i = 1; i <= 10; i++) {
 		strText.Format("%d", i);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
