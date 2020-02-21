@@ -10,8 +10,12 @@
 
 class CMyComPort {
 public:
+	CMyComPort() {
+		m_last_cmd_time = 0;
+	}
 	CLmnSerialPort     m_com;
 	CDataBuf           m_buf;
+	time_t             m_last_cmd_time;
 };
 
 

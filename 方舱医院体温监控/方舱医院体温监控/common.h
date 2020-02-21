@@ -55,6 +55,9 @@ using namespace DuiLib;
 #define  DEFAULT_CUBE_BEDS_COUNT_PER_PAGE   50
 #endif
 
+// 如果3分钟没有收到数据，重新初始化串口(写发送命令)
+#define  REINIT_COM_PORT_TIME         180
+
 
 // 窗格温度文字透明度
 #define   GRID_LABLE_TRANSPARENT_PARAM       0xCC
@@ -87,8 +90,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "1.0.2"
-#define   COMPILE_TIME                "2020-02-20 22:00"
+#define   VERSION                     "1.0.3"
+#define   COMPILE_TIME                "2020-02-21 21:00"
 #ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
 #else

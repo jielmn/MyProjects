@@ -656,6 +656,8 @@ void  CBusiness::CheckLaunch() {
 		}
 	}	
 
+	time_t now = time(0);
+
 	// 如果是指定多个串口获取数据
 	if ( g_data.m_bSpecifiedComports ) {		
 		for (it = all_ports.begin(); it != all_ports.end(); ++it) {
@@ -669,6 +671,7 @@ void  CBusiness::CheckLaunch() {
 					if (bRet) {
 						m_vSerialPorts.push_back(pItem);
 						InitComPort(pPort);
+						pItem->m_last_cmd_time = now;
 					}
 					else {
 						pPort->CloseUartPort();
@@ -694,6 +697,7 @@ void  CBusiness::CheckLaunch() {
 				if (bRet) {
 					m_vSerialPorts.push_back(pItem);
 					InitComPort(pPort);
+					pItem->m_last_cmd_time = now;
 				}
 				else {
 					pPort->CloseUartPort();
@@ -1499,10 +1503,13 @@ void   CBusiness::ReadAllComPorts() {
 	const int BATERRY_TEMP_DATAl_LENGTH = 16;       // 有源tag
 	const int HAND_TEMP_DATA_LENGTH = 19;
 
+	time_t now = time(0);
+
 	for (it_com = m_vSerialPorts.begin(); it_com != m_vSerialPorts.end(); ) {
 		CMyComPort * pItem = *it_com;
 		CLmnSerialPort * pCom = &pItem->m_com;
 		CDataBuf * pBuf = &pItem->m_buf;
+		BOOL   bHasData = FALSE;              // 是否接送到数据
 		
 		BOOL  bClosed = FALSE;
 		while (TRUE) {
@@ -1571,6 +1578,7 @@ void   CBusiness::ReadAllComPorts() {
 					TempItem * pNewItem = new TempItem;
 					memcpy( pNewItem, &item, sizeof(TempItem) );
 					::PostMessage(g_data.m_hWnd, UM_CUBE_TEMP_ITEM, (WPARAM)pNewItem, 0);
+					bHasData = TRUE;
 				}
 			}
 		}		
@@ -1580,6 +1588,15 @@ void   CBusiness::ReadAllComPorts() {
 			delete pItem;
 			it_com = m_vSerialPorts.erase(it_com);
 			continue;
+		}
+
+		// 如果没有接收到数据
+		if ( !bHasData ) {
+			// 如果经过了一定时间，需要重新初始化串口
+			if ( now - pItem->m_last_cmd_time >= REINIT_COM_PORT_TIME) {
+				InitComPort(&pItem->m_com);
+				pItem->m_last_cmd_time = now;
+			}
 		}
 
 		++it_com;
