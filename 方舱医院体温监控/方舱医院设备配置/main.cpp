@@ -85,7 +85,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_cmbHandReaderAddr->Add(pElement);
 	}
 
-	for (int i = 1; i <= 10; i++ ) {
+	for (int i = 1; i <= 101; i += 10 ) {
 		int k = i;
 
 //#ifdef REMOVE_11_CHANNEL_FLAG
@@ -136,7 +136,7 @@ void  CDuiFrameWnd::InitWindow() {
 		pItem->SetTag(pArea->dwAreaNo);
 	}
 
-	for (int i = 1; i <= 10; i++) {
+	for (int i = 1; i <= 101; i += 10) {
 		strText.Format("%d", i);
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		pElement->SetText(strText);
