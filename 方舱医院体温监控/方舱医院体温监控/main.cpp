@@ -3127,10 +3127,10 @@ void   CDuiFrameWnd::UpdateCubeItemsHigh() {
 
 		if (item != m_SelectedCubeItem_high_temp) {
 			if (i % 2 == 0) {
-				item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+				item->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_0]);
 			}
 			else {
-				item->SetBkColor(0);
+				item->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_1]);
 			}
 		}		
 	}
@@ -3190,10 +3190,10 @@ void   CDuiFrameWnd::UpdateCubeItems() {
 
 		if (item != m_SelectedCubeItem) {
 			if (i % 2 == 0) {
-				item->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+				item->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_0]);
 			}
 			else {
-				item->SetBkColor(0);
+				item->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_1]);
 			}
 		}		
 	}
@@ -3359,14 +3359,14 @@ void   CDuiFrameWnd::UpdateSelectedCubeItem_high_temp() {
 	for (int i = 0; i < nCnt; i++) {
 		CCubeItemUI * pItem = (CCubeItemUI *)m_CubeItems_high_temp->GetItemAt(i);
 		if (pItem == m_SelectedCubeItem_high_temp) {
-			pItem->SetBkColor(0xFF007ACC);
+			pItem->SetBkColor(g_skin[CSkin::ITEM_SELECTED_BKCOLOR]);
 		}
 		else {
 			if (i % 2 == 0) {
-				pItem->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+				pItem->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_0]);
 			}
 			else {
-				pItem->SetBkColor(0);
+				pItem->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_1]);
 			}
 		}
 	}
@@ -3377,14 +3377,14 @@ void   CDuiFrameWnd::UpdateSelectedCubeItem() {
 	for (int i = 0; i < nCnt; i++) {
 		CCubeItemUI * pItem = (CCubeItemUI *)m_CubeItems->GetItemAt(i);
 		if ( pItem == m_SelectedCubeItem ) {
-			pItem->SetBkColor(0xFF007ACC);
+			pItem->SetBkColor(g_skin[CSkin::ITEM_SELECTED_BKCOLOR]);
 		}
 		else {
 			if (i % 2 == 0) {
-				pItem->SetBkColor(CUBE_ALTERNATIVE_BKCOLOR);
+				pItem->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_0]);
 			}
 			else {
-				pItem->SetBkColor(0);
+				pItem->SetBkColor(g_skin[CSkin::ITEM_BKCOLOR_1]);
 			}
 		}
 	}
@@ -3521,6 +3521,7 @@ void   CDuiFrameWnd::OnDeleteCuteItemRet(WPARAM wParam, LPARAM  lParam) {
 
 void   CDuiFrameWnd::OnNextCubePage() {
 	m_nCurPageIndex++;
+	m_SelectedCubeItem = 0;
 	UpdateCubePages();
 	UpdateCubeItems();
 }
@@ -3528,6 +3529,7 @@ void   CDuiFrameWnd::OnNextCubePage() {
 void   CDuiFrameWnd::OnPrevCubePage() {
 	if (m_nCurPageIndex > 0) {
 		m_nCurPageIndex--;
+		m_SelectedCubeItem = 0;
 		UpdateCubePages();
 		UpdateCubeItems();
 	}	

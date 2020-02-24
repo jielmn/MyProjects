@@ -1660,7 +1660,14 @@ void CCubeItemUI::DoInit() {
 	SetBinding();
 
 	this->SetFixedHeight(30); 
-	this->SetFixedWidth(760);   
+	this->SetFixedWidth(760);  
+
+	m_lblBedNo->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblName->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblPhone->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblTemp->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblTime->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblBinding->SetTextColor(g_skin[CSkin::LABEL]);
 }
 
 void CCubeItemUI::DoEvent(DuiLib::TEventUI& event) {
@@ -1739,7 +1746,7 @@ void  CCubeItemUI::SetTemperature() {
 				m_lblTemp->SetTextColor(HIGH_TEMP_TEXT_COLOR);
 			}
 			else {
-				m_lblTemp->SetTextColor(0xFFFFFFFF);
+				m_lblTemp->SetTextColor(g_skin[CSkin::LABEL]);
 			}
 		}
 		else {
@@ -1779,7 +1786,7 @@ void  CCubeItemUI::SetBinding() {
 	if ( m_bInitiated ) {
 		if (m_bBinding) {
 			m_lblBinding->SetText("ÒÑ°ó¶¨");
-			m_lblBinding->SetTextColor(0xFFFFFFFF);
+			m_lblBinding->SetTextColor(g_skin[CSkin::LABEL]);
 		}
 		else {
 			m_lblBinding->SetText("Î´°ó¶¨");

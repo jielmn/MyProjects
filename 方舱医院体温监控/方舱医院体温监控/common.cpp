@@ -2037,6 +2037,15 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 		case CSkin::EDIT:
 			return 0xFFFFFFFF;
 			break;
+		case CSkin::ITEM_BKCOLOR_0:
+			return 0xFF666666;
+			break;
+		case CSkin::ITEM_BKCOLOR_1:
+			return 0;
+			break;
+		case CSkin::ITEM_SELECTED_BKCOLOR:
+			return 0xFF007ACC;
+			break;
 		default:
 			break;
 		}
@@ -2052,6 +2061,15 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 			break;
 		case CSkin::EDIT:
 			return 0xFFF0F0F0;
+			break;
+		case CSkin::ITEM_BKCOLOR_0:
+			return 0xFFCCCCCC;
+			break;
+		case CSkin::ITEM_BKCOLOR_1:
+			return 0;
+			break;
+		case CSkin::ITEM_SELECTED_BKCOLOR:
+			return 0xFF00AACC;
 			break;
 		default:
 			break;

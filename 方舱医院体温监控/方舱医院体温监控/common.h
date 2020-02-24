@@ -946,6 +946,9 @@ public:
 		MAIN_BACKGROUND = 0,
 		LABEL,
 		EDIT,
+		ITEM_BKCOLOR_0,
+		ITEM_BKCOLOR_1,
+		ITEM_SELECTED_BKCOLOR,
 	};
 
 	CSkin(DWORD  dwTheme = 0);
