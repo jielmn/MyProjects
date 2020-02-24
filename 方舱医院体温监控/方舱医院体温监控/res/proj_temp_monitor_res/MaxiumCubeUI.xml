@@ -3,7 +3,7 @@
 	<HorizontalLayout inset="1,1,1,1" bordercolor="#FF768D9B" bordersize="1" >			
 	
 		<!-- 左边的grid属性 -->
-		<VerticalLayout width="530" bkcolor="#FF434248" bkcolor2="#FF293441" inset="0,10,0,10" >			
+		<VerticalLayout width="530" bkcolor="#FF434248" bkcolor2="#FF293441" inset="0,10,0,10" name="layMaxCubeLeft"  >			
 			<HorizontalLayout height="30" inset="10,0,10,0" >
 				<Control bkimage="grid.png" width="30" />
 				<Control width="10" />
@@ -28,7 +28,7 @@
 		</VerticalLayout>
 		
 		<!-- 右边的温度曲线 -->
-		<VerticalLayout inset="10,0,10,10" bkcolor="#FF434248" >
+		<VerticalLayout inset="10,0,10,10" bkcolor="#FF434248" name="layMaxCubeRight" >
 			<HorizontalLayout height="40">
 				<Control bkimage="beat.png" width="40" />
 				<Control width="10" />

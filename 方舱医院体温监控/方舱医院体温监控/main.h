@@ -357,6 +357,9 @@ private:
 	int                                         m_nMaxBedNo;
 	int                                         m_nCurPageIndex;
 
+	CHorizontalLayoutUI *                       m_layMaxCubeLeft;
+	CHorizontalLayoutUI *                       m_layMaxCubeRight;
+
 private:
 	void   MoveNewTag(const POINT & pt);
 	void   OnMoveNewTag(const POINT & pt);

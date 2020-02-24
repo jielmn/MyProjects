@@ -123,6 +123,8 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_btnCubePrev = 0;
 
 	m_layCube = 0;
+	m_layMaxCubeLeft = 0;
+	m_layMaxCubeRight = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -272,6 +274,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnCubeNext = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnNext1"));
 	m_btnCubePrev = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPrev1"));
 	m_layCube = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layMain_1"));
+	m_layMaxCubeLeft = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layMaxCubeLeft"));
+	m_layMaxCubeRight = static_cast<CHorizontalLayoutUI *>(m_PaintManager.FindControl("layMaxCubeRight"));
 
 	// 改变字体颜色，背景色等
 	SetCubeTheme();
@@ -3546,12 +3550,21 @@ static CControlUI* CALLBACK MY_SET_SKIN_PROC (CControlUI* p, LPVOID data) {
 		pEdit->SetBkColor(g_skin[CSkin::EDIT]);
 		pEdit->SetNativeEditBkColor(g_skin[CSkin::EDIT]);
 	}
+	else if (0 == strcmp(p->GetClass(), "Button")) {
+		CButtonUI * pButton = (CButtonUI *)p;
+		pButton->SetTextColor(g_skin[CSkin::BUTTON]);
+	}
 	return 0;
 }
 
 void   CDuiFrameWnd::SetCubeTheme() {
 	m_layCube->SetBkColor(g_skin[CSkin::MAIN_BACKGROUND]);
 	m_layCube->FindControl(MY_SET_SKIN_PROC, 0, 0);
+	m_layMaxCubeLeft->SetBkColor(g_skin[CSkin::MAX_CUBE_LEFT_BKCOLOR]); 
+	m_layMaxCubeLeft->SetBkColor2(g_skin[CSkin::MAX_CUBE_LEFT_BKCOLOR_1]);
+	m_layMaxCubeRight->SetBkColor(g_skin[CSkin::MAX_CUBE_RIGHT_BKCOLOR]);
+	m_layMaxCubeLeft->FindControl(MY_SET_SKIN_PROC, 0, 0);
+	m_layMaxCubeRight->FindControl(MY_SET_SKIN_PROC, 0, 0);
 }
 
 

@@ -2037,6 +2037,9 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 		case CSkin::EDIT:
 			return 0xFFFFFFFF;
 			break;
+		case CSkin::BUTTON:
+			return 0xFFFFFFFF;
+			break;
 		case CSkin::ITEM_BKCOLOR_0:
 			return 0xFF666666;
 			break;
@@ -2045,6 +2048,15 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 			break;
 		case CSkin::ITEM_SELECTED_BKCOLOR:
 			return 0xFF007ACC;
+			break;
+		case CSkin::MAX_CUBE_LEFT_BKCOLOR:
+			return 0xFF434248;
+			break;
+		case CSkin::MAX_CUBE_LEFT_BKCOLOR_1:
+			return 0xFF293441;
+			break;
+		case CSkin::MAX_CUBE_RIGHT_BKCOLOR:
+			return 0xFF434248;
 			break;
 		default:
 			break;
@@ -2062,6 +2074,9 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 		case CSkin::EDIT:
 			return 0xFFF0F0F0;
 			break;
+		case CSkin::BUTTON:
+			return 0xFF000000;
+			break;
 		case CSkin::ITEM_BKCOLOR_0:
 			return 0xFFCCCCCC;
 			break;
@@ -2070,6 +2085,15 @@ DWORD   CSkin::operator[] (COLOR_ENUM  dwColorIndex) {
 			break;
 		case CSkin::ITEM_SELECTED_BKCOLOR:
 			return 0xFF00AACC;
+			break;
+		case CSkin::MAX_CUBE_LEFT_BKCOLOR:
+			return 0xFFFFFFFF;
+			break;
+		case CSkin::MAX_CUBE_LEFT_BKCOLOR_1:
+			return 0xFFCCCCCC;
+			break;
+		case CSkin::MAX_CUBE_RIGHT_BKCOLOR:
+			return 0xFFFFFFFF;
 			break;
 		default:
 			break;

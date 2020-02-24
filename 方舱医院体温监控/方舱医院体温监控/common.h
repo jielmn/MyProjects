@@ -90,8 +90,8 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "1.0.3"
-#define   COMPILE_TIME                "2020-02-21 21:00"
+#define   VERSION                     "1.0.4"
+#define   COMPILE_TIME                "2020-02-24 21:00"
 #ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
 #else
@@ -946,9 +946,13 @@ public:
 		MAIN_BACKGROUND = 0,
 		LABEL,
 		EDIT,
+		BUTTON,
 		ITEM_BKCOLOR_0,
 		ITEM_BKCOLOR_1,
 		ITEM_SELECTED_BKCOLOR,
+		MAX_CUBE_LEFT_BKCOLOR,
+		MAX_CUBE_LEFT_BKCOLOR_1,
+		MAX_CUBE_RIGHT_BKCOLOR,
 	};
 
 	CSkin(DWORD  dwTheme = 0);
