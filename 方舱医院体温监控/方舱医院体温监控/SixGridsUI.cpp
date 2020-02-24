@@ -1832,6 +1832,9 @@ void  CNewTagUI::DoInit() {
 
 	SetTemperature();
 	SetTime();
+
+	m_lblTemp->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblTime->SetTextColor(g_skin[CSkin::LABEL]);
 }
 
 void  CNewTagUI::SetTemperature(int nTemp) {
@@ -1884,6 +1887,8 @@ void  CNewTagUI::Fade() {
 }
 
 void  CNewTagUI::Refresh() {
-	m_lblTemp->SetTextColor(CUBE_REFRESH_TEXTCOLOR);
-	m_lblTime->SetTextColor(CUBE_REFRESH_TEXTCOLOR);
+	//m_lblTemp->SetTextColor(CUBE_REFRESH_TEXTCOLOR);
+	//m_lblTime->SetTextColor(CUBE_REFRESH_TEXTCOLOR);
+	m_lblTemp->SetTextColor(g_skin[CSkin::LABEL]);
+	m_lblTime->SetTextColor(g_skin[CSkin::LABEL]);
 }
