@@ -10,15 +10,34 @@ Page({
     index: 0,
     curtagId: null,    
     bluetoothStr: "正在连接易温读卡器...",
-    spinShow: true
+    spinShow: true,
+    connected:false,
+    mesureBusy: false,
   },
 
   timerId: null,  
   curTempItem: null,
+  measureTimerId: null,
 
   onLoad: function(options) {
     var that = this;
     app.temperatureCallback = function(item) {
+
+      clearTimeout(that.measureTimerId);
+      that.measureTimerId = null;
+      this.setData({
+        mesureBusy: false
+      });
+
+      if ( item.errno != 0 ) {        
+        wx.showToast({
+          title: '测温失败: ' + item.errMsg,
+          icon: 'none',
+          duration: 2000
+        })
+
+        return;
+      }
 
       // app.innerAudioContext.src = '/sound/bongo.mp3'; //链接到音频的地址
       // app.innerAudioContext.play();
@@ -75,18 +94,21 @@ Page({
       if (res.errCode && res.errCode != 0) {
         that.setData({
           bluetoothStr: "连接易温读卡器失败:" + res.errMsg,
-          spinShow: false
+          spinShow: false,
+          connected: false
         });
       } else {
         if (res.myCode && res.myCode != 0) {
           that.setData({
             bluetoothStr: "正在连接易温读卡器...",
-            spinShow: true
+            spinShow: true,
+            connected: false
           });
         } else {
           that.setData({
             bluetoothStr: "连接易温读卡器成功",
-            spinShow: false
+            spinShow: false,
+            connected: true
           });
         }
       }
@@ -176,6 +198,28 @@ Page({
         app.log("wx.chooseLocation success", res)
       }
     })
+  },
+
+  onMesure:function() {
+    this.measureTimerId = setTimeout(this.onMesureTimeout, 10000);
+    app.measureTemp();
+
+    this.setData({
+      mesureBusy: true
+    });
+
+  },
+
+  onMesureTimeout:function() {
+    wx.showToast({
+      title: '测温超时',
+      icon: 'none',
+      duration: 2000
+    })
+    this.measureTimerId = null;
+    this.setData({
+      mesureBusy: false
+    });
   }
 
 

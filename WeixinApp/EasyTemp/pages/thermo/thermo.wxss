@@ -1,7 +1,7 @@
 .upview {
   width: 100%;
   background-color: #3dc5a2;
-  height: 380rpx;
+  height: 460rpx;
   color: #a5eddf;
   font-size: 30rpx;
   padding-left:20rpx;
@@ -104,4 +104,13 @@
 .update{
   width: 40rpx;
   height: 40rpx;
+}
+
+.start {
+  color: #fff;
+  background: #CA587A;
+  line-height: 60rpx;
+  border-radius: 40rpx;
+  font-size: 40rpx;
+  width: 400rpx;
 }

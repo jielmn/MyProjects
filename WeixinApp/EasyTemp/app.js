@@ -15,6 +15,13 @@ App({
   lat: null,
   lng: null,
 
+  readerName:'EASYTEMP READER',   // 蓝牙搜索到的设备名称
+  uuid:'0000fff0',                // reader提供服务的uuid
+
+  writeCharacterId: null,         // 写id
+  notifyCharacterId: null,        // 通知id
+  serviceId: null,
+
   globalData: {
     userInfo: null,
     serverAddr: "https://telemed-healthcare.cn/easytemp/main",
@@ -46,6 +53,7 @@ App({
     //this.innerAudioContext.src = null,
     //this.innerAudioContext.volume = 0.1;
     //this.innerAudioContext.onPlay(() => { }); //播放音效
+
 
     // 登录
     wx.login({
@@ -207,6 +215,9 @@ App({
     this.globalData.devices = new Array();
     this.globalData.device = null
 
+    this.writeCharacterId = null;
+    this.notifyCharacterId = null;
+
     if (this.bluetoothCallback) {
       var res = {}
       res.myCode = 1;
@@ -230,16 +241,28 @@ App({
     var app = this;
     var that = this;
 
-    wx.onBluetoothDeviceFound((res) => {
-      res.devices.forEach(device => {
+    var readerNameLen = that.readerName.length;
+    var readerName = that.readerName.toLowerCase();    
 
+    wx.onBluetoothDeviceFound((res) => {
+
+      var foundCount = 0;
+      res.devices.forEach(device => {
         if (!device.name && !device.localName) {
           return
         }
 
+        // reader名字改变了
+        /*
         if (device.name.substring(0, 7).toLowerCase() != 'telemed') {
           return;
         }
+        */
+
+        if (device.name.substring(0, readerNameLen).toLowerCase() != readerName ) {
+          return;
+        }
+        foundCount++;
 
         var foundDevices = that.globalData.devices
         const idx = app.inArray(foundDevices, 'deviceId', device.deviceId)
@@ -251,6 +274,11 @@ App({
         }
 
       })
+
+      if (0 == foundCount) {
+        app.log('not found reader: ' + readerName, res);
+      }
+
     })
   },
 
@@ -341,6 +369,8 @@ App({
     var that = this;
     var app = this;
 
+    var uuid = that.uuid.toLowerCase();
+
     wx.getBLEDeviceServices({
       deviceId,
       success: (res) => {
@@ -354,7 +384,14 @@ App({
           */
 
           /*易温的服务*/
+          /*
           if (res.services[i].uuid.substring(0, 8).toLowerCase() == 'f000fff0') {
+            that.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid)
+          }
+          */
+
+          if (res.services[i].uuid.substring(0, 8).toLowerCase() == uuid ) {
+            that.serviceId = res.services[i].uuid;
             that.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid)
           }
 
@@ -392,10 +429,15 @@ App({
           }
 
           if (item.properties.write) {
-            // that.writeBLECharacteristicValue(deviceId, serviceId, item.uuid, app.stringToBytes("56"))
+            if ( item.uuid.substring(0, 8).toLowerCase() == '0000fff2' ) {
+              app.writeCharacterId = item.uuid;
+              app.log('found write character id: ' + item.uuid );
+            }
           }
 
           if (item.properties.notify || item.properties.indicate) {
+            app.log('found notify character id: ' + item.uuid);
+
             wx.notifyBLECharacteristicValueChange({
               deviceId,
               serviceId,
@@ -432,12 +474,18 @@ App({
     var app = this;
     var that = this;
 
+    var hex = order;
+    var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
+      return parseInt(h, 16)
+    }))
+
     wx.writeBLECharacteristicValue({
       deviceId: deviceId,
       serviceId: serviceId,
       characteristicId: characterId,
       // 这里的value是ArrayBuffer类型
-      value: order.slice(0, 20),
+      //value: order.slice(0, 20),
+      value: typedArray,
       success: function(res) {
         app.log("write characterid success");
       },
@@ -459,10 +507,22 @@ App({
 
       var data = new Uint8Array(res.value);
       var item = {};
-      item.tagid = resValue.substr(2, 16);
-      item.temperature = data[9] + data[10] / 100;
-      item.battery = data[13] * 100 + data[14] * 10 + data[15];
-      app.log("formated item: ", item);
+      item.errno = 0;
+      item.errMsg = resValue;
+
+      if (data.length != 12) {
+        item.errno = -1;
+      } else {
+        item.tagid = resValue.substr(4, 16);
+        item.temperature = data[10] + data[11] / 100;
+        item.battery = 0;
+      }
+
+      //item.tagid = resValue.substr(2, 16);
+      //item.temperature = data[9] + data[10] / 100;
+      //item.battery = data[13] * 100 + data[14] * 10 + data[15];
+
+      app.log("received temperature data: ", item);
 
       if (that.temperatureCallback) {
         that.temperatureCallback(item);
@@ -843,6 +903,14 @@ App({
       this.globalData.mine.lasttemperature = null;
       this.globalData.mine.time = null;
     }
+  },
+
+  measureTemp() {
+    var deviceId = this.globalData.device.deviceId;
+    var serviceId = this.serviceId;
+    var writeId = this.writeCharacterId;
+
+    this.writeBLECharacteristicValue(deviceId, serviceId, writeId, "C311" );
   }
 
 })

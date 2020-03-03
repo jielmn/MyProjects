@@ -9,6 +9,10 @@
     </view>
   </view>
 
+  <view class='btnview'>
+    <button class='start' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
+  </view>
+
   <view class="tempview">
     <view class='v1'>收到温度(℃):</view>
     <view class='x1'>
