@@ -54,6 +54,12 @@ App({
     //this.innerAudioContext.volume = 0.1;
     //this.innerAudioContext.onPlay(() => { }); //播放音效
 
+    //var hex = "C311";
+    //var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
+    //  return parseInt(h, 16)
+    //}))
+    //this.log('typearray: ', typedArray)
+
 
     // 登录
     wx.login({
@@ -485,13 +491,13 @@ App({
       characteristicId: characterId,
       // 这里的value是ArrayBuffer类型
       //value: order.slice(0, 20),
-      value: typedArray,
+      value: typedArray.buffer,
       success: function(res) {
         app.log("write characterid success");
       },
 
       fail: function(res) {
-        app.log("write characterid failed");
+        app.log("write characterid failed:", res);
       }
     })
   },
@@ -910,7 +916,8 @@ App({
     var serviceId = this.serviceId;
     var writeId = this.writeCharacterId;
 
-    this.writeBLECharacteristicValue(deviceId, serviceId, writeId, "C311" );
+    this.log('measure temperature, device id=' + deviceId + ', service id=' + serviceId + ', write id=' + writeId );
+    this.writeBLECharacteristicValue(deviceId, serviceId, writeId, 'C311' );
   }
 
 })

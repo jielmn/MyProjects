@@ -25,7 +25,7 @@ Page({
 
       clearTimeout(that.measureTimerId);
       that.measureTimerId = null;
-      this.setData({
+      that.setData({
         mesureBusy: false
       });
 
