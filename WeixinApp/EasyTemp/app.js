@@ -14,6 +14,7 @@ App({
   uploadMinTemperature: 35.0,
   lat: null,
   lng: null,
+  discoveryTimeout:6000,
 
   readerName:'EASYTEMP READER',   // 蓝牙搜索到的设备名称
   uuid:'0000fff0',                // reader提供服务的uuid
@@ -231,7 +232,7 @@ App({
     }
 
     this.globalData.discoveryStarted = true
-    this.globalData.timerid = setTimeout(this.onBluetoothDevicesDiscoveryTimeout, 6000);
+    this.globalData.timerid = setTimeout(this.onBluetoothDevicesDiscoveryTimeout, this.discoveryTimeout);
     this.isBluetoothStoped = false;
 
     wx.startBluetoothDevicesDiscovery({
