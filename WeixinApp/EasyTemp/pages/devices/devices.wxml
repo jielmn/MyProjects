@@ -1,5 +1,6 @@
 <wxs src="../../tools.wxs" module="tools" />
 
+<!--
 <view class="upview">
   <view class="left"></view>
   <view class="weui-loading" fix wx:if="{{ spinShow }}" ></view>
@@ -7,13 +8,15 @@
     <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
   </view>
 </view>
+-->
 
 <view class="weui-panel">
   <view class="weui-panel__hd" wx:for="{{devices}}" wx:key="index">
-    <view class="device" bindtap="onSelectDevice" >
+    <view class="device" bindtap="onSelectDevice" data-deviceid="{{item.deviceId}}" >
       <view class="x1">{{index+1}}</view>
       <view class="x2">{{item.name}}</view>
       <view class="x3">{{item.deviceId}}</view>
+      <view class="x4">{{item.selected}}</view>
     </view>
   </view>
 </view>

@@ -13,6 +13,7 @@ Page({
     spinShow: true,
     connected:false,
     mesureBusy: false,
+    lastDeviceId:null,
   },
 
   timerId: null,  
@@ -110,6 +111,7 @@ Page({
             spinShow: false,
             connected: true
           });
+          that.lastDeviceId = res.myDeviceId;
         }
       }
 
@@ -134,6 +136,11 @@ Page({
   },
 
   onShow: function(options) {
+    //app.log('thermo page on show');
+    //app.log('app.isBluetoothStoped:', app.isBluetoothStoped );
+    //app.log('app.globalData.selectedDevice:', app.globalData.selectedDevice );
+    //app.log('that.lastDeviceId:', this.lastDeviceId);
+
     var that = this;
 
     if (app.isBluetoothStoped) {
@@ -144,6 +151,15 @@ Page({
       });
 
       app.openBluetoothAdapter();
+    } else if ( app.globalData.selectedDevice != that.lastDeviceId ) {
+      app.log('reconnect device');
+      that.setData({
+        bluetoothStr: "正在连接易温读卡器...",
+        spinShow: true,
+        connected: false
+      });
+      app.reconnect( that.lastDeviceId, app.globalData.selectedDevice )
+      app.globalData.selectedDevice = null;
     }
 
     var tmp = [];
@@ -224,6 +240,7 @@ Page({
 
   onSelectDevice:function(){
     //app.log('on select device')
+    app.globalData.selectedDevice = null;
     wx.navigateTo({ url: '../devices/devices' })
   }
 

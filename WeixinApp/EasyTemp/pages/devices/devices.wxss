@@ -48,4 +48,9 @@
 
 .device .x3 {
   display: inline-block;
+  width:240rpx;
+}
+
+.device .x4 {
+  display: inline-block;
 }
