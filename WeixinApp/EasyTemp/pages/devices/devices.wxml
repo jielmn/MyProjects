@@ -10,7 +10,11 @@
 
 <view class="weui-panel">
   <view class="weui-panel__hd" wx:for="{{devices}}" wx:key="index">
-    <view bindtap="onSelectDevice" >{{index}}</view>
+    <view class="device" bindtap="onSelectDevice" >
+      <view class="x1">{{index+1}}</view>
+      <view class="x2">{{item.name}}</view>
+      <view class="x3">{{item.deviceId}}</view>
+    </view>
   </view>
 </view>
 

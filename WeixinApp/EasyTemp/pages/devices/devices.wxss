@@ -35,3 +35,17 @@
 .bottomview{
   padding-left: 20rpx;
 }
+
+.device .x1 {
+  display: inline-block;
+  width:80rpx;
+}
+
+.device .x2 {
+  display: inline-block;
+  width:240rpx;
+}
+
+.device .x3 {
+  display: inline-block;
+}

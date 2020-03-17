@@ -356,11 +356,18 @@ App({
         }
       })
     } else {
-      devices.forEach(device => {
-        if (device.deviceId == this.lastDeviceId) {
-          foundDevice = device;
-        }
-      })
+      if ( devices.length == 1 ) {
+        foundDevice = devices[0];
+      } else {
+        devices.forEach(device => {
+          if ( foundDevice == null ) {
+            foundDevice = device;
+          }
+           else if (device.deviceId == this.lastDeviceId) {
+            foundDevice = device;
+          }
+        })
+      }      
     }
     
     this.log('last device id:' + this.lastDeviceId);

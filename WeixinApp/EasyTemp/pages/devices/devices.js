@@ -4,7 +4,16 @@ const app = getApp()
 
 Page({
   data: {
-    devices:[{a:1},{b:2}]
+    devices:[],
+    spinShow:false
+  },
+
+  onLoad: function (options){
+    var devices = app.globalData.devices || [];
+
+    this.setData({
+      devices:devices
+    });
   },
 
   onSelectDevice:function(e){
