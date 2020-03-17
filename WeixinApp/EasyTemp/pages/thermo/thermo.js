@@ -220,6 +220,11 @@ Page({
     this.setData({
       mesureBusy: false
     });
+  },
+
+  onSelectDevice:function(){
+    //app.log('on select device')
+    wx.navigateTo({ url: '../devices/devices' })
   }
 
 

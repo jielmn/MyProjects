@@ -15,8 +15,10 @@ App({
   lat: null,
   lng: null,
   discoveryTimeout:6000,
+  lastDeviceId:null,
 
-  readerName:'EASYTEMP READER',   // 蓝牙搜索到的设备名称
+  //readerName:'EASYTEMP READER',   // 蓝牙搜索到的设备名称
+  readerName: 'HB53504',   // 蓝牙搜索到的设备名称
   uuid:'0000fff0',                // reader提供服务的uuid
 
   writeCharacterId: null,         // 写id
@@ -266,6 +268,8 @@ App({
         }
         */
 
+        that.log('device name: ' + device.name );
+
         if (device.name.substring(0, readerNameLen).toLowerCase() != readerName ) {
           return;
         }
@@ -297,6 +301,15 @@ App({
     this.stopBluetoothDevicesDiscovery();
 
     this.log("found devices", this.globalData.devices);
+    if ( this.globalData.devices.length > 1 ) {
+      var res = {}
+      res.errCode = -1;
+      res.errMsg = "找到两个以上易温读卡器，请选择一个"
+      that.bluetoothCallback(res);
+      return;
+    }
+
+
     var device = this.getNearestDevice();
     this.globalData.device = device;
 
@@ -334,13 +347,25 @@ App({
   getNearestDevice() {
     var devices = this.globalData.devices;
     var foundDevice = null;
-    devices.forEach(device => {
-      if (device) {
-        foundDevice = device;
-      } else if (device.RSSI > foundDevice.RSSI) {
-        foundDevice = device;
-      }
-    })
+    if ( this.lastDeviceId == null ) {
+      devices.forEach(device => {
+        if (foundDevice == null) {
+          foundDevice = device;
+        } else if (device.RSSI > foundDevice.RSSI) {
+          foundDevice = device;
+        }
+      })
+    } else {
+      devices.forEach(device => {
+        if (device.deviceId == this.lastDeviceId) {
+          foundDevice = device;
+        }
+      })
+    }
+    
+    this.log('last device id:' + this.lastDeviceId);
+    this.log('foundDevice:', foundDevice);
+
     return foundDevice;
   },
 
@@ -354,6 +379,7 @@ App({
       deviceId,
       success: (res) => {
         app.log("createBLEConnection success");
+        that.lastDeviceId = deviceId;
         that.getBLEDeviceServices(deviceId)
       },
       fail: (err) => {

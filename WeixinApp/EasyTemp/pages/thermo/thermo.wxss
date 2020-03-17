@@ -18,7 +18,7 @@
   height: 60rpx;
   line-height: 60rpx;
   color: #FD7432;
-  max-width:630rpx;
+  max-width:580rpx;
   overflow: hidden;/*超出部分隐藏*/
   white-space: nowrap;/*不换行*/
   text-overflow:ellipsis;/*超出部分文字以...显示*/

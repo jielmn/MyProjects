@@ -1,0 +1,19 @@
+<wxs src="../../tools.wxs" module="tools" />
+
+<view class="upview">
+  <view class="left"></view>
+  <view class="weui-loading" fix wx:if="{{ spinShow }}" ></view>
+  <view class="right" wx:if="{{ !spinShow }}" >
+    <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
+  </view>
+</view>
+
+<view class="weui-panel">
+  <view class="weui-panel__hd" wx:for="{{devices}}" wx:key="index">
+    <view bindtap="onSelectDevice" >{{index}}</view>
+  </view>
+</view>
+
+<view class="bottomview" wx:if="{{devices.length==0}}" >
+  没有找到设备
+</view>

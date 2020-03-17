@@ -7,6 +7,9 @@
     <view class="right" wx:if="{{ !spinShow }}" >
       <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
     </view>
+    <view class="right" wx:if="{{ !spinShow }}" >
+      <image class='update' src='/images/setting.png' bindtap="onSelectDevice" ></image>
+    </view>
   </view>
 
   <view class='btnview'>
