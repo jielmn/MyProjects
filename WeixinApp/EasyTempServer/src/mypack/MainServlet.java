@@ -309,7 +309,10 @@ public class MainServlet extends HttpServlet {
 			
 			// 如果已经注册
 			if ( rs.next() ) {
+				String lastDevice = rs.getString(2);
+				object.put("lastdevice", lastDevice);
 				rs.close();
+				
 				rs = stmt.executeQuery("select * from family where open_id = '" + open_id_sql + "'" );
 				while ( rs.next() ) {
 					JSONObject member = new JSONObject();
@@ -361,7 +364,7 @@ public class MainServlet extends HttpServlet {
 				} 
 				// 允许注册
 				else {
-					stmt.executeUpdate("insert into users values('" + open_id_sql + "') ");
+					stmt.executeUpdate("insert into users(open_id) values('" + open_id_sql + "') ");
 				}
 			}
 			

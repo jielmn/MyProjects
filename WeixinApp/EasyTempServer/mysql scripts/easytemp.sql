@@ -10,7 +10,7 @@ insert into config (value0) values ( 1 );
 -- open_id是微信给的用户id, 28个字节
 -- name是获取的微信的用户名
 -- avatar_url是微信的头像地址
-create table users ( open_id varchar(64) primary key not null ) DEFAULT CHARSET=utf8;
+create table users ( open_id varchar(64) primary key not null, lastdevice varchar(18) not null default '' ) DEFAULT CHARSET=utf8;
 
 -- 体温表
 create table temperature( id int primary key not null auto_increment, open_id varchar(64) not null, tagid varchar(20) not null, temp float(3,1) not null, ctime datetime not null, lat double(9,6) null, lng double(9,6) null ) DEFAULT CHARSET=utf8;
