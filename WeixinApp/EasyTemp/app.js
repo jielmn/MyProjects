@@ -17,7 +17,7 @@ App({
   discoveryTimeout:6000,
   lastDeviceId:null,
 
-  readerName:'EASYTEMP READER',   // 蓝牙搜索到的设备名称
+  readerName:'reader_',   // 蓝牙搜索到的设备名称
   //readerName: 'HB53504',   // 蓝牙搜索到的设备名称
   uuid:'0000fff0',                // reader提供服务的uuid
 
