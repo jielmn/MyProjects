@@ -1,0 +1,6 @@
+<!--pages/welcome.wxml-->
+
+<image mode='scaleToFill' src="/images/banner.png" class="bkimg" ></image>
+<button class='start' open-type="getUserInfo" bindgetuserinfo="onStart"  >开始测温吧</button>
+
+

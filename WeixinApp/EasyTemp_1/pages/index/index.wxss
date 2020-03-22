@@ -1,0 +1,34 @@
+/**index.wxss**/
+.top {
+  width: 100%;
+  height: 100rpx;
+  background-color: #3dc5a2;
+}
+
+.top .text {
+  color: #fff;
+  font-size: 30rpx;
+  text-align: center;
+  line-height: 100rpx;
+}
+
+.search{
+  width:100%;
+  background-color:#fff;
+  margin-top:50rpx;
+  margin-bottom:50rpx;
+}
+
+.search .button {
+  color: #fff;
+  background: #3dc5a2;
+  line-height: 60rpx;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  width: 400rpx;
+}
+
+.itemimage{
+  width: 40rpx;
+  height: 40rpx;
+}

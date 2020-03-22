@@ -1,0 +1,21 @@
+/* pages/welcome.wxss */
+
+page {
+  width: 100%;
+  height: 100%;
+}
+
+.bkimg {
+  width: 100%;
+  height: 100%;
+}
+
+.start {
+  margin-top:-150rpx;
+  color: #fff;
+  background: #3dc5a2;
+  line-height: 60rpx;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  width: 400rpx;
+}

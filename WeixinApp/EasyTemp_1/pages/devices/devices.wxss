@@ -1,0 +1,56 @@
+.upview {
+  width: 100%;
+  background-color: #3dc5a2;
+  height: 80rpx;
+  color: #a5eddf;
+  font-size: 30rpx;
+  padding-left:20rpx;
+}
+
+.upview .left{
+  display: inline-block;
+  vertical-align: top;
+  height: 60rpx;
+  line-height: 60rpx;
+  color: #FD7432;
+  width:620rpx;
+  overflow: hidden;/*超出部分隐藏*/
+  white-space: nowrap;/*不换行*/
+  text-overflow:ellipsis;/*超出部分文字以...显示*/
+}
+
+.upview .right{
+  display: inline-block;
+  vertical-align: top;
+  height: 60rpx;
+  padding-top: 10rpx;
+  padding-left: 20rpx;
+}
+
+.update{
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.bottomview{
+  padding-left: 20rpx;
+}
+
+.device .x1 {
+  display: inline-block;
+  width:80rpx;
+}
+
+.device .x2 {
+  display: inline-block;
+  width:240rpx;
+}
+
+.device .x3 {
+  display: inline-block;
+  width:240rpx;
+}
+
+.device .x4 {
+  display: inline-block;
+}

@@ -1,0 +1,48 @@
+<wxs src="../../tools.wxs" module="tools" />
+
+<view class="upview">
+  <view class="connectview">
+    <view class="left">{{bluetoothStr}}</view>
+    <view class="weui-loading" fix wx:if="{{ spinShow }}" ></view>
+    <view class="right" wx:if="{{ !spinShow }}" >
+      <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
+    </view>
+    <!--
+    <view class="right" wx:if="{{ !spinShow }}" >
+      <image class='update' src='/images/setting.png' bindtap="onSelectDevice" ></image>
+    </view>
+    -->
+    <view class="right" wx:if="{{ !spinShow }}" >
+      <image class='update' src='/images/scan.png' bindtap="onScan" ></image>
+    </view>
+  </view>
+
+  <view class='btnview'>
+    <button class='start' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
+  </view>
+
+  <view class="tempview">
+    <view class='v1'>收到温度(℃):</view>
+    <view class='x1'>
+      <view class='v2' style='color:{{curtempColor}};'>{{ tools.toFixed(curtemp,1) }}</view>
+      <view class='v3'>
+        <picker bindchange="bindPickerChange" value="{{index}}" range="{{ tools.toMembers(members) }}" disabled="{{!curtagId}}" >
+          <view class="picker">
+            {{members[index].name}}
+          </view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+</view>
+
+<view class="middleview">上一次测量温度</view>
+
+<view class="weui-panel">
+  <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index">
+    <view class="y1">{{item.name}}</view>
+    <view class="y2">{{item.lasttemperature?tools.toFixed(item.lasttemperature,1):'无'}}</view>
+    <view class="y3">{{item.time?tools.formatTime(item.time):''}}</view>
+  </view>
+</view>

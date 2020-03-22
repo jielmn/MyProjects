@@ -1,0 +1,43 @@
+{
+  "pages": [
+    "pages/welcome/welcome",    
+    "pages/thermo/thermo",
+    "pages/index/index",    
+    "pages/logs/logs",    
+    "pages/setting/setting",
+    "pages/devices/devices"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#3dc5a2",
+    "navigationBarTitleText": "易温",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "backgroundColor": "#ffffff",
+    "selectedColor": "#3dc5a2",
+    "color": "#000",
+    "borderStyle": "black",
+    "list": [      
+      {
+        "pagePath": "pages/thermo/thermo",
+        "iconPath": "images/thermo_u.png",
+        "selectedIconPath": "images/thermo.png",
+        "text": "测温"
+      },
+      {
+        "pagePath": "pages/setting/setting",
+        "iconPath": "images/user_u.png",
+        "selectedIconPath": "images/user.png",
+        "text": "设置"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于温度大数据平台"
+    }
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

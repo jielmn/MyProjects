@@ -1,0 +1,52 @@
+var toFixed = function (f,n) {
+  return f.toFixed(n);
+}
+
+var toMembers = function( members ) {
+  var array = [];
+  members.forEach( function(item) {
+    array.push(item.name);
+  })
+  return array;
+}
+
+var formatTime = function (t) {
+  var date = getDate(t);
+  var year = date.getFullYear()
+  var month = date.getMonth() + 1
+  var day = date.getDate()
+  var hour = date.getHours()
+  var minute = date.getMinutes()
+  var second = date.getSeconds()
+
+  var formatNumber = function (n) {
+    n = n.toString()
+    return n[1] ? n : '0' + n
+  }
+
+  var now = getDate().getTime();
+  var span = 86400000;
+  var r = t % span;
+  t -= r;
+  var diff = now - t;
+  if ( diff > 0 ) {
+    if ( diff < span ) {
+      return '今天' + ' ' + [hour, minute, second].map(formatNumber).join(':')
+    } else if ( diff < 2 * span ) {
+      return '昨天' + ' ' + [hour, minute, second].map(formatNumber).join(':')
+    } else if ( diff < 3 * span ) {
+      return '前天' + ' ' + [hour, minute, second].map(formatNumber).join(':') 
+    } else {
+      return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+    }
+  } else {
+    return [year, month, day].map(formatNumber).join('-') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+  }  
+}
+
+
+module.exports = {
+  toFixed: toFixed,
+  toMembers: toMembers,
+  formatTime: formatTime
+};
