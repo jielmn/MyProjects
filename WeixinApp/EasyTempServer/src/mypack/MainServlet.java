@@ -221,6 +221,19 @@ public class MainServlet extends HttpServlet {
 				
 				binding(out, openid, tagid, memberId );
 			}
+			else if ( type.equals("updatedevice") ) {
+				String openid = new String();
+				String deviceid = new String();
+				
+				if ( null != req.getParameter("openid") ) {
+					openid = req.getParameter("openid");
+				}				
+				if ( null != req.getParameter("device") ) {
+					deviceid = req.getParameter("device");
+				}		
+				
+				updatedevice(out, openid, deviceid);
+			}
 			else if ( type.equals("datavtest0") ) {
 				datavtest0(out);
 			}
@@ -576,6 +589,33 @@ public class MainServlet extends HttpServlet {
 			out.print(rsp_obj.toString());			
 			
 			rs.close();
+			stmt.close();
+			con.close();
+        } catch (Exception ex ) {
+           out.print(ex.getMessage());
+        }
+	}
+	
+	public void updatedevice(PrintWriter out, String openid, String deviceid) {
+		String openid_sql          = openid.replace("'","''");
+		String deviceid_sql        = deviceid.replace("'","''");
+		
+		try {			
+			Connection con = null;
+			try{
+				con = getConnection();
+			}
+			catch(Exception e ) {
+				out.print(e.getMessage());
+				return;
+			}
+			
+			JSONObject rsp_obj = new JSONObject();			
+			Statement stmt = con.createStatement();      
+			stmt.executeUpdate("update users set lastdevice='" + deviceid_sql + "' where open_id='" + openid_sql + "'");
+			rsp_obj.put("error", 0);
+			out.print(rsp_obj.toString());			
+			
 			stmt.close();
 			con.close();
         } catch (Exception ex ) {

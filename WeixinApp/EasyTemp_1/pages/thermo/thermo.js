@@ -248,17 +248,13 @@ Page({
     // 允许从相机和相册扫码
     wx.scanCode({
       success(res) {
-        console.log(res);
-        wx.showToast({
-          title: '成功',
-          icon: 'success',
-          duration: 2000
-        })
+        // console.log(res);
+        app.parseCode(res.result);
       },
       fail: (res) => {
-        console.log(res);
+        app.log('scan code failed: ', res);
         wx.showToast({
-          title: '失败',
+          title: '扫码失败',
           icon: 'none',
           duration: 2000
         })

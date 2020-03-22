@@ -16,10 +16,12 @@ App({
   lng: null,
   discoveryTimeout:6000,
   lastDeviceId:null,
+  parseCodeCallback:null,
 
-  readerName:'EASYTEMP READER',   // 蓝牙搜索到的设备名称
+  readerName:'reader_',   // 蓝牙搜索到的设备名称
   //readerName: 'HB53504',   // 蓝牙搜索到的设备名称
-  uuid:'0000fff0',                // reader提供服务的uuid
+  uuid:'f000fff0',                // reader提供服务的uuid
+  matchDeviceName: true,
 
   writeCharacterId: null,         // 写id
   notifyCharacterId: null,        // 通知id
@@ -124,6 +126,8 @@ App({
         that.globalData.members = res.data.members || [];
         that.globalData.tagsbinding = res.data.tagsbinding || [];
         var lastTemp = res.data.lasttemperature || [];
+        var lastDeviceId = res.data.lastdevice || '';
+        that.lastDeviceId = lastDeviceId.toLowerCase();
 
         that.fetchLastTemp(lastTemp);
       }, // success
@@ -233,6 +237,18 @@ App({
       that.bluetoothCallback(res);
     }
 
+    var lastDeviceId = this.lastDeviceId || '';
+    if (lastDeviceId == '' ) {
+      if (this.bluetoothCallback) {
+        var res = {}
+        res.errCode = -1;
+        res.errMsg = '请扫码连接reader'
+        that.bluetoothCallback(res);        
+      }
+      this.isBluetoothStoped = false;
+      return;
+    }
+
     this.globalData.discoveryStarted = true
     this.globalData.timerid = setTimeout(this.onBluetoothDevicesDiscoveryTimeout, this.discoveryTimeout);
     this.isBluetoothStoped = false;
@@ -252,6 +268,7 @@ App({
 
     var readerNameLen = that.readerName.length;
     var readerName = that.readerName.toLowerCase();    
+    var matchDeviceName = that.matchDeviceName;
 
     wx.onBluetoothDeviceFound((res) => {
 
@@ -268,11 +285,15 @@ App({
         }
         */
 
-        // that.log('device name: ' + device.name );
+        // that.log('device id:' + device.deviceId + ', device name: ' + device.name );
 
-        if (device.name.substring(0, readerNameLen).toLowerCase() != readerName ) {
-          return;
+        // 如果要根据名称找公司设备
+        if (matchDeviceName) {
+          if (device.name.substring(0, readerNameLen).toLowerCase() != readerName) {
+            return;
+          }
         }
+        
         foundCount++;
 
         var foundDevices = that.globalData.devices
@@ -301,6 +322,7 @@ App({
     this.stopBluetoothDevicesDiscovery();
 
     this.log("found devices", this.globalData.devices);
+    /*
     if ( this.globalData.devices.length > 1 && this.lastDeviceId == null ) {
       var res = {}
       res.errCode = -1;
@@ -308,7 +330,7 @@ App({
       that.bluetoothCallback(res);
       return;
     }
-
+    */
 
     var device = this.getNearestDevice();
     this.globalData.device = device;
@@ -318,7 +340,7 @@ App({
       if (this.bluetoothCallback) {
         var res = {}
         res.errCode = -1;
-        res.errMsg = "没有找到易温读卡器"
+        res.errMsg = "没有找到上一次用的易温读卡器"
         that.bluetoothCallback(res);
       }
 
@@ -347,28 +369,11 @@ App({
   getNearestDevice() {
     var devices = this.globalData.devices;
     var foundDevice = null;
-    if ( this.lastDeviceId == null ) {
-      devices.forEach(device => {
-        if (foundDevice == null) {
-          foundDevice = device;
-        } else if (device.RSSI > foundDevice.RSSI) {
-          foundDevice = device;
-        }
-      })
-    } else {
-      if ( devices.length == 1 ) {
-        foundDevice = devices[0];
-      } else {
-        devices.forEach(device => {
-          if ( foundDevice == null ) {
-            foundDevice = device;
-          }
-           else if (device.deviceId == this.lastDeviceId) {
-            foundDevice = device;
-          }
-        })
-      }      
-    }
+    devices.forEach(device => {
+      if (device.deviceId.toLowerCase() == this.lastDeviceId) {
+        foundDevice = device;
+      }
+    })
     
     this.log('last device id:' + this.lastDeviceId);
     this.log('foundDevice:', foundDevice);
@@ -576,11 +581,13 @@ App({
     // Do something when hide.
     wx.closeBluetoothAdapter();
     this.isBluetoothStoped = true;
+    //this.log('onHide');
   },
 
   refresh:function(){
     wx.closeBluetoothAdapter();
     this.isBluetoothStoped = true;
+    //this.log('refresh');
     this.openBluetoothAdapter();
   },
 
@@ -985,5 +992,57 @@ App({
     })
     //that.stopBluetoothDevicesDiscovery()
   },
+
+  // 解析扫描的二维码
+  parseCode( code ) {
+    var that = this;
+    var app = this;
+    var res = {};
+    res.errCode = -1;
+    res.errMsg = '二维码数据格式不对';
+
+    if ( code.length != 12 ) {
+      if ( this.parseCodeCallback ) {        
+        this.parseCodeCallback(res);
+      }
+      return;
+    }
+
+    var codeLower = code.toLowerCase();
+    for (var i = 0; i < codeLower.length; i++) {
+      var c = codeLower.charCodeAt(i);
+      if ( !((c >= 48 && c <= 57) || (c >= 97 && c <= 102)) ) {
+        if (this.parseCodeCallback) {
+          this.parseCodeCallback(res);
+        }
+        return;
+      }
+    }    
+
+    // 连接
+    var deviceId = codeLower.substr(0, 2) + ':' + codeLower.substr(2, 2) + ':' + codeLower.substr(4, 2) + ':' + codeLower.substr(6, 2) + ':' + codeLower.substr(8, 2) + ':' + codeLower.substr(10, 2);
+    
+    var oldDeviceId = this.lastDeviceId || '';
+    this.lastDeviceId = deviceId;
+
+    // 保存lastdeviceid
+    if ( this.lastDeviceId != oldDeviceId ) {
+      wx.request({
+        url: app.globalData.serverAddr + '?type=updatedevice&openid=' + encodeURIComponent(this.globalData.openid) + '&device=' + encodeURIComponent(deviceId),
+        method: 'GET',
+        success: (res) => {
+          if (res.data.error != null && res.data.error == 0) {
+            that.log("updatedevice success", res);
+          } else {
+            that.log("updatedevice failed", res);
+          }
+        },
+        fail: (res) => {
+          that.log("updatedevice failed to wx.request", res);
+        }
+      })
+    }
+
+  }
 
 })
