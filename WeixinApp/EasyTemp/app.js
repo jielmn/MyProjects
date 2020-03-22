@@ -19,7 +19,8 @@ App({
 
   readerName:'reader_',   // 蓝牙搜索到的设备名称
   //readerName: 'HB53504',   // 蓝牙搜索到的设备名称
-  uuid:'0000fff0',                // reader提供服务的uuid
+  //uuid:'0000fff0',                // reader提供服务的uuid
+  uuid: 'f000fff0',
 
   writeCharacterId: null,         // 写id
   notifyCharacterId: null,        // 通知id
