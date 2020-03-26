@@ -52,11 +52,11 @@ App({
     // logs.unshift(Date.now())
     // wx.setStorageSync('logs', logs)
 
-    //this.innerAudioContext = wx.createInnerAudioContext(); //新建一个createInnerAudioContext();
-    //this.innerAudioContext.autoplay = true; //音频自动播放设置
-    //this.innerAudioContext.src = null,
-    //this.innerAudioContext.volume = 0.1;
-    //this.innerAudioContext.onPlay(() => { }); //播放音效
+    this.innerAudioContext = wx.createInnerAudioContext(); //新建一个createInnerAudioContext();
+    this.innerAudioContext.autoplay = true; //音频自动播放设置
+    this.innerAudioContext.src = null,
+    this.innerAudioContext.volume = 0.1;
+    this.innerAudioContext.onPlay(() => { }); //播放音效
 
     //var hex = "C311";
     //var typedArray = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {

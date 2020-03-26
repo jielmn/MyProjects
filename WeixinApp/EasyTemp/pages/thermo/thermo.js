@@ -40,8 +40,9 @@ Page({
         return;
       }
 
-      // app.innerAudioContext.src = '/sound/bongo.mp3'; //链接到音频的地址
-      // app.innerAudioContext.play();
+      app.innerAudioContext.src = '/sound/ping.wav'; //链接到音频的地址
+      app.innerAudioContext.play();
+
       var index = 0;
       var bindindex = app.inArray(app.globalData.tagsbinding, 'tagid', item.tagid);
       if ( bindindex >= 0 ) {
