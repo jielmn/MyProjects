@@ -1,0 +1,6 @@
+<!-- 请放在tomcat/conf/context.xml文件里 -->
+<!--
+<Context reloadable='true'>
+  <Resource name="jdbc/test" auth="Container" type="javax.sql.DataSource" maxActive="100" maxIdle="30" maxWait="10000" username="sys as sysdba" password="Abcd1234" driverClassName="oracle.jdbc.driver.OracleDriver" url="jdbc:oracle:thin:@localhost:1521:telemedo" />
+</Context>
+-->
