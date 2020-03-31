@@ -13,16 +13,30 @@
 CDuiFrameWnd::CDuiFrameWnd() {
 
 }
-   
+            
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
 
 void  CDuiFrameWnd::InitWindow() {
-	WindowImplBase::InitWindow();
+	WindowImplBase::InitWindow(); 
 }
 
 CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
+	DuiLib::CDialogBuilder builder;
+	DuiLib::CDuiString  strText;
+	DuiLib::CControlUI * pUI = 0;
+
+	if ( 0 == strcmp(pstrClass, "Classes") ) {
+		strText.Format("%s.xml", pstrClass);
+		pUI = builder.Create((const char *)strText, (UINT)0, this, &m_PaintManager);
+		return pUI;
+	}
+	else if (0 == strcmp(pstrClass, "Newtag")) {
+		strText.Format("%s.xml", pstrClass); 
+		pUI = builder.Create((const char *)strText, (UINT)0, this, &m_PaintManager);
+		return pUI;     
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
