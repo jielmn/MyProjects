@@ -20,6 +20,12 @@ public:
 	void  CheckDevicesAsyn();
 	void  CheckDevices();
 
+	void  StartAutoTestAsyn(const char * szMac);
+	void  StartAutoTest();
+
+	void  StopAutoTestAsyn();
+	void  StopAutoTest();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

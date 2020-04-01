@@ -44,6 +44,15 @@ public:
 
 extern CGlobalData  g_data;
 
+class CStartAutoTestParam : public LmnToolkits::MessageData {
+public:
+	CStartAutoTestParam(const char * szMac) {
+		STRNCPY(m_szMac, szMac, sizeof(m_szMac));
+	}
+
+	char   m_szMac[20];
+};
+
 
 // templates
 template <class T>

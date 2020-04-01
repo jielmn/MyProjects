@@ -40,8 +40,24 @@ public:
 
 private:
 	void   CheckDevices();
+	void   CheckControls();
+	void   OnAutoTest();
 
 private:
 	CLabelUI *                m_lblStatus;
+	CEditUI *                 m_edReaderMac;
+	CButtonUI *               m_btnClearMac;
+	CButtonUI *               m_btnAutoTest;
+	CRichEditUI *             m_rchInfo;
+	CButtonUI *               m_btnTemp;
+	COptionUI *               m_opPass;
+	COptionUI *               m_opNotPass;
+	COptionUI *               m_opErrReason[3];
+	CButtonUI *               m_btnSaveResult;
+
+private:
+	BOOL                      m_bComConnected;
+	BOOL                      m_bAutoTestStarted;
+	BOOL                      m_bBleConnected;
 
 };

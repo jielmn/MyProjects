@@ -15,7 +15,24 @@
 
                                                              
 CDuiFrameWnd::CDuiFrameWnd() {
+	m_bComConnected = FALSE;
+	m_bAutoTestStarted = FALSE;
+	m_bBleConnected = FALSE;
 
+	m_lblStatus   = 0;
+	m_edReaderMac = 0;
+	m_btnClearMac = 0;
+	m_btnAutoTest = 0;
+	m_rchInfo     = 0;
+	m_btnTemp     = 0;
+	m_opPass      = 0;
+	m_opNotPass   = 0;
+
+	for (int i = 0; i < 3; i++) {
+		m_opErrReason[i] = 0;
+	}
+
+	m_btnSaveResult = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -25,9 +42,26 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 void  CDuiFrameWnd::InitWindow() {
 	g_data.m_hWnd = GetHWND();
 
-	m_lblStatus = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblStatus"));
+	m_lblStatus   = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblStatus"));
+	m_edReaderMac = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edReaderMac"));
+	m_btnClearMac = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnClearMac"));
+	m_btnAutoTest = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnAutoTest"));
+	m_rchInfo     = static_cast<DuiLib::CRichEditUI*>(m_PaintManager.FindControl("rchInfo"));
+	m_btnTemp     = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnTemp"));
+	m_opPass      = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl("radio1"));
+	m_opNotPass   = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl("radio2"));
 
-	CheckDevices();
+	CDuiString  strText;
+	for ( int i = 0; i < 3; i++ ) {
+		strText.Format("option%d", i + 1);
+		m_opErrReason[i] = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl(strText));
+	}
+
+	m_btnSaveResult = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveResult"));
+	
+	CheckDevices(); 
+	CheckControls();
+
 	WindowImplBase::InitWindow();
 }
 
@@ -54,8 +88,14 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 			//使用文件方式
 			STRINGorID xml("menusetting.xml"); 
-			pMenu->Init(NULL, xml, 0, point);                          
+			pMenu->Init(NULL, xml, 0, point); 
 		}
+		else if (strName == "btnAutoTest") {
+			OnAutoTest();
+		}
+	}
+	else if (msg.sType == "textchanged") {
+		
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -69,20 +109,25 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (nCom > 0) {
 			if (bRet) {
 				strText.Format("打开串口com%d成功", nCom);
-				
+				m_bComConnected = TRUE;
+				m_bAutoTestStarted = FALSE;
 			}
 			else {
 				strText.Format("打开串口com%d失败！", nCom);
+				m_bComConnected = FALSE;
 			}
 		}
 		else if (nCom == 0) {
-			strText.Format("没有打开蓝牙模块串口");
+			strText.Format("没有打开蓝牙模块串口");     
+			m_bComConnected = FALSE;
 		}
 		else {
 			strText.Format("找到多个蓝牙模块，请确保只用一个");
+			m_bComConnected = FALSE;
 		}
 
 		m_lblStatus->SetText(strText);
+		CheckControls();
 	}
 	else if (WM_DEVICECHANGE == uMsg) {
 		CheckDevices();
@@ -94,6 +139,92 @@ void CDuiFrameWnd::CheckDevices() {
 	CBusiness::GetInstance()->CheckDevicesAsyn();
 }
 
+void  CDuiFrameWnd::CheckControls() {
+	// 如果没有连接蓝牙模块的串口
+	if (!m_bComConnected) {
+		m_edReaderMac->SetEnabled(false);
+		m_edReaderMac->SetBkColor(0xFFF1F1F1);
+		m_btnClearMac->SetEnabled(false);
+		m_btnAutoTest->SetEnabled(false);
+		m_btnTemp->SetEnabled(false);
+		m_opPass->SetEnabled(false);
+		m_opNotPass->SetEnabled(false);
+		for (int i = 0; i < 3; i++) {
+			m_opErrReason[i]->SetEnabled(false);
+		}
+		m_btnSaveResult->SetEnabled(false);
+	}
+	else {
+		// 自动测试开始了
+		if (m_bAutoTestStarted) {
+			m_edReaderMac->SetEnabled(false);
+			m_edReaderMac->SetBkColor(0xFFF1F1F1);
+			m_btnClearMac->SetEnabled(false);
+			m_btnAutoTest->SetEnabled(true);
+			m_btnAutoTest->SetText("停止测试");
+			m_btnTemp->SetEnabled(true);
+			m_opPass->SetEnabled(true);
+			m_opNotPass->SetEnabled(true);
+			for (int i = 0; i < 3; i++) {
+				m_opErrReason[i]->SetEnabled(true);
+			}
+			m_btnSaveResult->SetEnabled(true);
+		}
+		else {
+			m_edReaderMac->SetEnabled(true);
+			m_edReaderMac->SetBkColor(0xFFFFFFFF);
+			m_btnClearMac->SetEnabled(true);
+			m_btnAutoTest->SetEnabled(true);
+			m_btnAutoTest->SetText("自动测试");
+			m_btnTemp->SetEnabled(false);
+			m_opPass->SetEnabled(false);
+			m_opNotPass->SetEnabled(false);
+			for (int i = 0; i < 3; i++) {
+				m_opErrReason[i]->SetEnabled(false);
+			}
+			m_btnSaveResult->SetEnabled(false);
+		}
+	}
+}
+
+void   CDuiFrameWnd::OnAutoTest() {
+	//if (m_bAutoTestStarted) {
+	//	m_bAutoTestStarted = FALSE;
+	//}
+	//else {
+	//	m_bAutoTestStarted = TRUE;
+	//}
+	//CheckControls();
+
+	if (!m_bComConnected) {
+		MessageBox(GetHWND(), "没有打开蓝牙模块的串口", "错误", 0);
+		return;
+	}
+
+	// 如果还没有开始测试
+	if (!m_bAutoTestStarted) {
+		CDuiString strMac = m_edReaderMac->GetText();
+		strMac.Trim();
+
+		if ( strMac.GetLength() != 12 ) {
+			MessageBox(GetHWND(), "小蓝牙Reader的Mac地址格式错误，正确格式为xxxxxxxxxxxx", "错误", 0);
+			return;
+		}
+
+		for ( int i = 0; i < 12; i++ ) {
+			char ch = Char2Lower(strMac.GetAt(i));
+			if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f'))) {
+				MessageBox(GetHWND(), "小蓝牙Reader的Mac地址格式错误，正确格式为xxxxxxxxxxxx", "错误", 0);
+				return;
+			}
+		}
+
+		CBusiness::GetInstance()->StartAutoTestAsyn( strMac );
+	}
+	else {
+		CBusiness::GetInstance()->StopAutoTestAsyn();
+	}
+}
 
 
 

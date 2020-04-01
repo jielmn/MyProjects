@@ -131,6 +131,22 @@ void  CBusiness::CheckDevices() {
 	}
 }
 
+void  CBusiness::StartAutoTestAsyn(const char * szMac) {
+
+}
+
+void  CBusiness::StartAutoTest() {
+
+}
+
+void  CBusiness::StopAutoTestAsyn() {
+
+}
+
+void  CBusiness::StopAutoTest() {
+
+}
+
 
 
 // 消息处理
