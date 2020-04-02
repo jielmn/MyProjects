@@ -18,6 +18,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_bComConnected = FALSE;
 	m_bAutoTestStarted = FALSE;
 	m_bAutoTestFinished = FALSE;
+	m_bStopAutoTestFinished = FALSE;
 	m_bBleConnected = FALSE;
 
 	m_lblStatus   = 0;
@@ -146,6 +147,10 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (UM_STOP_AUTO_TEST_RET == uMsg) {
 		m_bAutoTestStarted = FALSE;
+		CheckControls();
+	}
+	else if (UM_AUTO_TEST_FIN == uMsg) {
+		m_bAutoTestFinished = TRUE;
 		CheckControls();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);

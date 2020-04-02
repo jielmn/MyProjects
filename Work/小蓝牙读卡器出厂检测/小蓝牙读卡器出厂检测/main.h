@@ -61,6 +61,7 @@ private:
 	BOOL                      m_bComConnected;                // 串口是否连接上
 	BOOL                      m_bAutoTestStarted;             // 是否点击了自动测试按钮
 	BOOL                      m_bAutoTestFinished;            // 自动测试是否完成
+	BOOL                      m_bStopAutoTestFinished;        // 停止自动测试是否完成
 	BOOL                      m_bBleConnected;                // 蓝牙连接是否还在
 
 };

@@ -380,6 +380,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 		::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMP_RET, 0);
 	}
 	
+	::PostMessage(g_data.m_hWnd, UM_AUTO_TEST_FIN, 0, 0);	
 }
 
 void  CBusiness::StopAutoTestAsyn() {

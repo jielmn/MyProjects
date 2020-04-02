@@ -29,6 +29,7 @@
 #define   UM_INFO_MSG              (WM_USER + 2)
 #define   UM_BLUETOOTH_CNN_RET     (WM_USER + 3)
 #define   UM_STOP_AUTO_TEST_RET    (WM_USER + 4)
+#define   UM_AUTO_TEST_FIN         (WM_USER + 5)
 
 enum InfoType {
 	CONNECTING  = 0,
