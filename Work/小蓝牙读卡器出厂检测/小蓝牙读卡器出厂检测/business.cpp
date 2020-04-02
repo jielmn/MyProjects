@@ -1,6 +1,6 @@
 #include "business.h"
 
-#define  RSP_TIME_LIMIT              12000               // 12秒内收到应答
+#define  RSP_TIME_LIMIT              20000               // 12秒内收到应答
 #define  SLEEP_TIME                  100
 
 CBusiness * CBusiness::pInstance = 0;
@@ -225,10 +225,9 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	InfoType  infoType = CONNECTING;
 
 	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT) {
-		dwRevLen = sizeof(rsp);
-		memset(rsp, 0, sizeof(rsp));
-
 		CDataBuf buf;
+		dwRevLen = sizeof(rsp);
+
 		if ( m_com.Read(rsp, dwRevLen) && dwRevLen > 0 ) {	
 			buf.Append(rsp, dwRevLen);
 
@@ -297,6 +296,88 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	if ( !bConnected ) {
 		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
 		return;
+	}
+	
+	// AT+NOTIFY_ON000F
+	memcpy(data, "AT+NOTIFY_ON", 12);
+	memcpy(data + 12, g_data.m_szNotifyCharId, 4);
+	dwLen = 16;
+	m_com.Write(data, dwLen);
+
+	LmnSleep(1000);
+	memset(rsp, 0, sizeof(rsp));
+	dwRevLen = sizeof(rsp);
+	// "OK+DATA-OK\r\n"
+	m_com.Read(rsp, dwRevLen);           
+
+
+	//// AT+SET_WAYWR000D
+	//memcpy(data, "AT+SET_WAYWR", 12);
+	//memcpy(data + 12, g_data.m_szWriteCharId, 4);
+	//dwLen = 16;
+	//m_com.Write(data, dwLen);
+
+	//LmnSleep(1000);
+	//memset(rsp, 0, sizeof(rsp));
+	//dwRevLen = sizeof(rsp);
+	//// "OK+SEND-OK\r\n"
+	//m_com.Read(rsp, dwRevLen);
+
+
+	// 41542B53454E445F44415441574E30303044C311   (十六进制下)   AT+SEND_DATAWN000D
+	memcpy(data, "AT+SEND_DATAWN", 14);
+	memcpy(data + 14, g_data.m_szWriteCharId, 4);
+	memcpy(data + 18, g_data.m_adwTempCmd, 2);
+	dwLen = 20;
+	m_com.Write(data, dwLen);
+	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMPING, 0);
+
+	dwLastTick = LmnGetTickCount();
+	dwCurTick = dwLastTick;
+	BOOL  bGetTemp = FALSE;
+	char  szTagId[20] = { 0 };
+	DWORD  dwTemp = 0;
+
+	while ( dwCurTick - dwLastTick < RSP_TIME_LIMIT ) {
+		CDataBuf buf;
+		dwRevLen = sizeof(rsp);		
+
+		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+			buf.Append(rsp, dwRevLen);
+		}
+
+		if ( buf.GetDataLength() == 12 ) {
+			buf.Read(rsp, 12);
+			bGetTemp = TRUE;
+			dwTemp = (DWORD)( rsp[10] * 100 + rsp[11] );
+
+			BYTE  abyTagId[8];
+			for (int i = 0; i < 8; i++) {
+				abyTagId[i] = (BYTE)rsp[9-i];
+			}
+			
+			Bytes2String(szTagId, sizeof(szTagId), abyTagId, 8);
+
+			TempItem * pItem = new TempItem;
+			memset(pItem, 0, sizeof(TempItem));
+			pItem->dwTemp = dwTemp;
+			STRNCPY(pItem->szTagId, szTagId, sizeof(pItem->szTagId));
+			::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMP_RET, (LPARAM)pItem);
+
+			break;
+		}
+		else if (buf.GetDataLength() == 2) {
+			buf.Read(rsp, 2);
+			bGetTemp = FALSE;
+			break;
+		}
+
+		LmnSleep(SLEEP_TIME);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	if (!bGetTemp) {
+		::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMP_RET, 0);
 	}
 	
 }

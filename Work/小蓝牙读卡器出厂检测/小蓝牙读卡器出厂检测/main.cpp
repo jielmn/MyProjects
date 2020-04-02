@@ -41,6 +41,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
 
 void  CDuiFrameWnd::InitWindow() {
+
 	g_data.m_hWnd = GetHWND();
 
 	m_lblStatus   = static_cast<DuiLib::CLabelUI*>(m_PaintManager.FindControl("lblStatus"));
@@ -281,6 +282,34 @@ void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
 	}
 	break;
 
+	case TEMPING:
+	{
+		strText += "正在测温...\n";
+		m_rchInfo->SetText(strText);
+	}
+	break;
+
+	case TEMP_RET:
+	{
+		TempItem * pItem = (TempItem *)lParam;
+		CDuiString  s;
+
+		if ( pItem ) {			
+			s.Format("测温成功：tag id: %s, 温度: %.2f℃\r\n", pItem->szTagId, pItem->dwTemp / 100.0);
+			strText += s;
+			m_rchInfo->SetText(strText);
+			delete pItem;
+			m_opPass->Selected(true);
+		}
+		else {
+			s.Format("测温失败！\r\n");
+			strText += s;
+			m_rchInfo->SetText(strText);
+			m_opNotPass->Selected(true);
+		}
+	}
+	break;
+
 	default:
 		break;
 	}
@@ -293,14 +322,13 @@ void   CDuiFrameWnd::OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam) {
 	if ( bRet ) {
 		strText += "连接蓝牙成功\n";
 		m_rchInfo->SetText(strText);
+		m_bBleConnected = TRUE;
 	}
 	else {
 		strText += "连接蓝牙失败！\n";
 		m_rchInfo->SetText(strText);
+		m_bBleConnected = FALSE;
 	}
-
-	m_bAutoTestFinished = TRUE;
-	CheckControls();
 }
 
 

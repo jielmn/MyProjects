@@ -35,6 +35,8 @@ enum InfoType {
 	CONNECTING_1,
 	CNN_FAILED,
 	CNN_OK,
+	TEMPING,
+	TEMP_RET,
 };
 
 
@@ -77,6 +79,11 @@ public:
 
 	char   m_szMac[20];
 };
+
+typedef  struct  tagTempItem {
+	DWORD      dwTemp;
+	char       szTagId[20];
+}TempItem;
 
 
 // templates
