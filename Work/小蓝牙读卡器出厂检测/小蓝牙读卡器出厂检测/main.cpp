@@ -58,6 +58,10 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 	m_btnSaveResult = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnSaveResult"));
+
+#if TEST_FLAG
+	m_edReaderMac->SetText("18994455DDBB");
+#endif
 	
 	CheckDevices(); 
 	CheckControls();
@@ -131,6 +135,16 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (WM_DEVICECHANGE == uMsg) {
 		CheckDevices();
+	}
+	else if (UM_INFO_MSG == uMsg) {
+		OnInfoMsg(wParam, lParam);
+	}
+	else if (UM_BLUETOOTH_CNN_RET == uMsg) {
+		OnBluetoothCnnMsg(wParam, lParam);
+	}
+	else if (UM_STOP_AUTO_TEST_RET == uMsg) {
+		m_bAutoTestStarted = FALSE;
+		CheckControls();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -220,13 +234,51 @@ void   CDuiFrameWnd::OnAutoTest() {
 		}
 
 		CBusiness::GetInstance()->StartAutoTestAsyn( strMac );
+		m_rchInfo->SetText("");
+		m_opPass->Selected(false);
+		m_opNotPass->Selected(false);
+		for (int i = 0; i < 3; i++) {
+			m_opErrReason[i]->Selected(false);
+		}
+		m_bAutoTestStarted = TRUE;
+		CheckControls();
 	}
 	else {
 		CBusiness::GetInstance()->StopAutoTestAsyn();
 	}
 }
 
+void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
+	InfoType  infoType = (InfoType)wParam;
+	CDuiString  strText = m_rchInfo->GetText();
 
+	switch (infoType)
+	{
+	case CONNECTING:
+	{
+		strText += "正在连接蓝牙...\n";
+		m_rchInfo->SetText(strText);
+	}
+	break;
+
+	default:
+		break;
+	}
+}
+
+void   CDuiFrameWnd::OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam) {
+	BOOL  bRet = wParam;
+	CDuiString  strText = m_rchInfo->GetText();
+
+	if ( bRet ) {
+		strText += "连接蓝牙成功\n";
+		m_rchInfo->SetText(strText);
+	}
+	else {
+		strText += "连接蓝牙失败！\n";
+		m_rchInfo->SetText(strText);
+	}
+}
 
 
 

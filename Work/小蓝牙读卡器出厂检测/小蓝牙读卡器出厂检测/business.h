@@ -21,7 +21,7 @@ public:
 	void  CheckDevices();
 
 	void  StartAutoTestAsyn(const char * szMac);
-	void  StartAutoTest();
+	void  StartAutoTest(const CStartAutoTestParam * pParam);
 
 	void  StopAutoTestAsyn();
 	void  StopAutoTest();
@@ -37,6 +37,7 @@ private:
 
 private:
 	CLmnSerialPort           m_com;
+	BOOL                     m_bBluetoothCnn;                    // 蓝牙是否连接上
 };
 
 

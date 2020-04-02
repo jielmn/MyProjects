@@ -1,5 +1,8 @@
 #include "business.h"
 
+#define  RSP_TIME_LIMIT              12000               // 12秒内收到应答
+#define  SLEEP_TIME                  100
+
 CBusiness * CBusiness::pInstance = 0;
 
 CBusiness *  CBusiness::GetInstance() {
@@ -10,7 +13,7 @@ CBusiness *  CBusiness::GetInstance() {
 }
 
 CBusiness::CBusiness() {
-
+	m_bBluetoothCnn = FALSE;
 }
 
 CBusiness::~CBusiness() {
@@ -48,6 +51,18 @@ int CBusiness::Init() {
 		return -1;
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
+
+	DWORD  dwValue = 0;
+	g_data.m_cfg->GetConfig("mac type", dwValue, 0);
+	g_data.m_byMacType = (BYTE)dwValue;
+
+	g_data.m_cfg->GetConfig("notify id", g_data.m_szNotifyCharId, sizeof(g_data.m_szNotifyCharId), "000F");
+	g_data.m_cfg->GetConfig("write id", g_data.m_szWriteCharId, sizeof(g_data.m_szWriteCharId), "000D");
+
+	char  szTempCmd[256];
+	g_data.m_cfg->GetConfig("temperature command", szTempCmd, sizeof(szTempCmd), "C311");
+	DWORD  dwSize = sizeof(g_data.m_adwTempCmd);
+	String2Bytes(g_data.m_adwTempCmd, dwSize, szTempCmd);
 
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
@@ -127,16 +142,163 @@ void  CBusiness::CheckDevices() {
 		else {
 			BOOL bRet = m_com.OpenUartPort(it_find->first);
 			::PostMessage(g_data.m_hWnd, UM_COM_STATUS, it_find->first, bRet);
+
+			// 关闭之前的蓝牙连接
+			if (bRet) {
+				char   data[256];
+				DWORD  dwLen = 0;
+				char   rsp[256];
+				DWORD  dwRevLen = 0;
+
+				// AT命令
+				memcpy(data, "AT", 2);
+				dwLen = 2;
+				m_com.Write(data, dwLen);
+				LmnSleep(1000);
+
+				BOOL  bAtOk = FALSE;
+				memset(rsp, 0, sizeof(rsp));
+				dwRevLen = sizeof(rsp);
+				if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+					if (0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST", rsp)) {
+						bAtOk = TRUE;
+					}
+				}
+
+			}
 		}
 	}
 }
 
+// AT+CO018994455DDBB
+// AT+NOTIFY_ON000F
+// AT+SET_WAYWR000D
+// 41542B53454E445F44415441574E30303044C311   (十六进制下)
 void  CBusiness::StartAutoTestAsyn(const char * szMac) {
-
+	g_data.m_thrd_com->PostMessage(this, MSG_AUTO_START_TEST, new CStartAutoTestParam(szMac));
 }
 
-void  CBusiness::StartAutoTest() {
+void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
+	// 串口应该打开
+	assert(m_com.GetStatus() == CLmnSerialPort::OPEN);
+	// 蓝牙应该没有连上
+	assert(!m_bBluetoothCnn);
+	
+	char   data[256];
+	DWORD  dwLen = 0;
 
+	char   rsp[256];
+	DWORD  dwRevLen = 0;
+
+	// AT命令
+	memcpy(data, "AT", 2);
+	dwLen = 2;
+	m_com.Write(data, dwLen);
+	LmnSleep(1000);
+
+	BOOL  bAtOk = FALSE;
+	memset(rsp, 0, sizeof(rsp));
+	dwRevLen = sizeof(rsp);
+	if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+		if ( 0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST",rsp) ) {
+			bAtOk = TRUE;
+		}
+	}
+
+	if (!bAtOk) {
+		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
+		return;
+	}
+
+
+	memcpy(data, "AT+CO", 5);
+	data[5] = g_data.m_byMacType;
+	memcpy(data + 6, pParam->m_szMac, 12);
+	dwLen = 18;
+
+	m_com.Write(data, dwLen);
+
+	DWORD  dwLastTick = LmnGetTickCount();
+	DWORD  dwCurTick = dwLastTick;
+	
+	BOOL   bConnected = FALSE;
+	InfoType  infoType = CONNECTING;
+
+	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT) {
+		dwRevLen = sizeof(rsp);
+		memset(rsp, 0, sizeof(rsp));
+
+		CDataBuf buf;
+		if ( m_com.Read(rsp, dwRevLen) && dwRevLen > 0 ) {	
+			buf.Append(rsp, dwRevLen);
+
+			while ( TRUE ) {
+				if (infoType == CONNECTING) {
+					if (buf.GetDataLength() >= 8) {
+						buf.Read(rsp, 8);
+						rsp[8] = '\0';
+						buf.Reform();
+
+						if (0 == strcmp(rsp, "OK+CONNA")) {
+							::PostMessage(g_data.m_hWnd, UM_INFO_MSG, CONNECTING, 0);
+							infoType = CONNECTING_1;
+						}
+						else {
+							infoType = CNN_FAILED;
+							break;
+						}
+					}
+					else {
+						break;
+					}
+				}
+				else if (infoType == CONNECTING_1) {
+					if (buf.GetDataLength() >= 10) {
+						// OK+CONNF\r\n
+						// memset(rsp, 0, sizeof(rsp));
+						// buf.Read(rsp);
+						infoType = CNN_FAILED;
+						break;
+					}
+					else if (buf.GetDataLength() >= 9) {
+						buf.Read(rsp, 9);
+						rsp[9] = '\0';
+						StrTrim(rsp);
+
+						if (0 == strcmp(rsp, "OK+CONN")) {
+							bConnected = TRUE;
+							infoType = CNN_OK;
+						}
+						else {
+							infoType = CNN_FAILED;
+						}
+						break;
+					}
+					else {
+						break;
+					}
+				}
+				else {
+					break;
+				}
+			}	
+
+			if (infoType == CNN_FAILED || infoType == CNN_OK) {
+				break;
+			}
+		}
+
+		LmnSleep(SLEEP_TIME);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	::PostMessage(g_data.m_hWnd, UM_BLUETOOTH_CNN_RET, bConnected, 0);
+
+	if ( !bConnected ) {
+		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
+		return;
+	}
+	
 }
 
 void  CBusiness::StopAutoTestAsyn() {
@@ -156,6 +318,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_CHECK_DEVICES:
 	{
 		CheckDevices();
+	}
+	break;
+
+	case MSG_AUTO_START_TEST:
+	{
+		CStartAutoTestParam * pParam = (CStartAutoTestParam *)pMessageData;
+		StartAutoTest(pParam);
 	}
 	break;
 
