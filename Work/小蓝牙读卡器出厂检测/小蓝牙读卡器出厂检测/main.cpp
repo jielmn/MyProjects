@@ -17,6 +17,7 @@
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_bComConnected = FALSE;
 	m_bAutoTestStarted = FALSE;
+	m_bAutoTestFinished = FALSE;
 	m_bBleConnected = FALSE;
 
 	m_lblStatus   = 0;
@@ -171,18 +172,35 @@ void  CDuiFrameWnd::CheckControls() {
 	else {
 		// ×Ô¶¯²âÊÔ¿ªÊ¼ÁË
 		if (m_bAutoTestStarted) {
-			m_edReaderMac->SetEnabled(false);
-			m_edReaderMac->SetBkColor(0xFFF1F1F1);
-			m_btnClearMac->SetEnabled(false);
-			m_btnAutoTest->SetEnabled(true);
-			m_btnAutoTest->SetText("Í£Ö¹²âÊÔ");
-			m_btnTemp->SetEnabled(true);
-			m_opPass->SetEnabled(true);
-			m_opNotPass->SetEnabled(true);
-			for (int i = 0; i < 3; i++) {
-				m_opErrReason[i]->SetEnabled(true);
+
+			if ( m_bAutoTestFinished ) {
+				m_edReaderMac->SetEnabled(false);
+				m_edReaderMac->SetBkColor(0xFFF1F1F1);
+				m_btnClearMac->SetEnabled(false);
+				m_btnAutoTest->SetEnabled(true);
+				m_btnAutoTest->SetText("Í£Ö¹²âÊÔ");
+				m_btnTemp->SetEnabled(true);
+				m_opPass->SetEnabled(true);
+				m_opNotPass->SetEnabled(true);
+				for (int i = 0; i < 3; i++) {
+					m_opErrReason[i]->SetEnabled(true);
+				}
+				m_btnSaveResult->SetEnabled(true);
 			}
-			m_btnSaveResult->SetEnabled(true);
+			else {
+				m_edReaderMac->SetEnabled(false);
+				m_edReaderMac->SetBkColor(0xFFF1F1F1);
+				m_btnClearMac->SetEnabled(false);
+				m_btnAutoTest->SetEnabled(false);
+				m_btnAutoTest->SetText("Í£Ö¹²âÊÔ");
+				m_btnTemp->SetEnabled(false);
+				m_opPass->SetEnabled(false);
+				m_opNotPass->SetEnabled(false);
+				for (int i = 0; i < 3; i++) {
+					m_opErrReason[i]->SetEnabled(false);
+				}
+				m_btnSaveResult->SetEnabled(false);
+			}			
 		}
 		else {
 			m_edReaderMac->SetEnabled(true);
@@ -241,6 +259,8 @@ void   CDuiFrameWnd::OnAutoTest() {
 			m_opErrReason[i]->Selected(false);
 		}
 		m_bAutoTestStarted = TRUE;
+		m_bAutoTestFinished = FALSE;
+		m_bBleConnected = FALSE;
 		CheckControls();
 	}
 	else {
@@ -278,6 +298,9 @@ void   CDuiFrameWnd::OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam) {
 		strText += "Á¬½ÓÀ¶ÑÀÊ§°Ü£¡\n";
 		m_rchInfo->SetText(strText);
 	}
+
+	m_bAutoTestFinished = TRUE;
+	CheckControls();
 }
 
 

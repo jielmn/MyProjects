@@ -58,8 +58,9 @@ private:
 	CButtonUI *               m_btnSaveResult;
 
 private:
-	BOOL                      m_bComConnected;
-	BOOL                      m_bAutoTestStarted;
-	BOOL                      m_bBleConnected;
+	BOOL                      m_bComConnected;                // 串口是否连接上
+	BOOL                      m_bAutoTestStarted;             // 是否点击了自动测试按钮
+	BOOL                      m_bAutoTestFinished;            // 自动测试是否完成
+	BOOL                      m_bBleConnected;                // 蓝牙连接是否还在
 
 };
