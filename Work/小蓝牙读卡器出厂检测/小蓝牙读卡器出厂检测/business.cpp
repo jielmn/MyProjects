@@ -199,20 +199,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	DWORD  dwRevLen = 0;
 
 	// ATÃüÁî
-	memcpy(data, "AT", 2);
-	dwLen = 2;
-	m_com.Write(data, dwLen);
-	LmnSleep(1000);
-
-	BOOL  bAtOk = FALSE;
-	memset(rsp, 0, sizeof(rsp));
-	dwRevLen = sizeof(rsp);
-	if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
-		PrintComData(rsp, dwRevLen);
-		if ( 0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST",rsp) ) {
-			bAtOk = TRUE;
-		}
-	}
+	BOOL  bAtOk = DisconnectBle();
 
 	if (!bAtOk) {
 		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
@@ -440,14 +427,25 @@ BOOL  CBusiness::DisconnectBle() {
 	DWORD  dwLastTick = LmnGetTickCount();
 	DWORD  dwCurTick = dwLastTick;
 	BOOL  bAtOk = FALSE;
+	CDataBuf buf;
 
 	while (dwCurTick - dwLastTick < 1000) {
 		dwRevLen = sizeof(rsp);
 		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
 			PrintComData(rsp, dwRevLen);
-			if (0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST", rsp)) {
-				bAtOk = TRUE;
-				break;
+			buf.Append(rsp, dwRevLen);
+
+			if ( buf.GetDataLength() == 7 ) {
+				if ( 0 == strncmp( (const char *)buf.GetData(), "OK+LOST", 7) ) {
+					bAtOk = TRUE;
+					break;
+				}
+			}
+			else if (buf.GetDataLength() == 2) {
+				if (0 == strncmp((const char *)buf.GetData(), "OK", 2)) {
+					bAtOk = TRUE;
+					break;
+				}
 			}
 		}
 		LmnSleep(100);
