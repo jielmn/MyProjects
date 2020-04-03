@@ -32,6 +32,9 @@ public:
 	void  ReadComDataAsyn();
 	void  ReadComData();
 
+	void  MeasureTempAsyn();
+	void  MeasureTemp();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

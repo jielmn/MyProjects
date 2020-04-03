@@ -27,6 +27,7 @@
 #define   MSG_DISCONNECT_BLE       102
 #define   MSG_READ_COM_DATA        103
 #define   MSG_STOP_AUTO_TEST       104
+#define   MSG_MEASURE_TEMP         105
 
 #define   UM_COM_STATUS            (WM_USER + 1)
 #define   UM_INFO_MSG              (WM_USER + 2)
@@ -35,6 +36,7 @@
 #define   UM_AUTO_TEST_FIN         (WM_USER + 5)
 #define   UM_BLE_DISCONNECTED      (WM_USER + 6)
 #define   UM_STOP_AUTO_TEST_RET    (WM_USER + 7)
+#define   UM_MEASURE_TEMP_FIN      (WM_USER + 8)
 
 enum InfoType {
 	CONNECTING  = 0,

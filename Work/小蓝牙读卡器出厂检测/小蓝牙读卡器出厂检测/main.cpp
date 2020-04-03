@@ -20,6 +20,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_bAutoTestFinished = FALSE;
 	m_bStopAutoTestFinished = FALSE;
 	m_bBleConnected = FALSE;
+	m_bMeasuringTemp = FALSE;
 
 	m_lblStatus   = 0;
 	m_edReaderMac = 0;
@@ -395,7 +396,8 @@ void   CDuiFrameWnd::OnBleDisconnected(WPARAM wParam, LPARAM  lParam) {
 }
 
 void   CDuiFrameWnd::OnMeasureTemp() {
-
+	CBusiness::GetInstance()->MeasureTempAsyn();
+	m_bMeasuringTemp = TRUE;
 }
 
 void   CDuiFrameWnd::OnAutoTestFin(WPARAM wParam, LPARAM  lParam) {

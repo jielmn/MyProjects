@@ -69,5 +69,6 @@ private:
 	BOOL                      m_bAutoTestFinished;            // 自动测试是否完成
 	BOOL                      m_bStopAutoTestFinished;        // 停止自动测试是否完成
 	BOOL                      m_bBleConnected;                // 蓝牙连接是否还在
+	BOOL                      m_bMeasuringTemp;
 
 };

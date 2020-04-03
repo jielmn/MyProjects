@@ -513,6 +513,82 @@ void  CBusiness::ReadComData() {
 	ReadComDataAsyn();
 }
 
+void  CBusiness::MeasureTempAsyn() {
+	g_data.m_thrd_com->PostMessage(this, MSG_MEASURE_TEMP);
+}
+
+void  CBusiness::MeasureTemp() {		
+	char   data[256];
+	DWORD  dwLen = 0;
+	char   rsp[256];
+	DWORD  dwRevLen = 0;
+
+	memcpy(data, "AT+SEND_DATAWN", 14);
+	memcpy(data + 14, g_data.m_szWriteCharId, 4);
+	memcpy(data + 18, g_data.m_adwTempCmd, 2);
+	dwLen = 20;
+	m_com.Write(data, dwLen);
+	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMPING, 0);
+
+	DWORD dwLastTick = LmnGetTickCount();
+	DWORD dwCurTick = dwLastTick;
+	BOOL  bGetTemp = FALSE;
+	char  szTagId[20] = { 0 };
+	DWORD  dwTemp = 0;
+	CDataBuf buf;
+
+	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT) {
+		dwRevLen = sizeof(rsp);
+
+		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+			buf.Append(rsp, dwRevLen);
+			PrintComData(rsp, dwRevLen);
+		}
+
+		if (buf.GetDataLength() >= 12) {
+			buf.Read(rsp, 12);
+
+			// 格式错误
+			if (!((BYTE)rsp[0] == 0xc0 && (BYTE)rsp[1] == 0x0a)) {
+				break;
+			}
+
+			bGetTemp = TRUE;
+			dwTemp = (DWORD)(rsp[10] * 100 + rsp[11]);
+
+			BYTE  abyTagId[8];
+			for (int i = 0; i < 8; i++) {
+				abyTagId[i] = (BYTE)rsp[9 - i];
+			}
+
+			Bytes2String(szTagId, sizeof(szTagId), abyTagId, 8);
+
+			TempItem * pItem = new TempItem;
+			memset(pItem, 0, sizeof(TempItem));
+			pItem->dwTemp = dwTemp;
+			STRNCPY(pItem->szTagId, szTagId, sizeof(pItem->szTagId));
+			::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMP_RET, (LPARAM)pItem);
+
+			break;
+		}
+		else if (buf.GetDataLength() == 2) {
+			buf.Read(rsp, 2);
+			bGetTemp = FALSE;
+			break;
+		}
+
+		LmnSleep(SLEEP_TIME);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	if (!bGetTemp) {
+		::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMP_RET, 0);
+		::PostMessage(g_data.m_hWnd, UM_MEASURE_TEMP_FIN, FALSE, 0);
+		return;
+	}
+
+	::PostMessage(g_data.m_hWnd, UM_MEASURE_TEMP_FIN, TRUE, 0);
+}
 
 
 // 消息处理
@@ -547,6 +623,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_STOP_AUTO_TEST:
 	{
 		StopAutoTest();
+	}
+	break;
+
+	case MSG_MEASURE_TEMP: 
+	{
+		MeasureTemp();
 	}
 	break;
 
