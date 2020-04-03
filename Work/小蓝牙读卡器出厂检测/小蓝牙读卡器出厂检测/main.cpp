@@ -100,6 +100,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (strName == "btnAutoTest") {
 			OnAutoTest();
 		}
+		else if (strName == "btnTemp") {
+			OnMeasureTemp();
+		}
 	}
 	else if (msg.sType == "textchanged") {
 		
@@ -148,10 +151,6 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (UM_BLUETOOTH_CNN_RET == uMsg) {
 		OnBluetoothCnnMsg(wParam, lParam);
-	}
-	else if (UM_STOP_AUTO_TEST_RET == uMsg) {
-		m_bAutoTestStarted = FALSE;
-		CheckControls();
 	}
 	else if (UM_AUTO_TEST_FIN == uMsg) {
 		m_bAutoTestFinished = TRUE;
@@ -312,13 +311,11 @@ void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
 			strText += s;
 			m_rchInfo->SetText(strText);
 			delete pItem;
-			m_opPass->Selected(true);
 		}
 		else {
 			s.Format("²âÎÂÊ§°Ü£¡\r\n");
 			strText += s;
 			m_rchInfo->SetText(strText);
-			m_opNotPass->Selected(true);
 		}
 	}
 	break;
@@ -392,6 +389,10 @@ void   CDuiFrameWnd::OnBleDisconnected(WPARAM wParam, LPARAM  lParam) {
 	strText += "À¶ÑÀ¶Ï¿ª!\n";
 	m_rchInfo->SetText(strText);
 	CheckControls();
+}
+
+void   CDuiFrameWnd::OnMeasureTemp() {
+
 }
 
 

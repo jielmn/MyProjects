@@ -30,7 +30,7 @@
 #define   UM_COM_STATUS            (WM_USER + 1)
 #define   UM_INFO_MSG              (WM_USER + 2)
 #define   UM_BLUETOOTH_CNN_RET     (WM_USER + 3)
-#define   UM_STOP_AUTO_TEST_RET    (WM_USER + 4)
+// #define   UM_STOP_AUTO_TEST_RET    (WM_USER + 4)
 #define   UM_AUTO_TEST_FIN         (WM_USER + 5)
 #define   UM_BLE_DISCONNECTED      (WM_USER + 6)
 
@@ -45,6 +45,14 @@ enum InfoType {
 	SETTING_NOTIFYID_RET,
 	ATING,
 	ATING_RET,
+};
+
+enum AutoTestRet {
+	RET_OK   = 0,
+	RET_BLE_FAILED,
+	RET_TEMP_FAILED,
+	RET_AT_FAILED,
+	RET_NOTIFYID_FAILED,
 };
 
 

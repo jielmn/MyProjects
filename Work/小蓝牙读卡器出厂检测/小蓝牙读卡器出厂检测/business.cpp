@@ -205,7 +205,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, ATING_RET, bAtOk);
 
 	if (!bAtOk) {
-		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
+		::PostMessage(g_data.m_hWnd, UM_AUTO_TEST_FIN, RET_AT_FAILED, 0);
 		return;
 	}
 
@@ -295,7 +295,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_BLUETOOTH_CNN_RET, bConnected, 0);
 
 	if ( !bConnected ) {
-		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
+		::PostMessage(g_data.m_hWnd, UM_AUTO_TEST_FIN, RET_BLE_FAILED, 0);
 		return;
 	}
 	
@@ -337,7 +337,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, SETTING_NOTIFYID_RET, bDataOk);
 
 	if (!bDataOk) {
-		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
+		::PostMessage(g_data.m_hWnd, UM_AUTO_TEST_FIN, RET_NOTIFYID_FAILED, 0);
 		return;
 	}
 
@@ -416,6 +416,8 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 
 	if (!bGetTemp) {
 		::PostMessage(g_data.m_hWnd, UM_INFO_MSG, TEMP_RET, 0);
+		::PostMessage(g_data.m_hWnd, UM_AUTO_TEST_FIN, RET_TEMP_FAILED, 0);
+		return;
 	}
 	
 	::PostMessage(g_data.m_hWnd, UM_AUTO_TEST_FIN, 0, 0);	
@@ -436,6 +438,7 @@ void  CBusiness::PrintComData(void * pData, DWORD  dwDataLen) {
 	OutputDebugString(szDebug);
 	OutputDebugString("\n");
 #endif
+	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "\n%s\n", szDebug);
 }
 
 void  CBusiness::DisconnectBleAsyn() {
