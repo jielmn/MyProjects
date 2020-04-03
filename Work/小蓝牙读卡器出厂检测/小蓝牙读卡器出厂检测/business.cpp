@@ -301,13 +301,42 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	memcpy(data + 12, g_data.m_szNotifyCharId, 4);
 	dwLen = 16;
 	m_com.Write(data, dwLen);
+	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, SETTING_NOTIFYID, 0);
 
-	LmnSleep(1000);
-	memset(rsp, 0, sizeof(rsp));
-	dwRevLen = sizeof(rsp);
-	// "OK+DATA-OK\r\n"
-	m_com.Read(rsp, dwRevLen);   
-	PrintComData(rsp, dwRevLen);
+	BOOL bDataOk = FALSE;
+	dwLastTick = LmnGetTickCount();
+	dwCurTick = dwLastTick;
+	buf.Clear();
+
+	while (dwCurTick - dwLastTick < 1000) {
+		dwRevLen = sizeof(rsp);
+		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+			PrintComData(rsp, dwRevLen);
+			buf.Append(rsp, dwRevLen);
+
+			if (buf.GetDataLength() == 12) {
+				if (0 == strncmp((const char *)buf.GetData(), "OK+DATA-OK\r\n", 12)) {
+					bDataOk = TRUE;
+					break;
+				}
+				else {
+					break;
+				}
+			}
+			else if (buf.GetDataLength() > 12) {
+				break;
+			}
+		}
+		LmnSleep(100);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, SETTING_NOTIFYID_RET, bDataOk);
+
+	if (!bDataOk) {
+		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
+		return;
+	}
 
 
 	//// AT+SET_WAYWR000D
@@ -435,8 +464,8 @@ BOOL  CBusiness::DisconnectBle() {
 			PrintComData(rsp, dwRevLen);
 			buf.Append(rsp, dwRevLen);
 
-			if ( buf.GetDataLength() == 7 ) {
-				if ( 0 == strncmp( (const char *)buf.GetData(), "OK+LOST", 7) ) {
+			if ( buf.GetDataLength() == 9 ) {
+				if ( 0 == strncmp( (const char *)buf.GetData(), "OK+LOST\r\n", 9) ) {
 					bAtOk = TRUE;
 					break;
 				}

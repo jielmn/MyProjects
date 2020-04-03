@@ -281,6 +281,7 @@ void   CDuiFrameWnd::OnAutoTest() {
 void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
 	InfoType  infoType = (InfoType)wParam;
 	CDuiString  strText = m_rchInfo->GetText();
+	BOOL  bRet = FALSE;
 
 	switch (infoType)
 	{
@@ -315,6 +316,27 @@ void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
 			strText += s;
 			m_rchInfo->SetText(strText);
 			m_opNotPass->Selected(true);
+		}
+	}
+	break;
+
+	case SETTING_NOTIFYID:
+	{
+		strText += "正在设置NotifyId...\n";
+		m_rchInfo->SetText(strText);
+	}
+	break;
+
+	case SETTING_NOTIFYID_RET:
+	{
+		bRet = lParam;
+		if (bRet) {
+			strText += "设置NotifyId成功\n";
+			m_rchInfo->SetText(strText);
+		}
+		else {
+			strText += "设置NotifyId失败!\n";
+			m_rchInfo->SetText(strText);
 		}
 	}
 	break;
