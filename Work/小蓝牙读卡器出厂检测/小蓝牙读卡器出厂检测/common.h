@@ -25,6 +25,7 @@
 #define   MSG_CHECK_DEVICES        100
 #define   MSG_AUTO_START_TEST      101
 #define   MSG_DISCONNECT_BLE       102
+#define   MSG_READ_COM_DATA        103
 
 #define   UM_COM_STATUS            (WM_USER + 1)
 #define   UM_INFO_MSG              (WM_USER + 2)
@@ -41,6 +42,8 @@ enum InfoType {
 	TEMP_RET,
 	SETTING_NOTIFYID,
 	SETTING_NOTIFYID_RET,
+	ATING,
+	ATING_RET,
 };
 
 

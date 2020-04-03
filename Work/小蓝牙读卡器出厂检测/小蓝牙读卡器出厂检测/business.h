@@ -29,6 +29,9 @@ public:
 	void  DisconnectBleAsyn();
 	BOOL  DisconnectBle();
 
+	void  ReadComDataAsyn();
+	void  ReadComData();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

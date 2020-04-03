@@ -341,6 +341,27 @@ void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
 	}
 	break;
 
+	case ATING:
+	{
+		strText += "ÕýÔÚ·¢ËÍATÃüÁî...\n";
+		m_rchInfo->SetText(strText);
+	}
+	break;
+
+	case ATING_RET:
+	{
+		bRet = lParam;
+		if (bRet) {
+			strText += "ATÃüÁî³É¹¦\n";
+			m_rchInfo->SetText(strText); 
+		}
+		else {
+			strText += "ATÃüÁîÊ§°Ü!\n";
+			m_rchInfo->SetText(strText);
+		}
+	}
+	break;
+
 	default:
 		break;
 	}

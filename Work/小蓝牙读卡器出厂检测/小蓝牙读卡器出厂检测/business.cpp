@@ -76,6 +76,7 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_com->Start();
 
+	ReadComDataAsyn();
 	return 0;
 }
 
@@ -199,7 +200,9 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	DWORD  dwRevLen = 0;
 
 	// AT命令
+	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, ATING, 0);
 	BOOL  bAtOk = DisconnectBle();
+	::PostMessage(g_data.m_hWnd, UM_INFO_MSG, ATING_RET, bAtOk);
 
 	if (!bAtOk) {
 		::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
@@ -484,6 +487,25 @@ BOOL  CBusiness::DisconnectBle() {
 	return bAtOk;
 }
 
+void  CBusiness::ReadComDataAsyn() {
+	g_data.m_thrd_com->PostDelayMessage(1000, this, MSG_READ_COM_DATA);
+}
+
+void  CBusiness::ReadComData() {
+	if (m_com.GetStatus() == CLmnSerialPort::CLOSE)
+		return;
+
+	char   rsp[256];
+	DWORD  dwRevLen = 0;
+
+	dwRevLen = sizeof(rsp);
+	if ( m_com.Read(rsp, dwRevLen) && dwRevLen > 0 ) {
+		PrintComData(rsp, dwRevLen);
+	}
+
+	ReadComDataAsyn();
+}
+
 
 
 // 消息处理
@@ -506,6 +528,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_DISCONNECT_BLE:
 	{
 		DisconnectBle();
+	}
+	break;
+
+	case MSG_READ_COM_DATA:
+	{
+		ReadComData();
 	}
 	break;
 
