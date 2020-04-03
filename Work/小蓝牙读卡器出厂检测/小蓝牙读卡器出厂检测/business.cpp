@@ -359,8 +359,14 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 			PrintComData(rsp, dwRevLen);
 		}
 
-		if ( buf.GetDataLength() == 12 ) {
+		if ( buf.GetDataLength() >= 12 ) {
 			buf.Read(rsp, 12);
+
+			// ∏Ò Ω¥ÌŒÛ
+			if ( !((BYTE)rsp[0] == 0xc0 && (BYTE)rsp[1] == 0x0a) ) {
+				break;
+			}
+
 			bGetTemp = TRUE;
 			dwTemp = (DWORD)( rsp[10] * 100 + rsp[11] );
 
