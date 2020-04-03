@@ -157,6 +157,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		m_bAutoTestFinished = TRUE;
 		CheckControls();
 	}
+	else if (UM_BLE_DISCONNECTED == uMsg) {
+		OnBleDisconnected(wParam, lParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -383,6 +386,13 @@ void   CDuiFrameWnd::OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam) {
 	}
 }
 
+void   CDuiFrameWnd::OnBleDisconnected(WPARAM wParam, LPARAM  lParam) {
+	m_bAutoTestStarted = FALSE;
+	CDuiString  strText = m_rchInfo->GetText();
+	strText += "À¶ÑÀ¶Ï¿ª!\n";
+	m_rchInfo->SetText(strText);
+	CheckControls();
+}
 
 
 

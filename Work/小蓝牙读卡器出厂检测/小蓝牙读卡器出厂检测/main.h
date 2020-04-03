@@ -45,6 +45,7 @@ private:
 	void   OnAutoTest();
 	void   OnInfoMsg(WPARAM wParam, LPARAM  lParam);
 	void   OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam);
+	void   OnBleDisconnected(WPARAM wParam, LPARAM  lParam);
 
 private:
 	CLabelUI *                m_lblStatus;

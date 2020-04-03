@@ -501,6 +501,9 @@ void  CBusiness::ReadComData() {
 	dwRevLen = sizeof(rsp);
 	if ( m_com.Read(rsp, dwRevLen) && dwRevLen > 0 ) {
 		PrintComData(rsp, dwRevLen);
+		if ( 9 == dwRevLen && 0 == strncmp(rsp, "OK+LOST\r\n", 9 ) ) {
+			::PostMessage(g_data.m_hWnd, UM_BLE_DISCONNECTED, 0, 0);
+		}
 	}
 
 	ReadComDataAsyn();
