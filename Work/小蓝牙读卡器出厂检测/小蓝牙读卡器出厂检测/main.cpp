@@ -152,9 +152,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (UM_BLUETOOTH_CNN_RET == uMsg) {
 		OnBluetoothCnnMsg(wParam, lParam);
 	}
-	else if (UM_AUTO_TEST_FIN == uMsg) {
-		m_bAutoTestFinished = TRUE;
-		CheckControls();
+	else if (UM_AUTO_TEST_FIN == uMsg) {		
+		OnAutoTestFin(wParam, lParam);
 	}
 	else if (UM_BLE_DISCONNECTED == uMsg) {
 		OnBleDisconnected(wParam, lParam);
@@ -395,6 +394,40 @@ void   CDuiFrameWnd::OnMeasureTemp() {
 
 }
 
+void   CDuiFrameWnd::OnAutoTestFin(WPARAM wParam, LPARAM  lParam) {
+	AutoTestRet eRet = (AutoTestRet)wParam;
+	if (eRet != RET_OK) {
+		m_opNotPass->Selected(true);
+	}
+	else {
+		m_opPass->Selected(true);
+	}
+
+	for (int i = 0; i < 3; i++) {
+		m_opErrReason[0]->Selected(false);
+	}
+
+	switch (eRet)
+	{
+	case RET_BLE_FAILED:
+		m_opErrReason[0]->Selected(true);
+		break;
+	case RET_TEMP_FAILED:
+		m_opErrReason[1]->Selected(true);
+		break;
+	case RET_AT_FAILED:
+		m_opErrReason[0]->Selected(true);
+		break;
+	case RET_NOTIFYID_FAILED:
+		m_opErrReason[1]->Selected(true);
+		break;
+	default:
+		break;
+	}
+
+	m_bAutoTestFinished = TRUE;
+	CheckControls();
+}
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
