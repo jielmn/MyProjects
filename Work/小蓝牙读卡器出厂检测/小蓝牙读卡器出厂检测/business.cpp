@@ -424,11 +424,12 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 }
 
 void  CBusiness::StopAutoTestAsyn() {
-	
+	g_data.m_thrd_com->PostMessage(this, MSG_STOP_AUTO_TEST );
 }
 
 void  CBusiness::StopAutoTest() {
-
+	DisconnectBle();
+	::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
 }
 
 void  CBusiness::PrintComData(void * pData, DWORD  dwDataLen) {
@@ -540,6 +541,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_COM_DATA:
 	{
 		ReadComData();
+	}
+	break;
+
+	case MSG_STOP_AUTO_TEST:
+	{
+		StopAutoTest();
 	}
 	break;
 

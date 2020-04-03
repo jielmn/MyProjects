@@ -158,6 +158,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (UM_BLE_DISCONNECTED == uMsg) {
 		OnBleDisconnected(wParam, lParam);
 	}
+	else if (UM_STOP_AUTO_TEST_RET == uMsg) {
+		OnStopAutoTestRet();
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -276,6 +279,7 @@ void   CDuiFrameWnd::OnAutoTest() {
 	}
 	else {
 		CBusiness::GetInstance()->StopAutoTestAsyn();
+		m_bStopAutoTestFinished = FALSE;
 	}
 }
 
@@ -426,6 +430,11 @@ void   CDuiFrameWnd::OnAutoTestFin(WPARAM wParam, LPARAM  lParam) {
 	}
 
 	m_bAutoTestFinished = TRUE;
+	CheckControls();
+}
+
+void   CDuiFrameWnd::OnStopAutoTestRet() {
+	m_bAutoTestStarted = FALSE;
 	CheckControls();
 }
 

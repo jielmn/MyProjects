@@ -48,6 +48,7 @@ private:
 	void   OnBleDisconnected(WPARAM wParam, LPARAM  lParam);
 	void   OnMeasureTemp();
 	void   OnAutoTestFin(WPARAM wParam, LPARAM  lParam);
+	void   OnStopAutoTestRet();
 
 private:
 	CLabelUI *                m_lblStatus;
@@ -62,6 +63,7 @@ private:
 	CButtonUI *               m_btnSaveResult;
 
 private:
+	// 先检查串口，再检测测试是否开始
 	BOOL                      m_bComConnected;                // 串口是否连接上
 	BOOL                      m_bAutoTestStarted;             // 是否点击了自动测试按钮
 	BOOL                      m_bAutoTestFinished;            // 自动测试是否完成
