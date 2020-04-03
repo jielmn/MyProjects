@@ -82,6 +82,7 @@ int CBusiness::Init() {
 int CBusiness::DeInit() {
 
 	if (g_data.m_thrd_db) {
+		LmnSleep(1000);
 		g_data.m_thrd_db->Stop();
 		delete g_data.m_thrd_db;
 		g_data.m_thrd_db = 0;
@@ -116,6 +117,13 @@ void  CBusiness::CheckDevices() {
 	}
 	// 如果是串口关闭状态
 	else {
+
+//#if TEST_FLAG
+//		BOOL bRet1 = m_com.OpenUartPort(17);
+//		::PostMessage(g_data.m_hWnd, UM_COM_STATUS, 17, bRet1);
+//		return;
+//#endif
+
 		std::map<int, std::string> m;
 		GetAllSerialPorts(m);
 		DWORD  dwLen = strlen(COM_STRING);
@@ -200,6 +208,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	memset(rsp, 0, sizeof(rsp));
 	dwRevLen = sizeof(rsp);
 	if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+		PrintComData(rsp, dwRevLen);
 		if ( 0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST",rsp) ) {
 			bAtOk = TRUE;
 		}
@@ -224,12 +233,14 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	BOOL   bConnected = FALSE;
 	InfoType  infoType = CONNECTING;
 
-	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT) {
-		CDataBuf buf;
+	CDataBuf buf;
+	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT) {		
 		dwRevLen = sizeof(rsp);
 
 		if ( m_com.Read(rsp, dwRevLen) && dwRevLen > 0 ) {	
 			buf.Append(rsp, dwRevLen);
+
+			PrintComData(rsp, dwRevLen);
 
 			while ( TRUE ) {
 				if (infoType == CONNECTING) {
@@ -308,7 +319,8 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	memset(rsp, 0, sizeof(rsp));
 	dwRevLen = sizeof(rsp);
 	// "OK+DATA-OK\r\n"
-	m_com.Read(rsp, dwRevLen);           
+	m_com.Read(rsp, dwRevLen);   
+	PrintComData(rsp, dwRevLen);
 
 
 	//// AT+SET_WAYWR000D
@@ -337,13 +349,14 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	BOOL  bGetTemp = FALSE;
 	char  szTagId[20] = { 0 };
 	DWORD  dwTemp = 0;
+	buf.Clear();
 
 	while ( dwCurTick - dwLastTick < RSP_TIME_LIMIT ) {
-		CDataBuf buf;
 		dwRevLen = sizeof(rsp);		
 
 		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
 			buf.Append(rsp, dwRevLen);
+			PrintComData(rsp, dwRevLen);
 		}
 
 		if ( buf.GetDataLength() == 12 ) {
@@ -384,11 +397,58 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 }
 
 void  CBusiness::StopAutoTestAsyn() {
-
+	
 }
 
 void  CBusiness::StopAutoTest() {
 
+}
+
+void  CBusiness::PrintComData(void * pData, DWORD  dwDataLen) {
+#if _DEBUG
+	char szDebug[8094];
+	DebugStream(szDebug, sizeof(szDebug), pData, dwDataLen);
+	OutputDebugString(szDebug);
+	OutputDebugString("\n");
+#endif
+}
+
+void  CBusiness::DisconnectBleAsyn() {
+	g_data.m_thrd_com->PostMessage(this, MSG_DISCONNECT_BLE);
+}
+
+BOOL  CBusiness::DisconnectBle() {
+	if (m_com.GetStatus() == CLmnSerialPort::CLOSE)
+		return TRUE;
+
+	char   data[256];
+	DWORD  dwLen = 0;
+
+	char   rsp[256];
+	DWORD  dwRevLen = 0;
+
+	memcpy(data, "AT", 2);
+	dwLen = 2;
+	m_com.Write(data, dwLen);
+
+	DWORD  dwLastTick = LmnGetTickCount();
+	DWORD  dwCurTick = dwLastTick;
+	BOOL  bAtOk = FALSE;
+
+	while (dwCurTick - dwLastTick < 1000) {
+		dwRevLen = sizeof(rsp);
+		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+			PrintComData(rsp, dwRevLen);
+			if (0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST", rsp)) {
+				bAtOk = TRUE;
+				break;
+			}
+		}
+		LmnSleep(100);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	return bAtOk;
 }
 
 
@@ -407,6 +467,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CStartAutoTestParam * pParam = (CStartAutoTestParam *)pMessageData;
 		StartAutoTest(pParam);
+	}
+	break;
+
+	case MSG_DISCONNECT_BLE:
+	{
+		DisconnectBle();
 	}
 	break;
 

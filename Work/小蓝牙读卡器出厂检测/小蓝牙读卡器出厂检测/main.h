@@ -36,6 +36,7 @@ public:
 	virtual void    InitWindow();
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual void OnFinalMessage(HWND hWnd);
 
 
 private:

@@ -26,9 +26,13 @@ public:
 	void  StopAutoTestAsyn();
 	void  StopAutoTest();
 
+	void  DisconnectBleAsyn();
+	BOOL  DisconnectBle();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
+	void  PrintComData(void * pData, DWORD  dwDataLen);
 
 	// 消息处理
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);

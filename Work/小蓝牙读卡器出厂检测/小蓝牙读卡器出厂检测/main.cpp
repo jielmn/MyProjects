@@ -107,6 +107,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	WindowImplBase::Notify(msg);
 }
 
+void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
+	CBusiness::GetInstance()->DisconnectBleAsyn();
+}
+
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if ( uMsg == UM_COM_STATUS ) {
 		int nCom  = (int)wParam;
