@@ -399,6 +399,8 @@ void   CDuiFrameWnd::OnInfoMsg(WPARAM wParam, LPARAM  lParam) {
 	default:
 		break;
 	}
+
+	m_rchInfo->EndDown();
 }
 
 void   CDuiFrameWnd::OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam) {
@@ -414,7 +416,9 @@ void   CDuiFrameWnd::OnBluetoothCnnMsg(WPARAM wParam, LPARAM  lParam) {
 		strText += "Á¬½ÓÀ¶ÑÀÊ§°Ü£¡\n";
 		m_rchInfo->SetText(strText);
 		m_bBleConnected = FALSE;
-	}
+	}	
+
+	m_rchInfo->EndDown();
 }
 
 void   CDuiFrameWnd::OnBleDisconnected(WPARAM wParam, LPARAM  lParam) {
@@ -428,6 +432,7 @@ void   CDuiFrameWnd::OnBleDisconnected(WPARAM wParam, LPARAM  lParam) {
 void   CDuiFrameWnd::OnMeasureTemp() {
 	CBusiness::GetInstance()->MeasureTempAsyn();
 	m_bMeasuringTemp = TRUE;
+	CheckControls();
 }
 
 void   CDuiFrameWnd::OnAutoTestFin(WPARAM wParam, LPARAM  lParam) {
@@ -459,6 +464,9 @@ void   CDuiFrameWnd::OnAutoTestFin(WPARAM wParam, LPARAM  lParam) {
 		break;
 	case RET_NOTIFYID_FAILED:
 		m_opErrReason[0]->Selected(true);
+		break;
+	case RET_OK:
+		m_bBleConnected = TRUE;
 		break;
 	default:
 		break;
