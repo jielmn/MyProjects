@@ -10,6 +10,7 @@
 #include "UIMenu.h"
 #include "LmnSerialPort.h"
 #include "LmnTemplates.h"
+#include "QueryDlg.h"
 
 #include "business.h"
 #include "resource.h"
@@ -115,6 +116,17 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	}
 	else if (msg.sType == "textchanged") {
 		
+	}
+	else if (msg.sType == "query_and_export") {
+		RECT rect;
+		::GetWindowRect(GetHWND(), &rect);
+
+		CQueryDlg * pDlg = new CQueryDlg;
+		pDlg->Create(this->m_hWnd, "query", UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);		
+		// pDlg->CenterWindow();
+		::MoveWindow(pDlg->GetHWND(), rect.left + 100 , rect.top + 100, 800, 600, TRUE); 
+		pDlg->ShowModal();
+		delete pDlg;		
 	}
 	WindowImplBase::Notify(msg);
 }

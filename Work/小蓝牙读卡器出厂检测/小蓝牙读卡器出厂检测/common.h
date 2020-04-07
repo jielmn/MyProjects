@@ -10,6 +10,9 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#include "UIlib.h"
+using namespace DuiLib;
+
 #define   PROJ_NAME               "bluecheck"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
