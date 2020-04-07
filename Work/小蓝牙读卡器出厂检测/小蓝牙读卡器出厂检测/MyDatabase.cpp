@@ -57,7 +57,10 @@ BOOL  CMySqliteDatabase::CreateTable(const char * szTableName, const char * szSq
 
 int  CMySqliteDatabase::SaveResult(const CSaveResultParam * pParam) {
 	char szSql[8192];
-	SNPRINTF(szSql, sizeof(szSql), "select * from %s where id='%s'", READER_TABLE, pParam->m_szMac);
+	char szMac[256];
+	Str2Lower(pParam->m_szMac, szMac, sizeof(szMac));
+
+	SNPRINTF(szSql, sizeof(szSql), "select * from %s where id='%s'", READER_TABLE, szMac);
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
@@ -72,13 +75,13 @@ int  CMySqliteDatabase::SaveResult(const CSaveResultParam * pParam) {
 	// 如果有记录
 	if (nrow > 0) {
 		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set pass=%d, failfact=%d, time=%lu WHERE id='%s' ",
-			READER_TABLE, pParam->m_bPass, pParam->m_dwFact, now, pParam->m_szMac );
+			READER_TABLE, pParam->m_bPass, pParam->m_dwFact, now, szMac);
 		ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
 	}
 	// 没有记录 
 	else {
 		SNPRINTF(szSql, sizeof(szSql), "INSERT INTO %s VALUES('%s', %d, %d, %lu) ",
-			READER_TABLE, pParam->m_szMac, pParam->m_bPass, pParam->m_dwFact, now);
+			READER_TABLE, szMac, pParam->m_bPass, pParam->m_dwFact, now);
 		ret = sqlite3_exec(m_db, szSql, 0, 0, 0);
 	}
 
@@ -97,8 +100,10 @@ int  CMySqliteDatabase::QueryData(const CQueryDataParam * pParam, std::vector<Re
 			READER_TABLE, t1, t2 );
 	}
 	else {
+		char szMac[256];
+		StrReplaceAll(szMac, sizeof(szMac),pParam->m_szMac, "'", "''");
 		SNPRINTF(szSql, sizeof(szSql), "select * from %s WHERE time>=%lu AND time<%lu AND id LIKE '%%%s%%' ",
-			READER_TABLE, t1, t2, pParam->m_szMac);
+			READER_TABLE, t1, t2, szMac);
 	}
 	
 

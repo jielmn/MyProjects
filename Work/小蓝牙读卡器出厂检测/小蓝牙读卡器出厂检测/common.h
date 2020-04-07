@@ -43,6 +43,7 @@ using namespace DuiLib;
 #define   UM_STOP_AUTO_TEST_RET    (WM_USER + 7)
 #define   UM_MEASURE_TEMP_FIN      (WM_USER + 8)
 #define   UM_SAVE_RESULT_FIN       (WM_USER + 9)
+#define   UM_QUERY_DATA_RET        (WM_USER + 10)
 
 enum InfoType {
 	CONNECTING  = 0,
@@ -128,15 +129,17 @@ public:
 
 class CQueryDataParam : public LmnToolkits::MessageData {
 public:
-	CQueryDataParam(time_t t1, time_t t2, const char * szMac) {
+	CQueryDataParam(time_t t1, time_t t2, const char * szMac, HWND hWnd) {
 		STRNCPY(m_szMac, szMac, sizeof(m_szMac));
 		m_t1 = t1;
 		m_t2 = t2;
+		m_hWnd = hWnd;
 	}
 
 	char     m_szMac[20];
 	time_t   m_t1;
 	time_t   m_t2;
+	HWND     m_hWnd;
 };
 
 typedef  struct tagReaderItem {

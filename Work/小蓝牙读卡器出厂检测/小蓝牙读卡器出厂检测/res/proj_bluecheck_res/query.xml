@@ -43,9 +43,9 @@
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="10,20" height="340">
-				<List name="lstResult" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="0" itemtextcolor="#FF386382" >
+				<List name="lstResult" bkcolor="#FFFFFFFF" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="true" headerbkimage="file='list_header_bg.png'" itemalign="center" itembkcolor="#FFFFFFFF" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="1" itemfont="1" itemtextcolor="#FF386382" >
 					<ListHeader height="24" menu="true">
-						<ListHeaderItem text="地址"      font="1" width="100"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
+						<ListHeaderItem text="地址"      font="1" width="150"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 						<ListHeaderItem text="测试通过"    font="1" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 						<ListHeaderItem text="蓝牙连接OK"      font="1" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1" name="headerPhone"  />
 						<ListHeaderItem text="测温OK"      font="1" width="80"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>

@@ -584,14 +584,14 @@ void  CBusiness::SaveResult(const CSaveResultParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_SAVE_RESULT_FIN, 0, 0);
 }
 
-void  CBusiness::QueryDataAsyn(time_t t1, time_t t2, const char * szMac) {
-	g_data.m_thrd_db->PostMessage(this, MSG_QUERY_DATA, new CQueryDataParam(t1, t2, szMac) );
+void  CBusiness::QueryDataAsyn(time_t t1, time_t t2, const char * szMac, HWND hWnd) {
+	g_data.m_thrd_db->PostMessage(this, MSG_QUERY_DATA, new CQueryDataParam(t1, t2, szMac, hWnd) );
 }
 
 void  CBusiness::QueryData(const CQueryDataParam * pParam) {
 	std::vector<ReaderItem*> * pvRet = new std::vector<ReaderItem*>;
 	m_db.QueryData(pParam, *pvRet);
-	int a = 100;
+	::PostMessage(pParam->m_hWnd, UM_QUERY_DATA_RET, (WPARAM)pvRet, 0);
 }
 
 

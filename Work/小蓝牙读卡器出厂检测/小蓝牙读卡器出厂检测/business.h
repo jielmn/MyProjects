@@ -39,7 +39,7 @@ public:
 	void  SaveResultAsyn(const char * szReaderId, BOOL bPass, DWORD  dwFact);
 	void  SaveResult(const CSaveResultParam * pParam);
 
-	void  QueryDataAsyn(time_t t1, time_t t2, const char * szMac);
+	void  QueryDataAsyn(time_t t1, time_t t2, const char * szMac, HWND hWnd);
 	void  QueryData(const CQueryDataParam * pParam);
 
 private:
