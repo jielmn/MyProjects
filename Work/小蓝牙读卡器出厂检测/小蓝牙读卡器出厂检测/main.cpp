@@ -109,6 +109,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (strName == "btnSaveResult") {
 			OnSaveResult();
 		}
+		else if (strName == "btnClearMac") {
+			m_edReaderMac->SetText("");
+		}
 	}
 	else if (msg.sType == "textchanged") {
 		
@@ -304,14 +307,14 @@ void   CDuiFrameWnd::OnAutoTest() {
 		strMac.Trim();
 
 		if ( strMac.GetLength() != 12 ) {
-			MessageBox(GetHWND(), "小蓝牙Reader的Mac地址格式错误，正确格式为xxxxxxxxxxxx", "错误", 0);
+			MessageBox(GetHWND(), "小蓝牙Reader的Mac地址格式错误，正确格式为xxxxxxxxxxxx(长度为12,x为0-9,a-f)", "错误", 0);
 			return;
 		}
 
 		for ( int i = 0; i < 12; i++ ) {
 			char ch = Char2Lower(strMac.GetAt(i));
 			if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f'))) {
-				MessageBox(GetHWND(), "小蓝牙Reader的Mac地址格式错误，正确格式为xxxxxxxxxxxx", "错误", 0);
+				MessageBox(GetHWND(), "小蓝牙Reader的Mac地址格式错误，正确格式为xxxxxxxxxxxx(长度为12,x为0-9,a-f)", "错误", 0);
 				return;
 			}
 		}
