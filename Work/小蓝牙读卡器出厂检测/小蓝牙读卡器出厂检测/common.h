@@ -38,6 +38,7 @@
 #define   UM_BLE_DISCONNECTED      (WM_USER + 6)
 #define   UM_STOP_AUTO_TEST_RET    (WM_USER + 7)
 #define   UM_MEASURE_TEMP_FIN      (WM_USER + 8)
+#define   UM_SAVE_RESULT_FIN       (WM_USER + 9)
 
 enum InfoType {
 	CONNECTING  = 0,

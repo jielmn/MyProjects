@@ -51,6 +51,7 @@ private:
 	void   OnStopAutoTestRet();
 	void   OnMeasureTempFin(WPARAM wParam, LPARAM  lParam);
 	void   OnSaveResult();
+	void   OnSaveResultFin();
 
 private:
 	CLabelUI *                m_lblStatus;
@@ -72,5 +73,6 @@ private:
 	BOOL                      m_bStopAutoTestFinished;        // 停止自动测试是否完成
 	BOOL                      m_bBleConnected;                // 蓝牙连接是否还在
 	BOOL                      m_bMeasuringTemp;
+	BOOL                      m_bSavingResult;
 
 };

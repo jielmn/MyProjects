@@ -22,6 +22,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_bStopAutoTestFinished = FALSE;
 	m_bBleConnected = FALSE;
 	m_bMeasuringTemp = FALSE;
+	m_bSavingResult = FALSE;
 
 	m_lblStatus   = 0;
 	m_edReaderMac = 0;
@@ -170,6 +171,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (UM_MEASURE_TEMP_FIN == uMsg) {
 		OnMeasureTempFin(wParam, lParam);
 	}
+	else if (UM_SAVE_RESULT_FIN == uMsg) {
+		OnSaveResultFin();
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -211,7 +215,14 @@ void  CDuiFrameWnd::CheckControls() {
 					for (int i = 0; i < 3; i++) {
 						m_opErrReason[i]->SetEnabled(true);
 					}
-					m_btnSaveResult->SetEnabled(true);
+
+					if (m_bSavingResult) {
+						m_btnSaveResult->SetEnabled(false);
+					}
+					else {
+						m_btnSaveResult->SetEnabled(true);
+					}
+					
 
 					if (m_bBleConnected) {
 						m_btnTemp->SetEnabled(true);
@@ -232,7 +243,12 @@ void  CDuiFrameWnd::CheckControls() {
 					for (int i = 0; i < 3; i++) {
 						m_opErrReason[i]->SetEnabled(false);
 					}
-					m_btnSaveResult->SetEnabled(false);
+					if (m_bSavingResult) {
+						m_btnSaveResult->SetEnabled(false);
+					}
+					else {
+						m_btnSaveResult->SetEnabled(true);
+					}
 				}
 				
 			}
@@ -311,6 +327,7 @@ void   CDuiFrameWnd::OnAutoTest() {
 		m_bAutoTestFinished = FALSE;
 		m_bBleConnected = FALSE;
 		m_bMeasuringTemp = FALSE;
+		m_bSavingResult = FALSE;
 		CheckControls();
 	}
 	else {
@@ -518,6 +535,13 @@ void   CDuiFrameWnd::OnSaveResult() {
 	}
 
 	CBusiness::GetInstance()->SaveResultAsyn(strReaderId, bPass, dwFact);
+	m_bSavingResult = TRUE;
+	CheckControls();
+}
+
+void   CDuiFrameWnd::OnSaveResultFin() {
+	m_bSavingResult = FALSE;
+	CheckControls();
 }
 
  

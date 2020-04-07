@@ -581,6 +581,7 @@ void  CBusiness::SaveResultAsyn(const char * szReaderId, BOOL bPass, DWORD  dwFa
 
 void  CBusiness::SaveResult(const CSaveResultParam * pParam) {
 	m_db.SaveResult(pParam);
+	::PostMessage(g_data.m_hWnd, UM_SAVE_RESULT_FIN, 0, 0);
 }
 
 
