@@ -39,6 +39,9 @@ public:
 	void  SaveResultAsyn(const char * szReaderId, BOOL bPass, DWORD  dwFact);
 	void  SaveResult(const CSaveResultParam * pParam);
 
+	void  QueryDataAsyn(time_t t1, time_t t2, const char * szMac);
+	void  QueryData(const CQueryDataParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

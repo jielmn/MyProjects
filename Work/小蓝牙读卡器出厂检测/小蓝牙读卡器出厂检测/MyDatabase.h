@@ -10,6 +10,7 @@ public:
 	int DeinitDb();
 
 	int  SaveResult(const CSaveResultParam * pParam);
+	int  QueryData(const CQueryDataParam * pParam, std::vector<ReaderItem*> & vRet);
 
 private:
 	// szTableName: 要创建的表名

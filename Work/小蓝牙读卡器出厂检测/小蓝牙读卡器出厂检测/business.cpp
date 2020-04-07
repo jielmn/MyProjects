@@ -584,6 +584,16 @@ void  CBusiness::SaveResult(const CSaveResultParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_SAVE_RESULT_FIN, 0, 0);
 }
 
+void  CBusiness::QueryDataAsyn(time_t t1, time_t t2, const char * szMac) {
+	g_data.m_thrd_db->PostMessage(this, MSG_QUERY_DATA, new CQueryDataParam(t1, t2, szMac) );
+}
+
+void  CBusiness::QueryData(const CQueryDataParam * pParam) {
+	std::vector<ReaderItem*> * pvRet = new std::vector<ReaderItem*>;
+	m_db.QueryData(pParam, *pvRet);
+	int a = 100;
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -630,6 +640,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSaveResultParam * pParam = (CSaveResultParam *)pMessageData;
 		SaveResult(pParam);
+	}
+	break;
+
+	case MSG_QUERY_DATA:
+	{
+		CQueryDataParam * pParam = (CQueryDataParam *)pMessageData;
+		QueryData(pParam);
 	}
 	break;
 

@@ -32,6 +32,7 @@ using namespace DuiLib;
 #define   MSG_STOP_AUTO_TEST       104
 #define   MSG_MEASURE_TEMP         105
 #define   MSG_SAVE_RESULT          106
+#define   MSG_QUERY_DATA           107
 
 #define   UM_COM_STATUS            (WM_USER + 1)
 #define   UM_INFO_MSG              (WM_USER + 2)
@@ -124,6 +125,29 @@ public:
 	BOOL   m_bPass;
 	DWORD  m_dwFact;
 };
+
+class CQueryDataParam : public LmnToolkits::MessageData {
+public:
+	CQueryDataParam(time_t t1, time_t t2, const char * szMac) {
+		STRNCPY(m_szMac, szMac, sizeof(m_szMac));
+		m_t1 = t1;
+		m_t2 = t2;
+	}
+
+	char     m_szMac[20];
+	time_t   m_t1;
+	time_t   m_t2;
+};
+
+typedef  struct tagReaderItem {
+	char     m_szMac[20];
+	BOOL     m_bPass;
+	DWORD    m_dwFact;
+	time_t   m_time;
+}ReaderItem;
+
+extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
+extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
 
 
 // templates

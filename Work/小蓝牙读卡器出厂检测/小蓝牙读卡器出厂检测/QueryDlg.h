@@ -18,5 +18,16 @@ public:
 	virtual void     InitWindow();
 	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
+
+private:
+	void   OnQuery();
+
+private:
+	DuiLib::CDateTimeUI *             m_StartTime;
+	DuiLib::CDateTimeUI *             m_EndTime;
+	DuiLib::CEditUI *                 m_edMac;
+	DuiLib::CListUI *                 m_lstResult;
+	CButtonUI *                       m_btnQuery;
+	CButtonUI *                       m_btnExport;
 };
 
