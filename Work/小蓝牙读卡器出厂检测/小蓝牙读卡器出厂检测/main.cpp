@@ -426,6 +426,7 @@ void   CDuiFrameWnd::OnBleDisconnected(WPARAM wParam, LPARAM  lParam) {
 	CDuiString  strText = m_rchInfo->GetText();
 	strText += "À¶ÑÀ¶Ï¿ª!\n";
 	m_rchInfo->SetText(strText);
+	m_rchInfo->EndDown();
 	CheckControls();
 }
 

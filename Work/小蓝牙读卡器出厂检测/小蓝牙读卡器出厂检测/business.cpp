@@ -154,26 +154,7 @@ void  CBusiness::CheckDevices() {
 
 			// 关闭之前的蓝牙连接
 			if (bRet) {
-				char   data[256];
-				DWORD  dwLen = 0;
-				char   rsp[256];
-				DWORD  dwRevLen = 0;
-
-				// AT命令
-				memcpy(data, "AT", 2);
-				dwLen = 2;
-				m_com.Write(data, dwLen);
-				LmnSleep(1000);
-
-				BOOL  bAtOk = FALSE;
-				memset(rsp, 0, sizeof(rsp));
-				dwRevLen = sizeof(rsp);
-				if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
-					if (0 == strcmp("OK", rsp) || 0 == strcmp("OK+LOST", rsp)) {
-						bAtOk = TRUE;
-					}
-				}
-
+				DisconnectBle();
 			}
 		}
 	}
