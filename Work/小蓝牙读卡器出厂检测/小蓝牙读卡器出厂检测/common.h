@@ -28,6 +28,7 @@
 #define   MSG_READ_COM_DATA        103
 #define   MSG_STOP_AUTO_TEST       104
 #define   MSG_MEASURE_TEMP         105
+#define   MSG_SAVE_RESULT          106
 
 #define   UM_COM_STATUS            (WM_USER + 1)
 #define   UM_INFO_MSG              (WM_USER + 2)
@@ -106,6 +107,19 @@ typedef  struct  tagTempItem {
 	DWORD      dwTemp;
 	char       szTagId[20];
 }TempItem;
+
+class CSaveResultParam : public LmnToolkits::MessageData {
+public:
+	CSaveResultParam(const char * szReaderId, BOOL bPass, DWORD  dwFact) {
+		STRNCPY(m_szMac, szReaderId, sizeof(m_szMac));
+		m_bPass = bPass;
+		m_dwFact = dwFact;
+	}
+
+	char   m_szMac[20];
+	BOOL   m_bPass;
+	DWORD  m_dwFact;
+};
 
 
 // templates

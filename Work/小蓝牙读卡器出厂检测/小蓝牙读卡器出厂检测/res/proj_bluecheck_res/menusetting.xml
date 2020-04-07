@@ -5,6 +5,6 @@
   <Default name="Menu" value="inset=&quot;2,2,2,2&quot; itemtextpadding=&quot;30,0,0,0&quot; bkimage=&quot;file='menu_bk.png'  corner='30,8,8,8'&quot; hole=&quot;false&quot;" />
   <Menu>	
 	<MenuElement text="初始化蓝牙模块"  name="munu_bluetooth_moudle" />
-	<MenuElement text="关于"          name="munu_bluetooth_moudle" />
+	<MenuElement text="查询和导出"      name="query_and_export" />
   </Menu>
 </Window>

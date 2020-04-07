@@ -4,6 +4,7 @@
 #include "LmnThread.h"
 #include "common.h"
 #include "LmnSerialPort.h"
+#include "MyDatabase.h"
 
 #include "sigslot.h"
 
@@ -35,6 +36,9 @@ public:
 	void  MeasureTempAsyn();
 	void  MeasureTemp();
 
+	void  SaveResultAsyn(const char * szReaderId, BOOL bPass, DWORD  dwFact);
+	void  SaveResult(const CSaveResultParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
@@ -48,6 +52,7 @@ private:
 private:
 	CLmnSerialPort           m_com;
 	BOOL                     m_bBluetoothCnn;                    // 蓝牙是否连接上
+	CMySqliteDatabase        m_db;
 };
 
 

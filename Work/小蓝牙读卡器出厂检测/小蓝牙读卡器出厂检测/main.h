@@ -50,6 +50,7 @@ private:
 	void   OnAutoTestFin(WPARAM wParam, LPARAM  lParam);
 	void   OnStopAutoTestRet();
 	void   OnMeasureTempFin(WPARAM wParam, LPARAM  lParam);
+	void   OnSaveResult();
 
 private:
 	CLabelUI *                m_lblStatus;

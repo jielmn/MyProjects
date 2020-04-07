@@ -9,6 +9,7 @@
 #include "main.h"
 #include "UIMenu.h"
 #include "LmnSerialPort.h"
+#include "LmnTemplates.h"
 
 #include "business.h"
 #include "resource.h"
@@ -103,6 +104,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 		else if (strName == "btnTemp") {
 			OnMeasureTemp();
+		}
+		else if (strName == "btnSaveResult") {
+			OnSaveResult();
 		}
 	}
 	else if (msg.sType == "textchanged") {
@@ -502,7 +506,21 @@ void   CDuiFrameWnd::OnMeasureTempFin(WPARAM wParam, LPARAM  lParam) {
 	}
 }
 
+void   CDuiFrameWnd::OnSaveResult() {
+	CDuiString  strReaderId = m_edReaderMac->GetText();
+	BOOL  bPass = m_opPass->IsSelected();
+	DWORD  dwFact = 0;
+	for (int i = 0; i < 3; i++) {
+		BOOL bFact = m_opErrReason[i]->IsSelected();
+		if (bFact) {
+			SetBit(dwFact, i);
+		}
+	}
 
+	CBusiness::GetInstance()->SaveResultAsyn(strReaderId, bPass, dwFact);
+}
+
+ 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,

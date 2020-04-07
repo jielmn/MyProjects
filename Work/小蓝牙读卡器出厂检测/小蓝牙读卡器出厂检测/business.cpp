@@ -64,6 +64,8 @@ int CBusiness::Init() {
 	DWORD  dwSize = sizeof(g_data.m_adwTempCmd);
 	String2Bytes(g_data.m_adwTempCmd, dwSize, szTempCmd);
 
+	m_db.InitDb();
+
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
 		return -1;
@@ -83,7 +85,6 @@ int CBusiness::Init() {
 int CBusiness::DeInit() {
 
 	if (g_data.m_thrd_db) {
-		LmnSleep(1000);
 		g_data.m_thrd_db->Stop();
 		delete g_data.m_thrd_db;
 		g_data.m_thrd_db = 0;
@@ -96,6 +97,8 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+
+	m_db.DeinitDb();
 	return 0;
 }
 
@@ -572,6 +575,14 @@ void  CBusiness::MeasureTemp() {
 	::PostMessage(g_data.m_hWnd, UM_MEASURE_TEMP_FIN, TRUE, 0);
 }
 
+void  CBusiness::SaveResultAsyn(const char * szReaderId, BOOL bPass, DWORD  dwFact) {
+	g_data.m_thrd_db->PostMessage( this, MSG_SAVE_RESULT, new CSaveResultParam(szReaderId, bPass, dwFact) );
+}
+
+void  CBusiness::SaveResult(const CSaveResultParam * pParam) {
+	m_db.SaveResult(pParam);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -611,6 +622,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_MEASURE_TEMP: 
 	{
 		MeasureTemp();
+	}
+	break;
+
+	case MSG_SAVE_RESULT:
+	{
+		CSaveResultParam * pParam = (CSaveResultParam *)pMessageData;
+		SaveResult(pParam);
 	}
 	break;
 

@@ -27,6 +27,9 @@
     <ClCompile Include="UIMenu.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MyDatabase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="observer_impl_base.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyDatabase.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
