@@ -113,6 +113,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 	CBusiness::GetInstance()->DisconnectBleAsyn();
+	g_data.m_bQuiting = TRUE;
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {

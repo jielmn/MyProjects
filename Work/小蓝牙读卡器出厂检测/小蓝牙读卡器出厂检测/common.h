@@ -67,6 +67,7 @@ public:
 	LmnToolkits::Thread *     m_thrd_db;
 	LmnToolkits::Thread *     m_thrd_com;
 	HWND                      m_hWnd;
+	BOOL                      m_bQuiting;
 
 	BYTE                      m_byMacType;
 	char                      m_szWriteCharId[5];
@@ -81,6 +82,7 @@ public:
 		m_thrd_db = 0;
 		m_thrd_com = 0;
 		m_hWnd = 0;
+		m_bQuiting = FALSE;
 
 		m_byMacType = 0;
 		memset(m_szWriteCharId, 0, sizeof(m_szWriteCharId));

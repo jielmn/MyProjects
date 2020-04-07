@@ -205,7 +205,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	InfoType  infoType = CONNECTING;
 
 	CDataBuf buf;
-	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT) {		
+	while (dwCurTick - dwLastTick < RSP_TIME_LIMIT && !g_data.m_bQuiting ) {
 		dwRevLen = sizeof(rsp);
 
 		if ( m_com.Read(rsp, dwRevLen) && dwRevLen > 0 ) {	
@@ -351,7 +351,7 @@ void  CBusiness::StartAutoTest(const CStartAutoTestParam * pParam) {
 	DWORD  dwTemp = 0;
 	buf.Clear();
 
-	while ( dwCurTick - dwLastTick < RSP_TIME_LIMIT ) {
+	while ( dwCurTick - dwLastTick < RSP_TIME_LIMIT && !g_data.m_bQuiting ) {
 		dwRevLen = sizeof(rsp);		
 
 		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
