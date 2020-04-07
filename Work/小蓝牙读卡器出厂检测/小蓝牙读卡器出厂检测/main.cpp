@@ -484,6 +484,20 @@ void   CDuiFrameWnd::OnStopAutoTestRet() {
 void   CDuiFrameWnd::OnMeasureTempFin(WPARAM wParam, LPARAM  lParam) {
 	m_bMeasuringTemp = FALSE;
 	CheckControls();
+
+	BOOL bRet = wParam;
+	if ( bRet ) {
+		m_opPass->Selected(true);
+		for (int i = 0; i < 3; i++) {
+			m_opErrReason[i]->Selected(false);
+		}
+	}
+	else {
+		m_opNotPass->Selected(true);
+		m_opErrReason[0]->Selected(false);
+		m_opErrReason[1]->Selected(true);
+		m_opErrReason[2]->Selected(false);
+	}
 }
 
 

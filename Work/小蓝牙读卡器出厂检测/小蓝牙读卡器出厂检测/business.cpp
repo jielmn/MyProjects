@@ -429,6 +429,7 @@ void  CBusiness::StopAutoTestAsyn() {
 
 void  CBusiness::StopAutoTest() {
 	DisconnectBle();
+	::PostMessage(g_data.m_hWnd, UM_BLE_DISCONNECTED, 0, 0);
 	::PostMessage(g_data.m_hWnd, UM_STOP_AUTO_TEST_RET, 0, 0);
 }
 
