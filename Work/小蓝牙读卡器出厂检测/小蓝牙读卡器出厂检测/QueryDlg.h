@@ -21,6 +21,7 @@ public:
 
 private:
 	void   OnQuery();
+	void   OnExport();
 
 private:
 	DuiLib::CDateTimeUI *             m_StartTime;

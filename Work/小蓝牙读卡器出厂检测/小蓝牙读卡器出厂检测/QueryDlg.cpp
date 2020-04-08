@@ -1,6 +1,7 @@
 #include "QueryDlg.h"
 #include "business.h"
 #include "LmnTemplates.h"
+#include <time.h>
 
 CQueryDlg::CQueryDlg() {
 	m_StartTime = 0;
@@ -17,6 +18,9 @@ void  CQueryDlg::Notify(DuiLib::TNotifyUI& msg) {
 	if (msg.sType == "click") {
 		if (strName == "btnQuery") {
 			OnQuery();
+		}
+		else if (strName == "btnExport") {
+			OnExport();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -81,4 +85,53 @@ void  CQueryDlg::OnQuery() {
 	CBusiness::GetInstance()->QueryDataAsyn(t1, t2 + 86400, strMac, GetHWND());
 	m_btnQuery->SetEnabled(false);
 	m_btnExport->SetEnabled(false);
+}
+
+void   CQueryDlg::OnExport() {
+	OPENFILENAME ofn = { 0 };
+	TCHAR strFilename[MAX_PATH] = { 0 };//用于接收文件名  
+
+	ofn.lStructSize     = sizeof(OPENFILENAME);//结构体大小  
+	ofn.hwndOwner       = GetHWND();//拥有着窗口句柄，为NULL表示对话框是非模态的，实际应用中一般都要有这个句柄  
+	ofn.lpstrFilter     = TEXT("Text Flie(*.txt)\0*.txt\0");//设置过滤  
+	ofn.nFilterIndex    = 0;//过滤器索引  
+	ofn.lpstrFile       = strFilename;//接收返回的文件名，注意第一个字符需要为NULL  
+	ofn.nMaxFile        = sizeof(strFilename);//缓冲区长度  
+	ofn.lpstrInitialDir = CPaintManagerUI::GetInstancePath();
+	ofn.lpstrTitle = TEXT("请选择一个文件");//使用系统默认标题留空即可  
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY;//文件、目录必须存在，隐藏只读选项  
+	if (!GetSaveFileName(&ofn)) {
+		::MessageBox(GetHWND(), "导出数据失败!", "错误", 0);
+		return;
+	}
+
+	char  szName[256];
+	char  szExtension[256];
+	char  szPath[256];
+	ParseFileName(strFilename, 0, 0, szName, sizeof(szName), szExtension, sizeof(szExtension));
+	if ( szExtension[0] == '\0' ) {
+		SNPRINTF(szPath, sizeof(szPath), "%s.txt", strFilename);
+	}
+	else {
+		SNPRINTF(szPath, sizeof(szPath), "%s", strFilename);
+	}
+
+	FILE * fp = fopen(szPath, "wb");
+	if (0 == fp) {
+		::MessageBox(GetHWND(), "导出数据失败!", "错误", 0);
+		return;
+	}
+
+	int nCnt = m_lstResult->GetCount();
+	char buf[8192];
+	for (int i = 0; i < nCnt; i++) {
+		CListTextElementUI * pUi = (CListTextElementUI *)m_lstResult->GetItemAt(i);
+		SNPRINTF(buf, sizeof(buf), "%s\t%s\t%s\t%s\t%s\t%s\r\n", 
+			pUi->GetText(0), pUi->GetText(1), pUi->GetText(2), 
+			pUi->GetText(3), pUi->GetText(4), pUi->GetText(5));
+		fwrite(buf, 1, strlen(buf), fp);
+	}
+
+	::MessageBox(GetHWND(), "导出数据成功!", "成功", 0);
+	fclose(fp);
 }
