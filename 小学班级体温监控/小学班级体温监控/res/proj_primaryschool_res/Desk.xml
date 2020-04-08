@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<VerticalLayout bordersize="1" bordercolor="#FF000000" >	
+		<HorizontalLayout>
+			<VerticalLayout width="30">
+				<Control />
+				<Control bkimage="girl.png" width="30" height="30" />
+				<Control />
+			</VerticalLayout>			
+			<Label text="张三玩" />
+		</HorizontalLayout>	
+		<HorizontalLayout height="16">
+			<Control />
+			<Button name="btnDelDesk" width="16" height="16" bordercolor="#FF768D9B" bordersize="0" textcolor="#FF447AA1" foreimage="del.png" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" />
+			<Control />
+		</HorizontalLayout>
+		<HorizontalLayout height="10" />
+	</VerticalLayout>
+</Window>

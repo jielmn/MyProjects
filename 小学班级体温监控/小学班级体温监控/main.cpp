@@ -11,14 +11,65 @@
 #include "resource.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
-
+	m_lstClasses = 0;
+	m_layDesks = 0;
+	m_layRows = 0;
+	m_layCols = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
 
 }
-
+          
 void  CDuiFrameWnd::InitWindow() {
+	m_lstClasses = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstClasses"));
+	m_layDesks   = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layDesks"));
+	m_layRows    = static_cast<DuiLib::CVerticalLayoutUI*>(m_PaintManager.FindControl("layRows"));
+	m_layCols    = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layCols"));
+
+	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
+	m_layDesks->SetItemSize(g_data.m_DeskSize);
+ 
+	SIZE s = { g_data.m_DeskSize.cx, 20 };
+	m_layCols->SetFixedColumns(g_data.m_dwRoomCols);
+	m_layCols->SetItemSize(s);
+
+	CDuiString strText;
+	for ( DWORD i = 0; i < g_data.m_dwRoomRows; i++ ) {
+		CLabelUI * pRowUi = new CLabelUI;
+		m_layRows->AddAt(pRowUi,0);
+		strText.Format("%lu", i + 1);
+		pRowUi->SetText(strText);
+		pRowUi->SetFixedHeight(g_data.m_DeskSize.cy);
+		pRowUi->SetFont(2);
+		pRowUi->SetTextColor(0xFF447AA1);
+		pRowUi->SetAttribute("align", "center"); 
+	}
+
+	assert(g_data.m_dwRoomCols <= 10);
+	for (DWORD i = 0; i < g_data.m_dwRoomCols && i < 10; i++) {
+		CLabelUI * pRowUi = new CLabelUI;
+		m_layCols->Add(pRowUi);
+		pRowUi->SetText(g_data.m_aszChNo[i]);
+		pRowUi->SetFont(2);
+		pRowUi->SetTextColor(0xFF447AA1);
+		pRowUi->SetAttribute("align", "center");
+	}
+
+#if TEST_FLAG
+	CListTextElementUI * pItem = new CListTextElementUI;
+	m_lstClasses->Add(pItem);
+	pItem->SetText(0, "六年级1班"); 
+	pItem = new CListTextElementUI;
+	m_lstClasses->Add(pItem);
+	pItem->SetText(0, "六年级2班"); 
+
+	for (DWORD i = 0; i < 48; i++) {
+		CDeskUI * p = new CDeskUI;		
+		m_layDesks->Add(p);  
+	}
+#endif
+
 	WindowImplBase::InitWindow(); 
 }
 
@@ -37,6 +88,11 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 		pUI = builder.Create((const char *)strText, (UINT)0, this, &m_PaintManager);
 		return pUI;     
 	}
+	else if (0 == strcmp(pstrClass, "Classroom")) {
+		strText.Format("%s.xml", pstrClass);
+		pUI = builder.Create((const char *)strText, (UINT)0, this, &m_PaintManager);
+		return pUI;         
+	}
 	return WindowImplBase::CreateControl(pstrClass);
 }
 
@@ -48,7 +104,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
-
+                
 
 
 

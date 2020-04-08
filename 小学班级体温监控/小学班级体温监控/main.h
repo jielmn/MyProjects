@@ -5,6 +5,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "MyControls.h"
+
 #include "resource.h"
 
 class CDuiFrameWnd : public WindowImplBase
@@ -36,5 +38,11 @@ public:
 	virtual void    InitWindow();
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+private:
+	CListUI *                                   m_lstClasses;
+	DuiLib::CTileLayoutUI *                     m_layDesks;
+	DuiLib::CVerticalLayoutUI *                 m_layRows;
+	DuiLib::CTileLayoutUI *                     m_layCols;
 
 };
