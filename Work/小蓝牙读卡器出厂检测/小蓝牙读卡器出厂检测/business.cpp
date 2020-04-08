@@ -122,12 +122,6 @@ void  CBusiness::CheckDevices() {
 	// 如果是串口关闭状态
 	else {
 
-//#if TEST_FLAG
-//		BOOL bRet1 = m_com.OpenUartPort(17);
-//		::PostMessage(g_data.m_hWnd, UM_COM_STATUS, 17, bRet1);
-//		return;
-//#endif
-
 		std::map<int, std::string> m;
 		GetAllSerialPorts(m);
 		DWORD  dwLen = strlen(COM_STRING);
@@ -418,9 +412,9 @@ void  CBusiness::StopAutoTest() {
 }
 
 void  CBusiness::PrintComData(void * pData, DWORD  dwDataLen) {
-#if _DEBUG
 	char szDebug[8094];
 	DebugStream(szDebug, sizeof(szDebug), pData, dwDataLen);
+#if _DEBUG		
 	OutputDebugString(szDebug);
 	OutputDebugString("\n");
 #endif

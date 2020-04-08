@@ -15,6 +15,8 @@
 #include "business.h"
 #include "resource.h"
 
+#define   CHAR_TIMER      101
+
                                                              
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_bComConnected = FALSE;
@@ -188,6 +190,21 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (UM_SAVE_RESULT_FIN == uMsg) {
 		OnSaveResultFin();
+	}
+	else if (WM_CHAR == uMsg) {
+		char ch = (char)wParam;
+		m_strChar += ch;
+		::SetTimer(GetHWND(), CHAR_TIMER, 100, 0);
+	}
+	else if (WM_TIMER == uMsg) {
+		if ( wParam == CHAR_TIMER ) {		
+			m_strChar.Trim();
+			if ( IsValidMac(m_strChar) ) {
+				m_edReaderMac->SetText(m_strChar);
+			}
+			::KillTimer(GetHWND(), wParam);
+			m_strChar = "";
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -557,6 +574,23 @@ void   CDuiFrameWnd::OnSaveResult() {
 void   CDuiFrameWnd::OnSaveResultFin() {
 	m_bSavingResult = FALSE;
 	CheckControls();
+}
+
+BOOL   CDuiFrameWnd::IsValidMac(const char * szMac) {
+	CDuiString strMac = szMac;
+
+	if (strMac.GetLength() != 12) {
+		return FALSE;
+	}
+
+	for (int i = 0; i < 12; i++) {
+		char ch = Char2Lower(strMac.GetAt(i));
+		if (!((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f'))) {
+			return FALSE;
+		}
+	}
+
+	return TRUE;
 }
 
  

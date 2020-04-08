@@ -52,6 +52,7 @@ private:
 	void   OnMeasureTempFin(WPARAM wParam, LPARAM  lParam);
 	void   OnSaveResult();
 	void   OnSaveResultFin();
+	BOOL   IsValidMac(const char * szMac);
 
 private:
 	CLabelUI *                m_lblStatus;
@@ -74,5 +75,6 @@ private:
 	BOOL                      m_bBleConnected;                // 蓝牙连接是否还在
 	BOOL                      m_bMeasuringTemp;
 	BOOL                      m_bSavingResult;
+	CDuiString                m_strChar;
 
 };
