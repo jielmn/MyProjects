@@ -130,6 +130,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		pDlg->ShowModal();
 		delete pDlg;		
 	}
+	else if (msg.sType == "munu_bluetooth_moudle") {
+		OnInitBluetooth();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -204,6 +207,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			}
 			::KillTimer(GetHWND(), wParam);
 			m_strChar = "";
+		}
+	}
+	else if (UM_INIT_BLUETOOTH_RET == uMsg) {
+		BOOL bRet = wParam;
+		if (bRet) {
+			::MessageBox(GetHWND(), "³õÊ¼»¯À¶ÑÀÄ£¿é³É¹¦!Çë²å°ÎÀ¶ÑÀÄ£¿é", "³É¹¦", 0);
+		}
+		else {
+			::MessageBox(GetHWND(), "³õÊ¼»¯À¶ÑÀÄ£¿éÊ§°Ü!Çë²å°ÎÀ¶ÑÀÄ£¿éÔÙÊÔ", "Ê§°Ü", 0);
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
@@ -558,13 +570,16 @@ void   CDuiFrameWnd::OnMeasureTempFin(WPARAM wParam, LPARAM  lParam) {
 void   CDuiFrameWnd::OnSaveResult() {
 	CDuiString  strReaderId = m_edReaderMac->GetText();
 	BOOL  bPass = m_opPass->IsSelected();
+
 	DWORD  dwFact = 0;
-	for (int i = 0; i < 3; i++) {
-		BOOL bFact = m_opErrReason[i]->IsSelected();
-		if (bFact) {
-			SetBit(dwFact, i);
+	if (!bPass) {
+		for (int i = 0; i < 3; i++) {
+			BOOL bFact = m_opErrReason[i]->IsSelected();
+			if (bFact) {
+				SetBit(dwFact, i);
+			}
 		}
-	}
+	}	
 
 	CBusiness::GetInstance()->SaveResultAsyn(strReaderId, bPass, dwFact);
 	m_bSavingResult = TRUE;
@@ -591,6 +606,15 @@ BOOL   CDuiFrameWnd::IsValidMac(const char * szMac) {
 	}
 
 	return TRUE;
+}
+
+void   CDuiFrameWnd::OnInitBluetooth() {
+	if (!m_bComConnected) {
+		::MessageBox(GetHWND(), "Ã»ÓÐ´ò¿ªÀ¶ÑÀ´®¿Ú", "´íÎó", 0);
+		return;
+	}
+
+	CBusiness::GetInstance()->InitBluetoothAsyn();
 }
 
  

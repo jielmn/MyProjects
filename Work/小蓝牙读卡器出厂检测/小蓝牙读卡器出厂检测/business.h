@@ -42,6 +42,9 @@ public:
 	void  QueryDataAsyn(time_t t1, time_t t2, const char * szMac, HWND hWnd);
 	void  QueryData(const CQueryDataParam * pParam);
 
+	void  InitBluetoothAsyn();
+	void  InitBluetooth();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

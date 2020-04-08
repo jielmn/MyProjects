@@ -588,6 +588,113 @@ void  CBusiness::QueryData(const CQueryDataParam * pParam) {
 	::PostMessage(pParam->m_hWnd, UM_QUERY_DATA_RET, (WPARAM)pvRet, 0);
 }
 
+void  CBusiness::InitBluetoothAsyn() {
+	g_data.m_thrd_com->PostMessage(this, MSG_INIT_BLUETOOTH);
+}
+
+void  CBusiness::InitBluetooth() {
+	if (m_com.GetStatus() == CLmnSerialPort::CLOSE) {
+		::PostMessage(g_data.m_hWnd, UM_INIT_BLUETOOTH_RET, FALSE, 0);
+		return;
+	}
+
+	BOOL  bRet = DisconnectBle();
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, UM_INIT_BLUETOOTH_RET, FALSE, 0);
+		return;
+	}
+
+	char   data[256];
+	DWORD  dwLen = 0;
+
+	char   rsp[256];
+	DWORD  dwRevLen = 0;
+
+	memcpy(data, "AT+ROLE1", 8);
+	dwLen = 8;
+	m_com.Write(data, dwLen);
+
+	DWORD  dwLastTick = LmnGetTickCount();
+	DWORD  dwCurTick = dwLastTick;
+	BOOL   bAtOk = FALSE;
+	CDataBuf buf;
+
+	while (dwCurTick - dwLastTick < 1000) {
+		dwRevLen = sizeof(rsp);
+
+		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+			PrintComData(rsp, dwRevLen);
+			buf.Append(rsp, dwRevLen);
+		}
+
+		if (buf.GetDataLength() == 8) {
+			if (0 == strncmp((const char *)buf.GetData(), "OK+Set:1", 8)) {
+				bAtOk = TRUE;
+				break;
+			}
+			else {
+				bAtOk = FALSE;
+				break;
+			}
+		}
+		else if (buf.GetDataLength() > 8) {
+			bAtOk = FALSE;
+			break;
+		}
+
+		LmnSleep(100);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	if (!bAtOk) {
+		::PostMessage(g_data.m_hWnd, UM_INIT_BLUETOOTH_RET, FALSE, 0);
+		return;
+	}
+
+	memcpy(data, "AT+IMME1", 8);
+	dwLen = 8;
+	m_com.Write(data, dwLen);
+
+	dwLastTick = LmnGetTickCount();
+	dwCurTick = dwLastTick;
+	bAtOk = FALSE;
+
+	while (dwCurTick - dwLastTick < 1000) {
+		dwRevLen = sizeof(rsp);
+
+		if (m_com.Read(rsp, dwRevLen) && dwRevLen > 0) {
+			PrintComData(rsp, dwRevLen);
+			buf.Append(rsp, dwRevLen);
+		}
+
+		if (buf.GetDataLength() == 8) {
+			if (0 == strncmp((const char *)buf.GetData(), "OK+Set:1", 8)) {
+				bAtOk = TRUE;
+				break;
+			}
+			else {
+				bAtOk = FALSE;
+				break;
+			}
+		}
+		else if (buf.GetDataLength() > 8) {
+			bAtOk = FALSE;
+			break;
+		}
+
+		LmnSleep(100);
+		dwCurTick = LmnGetTickCount();
+	}
+
+	if (!bAtOk) {
+		::PostMessage(g_data.m_hWnd, UM_INIT_BLUETOOTH_RET, FALSE, 0);
+		return;
+	}
+
+	::PostMessage(g_data.m_hWnd, UM_INIT_BLUETOOTH_RET, TRUE, 0);
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -641,6 +748,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CQueryDataParam * pParam = (CQueryDataParam *)pMessageData;
 		QueryData(pParam);
+	}
+	break;
+
+	case MSG_INIT_BLUETOOTH:
+	{
+		InitBluetooth();
 	}
 	break;
 

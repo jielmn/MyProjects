@@ -36,6 +36,7 @@ using namespace DuiLib;
 #define   MSG_MEASURE_TEMP         105
 #define   MSG_SAVE_RESULT          106
 #define   MSG_QUERY_DATA           107
+#define   MSG_INIT_BLUETOOTH       108
 
 #define   UM_COM_STATUS            (WM_USER + 1)
 #define   UM_INFO_MSG              (WM_USER + 2)
@@ -47,6 +48,7 @@ using namespace DuiLib;
 #define   UM_MEASURE_TEMP_FIN      (WM_USER + 8)
 #define   UM_SAVE_RESULT_FIN       (WM_USER + 9)
 #define   UM_QUERY_DATA_RET        (WM_USER + 10)
+#define   UM_INIT_BLUETOOTH_RET    (WM_USER + 11)
 
 enum InfoType {
 	CONNECTING  = 0,

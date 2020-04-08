@@ -53,6 +53,7 @@ private:
 	void   OnSaveResult();
 	void   OnSaveResultFin();
 	BOOL   IsValidMac(const char * szMac);
+	void   OnInitBluetooth();
 
 private:
 	CLabelUI *                m_lblStatus;
