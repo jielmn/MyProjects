@@ -17,6 +17,9 @@ public:
 	int Init();
 	int DeInit();
 
+	void   AddClassAsyn(HWND hWnd, DWORD dwGrade, DWORD  dwClass);
+	void   AddClass(const CAddClassParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

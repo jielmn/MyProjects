@@ -20,7 +20,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
-
+	m_vClasses.clear();
+	ClearVector(m_vDeskes);
 }
           
 void  CDuiFrameWnd::InitWindow() {
@@ -180,6 +181,16 @@ CAddClassDlg::CAddClassDlg() {
 }
 
 void  CAddClassDlg::Notify(DuiLib::TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+	if (msg.sType == "click") {
+		if (strName == "btnOK") {
+			int nSel = m_cmbGrade->GetCurSel();
+			DWORD i  = m_cmbGrade->GetItemAt(nSel)->GetTag();
+			nSel = m_cmbClass->GetCurSel();
+			DWORD j = m_cmbGrade->GetItemAt(nSel)->GetTag();
+			CBusiness::GetInstance()->AddClassAsyn(GetHWND(), i, j);
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -209,6 +220,20 @@ void  CAddClassDlg::InitWindow() {
 }
 
 LRESULT  CAddClassDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if ( uMsg == UM_ADD_CLASS_RET ) {
+		BOOL bRet = (BOOL)wParam;
+		if (bRet) {
+			int nSel = m_cmbGrade->GetCurSel();
+			DWORD i = m_cmbGrade->GetItemAt(nSel)->GetTag();
+			nSel = m_cmbClass->GetCurSel();
+			DWORD j = m_cmbGrade->GetItemAt(nSel)->GetTag();
+			m_dwClassNo = MAKELONG(j, i);
+			this->PostMessage(WM_CLOSE);
+		}
+		else {
+			MessageBox(GetHWND(), "Ìí¼Ó°à¼¶Ê§°Ü£¡", "´íÎó", 0);
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 

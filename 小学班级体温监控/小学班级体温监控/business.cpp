@@ -98,9 +98,29 @@ int CBusiness::DeInit() {
 	return 0;
 }
 
+void   CBusiness::AddClassAsyn( HWND hWnd, DWORD dwGrade, DWORD  dwClass) {
+	g_data.m_thrd_db->PostMessage(this, MSG_ADD_CLASS, new CAddClassParam(hWnd, dwGrade, dwClass));
+}
+
+void   CBusiness::AddClass(const CAddClassParam * pParam) {
+	BOOL bRet = m_db.AddClass(pParam);
+	::PostMessage(pParam->m_hWnd, UM_ADD_CLASS_RET, bRet, 0);
+}
+
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_ADD_CLASS:
+	{
+		CAddClassParam * pParam = (CAddClassParam *)pMessageData;
+		AddClass(pParam);
+	}
+	break;
 
+	default:
+		break;
+	}
 }

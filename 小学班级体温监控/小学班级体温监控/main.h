@@ -67,6 +67,8 @@ private:
 	DuiLib::CTileLayoutUI *                     m_layCols;
 	DWORD                                       m_dwHighlightIndex;
 	DuiLib::CContainerUI *                      m_layRoom;
+	std::vector<DWORD>                          m_vClasses;
+	std::vector<DeskItem *>                     m_vDeskes;
 
 private:
 	void   OnDeskHighlight(DWORD dwIndex);

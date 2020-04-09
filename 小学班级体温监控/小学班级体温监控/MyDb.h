@@ -9,6 +9,8 @@ public:
 	int InitDb();
 	int DeinitDb();
 
+	BOOL AddClass(const CAddClassParam * pParam);
+
 private:
 	// szTableName: 要创建的表名
 	// szSql: create table (...)，括号里面的内容

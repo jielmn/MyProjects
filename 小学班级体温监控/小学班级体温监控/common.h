@@ -20,6 +20,10 @@
 #define  TEST_FLAG     1
 #endif
 
+#define   MSG_ADD_CLASS             100
+
+#define   UM_ADD_CLASS_RET          (WM_USER + 1)
+
 typedef  struct  tagDeskItem{
 	int     nGrade;
 	int     nClass;
@@ -54,6 +58,19 @@ public:
 		memset(&m_DeskSize, 0, sizeof(m_DeskSize));
 		memset(m_aszChNo, 0, sizeof(m_aszChNo));
 	}
+};
+
+class CAddClassParam : public LmnToolkits::MessageData {
+public:
+	CAddClassParam(HWND hWnd, DWORD dwGrade, DWORD  dwClass) {
+		m_hWnd = hWnd;
+		m_dwGrade = dwGrade;
+		m_dwClass = dwClass;
+	}
+
+	HWND    m_hWnd;
+	DWORD   m_dwGrade;
+	DWORD   m_dwClass;
 };
 
 extern CGlobalData  g_data;
