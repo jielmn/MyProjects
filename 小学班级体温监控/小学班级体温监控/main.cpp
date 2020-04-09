@@ -16,6 +16,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_layRows = 0;
 	m_layCols = 0;
 	m_dwHighlightIndex = 0;
+	m_layRoom = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -27,6 +28,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layDesks   = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layDesks"));
 	m_layRows    = static_cast<DuiLib::CVerticalLayoutUI*>(m_PaintManager.FindControl("layRows"));
 	m_layCols    = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layCols"));
+	m_layRoom    = static_cast<DuiLib::CContainerUI*>(m_PaintManager.FindControl("layRoom"));
 
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
@@ -67,6 +69,8 @@ void  CDuiFrameWnd::InitWindow() {
 		}
 	}
 
+	m_layRoom->SetVisible(false);
+
 	WindowImplBase::InitWindow(); 
 }
 
@@ -94,11 +98,21 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+
 	if (msg.sType == "myselected") {
 		OnDeskHighlight(msg.pSender->GetTag());
 	}
 	else if (msg.sType == "myunselected") {
 		OnDeskUnHighlight(msg.pSender->GetTag());
+	}
+	else if ( msg.sType == "click" ) {
+		if (strName == "btnAddClass") {
+			OnAddClass();
+		}
+		else if (strName == "btnDelClass") {
+			OnDelClass();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -134,7 +148,73 @@ CDeskUI *  CDuiFrameWnd::GetDeskUI(DWORD  dwTag) {
 	return pDesk;
 }
 
+void   CDuiFrameWnd::OnAddClass() {
+	RECT rect;
+	::GetWindowRect(GetHWND(), &rect);
+
+	CAddClassDlg * pDlg = new CAddClassDlg;
+	pDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	::MoveWindow(pDlg->GetHWND(), rect.left + 50, rect.top + 100, 300, 200, TRUE);  
+	int ret = pDlg->ShowModal();  
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pDlg;
+		return;     
+	}
+
+	delete pDlg;
+}
+
+void   CDuiFrameWnd::OnDelClass() {
+
+}
+
                 
+
+CAddClassDlg::CAddClassDlg() {
+	m_cmbGrade = 0;
+	m_cmbClass = 0;
+	m_dwClassNo = 0;    // 年级 << 8 | 班级
+}
+
+void  CAddClassDlg::Notify(DuiLib::TNotifyUI& msg) {
+	WindowImplBase::Notify(msg);
+}
+
+void  CAddClassDlg::InitWindow() {
+	m_cmbGrade = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbGrade"));
+	m_cmbClass = static_cast<DuiLib::CComboUI*>(m_PaintManager.FindControl("cmbClass"));
+
+	for (int i = 0; i < 6; i++) {
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		pElement->SetText(g_data.m_aszChNo[i]);
+		pElement->SetTag(i+1);
+		m_cmbGrade->Add(pElement);
+	}
+	m_cmbGrade->SelectItem(0); 
+
+	CDuiString  strText;
+	for (int i = 0; i < 10; i++) {
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		strText.Format("%d", i + 1);
+		pElement->SetText(strText);
+		pElement->SetTag(i+1);
+		m_cmbClass->Add(pElement); 
+	}  
+	m_cmbClass->SelectItem(0);
+
+	WindowImplBase::InitWindow();
+}
+
+LRESULT  CAddClassDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+}
+
+DuiLib::CControlUI * CAddClassDlg::CreateControl(LPCTSTR pstrClass) {
+	return WindowImplBase::CreateControl(pstrClass);
+}
 
 
 

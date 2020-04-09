@@ -121,7 +121,7 @@ void  CDeskUI::SetHighlight(BOOL bHighlight) {
 		if (!m_bHighlight) {
 			this->SetBkColor(0x30000000); 
 			if (m_data.bValid) {
-				m_btnDel->SetVisible(true);
+				m_btnDel->SetVisible(true); 
 			}			
 			m_bHighlight = TRUE;
 		}

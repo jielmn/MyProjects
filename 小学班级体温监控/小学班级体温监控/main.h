@@ -6,8 +6,29 @@
 using namespace DuiLib;
 
 #include "MyControls.h"
-
 #include "resource.h"
+
+class CAddClassDlg : public DuiLib::WindowImplBase
+{
+public:
+	CAddClassDlg();
+
+	virtual LPCTSTR    GetWindowClassName() const { return "DUIAddClassFrame"; }
+	virtual DuiLib::CDuiString GetSkinFile() { return "AddClassDlg.xml"; }
+	virtual DuiLib::CDuiString GetSkinFolder() { return SKIN_FOLDER; }
+
+	virtual void   Notify(DuiLib::TNotifyUI& msg);
+	virtual void   InitWindow();
+	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
+private:
+	CComboUI *                 m_cmbGrade;
+	CComboUI *                 m_cmbClass;
+
+public:
+	DWORD                      m_dwClassNo;
+};
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -45,10 +66,13 @@ private:
 	DuiLib::CVerticalLayoutUI *                 m_layRows;
 	DuiLib::CTileLayoutUI *                     m_layCols;
 	DWORD                                       m_dwHighlightIndex;
+	DuiLib::CContainerUI *                      m_layRoom;
 
 private:
 	void   OnDeskHighlight(DWORD dwIndex);
 	void   OnDeskUnHighlight(DWORD dwIndex);
 	CDeskUI *  GetDeskUI(DWORD  dwTag);
+	void   OnAddClass();
+	void   OnDelClass();
 
 };
