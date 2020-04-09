@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iterator> 
 
 #include "LmnCommon.h"
 #include "LmnConfig.h"
@@ -21,8 +22,10 @@
 #endif
 
 #define   MSG_ADD_CLASS             100
+#define   MSG_GET_ALL_CLASSES       101
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
+#define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
 
 typedef  struct  tagDeskItem{
 	int     nGrade;
@@ -46,6 +49,7 @@ public:
 	DWORD                     m_dwRoomRows;
 	DWORD                     m_dwRoomCols;
 	SIZE                      m_DeskSize;
+	HWND                      m_hWnd;
 	char                      m_aszChNo[10][6];
 
 public:
@@ -57,6 +61,7 @@ public:
 		m_dwRoomCols = 0;
 		memset(&m_DeskSize, 0, sizeof(m_DeskSize));
 		memset(m_aszChNo, 0, sizeof(m_aszChNo));
+		m_hWnd = 0;
 	}
 };
 
@@ -75,6 +80,8 @@ public:
 
 extern CGlobalData  g_data;
 
+extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
+extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
 
 // templates
 template <class T>

@@ -88,3 +88,18 @@ BOOL  CMySqliteDatabase::AddClass(const CAddClassParam * pParam) {
 
 	return FALSE;
 }
+
+void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet) {
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s", CLASSES_TABLE);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+								  //char *zErrMsg = 0;          // 错误描述
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for ( int i = 0; i < nrow; i++ ) {
+		DWORD dwNo = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		vRet.push_back(dwNo);
+	}
+	sqlite3_free_table(azResult);
+}

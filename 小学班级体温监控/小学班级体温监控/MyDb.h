@@ -10,6 +10,7 @@ public:
 	int DeinitDb();
 
 	BOOL AddClass(const CAddClassParam * pParam);
+	void GetAllClasses(std::vector<DWORD> & vRet);
 
 private:
 	// szTableName: 要创建的表名

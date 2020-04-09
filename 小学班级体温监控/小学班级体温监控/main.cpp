@@ -25,6 +25,8 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 }
           
 void  CDuiFrameWnd::InitWindow() {
+	g_data.m_hWnd = this->GetHWND();
+
 	m_lstClasses = static_cast<DuiLib::CListUI*>(m_PaintManager.FindControl("lstClasses"));
 	m_layDesks   = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layDesks"));
 	m_layRows    = static_cast<DuiLib::CVerticalLayoutUI*>(m_PaintManager.FindControl("layRows"));
@@ -72,6 +74,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_layRoom->SetVisible(false);
 
+	CBusiness::GetInstance()->GetAllClassesAsyn();
 	WindowImplBase::InitWindow(); 
 }
 
@@ -119,6 +122,12 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if ( uMsg == UM_GET_ALL_CLASSES_RET ) {
+		m_vClasses.clear();
+		std::vector<DWORD> * pvRet = (std::vector<DWORD>*)wParam;
+		std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_vClasses));
+		delete pvRet;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 

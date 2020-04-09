@@ -20,6 +20,9 @@ public:
 	void   AddClassAsyn(HWND hWnd, DWORD dwGrade, DWORD  dwClass);
 	void   AddClass(const CAddClassParam * pParam);
 
+	void   GetAllClassesAsyn();
+	void   GetAllClasses();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

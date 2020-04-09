@@ -107,6 +107,16 @@ void   CBusiness::AddClass(const CAddClassParam * pParam) {
 	::PostMessage(pParam->m_hWnd, UM_ADD_CLASS_RET, bRet, 0);
 }
 
+void   CBusiness::GetAllClassesAsyn() {
+	g_data.m_thrd_db->PostMessage(this, MSG_GET_ALL_CLASSES);
+}
+
+void   CBusiness::GetAllClasses() {
+	std::vector<DWORD> * pvRet = new std::vector<DWORD>;
+	m_db.GetAllClasses(*pvRet);
+	::PostMessage(g_data.m_hWnd, UM_GET_ALL_CLASSES_RET, (WPARAM)pvRet, 0);
+}
+
 
 
 // 消息处理
@@ -117,6 +127,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAddClassParam * pParam = (CAddClassParam *)pMessageData;
 		AddClass(pParam);
+	}
+	break;
+
+	case MSG_GET_ALL_CLASSES:
+	{
+		GetAllClasses();
 	}
 	break;
 
