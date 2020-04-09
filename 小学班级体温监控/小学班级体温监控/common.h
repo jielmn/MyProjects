@@ -21,8 +21,11 @@
 #endif
 
 typedef  struct  tagDeskItem{
+	int     nGrade;
+	int     nClass;
 	int     nRow;
 	int     nCol;
+	BOOL    bValid;
 	char    szName[12];
 	int     nSex;
 	char    szTagId[20];

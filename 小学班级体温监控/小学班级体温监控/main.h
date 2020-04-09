@@ -44,5 +44,11 @@ private:
 	DuiLib::CTileLayoutUI *                     m_layDesks;
 	DuiLib::CVerticalLayoutUI *                 m_layRows;
 	DuiLib::CTileLayoutUI *                     m_layCols;
+	DWORD                                       m_dwHighlightIndex;
+
+private:
+	void   OnDeskHighlight(DWORD dwIndex);
+	void   OnDeskUnHighlight(DWORD dwIndex);
+	CDeskUI *  GetDeskUI(DWORD  dwTag);
 
 };

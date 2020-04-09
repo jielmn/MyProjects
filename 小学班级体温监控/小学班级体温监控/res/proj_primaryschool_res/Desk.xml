@@ -18,7 +18,7 @@
 		<HorizontalLayout height="16" inset="4,0,0,0">
 			<Label text="" align="left" font="2" textcolor="#FF447AA1" name="lblTime" />
 			<Control bkimage="warning.png" width="30" height="30" name="ctlWarning" />
-			<Button name="btnDelDesk" width="16" height="16" bordercolor="#FF768D9B" bordersize="0" textcolor="#FF447AA1" foreimage="del.png" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" />
+			<Button name="btnDelDesk" width="16" height="16" bordercolor="#FF768D9B" bordersize="0" textcolor="#FF447AA1" foreimage="del.png" normalimage="toolbar_normal.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" />
 			<Control width="4" />
 		</HorizontalLayout>		
 		<HorizontalLayout height="6" />

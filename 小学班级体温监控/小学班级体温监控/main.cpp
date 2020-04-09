@@ -15,6 +15,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_layDesks = 0;
 	m_layRows = 0;
 	m_layCols = 0;
+	m_dwHighlightIndex = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -56,20 +57,15 @@ void  CDuiFrameWnd::InitWindow() {
 		pRowUi->SetAttribute("align", "center");
 	}
 
-	DWORD  dwCnt = g_data.m_dwRoomRows * g_data.m_dwRoomCols;
-	for (DWORD i = 0; i < dwCnt; i++) {
-		CDeskUI * pDesk = new CDeskUI;
-		m_layDesks->Add(pDesk);   
+	for (DWORD i = 0; i < g_data.m_dwRoomRows; i++) {
+		for (DWORD j = 0; j < g_data.m_dwRoomCols; j++) {
+			CDeskUI * pDesk = new CDeskUI;
+			pDesk->SetTag( MAKELONG(j+1, i+1) );
+			//SNPRINTF(pDesk->m_data.szName, 12, "%d,%d", i + 1, j + 1);
+			//pDesk->m_data.bValid = TRUE;
+			m_layDesks->AddAt(pDesk, j);
+		}
 	}
-
-//#if TEST_FLAG
-//	CListTextElementUI * pItem = new CListTextElementUI;
-//	m_lstClasses->Add(pItem);
-//	pItem->SetText(0, "六年级1班"); 
-//	pItem = new CListTextElementUI;
-//	m_lstClasses->Add(pItem);
-//	pItem->SetText(0, "六年级2班"); 
-//#endif
 
 	WindowImplBase::InitWindow(); 
 }
@@ -98,11 +94,44 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if (msg.sType == "myselected") {
+		OnDeskHighlight(msg.pSender->GetTag());
+	}
+	else if (msg.sType == "myunselected") {
+		OnDeskUnHighlight(msg.pSender->GetTag());
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
+}
+
+void  CDuiFrameWnd::OnDeskHighlight(DWORD dwTag) {
+	if ( m_dwHighlightIndex > 0 ) {
+		CDeskUI * pDesk = GetDeskUI(m_dwHighlightIndex);
+		pDesk->SetHighlight(FALSE);
+	}
+	m_dwHighlightIndex = dwTag;
+	CDeskUI * pDesk = GetDeskUI(dwTag);
+	pDesk->SetHighlight(TRUE);
+}
+
+void  CDuiFrameWnd::OnDeskUnHighlight(DWORD dwTag) {
+	CDeskUI * pDesk = GetDeskUI(dwTag);
+	pDesk->SetHighlight(FALSE);
+	if (dwTag == m_dwHighlightIndex) {
+		m_dwHighlightIndex = 0;
+	}
+}
+
+CDeskUI *  CDuiFrameWnd::GetDeskUI(DWORD  dwTag) {
+	DWORD i = HIWORD(dwTag);
+	DWORD j = LOWORD(dwTag);
+	assert(i <= g_data.m_dwRoomRows && i > 0 );
+	assert(j <= g_data.m_dwRoomCols && j > 0 );
+	CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt( (g_data.m_dwRoomRows - i) * g_data.m_dwRoomCols + j - 1 );
+	return pDesk;
 }
 
                 
