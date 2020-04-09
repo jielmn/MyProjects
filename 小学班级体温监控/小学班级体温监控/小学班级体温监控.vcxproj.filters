@@ -27,6 +27,9 @@
     <ClCompile Include="MyControls.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MyDb.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="business.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MyControls.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyDb.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

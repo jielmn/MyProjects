@@ -56,19 +56,20 @@ void  CDuiFrameWnd::InitWindow() {
 		pRowUi->SetAttribute("align", "center");
 	}
 
-#if TEST_FLAG
-	CListTextElementUI * pItem = new CListTextElementUI;
-	m_lstClasses->Add(pItem);
-	pItem->SetText(0, "六年级1班"); 
-	pItem = new CListTextElementUI;
-	m_lstClasses->Add(pItem);
-	pItem->SetText(0, "六年级2班"); 
-
-	for (DWORD i = 0; i < 48; i++) {
-		CDeskUI * p = new CDeskUI;		
-		m_layDesks->Add(p);  
+	DWORD  dwCnt = g_data.m_dwRoomRows * g_data.m_dwRoomCols;
+	for (DWORD i = 0; i < dwCnt; i++) {
+		CDeskUI * pDesk = new CDeskUI;
+		m_layDesks->Add(pDesk);   
 	}
-#endif
+
+//#if TEST_FLAG
+//	CListTextElementUI * pItem = new CListTextElementUI;
+//	m_lstClasses->Add(pItem);
+//	pItem->SetText(0, "六年级1班"); 
+//	pItem = new CListTextElementUI;
+//	m_lstClasses->Add(pItem);
+//	pItem->SetText(0, "六年级2班"); 
+//#endif
 
 	WindowImplBase::InitWindow(); 
 }

@@ -73,6 +73,7 @@ int CBusiness::Init() {
 	STRNCPY(g_data.m_aszChNo[8], "¾Å", 6);
 	STRNCPY(g_data.m_aszChNo[9], "Ê®", 6);
 
+	m_db.InitDb();
 
 	g_data.m_thrd_db = new LmnToolkits::Thread();
 	if (0 == g_data.m_thrd_db) {
@@ -92,6 +93,8 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+
+	m_db.DeinitDb();
 	return 0;
 }
 

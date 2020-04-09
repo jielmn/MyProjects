@@ -20,6 +20,16 @@
 #define  TEST_FLAG     1
 #endif
 
+typedef  struct  tagDeskItem{
+	int     nRow;
+	int     nCol;
+	char    szName[12];
+	int     nSex;
+	char    szTagId[20];
+	int     nTemp;
+	time_t  time;
+}DeskItem;
+
 
 class  CGlobalData {
 public:
