@@ -59,9 +59,9 @@ int CBusiness::Init() {
 		g_data.m_dwRoomCols = 8;
 	}
 
-	g_data.m_DeskSize.cx = 92;                          
-	g_data.m_DeskSize.cy = 88;           
-
+	g_data.m_DeskSize.cx = 94;                           
+	g_data.m_DeskSize.cy = 88;               
+	         
 	STRNCPY(g_data.m_aszChNo[0], "Ò»", 6);
 	STRNCPY(g_data.m_aszChNo[1], "¶þ", 6);
 	STRNCPY(g_data.m_aszChNo[2], "Èý", 6);

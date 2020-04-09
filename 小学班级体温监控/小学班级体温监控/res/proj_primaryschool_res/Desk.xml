@@ -9,14 +9,17 @@
 			</VerticalLayout>			
 			<Label text="张三南北" font="3" textcolor="#FF447AA1" />
 		</HorizontalLayout>	
-		<HorizontalLayout height="16">
-			<Label text="36.5℃" align="center" font="2" textcolor="#FF447AA1" />
+		<HorizontalLayout height="16" inset="0,0,0,0">
+			<Label text="36.5℃" align="center" font="2" textcolor="#FF447AA1" />			
 		</HorizontalLayout>
-		<HorizontalLayout height="8" />
-		<HorizontalLayout height="16">
-			<Control />
+		<HorizontalLayout height="16" inset="4,0,0,0">
+			<Label text="2020-04-12" align="left" font="2" textcolor="#FF447AA1" />
+		</HorizontalLayout>
+		<HorizontalLayout height="16" inset="4,0,0,0">
+			<Label text="09:00" align="left" font="2" textcolor="#FF447AA1" />
+			<Control bkimage="warning.png" width="30" height="30" />
 			<Button name="btnDelDesk" width="16" height="16" bordercolor="#FF768D9B" bordersize="0" textcolor="#FF447AA1" foreimage="del.png" normalimage="toolbar_normal.png" hotimage="toolbar_hover.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" />
-			<Control />
+			<Control width="4" />
 		</HorizontalLayout>		
 		<HorizontalLayout height="6" />
 	</VerticalLayout>
