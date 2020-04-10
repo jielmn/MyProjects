@@ -12,6 +12,7 @@ public:
 	~CDeskUI();
 	void  SetHighlight(BOOL bHighlight);
 	BOOL  IsHighlight();
+	void  SetValid(BOOL bValid);
 
 private:
 	LPCTSTR GetClass() const;

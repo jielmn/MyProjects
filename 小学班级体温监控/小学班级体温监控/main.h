@@ -48,6 +48,7 @@ public:
 	DeskItem         m_data;
 	CEditUI *        m_edName;
 	COptionUI *      m_opBoy;
+	COptionUI *      m_opGirl;
 };
 
 class CDuiFrameWnd : public WindowImplBase

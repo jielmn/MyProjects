@@ -311,6 +311,25 @@ void   CDuiFrameWnd::OnDeskDbClick(CDeskUI * pDeskUI) {
 		return;
 	}
 
+	// 清除Desk
+	if (pDlg->m_data.szName[0] == '\0') {
+		if ( pDeskUI->m_data.bValid ) {
+			pDeskUI->SetValid(FALSE);
+		}
+	}
+	// 增加学生
+	else {
+		// 如果名字不同，认为修改
+		if ( 0 != strcmp(pDeskUI->m_data.szName, pDlg->m_data.szName) ) {
+
+		}
+		memset(&pDeskUI->m_data, 0, sizeof(DeskItem));
+		STRNCPY(pDeskUI->m_data.szName, pDlg->m_data.szName, sizeof(pDeskUI->m_data.szName));
+		pDeskUI->m_data.nSex = pDlg->m_data.nSex;
+		pDeskUI->m_data.bValid = TRUE;
+		pDeskUI->UpdateUI();
+	}
+
 	delete pDlg;
 }
                 
@@ -391,6 +410,7 @@ CDeskDlg::CDeskDlg() {
 
 	m_edName = 0;
 	m_opBoy = 0;
+	m_opGirl = 0;
 }
 
 void   CDeskDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -398,15 +418,35 @@ void   CDeskDlg::Notify(DuiLib::TNotifyUI& msg) {
 	if (msg.sType == "click") {
 		if (strName == "btnOK") {
 			CDuiString  strText;
+			strText = m_edName->GetText();
+			strText.Trim();
+			STRNCPY(m_data.szName, strText, sizeof(m_data.szName));
+			if (m_opBoy->IsSelected()) {
+				m_data.nSex = 1;
+			}
+			else {
+				m_data.nSex = 0;
+			}
+			this->PostMessage(WM_CLOSE);
 		}
 	}
 	WindowImplBase::Notify(msg);
 }
 
 void   CDeskDlg::InitWindow() {
-	m_edName = 0;
-	m_opBoy = 0;
+	m_edName = static_cast<DuiLib::CEditUI*>(m_PaintManager.FindControl("edName"));
+	m_opBoy  = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl("radio1"));
+	m_opGirl = static_cast<DuiLib::COptionUI*>(m_PaintManager.FindControl("radio2"));
 
+	if (m_data.bValid) {
+		m_edName->SetText(m_data.szName);
+		if (1 == m_data.nSex)
+			m_opBoy->Selected(true);
+		else
+			m_opGirl->Selected(true);
+	}
+	
+	m_edName->SetFocus();
 	WindowImplBase::InitWindow();
 }
 

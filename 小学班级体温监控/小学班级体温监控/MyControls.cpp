@@ -141,3 +141,11 @@ void  CDeskUI::SetHighlight(BOOL bHighlight) {
 BOOL  CDeskUI::IsHighlight() {
 	return m_bHighlight;
 }
+
+void  CDeskUI::SetValid(BOOL bValid) {
+	m_data.bValid = bValid;
+	if ( !bValid ) {
+		memset(&m_data, 0, sizeof(m_data));
+	}
+	UpdateUI();
+}
