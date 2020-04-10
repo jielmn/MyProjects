@@ -11,6 +11,7 @@ public:
 
 	BOOL AddClass(const CAddClassParam * pParam);
 	void GetAllClasses(std::vector<DWORD> & vRet);
+	void GetRoomData(const CGetRoomParam * pParam, std::vector<DeskItem*> & vRet);
 
 private:
 	// szTableName: 要创建的表名

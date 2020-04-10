@@ -23,6 +23,9 @@ public:
 	void   GetAllClassesAsyn();
 	void   GetAllClasses();
 
+	void   GetRoomDataAsyn(DWORD dwNo);
+	void   GetRoomData(const CGetRoomParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

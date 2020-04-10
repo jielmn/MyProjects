@@ -117,6 +117,16 @@ void   CBusiness::GetAllClasses() {
 	::PostMessage(g_data.m_hWnd, UM_GET_ALL_CLASSES_RET, (WPARAM)pvRet, 0);
 }
 
+void  CBusiness::GetRoomDataAsyn(DWORD dwNo) {
+	g_data.m_thrd_db->PostMessage(this, MSG_GET_ROOM, new CGetRoomParam(dwNo));
+}
+
+void  CBusiness::GetRoomData(const CGetRoomParam * pParam) {
+	std::vector<DeskItem*> * pvRet = new std::vector<DeskItem*>;
+	m_db.GetRoomData(pParam, *pvRet);
+	::PostMessage(g_data.m_hWnd, UM_GET_ROOM_RET, (WPARAM)pvRet, pParam->m_dwNo);
+}
+
 
 
 // 消息处理
@@ -133,6 +143,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_GET_ALL_CLASSES:
 	{
 		GetAllClasses();
+	}
+	break;
+
+	case MSG_GET_ROOM:
+	{
+		CGetRoomParam * pParam = (CGetRoomParam *)pMessageData;
+		GetRoomData(pParam);
 	}
 	break;
 

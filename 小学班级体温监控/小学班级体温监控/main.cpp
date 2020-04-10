@@ -118,6 +118,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnDelClass();
 		}
 	}
+	else if (msg.sType == "itemselect") {
+		UpdateRoom();
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -130,6 +133,13 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		std::sort(m_vClasses.begin(), m_vClasses.end(), sortDWord );
 		UpdateClasses();
+	}
+	else if ( uMsg == UM_GET_ROOM_RET ) {
+		std::vector<DeskItem*> * pvRet = (std::vector<DeskItem*> *)wParam;
+		DWORD   dwNo = lParam;
+
+		ClearVector(*pvRet);
+		delete pvRet;
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -229,7 +239,7 @@ void  CDuiFrameWnd::UpdateClasses() {
 		for (i = 0; i < nCnt; i++) {
 			CListTextElementUI * pItem = (CListTextElementUI *)m_lstClasses->GetItemAt(i);
 			if (pItem->GetTag() == dwOldSelNo) {
-				m_lstClasses->SelectItem(i);
+				m_lstClasses->SelectItem(i, false, false);
 				break;
 			}
 		}
@@ -237,14 +247,27 @@ void  CDuiFrameWnd::UpdateClasses() {
 		// 如果没有找到
 		if ( i >= nCnt ) {
 			if (nCnt > 0) {
-				m_lstClasses->SelectItem(0);
+				m_lstClasses->SelectItem(0, false, false);
 			}
 		}
 	}
 	else {
 		if ( nCnt > 0 ) {
-			m_lstClasses->SelectItem(0);
+			m_lstClasses->SelectItem(0, false, false);
 		}
+	}
+
+	UpdateRoom();
+}
+
+void   CDuiFrameWnd::UpdateRoom() {
+	int nSel = m_lstClasses->GetCurSel();
+	if (nSel < 0) {
+		m_layRoom->SetVisible(false);
+	}
+	else {
+		DWORD  dwNo = m_lstClasses->GetItemAt(nSel)->GetTag();
+		CBusiness::GetInstance()->GetRoomDataAsyn(dwNo);
 	}
 }
 

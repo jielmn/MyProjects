@@ -95,11 +95,53 @@ void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet) {
 
 	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
 	char **azResult = 0;          // 二维数组存放结果
-								  //char *zErrMsg = 0;          // 错误描述
+
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for ( int i = 0; i < nrow; i++ ) {
 		DWORD dwNo = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
 		vRet.push_back(dwNo);
+	}
+	sqlite3_free_table(azResult);
+}
+
+void  CMySqliteDatabase::GetRoomData(const CGetRoomParam * pParam, std::vector<DeskItem*> & vRet) {
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE class_id = %lu", ROOMS_TABLE, pParam->m_dwNo);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	char szName[256];
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		DWORD  dwPos = GetIntFromDb(azResult[(i + 1)*ncolumn + 1]);
+		DWORD  dwRow = HIWORD(dwPos);
+		DWORD  dwCol = LOWORD(dwPos);
+
+		if (0 == dwRow || dwRow > g_data.m_dwRoomRows) {
+			continue;
+		}
+
+		if (0 == dwCol || dwCol > g_data.m_dwRoomCols) {
+			continue;
+		}
+
+		DeskItem * pItem = new DeskItem;
+		memset(pItem, 0, sizeof(DeskItem));
+
+		pItem->nRow = dwRow;
+		pItem->nCol = dwCol;
+		pItem->bValid = TRUE;
+
+		GetStrFromdDb(szName, sizeof(szName), azResult[(i + 1)*ncolumn +2]);
+		Utf8ToAnsi(pItem->szName, sizeof(pItem->szName), szName);
+		
+		pItem->nSex = GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+		GetStrFromdDb(pItem->szTagId, sizeof(pItem->szTagId), azResult[(i + 1)*ncolumn + 4]);
+		pItem->nTemp = GetIntFromDb(azResult[(i + 1)*ncolumn + 5]);
+		pItem->time  = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 6]);
+
+		vRet.push_back(pItem);
 	}
 	sqlite3_free_table(azResult);
 }

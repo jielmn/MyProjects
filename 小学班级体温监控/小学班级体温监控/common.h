@@ -23,9 +23,11 @@
 
 #define   MSG_ADD_CLASS             100
 #define   MSG_GET_ALL_CLASSES       101
+#define   MSG_GET_ROOM              102
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
+#define   UM_GET_ROOM_RET           (WM_USER + 3)
 
 typedef  struct  tagDeskItem{
 	int     nGrade;
@@ -77,6 +79,15 @@ public:
 	DWORD   m_dwGrade;
 	DWORD   m_dwClass;
 };
+
+class CGetRoomParam : public LmnToolkits::MessageData {
+public:
+	CGetRoomParam(DWORD  dwNo) {
+		m_dwNo = dwNo;
+	}
+	DWORD   m_dwNo;
+};
+
 
 
 

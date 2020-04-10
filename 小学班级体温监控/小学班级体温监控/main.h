@@ -77,5 +77,6 @@ private:
 	void   OnAddClass();
 	void   OnDelClass();
 	void   UpdateClasses();
+	void   UpdateRoom();
 
 };
