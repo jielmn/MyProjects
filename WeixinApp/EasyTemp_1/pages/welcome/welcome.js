@@ -28,27 +28,9 @@ Page({
         */
         return;
       }
-
-      if ( !(app.lat && app.lng) ) {
-        return;
-      }
       
-      wx.getUserInfo({
-        success:function(res){
-          wx.switchTab({
-            url: '../thermo/thermo'
-          })
-        },
-        fail:function(res) {
-          /*
-          wx.showToast({
-            title: '获取用户信息失败',
-            icon:'none',
-            duration: 2000
-          })
-          */
-          return;
-        }
+      wx.switchTab({
+        url: '../thermo/thermo'
       })
     }, 5000)
   },
@@ -105,6 +87,7 @@ Page({
   onStart: function(e) {
     app.log("onStart");
     
+    /*
     if ( e.detail.errMsg != "getUserInfo:ok") {
       wx.showToast({
         title: '获取用户信息失败',
@@ -113,6 +96,7 @@ Page({
       })
       return;
     }
+    */
 
     if ( !app.globalData.openid ) {
       wx.showToast({
@@ -123,6 +107,7 @@ Page({
       return;
     }
 
+    /*
     if (!(app.lat && app.lng)) {
       wx.showToast({
         title: '请稍候，正在获取位置信息',
@@ -130,7 +115,7 @@ Page({
         duration: 2000
       })
       return;
-    }
+    }*/
 
     wx.switchTab({
       url: '../thermo/thermo'

@@ -12,8 +12,8 @@ App({
   uploadTemperatureCallback:null,
   isBluetoothStoped: true,
   uploadMinTemperature: 35.0,
-  lat: null,
-  lng: null,
+  lat: 0,
+  lng: 0,
   discoveryTimeout:6000,
   lastDeviceId:null,
   parseCodeCallback:null,
@@ -43,6 +43,8 @@ App({
     devices: null,
     device: null
   },
+
+  userLocation:0,
 
   onLaunch: function() {
     // 保存变量
@@ -79,6 +81,7 @@ App({
     // 获取用户信息
     wx.getSetting({
       success: res => {
+        /*
         if (res.authSetting['scope.userInfo']) {
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           wx.getUserInfo({
@@ -94,19 +97,32 @@ App({
             }
           })
         }
+        */
+
+        if (res.authSetting['scope.userLocation']) {
+          app_obj.userLocation = 2;
+          wx.getLocation({
+            type: 'gcj02',
+            isHighAccuracy: true,
+            highAccuracyExpireTime: 5000,
+            success(res) {
+              app_obj.log("get location", res);
+              app_obj.lat = res.latitude;
+              app_obj.lng = res.longitude;
+            }
+          })
+        } else {
+          if (res.authSetting['scope.userLocation'] == null ) {
+            app_obj.userLocation = 0;
+          } else {
+            app_obj.userLocation = 1;
+          }
+        }
+
       }
     })
 
-    wx.getLocation({
-      type: 'gcj02',
-      isHighAccuracy: true,
-      highAccuracyExpireTime:5000,
-      success(res) {
-        app_obj.log("get location", res);
-        app_obj.lat = res.latitude;
-        app_obj.lng = res.longitude;
-      }
-    })
+    
   },
 
   // 获取open_id

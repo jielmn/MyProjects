@@ -5,6 +5,7 @@ Page({
   data: {
     userInfo: {},
     hasUserInfo: false,
+    userLocation:false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     members: [],
     hidden: true,
@@ -46,6 +47,10 @@ Page({
         }
       })
     }
+
+    this.setData({
+      userLocation: app.userLocation == 2
+    })
 
     this.setData({
       members: app.globalData.members
@@ -193,6 +198,57 @@ Page({
     this.setData({
       hidden2: !this.data.hidden2
     })    
+  },
+
+  onlogin:function() {
+    var that = this;
+
+    if ( app.userLocation == 0 ) {
+      wx.getLocation({
+        type: 'gcj02',
+        isHighAccuracy: true,
+        highAccuracyExpireTime: 5000,
+        success(res) {
+          app.userLocation = 2;
+          app.log("get location", res);
+          app.lat = res.latitude;
+          app.lng = res.longitude;
+
+          that.setData({
+            userLocation:true
+          })
+        },
+        fail(res) {
+          app.userLocation = 1;
+        }
+      })
+    } else {
+      wx.openSetting({      
+        success: res => {
+          if (res.authSetting['scope.userLocation']) {
+            app.userLocation = 2;
+            that.setData({
+              userLocation: true
+            })
+            wx.getLocation({
+              type: 'gcj02',
+              isHighAccuracy: true,
+              highAccuracyExpireTime: 5000,
+              success(res) {
+                app.log("get location", res);
+                app.lat = res.latitude;
+                app.lng = res.longitude;
+              }
+            })
+          }
+        }
+      })
+    }
+    
+
+
+    
+
   }
 
 })
