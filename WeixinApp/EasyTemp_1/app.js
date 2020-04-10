@@ -308,7 +308,7 @@ App({
       })
 
       if (0 == foundCount) {
-        app.log('not found reader: ' + readerName, res);
+        // app.log('not found reader: ' + readerName, res);
       }
 
     })
@@ -368,13 +368,16 @@ App({
 
   getNearestDevice() {
     var devices = this.globalData.devices;
+    var lastDeviceId = this.lastDeviceId.toLowerCase();
     var foundDevice = null;
+
     devices.forEach(device => {
-      if (device.deviceId.toLowerCase() == this.lastDeviceId) {
+      if (device.deviceId.toLowerCase() == lastDeviceId) {
         foundDevice = device;
       }
     })
     
+    this.log('devices:', devices);
     this.log('last device id:' + this.lastDeviceId);
     this.log('foundDevice:', foundDevice);
 
