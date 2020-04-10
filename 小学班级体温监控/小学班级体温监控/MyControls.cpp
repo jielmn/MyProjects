@@ -59,6 +59,9 @@ void CDeskUI::DoEvent(DuiLib::TEventUI& event) {
 			m_pManager->SendNotify(this, "myunselected");
 		}
 	}
+	else if (event.Type == UIEVENT_DBLCLICK) {
+		m_pManager->SendNotify(this, "mydbclick");
+	}
 	CContainerUI::DoEvent(event);
 }
 

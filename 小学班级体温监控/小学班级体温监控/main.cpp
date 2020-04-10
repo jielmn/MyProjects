@@ -121,6 +121,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "itemselect") {
 		UpdateRoom();
 	}
+	else if (msg.sType == "mydbclick") {
+		OnDeskDbClick((CDeskUI*)msg.pSender);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -292,6 +295,24 @@ void   CDuiFrameWnd::UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo) {
 		pDesk->UpdateUI();
 	}
 }
+
+void   CDuiFrameWnd::OnDeskDbClick(CDeskUI * pDeskUI) {
+
+	CDeskDlg * pDlg = new CDeskDlg;
+	memcpy(&pDlg->m_data, &pDeskUI->m_data, sizeof(DeskItem));
+
+	pDlg->Create(this->m_hWnd, _T("学生"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();          
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pDlg;
+		return;
+	}
+
+	delete pDlg;
+}
                 
 
 CAddClassDlg::CAddClassDlg() {
@@ -362,6 +383,40 @@ DuiLib::CControlUI * CAddClassDlg::CreateControl(LPCTSTR pstrClass) {
 }
 
 
+
+
+CDeskDlg::CDeskDlg() {
+	memset( &m_data, 0, sizeof(m_data) );
+	m_data.nSex = 1;
+
+	m_edName = 0;
+	m_opBoy = 0;
+}
+
+void   CDeskDlg::Notify(DuiLib::TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+	if (msg.sType == "click") {
+		if (strName == "btnOK") {
+			CDuiString  strText;
+		}
+	}
+	WindowImplBase::Notify(msg);
+}
+
+void   CDeskDlg::InitWindow() {
+	m_edName = 0;
+	m_opBoy = 0;
+
+	WindowImplBase::InitWindow();
+}
+
+LRESULT  CDeskDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+}
+
+DuiLib::CControlUI * CDeskDlg::CreateControl(LPCTSTR pstrClass) {
+	return WindowImplBase::CreateControl(pstrClass);
+}
 
 
 

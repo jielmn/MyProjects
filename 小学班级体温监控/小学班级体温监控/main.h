@@ -30,6 +30,26 @@ public:
 	DWORD                      m_dwClassNo;
 };
 
+class CDeskDlg : public DuiLib::WindowImplBase
+{
+public:
+	CDeskDlg();
+
+	virtual LPCTSTR    GetWindowClassName() const { return "DUIDeskFrame"; }
+	virtual DuiLib::CDuiString GetSkinFile() { return "DeskDlg.xml"; }
+	virtual DuiLib::CDuiString GetSkinFolder() { return SKIN_FOLDER; }
+
+	virtual void   Notify(DuiLib::TNotifyUI& msg);
+	virtual void   InitWindow();
+	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
+public:
+	DeskItem         m_data;
+	CEditUI *        m_edName;
+	COptionUI *      m_opBoy;
+};
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -79,6 +99,7 @@ private:
 	void   UpdateClasses();
 	void   UpdateRoom();
 	void   UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo);
+	void   OnDeskDbClick(CDeskUI * pDeskUI);
 
 };
 
