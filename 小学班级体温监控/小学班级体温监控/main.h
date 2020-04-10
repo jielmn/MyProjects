@@ -78,5 +78,25 @@ private:
 	void   OnDelClass();
 	void   UpdateClasses();
 	void   UpdateRoom();
+	void   UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo);
 
+};
+
+class CFindDeskObj {
+public:
+	CFindDeskObj(DWORD  dwPos) {
+		m_dwRow = HIWORD(dwPos);
+		m_dwCol = LOWORD(dwPos);
+	}
+
+	bool operator() (DeskItem * pItem) {
+		if ( pItem->nCol == m_dwCol && pItem->nRow == m_dwRow ) {
+			return true;
+		}
+		return false;
+	}
+
+private:
+	DWORD   m_dwRow;
+	DWORD   m_dwCol;
 };

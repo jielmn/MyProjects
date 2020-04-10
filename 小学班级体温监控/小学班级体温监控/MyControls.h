@@ -33,6 +33,6 @@ public:
 	DeskItem                             m_data;
 	BOOL                                 m_bHighlight;
 
-private:
+public:
 	void                                 UpdateUI();
 };

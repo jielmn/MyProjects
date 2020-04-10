@@ -138,6 +138,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		std::vector<DeskItem*> * pvRet = (std::vector<DeskItem*> *)wParam;
 		DWORD   dwNo = lParam;
 
+		UpdateRoom1(*pvRet, dwNo);
+
 		ClearVector(*pvRet);
 		delete pvRet;
 	}
@@ -271,6 +273,25 @@ void   CDuiFrameWnd::UpdateRoom() {
 	}
 }
 
+void   CDuiFrameWnd::UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo) {
+	m_layRoom->SetVisible(true);
+
+	int nCnt = m_layDesks->GetCount();
+	assert(nCnt == g_data.m_dwRoomCols * g_data.m_dwRoomRows);
+	std::vector<DeskItem*>::iterator it;
+
+	for (int i = 0; i < nCnt; i++) {
+		CDeskUI * pDesk = (CDeskUI * )m_layDesks->GetItemAt(i);
+		DWORD dwPos = pDesk->GetTag();		
+		it = std::find_if(vRet.begin(), vRet.end(), CFindDeskObj(dwPos) );
+		if (it == vRet.end()) {
+			continue;
+		}
+
+		memcpy(&pDesk->m_data, *it, sizeof(DeskItem));
+		pDesk->UpdateUI();
+	}
+}
                 
 
 CAddClassDlg::CAddClassDlg() {
