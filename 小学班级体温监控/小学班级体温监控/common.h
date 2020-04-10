@@ -78,10 +78,13 @@ public:
 	DWORD   m_dwClass;
 };
 
+
+
 extern CGlobalData  g_data;
 
 extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
 extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
+extern bool sortDWord(DWORD d1, DWORD d2);
 
 // templates
 template <class T>

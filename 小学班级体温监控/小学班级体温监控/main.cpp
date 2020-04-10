@@ -127,6 +127,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		std::vector<DWORD> * pvRet = (std::vector<DWORD>*)wParam;
 		std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_vClasses));
 		delete pvRet;
+
+		std::sort(m_vClasses.begin(), m_vClasses.end(), sortDWord );
+		UpdateClasses();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -177,8 +180,72 @@ void   CDuiFrameWnd::OnAddClass() {
 	delete pDlg;
 }
 
-void   CDuiFrameWnd::OnDelClass() {
+void  CDuiFrameWnd::OnDelClass() {
 
+}
+
+void  CDuiFrameWnd::UpdateClasses() {
+	int nCnt = (int)m_vClasses.size();
+	int nUiCnt = m_lstClasses->GetCount();
+	int nDiff = 0;
+
+	DWORD dwOldSelNo = 0;
+	int nOldSel = m_lstClasses->GetCurSel();
+	if ( nOldSel >= 0 ) {
+		dwOldSelNo = m_lstClasses->GetItemAt(nOldSel)->GetTag();
+	}
+
+	if ( nCnt > nUiCnt ) {
+		nDiff = nCnt - nUiCnt;
+		for (int i = 0; i < nDiff; i++) {
+			CListTextElementUI * pItem = new CListTextElementUI;
+			m_lstClasses->Add(pItem);
+		}
+	}
+	else if (nCnt < nUiCnt) {
+		nDiff = nUiCnt - nCnt;
+		for (int i = 0; i < nDiff; i++) {
+			m_lstClasses->RemoveAt(0);
+		}
+	}
+
+	CDuiString strText;
+	for (int i = 0; i < nCnt; i++) {
+		DWORD  dwNo    = m_vClasses[i];
+		DWORD  dwGrade = HIWORD(dwNo);
+		DWORD  dwClass = LOWORD(dwNo);
+
+		assert(dwGrade > 0 && dwGrade <= 6);
+		assert(dwClass > 0 && dwClass <= 10);
+
+		strText.Format("%s年级%d班", g_data.m_aszChNo[dwGrade-1], dwClass);
+		CListTextElementUI * pItem = (CListTextElementUI *)m_lstClasses->GetItemAt(i);
+		pItem->SetText(0, strText);
+		pItem->SetTag(dwNo);
+	}
+
+	if ( dwOldSelNo > 0 ) {
+		int i = 0;
+		for (i = 0; i < nCnt; i++) {
+			CListTextElementUI * pItem = (CListTextElementUI *)m_lstClasses->GetItemAt(i);
+			if (pItem->GetTag() == dwOldSelNo) {
+				m_lstClasses->SelectItem(i);
+				break;
+			}
+		}
+
+		// 如果没有找到
+		if ( i >= nCnt ) {
+			if (nCnt > 0) {
+				m_lstClasses->SelectItem(0);
+			}
+		}
+	}
+	else {
+		if ( nCnt > 0 ) {
+			m_lstClasses->SelectItem(0);
+		}
+	}
 }
 
                 

@@ -76,5 +76,6 @@ private:
 	CDeskUI *  GetDeskUI(DWORD  dwTag);
 	void   OnAddClass();
 	void   OnDelClass();
+	void   UpdateClasses();
 
 };

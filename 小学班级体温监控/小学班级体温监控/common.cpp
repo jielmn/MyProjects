@@ -19,3 +19,7 @@ char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue) {
 		buf[0] = '\0';
 	return buf;
 }
+
+bool sortDWord(DWORD d1, DWORD d2) {
+	return d1 < d2;
+}
