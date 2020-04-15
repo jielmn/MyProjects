@@ -12,8 +12,8 @@
 					<Control bkimage="tag_1.png" width="64" height="64" />
 				<Control />
 			</VerticalLayout>	
-			<Label text="36.5℃" textcolor="#FF447AA1" font="2" width="60" name="lblTemp"  />			
-			<Label text="2020-01-01 09:00:00" textcolor="#FF447AA1" font="2" width="220" name="lblTime"  />					
+			<Label text="未测量" textcolor="#FF447AA1" font="2" width="60" name="lblTemp"  />			
+			<Label text="" textcolor="#FF447AA1" font="2" width="220" name="lblTime"  />					
 		</VerticalLayout>	
 		
 	</VerticalLayout>

@@ -35,6 +35,9 @@ public:
 	void   DeleteClassAsyn(DWORD  dwClassNo);
 	void   DeleteClass(const CDeleteClassParam * pParam);
 
+	void   ExchangeDeskAsyn(DWORD  dwClassNo, DWORD  dwPos1, DWORD  dwPos2);
+	void   ExchangeDesk(const CExchangeDeskParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

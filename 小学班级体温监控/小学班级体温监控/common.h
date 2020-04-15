@@ -30,6 +30,7 @@
 #define   MSG_MODIFY_DESK           103
 #define   MSG_EMPTY_DESK            104
 #define   MSG_DELETE_CLASS          105
+#define   MSG_EXCHANGE_DESK         106
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
@@ -37,6 +38,7 @@
 #define   UM_MODIFY_DESK_RET        (WM_USER + 4)
 #define   UM_EMPTY_DESK_RET         (WM_USER + 5)
 #define   UM_DELETE_CLASS_RET       (WM_USER + 6)
+#define   UM_EXCHANGE_DESK_RET      (WM_USER + 7)
 
 typedef  struct  tagDeskItem{
 	int     nGrade;
@@ -127,6 +129,18 @@ public:
 		m_dwNo = dwClassNo;
 	}
 	DWORD   m_dwNo;
+};
+
+class CExchangeDeskParam : public LmnToolkits::MessageData {
+public:
+	CExchangeDeskParam(DWORD  dwClassNo, DWORD  dwPos1, DWORD  dwPos2) {
+		m_dwNo = dwClassNo;
+		m_dwPos1 = dwPos1;
+		m_dwPos2 = dwPos2;
+	}
+	DWORD   m_dwNo;
+	DWORD   m_dwPos1;
+	DWORD   m_dwPos2;
 };
 
 

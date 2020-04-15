@@ -162,6 +162,17 @@ void  CBusiness::DeleteClass(const CDeleteClassParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_DELETE_CLASS_RET, pParam->m_dwNo, 0);
 }
 
+void  CBusiness::ExchangeDeskAsyn(DWORD  dwClassNo, DWORD  dwPos1, DWORD  dwPos2) {
+	g_data.m_thrd_db->PostMessage(this, MSG_EXCHANGE_DESK, new CExchangeDeskParam(dwClassNo, dwPos1, dwPos2));
+}
+ 
+void  CBusiness::ExchangeDesk(const CExchangeDeskParam * pParam) {
+	DeskItem * pDesk1 = new DeskItem;
+	DeskItem * pDesk2 = new DeskItem;
+	m_db.ExchangeDesk(pParam, *pDesk1, *pDesk2); 
+	::PostMessage(g_data.m_hWnd, UM_EXCHANGE_DESK_RET, (WPARAM)pDesk1, (LPARAM)pDesk2);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -205,6 +216,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CDeleteClassParam * pParam = (CDeleteClassParam *)pMessageData;
 		DeleteClass(pParam);
+	}
+	break;
+
+	case MSG_EXCHANGE_DESK:
+	{
+		CExchangeDeskParam * pParam = (CExchangeDeskParam *)pMessageData;
+		ExchangeDesk(pParam);
 	}
 	break;
 

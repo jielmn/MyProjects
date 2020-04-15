@@ -15,6 +15,7 @@ public:
 	void ModifyDesk(const CModifyDeskParam * pParam);
 	void EmptyDesk(const CEmptyDeskParam * pParam);
 	void DeleteClass(const CDeleteClassParam * pParam);
+	void ExchangeDesk(const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2);
 
 private:
 	// szTableName: 要创建的表名

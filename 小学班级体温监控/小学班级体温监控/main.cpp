@@ -204,6 +204,30 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			UpdateClasses();
 		}
 	}
+	else if (uMsg == UM_EXCHANGE_DESK_RET) {
+		DeskItem* pDesk1 = (DeskItem*)wParam;
+		DeskItem* pDesk2 = (DeskItem*)lParam;
+
+		assert(pDesk1->nRow > 0 && pDesk1->nRow <= (int)g_data.m_dwRoomRows);
+		assert(pDesk1->nCol > 0 && pDesk1->nCol <= (int)g_data.m_dwRoomCols);
+		assert(pDesk2->nRow > 0 && pDesk2->nRow <= (int)g_data.m_dwRoomRows);
+		assert(pDesk2->nCol > 0 && pDesk2->nCol <= (int)g_data.m_dwRoomCols);
+
+		DWORD  dwUiRow = g_data.m_dwRoomRows - pDesk1->nRow;
+		CDeskUI * pDeskUI = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + pDesk1->nCol - 1);
+		assert(pDeskUI);
+		memcpy(&pDeskUI->m_data, pDesk1, sizeof(DeskItem));
+		pDeskUI->UpdateUI();
+
+		dwUiRow = g_data.m_dwRoomRows - pDesk2->nRow;
+		pDeskUI = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + pDesk2->nCol - 1);
+		assert(pDeskUI);
+		memcpy(&pDeskUI->m_data, pDesk2, sizeof(DeskItem));
+		pDeskUI->UpdateUI();
+
+		delete pDesk1;
+		delete pDesk2;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -250,8 +274,13 @@ void  CDuiFrameWnd::OnStopMoveDesk() {
 	if (m_dragdrop_desk.m_highlight) {
 		m_dragdrop_desk.m_highlight->SetHighlightBorder(FALSE);
 
-		//int nBedNo = m_HightLightItem->GetBedNo();
-		//CBusiness::GetInstance()->CubeBindingTagAsyn(nBedNo, m_cur_tag.szTagId);
+		int nSel = m_lstClasses->GetCurSel();
+		assert(nSel >= 0);
+		DWORD  dwNo   = m_lstClasses->GetItemAt(nSel)->GetTag();
+		DWORD  dwPos1 = m_dragdrop_desk.m_source->GetTag();
+		DWORD  dwPos2 = m_dragdrop_desk.m_highlight->GetTag();
+
+		CBusiness::GetInstance()->ExchangeDeskAsyn(dwNo, dwPos1, dwPos2);
 
 		m_dragdrop_desk.m_highlight = 0;
 	}

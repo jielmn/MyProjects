@@ -193,3 +193,83 @@ void  CMySqliteDatabase::DeleteClass(const CDeleteClassParam * pParam) {
 		CLASSES_TABLE, pParam->m_dwNo);
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
 }
+
+void  CMySqliteDatabase::ExchangeDesk(const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2) {
+	char  szSql[8192];
+	int nrow = 0, ncolumn = 0;
+	char **azResult = 0;      
+	char  szName[256];
+
+	memset(&desk1, 0, sizeof(DeskItem));
+	memset(&desk2, 0, sizeof(DeskItem));
+
+	// 取得第一个desk数据
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE class_id=%lu AND position=%lu", 
+		ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos1);
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	if ( nrow > 0 ) {
+		desk1.bValid = TRUE;
+		GetStrFromdDb(szName, sizeof(szName), azResult[ncolumn + 2]);
+		Utf8ToAnsi(desk1.szName, sizeof(desk1.szName), szName);
+		desk1.nSex = GetIntFromDb(azResult[ncolumn + 3]);
+		GetStrFromdDb(desk1.szTagId, sizeof(desk1.szTagId), azResult[ncolumn + 4]);
+		desk1.nTemp = GetIntFromDb(azResult[ncolumn + 5]);
+		desk1.time = (time_t)GetIntFromDb(azResult[ncolumn + 6]);
+	}
+	sqlite3_free_table(azResult);
+
+	// 取得第二个desk数据
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE class_id=%lu AND position=%lu",
+		ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos2);
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	if (nrow > 0) {
+		desk2.bValid = TRUE;
+		GetStrFromdDb(szName, sizeof(szName), azResult[ncolumn + 2]);
+		Utf8ToAnsi(desk2.szName, sizeof(desk2.szName), szName);
+		desk2.nSex = GetIntFromDb(azResult[ncolumn + 3]);
+		GetStrFromdDb(desk2.szTagId, sizeof(desk2.szTagId), azResult[ncolumn + 4]);
+		desk2.nTemp = GetIntFromDb(azResult[ncolumn + 5]);
+		desk2.time = (time_t)GetIntFromDb(azResult[ncolumn + 6]);
+	}
+	sqlite3_free_table(azResult);
+
+	// desk1 有记录
+	if ( desk1.bValid ) {
+		if ( desk2.bValid ) {
+			SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set position=0"
+				" WHERE class_id=%lu AND position=%lu",
+				ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos1);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+			SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set position=%d"
+				" WHERE class_id=%lu AND position=%lu",
+				ROOMS_TABLE, pParam->m_dwPos1, pParam->m_dwNo, pParam->m_dwPos2);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+			SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set position=%d"
+				" WHERE class_id=%lu AND position=0",
+				ROOMS_TABLE, pParam->m_dwPos2, pParam->m_dwNo);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+		}
+		else {
+			SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set position=%d"
+				" WHERE class_id=%lu AND position=%lu",
+				ROOMS_TABLE, pParam->m_dwPos2, pParam->m_dwNo, pParam->m_dwPos1);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+		}
+	}
+	// desk1 没有记录
+	else {
+		if ( desk2.bValid ) {
+			SNPRINTF(szSql, sizeof(szSql), "UPDATE %s set position=%d"
+				" WHERE class_id=%lu AND position=%lu",
+				ROOMS_TABLE, pParam->m_dwPos1, pParam->m_dwNo, pParam->m_dwPos2);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+		}
+	}
+
+	desk1.nRow = HIWORD(pParam->m_dwPos2);
+	desk1.nCol = LOWORD(pParam->m_dwPos2);
+	desk2.nRow = HIWORD(pParam->m_dwPos1);
+	desk2.nCol = LOWORD(pParam->m_dwPos1);
+}
