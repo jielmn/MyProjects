@@ -119,7 +119,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		}
 	}
 	else if (msg.sType == "itemselect") {
-		UpdateRoom();
+		if ( msg.pSender == m_lstClasses ) {
+			UpdateRoom();
+		}		
 	}
 	else if (msg.sType == "mydbclick") {
 		OnDeskDbClick((CDeskUI*)msg.pSender);
@@ -188,6 +190,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		if (pDeskUI->m_data.bValid) {
 			pDeskUI->SetValid(FALSE);
+			pDeskUI->UpdateUI();
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
@@ -332,11 +335,13 @@ void   CDuiFrameWnd::UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo) {
 		DWORD dwPos = pDesk->GetTag();		
 		it = std::find_if(vRet.begin(), vRet.end(), CFindDeskObj(dwPos) );
 		if (it == vRet.end()) {
-			continue;
+			pDesk->SetValid(FALSE);
+			pDesk->UpdateUI();
 		}
-
-		memcpy(&pDesk->m_data, *it, sizeof(DeskItem));
-		pDesk->UpdateUI();
+		else {
+			memcpy(&pDesk->m_data, *it, sizeof(DeskItem));
+			pDesk->UpdateUI();
+		}		
 	}
 }
 

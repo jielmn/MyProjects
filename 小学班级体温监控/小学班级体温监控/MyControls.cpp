@@ -152,5 +152,4 @@ void  CDeskUI::SetValid(BOOL bValid) {
 	if ( !bValid ) {
 		memset(&m_data, 0, sizeof(m_data));
 	}
-	UpdateUI();
 }
