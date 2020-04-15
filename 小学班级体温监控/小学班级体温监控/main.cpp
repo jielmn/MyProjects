@@ -52,7 +52,7 @@ void  CDuiFrameWnd::InitWindow() {
 		pRowUi->SetAttribute("align", "center"); 
 	}
 
-	assert(g_data.m_dwRoomCols <= 10);
+	assert(g_data.m_dwRoomCols <= MAX_ROOM_COLUMN);
 	for (DWORD i = 0; i < g_data.m_dwRoomCols && i < 10; i++) {
 		CLabelUI * pRowUi = new CLabelUI;
 		m_layCols->Add(pRowUi);
@@ -124,6 +124,17 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "mydbclick") {
 		OnDeskDbClick((CDeskUI*)msg.pSender);
 	}
+	else if (msg.sType == "emptydesk") {
+		int nSel = m_lstClasses->GetCurSel();
+		assert(nSel >= 0);
+		DWORD  dwNo  = m_lstClasses->GetItemAt(nSel)->GetTag();
+		DWORD  dwPos = msg.pSender->GetTag();
+
+		CDeskUI * pDeskUI = (CDeskUI *)msg.pSender;
+		if (pDeskUI->m_data.bValid) {
+			CBusiness::GetInstance()->EmptyDeskAsyn(dwNo, dwPos);
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -140,11 +151,44 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if ( uMsg == UM_GET_ROOM_RET ) {
 		std::vector<DeskItem*> * pvRet = (std::vector<DeskItem*> *)wParam;
 		DWORD   dwNo = lParam;
-
 		UpdateRoom1(*pvRet, dwNo);
-
 		ClearVector(*pvRet);
 		delete pvRet;
+	}
+	else if (uMsg == UM_MODIFY_DESK_RET) {
+		DeskItem* pItem = (DeskItem*)wParam;
+		assert(pItem->nGrade > 0 && pItem->nGrade <= 6);
+		assert(pItem->nClass > 0 && pItem->nClass <= MAX_CLASS_NUM);
+		assert(pItem->nRow   > 0 && pItem->nRow <= (int)g_data.m_dwRoomRows);
+		assert(pItem->nCol   > 0 && pItem->nCol <= (int)g_data.m_dwRoomCols);
+
+		DWORD  dwUiRow = g_data.m_dwRoomRows - pItem->nRow;
+		CDeskUI * pDeskUI = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + pItem->nCol - 1);
+		assert(pDeskUI);
+
+		memset(&pDeskUI->m_data, 0, sizeof(DeskItem));
+		STRNCPY(pDeskUI->m_data.szName, pItem->szName, sizeof(pDeskUI->m_data.szName));
+		pDeskUI->m_data.nSex = pItem->nSex;
+		pDeskUI->m_data.bValid = TRUE;
+		pDeskUI->UpdateUI();
+
+		delete pItem;
+	}
+	else if (uMsg == UM_EMPTY_DESK_RET) {
+		DWORD  dwNo  = wParam;
+		DWORD  dwPos = lParam;
+		DWORD  dwRow = HIWORD(dwPos);
+		DWORD  dwCol = LOWORD(dwPos);
+		assert(dwRow > 0 && dwRow <= g_data.m_dwRoomRows);
+		assert(dwCol > 0 && dwCol <= g_data.m_dwRoomCols);
+
+		DWORD  dwUiRow = g_data.m_dwRoomRows - dwRow;
+		CDeskUI * pDeskUI = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + dwCol - 1);
+		assert(pDeskUI);
+
+		if (pDeskUI->m_data.bValid) {
+			pDeskUI->SetValid(FALSE);
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -231,7 +275,7 @@ void  CDuiFrameWnd::UpdateClasses() {
 		DWORD  dwClass = LOWORD(dwNo);
 
 		assert(dwGrade > 0 && dwGrade <= 6);
-		assert(dwClass > 0 && dwClass <= 10);
+		assert(dwClass > 0 && dwClass <= MAX_CLASS_NUM);
 
 		strText.Format("%s年级%d班", g_data.m_aszChNo[dwGrade-1], dwClass);
 		CListTextElementUI * pItem = (CListTextElementUI *)m_lstClasses->GetItemAt(i);
@@ -311,23 +355,23 @@ void   CDuiFrameWnd::OnDeskDbClick(CDeskUI * pDeskUI) {
 		return;
 	}
 
+	int nSel = m_lstClasses->GetCurSel();
+	assert(nSel >= 0);
+	DWORD  dwNo = m_lstClasses->GetItemAt(nSel)->GetTag();
+	DWORD  dwPos = pDeskUI->GetTag();
+
 	// 清除Desk
 	if (pDlg->m_data.szName[0] == '\0') {
 		if ( pDeskUI->m_data.bValid ) {
-			pDeskUI->SetValid(FALSE);
+			CBusiness::GetInstance()->EmptyDeskAsyn(dwNo, dwPos);
 		}
 	}
 	// 增加学生
 	else {
 		// 如果名字不同，认为修改
 		if ( 0 != strcmp(pDeskUI->m_data.szName, pDlg->m_data.szName) ) {
-
-		}
-		memset(&pDeskUI->m_data, 0, sizeof(DeskItem));
-		STRNCPY(pDeskUI->m_data.szName, pDlg->m_data.szName, sizeof(pDeskUI->m_data.szName));
-		pDeskUI->m_data.nSex = pDlg->m_data.nSex;
-		pDeskUI->m_data.bValid = TRUE;
-		pDeskUI->UpdateUI();
+			CBusiness::GetInstance()->ModifyDeskAsyn(dwNo, dwPos, pDlg->m_data.szName, pDlg->m_data.nSex);
+		}		
 	}
 
 	delete pDlg;

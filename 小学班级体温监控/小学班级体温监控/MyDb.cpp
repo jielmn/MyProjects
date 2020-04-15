@@ -145,3 +145,40 @@ void  CMySqliteDatabase::GetRoomData(const CGetRoomParam * pParam, std::vector<D
 	}
 	sqlite3_free_table(azResult);
 }
+
+void  CMySqliteDatabase::ModifyDesk(const CModifyDeskParam * pParam) {
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE class_id = %lu AND position=%lu", 
+		ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	char szName[256];
+	char szTemp[256];
+	StrReplaceAll(szTemp, sizeof(szTemp), pParam->m_szName, "'", "''");
+	AnsiToUtf8(szName, sizeof(szName), szTemp);
+
+	// 如果有
+	if (nrow > 0) {
+		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET name='%s', sex=%d, tag_id=null,"
+			" temperature=0, time=0 WHERE class_id = %lu AND position=%lu", 
+			ROOMS_TABLE, szName, pParam->m_nSex, pParam->m_dwNo, pParam->m_dwPos);
+		sqlite3_exec(m_db, szSql, 0, 0, 0);
+	}
+	else {
+		SNPRINTF(szSql, sizeof(szSql), "INSERT INTO %s VALUES (%d, %d, '%s', %d, null, 0, 0) ", 
+			ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos, szName, pParam->m_nSex);
+		sqlite3_exec(m_db, szSql, 0, 0, 0);
+	}
+}
+
+void  CMySqliteDatabase::EmptyDesk(const CEmptyDeskParam * pParam) {
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE class_id=%lu AND position=%lu",
+		ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos);
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+}

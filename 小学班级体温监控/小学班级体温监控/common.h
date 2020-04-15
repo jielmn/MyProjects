@@ -21,13 +21,20 @@
 #define  TEST_FLAG     1
 #endif
 
+#define   MAX_CLASS_NUM             10
+#define   MAX_ROOM_COLUMN           10
+
 #define   MSG_ADD_CLASS             100
 #define   MSG_GET_ALL_CLASSES       101
 #define   MSG_GET_ROOM              102
+#define   MSG_MODIFY_DESK           103
+#define   MSG_EMPTY_DESK            104
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
 #define   UM_GET_ROOM_RET           (WM_USER + 3)
+#define   UM_MODIFY_DESK_RET        (WM_USER + 4)
+#define   UM_EMPTY_DESK_RET         (WM_USER + 5)
 
 typedef  struct  tagDeskItem{
 	int     nGrade;
@@ -86,6 +93,30 @@ public:
 		m_dwNo = dwNo;
 	}
 	DWORD   m_dwNo;
+};
+
+class CModifyDeskParam : public LmnToolkits::MessageData {
+public:
+	CModifyDeskParam(DWORD dwClassNo, DWORD dwPos, const char * szName, int nSex) {
+		m_dwNo = dwClassNo;
+		m_dwPos = dwPos;
+		STRNCPY(m_szName, szName, sizeof(m_szName));
+		m_nSex = nSex;
+	}
+	DWORD   m_dwNo;
+	DWORD   m_dwPos;
+	char    m_szName[12];
+	int     m_nSex;
+};
+
+class CEmptyDeskParam : public LmnToolkits::MessageData {
+public:
+	CEmptyDeskParam(DWORD dwClassNo, DWORD dwPos) {
+		m_dwNo = dwClassNo;
+		m_dwPos = dwPos;
+	}
+	DWORD   m_dwNo;
+	DWORD   m_dwPos;
 };
 
 

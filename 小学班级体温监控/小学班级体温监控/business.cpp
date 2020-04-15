@@ -127,6 +127,31 @@ void  CBusiness::GetRoomData(const CGetRoomParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_GET_ROOM_RET, (WPARAM)pvRet, pParam->m_dwNo);
 }
 
+void  CBusiness::ModifyDeskAsyn(DWORD dwClassNo, DWORD dwPos, const char * szName, int nSex) {
+	g_data.m_thrd_db->PostMessage(this, MSG_MODIFY_DESK, new CModifyDeskParam(dwClassNo, dwPos, szName,nSex));
+}
+
+void  CBusiness::ModifyDesk(const CModifyDeskParam * pParam) {
+	m_db.ModifyDesk(pParam);
+	DeskItem * pItem = new DeskItem;
+	memset(pItem, 0, sizeof(DeskItem));
+	STRNCPY(pItem->szName, pParam->m_szName, sizeof(pItem->szName));
+	pItem->nSex   = pParam->m_nSex;
+	pItem->nGrade = HIWORD(pParam->m_dwNo);
+	pItem->nClass = LOWORD(pParam->m_dwNo);
+	pItem->nRow   = HIWORD(pParam->m_dwPos);
+	pItem->nCol   = LOWORD(pParam->m_dwPos);
+	::PostMessage(g_data.m_hWnd, UM_MODIFY_DESK_RET, (WPARAM)pItem, 0);
+}
+
+void   CBusiness::EmptyDeskAsyn(DWORD dwClassNo, DWORD dwPos) {
+	g_data.m_thrd_db->PostMessage(this, MSG_EMPTY_DESK, new CEmptyDeskParam(dwClassNo, dwPos));
+}
+
+void   CBusiness::EmptyDesk(const CEmptyDeskParam * pParam) {
+	m_db.EmptyDesk(pParam);
+	::PostMessage(g_data.m_hWnd, UM_EMPTY_DESK_RET, pParam->m_dwNo, pParam->m_dwPos);
+}
 
 
 // 消息处理
@@ -150,6 +175,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CGetRoomParam * pParam = (CGetRoomParam *)pMessageData;
 		GetRoomData(pParam);
+	}
+	break;
+
+	case MSG_MODIFY_DESK:
+	{
+		CModifyDeskParam * pParam = (CModifyDeskParam *)pMessageData;
+		ModifyDesk(pParam);
+	}
+	break;
+
+	case MSG_EMPTY_DESK:
+	{
+		CEmptyDeskParam * pParam = (CEmptyDeskParam *)pMessageData;
+		EmptyDesk(pParam);
 	}
 	break;
 

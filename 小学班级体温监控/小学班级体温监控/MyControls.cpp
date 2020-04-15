@@ -15,7 +15,7 @@ CDeskUI::CDeskUI() {
 }
 
 CDeskUI::~CDeskUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 LPCTSTR CDeskUI::GetClass() const {
@@ -27,6 +27,7 @@ void CDeskUI::DoInit() {
 	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("Desk.xml"), (UINT)0, NULL, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
+		m_pManager->AddNotifier(this);
 	}
 	else {
 		this->RemoveAll();
@@ -66,7 +67,11 @@ void CDeskUI::DoEvent(DuiLib::TEventUI& event) {
 }
 
 void CDeskUI::Notify(TNotifyUI& msg) {
-
+	if ( msg.sType == "click" ) {
+		if (msg.pSender == m_btnDel) {
+			m_pManager->SendNotify(this, "emptydesk");
+		}
+	}
 }
 
 void CDeskUI::UpdateUI() {

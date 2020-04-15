@@ -26,6 +26,12 @@ public:
 	void   GetRoomDataAsyn(DWORD dwNo);
 	void   GetRoomData(const CGetRoomParam * pParam);
 
+	void   ModifyDeskAsyn(DWORD dwClassNo, DWORD dwPos, const char * szName, int nSex);
+	void   ModifyDesk(const CModifyDeskParam * pParam);
+
+	void   EmptyDeskAsyn(DWORD dwClassNo, DWORD dwPos);
+	void   EmptyDesk(const CEmptyDeskParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();
