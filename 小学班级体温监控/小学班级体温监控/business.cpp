@@ -153,6 +153,15 @@ void   CBusiness::EmptyDesk(const CEmptyDeskParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_EMPTY_DESK_RET, pParam->m_dwNo, pParam->m_dwPos);
 }
 
+void  CBusiness::DeleteClassAsyn(DWORD  dwClassNo) {
+	g_data.m_thrd_db->PostMessage(this, MSG_DELETE_CLASS, new CDeleteClassParam(dwClassNo));
+}
+
+void  CBusiness::DeleteClass(const CDeleteClassParam * pParam) {
+	m_db.DeleteClass(pParam);
+	::PostMessage(g_data.m_hWnd, UM_DELETE_CLASS_RET, pParam->m_dwNo, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -189,6 +198,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CEmptyDeskParam * pParam = (CEmptyDeskParam *)pMessageData;
 		EmptyDesk(pParam);
+	}
+	break;
+
+	case MSG_DELETE_CLASS:
+	{
+		CDeleteClassParam * pParam = (CDeleteClassParam *)pMessageData;
+		DeleteClass(pParam);
 	}
 	break;
 

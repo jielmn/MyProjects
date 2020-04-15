@@ -14,6 +14,7 @@ public:
 	void GetRoomData(const CGetRoomParam * pParam, std::vector<DeskItem*> & vRet);
 	void ModifyDesk(const CModifyDeskParam * pParam);
 	void EmptyDesk(const CEmptyDeskParam * pParam);
+	void DeleteClass(const CDeleteClassParam * pParam);
 
 private:
 	// szTableName: 要创建的表名

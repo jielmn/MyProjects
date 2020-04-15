@@ -193,6 +193,14 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			pDeskUI->UpdateUI();
 		}
 	}
+	else if (uMsg == UM_DELETE_CLASS_RET) {
+		DWORD  dwNo = wParam;
+		std::vector<DWORD>::iterator it_find = std::find(m_vClasses.begin(), m_vClasses.end(), dwNo);
+		if ( it_find != m_vClasses.end() ) {
+			m_vClasses.erase(it_find);
+			UpdateClasses();
+		}
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -239,11 +247,26 @@ void   CDuiFrameWnd::OnAddClass() {
 		return;     
 	}
 
+	m_vClasses.push_back(pDlg->m_dwClassNo);
+	std::sort(m_vClasses.begin(), m_vClasses.end(), sortDWord);
+	UpdateClasses();
+
 	delete pDlg;
 }
 
 void  CDuiFrameWnd::OnDelClass() {
+	int nSel = m_lstClasses->GetCurSel();
+	if ( nSel < 0 ) {
+		MessageBox(GetHWND(), "没有选中班级", "错误", 0);
+		return;
+	}
 
+	if ( IDNO == MessageBox(GetHWND(), "确定要删除该班级吗？", "删除", MB_YESNO | MB_DEFBUTTON2) ) {
+		return;
+	}
+
+	DWORD  dwNo = m_lstClasses->GetItemAt(nSel)->GetTag();
+	CBusiness::GetInstance()->DeleteClassAsyn(dwNo);
 }
 
 void  CDuiFrameWnd::UpdateClasses() {

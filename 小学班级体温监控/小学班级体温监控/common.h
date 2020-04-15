@@ -29,12 +29,14 @@
 #define   MSG_GET_ROOM              102
 #define   MSG_MODIFY_DESK           103
 #define   MSG_EMPTY_DESK            104
+#define   MSG_DELETE_CLASS          105
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
 #define   UM_GET_ROOM_RET           (WM_USER + 3)
 #define   UM_MODIFY_DESK_RET        (WM_USER + 4)
 #define   UM_EMPTY_DESK_RET         (WM_USER + 5)
+#define   UM_DELETE_CLASS_RET       (WM_USER + 6)
 
 typedef  struct  tagDeskItem{
 	int     nGrade;
@@ -117,6 +119,14 @@ public:
 	}
 	DWORD   m_dwNo;
 	DWORD   m_dwPos;
+};
+
+class CDeleteClassParam : public LmnToolkits::MessageData {
+public:
+	CDeleteClassParam(DWORD dwClassNo) {
+		m_dwNo = dwClassNo;
+	}
+	DWORD   m_dwNo;
 };
 
 

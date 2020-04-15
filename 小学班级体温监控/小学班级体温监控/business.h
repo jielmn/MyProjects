@@ -32,6 +32,9 @@ public:
 	void   EmptyDeskAsyn(DWORD dwClassNo, DWORD dwPos);
 	void   EmptyDesk(const CEmptyDeskParam * pParam);
 
+	void   DeleteClassAsyn(DWORD  dwClassNo);
+	void   DeleteClass(const CDeleteClassParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

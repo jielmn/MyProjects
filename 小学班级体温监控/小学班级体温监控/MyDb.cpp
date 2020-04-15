@@ -182,3 +182,14 @@ void  CMySqliteDatabase::EmptyDesk(const CEmptyDeskParam * pParam) {
 		ROOMS_TABLE, pParam->m_dwNo, pParam->m_dwPos);
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
 }
+
+void  CMySqliteDatabase::DeleteClass(const CDeleteClassParam * pParam) {
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE class_id=%lu",
+		ROOMS_TABLE, pParam->m_dwNo);
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+	SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE id=%lu",
+		CLASSES_TABLE, pParam->m_dwNo);
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+}
