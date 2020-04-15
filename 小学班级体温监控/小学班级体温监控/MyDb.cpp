@@ -16,7 +16,7 @@ int CMySqliteDatabase::InitDb() {
 	}
 
 	CreateTable( CLASSES_TABLE,
-		"id         INTEGER        NOT NULL       PRIMARY KEY" );             // 年级 << 16 | 班级
+		"id         INTEGER        NOT NULL" );             // 年级 << 16 | 班级
 
 	CreateTable( ROOMS_TABLE,
 		"class_id     INTEGER        NOT NULL," \
