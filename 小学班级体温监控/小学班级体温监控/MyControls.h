@@ -14,6 +14,9 @@ public:
 	BOOL  IsHighlight();
 	void  SetValid(BOOL bValid);
 
+	// ¸ßÁÁ±ß¿ò
+	void  SetHighlightBorder(BOOL bHighlight);
+
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
@@ -29,6 +32,7 @@ private:
 	CLabelUI *                           m_lblTime;
 	CControlUI *                         m_Warning;
 	CButtonUI *                          m_btnDel;
+	CControlUI *                         m_total;
 
 public:
 	DeskItem                             m_data;

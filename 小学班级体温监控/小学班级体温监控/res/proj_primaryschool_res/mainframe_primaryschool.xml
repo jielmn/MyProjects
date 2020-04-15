@@ -51,5 +51,6 @@
 		<HorizontalLayout height="30" bkcolor="#FF007ACC" inset="10,3,10,3">
 			<Label name="lblDatabaseStatus"         text="数据库连接失败"         width="230" font="0" textcolor="#FFCAF100"  /><Control width="1" bkimage="sep.png" /><Control width="10" />		
 		</HorizontalLayout>
+		<Control name="DragDropControl" float="true" pos="100,100,160,160" visible="false" bkcolor="#AA000000" />
 	</VerticalLayout>
 </Window>

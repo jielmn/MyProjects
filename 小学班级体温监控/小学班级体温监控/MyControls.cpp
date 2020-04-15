@@ -9,6 +9,7 @@ CDeskUI::CDeskUI() {
 	m_lblTime = 0;
 	m_Warning = 0;
 	m_btnDel = 0;
+	m_total = 0;
 
 	memset(&m_data, 0, sizeof(m_data));
 	m_bHighlight = FALSE;
@@ -41,6 +42,7 @@ void CDeskUI::DoInit() {
 	m_lblTime = static_cast<DuiLib::CLabelUI*>(m_pManager->FindControl("lblTime"));
 	m_Warning = m_pManager->FindControl("ctlWarning");
 	m_btnDel = static_cast<DuiLib::CButtonUI*>(m_pManager->FindControl("btnDelDesk"));
+	m_total = m_pManager->FindControl("layItem");
 
 	UpdateUI();
 }
@@ -151,5 +153,15 @@ void  CDeskUI::SetValid(BOOL bValid) {
 	m_data.bValid = bValid;
 	if ( !bValid ) {
 		memset(&m_data, 0, sizeof(m_data));
+	}
+}
+
+// ¸ßÁÁ±ß¿ò
+void  CDeskUI::SetHighlightBorder(BOOL bHighlight) {
+	if (bHighlight) {
+		m_total->SetBorderColor(0xFFCAF100);
+	}
+	else {
+		m_total->SetBorderColor(0xFF000000); 
 	}
 }

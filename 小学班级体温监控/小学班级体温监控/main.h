@@ -51,6 +51,13 @@ public:
 	COptionUI *      m_opGirl;
 };
 
+typedef  struct tagDragdropDesk {
+	CDeskUI *        m_source;
+	CDeskUI *        m_highlight;
+	DWORD            m_dwStartTick;
+	BOOL             m_bStarted;
+}DragdropDesk;
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -80,6 +87,9 @@ public:
 	virtual void    InitWindow();
 	virtual CControlUI * CreateControl(LPCTSTR pstrClass);
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT  OnLButtonDown(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);	
+	virtual LRESULT  OnMouseMove(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
+	virtual LRESULT  OnLButtonUp(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& bHandled);
 
 private:
 	CListUI *                                   m_lstClasses;
@@ -90,6 +100,8 @@ private:
 	DuiLib::CContainerUI *                      m_layRoom;
 	std::vector<DWORD>                          m_vClasses;
 	std::vector<DeskItem *>                     m_vDeskes;
+	DragdropDesk                                m_dragdrop_desk;
+	CControlUI *                                m_DragdropUI;
 
 private:
 	void   OnDeskHighlight(DWORD dwIndex);
@@ -101,6 +113,8 @@ private:
 	void   UpdateRoom();
 	void   UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo);
 	void   OnDeskDbClick(CDeskUI * pDeskUI);
+	void   OnMoveDesk(const POINT & pt);
+	void   OnStopMoveDesk();
 
 };
 

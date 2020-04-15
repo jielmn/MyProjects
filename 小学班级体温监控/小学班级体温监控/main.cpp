@@ -17,6 +17,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_layCols = 0;
 	m_dwHighlightIndex = 0;
 	m_layRoom = 0;
+	memset(&m_dragdrop_desk, 0, sizeof(m_dragdrop_desk));
+	m_DragdropUI = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -32,6 +34,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layRows    = static_cast<DuiLib::CVerticalLayoutUI*>(m_PaintManager.FindControl("layRows"));
 	m_layCols    = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layCols"));
 	m_layRoom    = static_cast<DuiLib::CContainerUI*>(m_PaintManager.FindControl("layRoom"));
+	m_DragdropUI = m_PaintManager.FindControl("DragDropControl");
 
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
@@ -202,6 +205,130 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
+}
+
+LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	POINT pt;
+	pt.x = LOWORD(lParam);
+	pt.y = HIWORD(lParam);
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(0, pt);
+	// 如果没有点击到任何控件
+	if (0 == pCtl) {
+		return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
+	}
+
+	// 保存原始点击的控件
+	CControlUI* pOriginalCtl = pCtl;
+
+	while (pCtl) {
+		if (0 == strcmp(pCtl->GetClass(), "Desk")) {
+			// 不是点击了按钮
+			if (0 != strcmp(pOriginalCtl->GetClass(), "Button")) {
+				m_dragdrop_desk.m_source      = (CDeskUI *)pCtl;
+				m_dragdrop_desk.m_highlight   = 0;
+				m_dragdrop_desk.m_dwStartTick = LmnGetTickCount();				
+				m_dragdrop_desk.m_bStarted    = TRUE;
+			}
+		}
+		pCtl = pCtl->GetParent();
+	}
+
+	return WindowImplBase::OnLButtonDown(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	if (m_dragdrop_desk.m_bStarted) {
+		OnStopMoveDesk();
+	}
+	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
+}
+
+void  CDuiFrameWnd::OnStopMoveDesk() {
+	m_DragdropUI->SetVisible(false);
+	m_dragdrop_desk.m_bStarted = FALSE;
+
+	if (m_dragdrop_desk.m_highlight) {
+		m_dragdrop_desk.m_highlight->SetHighlightBorder(FALSE);
+
+		//int nBedNo = m_HightLightItem->GetBedNo();
+		//CBusiness::GetInstance()->CubeBindingTagAsyn(nBedNo, m_cur_tag.szTagId);
+
+		m_dragdrop_desk.m_highlight = 0;
+	}
+}
+
+LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
+	POINT  pt;
+	DWORD  dwCurTick = 0;
+
+	if (m_dragdrop_desk.m_bStarted) {
+		dwCurTick = LmnGetTickCount();
+		if (dwCurTick - m_dragdrop_desk.m_dwStartTick < 100) {
+			return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+		}
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		OnMoveDesk(pt);
+	}
+
+	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+}
+
+void  CDuiFrameWnd::OnMoveDesk(const POINT & pt) {
+	if (!m_DragdropUI->IsVisible()) {
+		m_DragdropUI->SetVisible(true);
+	}
+
+	int x = 60 / 2;
+	int y = 60 / 2;
+
+	RECT r;
+	r.left = pt.x - x;
+	r.right = r.left + x * 2;
+	r.top = pt.y - y;
+	r.bottom = r.top + y * 2;
+	m_DragdropUI->SetPos(r);
+
+	
+	// 高亮经过的desk
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(m_layDesks, pt);
+	CDeskUI * pHighLight = 0;
+
+	// 如果没有移动到任何控件上
+	if (0 == pCtl) {
+		if (m_dragdrop_desk.m_highlight) {
+			m_dragdrop_desk.m_highlight->SetHighlightBorder(FALSE);
+		}
+		m_dragdrop_desk.m_highlight = 0;
+		return;
+	}
+
+	while (pCtl) {
+		if (pCtl->GetClass() == "Desk") {
+			pHighLight = (CDeskUI *)pCtl;
+			break;
+		}
+		pCtl = pCtl->GetParent();
+	}
+
+	if (pHighLight) {
+		if (m_dragdrop_desk.m_highlight) {
+			if (m_dragdrop_desk.m_highlight != pHighLight) {
+				pHighLight->SetHighlightBorder(TRUE);
+				m_dragdrop_desk.m_highlight->SetHighlightBorder(FALSE);
+			}
+		}
+		else {
+			pHighLight->SetHighlightBorder(TRUE);
+		}
+		m_dragdrop_desk.m_highlight = pHighLight;
+	}
+	else {
+		if (m_dragdrop_desk.m_highlight) {
+			m_dragdrop_desk.m_highlight->SetHighlightBorder(FALSE);
+		}
+		m_dragdrop_desk.m_highlight = 0;
+	}
 }
 
 void  CDuiFrameWnd::OnDeskHighlight(DWORD dwTag) {
