@@ -618,10 +618,10 @@ void   CDuiFrameWnd::CheckDevice() {
 		}
 	}
 
-	//CBusiness::GetInstance()->CheckLaunchAsyn();    
+	CBusiness::GetInstance()->CheckLaunchAsyn();    
 }
                 
-
+ 
 CAddClassDlg::CAddClassDlg() {
 	m_cmbGrade = 0;
 	m_cmbClass = 0;
