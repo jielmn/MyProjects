@@ -89,7 +89,7 @@ BOOL  CMySqliteDatabase::AddClass(const CAddClassParam * pParam) {
 	return FALSE;
 }
 
-void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet) {
+void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet, std::map<std::string, DWORD> & vBindingTags) {
 	char  szSql[8192];
 	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s", CLASSES_TABLE);
 
@@ -100,6 +100,26 @@ void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet) {
 	for ( int i = 0; i < nrow; i++ ) {
 		DWORD dwNo = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
 		vRet.push_back(dwNo);
+	}
+	sqlite3_free_table(azResult);
+
+
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s", ROOMS_TABLE);
+
+	nrow = 0;
+	ncolumn = 0;
+	azResult = 0;
+
+	vBindingTags.clear();
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		char * szTagId = azResult[ncolumn + 4];
+		if ( szTagId ) {
+			WORD wNo  = (WORD)GetIntFromDb(azResult[ncolumn + 0]);
+			WORD wPos = (WORD)GetIntFromDb(azResult[ncolumn + 1]);
+			vBindingTags.insert( std::make_pair(szTagId, MAKELONG(wPos, wNo)));
+		}		
 	}
 	sqlite3_free_table(azResult);
 }

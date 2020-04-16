@@ -202,7 +202,7 @@ void   CBusiness::GetAllClassesAsyn() {
 
 void   CBusiness::GetAllClasses() {
 	std::vector<DWORD> * pvRet = new std::vector<DWORD>;
-	m_db.GetAllClasses(*pvRet);
+	m_db.GetAllClasses(*pvRet, m_BindingTags);
 	::PostMessage(g_data.m_hWnd, UM_GET_ALL_CLASSES_RET, (WPARAM)pvRet, 0);
 }
 
@@ -452,9 +452,7 @@ void  CBusiness::ReadAllComPorts() {
 
 				// 得到一条温度数据
 				if (bHandled) {
-					//TempItem * pNewItem = new TempItem;
-					//memcpy(pNewItem, &item, sizeof(TempItem));
-					//::PostMessage(g_data.m_hWnd, UM_CUBE_TEMP_ITEM, (WPARAM)pNewItem, 0);
+					g_data.m_thrd_db->PostMessage(this, MSG_TEMPERATURE_ITEM, new CTempParam(&item));
 					bHasData = TRUE;
 				}
 			}
@@ -514,6 +512,19 @@ void  CBusiness::ProcTail(CDataBuf * pBuf) {
 		else {
 			pBuf->ResetReadPos();
 		}
+	}
+}
+
+void  CBusiness::OnTempItem(const CTempParam * pParam) {
+	std::map<std::string, DWORD>::iterator it = m_BindingTags.find(pParam->m_item.m_szTagId);
+	// 如果是新tag
+	if (it == m_BindingTags.end()) {
+		TempItem * pItem = new TempItem;
+		memcpy(pItem, &pParam->m_item, sizeof(TempItem));
+		::PostMessage(g_data.m_hWnd, UM_NEW_TAG_TEMPERATURE, (WPARAM)pItem, 0);
+	}
+	else {
+
 	}
 }
 
@@ -578,6 +589,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_COM_PORTS:
 	{
 		ReadAllComPorts();
+	}
+	break;
+
+	case MSG_TEMPERATURE_ITEM:
+	{
+		CTempParam * pParam = (CTempParam *)pMessageData;
+		OnTempItem(pParam);
 	}
 	break;
 

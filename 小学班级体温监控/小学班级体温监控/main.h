@@ -103,6 +103,9 @@ private:
 	DragdropDesk                                m_dragdrop_desk;
 	CControlUI *                                m_DragdropUI;
 	CLabelUI *                                  m_lblBarTips;
+	TempItem                                    m_tNewTag;
+	CLabelUI *                                  m_lblNewTagTemp;
+	CLabelUI *                                  m_lblNewTagTime;
 
 private:
 	void   OnDeskHighlight(DWORD dwIndex);
@@ -119,6 +122,7 @@ private:
 
 	// 硬件设备变动，可能有串口变动
 	void   CheckDevice();
+	void   UpdateNewTag();
 
 };
 

@@ -20,6 +20,9 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	memset(&m_dragdrop_desk, 0, sizeof(m_dragdrop_desk));
 	m_DragdropUI = 0;
 	m_lblBarTips = 0;
+	memset(&m_tNewTag, 0, sizeof(m_tNewTag));
+	m_lblNewTagTemp = 0;
+	m_lblNewTagTime = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -37,6 +40,8 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layRoom    = static_cast<DuiLib::CContainerUI*>(m_PaintManager.FindControl("layRoom"));
 	m_DragdropUI = m_PaintManager.FindControl("DragDropControl");
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblStatus")); 
+	m_lblNewTagTemp = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTemp"));
+	m_lblNewTagTime = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTime"));
 
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
@@ -259,6 +264,13 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		if (pvRet) {
 			delete pvRet;
 		}
+	}
+	else if (UM_NEW_TAG_TEMPERATURE == uMsg) {
+		TempItem * pItem = (TempItem *)wParam;
+		memcpy(&m_tNewTag, pItem, sizeof(TempItem));
+		delete pItem;
+
+		UpdateNewTag();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -619,6 +631,16 @@ void   CDuiFrameWnd::CheckDevice() {
 	}
 
 	CBusiness::GetInstance()->CheckLaunchAsyn();    
+}
+
+void   CDuiFrameWnd::UpdateNewTag() {
+	CDuiString  strText;
+	strText.Format("%.1f¡æ", m_tNewTag.m_dwTemp / 100.0f);
+	m_lblNewTagTemp->SetText(strText);
+
+	char  szTime[256];
+	LmnFormatTime(szTime, sizeof(szTime), m_tNewTag.m_time, "%Y-%m-%d %H:%M:%S");
+	m_lblNewTagTime->SetText(szTime);
 }
                 
  

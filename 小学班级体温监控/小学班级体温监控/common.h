@@ -35,6 +35,7 @@
 #define   MSG_EXCHANGE_DESK         106
 #define   MSG_CHECK_LAUNCH_STATUS   107
 #define   MSG_READ_COM_PORTS        108
+#define   MSG_TEMPERATURE_ITEM      109
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
@@ -44,6 +45,7 @@
 #define   UM_DELETE_CLASS_RET       (WM_USER + 6)
 #define   UM_EXCHANGE_DESK_RET      (WM_USER + 7)
 #define   UM_CHECK_COM_PORTS_RET    (WM_USER + 8)
+#define   UM_NEW_TAG_TEMPERATURE    (WM_USER + 9)
 
 
 #define   CFG_LAUNCH_COM_PORT               "launch com ports"
@@ -173,17 +175,23 @@ public:
 
 #define  MAX_TAG_ID_LENGTH          20
 #define  MAX_READER_ID_LENGTH       20
-#define  MAX_REMARK_LENGTH          26
+
 // 温度数据
 typedef struct  tagTempItem {
-	DWORD   m_dwDbId;                                        // 数据库的Id
 	DWORD   m_dwTemp;                                        // 温度
 	time_t  m_time;                                          // 时间
 	char    m_szTagId[MAX_TAG_ID_LENGTH];                    // tag id
 	char    m_szReaderId[MAX_READER_ID_LENGTH];              // reader id
-	char    m_szRemark[MAX_REMARK_LENGTH];                   // 注释
 }TempItem;
 
+
+class CTempParam : public LmnToolkits::MessageData {
+public:
+	CTempParam(TempItem * pItem) {
+		memcpy(&m_item, pItem, sizeof(TempItem));
+	}
+	TempItem   m_item;
+};
 
 
 extern CGlobalData  g_data;

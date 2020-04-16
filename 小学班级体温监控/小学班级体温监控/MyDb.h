@@ -10,7 +10,7 @@ public:
 	int DeinitDb();
 
 	BOOL AddClass(const CAddClassParam * pParam);
-	void GetAllClasses(std::vector<DWORD> & vRet);
+	void GetAllClasses(std::vector<DWORD> & vRet, std::map<std::string, DWORD> & vBindingTags);
 	void GetRoomData(const CGetRoomParam * pParam, std::vector<DeskItem*> & vRet);
 	void ModifyDesk(const CModifyDeskParam * pParam);
 	void EmptyDesk(const CEmptyDeskParam * pParam);

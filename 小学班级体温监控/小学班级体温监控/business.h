@@ -67,9 +67,12 @@ private:
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
 	BOOL CanBeFreed() { return false; }
 
+	void  OnTempItem(const CTempParam * pParam);
+
 private:
-	CMySqliteDatabase           m_db;
-	std::vector<CMyComPort *>   m_vSerialPorts;
+	CMySqliteDatabase              m_db;
+	std::vector<CMyComPort *>      m_vSerialPorts;
+	std::map<std::string, DWORD>   m_BindingTags;
 };
 
 
