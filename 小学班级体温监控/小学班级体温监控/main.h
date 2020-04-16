@@ -61,6 +61,12 @@ typedef  struct tagDragdropDesk {
 	BOOL             m_bStarted;
 }DragdropDesk;
 
+typedef  struct tagDragdropTag {
+	CDeskUI *        m_highlight;
+	DWORD            m_dwStartTick;
+	BOOL             m_bStarted;
+}DragdropTag;
+
 class CDuiFrameWnd : public WindowImplBase
 {
 public:
@@ -109,6 +115,8 @@ private:
 	TempItem                                    m_tNewTag;
 	CLabelUI *                                  m_lblNewTagTemp;
 	CLabelUI *                                  m_lblNewTagTime;
+	CContainerUI *                              m_layNewTag;
+	DragdropTag                                 m_dragdrop_tag;
 
 private:
 	void   OnDeskHighlight(DWORD dwIndex);
@@ -126,6 +134,8 @@ private:
 	// 硬件设备变动，可能有串口变动
 	void   CheckDevice();
 	void   UpdateNewTag();
+	void   OnMoveTag(const POINT & pt);
+	void   OnStopMoveTag();
 
 };
 

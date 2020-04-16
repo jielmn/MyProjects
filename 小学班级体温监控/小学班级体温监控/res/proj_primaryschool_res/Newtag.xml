@@ -8,7 +8,7 @@
 		
 		<HorizontalLayout height="20" />
 		
-		<VerticalLayout >
+		<VerticalLayout name="layNewTag" >
 			<VerticalLayout height="70"  >
 				<Control />
 				<HorizontalLayout height="64" >

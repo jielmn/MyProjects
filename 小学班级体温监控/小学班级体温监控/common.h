@@ -36,6 +36,7 @@
 #define   MSG_CHECK_LAUNCH_STATUS   107
 #define   MSG_READ_COM_PORTS        108
 #define   MSG_TEMPERATURE_ITEM      109
+#define   MSG_BINDING_TAG           110
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
@@ -46,6 +47,7 @@
 #define   UM_EXCHANGE_DESK_RET      (WM_USER + 7)
 #define   UM_CHECK_COM_PORTS_RET    (WM_USER + 8)
 #define   UM_NEW_TAG_TEMPERATURE    (WM_USER + 9)
+#define   UM_BINDING_TAG_RET        (WM_USER + 10)
 
 
 #define   CFG_LAUNCH_COM_PORT               "launch com ports"
@@ -191,6 +193,18 @@ public:
 		memcpy(&m_item, pItem, sizeof(TempItem));
 	}
 	TempItem   m_item;
+};
+
+class CBindingTagParam : public LmnToolkits::MessageData {
+public:
+	CBindingTagParam(const char * szTagId, DWORD  dwClassNo, DWORD  dwPos) {
+		m_dwNo = dwClassNo;
+		m_dwPos = dwPos;
+		STRNCPY(m_szTagId, szTagId, sizeof(m_szTagId));
+	}
+	DWORD   m_dwNo;
+	DWORD   m_dwPos;
+	char    m_szTagId[20];
 };
 
 

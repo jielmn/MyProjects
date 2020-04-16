@@ -528,6 +528,15 @@ void  CBusiness::OnTempItem(const CTempParam * pParam) {
 	}
 }
 
+void  CBusiness::BindingTag2DeskAsyn(const char * szTagId, DWORD  dwClassNo, DWORD  dwPos) {
+	g_data.m_thrd_db->PostMessage(this, MSG_BINDING_TAG, new CBindingTagParam( szTagId, dwClassNo, dwPos) );
+}
+
+void  CBusiness::BindingTag2Desk(const CBindingTagParam * pParam) {
+	m_db.BindingTag2Desk(pParam, m_BindingTags);
+	::PostMessage(g_data.m_hWnd, UM_BINDING_TAG_RET, 0, 0);
+}
+
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
@@ -596,6 +605,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CTempParam * pParam = (CTempParam *)pMessageData;
 		OnTempItem(pParam);
+	}
+	break;
+
+	case MSG_BINDING_TAG:
+	{
+		CBindingTagParam * pParam = (CBindingTagParam *)pMessageData;
+		BindingTag2Desk(pParam);
 	}
 	break;
 

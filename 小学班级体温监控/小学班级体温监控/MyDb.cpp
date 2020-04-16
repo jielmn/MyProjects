@@ -89,7 +89,7 @@ BOOL  CMySqliteDatabase::AddClass(const CAddClassParam * pParam) {
 	return FALSE;
 }
 
-void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet, std::map<std::string, DWORD> & vBindingTags) {
+void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet, std::map<std::string, DWORD> & BindingTags) {
 	char  szSql[8192];
 	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s", CLASSES_TABLE);
 
@@ -110,7 +110,7 @@ void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet, std::map<std::s
 	ncolumn = 0;
 	azResult = 0;
 
-	vBindingTags.clear();
+	BindingTags.clear();
 
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for (int i = 0; i < nrow; i++) {
@@ -118,7 +118,7 @@ void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet, std::map<std::s
 		if ( szTagId ) {
 			WORD wNo  = (WORD)GetIntFromDb(azResult[ncolumn + 0]);
 			WORD wPos = (WORD)GetIntFromDb(azResult[ncolumn + 1]);
-			vBindingTags.insert( std::make_pair(szTagId, MAKELONG(wPos, wNo)));
+			BindingTags.insert( std::make_pair(szTagId, MAKELONG(wPos, wNo)));
 		}		
 	}
 	sqlite3_free_table(azResult);
@@ -292,4 +292,37 @@ void  CMySqliteDatabase::ExchangeDesk(const CExchangeDeskParam * pParam, DeskIte
 	desk1.nCol = LOWORD(pParam->m_dwPos2);
 	desk2.nRow = HIWORD(pParam->m_dwPos1);
 	desk2.nCol = LOWORD(pParam->m_dwPos1);
+}
+
+void  CMySqliteDatabase::BindingTag2Desk(const CBindingTagParam * pParam, 
+	                         std::map<std::string, DWORD> & BindingTags) {
+
+	char  szSql[8192];
+	int nrow = 0, ncolumn = 0;
+	char **azResult = 0;
+	std::map<std::string, DWORD>::iterator it;
+
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE tag_id='%s'", ROOMS_TABLE, pParam->m_szTagId);
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	if ( nrow > 0 ) {
+		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET tag_id=null WHERE tag_id='%s'", 
+			ROOMS_TABLE, pParam->m_szTagId);
+		sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+		it = BindingTags.find(pParam->m_szTagId);
+		if ( it != BindingTags.end() ) {
+			BindingTags.erase(it);
+		}
+	}
+
+	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET tag_id='%s' WHERE class_id=%d AND position=%d",
+		ROOMS_TABLE, pParam->m_szTagId, pParam->m_dwNo, pParam->m_dwPos);
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+	WORD a = (WORD)pParam->m_dwNo;
+	WORD b = (WORD)pParam->m_dwPos;
+	BindingTags.insert(std::make_pair(pParam->m_szTagId, MAKELONG(b,a) ));
+
 }

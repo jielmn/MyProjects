@@ -59,6 +59,9 @@ public:
 	// 清除结尾可能存在的"dd aa"
 	void   ProcTail(CDataBuf * pBuf);
 
+	void   BindingTag2DeskAsyn(const char * szTagId, DWORD  dwClassNo, DWORD  dwPos);
+	void   BindingTag2Desk(const CBindingTagParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

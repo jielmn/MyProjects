@@ -26,6 +26,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	memset(&m_tNewTag, 0, sizeof(m_tNewTag));
 	m_lblNewTagTemp = 0;
 	m_lblNewTagTime = 0;
+	memset(&m_dragdrop_tag, 0, sizeof(m_dragdrop_tag));	
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -45,6 +46,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblStatus")); 
 	m_lblNewTagTemp = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTemp"));
 	m_lblNewTagTime = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTime"));
+	m_layNewTag     = static_cast<CContainerUI*>(m_PaintManager.FindControl("layNewTag"));
 
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
@@ -283,6 +285,11 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			::KillTimer(GetHWND(), wParam);
 		}
 	}
+	else if (UM_BINDING_TAG_RET == uMsg) {
+		memset(&m_tNewTag, 0, sizeof(m_tNewTag));
+		UpdateNewTag();
+		::KillTimer(GetHWND(), TEMP_FADE_TIMER);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -309,6 +316,13 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 				m_dragdrop_desk.m_bStarted    = TRUE;
 			}
 		}
+		else if (pCtl->GetName() == "layNewTag") {
+			if ( m_tNewTag.m_szTagId[0] != '\0' ) {
+				m_dragdrop_tag.m_highlight = 0;
+				m_dragdrop_tag.m_dwStartTick = LmnGetTickCount();
+				m_dragdrop_tag.m_bStarted = TRUE;
+			}			
+		}
 		pCtl = pCtl->GetParent();
 	}
 
@@ -318,6 +332,9 @@ LRESULT  CDuiFrameWnd::OnLButtonDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 LRESULT  CDuiFrameWnd::OnLButtonUp(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) {
 	if (m_dragdrop_desk.m_bStarted) {
 		OnStopMoveDesk();
+	}
+	else if (m_dragdrop_tag.m_bStarted) {
+		OnStopMoveTag();
 	}
 	return WindowImplBase::OnLButtonUp(uMsg, wParam, lParam, bHandled);
 }
@@ -353,6 +370,15 @@ LRESULT  CDuiFrameWnd::OnMouseMove(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL
 		pt.x = LOWORD(lParam);
 		pt.y = HIWORD(lParam);
 		OnMoveDesk(pt);
+	}
+	else if (m_dragdrop_tag.m_bStarted) {
+		dwCurTick = LmnGetTickCount();
+		if (dwCurTick - m_dragdrop_tag.m_dwStartTick < 100) {
+			return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
+		}
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		OnMoveTag(pt);
 	}
 
 	return WindowImplBase::OnMouseMove(uMsg, wParam, lParam, bHandled);
@@ -646,14 +672,99 @@ void   CDuiFrameWnd::CheckDevice() {
 
 void   CDuiFrameWnd::UpdateNewTag() {
 	CDuiString  strText;
-	strText.Format("%.1f℃", m_tNewTag.m_dwTemp / 100.0f);
-	m_lblNewTagTemp->SetText(strText);
-	m_lblNewTagTemp->SetTextColor(FRESH_TEMP_COLOR);
 
-	char  szTime[256];
-	LmnFormatTime(szTime, sizeof(szTime), m_tNewTag.m_time, "%Y-%m-%d %H:%M:%S");
-	m_lblNewTagTime->SetText(szTime);
-	m_lblNewTagTime->SetTextColor(FRESH_TEMP_COLOR);
+	if (m_tNewTag.m_szTagId[0] != '\0') {
+		strText.Format("%.1f℃", m_tNewTag.m_dwTemp / 100.0f);
+		m_lblNewTagTemp->SetText(strText);
+		m_lblNewTagTemp->SetTextColor(FRESH_TEMP_COLOR);
+
+		char  szTime[256];
+		LmnFormatTime(szTime, sizeof(szTime), m_tNewTag.m_time, "%Y-%m-%d %H:%M:%S");
+		m_lblNewTagTime->SetText(szTime);
+		m_lblNewTagTime->SetTextColor(FRESH_TEMP_COLOR);
+	}
+	else {
+		m_lblNewTagTemp->SetText("");
+		m_lblNewTagTemp->SetTextColor(FADE_TEMP_COLOR);
+		m_lblNewTagTime->SetText("");
+		m_lblNewTagTime->SetTextColor(FADE_TEMP_COLOR);
+	}
+}
+
+void  CDuiFrameWnd::OnMoveTag(const POINT & pt) {
+	if (!m_DragdropUI->IsVisible()) {
+		m_DragdropUI->SetVisible(true);
+	}
+
+	int x = 60 / 2;
+	int y = 60 / 2;
+
+	RECT r;
+	r.left = pt.x - x;
+	r.right = r.left + x * 2;
+	r.top = pt.y - y;
+	r.bottom = r.top + y * 2;
+	m_DragdropUI->SetPos(r);
+
+
+	// 高亮经过的desk
+	CControlUI* pCtl = m_PaintManager.FindSubControlByPoint(m_layDesks, pt);
+	CDeskUI * pHighLight = 0;
+
+	// 如果没有移动到任何控件上
+	if (0 == pCtl) {
+		if (m_dragdrop_tag.m_highlight) {
+			m_dragdrop_tag.m_highlight->SetHighlightBorder(FALSE);
+		}
+		m_dragdrop_tag.m_highlight = 0;
+		return;
+	}
+
+	while (pCtl) {
+		if (pCtl->GetClass() == "Desk") {
+			pHighLight = (CDeskUI *)pCtl;
+			break;
+		}
+		pCtl = pCtl->GetParent();
+	}
+
+	if (pHighLight) {
+		if (m_dragdrop_tag.m_highlight) {
+			if (m_dragdrop_tag.m_highlight != pHighLight) {
+				pHighLight->SetHighlightBorder(TRUE);
+				m_dragdrop_tag.m_highlight->SetHighlightBorder(FALSE);
+			}
+		}
+		else {
+			pHighLight->SetHighlightBorder(TRUE);
+		}
+		m_dragdrop_tag.m_highlight = pHighLight;
+	}
+	else {
+		if (m_dragdrop_tag.m_highlight) {
+			m_dragdrop_tag.m_highlight->SetHighlightBorder(FALSE);
+		}
+		m_dragdrop_tag.m_highlight = 0;
+	}
+}
+
+void  CDuiFrameWnd::OnStopMoveTag() {
+	m_DragdropUI->SetVisible(false);
+	m_dragdrop_tag.m_bStarted = FALSE;
+
+	if (m_dragdrop_tag.m_highlight) {
+		m_dragdrop_tag.m_highlight->SetHighlightBorder(FALSE);
+
+		if ( m_dragdrop_tag.m_highlight->m_data.bValid ) {
+			int nSel = m_lstClasses->GetCurSel();
+			assert(nSel >= 0);
+			DWORD  dwNo = m_lstClasses->GetItemAt(nSel)->GetTag();
+			DWORD  dwPos = m_dragdrop_tag.m_highlight->GetTag();
+			CBusiness::GetInstance()->BindingTag2DeskAsyn(m_tNewTag.m_szTagId, dwNo, dwPos);
+		}	
+
+		m_dragdrop_tag.m_highlight = 0;
+	}
 }
                 
  
