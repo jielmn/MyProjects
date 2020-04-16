@@ -523,8 +523,9 @@ void  CBusiness::OnTempItem(const CTempParam * pParam) {
 		memcpy(pItem, &pParam->m_item, sizeof(TempItem));
 		::PostMessage(g_data.m_hWnd, UM_NEW_TAG_TEMPERATURE, (WPARAM)pItem, 0);
 	}
+	// ²»ÊÇĞÂTag
 	else {
-
+		m_db.SaveTemp(it->second, &pParam->m_item);
 	}
 }
 

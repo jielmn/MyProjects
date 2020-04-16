@@ -12,9 +12,10 @@ CBusiness *  CBusiness::GetInstance() {
 CBusiness::CBusiness() {
 	for (DWORD i = 0; i < MAX_TAG_CNT; i++) {
 		for (DWORD j = 0; j < 8; j++) {
-			m_tagid[i][j] = (BYTE)GetRand(0, 255);
+			m_tagid[i][j] = (BYTE)(i+100);
 		}
 	}
+	m_dwIndex = 0;
 }
 
 CBusiness::~CBusiness() {
@@ -102,7 +103,8 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 		if ( m_com.GetStatus() == CLmnSerialPort::OPEN && g_data.m_bStart ) {
 			BYTE  data[19];
 			memcpy(data, "\x55\x11\x01\x01\x00\x00\x01\x00\xE2\x8C\x8A\x8D\x8B\x5F\x5C\x6D\x23\x0C\xFF", 19);
-			DWORD i = GetRand(0, MAX_TAG_CNT - 1);
+			DWORD i = m_dwIndex % MAX_TAG_CNT;
+			m_dwIndex++;
 			memcpy(data + 8, m_tagid[i], 8);
 			WORD  wTemp = GetRand(3500, 4000);
 			data[16] = wTemp / 100;

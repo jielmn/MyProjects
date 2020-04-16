@@ -326,3 +326,13 @@ void  CMySqliteDatabase::BindingTag2Desk(const CBindingTagParam * pParam,
 	BindingTags.insert(std::make_pair(pParam->m_szTagId, MAKELONG(b,a) ));
 
 }
+
+void  CMySqliteDatabase::SaveTemp(DWORD dwGreat, const TempItem * pItem) {
+	WORD wNo  = HIWORD(dwGreat);
+	WORD wPos = LOWORD(dwGreat);
+
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET temperature=%d, time=%lu WHERE class_id=%d AND position=%d ",
+		ROOMS_TABLE, pItem->m_dwTemp, (DWORD)pItem->m_time, (int)wNo, (int)wPos );
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+}

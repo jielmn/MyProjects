@@ -115,6 +115,7 @@ private:
 	TempItem                                    m_tNewTag;
 	CLabelUI *                                  m_lblNewTagTemp;
 	CLabelUI *                                  m_lblNewTagTime;
+	CLabelUI *                                  m_lblNewTagId;
 	CContainerUI *                              m_layNewTag;
 	DragdropTag                                 m_dragdrop_tag;
 

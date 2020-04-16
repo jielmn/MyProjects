@@ -17,6 +17,7 @@ public:
 	void DeleteClass(const CDeleteClassParam * pParam);
 	void ExchangeDesk(const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2);
 	void BindingTag2Desk(const CBindingTagParam * pParam, std::map<std::string, DWORD> & BindingTags);
+	void SaveTemp(DWORD dwGreat, const TempItem * pItem);
 
 private:
 	// szTableName: 要创建的表名

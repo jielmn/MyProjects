@@ -29,7 +29,8 @@ private:
 
 private:
 	CLmnSerialPort          m_com;
-	BYTE                     m_tagid[MAX_TAG_CNT][8];
+	BYTE                    m_tagid[MAX_TAG_CNT][8];
+	DWORD                   m_dwIndex;
 };
 
 

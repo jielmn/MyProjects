@@ -21,6 +21,7 @@
 			
 			<Label text="未测量" textcolor="#FF447AA1" font="4" name="lblTemp" align="center"  />			
 			<Label text="" textcolor="#FF447AA1" font="2" name="lblTime" align="center"  />					
+			<Label text="" textcolor="#FF447AA1" font="2" name="lblTagId" align="center"  />	
 		</VerticalLayout>	
 		
 	</VerticalLayout>

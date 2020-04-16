@@ -27,6 +27,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_lblNewTagTemp = 0;
 	m_lblNewTagTime = 0;
 	memset(&m_dragdrop_tag, 0, sizeof(m_dragdrop_tag));	
+	m_lblNewTagId = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -47,6 +48,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lblNewTagTemp = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTemp"));
 	m_lblNewTagTime = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTime"));
 	m_layNewTag     = static_cast<CContainerUI*>(m_PaintManager.FindControl("layNewTag"));
+	m_lblNewTagId   = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTagId"));
 
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
@@ -682,6 +684,8 @@ void   CDuiFrameWnd::UpdateNewTag() {
 		LmnFormatTime(szTime, sizeof(szTime), m_tNewTag.m_time, "%Y-%m-%d %H:%M:%S");
 		m_lblNewTagTime->SetText(szTime);
 		m_lblNewTagTime->SetTextColor(FRESH_TEMP_COLOR);
+
+		m_lblNewTagId->SetText(m_tNewTag.m_szTagId);
 	}
 	else {
 		m_lblNewTagTemp->SetText("");
