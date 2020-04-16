@@ -10,6 +10,9 @@
 #include "business.h"
 #include "resource.h"
 
+#define   TEMP_FADE_TIMER              1001
+#define   TEMP_FADE_TIMER_ELAPSE       10000
+
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_lstClasses = 0;
 	m_layDesks = 0;
@@ -271,6 +274,14 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		delete pItem;
 
 		UpdateNewTag();
+		::SetTimer(GetHWND(), TEMP_FADE_TIMER, TEMP_FADE_TIMER_ELAPSE, 0);
+	}
+	else if (WM_TIMER == uMsg) {               
+		if (wParam == TEMP_FADE_TIMER) {
+			m_lblNewTagTemp->SetTextColor(FADE_TEMP_COLOR);
+			m_lblNewTagTime->SetTextColor(FADE_TEMP_COLOR);
+			::KillTimer(GetHWND(), wParam);
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -637,10 +648,12 @@ void   CDuiFrameWnd::UpdateNewTag() {
 	CDuiString  strText;
 	strText.Format("%.1f¡æ", m_tNewTag.m_dwTemp / 100.0f);
 	m_lblNewTagTemp->SetText(strText);
+	m_lblNewTagTemp->SetTextColor(FRESH_TEMP_COLOR);
 
 	char  szTime[256];
 	LmnFormatTime(szTime, sizeof(szTime), m_tNewTag.m_time, "%Y-%m-%d %H:%M:%S");
 	m_lblNewTagTime->SetText(szTime);
+	m_lblNewTagTime->SetTextColor(FRESH_TEMP_COLOR);
 }
                 
  

@@ -8,6 +8,9 @@ using namespace DuiLib;
 #include "MyControls.h"
 #include "resource.h"
 
+#define   FRESH_TEMP_COLOR      0xFF48D0CC
+#define   FADE_TEMP_COLOR       0xFF447AA1
+
 class CAddClassDlg : public DuiLib::WindowImplBase
 {
 public:
