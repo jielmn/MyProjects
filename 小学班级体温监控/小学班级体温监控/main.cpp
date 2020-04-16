@@ -19,6 +19,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_layRoom = 0;
 	memset(&m_dragdrop_desk, 0, sizeof(m_dragdrop_desk));
 	m_DragdropUI = 0;
+	m_lblBarTips = 0;
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -35,6 +36,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layCols    = static_cast<DuiLib::CTileLayoutUI*>(m_PaintManager.FindControl("layCols"));
 	m_layRoom    = static_cast<DuiLib::CContainerUI*>(m_PaintManager.FindControl("layRoom"));
 	m_DragdropUI = m_PaintManager.FindControl("DragDropControl");
+	m_lblBarTips = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblStatus")); 
 
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
@@ -152,6 +154,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		std::sort(m_vClasses.begin(), m_vClasses.end(), sortDWord );
 		UpdateClasses();
+
+		// 检查串口
+		CheckDevice();
 	}
 	else if ( uMsg == UM_GET_ROOM_RET ) {
 		std::vector<DeskItem*> * pvRet = (std::vector<DeskItem*> *)wParam;
@@ -227,6 +232,33 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		delete pDesk1;
 		delete pDesk2;
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		CheckDevice();
+	}
+	else if (uMsg == UM_CHECK_COM_PORTS_RET) {
+		std::vector<int> * pvRet = (std::vector<int> *)wParam; 
+		assert(pvRet);
+		if (pvRet->size() == 0) {
+			m_lblBarTips->SetText("没有打开任何接收基站");
+		}
+		else {
+			std::vector<int>::iterator it;
+			CDuiString strText = "打开了";
+			int i = 0;
+			for (it = pvRet->begin(); it != pvRet->end(); ++it, i++) {
+				if (i > 0) {
+					strText += ",";
+				}
+				CDuiString item;
+				item.Format("com%d", *it);
+				strText += item;
+			}
+			m_lblBarTips->SetText(strText);
+		}
+		if (pvRet) {
+			delete pvRet;
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -559,6 +591,34 @@ void   CDuiFrameWnd::OnDeskDbClick(CDeskUI * pDeskUI) {
 	}
 
 	delete pDlg;
+}
+
+void   CDuiFrameWnd::CheckDevice() {
+	char szComPort[16];
+	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
+
+	// 单个串口
+	if (!g_data.m_bMultipleComport) {
+		if (nFindCount > 1) {
+			m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+		}
+		else if (0 == nFindCount) {
+			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+		}
+		else {
+			m_lblBarTips->SetText("");
+		}
+	}
+	else {
+		if (0 == nFindCount) {
+			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+		}
+		else {
+			m_lblBarTips->SetText("");
+		}
+	}
+
+	//CBusiness::GetInstance()->CheckLaunchAsyn();    
 }
                 
 

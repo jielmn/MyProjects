@@ -102,6 +102,7 @@ private:
 	std::vector<DeskItem *>                     m_vDeskes;
 	DragdropDesk                                m_dragdrop_desk;
 	CControlUI *                                m_DragdropUI;
+	CLabelUI *                                  m_lblBarTips;
 
 private:
 	void   OnDeskHighlight(DWORD dwIndex);
@@ -115,6 +116,9 @@ private:
 	void   OnDeskDbClick(CDeskUI * pDeskUI);
 	void   OnMoveDesk(const POINT & pt);
 	void   OnStopMoveDesk();
+
+	// 硬件设备变动，可能有串口变动
+	void   CheckDevice();
 
 };
 

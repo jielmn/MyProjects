@@ -3,12 +3,14 @@
 #include <vector>
 #include <algorithm>
 #include <iterator> 
+#include <map>
 
 #include "LmnCommon.h"
 #include "LmnConfig.h"
 #include "LmnLog.h"
 #include "LmnThread.h"
 #include "LmnString.h"
+#include "LmnSerialPort.h"
 
 #define   PROJ_NAME               "primaryschool"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
@@ -31,6 +33,8 @@
 #define   MSG_EMPTY_DESK            104
 #define   MSG_DELETE_CLASS          105
 #define   MSG_EXCHANGE_DESK         106
+#define   MSG_CHECK_LAUNCH_STATUS   107
+#define   MSG_READ_COM_PORTS        108
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
@@ -39,6 +43,13 @@
 #define   UM_EMPTY_DESK_RET         (WM_USER + 5)
 #define   UM_DELETE_CLASS_RET       (WM_USER + 6)
 #define   UM_EXCHANGE_DESK_RET      (WM_USER + 7)
+#define   UM_CHECK_COM_PORTS_RET    (WM_USER + 8)
+
+
+#define   CFG_LAUNCH_COM_PORT               "launch com ports"
+
+// 如果3分钟没有收到数据，重新初始化串口(写发送命令)
+#define  REINIT_COM_PORT_TIME         180
 
 typedef  struct  tagDeskItem{
 	int     nGrade;
@@ -54,27 +65,44 @@ typedef  struct  tagDeskItem{
 }DeskItem;
 
 
+#define   MAX_COM_PORTS_CNT            4
+#define   DEFAULT_READER_NO_START      1
+#define   DEFAULT_READER_NO_END        10
+
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
 	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_launch_cube;
 	DWORD                     m_dwRoomRows;
 	DWORD                     m_dwRoomCols;
 	SIZE                      m_DeskSize;
 	HWND                      m_hWnd;
 	char                      m_aszChNo[10][6];
 
+	BOOL                      m_bMultipleComport;
+	BOOL                      m_bSpecifiedComports;
+	int                       m_nComports[MAX_COM_PORTS_CNT];     // 使用哪些指定串口
+	int                       m_nComportsCnt;
+	int                       m_nReaderNoStart;
+	int                       m_nReaderNoEnd;
+
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
 		m_thrd_db = 0;
+		m_thrd_launch_cube = 0;
 		m_dwRoomRows = 0;
 		m_dwRoomCols = 0;
 		memset(&m_DeskSize, 0, sizeof(m_DeskSize));
 		memset(m_aszChNo, 0, sizeof(m_aszChNo));
 		m_hWnd = 0;
+		m_bMultipleComport = FALSE;
+		m_bSpecifiedComports = FALSE;
+		m_nReaderNoStart = 0;
+		m_nReaderNoEnd = 0;
 	}
 };
 
@@ -143,6 +171,18 @@ public:
 	DWORD   m_dwPos2;
 };
 
+#define  MAX_TAG_ID_LENGTH          20
+#define  MAX_READER_ID_LENGTH       20
+#define  MAX_REMARK_LENGTH          26
+// 温度数据
+typedef struct  tagTempItem {
+	DWORD   m_dwDbId;                                        // 数据库的Id
+	DWORD   m_dwTemp;                                        // 温度
+	time_t  m_time;                                          // 时间
+	char    m_szTagId[MAX_TAG_ID_LENGTH];                    // tag id
+	char    m_szReaderId[MAX_READER_ID_LENGTH];              // reader id
+	char    m_szRemark[MAX_REMARK_LENGTH];                   // 注释
+}TempItem;
 
 
 
@@ -151,6 +191,10 @@ extern CGlobalData  g_data;
 extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
 extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
 extern bool sortDWord(DWORD d1, DWORD d2);
+extern int  GetCh340Count(char * szComPort, DWORD dwComPortLen);
+extern void InitComPort(CLmnSerialPort * pPort);
+extern char *  GetTagId(char * szTagId, DWORD dwTagIdLen, const BYTE * pData, DWORD dwDataLen);
+extern char *  GetHandReaderId(char * szReaderId, DWORD dwReaderIdLen, const BYTE * pData);
 
 // templates
 template <class T>
