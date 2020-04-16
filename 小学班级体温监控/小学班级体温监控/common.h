@@ -21,6 +21,7 @@
 
 #ifdef _DEBUG
 #define  TEST_FLAG     1
+#define  SHOW_TAG_ID   1
 #endif
 
 #define   MAX_CLASS_NUM             10

@@ -50,6 +50,10 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layNewTag     = static_cast<CContainerUI*>(m_PaintManager.FindControl("layNewTag"));
 	m_lblNewTagId   = static_cast<CLabelUI*>(m_PaintManager.FindControl("lblTagId"));
 
+#if !SHOW_TAG_ID
+	m_lblNewTagId->SetVisible(false);
+#endif
+
 	m_layDesks->SetFixedColumns(g_data.m_dwRoomCols);
 	m_layDesks->SetItemSize(g_data.m_DeskSize);
  
@@ -82,7 +86,7 @@ void  CDuiFrameWnd::InitWindow() {
 	for (DWORD i = 0; i < g_data.m_dwRoomRows; i++) {
 		for (DWORD j = 0; j < g_data.m_dwRoomCols; j++) {
 			CDeskUI * pDesk = new CDeskUI;
-			pDesk->SetTag( MAKELONG(j+1, i+1) );
+			pDesk->SetTag( MAKEWORD(j+1, i+1) );
 			//SNPRINTF(pDesk->m_data.szName, 12, "%d,%d", i + 1, j + 1);
 			//pDesk->m_data.bValid = TRUE;
 			m_layDesks->AddAt(pDesk, j);
@@ -199,8 +203,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_EMPTY_DESK_RET) {
 		DWORD  dwNo  = wParam;
 		DWORD  dwPos = lParam;
-		DWORD  dwRow = HIWORD(dwPos);
-		DWORD  dwCol = LOWORD(dwPos);
+		DWORD  dwRow = HIBYTE(dwPos);
+		DWORD  dwCol = LOBYTE(dwPos);
 		assert(dwRow > 0 && dwRow <= g_data.m_dwRoomRows);
 		assert(dwCol > 0 && dwCol <= g_data.m_dwRoomCols);
 
@@ -462,8 +466,8 @@ void  CDuiFrameWnd::OnDeskUnHighlight(DWORD dwTag) {
 }
 
 CDeskUI *  CDuiFrameWnd::GetDeskUI(DWORD  dwTag) {
-	DWORD i = HIWORD(dwTag);
-	DWORD j = LOWORD(dwTag);
+	DWORD i = HIBYTE(dwTag);
+	DWORD j = LOBYTE(dwTag);
 	assert(i <= g_data.m_dwRoomRows && i > 0 );
 	assert(j <= g_data.m_dwRoomCols && j > 0 );
 	CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt( (g_data.m_dwRoomRows - i) * g_data.m_dwRoomCols + j - 1 );
@@ -536,8 +540,8 @@ void  CDuiFrameWnd::UpdateClasses() {
 	CDuiString strText;
 	for (int i = 0; i < nCnt; i++) {
 		DWORD  dwNo    = m_vClasses[i];
-		DWORD  dwGrade = HIWORD(dwNo);
-		DWORD  dwClass = LOWORD(dwNo);
+		DWORD  dwGrade = HIBYTE(dwNo);
+		DWORD  dwClass = LOBYTE(dwNo);
 
 		assert(dwGrade > 0 && dwGrade <= 6);
 		assert(dwClass > 0 && dwClass <= MAX_CLASS_NUM);
@@ -686,12 +690,15 @@ void   CDuiFrameWnd::UpdateNewTag() {
 		m_lblNewTagTime->SetTextColor(FRESH_TEMP_COLOR);
 
 		m_lblNewTagId->SetText(m_tNewTag.m_szTagId);
+		m_lblNewTagId->SetTextColor(FRESH_TEMP_COLOR);
 	}
 	else {
 		m_lblNewTagTemp->SetText("");
 		m_lblNewTagTemp->SetTextColor(FADE_TEMP_COLOR);
 		m_lblNewTagTime->SetText("");
 		m_lblNewTagTime->SetTextColor(FADE_TEMP_COLOR);
+		m_lblNewTagId->SetText("");
+		m_lblNewTagId->SetTextColor(FADE_TEMP_COLOR);
 	}
 }
 
@@ -824,8 +831,8 @@ LRESULT  CAddClassDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			int nSel = m_cmbGrade->GetCurSel();
 			DWORD i = m_cmbGrade->GetItemAt(nSel)->GetTag();
 			nSel = m_cmbClass->GetCurSel();
-			DWORD j = m_cmbGrade->GetItemAt(nSel)->GetTag();
-			m_dwClassNo = MAKELONG(j, i);
+			DWORD j = m_cmbClass->GetItemAt(nSel)->GetTag();
+			m_dwClassNo = MAKEWORD(j, i);
 			this->PostMessage(WM_CLOSE);
 		}
 		else {

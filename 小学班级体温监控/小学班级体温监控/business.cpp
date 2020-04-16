@@ -226,10 +226,10 @@ void  CBusiness::ModifyDesk(const CModifyDeskParam * pParam) {
 	memset(pItem, 0, sizeof(DeskItem));
 	STRNCPY(pItem->szName, pParam->m_szName, sizeof(pItem->szName));
 	pItem->nSex   = pParam->m_nSex;
-	pItem->nGrade = HIWORD(pParam->m_dwNo);
-	pItem->nClass = LOWORD(pParam->m_dwNo);
-	pItem->nRow   = HIWORD(pParam->m_dwPos);
-	pItem->nCol   = LOWORD(pParam->m_dwPos);
+	pItem->nGrade = HIBYTE(pParam->m_dwNo);
+	pItem->nClass = LOBYTE(pParam->m_dwNo);
+	pItem->nRow   = HIBYTE(pParam->m_dwPos);
+	pItem->nCol   = LOBYTE(pParam->m_dwPos);
 	::PostMessage(g_data.m_hWnd, UM_MODIFY_DESK_RET, (WPARAM)pItem, 0);
 }
 

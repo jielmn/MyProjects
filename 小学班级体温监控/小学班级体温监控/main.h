@@ -143,8 +143,8 @@ private:
 class CFindDeskObj {
 public:
 	CFindDeskObj(DWORD  dwPos) {
-		m_dwRow = HIWORD(dwPos);
-		m_dwCol = LOWORD(dwPos);
+		m_dwRow = HIBYTE(dwPos);
+		m_dwCol = LOBYTE(dwPos);
 	}
 
 	bool operator() (DeskItem * pItem) {

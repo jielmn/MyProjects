@@ -65,7 +65,7 @@ BOOL  CMySqliteDatabase::CreateTable(const char * szTableName, const char * szSq
 BOOL  CMySqliteDatabase::AddClass(const CAddClassParam * pParam) {
 
 	char  szSql[8192];
-	DWORD  dwNo = MAKELONG(pParam->m_dwClass, pParam->m_dwGrade);
+	DWORD  dwNo = MAKEWORD(pParam->m_dwClass, pParam->m_dwGrade);
 	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE id=%lu", 
 		CLASSES_TABLE, dwNo );
 
@@ -135,8 +135,8 @@ void  CMySqliteDatabase::GetRoomData(const CGetRoomParam * pParam, std::vector<D
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for (int i = 0; i < nrow; i++) {
 		DWORD  dwPos = GetIntFromDb(azResult[(i + 1)*ncolumn + 1]);
-		DWORD  dwRow = HIWORD(dwPos);
-		DWORD  dwCol = LOWORD(dwPos);
+		DWORD  dwRow = HIBYTE(dwPos);
+		DWORD  dwCol = LOBYTE(dwPos);
 
 		if (0 == dwRow || dwRow > g_data.m_dwRoomRows) {
 			continue;
@@ -288,10 +288,10 @@ void  CMySqliteDatabase::ExchangeDesk(const CExchangeDeskParam * pParam, DeskIte
 		}
 	}
 
-	desk1.nRow = HIWORD(pParam->m_dwPos2);
-	desk1.nCol = LOWORD(pParam->m_dwPos2);
-	desk2.nRow = HIWORD(pParam->m_dwPos1);
-	desk2.nCol = LOWORD(pParam->m_dwPos1);
+	desk1.nRow = HIBYTE(pParam->m_dwPos2);
+	desk1.nCol = LOBYTE(pParam->m_dwPos2);
+	desk2.nRow = HIBYTE(pParam->m_dwPos1);
+	desk2.nCol = LOBYTE(pParam->m_dwPos1);
 }
 
 void  CMySqliteDatabase::BindingTag2Desk(const CBindingTagParam * pParam, 
