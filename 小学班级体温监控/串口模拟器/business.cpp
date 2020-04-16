@@ -99,7 +99,7 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 
 	case 1002: 
 	{
-		if ( m_com.GetStatus() == CLmnSerialPort::OPEN ) {
+		if ( m_com.GetStatus() == CLmnSerialPort::OPEN && g_data.m_bStart ) {
 			BYTE  data[19];
 			memcpy(data, "\x55\x11\x01\x01\x00\x00\x01\x00\xE2\x8C\x8A\x8D\x8B\x5F\x5C\x6D\x23\x0C\xFF", 19);
 			DWORD i = GetRand(0, MAX_TAG_CNT - 1);

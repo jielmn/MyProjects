@@ -25,6 +25,7 @@ public:
 	LmnToolkits::Thread *     m_thrd_db;
 	HWND                      m_hWnd;
 	char                      m_szCom[16];
+	BOOL                      m_bStart;
 
 public:
 	CGlobalData() {
@@ -33,6 +34,7 @@ public:
 		m_thrd_db = 0;
 		m_hWnd = 0;
 		memset(m_szCom, 0, sizeof(m_szCom));
+		m_bStart = FALSE;
 	}
 };
 

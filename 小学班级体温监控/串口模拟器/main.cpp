@@ -11,7 +11,7 @@
 #include "resource.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
-	m_lblStatus = 0;	
+	m_lblStatus = 0; 	 
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -31,6 +31,19 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if (msg.sType == "click") {
+		if (msg.pSender->GetName() == "btnStart") {
+			CButtonUI * btn = (CButtonUI *)msg.pSender;
+			if ( !g_data.m_bStart ) {
+				btn->SetText("Í£Ö¹");
+				g_data.m_bStart = TRUE;
+			}
+			else {
+				btn->SetText("¿ªÊ¼");
+				g_data.m_bStart = FALSE;
+			}
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
