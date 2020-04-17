@@ -592,6 +592,18 @@ void  CBusiness::DisableBinding(const CDisableBindingTagParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_DISABLE_BINDING_RET, pParam->m_wNo, pParam->m_wPos);
 }
 
+void CBusiness::UpgradeAsyn() {
+	g_data.m_thrd_db->PostMessage(this, MSG_UPGRADE);
+}
+
+void CBusiness::Upgrade() {
+	m_db.Upgrade();
+
+	std::vector<DWORD> * pvRet = new std::vector<DWORD>;
+	m_db.GetAllClasses(*pvRet, m_BindingTags);
+	::PostMessage(g_data.m_hWnd, UM_UPGRADE_RET, (WPARAM)pvRet, 0);
+}
+
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
 	switch (dwMessageId)
@@ -674,6 +686,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CDisableBindingTagParam * pParam = (CDisableBindingTagParam *)pMessageData;
 		DisableBinding(pParam);
+	}
+	break;
+
+	case MSG_UPGRADE:
+	{
+		Upgrade();
 	}
 	break;
 

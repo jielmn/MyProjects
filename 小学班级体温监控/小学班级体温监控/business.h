@@ -65,6 +65,9 @@ public:
 	void   DisableBindingAsyn(WORD wClassNo, WORD  wPos);
 	void   DisableBinding(const CDisableBindingTagParam * pParam);
 
+	void   UpgradeAsyn();
+	void   Upgrade();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

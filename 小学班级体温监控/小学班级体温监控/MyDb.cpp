@@ -1,4 +1,5 @@
 #include "MyDb.h"
+#include <assert.h>
 
 #define  DB_NAME                          "primary_school.db"
 
@@ -353,4 +354,62 @@ void  CMySqliteDatabase::DisableBinding(const CDisableBindingTagParam * pParam) 
 	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET tag_id=null WHERE class_id=%d AND position=%d ",
 		ROOMS_TABLE, (int)pParam->m_wNo, (int)pParam->m_wPos );
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
+}
+
+void  CMySqliteDatabase::Upgrade() {
+	char  szSql[8192];
+	int nrow = 0, ncolumn = 0;
+	char **azResult = 0;
+
+	//CreateTable(CLASSES_TABLE,
+	//	"id         INTEGER        NOT NULL  PRIMARY KEY");             // Äê¼¶ << 16 | °à¼¶
+
+	//CreateTable(ROOMS_TABLE,
+	//	"class_id     INTEGER        NOT NULL," \
+	//	"position     INTEGER        NOT NULL," \
+	//	"name         VARCHAR(16)    NOT NULL," \
+	//	"sex          int            NOT NULL," \
+	//	"tag_id       CHAR(16)       NULL      UNIQUE," \
+	//	"temperature  int            NOT NULL," \
+	//	"time         int            NOT NULL," \
+	//	"PRIMARY KEY(class_id,  position)");
+
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s ORDER BY id DESC", CLASSES_TABLE);
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for ( int i = 0; i < nrow; i++ ) {
+		WORD wNo     = (WORD)GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		BYTE byGrade = HIBYTE(wNo);
+		BYTE byClass = LOBYTE(wNo);
+		assert(byGrade > 0 && byGrade <= 6);
+		assert(byClass > 0 && byClass <= MAX_CLASS_NUM);
+		if (byGrade >= 6) {
+			SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE class_id=%d", ROOMS_TABLE, (int)wNo);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+			SNPRINTF(szSql, sizeof(szSql), "DELETE FROM %s WHERE id=%d", CLASSES_TABLE, (int)wNo);
+			sqlite3_exec(m_db, szSql, 0, 0, 0);
+			continue;
+		}
+
+		WORD  wNewNo = MAKEWORD(byClass, byGrade + 1);
+		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET id=%d WHERE id=%d",
+			CLASSES_TABLE, (int)wNewNo, (int)wNo );
+		sqlite3_exec(m_db, szSql, 0, 0, 0);
+	}
+	sqlite3_free_table(azResult);
+
+
+	nrow = 0;
+	ncolumn = 0;
+	azResult = 0;
+
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s ORDER BY class_id DESC", ROOMS_TABLE);
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		WORD wNo  = (WORD)GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		WORD wPos = (WORD)GetIntFromDb(azResult[(i + 1)*ncolumn + 1]);
+		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET class_id=class_id+256 WHERE class_id=%d AND position=%d",
+			ROOMS_TABLE, (int)wNo, (int)wPos);
+		sqlite3_exec(m_db, szSql, 0, 0, 0);
+	}
+	sqlite3_free_table(azResult); 
 }

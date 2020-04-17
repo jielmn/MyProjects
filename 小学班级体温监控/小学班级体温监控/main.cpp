@@ -143,6 +143,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (strName == "btnDelClass") {
 			OnDelClass();
 		}
+		else if (strName == "btnUpgrade") {
+			OnUpgrade();
+		}
 	}
 	else if (msg.sType == "itemselect") {
 		if ( msg.pSender == m_lstClasses ) {
@@ -193,6 +196,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 		// 检查串口
 		CheckDevice();
+	}
+	else if (UM_UPGRADE_RET == uMsg) {
+		m_vClasses.clear();
+		std::vector<DWORD> * pvRet = (std::vector<DWORD>*)wParam;
+		std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_vClasses));
+		delete pvRet;
+
+		std::sort(m_vClasses.begin(), m_vClasses.end(), sortDWord);
+		UpdateClasses();
 	}
 	else if ( uMsg == UM_GET_ROOM_RET ) {
 		std::vector<DeskItem*> * pvRet = (std::vector<DeskItem*> *)wParam;
@@ -683,6 +695,12 @@ void   CDuiFrameWnd::UpdateRoom() {
 }
 
 void   CDuiFrameWnd::UpdateRoom1(std::vector<DeskItem*> vRet, DWORD   dwNo) {
+	int nSel = m_lstClasses->GetCurSel();
+	if (nSel < 0) {
+		m_layRoom->SetVisible(false);
+		return;
+	}
+
 	m_layRoom->SetVisible(true);
 
 	int nCnt = m_layDesks->GetCount();
@@ -890,6 +908,20 @@ void  CDuiFrameWnd::OnCheckWarning() {
 		pDesk->UpdateWarning(now);
 	}
 }
+
+void  CDuiFrameWnd::OnUpgrade() {
+	int nCnt = m_lstClasses->GetCount();
+	if ( 0 == nCnt ) {
+		MessageBox(GetHWND(), "没有班级可以升级", "错误", 0);
+		return;
+	}
+
+	if (IDNO == MessageBox(GetHWND(), "确定要把所有的班级升一级吗？", "升级", MB_YESNO | MB_DEFBUTTON2)) {
+		return;
+	}
+
+	CBusiness::GetInstance()->UpgradeAsyn();
+}
                 
  
 CAddClassDlg::CAddClassDlg() {
@@ -961,7 +993,7 @@ DuiLib::CControlUI * CAddClassDlg::CreateControl(LPCTSTR pstrClass) {
 
 
 
-
+   
 CDeskDlg::CDeskDlg() {
 	memset( &m_data, 0, sizeof(m_data) );
 	m_data.nSex = 1;

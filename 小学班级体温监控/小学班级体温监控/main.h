@@ -138,6 +138,7 @@ private:
 	void   OnStopMoveTag();
 	WORD   GetCurClass();
 	void   OnCheckWarning();
+	void   OnUpgrade();
 
 };
 

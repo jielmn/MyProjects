@@ -46,6 +46,7 @@
 #define   MSG_TEMPERATURE_ITEM      109
 #define   MSG_BINDING_TAG           110
 #define   MSG_DISABLE_BINDING_TAG   111
+#define   MSG_UPGRADE               112
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
@@ -59,6 +60,7 @@
 #define   UM_BINDING_TAG_RET        (WM_USER + 10)
 #define   UM_DESK_TEMPERATURE       (WM_USER + 11)
 #define   UM_DISABLE_BINDING_RET    (WM_USER + 12)
+#define   UM_UPGRADE_RET            (WM_USER + 13)
 
 
 #define   CFG_LAUNCH_COM_PORT               "launch com ports"
