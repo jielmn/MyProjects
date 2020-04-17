@@ -667,11 +667,11 @@ void  CDuiFrameWnd::UpdateClasses() {
 void   CDuiFrameWnd::UpdateRoom() {
 	int nSel = m_lstClasses->GetCurSel();
 	if (nSel < 0) {		
-		//int nCnt = m_layRoom->GetCount();
-		//for (int i = 0; i < nCnt; i++) {
-		//	CDeskUI * pDesk = (CDeskUI*)m_layRoom->GetItemAt(i);
-		//	pDesk->SetValid(FALSE);
-		//}
+		int nCnt = m_layDesks->GetCount();
+		for (int i = 0; i < nCnt; i++) {
+			CDeskUI * pDesk = (CDeskUI*)m_layDesks->GetItemAt(i);
+			pDesk->SetValid(FALSE);
+		}
 		m_layRoom->SetVisible(false);
 	}
 	else {
