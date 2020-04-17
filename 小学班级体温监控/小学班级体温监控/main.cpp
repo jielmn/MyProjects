@@ -339,6 +339,8 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			STRNCPY(pDesk->m_data.szTagId, szTagId, sizeof(pDesk->m_data.szTagId));
 			pDesk->UpdateUI();
 		}
+
+		delete[] szTagId;
 	}
 	else if (UM_DESK_TEMPERATURE == uMsg) {
 		TempItem * pItem = (TempItem *)wParam;
