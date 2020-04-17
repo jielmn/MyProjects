@@ -214,7 +214,8 @@ void  CMySqliteDatabase::DeleteClass(const CDeleteClassParam * pParam) {
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
 }
 
-void  CMySqliteDatabase::ExchangeDesk(const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2) {
+void  CMySqliteDatabase::ExchangeDesk( const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2, 
+	                                   std::map<std::string, DWORD> & BindingTags) {
 	char  szSql[8192];
 	int nrow = 0, ncolumn = 0;
 	char **azResult = 0;      
@@ -252,6 +253,8 @@ void  CMySqliteDatabase::ExchangeDesk(const CExchangeDeskParam * pParam, DeskIte
 		desk2.time = (time_t)GetIntFromDb(azResult[ncolumn + 6]);
 	}
 	sqlite3_free_table(azResult);
+
+	std::map<std::string, DWORD>::iterator it;
 
 	// desk1 ÓÐ¼ÇÂ¼
 	if ( desk1.bValid ) {
@@ -292,6 +295,14 @@ void  CMySqliteDatabase::ExchangeDesk(const CExchangeDeskParam * pParam, DeskIte
 	desk1.nCol = LOBYTE(pParam->m_dwPos2);
 	desk2.nRow = HIBYTE(pParam->m_dwPos1);
 	desk2.nCol = LOBYTE(pParam->m_dwPos1);
+
+	if ( desk1.szTagId[0] != '\0' ) {
+		BindingTags[desk1.szTagId] = MAKELONG( (WORD)pParam->m_dwPos2, (WORD)pParam->m_dwNo );
+	}
+
+	if (desk2.szTagId[0] != '\0') {
+		BindingTags[desk2.szTagId] = MAKELONG( (WORD)pParam->m_dwPos1, (WORD)pParam->m_dwNo);
+	}
 }
 
 void  CMySqliteDatabase::BindingTag2Desk(const CBindingTagParam * pParam, 

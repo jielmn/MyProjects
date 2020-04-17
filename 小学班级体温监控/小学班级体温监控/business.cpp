@@ -286,7 +286,7 @@ void  CBusiness::ExchangeDeskAsyn(DWORD  dwClassNo, DWORD  dwPos1, DWORD  dwPos2
 void  CBusiness::ExchangeDesk(const CExchangeDeskParam * pParam) {
 	DeskItem * pDesk1 = new DeskItem;
 	DeskItem * pDesk2 = new DeskItem;
-	m_db.ExchangeDesk(pParam, *pDesk1, *pDesk2); 
+	m_db.ExchangeDesk(pParam, *pDesk1, *pDesk2, m_BindingTags); 
 	::PostMessage(g_data.m_hWnd, UM_EXCHANGE_DESK_RET, (WPARAM)pDesk1, (LPARAM)pDesk2);
 }
 

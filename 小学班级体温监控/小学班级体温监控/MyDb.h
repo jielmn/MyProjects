@@ -15,7 +15,7 @@ public:
 	void ModifyDesk(const CModifyDeskParam * pParam);
 	void EmptyDesk(const CEmptyDeskParam * pParam);
 	void DeleteClass(const CDeleteClassParam * pParam);
-	void ExchangeDesk(const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2);
+	void ExchangeDesk(const CExchangeDeskParam * pParam, DeskItem & desk1, DeskItem & desk2, std::map<std::string, DWORD> & BindingTags);
 	void BindingTag2Desk(const CBindingTagParam * pParam, std::map<std::string, DWORD> & BindingTags);
 	void SaveTemp(DWORD dwGreat, const TempItem * pItem);
 	void DisableBinding(const CDisableBindingTagParam * pParam);
