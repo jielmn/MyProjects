@@ -333,6 +333,15 @@ void  CMySqliteDatabase::BindingTag2Desk(const CBindingTagParam * pParam,
 		ROOMS_TABLE, pParam->m_szTagId, pParam->m_dwNo, pParam->m_dwPos);
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
 
+
+	DWORD  dwGreat = MAKELONG((WORD)pParam->m_dwPos, (WORD)pParam->m_dwNo);
+	for (it = BindingTags.begin(); it != BindingTags.end(); ++it) {
+		if (it->second == dwGreat) {
+			BindingTags.erase(it);
+			break;
+		}
+	}
+
 	WORD a = (WORD)pParam->m_dwNo;
 	WORD b = (WORD)pParam->m_dwPos;
 	BindingTags.insert(std::make_pair(pParam->m_szTagId, MAKELONG(b,a) ));
