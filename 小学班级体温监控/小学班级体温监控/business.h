@@ -62,6 +62,9 @@ public:
 	void   BindingTag2DeskAsyn(const char * szTagId, DWORD  dwClassNo, DWORD  dwPos);
 	void   BindingTag2Desk(const CBindingTagParam * pParam);
 
+	void   DisableBindingAsyn(WORD wClassNo, WORD  wPos);
+	void   DisableBinding(const CDisableBindingTagParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

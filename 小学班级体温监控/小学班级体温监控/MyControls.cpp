@@ -10,6 +10,7 @@ CDeskUI::CDeskUI() {
 	m_Warning = 0;
 	m_btnDel = 0;
 	m_total = 0;
+	m_Binding = 0;
 
 	memset(&m_data, 0, sizeof(m_data));
 	m_bHighlight = FALSE;
@@ -43,6 +44,7 @@ void CDeskUI::DoInit() {
 	m_Warning = m_pManager->FindControl("ctlWarning");
 	m_btnDel = static_cast<DuiLib::CButtonUI*>(m_pManager->FindControl("btnDelDesk"));
 	m_total = m_pManager->FindControl("layItem");
+	m_Binding = m_pManager->FindControl("ctlBinding");
 
 	UpdateUI();
 }
@@ -137,6 +139,12 @@ void CDeskUI::UpdateUI() {
 		}
 
 		m_btnDel->SetVisible(false);
+
+		if (m_data.szTagId[0] == '\0') {
+			m_Binding->SetVisible(false);
+		} else {
+			m_Binding->SetVisible(true);
+		}
 	}
 	else {
 		m_Sex->SetBkImage("");
@@ -146,6 +154,7 @@ void CDeskUI::UpdateUI() {
 		m_lblTime->SetText("");
 		m_Warning->SetVisible(false);
 		m_btnDel->SetVisible(false);
+		m_Binding->SetVisible(false);
 	}
 }
 

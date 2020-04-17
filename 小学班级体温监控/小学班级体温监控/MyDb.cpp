@@ -114,10 +114,10 @@ void CMySqliteDatabase::GetAllClasses(std::vector<DWORD> & vRet, std::map<std::s
 
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for (int i = 0; i < nrow; i++) {
-		char * szTagId = azResult[ncolumn + 4];
+		char * szTagId = azResult[(i + 1)*ncolumn + 4];
 		if ( szTagId ) {
-			WORD wNo  = (WORD)GetIntFromDb(azResult[ncolumn + 0]);
-			WORD wPos = (WORD)GetIntFromDb(azResult[ncolumn + 1]);
+			WORD wNo  = (WORD)GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+			WORD wPos = (WORD)GetIntFromDb(azResult[(i + 1)*ncolumn + 1]);
 			BindingTags.insert( std::make_pair(szTagId, MAKELONG(wPos, wNo)));
 		}		
 	}
@@ -334,5 +334,12 @@ void  CMySqliteDatabase::SaveTemp(DWORD dwGreat, const TempItem * pItem) {
 	char  szSql[8192];
 	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET temperature=%d, time=%lu WHERE class_id=%d AND position=%d ",
 		ROOMS_TABLE, pItem->m_dwTemp, (DWORD)pItem->m_time, (int)wNo, (int)wPos );
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+}
+
+void  CMySqliteDatabase::DisableBinding(const CDisableBindingTagParam * pParam) {
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET tag_id=null WHERE class_id=%d AND position=%d ",
+		ROOMS_TABLE, (int)pParam->m_wNo, (int)pParam->m_wPos );
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
 }

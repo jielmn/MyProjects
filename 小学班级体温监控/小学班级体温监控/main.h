@@ -108,7 +108,6 @@ private:
 	DWORD                                       m_dwHighlightIndex;
 	DuiLib::CContainerUI *                      m_layRoom;
 	std::vector<DWORD>                          m_vClasses;
-	std::vector<DeskItem *>                     m_vDeskes;
 	DragdropDesk                                m_dragdrop_desk;
 	CControlUI *                                m_DragdropUI;
 	CLabelUI *                                  m_lblBarTips;

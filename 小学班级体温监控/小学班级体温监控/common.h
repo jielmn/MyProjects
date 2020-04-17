@@ -45,6 +45,7 @@
 #define   MSG_READ_COM_PORTS        108
 #define   MSG_TEMPERATURE_ITEM      109
 #define   MSG_BINDING_TAG           110
+#define   MSG_DISABLE_BINDING_TAG   111
 
 #define   UM_ADD_CLASS_RET          (WM_USER + 1)
 #define   UM_GET_ALL_CLASSES_RET    (WM_USER + 2)
@@ -57,6 +58,7 @@
 #define   UM_NEW_TAG_TEMPERATURE    (WM_USER + 9)
 #define   UM_BINDING_TAG_RET        (WM_USER + 10)
 #define   UM_DESK_TEMPERATURE       (WM_USER + 11)
+#define   UM_DISABLE_BINDING_RET    (WM_USER + 12)
 
 
 #define   CFG_LAUNCH_COM_PORT               "launch com ports"
@@ -222,6 +224,16 @@ public:
 	DWORD   m_dwNo;
 	DWORD   m_dwPos;
 	char    m_szTagId[20];
+};
+
+class CDisableBindingTagParam : public LmnToolkits::MessageData {
+public:
+	CDisableBindingTagParam(WORD wClassNo, WORD  wPos) {
+		m_wNo  = wClassNo;
+		m_wPos = wPos;
+	}
+	WORD   m_wNo;
+	WORD   m_wPos;
 };
 
 

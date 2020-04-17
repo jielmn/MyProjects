@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window>
-	<VerticalLayout bordersize="1" bordercolor="#FF000000" name="layItem" >	
+	<VerticalLayout bordersize="1" bordercolor="#FF000000" name="layItem" menu="true" >	
 		<HorizontalLayout>
 			<VerticalLayout width="30">
 				<Control />
@@ -9,8 +9,9 @@
 			</VerticalLayout>			
 			<Label text="" font="3" textcolor="#FF447AA1" name="lblName" />
 		</HorizontalLayout>	
-		<HorizontalLayout height="16" inset="0,0,0,0">
-			<Label text="" align="center" font="2" textcolor="#FF447AA1" name="lblTemp" />			
+		<HorizontalLayout height="16" inset="4,0,0,0">
+			<Label text="" align="left" font="2" textcolor="#FF447AA1" name="lblTemp" width="60" />	
+			<Control bkimage="tag_1.png" width="16" height="16" name="ctlBinding" />
 		</HorizontalLayout>
 		<HorizontalLayout height="16" inset="4,0,0,0">
 			<Label text="" align="left" font="2" textcolor="#FF447AA1" name="lblDate" />

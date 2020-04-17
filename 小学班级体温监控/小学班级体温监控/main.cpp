@@ -7,6 +7,7 @@
 
 #include "Windows.h"
 #include "main.h"
+#include "DuiMenu.h"
 #include "business.h"
 #include "resource.h"
 #include <time.h>
@@ -35,8 +36,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 }
             
 CDuiFrameWnd::~CDuiFrameWnd() {
-	m_vClasses.clear();
-	ClearVector(m_vDeskes);
+	//m_vClasses.clear();
 }
           
 void  CDuiFrameWnd::InitWindow() {
@@ -162,6 +162,21 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (pDeskUI->m_data.bValid) {
 			CBusiness::GetInstance()->EmptyDeskAsyn(dwNo, dwPos);
 		}
+	}
+	else if (msg.sType == "menu") {
+		if (strName == "layItem") {
+			CDeskUI * pDesk = (CDeskUI *)msg.pSender->GetParent();
+			if ( pDesk->m_data.bValid && pDesk->m_data.szTagId[0] != '\0' ) {
+				CDuiMenu *pMenu = new CDuiMenu(_T("menu_desk.xml"), pDesk, pDesk->GetTag(), 0);
+				pMenu->Init(*this, msg.ptMouse);
+				pMenu->ShowWindow(TRUE);
+			}			
+		}
+	}
+	else if (msg.sType == "menu_disable_binding") {
+		WORD wNo  = GetCurClass();
+		WORD wPos = (WORD)msg.wParam;
+		CBusiness::GetInstance()->DisableBindingAsyn(wNo, wPos);
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -300,9 +315,30 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 	}
 	else if (UM_BINDING_TAG_RET == uMsg) {
+		DWORD  dwGreat = wParam;
+		char * szTagId = (char *)lParam;
+
 		memset(&m_tNewTag, 0, sizeof(m_tNewTag));
 		UpdateNewTag();
 		::KillTimer(GetHWND(), TEMP_FADE_TIMER);
+
+		WORD  wCurNo = GetCurClass();
+		WORD  wNo = HIWORD(dwGreat);
+		WORD  wPos = LOWORD(dwGreat);
+
+		if (wCurNo == wNo) {
+			BYTE   byRow = HIBYTE(wPos);
+			BYTE   byCol = LOBYTE(wPos);
+			assert(byCol > 0 && byCol <= g_data.m_dwRoomCols);
+			assert(byRow > 0 && byRow <= g_data.m_dwRoomRows);
+			DWORD  dwUiRow = g_data.m_dwRoomRows - byRow;
+			DWORD  dwUiCol = byCol - 1;
+			CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + dwUiCol);
+			assert(pDesk);
+			assert(pDesk->m_data.bValid);
+			STRNCPY(pDesk->m_data.szTagId, szTagId, sizeof(pDesk->m_data.szTagId));
+			pDesk->UpdateUI();
+		}
 	}
 	else if (UM_DESK_TEMPERATURE == uMsg) {
 		TempItem * pItem = (TempItem *)wParam;
@@ -327,6 +363,24 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 
 		delete pItem;
+	}
+	else if (UM_DISABLE_BINDING_RET == uMsg) {
+		WORD  wCurNo = GetCurClass();
+		WORD  wNo    = (WORD)wParam;
+		WORD  wPos   = (WORD)lParam;
+		if ( wCurNo == wNo ) {
+			BYTE   byRow = HIBYTE(wPos);
+			BYTE   byCol = LOBYTE(wPos);
+			assert(byCol > 0 && byCol <= g_data.m_dwRoomCols);
+			assert(byRow > 0 && byRow <= g_data.m_dwRoomRows);
+			DWORD  dwUiRow = g_data.m_dwRoomRows - byRow;
+			DWORD  dwUiCol = byCol - 1;
+			CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + dwUiCol);
+			assert(pDesk);
+			assert(pDesk->m_data.bValid);
+			pDesk->m_data.szTagId[0] = '\0';     
+			pDesk->UpdateUI(); 
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -612,7 +666,12 @@ void  CDuiFrameWnd::UpdateClasses() {
 
 void   CDuiFrameWnd::UpdateRoom() {
 	int nSel = m_lstClasses->GetCurSel();
-	if (nSel < 0) {
+	if (nSel < 0) {		
+		//int nCnt = m_layRoom->GetCount();
+		//for (int i = 0; i < nCnt; i++) {
+		//	CDeskUI * pDesk = (CDeskUI*)m_layRoom->GetItemAt(i);
+		//	pDesk->SetValid(FALSE);
+		//}
 		m_layRoom->SetVisible(false);
 	}
 	else {

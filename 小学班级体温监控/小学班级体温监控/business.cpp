@@ -264,6 +264,18 @@ void  CBusiness::DeleteClassAsyn(DWORD  dwClassNo) {
 
 void  CBusiness::DeleteClass(const CDeleteClassParam * pParam) {
 	m_db.DeleteClass(pParam);
+
+	std::map<std::string, DWORD>::iterator it;
+	for (it = m_BindingTags.begin(); it != m_BindingTags.end(); ) {
+		WORD  wNo = HIWORD(it->second);
+		if ( (DWORD)wNo == pParam->m_dwNo ) {
+			it = m_BindingTags.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+
 	::PostMessage(g_data.m_hWnd, UM_DELETE_CLASS_RET, pParam->m_dwNo, 0);
 }
 
@@ -555,7 +567,29 @@ void  CBusiness::BindingTag2DeskAsyn(const char * szTagId, DWORD  dwClassNo, DWO
 
 void  CBusiness::BindingTag2Desk(const CBindingTagParam * pParam) {
 	m_db.BindingTag2Desk(pParam, m_BindingTags);
-	::PostMessage(g_data.m_hWnd, UM_BINDING_TAG_RET, 0, 0);
+	DWORD  dwGreat = MAKELONG((WORD)pParam->m_dwPos, (WORD)pParam->m_dwNo);
+	char * szTagId = new char[20];
+	STRNCPY(szTagId, pParam->m_szTagId, 20);
+	::PostMessage(g_data.m_hWnd, UM_BINDING_TAG_RET, dwGreat, (LPARAM)szTagId);
+}
+
+void  CBusiness::DisableBindingAsyn(WORD wClassNo, WORD  wPos) {
+	g_data.m_thrd_db->PostMessage(this, MSG_DISABLE_BINDING_TAG, new CDisableBindingTagParam(wClassNo, wPos));
+}
+
+void  CBusiness::DisableBinding(const CDisableBindingTagParam * pParam) {
+	m_db.DisableBinding(pParam);
+
+	DWORD  dwGreat = MAKELONG(pParam->m_wPos, pParam->m_wNo);
+	std::map<std::string, DWORD>::iterator it;
+	for (it = m_BindingTags.begin(); it != m_BindingTags.end(); ++it) {
+		if (it->second == dwGreat) {
+			m_BindingTags.erase(it);
+			break;
+		}
+	}
+
+	::PostMessage(g_data.m_hWnd, UM_DISABLE_BINDING_RET, pParam->m_wNo, pParam->m_wPos);
 }
 
 // 消息处理
@@ -633,6 +667,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CBindingTagParam * pParam = (CBindingTagParam *)pMessageData;
 		BindingTag2Desk(pParam);
+	}
+	break;
+
+	case MSG_DISABLE_BINDING_TAG:
+	{
+		CDisableBindingTagParam * pParam = (CDisableBindingTagParam *)pMessageData;
+		DisableBinding(pParam);
 	}
 	break;
 

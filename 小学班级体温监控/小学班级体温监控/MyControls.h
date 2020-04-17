@@ -33,6 +33,7 @@ private:
 	CControlUI *                         m_Warning;
 	CButtonUI *                          m_btnDel;
 	CControlUI *                         m_total;
+	CControlUI *                         m_Binding;
 
 public:
 	DeskItem                             m_data;
