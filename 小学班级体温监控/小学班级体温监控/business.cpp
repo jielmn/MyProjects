@@ -145,6 +145,13 @@ int CBusiness::Init() {
 		g_data.m_nReaderNoEnd = g_data.m_nReaderNoStart;
 	}
 
+	g_data.m_cfg->GetConfig("high temperature", g_data.m_dwHighTemp, 3730);
+	g_data.m_cfg->GetConfig("low temperature",  g_data.m_dwLowTemp,  3500);
+
+	if ( g_data.m_dwLowTemp > g_data.m_dwHighTemp ) {
+		g_data.m_dwHighTemp = 3730;
+		g_data.m_dwLowTemp = 3500;
+	}
 
 	m_db.InitDb();
 
@@ -239,6 +246,15 @@ void   CBusiness::EmptyDeskAsyn(DWORD dwClassNo, DWORD dwPos) {
 
 void   CBusiness::EmptyDesk(const CEmptyDeskParam * pParam) {
 	m_db.EmptyDesk(pParam);
+
+	DWORD  dwGreat = MAKELONG((WORD)pParam->m_dwPos, (WORD)pParam->m_dwNo);
+	std::map<std::string, DWORD>::iterator it;
+	for (it = m_BindingTags.begin(); it != m_BindingTags.end(); ++it) {
+		if (it->second == dwGreat) {
+			m_BindingTags.erase(it);
+			break;
+		}
+	}
 	::PostMessage(g_data.m_hWnd, UM_EMPTY_DESK_RET, pParam->m_dwNo, pParam->m_dwPos);
 }
 

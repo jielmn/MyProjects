@@ -64,6 +64,10 @@
 // 如果3分钟没有收到数据，重新初始化串口(写发送命令)
 #define  REINIT_COM_PORT_TIME         180
 
+#define  HIGH_TEMP_COLOR            0xFFFF0000
+#define  LOW_TEMP_COLOR             0xFF0000FF
+#define  NORMAL_TEMP_COLOR          0xFF447AA1
+
 typedef  struct  tagDeskItem{
 	int     nGrade;
 	int     nClass;
@@ -100,6 +104,8 @@ public:
 	int                       m_nComportsCnt;
 	int                       m_nReaderNoStart;
 	int                       m_nReaderNoEnd;
+	DWORD                     m_dwLowTemp;
+	DWORD                     m_dwHighTemp;
 
 public:
 	CGlobalData() {
@@ -116,6 +122,8 @@ public:
 		m_bSpecifiedComports = FALSE;
 		m_nReaderNoStart = 0;
 		m_nReaderNoEnd = 0;
+		m_dwLowTemp = 0;
+		m_dwHighTemp = 0;
 	}
 };
 

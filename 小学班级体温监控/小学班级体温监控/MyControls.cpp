@@ -97,6 +97,16 @@ void CDeskUI::UpdateUI() {
 		if (m_data.nTemp > 0) {
 			strText.Format("%.2f¡æ", m_data.nTemp / 100.0f);
 			m_lblTemp->SetText(strText);
+
+			if (m_data.nTemp > (int)g_data.m_dwHighTemp) {
+				m_lblTemp->SetTextColor(HIGH_TEMP_COLOR);
+			}
+			else if (m_data.nTemp < (int)g_data.m_dwLowTemp) {
+				m_lblTemp->SetTextColor(LOW_TEMP_COLOR);
+			}
+			else {
+				m_lblTemp->SetTextColor(NORMAL_TEMP_COLOR);
+			}
 		}
 		else {
 			m_lblTemp->SetText("");
@@ -136,6 +146,26 @@ void CDeskUI::UpdateUI() {
 		m_lblTime->SetText("");
 		m_Warning->SetVisible(false);
 		m_btnDel->SetVisible(false);
+	}
+}
+
+void  CDeskUI::UpdateWarning(time_t now) {
+	if (!m_bInitiated)
+		return;
+
+	if (m_data.bValid) {		
+		if (m_data.time > 0 && now > m_data.time) {
+			time_t diff = now - m_data.time;
+			if (diff >= WARNING_TIME_ELAPSED) {
+				m_Warning->SetVisible(true);
+			}
+			else {
+				m_Warning->SetVisible(false);
+			}
+		}
+		else {
+			m_Warning->SetVisible(false);
+		}
 	}
 }
 

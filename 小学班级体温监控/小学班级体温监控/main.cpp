@@ -9,9 +9,13 @@
 #include "main.h"
 #include "business.h"
 #include "resource.h"
+#include <time.h>
 
 #define   TEMP_FADE_TIMER              1001
 #define   TEMP_FADE_TIMER_ELAPSE       10000
+
+#define   CHECK_WARNING_TIMER          1002
+#define   CHECK_WARNING_TIMER_ELAPSE   60000
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_lstClasses = 0;
@@ -94,6 +98,7 @@ void  CDuiFrameWnd::InitWindow() {
 	}
 
 	m_layRoom->SetVisible(false);
+	::SetTimer(GetHWND(), CHECK_WARNING_TIMER, CHECK_WARNING_TIMER_ELAPSE, 0);
 
 	CBusiness::GetInstance()->GetAllClassesAsyn();
 	WindowImplBase::InitWindow(); 
@@ -289,6 +294,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			m_lblNewTagTemp->SetTextColor(FADE_TEMP_COLOR);
 			m_lblNewTagTime->SetTextColor(FADE_TEMP_COLOR);
 			::KillTimer(GetHWND(), wParam);
+		}
+		else if (wParam == CHECK_WARNING_TIMER) {
+			OnCheckWarning();
 		}
 	}
 	else if (UM_BINDING_TAG_RET == uMsg) {
@@ -807,6 +815,19 @@ WORD  CDuiFrameWnd::GetCurClass() {
 	if (nSel < 0)
 		return 0;
 	return (WORD)m_lstClasses->GetItemAt(nSel)->GetTag();
+}
+
+void  CDuiFrameWnd::OnCheckWarning() {
+	int nSel = m_lstClasses->GetCurSel();
+	if (nSel < 0)
+		return;
+
+	time_t now = time(0);
+	int nCnt = m_layDesks->GetCount();
+	for (int i = 0; i < nCnt; i++) {
+		CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt(i);
+		pDesk->UpdateWarning(now);
+	}
 }
                 
  

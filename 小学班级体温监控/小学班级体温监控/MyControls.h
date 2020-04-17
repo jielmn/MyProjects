@@ -40,4 +40,5 @@ public:
 
 public:
 	void                                 UpdateUI();
+	void                                 UpdateWarning(time_t now);
 };
