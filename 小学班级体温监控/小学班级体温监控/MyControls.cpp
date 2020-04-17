@@ -95,7 +95,7 @@ void CDeskUI::UpdateUI() {
 		m_lblName->SetText(m_data.szName);
 
 		if (m_data.nTemp > 0) {
-			strText.Format("%.2f¡æ", m_data.nTemp / 100.0f);
+			strText.Format("%.1f¡æ", m_data.nTemp / 100.0f);
 			m_lblTemp->SetText(strText);
 
 			if (m_data.nTemp > (int)g_data.m_dwHighTemp) {
