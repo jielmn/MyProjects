@@ -137,6 +137,7 @@ private:
 	void   UpdateNewTag();
 	void   OnMoveTag(const POINT & pt);
 	void   OnStopMoveTag();
+	WORD   GetCurClass();
 
 };
 

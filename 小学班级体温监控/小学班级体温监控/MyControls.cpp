@@ -82,6 +82,7 @@ void CDeskUI::UpdateUI() {
 
 	CDuiString  strText;
 	char szBuf[256];
+	time_t now = time(0);
 
 	if (m_data.bValid) {
 		if (m_data.nSex == 1) {
@@ -112,7 +113,19 @@ void CDeskUI::UpdateUI() {
 			m_lblTime->SetText("");
 		}
 
-		m_Warning->SetVisible(false);
+		if ( m_data.time > 0 && now > m_data.time ) {
+			time_t diff = now - m_data.time;
+			if ( diff >= WARNING_TIME_ELAPSED ) {
+				m_Warning->SetVisible(true);
+			}
+			else {
+				m_Warning->SetVisible(false);
+			}
+		}
+		else {
+			m_Warning->SetVisible(false);
+		}
+
 		m_btnDel->SetVisible(false);
 	}
 	else {

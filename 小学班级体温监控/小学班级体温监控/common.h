@@ -24,6 +24,13 @@
 #define  SHOW_TAG_ID   1
 #endif
 
+#ifdef _DEBUG
+#define  WARNING_TIME_ELAPSED          10                             // 单位秒
+#else
+#define  WARNING_TIME_ELAPSED          86400                          // 单位秒
+#endif
+
+
 #define   MAX_CLASS_NUM             10
 #define   MAX_ROOM_COLUMN           10
 
@@ -49,6 +56,7 @@
 #define   UM_CHECK_COM_PORTS_RET    (WM_USER + 8)
 #define   UM_NEW_TAG_TEMPERATURE    (WM_USER + 9)
 #define   UM_BINDING_TAG_RET        (WM_USER + 10)
+#define   UM_DESK_TEMPERATURE       (WM_USER + 11)
 
 
 #define   CFG_LAUNCH_COM_PORT               "launch com ports"

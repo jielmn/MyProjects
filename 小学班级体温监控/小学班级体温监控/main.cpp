@@ -296,6 +296,30 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		UpdateNewTag();
 		::KillTimer(GetHWND(), TEMP_FADE_TIMER);
 	}
+	else if (UM_DESK_TEMPERATURE == uMsg) {
+		TempItem * pItem = (TempItem *)wParam;
+		DWORD  dwGreat = lParam;
+		WORD  wNo = HIWORD(dwGreat);
+		WORD  wPos = LOWORD(dwGreat);
+
+		WORD wCurClass = GetCurClass();
+		if ( wCurClass == wNo ) {
+			BYTE  byRow = HIBYTE(wPos);
+			BYTE  byCol = LOBYTE(wPos);
+			assert(byCol > 0 && byCol <= g_data.m_dwRoomCols);
+			assert(byRow > 0 && byRow <= g_data.m_dwRoomRows);
+			DWORD  dwUiRow = g_data.m_dwRoomRows - byRow;
+			DWORD  dwUiCol = byCol - 1;
+			CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + dwUiCol);
+			assert(pDesk);
+			assert(pDesk->m_data.bValid);
+			pDesk->m_data.nTemp = pItem->m_dwTemp;
+			pDesk->m_data.time = pItem->m_time;
+			pDesk->UpdateUI();
+		}
+
+		delete pItem;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -776,6 +800,13 @@ void  CDuiFrameWnd::OnStopMoveTag() {
 
 		m_dragdrop_tag.m_highlight = 0;
 	}
+}
+
+WORD  CDuiFrameWnd::GetCurClass() {
+	int nSel = m_lstClasses->GetCurSel();
+	if (nSel < 0)
+		return 0;
+	return (WORD)m_lstClasses->GetItemAt(nSel)->GetTag();
 }
                 
  
