@@ -235,6 +235,7 @@ int  CLaunch::ReadComData() {
 // 协议：  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
 //        55 0D 01 02 E1 01 FF DA A1 05 12 41 23 14 00 FF
 void   CLaunch::ProcBatteryTemp(const BYTE * pData, DWORD dwDataLen) {
+#if TRI_TAGS_FLAG
 	char debug_buf[8192];
 
 	if (pData[15] != (BYTE)'\xFF') {
@@ -267,6 +268,7 @@ void   CLaunch::ProcBatteryTemp(const BYTE * pData, DWORD dwDataLen) {
 
 	if ( wBedNo > 0 )
 		m_sigReaderTemp.emit(wBedNo, temp_item);
+#endif
 }
 
 // 术中读卡器温度
