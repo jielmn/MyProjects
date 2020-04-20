@@ -5,7 +5,8 @@
     "pages/index/index",    
     "pages/logs/logs",    
     "pages/setting/setting",
-    "pages/devices/devices"
+    "pages/devices/devices",
+    "pages/help/help"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -30,6 +31,12 @@
         "iconPath": "images/user_u.png",
         "selectedIconPath": "images/user.png",
         "text": "设置"
+      },
+      {
+        "pagePath": "pages/help/help",
+        "iconPath": "images/help_u.png",
+        "selectedIconPath": "images/help.png",
+        "text": "帮助"
       }
     ]
   },
