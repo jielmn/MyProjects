@@ -17,9 +17,11 @@
     </view>
   </view>
 
+  <!--
   <view class='btnview'>
     <button class='start' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
   </view>
+  -->
 
   <view class="tempview">
     <view class='v1'>收到温度(℃):</view>
@@ -45,4 +47,9 @@
     <view class="y2">{{item.lasttemperature?tools.toFixed(item.lasttemperature,1):'无'}}</view>
     <view class="y3">{{item.time?tools.formatTime(item.time):''}}</view>
   </view>
+</view>
+
+
+<view class="bottom">
+  <button class='start' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
 </view>
