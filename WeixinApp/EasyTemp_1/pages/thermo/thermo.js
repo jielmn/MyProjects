@@ -9,7 +9,7 @@ Page({
     members: [],
     index: 0,
     curtagId: null,    
-    bluetoothStr: "正在连接易温读卡器...",
+    bluetoothStr: "正在连接易温读卡器......",
     spinShow: true,
     connected:false,
     mesureBusy: false,
@@ -101,7 +101,7 @@ Page({
       } else {
         if (res.myCode && res.myCode != 0) {
           that.setData({
-            bluetoothStr: "正在连接易温读卡器...",
+            bluetoothStr: "正在连接易温读卡器......",
             spinShow: true,
             connected: false
           });
@@ -155,7 +155,7 @@ Page({
       app.log('that.lastDeviceId', that.lastDeviceId);
       app.log('reconnect device');
       that.setData({
-        bluetoothStr: "正在连接易温读卡器...",
+        bluetoothStr: "正在连接易温读卡器......",
         spinShow: true,
         connected: false
       });

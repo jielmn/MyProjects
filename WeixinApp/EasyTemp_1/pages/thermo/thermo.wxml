@@ -3,19 +3,14 @@
 <view class="upview">
   <view class="connectview">
     <view class="left">{{bluetoothStr}}</view>
-    <view class="weui-loading" fix wx:if="{{ spinShow }}" ></view>
-    <view class="right" wx:if="{{ !spinShow }}" >
-      <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
-    </view>
-    <!--
-    <view class="right" wx:if="{{ !spinShow }}" >
-      <image class='update' src='/images/setting.png' bindtap="onSelectDevice" ></image>
-    </view>
-    -->
-    <view class="right" wx:if="{{ !spinShow }}" >
-      <image class='update' src='/images/scan.png' bindtap="onScan" ></image>
-    </view>
+    <view class="weui-loading errmsg" fix wx:if="{{ spinShow }}" ></view>  
   </view>
+
+  <view class="btn" wx:if="{{ !spinShow }}" >
+    <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
+    <image class='scan'   src='/images/scan.png' bindtap="onScan" ></image>
+  </view>
+
 
   <!--
   <view class='btnview'>

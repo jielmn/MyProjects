@@ -16,12 +16,8 @@
   display: inline-block;
   vertical-align: top;
   height: 60rpx;
-  line-height: 60rpx;
+  line-height: 30rpx;
   color: #FD7432;
-  max-width:580rpx;
-  overflow: hidden;/*超出部分隐藏*/
-  white-space: nowrap;/*不换行*/
-  text-overflow:ellipsis;/*超出部分文字以...显示*/
 }
 
 .connectview .right{
@@ -30,6 +26,14 @@
   height: 60rpx;
   padding-top: 10rpx;
   padding-left: 20rpx;
+}
+
+.connectview .errmsg{
+  vertical-align: top;
+}
+
+.btn{
+  padding-top: 30rpx;
 }
 
 .tempview{
@@ -102,8 +106,15 @@
 }
 
 .update{
-  width: 40rpx;
-  height: 40rpx;
+  width: 80rpx;
+  height: 80rpx;
+  padding-left: 200rpx;
+}
+
+.scan{
+  width: 80rpx;
+  height: 80rpx;
+  padding-left: 200rpx;
 }
 
 .start {
@@ -120,7 +131,7 @@
   background:#00000000;
   position:fixed;
   text-align: center;
-  bottom: 0;
+  bottom: 20rpx;
   left: 0;  
   color: transparent;
 }
