@@ -72,6 +72,7 @@ private:
 	void  OnNextPage_1();
 
 	void  OnInHospitalCheckbox();
+	void  OnInHospitalKillfocus();
 
 private:
 	CMyTreeCfgUI  *             m_tree;
