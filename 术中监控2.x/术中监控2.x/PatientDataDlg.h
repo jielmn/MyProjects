@@ -67,6 +67,10 @@ private:
 	void  OnPrevPage();
 	void  OnNextPage();
 
+	// 上一页，下一页
+	void  OnPrevPage_1();
+	void  OnNextPage_1();
+
 private:
 	CMyTreeCfgUI  *             m_tree;
 	CTabLayoutUI *              m_switch;
@@ -99,6 +103,8 @@ private:
 	CButtonUI *               m_btnNext;
 	CButtonUI *               m_btnZoomout;
 	CButtonUI *               m_btnZoomin;
+
+	CLabelUI *                m_lblPageIndex;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

@@ -45,6 +45,8 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_btnNext = 0;
 	m_btnZoomout = 0;
 	m_btnZoomin = 0;
+
+	m_lblPageIndex = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -89,6 +91,12 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		}
 		else if ( name == "btnNext" ) {
 			OnNextPage();
+		}
+		else if (name == "btnPrev_1") {
+			OnPrevPage_1();
+		}
+		else if (name == "btnNext_1") {
+			OnNextPage_1();
 		}
 		else {
 			if ( msg.pSender->GetClass() == "MyEvent" ) {
@@ -403,6 +411,8 @@ void  CPatientDataDlg::InitData() {
 	CControlUI * pCtl = 0;
 	CLabelUI * pLabel = 0;
 	CButtonUI * pBtn = 0;
+	CButtonUI * pBtnPrev = 0;
+	CButtonUI * pBtnNext = 0;
 	RECT r = { 5,0,5,0 };
 	CControlUI * pToolTip = 0;
 	CVerticalLayoutUI * pLayV1 = 0;
@@ -418,14 +428,17 @@ void  CPatientDataDlg::InitData() {
 	m_date_start->SetTextColor(0xFF666666);
 	m_date_start->SetTextPadding(r);
 	m_date_start->SetName("DateTimeS");
+	m_date_start->SetVisible(false);
 
 	pCtl = new CControlUI;
 	pCtl->SetFixedWidth(10);
+	pCtl->SetVisible(false);
 	pLabel = new CLabelUI;
 	pLabel->SetText("到");
 	pLabel->SetFixedWidth(60);
 	pLabel->SetFont(3);
 	pLabel->SetTextColor(0xFF666666);
+	pLabel->SetVisible(false);
 
 	m_date_end   = new CMyDateUI;
 	m_date_end->SetFixedWidth(180);
@@ -434,12 +447,78 @@ void  CPatientDataDlg::InitData() {
 	m_date_end->SetTextPadding(r);
 	m_date_end->SetEnabled(false);
 	m_date_end->SetName("DateTimeE");
+	m_date_end->SetVisible(false);
+
+	pBtnPrev = new CButtonUI;
+	pBtnPrev->SetText("上一页");
+	pBtnPrev->SetFixedWidth(100);
+	pBtnPrev->SetNormalImage("file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+	pBtnPrev->SetHotImage("file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+	pBtnPrev->SetPushedImage("file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+	pBtnPrev->SetFont(1);
+	pBtnPrev->SetTextColor(0xFF386382);
+	pBtnPrev->SetName("btnPrev_1");
+	//pBtnPrev->SetEnabled(false);
+
+	pBtnNext = new CButtonUI;
+	pBtnNext->SetFixedWidth(100);
+	pBtnNext->SetText("下一页");
+	pBtnNext->SetNormalImage("file='win7_button_normal.png' corner='5,5,5,5' hole='false'");
+	pBtnNext->SetHotImage("file='win7_button_hot.png' corner='5,5,5,5' hole='false'");
+	pBtnNext->SetPushedImage("file='win7_button_pushed.png' corner='5,5,5,5' hole='false'");
+	pBtnNext->SetFont(1);
+	pBtnNext->SetTextColor(0xFF386382);
+	pBtnNext->SetName("btnNext_1");
+	//pBtnNext->SetEnabled(false);
 
 	pLayH = new CHorizontalLayoutUI;
 	pLayH->Add(m_date_start);
 	pLayH->Add(pCtl);
 	pLayH->Add(pLabel);
 	pLayH->Add(m_date_end);
+
+	pCtl = new CControlUI;
+	pCtl->SetFixedWidth(100);
+	pLayH->Add(pCtl);
+
+	pLayH->Add(pBtnPrev);
+
+	pCtl = new CControlUI;
+	pCtl->SetFixedWidth(40);
+	pLayH->Add(pCtl);
+
+	pLayH->Add(pBtnNext);
+
+	pCtl = new CControlUI;
+	//pCtl->SetFixedWidth(40);
+	pLayH->Add(pCtl);
+
+	pLabel = new CLabelUI;
+	pLabel->SetText("第");
+	pLabel->SetFixedWidth(40);
+	pLabel->SetFont(3);
+	pLabel->SetTextColor(0xFF666666);
+	pLabel->SetAttribute("align", "center");
+	pLayH->Add(pLabel);
+
+	pLabel = new CLabelUI;
+	pLabel->SetText("0");
+	pLabel->SetFixedWidth(40);
+	pLabel->SetFont(3);
+	pLabel->SetTextColor(0xFF666666);
+	pLabel->SetAttribute("align", "center");
+	pLabel->SetName("lblPageIndex_1");
+	m_lblPageIndex = pLabel;
+	pLayH->Add(pLabel);
+
+	pLabel = new CLabelUI;
+	pLabel->SetText("页");
+	pLabel->SetFixedWidth(40);
+	pLabel->SetFont(3);
+	pLabel->SetTextColor(0xFF666666);
+	pLabel->SetAttribute("align", "center");
+	pLayH->Add(pLabel);
+
 	pTitleNode = m_tree->AddNode(strText, 0, 0, pLayH, 3, 0xFF666666, -1, -1, 40);
 
 	// 体温
@@ -1148,30 +1227,61 @@ void  CPatientDataDlg::OnPatientInfoRet(WPARAM wParam, LPARAM  lParam) {
 
 	time_t tFirstDay = 0;
 	// 如果有住院日期
-	if ( m_patient_info.m_in_hospital > 0 ) {
+	//if ( m_patient_info.m_in_hospital > 0 ) {
+	//	// 如果没有出院日期
+	//	if (m_patient_info.m_out_hospital == 0) {
+	//		time_t  tHospital = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
+	//		time_t  tTodayZero = GetTodayZeroTime();
+	//		if (tTodayZero < tHospital) {
+	//			tFirstDay = tTodayZero;
+	//		}
+	//		// 差距小于一周
+	//		else if (tTodayZero - tHospital < 3600 * 24 * 6) {
+	//			tFirstDay = tHospital;
+	//		}
+	//		// 差距大于一周
+	//		else {
+	//			tFirstDay = tTodayZero - 3600 * 24 * 6;
+	//		}
+	//	}
+	//	// 有出院日期
+	//	else {
+	//		tFirstDay = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
+	//	}		
+	//}
+	//else {
+	//	tFirstDay = GetTodayZeroTime();
+	//}
+
+	CDuiString  strText;
+	// 如果有住院日期
+	if (m_patient_info.m_in_hospital > 0) {
 		// 如果没有出院日期
 		if (m_patient_info.m_out_hospital == 0) {
-			time_t  tHospital = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
+			time_t  tHospital  = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
 			time_t  tTodayZero = GetTodayZeroTime();
-			if (tTodayZero < tHospital) {
-				tFirstDay = tTodayZero;
-			}
-			// 差距小于一周
-			else if (tTodayZero - tHospital < 3600 * 24 * 6) {
+			if (tTodayZero <= tHospital) {
 				tFirstDay = tHospital;
+				m_lblPageIndex->SetText("1");
 			}
-			// 差距大于一周
 			else {
-				tFirstDay = tTodayZero - 3600 * 24 * 6;
+				time_t  diff   = tTodayZero - tHospital;
+				int nPageIndex = (int)diff / (86400 * 7) + 1;
+				tFirstDay = tHospital + 86400 * 7 * (nPageIndex - 1);
+				strText.Format("%d", nPageIndex);
+				m_lblPageIndex->SetText(strText);
 			}
 		}
 		// 有出院日期
 		else {
 			tFirstDay = GetAnyDayZeroTime(m_patient_info.m_in_hospital);
-		}		
+			m_lblPageIndex->SetText("1");
+		}
 	}
+	// 没有住院日期
 	else {
 		tFirstDay = GetTodayZeroTime();
+		m_lblPageIndex->SetText("");
 	}
 
 	SYSTEMTIME s = Time2SysTime(tFirstDay);
@@ -1524,4 +1634,103 @@ void  CPatientDataDlg::OnNextPage() {
 
 	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
 	SetBusy(TRUE);
+}
+
+void  CPatientDataDlg::OnPrevPage_1() {
+
+	PatientInfo info;
+	std::vector<PatientEvent * > vEvents;
+
+	GetPatientInfo(&info, vEvents);
+	if ( info.m_in_hospital <= 0 ) {
+		MessageBox(GetHWND(), "请先输入住院日期", "错误", 0);
+		return;
+	}
+
+	time_t  tHospital = GetAnyDayZeroTime(info.m_in_hospital);
+	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
+	if ( tFirstDay - 86400 * 7 < tHospital ) {
+		return;
+	}
+
+	// 先保存数据
+	PatientData data[7];
+	GetPatientData(data, 7);
+
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientDataChanged(&data[i], i)) {
+			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
+			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+		}
+	}
+	// END 保存数据
+
+	tFirstDay -= 3600 * 24 * 7;    // 604800
+	SYSTEMTIME s1 = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s1);
+
+	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
+	SYSTEMTIME s2 = Time2SysTime(tEndDay);
+	m_date_end->SetMyTime(&s2);
+
+	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+	SetBusy(TRUE);
+
+	time_t  diff = tFirstDay - tHospital;
+	int nPageIndex = (int)diff / (86400 * 7) + 1;
+	CDuiString  strText;
+	strText.Format("%d", nPageIndex);
+	m_lblPageIndex->SetText(strText);
+}
+
+void  CPatientDataDlg::OnNextPage_1() {
+	PatientInfo info;
+	std::vector<PatientEvent * > vEvents;
+
+	GetPatientInfo(&info, vEvents);
+	if (info.m_in_hospital <= 0) {
+		MessageBox(GetHWND(), "请先输入住院日期", "错误", 0);
+		return;
+	}
+
+	time_t  tHospital = GetAnyDayZeroTime(info.m_in_hospital);
+	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
+
+	// 先保存数据
+	PatientData data[7];
+	GetPatientData(data, 7);
+
+	for (DWORD i = 0; i < 7; i++) {
+		if (IsPatientDataChanged(&data[i], i)) {
+			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
+			data[i].m_date = tFirstDay + 3600 * 24 * i;
+			// 保存数据库
+			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
+		}
+	}
+	// END 保存数据
+
+	tFirstDay += 3600 * 24 * 7;    // 604800
+	SYSTEMTIME s1 = Time2SysTime(tFirstDay);
+	m_date_start->SetMyTime(&s1);
+
+	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
+	SYSTEMTIME s2 = Time2SysTime(tEndDay);
+	m_date_end->SetMyTime(&s2);
+
+	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+	SetBusy(TRUE);
+
+	CDuiString  strText;
+	if ( tFirstDay >= tHospital ) {
+		time_t  diff = tFirstDay - tHospital;
+		int nPageIndex = (int)diff / (86400 * 7) + 1;		
+		strText.Format("%d", nPageIndex);
+		m_lblPageIndex->SetText(strText);
+	}
+	else {
+		m_lblPageIndex->SetText("");
+	}
 }
