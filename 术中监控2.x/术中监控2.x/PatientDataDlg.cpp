@@ -1582,58 +1582,11 @@ DWORD  CPatientDataDlg::GetTemp(time_t tStart, time_t tEnd) {
 
 // 上一页，下一页
 void  CPatientDataDlg::OnPrevPage() {
-	PatientData data[7];
-	GetPatientData(data, 7);
-	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
-
-	for (DWORD i = 0; i < 7; i++) {
-		if (IsPatientDataChanged(&data[i], i)) {
-			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
-			data[i].m_date = tFirstDay + 3600 * 24 * i;
-			// 保存数据库
-			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);
-		}
-	}
-	// END 保存数据
-
-	tFirstDay -= 3600 * 24 * 7;
-	SYSTEMTIME s = Time2SysTime(tFirstDay);
-	m_date_start->SetMyTime(&s);
-	
-	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
-	SYSTEMTIME s1 = Time2SysTime(tEndDay);
-	m_date_end->SetMyTime(&s1);
-
-	//m_switch->SelectItem(0);
-	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
-	SetBusy(TRUE);
+	OnPrevPage_1();
 }
 
-void  CPatientDataDlg::OnNextPage() {
-	PatientData data[7];
-	GetPatientData(data, 7);
-	time_t  tFirstDay = GetAnyDayZeroTime(SysTime2Time(m_date_end->GetTime())) - 3600 * 24 * 6;
-
-	for (DWORD i = 0; i < 7; i++) {
-		if (IsPatientDataChanged(&data[i], i)) {
-			STRNCPY(data[i].m_szTagId, m_szTagId, MAX_TAG_ID_LENGTH);
-			data[i].m_date = tFirstDay + 3600 * 24 * i;
-			// 保存数据库
-			CBusiness::GetInstance()->SavePatientDataAsyn(&data[i]);   
-		}
-	}
-	// END 保存数据
-
-	tFirstDay += 3600 * 24 * 7;
-	SYSTEMTIME s = Time2SysTime(tFirstDay);
-	m_date_start->SetMyTime(&s);
-
-	time_t tEndDay = tFirstDay + 3600 * 24 * 6;
-	SYSTEMTIME s1 = Time2SysTime(tEndDay);
-	m_date_end->SetMyTime(&s1);
-
-	CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
-	SetBusy(TRUE);
+void  CPatientDataDlg::OnNextPage() {	
+	OnNextPage_1();
 }
 
 void  CPatientDataDlg::OnPrevPage_1() {
