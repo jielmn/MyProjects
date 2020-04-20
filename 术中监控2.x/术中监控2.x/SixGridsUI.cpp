@@ -308,7 +308,7 @@ CMyDateTimeUI::CMyDateTimeUI() : m_callback(m_pManager) {
 }
 
 CMyDateTimeUI::~CMyDateTimeUI() {
-
+	m_pManager->RemoveNotifier(this);
 }
 
 LPCTSTR CMyDateTimeUI::GetClass() const {
@@ -320,6 +320,7 @@ void CMyDateTimeUI::DoInit() {
 	CContainerUI* pChildWindow = static_cast<CContainerUI*>(builder.Create(_T("MyTime.xml"), (UINT)0, &m_callback, m_pManager));
 	if (pChildWindow) {
 		this->Add(pChildWindow);
+		m_pManager->AddNotifier(this);
 	}
 	else {
 		this->RemoveAll();
@@ -340,6 +341,14 @@ void CMyDateTimeUI::DoInit() {
 
 		strText.Format("%d", (int)s.wMinute);
 		m_minute->SetText(strText);
+	}
+}
+
+void CMyDateTimeUI::Notify(TNotifyUI& msg) {
+	if (msg.sType == "killfocus") {
+		if (msg.pSender == m_date) {
+			this->m_pManager->SendNotify(this, "mykillfocus");
+		}
 	}
 }
 

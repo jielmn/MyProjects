@@ -71,6 +71,8 @@ private:
 	void  OnPrevPage_1();
 	void  OnNextPage_1();
 
+	void  OnInHospitalCheckbox();
+
 private:
 	CMyTreeCfgUI  *             m_tree;
 	CTabLayoutUI *              m_switch;
@@ -105,6 +107,7 @@ private:
 	CButtonUI *               m_btnZoomin;
 
 	CLabelUI *                m_lblPageIndex;
+	CCheckBoxUI *             m_chInHospital;
 
 public:
 	char                        m_szTagId[MAX_TAG_ID_LENGTH];              // Tag Id

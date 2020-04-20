@@ -83,7 +83,7 @@ private:
 	void DoInit();
 };
 
-class CMyDateTimeUI : public  CContainerUI {
+class CMyDateTimeUI : public  CContainerUI, INotifyUI {
 public:
 	CMyDateTimeUI();
 	~CMyDateTimeUI();
@@ -93,6 +93,7 @@ public:
 private:
 	LPCTSTR GetClass() const;
 	void DoInit();
+	void Notify(TNotifyUI& msg);
 
 	CDialogBuilderCallbackEx                    m_callback;
 	CMyDateUI *                                 m_date;

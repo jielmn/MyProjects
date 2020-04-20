@@ -47,6 +47,7 @@ CPatientDataDlg::CPatientDataDlg() {
 	m_btnZoomin = 0;
 
 	m_lblPageIndex = 0;
+	m_chInHospital = 0;
 }
 
 CPatientDataDlg::~CPatientDataDlg() {
@@ -143,6 +144,16 @@ void   CPatientDataDlg::Notify(DuiLib::TNotifyUI& msg) {
 		//OutputDebugString(strText);
 		if ( t > 0 && m_cur_temp) {
 			m_cur_temp->SetFocusValue(t);
+		}
+	}
+	else if (msg.sType == "mykillfocus") {
+		if (name == "dtInHospital") {
+			
+		}
+	}
+	else if (msg.sType == "selectchanged") {
+		if (name == "chInHospital") {
+			OnInHospitalCheckbox();
 		}
 	}
 	WindowImplBase::Notify(msg);
@@ -317,8 +328,11 @@ void   CPatientDataDlg::InitInfo() {
 	pSubTitleNode = m_tree->AddNode(strText, pTitleNode, 0, 0, 3, 0xFF666666);
 	pCheckBox = new CCheckBoxUI;
 	pCheckBox->SetFixedWidth(20);
+	pCheckBox->SetName("chInHospital");
+	m_chInHospital = pCheckBox;
 	m_tree->AddNode("是否入院", pSubTitleNode, 0, pCheckBox, 2, 0xFF386382, 2, 0xFF386382);
 	pMyTime = new CMyDateTimeUI;
+	pMyTime->SetName("dtInHospital");
 	m_tree->AddNode("入院日期", pSubTitleNode, 0, pMyTime, 2, 0xFF386382);
 
 	// 出院日期
@@ -1595,6 +1609,7 @@ void  CPatientDataDlg::OnPrevPage_1() {
 	std::vector<PatientEvent * > vEvents;
 
 	GetPatientInfo(&info, vEvents);
+	ClearVector(vEvents);
 	if ( info.m_in_hospital <= 0 ) {
 		MessageBox(GetHWND(), "请先输入住院日期", "错误", 0);
 		return;
@@ -1643,6 +1658,7 @@ void  CPatientDataDlg::OnNextPage_1() {
 	std::vector<PatientEvent * > vEvents;
 
 	GetPatientInfo(&info, vEvents);
+	ClearVector(vEvents);
 	if (info.m_in_hospital <= 0) {
 		MessageBox(GetHWND(), "请先输入住院日期", "错误", 0);
 		return;
@@ -1682,6 +1698,60 @@ void  CPatientDataDlg::OnNextPage_1() {
 		int nPageIndex = (int)diff / (86400 * 7) + 1;		
 		strText.Format("%d", nPageIndex);
 		m_lblPageIndex->SetText(strText);
+	}
+	else {
+		m_lblPageIndex->SetText("");
+	}
+}
+
+void CPatientDataDlg::OnInHospitalCheckbox() {
+	BOOL  bSelected = m_chInHospital->IsSelected();
+	if (bSelected) {
+
+		PatientInfo info;
+		std::vector<PatientEvent * > vEvents;
+		GetPatientInfo(&info, vEvents);
+		ClearVector(vEvents);
+
+		time_t tFirstDay = 0;
+		CDuiString  strText;
+		// 如果有住院日期
+		if (info.m_in_hospital > 0) {
+			// 如果没有出院日期
+			if (info.m_out_hospital == 0) {
+				time_t  tHospital = GetAnyDayZeroTime(info.m_in_hospital);
+				time_t  tTodayZero = GetTodayZeroTime();
+				if (tTodayZero <= tHospital) {
+					tFirstDay = tHospital;
+					m_lblPageIndex->SetText("1");
+				}
+				else {
+					time_t  diff = tTodayZero - tHospital;
+					int nPageIndex = (int)diff / (86400 * 7) + 1;
+					tFirstDay = tHospital + 86400 * 7 * (nPageIndex - 1);
+					strText.Format("%d", nPageIndex);
+					m_lblPageIndex->SetText(strText);
+				}
+			}
+			// 有出院日期
+			else {
+				tFirstDay = GetAnyDayZeroTime(info.m_in_hospital);
+				m_lblPageIndex->SetText("1");
+			}
+		}
+		// 没有住院日期
+		else {
+			tFirstDay = GetTodayZeroTime();
+			m_lblPageIndex->SetText("");
+		}
+
+		SYSTEMTIME s = Time2SysTime(tFirstDay);
+		m_date_start->SetMyTime(&s);
+		s = Time2SysTime(tFirstDay + 3600 * 24 * 6);
+		m_date_end->SetMyTime(&s);
+
+		CBusiness::GetInstance()->QueryPatientDataAsyn(m_szTagId, tFirstDay);
+		SetBusy(TRUE);
 	}
 	else {
 		m_lblPageIndex->SetText("");
