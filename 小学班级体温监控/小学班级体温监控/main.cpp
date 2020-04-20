@@ -224,7 +224,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		CDeskUI * pDeskUI = (CDeskUI *)m_layDesks->GetItemAt(dwUiRow * g_data.m_dwRoomCols + pItem->nCol - 1);
 		assert(pDeskUI);
 
-		memset(&pDeskUI->m_data, 0, sizeof(DeskItem));
+		// memset(&pDeskUI->m_data, 0, sizeof(DeskItem));
 		STRNCPY(pDeskUI->m_data.szName, pItem->szName, sizeof(pDeskUI->m_data.szName));
 		pDeskUI->m_data.nSex = pItem->nSex;
 		pDeskUI->m_data.bValid = TRUE;
@@ -751,7 +751,8 @@ void   CDuiFrameWnd::OnDeskDbClick(CDeskUI * pDeskUI) {
 	// 增加学生
 	else {
 		// 如果名字不同，认为修改
-		if ( 0 != strcmp(pDeskUI->m_data.szName, pDlg->m_data.szName) ) {
+		if (  0 != strcmp(pDeskUI->m_data.szName, pDlg->m_data.szName) 
+			|| pDeskUI->m_data.nSex != pDlg->m_data.nSex ) {
 			CBusiness::GetInstance()->ModifyDeskAsyn(dwNo, dwPos, pDlg->m_data.szName, pDlg->m_data.nSex);
 		}		
 	}

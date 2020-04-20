@@ -185,8 +185,7 @@ void  CMySqliteDatabase::ModifyDesk(const CModifyDeskParam * pParam) {
 
 	// Èç¹ûÓÐ
 	if (nrow > 0) {
-		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET name='%s', sex=%d, tag_id=null,"
-			" temperature=0, time=0 WHERE class_id = %lu AND position=%lu", 
+		SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET name='%s', sex=%d WHERE class_id = %lu AND position=%lu", 
 			ROOMS_TABLE, szName, pParam->m_nSex, pParam->m_dwNo, pParam->m_dwPos);
 		sqlite3_exec(m_db, szSql, 0, 0, 0);
 	}
