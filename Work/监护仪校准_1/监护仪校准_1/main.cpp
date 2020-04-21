@@ -14,6 +14,7 @@
 
 CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_nCurColumns = 0;
+	m_nCurRows = 0;
 	m_layMain = 0;
 	memset(m_layColumns, 0, sizeof(m_layColumns));
 	memset(m_temp_items, 0, sizeof(m_temp_items));
@@ -37,7 +38,7 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 void CDuiFrameWnd::OnFinalMessage(HWND hWnd) {
 	if (!m_bItemsAdded) {
 		for (int i = 0; i < MAX_TEMP_ITEMS_CNT; i++) {
-			delete m_temp_items[i];
+			delete m_temp_items[i]; 
 		}
 	}
 }
@@ -223,7 +224,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			}
 			else if (wParam == VK_LEFT) {
 				if (m_nHighlightIndex >= 0) {
-					int nRows = MAX_TEMP_ITEMS_CNT / m_nCurColumns;
+					int nRows = m_nCurRows;
 					int nColumnIndex = m_nHighlightIndex / nRows;
 					if (nColumnIndex > 0) {
 						m_nHighlightIndex -= nRows;
@@ -234,9 +235,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			}
 			else if (wParam == VK_RIGHT) {
 				if (m_nHighlightIndex >= 0) {
-					int nRows = MAX_TEMP_ITEMS_CNT / m_nCurColumns;
+					int nRows = m_nCurRows;
 					int nColumnIndex = m_nHighlightIndex / nRows;
-					if (nColumnIndex < m_nCurColumns - 1) {
+					if (m_nHighlightIndex + nRows < MAX_TEMP_ITEMS_CNT) {
 						m_nHighlightIndex += nRows;
 						m_temp_items[m_nHighlightIndex]->SetHighlight(TRUE);
 						m_temp_items[m_nHighlightIndex - nRows]->SetHighlight(FALSE);
@@ -306,6 +307,7 @@ bool CDuiFrameWnd::OnMainSize(void * pParam) {
 	// 重新计算列数
 	nColumn = ( MAX_TEMP_ITEMS_CNT - 1 ) / nRows + 1;
 	m_nCurColumns = nColumn;
+	m_nCurRows = nRows;
 
 	int nItemIndex = 0;
 	for ( int i = 0; i < m_nCurColumns; i++ ) {

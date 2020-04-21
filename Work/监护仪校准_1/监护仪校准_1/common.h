@@ -23,8 +23,8 @@ using namespace DuiLib;
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
 #define   MAX_COLUMNS_CNT          10
-#define   MAX_TEMP_ITEMS_CNT       160            // 一共160个子项
-#define   FIRST_TEMP               3000           // 从30℃开始
+#define   MAX_TEMP_ITEMS_CNT       71             // 一共160个子项
+#define   FIRST_TEMP               3500           // 从30℃开始
 
 #if !NEW_VERSION_FLAG
 #define   MAX_MACHINE_CNT   4

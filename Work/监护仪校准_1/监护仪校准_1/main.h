@@ -58,6 +58,7 @@ private:
 	DuiLib::CHorizontalLayoutUI *             m_layMain;
 	DuiLib::CVerticalLayoutUI *               m_layColumns[MAX_COLUMNS_CNT];
 	int                                       m_nCurColumns;
+	int                                       m_nCurRows;
 	CTempItemUI *                             m_temp_items[MAX_TEMP_ITEMS_CNT];
 
 	// ´®¿Ú
