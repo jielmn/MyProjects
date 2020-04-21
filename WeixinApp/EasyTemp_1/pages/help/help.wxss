@@ -1,0 +1,9 @@
+.content{
+  padding-left:20rpx;
+  padding-right:20rpx;
+  padding-top: 20rpx;
+}
+
+.item{
+  padding-top: 20rpx;
+}

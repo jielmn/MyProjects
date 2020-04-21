@@ -7,8 +7,8 @@
   </view>
 
   <view class="btn" wx:if="{{ !spinShow }}" >
-    <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>
     <image class='scan'   src='/images/scan.png' bindtap="onScan" ></image>
+    <image class='update' src='/images/update.png' bindtap="onRefreshBluetooth" ></image>    
   </view>
 
 
@@ -44,6 +44,8 @@
   </view>
 </view>
 
+
+<view class="blank"></view>
 
 <view class="bottom">
   <button class='start' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
