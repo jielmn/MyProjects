@@ -74,3 +74,7 @@
   height: 40rpx;
   vertical-align: top;
 }
+
+.globalfont{
+  font-family: '微软雅黑';
+}

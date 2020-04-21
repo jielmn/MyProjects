@@ -1,14 +1,14 @@
-<view class="upview">
+<view class="upview globalfont">
   <!--<button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>-->
   <button wx:if="{{!userLocation}}" bindtap="onlogin"> 点击授权 </button>
 </view>
 
-<view class="middleview">
+<view class="middleview globalfont">
   <view class="x1">用户管理</view>
   <view class="x2" ><image class='edit' src='/images/add.png' bindtap="onAddMember"  ></image></view>
 </view>
 
-<view class="weui-panel">
+<view class="weui-panel globalfont">
   <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index"  >
     <view class="v1">{{item.name}}</view>
     <view class="v2"><image class='edit' src='/images/edit.png' bindtap="onEditMember" data-index="{{index}}" ></image></view>    

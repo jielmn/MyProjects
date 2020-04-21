@@ -36,7 +36,7 @@
 
 <view class="middleview">上一次测量温度</view>
 
-<view class="weui-panel">
+<view class="weui-panel globalfont">
   <view class="weui-panel__hd itemview" wx:for="{{members}}" wx:key="index">
     <view class="y1">{{item.name}}</view>
     <view class="y2">{{item.lasttemperature?tools.toFixed(item.lasttemperature,1):'无'}}</view>
@@ -48,5 +48,5 @@
 <view class="blank"></view>
 
 <view class="bottom">
-  <button class='start' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
+  <button class='start globalfont' bindtap='onMesure' disabled="{{ !connected || mesureBusy }}" >点击测温</button>
 </view>
