@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<VerticalLayout>
+		<HorizontalLayout bordersize="0" bordercolor="#FFFF0000" >
+			<Control width="5" />
+			<!-- 是否基准点 -->
+			<VerticalLayout width="16">
+				<Control />
+				<Option name="optBasePoint" text="" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" width="16" height="16" />
+				<Control />
+			</VerticalLayout>		
+			<Control width="10" />
+			<label name="lblTemp" text="30.0℃" font="2" textcolor="#FF386382" width="60" />
+			<!--<label name="lblDutyCycle" text="255" font="2" textcolor="#FF386382" width="35" />-->
+			<Edit name="edDutyCycle" text="255" font="2" textcolor="#FF386382" width="45" bkcolor="#00000000" nativebkcolor="#00000000" enabled="false" disabledtextcolor="#FF386382" numberonly="true" />
+			<VerticalLayout width="16">
+				<MyButton name="btnUp" text="+" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
+				<MyButton name="btnDown" text="-" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " font="2" />
+			</VerticalLayout>	
+			<Control width="10" />
+			<VerticalLayout width="50">
+				<Control />
+				<Button name="btnAdjust" text="校准" textcolor="#FF386382" normalimage="file='button_normal.png'" hotimage="file='button_hover.png' " pushedimage="file='button_pushed.png' " width="50" height="24" font="2" />
+				<Control />
+			</VerticalLayout>			
+		</HorizontalLayout>		
+	</VerticalLayout>
+</Window>

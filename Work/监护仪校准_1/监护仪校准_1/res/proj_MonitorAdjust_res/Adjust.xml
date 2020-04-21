@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<VerticalLayout inset="10,10,10,10">
+		<!--
+		<HorizontalLayout height="25" inset="10,0,10,0">
+			<Label text="选择串口" width="70" font="1" textcolor="#FF386382" />
+			<Combo name="cmComPort" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="510" />
+		</HorizontalLayout>
+		-->
+		
+		<HorizontalLayout height="30" inset="10,5,10,0">
+			<Label text="机器型号" width="70" font="1" textcolor="#FF386382" />
+			<Combo name="cmMachine" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="200" />
+			<Control width="40" />
+			<Label text="数据文件" width="70" font="1" textcolor="#FF386382" />
+			<Combo name="cmFiles" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="1" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="200" />
+			<Control width="80" />
+			<Button width="25" height="25" normalimage="save.png" pushedimage="save_pushed.png" disabledimage="save_disabled.png"  name="btnSaveAs" />
+			<Control width="20" />
+			<Button width="25" height="25" normalimage="saveas.png" pushedimage="saveas_pushed.png" disabledimage="saveas_disabled.png"  name="btnSave" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="35" inset="10,5,10,5">
+			<Button name="btnDiff" text="自动计算(&A)" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " shortcut="A" />
+			<Control width="20" />
+			<Button name="btnAdjustAll" text="数据上传(&U)" font="1" textcolor="#FF386382"   width = "100" normalimage="file='win7_button_normal.png' corner='5,5,5,5' hole='false' " hotimage="file='win7_button_hot.png' corner='5,5,5,5' hole='false' " pushedimage="file='win7_button_pushed.png' corner='5,5,5,5' hole='false' " shortcut="U" visible="false" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout height="35" inset="10,5,10,5">
+			<Text text="快捷键提示：上、下、左、右箭头选择小项目；S选中/不选中；+增加；-减少；回车校准；Alt+A自动计算；Alt+U数据上传" font="1" textcolor="#FF0000ff" />
+		</HorizontalLayout>
+		
+		<HorizontalLayout inset="10,5,10,5" vscrollbar="true">
+			<HorizontalLayout bordercolor="#FF000000" bordersize="1" name="layMain" inset="1,1,1,1">
+			</HorizontalLayout>
+		</HorizontalLayout>
+		
+	</VerticalLayout>
+</Window>
