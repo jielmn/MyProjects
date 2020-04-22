@@ -280,6 +280,81 @@ void  CBusiness::SetReaderMode(const CWorkModeParam * pParam) {
 	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
 }
 
+void  CBusiness::SetReaderAsyn(int nComPort, WORD wReaderAddr, BYTE  byChannel) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SET_READER,
+		new	CSetReaderParam(nComPort, wReaderAddr, byChannel));
+}
+
+void  CBusiness::SetReader(const CSetReaderParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  write_data[256];
+	DWORD dwWriteLen = 6;
+	int   nRegMsg = UM_SET_READER_RET;
+
+	BOOL bRet = serial_port.OpenUartPort(pParam->m_nComPort, g_data.m_dwBaud);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return;
+	}
+
+	memcpy(write_data, "\xC0\x00\x05\x04\xDD\xAA", dwWriteLen);
+	write_data[1] = HIBYTE(pParam->m_wAddr);
+	write_data[2] = LOBYTE(pParam->m_wAddr);
+	write_data[3] = pParam->m_byChannel;
+	serial_port.Write(write_data, dwWriteLen);	
+
+	int nRet = -1;
+	DWORD  dwCurTick = LmnGetTickCount();
+	DWORD  dwLastTick = dwCurTick;
+	while ( dwCurTick - dwLastTick < 5000 ) { 
+		LmnSleep(100);
+		dwWriteLen = sizeof(write_data);
+		serial_port.Read(write_data, dwWriteLen);
+		if ( dwWriteLen > 0 ) {
+			if (dwWriteLen == 2 && write_data[0] == 'O' && write_data[1] == 'K') {
+				nRet = 0;				
+			}
+			break;
+		}
+		dwCurTick = LmnGetTickCount();
+	}
+
+	serial_port.CloseUartPort();
+	::PostMessage(g_data.m_hWnd, nRegMsg, nRet, 0);
+}
+
+void  CBusiness::SetReaderSnAsyn(int nComPort, DWORD dwSn) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SET_READER_SN,
+		new	CSetReaderSnParam(nComPort, dwSn));
+}
+
+void  CBusiness::SetReaderSn(const CSetReaderSnParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  write_data[256];
+	DWORD dwWriteLen = 7;
+	int   nRegMsg = UM_SET_READER_SN_RET;
+
+	BOOL bRet = serial_port.OpenUartPort(pParam->m_nComPort, g_data.m_dwBaud);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return;
+	}
+
+	memcpy(write_data, "\xCC\x00\x00\x01\x00\xDD\xAA", dwWriteLen);
+	WORD wHigh = HIWORD(pParam->m_dwSn);
+	WORD wLow  = LOWORD(pParam->m_dwSn);
+	write_data[1] = HIBYTE(wHigh);
+	write_data[2] = LOBYTE(wHigh);
+	write_data[3] = HIBYTE(wLow);
+	write_data[4] = LOBYTE(wLow);
+	serial_port.Write(write_data, dwWriteLen);
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -303,6 +378,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CWorkModeParam * pParam = (CWorkModeParam *)pMessageData;
 		SetReaderMode(pParam);
+	}
+	break;
+
+	case MSG_SET_READER: 
+	{
+		CSetReaderParam * pParam = (CSetReaderParam *)pMessageData;
+		SetReader(pParam);
+	}
+	break;
+
+	case MSG_SET_READER_SN:
+	{
+		CSetReaderSnParam * pParam = (CSetReaderSnParam *)pMessageData;
+		SetReaderSn(pParam);
 	}
 	break;
 

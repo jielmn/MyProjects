@@ -24,6 +24,12 @@ public:
 	void  SetReaderModeAsyn(int nComPort, WORD wReaderAddr, WorkMode  eMode);
 	void  SetReaderMode(const CWorkModeParam * pParam);
 
+	void  SetReaderAsyn(int nComPort, WORD wReaderAddr, BYTE  byChannel);
+	void  SetReader(const CSetReaderParam * pParam);
+
+	void  SetReaderSnAsyn(int nComPort, DWORD dwSn);
+	void  SetReaderSn(const CSetReaderSnParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

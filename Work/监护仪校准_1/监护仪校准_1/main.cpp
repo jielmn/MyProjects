@@ -36,6 +36,17 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_opTempMode = 0;
 	m_edReaderAddr = 0;
 	m_btnOk1 = 0;
+
+	m_edReaderAddr_1 = 0;
+	m_edReaderChannel_1 = 0;
+	m_edStationAddr_1 = 0;
+	m_edStationChannel_1 = 0;
+	m_edQueryStationChannel_1 = 0;
+	m_btnOk2 = 0;
+	m_btnOk3 = 0;
+	m_btnOk4 = 0;
+	m_edReaderSn_1 = 0;
+	m_btnOk5 = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -76,6 +87,17 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_opSingle->Selected(true, false);
 	m_opAdjustMode->Selected(true, false);
+
+	m_edReaderAddr_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edAddr"));
+	m_edReaderChannel_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edChannel"));
+	m_edStationAddr_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edAddr_1"));
+	m_edStationChannel_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edChannel_1"));
+	m_edQueryStationChannel_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edChannel_2"));
+	m_btnOk2 = static_cast<CButtonUI*>(m_PaintManager.FindControl("btnOk2"));
+	m_btnOk3 = static_cast<CButtonUI*>(m_PaintManager.FindControl("btnOk3"));
+	m_btnOk4 = static_cast<CButtonUI*>(m_PaintManager.FindControl("btnOk4"));
+	m_edReaderSn_1 = static_cast<CEditUI*>(m_PaintManager.FindControl("edSN"));
+	m_btnOk5 = static_cast<CButtonUI*>(m_PaintManager.FindControl("btnOk5"));
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
 		m_layColumns[i] = new CVerticalLayoutUI;
@@ -154,6 +176,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnOk1") {
 			OnSetWorkMode();
 		}
+		else if (name == "btnOk2") {
+			OnSetReader();
+		}
+		else if (name == "btnOk3") {
+			OnSetStation();
+		}
+		else if (name == "btnOk4") {
+			OnQueryStation();
+		}
+		else if (name == "btnOk5") {
+			OnSetReaderSn();
+		}
 	}
 	else if (msg.sType == "myselected") {
 		if (m_nHighlightIndex >= 0) {
@@ -224,6 +258,15 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		m_waiting_bar->SetText(strText);
 	}
 	else if (uMsg == UM_SET_WORK_MODE_RET) {
+		SetBusy(FALSE);
+	}
+	else if (uMsg == UM_SET_READER_RET) {
+		SetBusy(FALSE);
+		if (wParam != 0) {
+			MessageBox(m_hWnd, "ÉèÖÃReaderÊ§°Ü!", "Ê§°Ü", 0);
+		}
+	}
+	else if (uMsg == UM_SET_READER_SN_RET) {
 		SetBusy(FALSE);
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
@@ -674,6 +717,17 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 		m_edReaderAddr->SetEnabled(false);
 		m_btnOk1->SetEnabled(false);
 
+		m_edReaderAddr_1->SetEnabled(false);
+		m_edReaderChannel_1->SetEnabled(false);
+		m_edStationAddr_1->SetEnabled(false);
+		m_edStationChannel_1->SetEnabled(false);
+		m_edQueryStationChannel_1->SetEnabled(false);
+		m_btnOk2->SetEnabled(false);
+		m_btnOk3->SetEnabled(false);
+		m_btnOk4->SetEnabled(false);
+		m_edReaderSn_1->SetEnabled(false);
+		m_btnOk5->SetEnabled(false);
+
 	}
 	else {
 		m_cmbComPorts->SetEnabled(true);
@@ -697,6 +751,17 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 		m_opTempMode->SetEnabled(true);
 		m_edReaderAddr->SetEnabled(true);
 		m_btnOk1->SetEnabled(true);
+
+		m_edReaderAddr_1->SetEnabled(true);
+		m_edReaderChannel_1->SetEnabled(true);
+		m_edStationAddr_1->SetEnabled(true);
+		m_edStationChannel_1->SetEnabled(true);
+		m_edQueryStationChannel_1->SetEnabled(true);
+		m_btnOk2->SetEnabled(true);
+		m_btnOk3->SetEnabled(true);
+		m_btnOk4->SetEnabled(true);
+		m_edReaderSn_1->SetEnabled(true);
+		m_btnOk5->SetEnabled(true);
 	}
 }
 
@@ -739,6 +804,40 @@ void CDuiFrameWnd::OnSetWorkMode() {
 	}
 
 	CBusiness::GetInstance()->SetReaderModeAsyn(GetComPort(), (WORD)nAddr, eMode);
+	SetBusy(TRUE, FALSE);
+}
+
+void  CDuiFrameWnd::OnSetReader() {
+	CDuiString  strText;
+	int   nAddr     = 0;
+	int   nChannel = 0;
+
+	strText = m_edReaderAddr_1->GetText();
+	sscanf(strText, " %d", &nAddr);
+
+	strText = m_edReaderChannel_1->GetText();
+	sscanf(strText, " %d", &nChannel);
+
+	CBusiness::GetInstance()->SetReaderAsyn( GetComPort(), (WORD)nAddr, (BYTE)nChannel );
+	SetBusy(TRUE, FALSE);
+}
+
+void  CDuiFrameWnd::OnSetStation() {
+
+}
+
+void  CDuiFrameWnd::OnQueryStation() {
+
+}
+
+void  CDuiFrameWnd::OnSetReaderSn() {
+	CDuiString  strText;
+	int nSn = 0;
+
+	strText = m_edReaderSn_1->GetText();
+	sscanf(strText, " %d", &nSn);
+
+	CBusiness::GetInstance()->SetReaderSnAsyn( GetComPort(), (DWORD)nSn );
 	SetBusy(TRUE, FALSE);
 }
     

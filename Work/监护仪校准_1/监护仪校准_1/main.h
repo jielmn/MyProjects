@@ -89,6 +89,17 @@ private:
 	CEditUI *                               m_edReaderAddr;
 	CButtonUI *                             m_btnOk1;
 
+	CEditUI *                               m_edReaderAddr_1;
+	CEditUI *                               m_edReaderChannel_1;
+	CEditUI *                               m_edStationAddr_1;
+	CEditUI *                               m_edStationChannel_1;
+	CEditUI *                               m_edQueryStationChannel_1;
+	CButtonUI *                             m_btnOk2;
+	CButtonUI *                             m_btnOk3;
+	CButtonUI *                             m_btnOk4;
+	CEditUI *                               m_edReaderSn_1;
+	CButtonUI *                             m_btnOk5;
+
 private:
 	void  OnWindowInit();
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -108,4 +119,9 @@ private:
 	void  OnAdjustAll();
 
 	void  OnSetWorkMode();
+
+	void  OnSetReader();
+	void  OnSetStation();
+	void  OnQueryStation();
+	void  OnSetReaderSn();
 };
