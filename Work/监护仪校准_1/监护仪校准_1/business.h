@@ -30,6 +30,12 @@ public:
 	void  SetReaderSnAsyn(int nComPort, DWORD dwSn);
 	void  SetReaderSn(const CSetReaderSnParam * pParam);
 
+	void  SetStationAsyn(int nComPort, WORD wReaderAddr, BYTE  byChannel);
+	void  SetStation(const CSetStationParam * pParam);
+
+	void  QueryStationAsyn(int nComPort);
+	void  QueryStation(const CQueryStationParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

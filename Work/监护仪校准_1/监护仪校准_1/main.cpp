@@ -269,6 +269,23 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_SET_READER_SN_RET) {
 		SetBusy(FALSE);
 	}
+	else if (uMsg == UM_SET_STATION_RET) {
+		SetBusy(FALSE);
+		if (wParam != 0) {
+			MessageBox(m_hWnd, "ÉèÖÃ»ùÕ¾Ê§°Ü!", "Ê§°Ü", 0);
+		}
+	}
+	else if (uMsg == UM_QUERY_STATION_RET) {
+		SetBusy(FALSE);
+		if (wParam != 0) {
+			m_edQueryStationChannel_1->SetText("");
+			MessageBox(m_hWnd, "²éÑ¯»ùÕ¾Ê§°Ü!", "Ê§°Ü", 0);
+		}
+		else {
+			strText.Format("%d", (int)lParam);
+			m_edQueryStationChannel_1->SetText(strText);
+		}
+	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		CheckDevice();
 	}
@@ -823,11 +840,23 @@ void  CDuiFrameWnd::OnSetReader() {
 }
 
 void  CDuiFrameWnd::OnSetStation() {
+	CDuiString  strText;
+	int   nAddr = 0;
+	int   nChannel = 0;
 
+	strText = m_edStationAddr_1->GetText();
+	sscanf(strText, " %d", &nAddr);
+
+	strText = m_edStationChannel_1->GetText();
+	sscanf(strText, " %d", &nChannel);
+
+	CBusiness::GetInstance()->SetStationAsyn(GetComPort(), (WORD)nAddr, (BYTE)nChannel);
+	SetBusy(TRUE, FALSE);
 }
 
 void  CDuiFrameWnd::OnQueryStation() {
-
+	CBusiness::GetInstance()->QueryStationAsyn(GetComPort());
+	SetBusy(TRUE, FALSE);
 }
 
 void  CDuiFrameWnd::OnSetReaderSn() {

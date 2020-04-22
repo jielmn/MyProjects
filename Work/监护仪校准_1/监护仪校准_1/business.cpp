@@ -355,6 +355,91 @@ void  CBusiness::SetReaderSn(const CSetReaderSnParam * pParam) {
 	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
 }
 
+void  CBusiness::SetStationAsyn(int nComPort, WORD wReaderAddr, BYTE  byChannel) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SET_STATION,
+		new	CSetStationParam(nComPort, wReaderAddr, byChannel));
+}
+
+void  CBusiness::SetStation(const CSetStationParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  write_data[256];
+	DWORD dwWriteLen = 7;
+	int   nRegMsg = UM_SET_STATION_RET;
+
+	BOOL bRet = serial_port.OpenUartPort(pParam->m_nComPort, g_data.m_dwBaud);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return;
+	}
+
+	memcpy(write_data, "\xC0\x00\x01\x05\xC0\xDD\xAA", dwWriteLen);
+	write_data[1] = HIBYTE(pParam->m_wAddr);
+	write_data[2] = LOBYTE(pParam->m_wAddr);
+	write_data[3] = pParam->m_byChannel;
+	serial_port.Write(write_data, dwWriteLen);
+
+	int nRet = -1;
+	DWORD  dwCurTick = LmnGetTickCount();
+	DWORD  dwLastTick = dwCurTick;
+	while (dwCurTick - dwLastTick < 5000) {
+		LmnSleep(100);
+		dwWriteLen = sizeof(write_data);
+		serial_port.Read(write_data, dwWriteLen);
+		if (dwWriteLen > 0) {
+			if (dwWriteLen == 2 && write_data[0] == 'O' && write_data[1] == 'K') {
+				nRet = 0;
+			}
+			break;
+		}
+		dwCurTick = LmnGetTickCount();
+	}
+
+	serial_port.CloseUartPort();
+	::PostMessage(g_data.m_hWnd, nRegMsg, nRet, 0);
+}
+
+void  CBusiness::QueryStationAsyn(int nComPort) {
+	g_data.m_thrd_db->PostMessage(this, MSG_QUERY_STATION,
+		new	CQueryStationParam(nComPort));
+}
+
+void  CBusiness::QueryStation(const CQueryStationParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  write_data[256];
+	DWORD dwWriteLen = 5;
+	int   nRegMsg = UM_QUERY_STATION_RET;
+
+	BOOL bRet = serial_port.OpenUartPort(pParam->m_nComPort, g_data.m_dwBaud);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return;
+	}
+
+	memcpy(write_data, "\xC1\xC1\xC1\xDD\xAA", dwWriteLen);
+	serial_port.Write(write_data, dwWriteLen);
+
+	int nRet = -1;
+	DWORD  dwCurTick = LmnGetTickCount();
+	DWORD  dwLastTick = dwCurTick;
+	while (dwCurTick - dwLastTick < 5000) {
+		LmnSleep(100);
+		dwWriteLen = sizeof(write_data);
+		serial_port.Read(write_data, dwWriteLen);
+		if (dwWriteLen > 0) {
+			if (dwWriteLen == 3 && (BYTE)write_data[0] == 0xC1 && (BYTE)write_data[2] == 0xC1 ) {
+				nRet = 0;
+			}
+			break;
+		}
+		dwCurTick = LmnGetTickCount();
+	}
+
+	serial_port.CloseUartPort();
+	::PostMessage(g_data.m_hWnd, nRegMsg, nRet, write_data[1]);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -392,6 +477,20 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CSetReaderSnParam * pParam = (CSetReaderSnParam *)pMessageData;
 		SetReaderSn(pParam);
+	}
+	break;
+
+	case MSG_SET_STATION:
+	{
+		CSetStationParam * pParam = (CSetStationParam *)pMessageData;
+		SetStation(pParam);
+	}
+	break;
+
+	case MSG_QUERY_STATION:
+	{
+		CQueryStationParam * pParam = (CQueryStationParam *)pMessageData;
+		QueryStation(pParam);
 	}
 	break;
 

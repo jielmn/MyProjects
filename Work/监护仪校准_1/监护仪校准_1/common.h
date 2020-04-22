@@ -53,6 +53,8 @@ enum MachineType {
 #define MSG_SET_WORK_MODE            1003
 #define MSG_SET_READER               1004
 #define MSG_SET_READER_SN            1005
+#define MSG_SET_STATION              1006
+#define MSG_QUERY_STATION            1007
 
 #define UM_WRONG_DATA                (WM_USER + 1)
 #define UM_ADJUST_RET                (WM_USER + 2)
@@ -61,6 +63,8 @@ enum MachineType {
 #define UM_SET_WORK_MODE_RET         (WM_USER + 5)
 #define UM_SET_READER_RET            (WM_USER + 6)
 #define UM_SET_READER_SN_RET         (WM_USER + 7)
+#define UM_SET_STATION_RET           (WM_USER + 8)
+#define UM_QUERY_STATION_RET         (WM_USER + 9)
 
 typedef  struct  tagTempItem {
 	int    m_nTemp;
@@ -190,6 +194,28 @@ public:
 
 	int          m_nComPort;
 	DWORD        m_dwSn;
+};
+
+class CSetStationParam : public LmnToolkits::MessageData {
+public:
+	CSetStationParam(int nComPort, WORD wReaderAddr, BYTE  byChannel) {
+		m_nComPort = nComPort;
+		m_wAddr = wReaderAddr;
+		m_byChannel = byChannel;
+	}
+
+	int          m_nComPort;
+	WORD         m_wAddr;
+	BYTE         m_byChannel;
+};
+
+class CQueryStationParam : public LmnToolkits::MessageData {
+public:
+	CQueryStationParam(int nComPort) {
+		m_nComPort = nComPort;
+	}
+
+	int          m_nComPort;
 };
 
 
