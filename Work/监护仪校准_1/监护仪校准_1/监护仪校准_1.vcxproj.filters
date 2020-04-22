@@ -73,4 +73,7 @@
     <Text Include="res\GE.txt" />
     <Text Include="res\GE2.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\proj_MonitorAdjust_res.zip" />
+  </ItemGroup>
 </Project>
