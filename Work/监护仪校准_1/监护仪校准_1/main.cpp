@@ -29,6 +29,13 @@ CDuiFrameWnd::CDuiFrameWnd() : m_callback(&m_PaintManager) {
 	m_bItemsAdded = FALSE;
 	m_tabs = 0;
 	m_bAdjustTagSelected = FALSE;
+
+	m_opSingle = 0;
+	m_opBroadcast = 0;
+	m_opAdjustMode = 0;
+	m_opTempMode = 0;
+	m_edReaderAddr = 0;
+	m_btnOk1 = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -59,6 +66,16 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnDiff = static_cast<DuiLib::CButtonUI*>(m_PaintManager.FindControl("btnDiff"));
 	m_waiting_bar = static_cast<CProgressUI*>(m_PaintManager.FindControl("waiting")); 
 	m_waiting_bar->SetVisible(false);  
+
+	m_opSingle = static_cast<COptionUI*>(m_PaintManager.FindControl("rdSingle"));
+	m_opBroadcast = static_cast<COptionUI*>(m_PaintManager.FindControl("rdBroadcast"));
+	m_opAdjustMode = static_cast<COptionUI*>(m_PaintManager.FindControl("rdAdjust"));
+	m_opTempMode = static_cast<COptionUI*>(m_PaintManager.FindControl("rdTemp"));
+	m_edReaderAddr = static_cast<CEditUI*>(m_PaintManager.FindControl("edReaderAddr"));
+	m_btnOk1 = static_cast<CButtonUI*>(m_PaintManager.FindControl("btnOk1"));
+
+	m_opSingle->Selected(true, false);
+	m_opAdjustMode->Selected(true, false);
 
 	for ( int i = 0; i < MAX_COLUMNS_CNT; i++ ) {
 		m_layColumns[i] = new CVerticalLayoutUI;
@@ -134,6 +151,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == "btnAdjustAll") {
 			OnAdjustAll();
 		}
+		else if (name == "btnOk1") {
+			OnSetWorkMode();
+		}
 	}
 	else if (msg.sType == "myselected") {
 		if (m_nHighlightIndex >= 0) {
@@ -161,6 +181,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (name == _T("opn_setting")) {
 			m_bAdjustTagSelected = FALSE;
 			m_tabs->SelectItem(2);
+		}
+		else if (name == "rdSingle") {
+			m_edReaderAddr->SetText("");
+			m_edReaderAddr->SetReadOnly(false);
+			m_edReaderAddr->SetBkColor(0xFFFFFFFF);
+			m_edReaderAddr->SetNativeEditBkColor(0xFFFFFFFF);
+		}
+		else if (name == "rdBroadcast") {
+			m_edReaderAddr->SetText("");
+			m_edReaderAddr->SetReadOnly(true);
+			m_edReaderAddr->SetBkColor(0xFFCCCCCC);
+			m_edReaderAddr->SetNativeEditBkColor(0xFFCCCCCC);
 		}
 	}
 
@@ -190,6 +222,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		
 		strText.Format("%d%%", (int)round((double)(wParam + 1) / MAX_TEMP_ITEMS_CNT * 100.0) );
 		m_waiting_bar->SetText(strText);
+	}
+	else if (uMsg == UM_SET_WORK_MODE_RET) {
+		SetBusy(FALSE);
 	}
 	else if (uMsg == WM_DEVICECHANGE) {
 		CheckDevice();
@@ -631,6 +666,14 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 			m_waiting_bar->SetValue(0);
 			m_waiting_bar->SetText("0%"); 
 		}		
+
+		m_opSingle->SetEnabled(false);
+		m_opBroadcast->SetEnabled(false);
+		m_opAdjustMode->SetEnabled(false);
+		m_opTempMode->SetEnabled(false);
+		m_edReaderAddr->SetEnabled(false);
+		m_btnOk1->SetEnabled(false);
+
 	}
 	else {
 		m_cmbComPorts->SetEnabled(true);
@@ -646,7 +689,14 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/, BOOL bWaitingBar /*= FALSE*/)
 		}		
 		if (bWaitingBar) {
 			m_waiting_bar->SetVisible(false);
-		}		
+		}	
+
+		m_opSingle->SetEnabled(true);
+		m_opBroadcast->SetEnabled(true);
+		m_opAdjustMode->SetEnabled(true);
+		m_opTempMode->SetEnabled(true);
+		m_edReaderAddr->SetEnabled(true);
+		m_btnOk1->SetEnabled(true);
 	}
 }
 
@@ -670,8 +720,29 @@ void  CDuiFrameWnd::OnAdjustAll() {
 		items, MAX_TEMP_ITEMS_CNT);
 	SetBusy(TRUE, TRUE);
 }
+
+void CDuiFrameWnd::OnSetWorkMode() {
+	CDuiString  strText;
+	int nAddr = 0;
+
+	if (m_opSingle->IsSelected()) {
+		strText = m_edReaderAddr->GetText();
+		sscanf(strText, " %d", &nAddr);
+	}
+	else {
+		nAddr = 0xFFFF;
+	}
+
+	WorkMode eMode = WorkMode_Adjust;
+	if (m_opTempMode->IsSelected()) {
+		eMode = WorkMode_Temp;
+	}
+
+	CBusiness::GetInstance()->SetReaderModeAsyn(GetComPort(), (WORD)nAddr, eMode);
+	SetBusy(TRUE, FALSE);
+}
     
-                  
+                            
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,

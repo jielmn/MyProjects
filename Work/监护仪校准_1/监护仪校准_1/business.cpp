@@ -247,6 +247,39 @@ void  CBusiness::AdjustAll(const CAdjustAllParam * pParam) {
 	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
 }
 
+void  CBusiness::SetReaderModeAsyn(int nComPort, WORD wReaderAddr, WorkMode  eMode) {
+	g_data.m_thrd_db->PostMessage(this, MSG_SET_WORK_MODE,
+		new	CWorkModeParam(nComPort, wReaderAddr, eMode));
+}
+
+void  CBusiness::SetReaderMode(const CWorkModeParam * pParam) {
+	CLmnSerialPort  serial_port;
+
+	char  write_data[256];
+	DWORD dwWriteLen = 9;
+	int   nRegMsg = UM_SET_WORK_MODE_RET;
+
+	BOOL bRet = serial_port.OpenUartPort(pParam->m_nComPort, g_data.m_dwBaud);
+	if (!bRet) {
+		::PostMessage(g_data.m_hWnd, nRegMsg, -1, 0);
+		return;
+	}
+
+	memcpy(write_data, "\x55\x01\xFF\xFF\x00\x00\xFF\xDD\xAA", dwWriteLen);
+	if (pParam->m_eMode == WorkMode_Adjust) {
+		write_data[1] = 1;
+	}
+	else {
+		write_data[1] = 0;
+	}
+	write_data[2] = HIBYTE(pParam->m_wAddr);
+	write_data[3] = LOBYTE(pParam->m_wAddr);
+	serial_port.Write(write_data, dwWriteLen);
+	serial_port.CloseUartPort();
+
+	::PostMessage(g_data.m_hWnd, nRegMsg, 0, 0);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -263,6 +296,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAdjustAllParam * pParam = (CAdjustAllParam *)pMessageData;
 		AdjustAll(pParam);
+	}
+	break;
+
+	case MSG_SET_WORK_MODE: 
+	{
+		CWorkModeParam * pParam = (CWorkModeParam *)pMessageData;
+		SetReaderMode(pParam);
 	}
 	break;
 

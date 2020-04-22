@@ -21,6 +21,9 @@ public:
 	void  AdjustAllAsyn(int nComPort, MachineType eType, TempAdjust * items, DWORD dwSize);
 	void  AdjustAll(const CAdjustAllParam * pParam);
 
+	void  SetReaderModeAsyn(int nComPort, WORD wReaderAddr, WorkMode  eMode);
+	void  SetReaderMode(const CWorkModeParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

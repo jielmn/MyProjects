@@ -50,11 +50,13 @@ enum MachineType {
 
 #define MSG_ADJUST                   1001
 #define MSG_ADJUST_ALL               1002
+#define MSG_SET_WORK_MODE            1003
 
 #define UM_WRONG_DATA                (WM_USER + 1)
 #define UM_ADJUST_RET                (WM_USER + 2)
 #define UM_ADJUST_ALL_RET            (WM_USER + 3)
 #define UM_ADJUST_ALL_PROGRESS       (WM_USER + 4)
+#define UM_SET_WORK_MODE_RET         (WM_USER + 5)
 
 typedef  struct  tagTempItem {
 	int    m_nTemp;
@@ -65,6 +67,11 @@ typedef  struct  tagTempAdjust {
 	int    m_nTemp;
 	int    m_nOffset;
 }TempAdjust;
+
+enum  WorkMode {
+	WorkMode_Adjust = 0,
+	WorkMode_Temp,
+};
 
 class  CGlobalData {
 public:
@@ -142,6 +149,19 @@ public:
 	MachineType  m_eType;
 	TempAdjust   m_items[MAX_TEMP_ITEMS_CNT];
 	DWORD        m_dwSize;
+};
+
+class CWorkModeParam : public LmnToolkits::MessageData {
+public:
+	CWorkModeParam(int nComPort, WORD wReaderAddr, WorkMode  eMode) {
+		m_nComPort = nComPort;
+		m_wAddr = wReaderAddr;
+		m_eMode = eMode;
+	}
+
+	int          m_nComPort;
+	WORD         m_wAddr;
+	WorkMode     m_eMode;
 };
 
 

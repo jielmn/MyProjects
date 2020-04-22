@@ -82,6 +82,13 @@ private:
 	DuiLib::CTabLayoutUI *                  m_tabs;
 	BOOL                                    m_bAdjustTagSelected;
 
+	COptionUI *                             m_opSingle;
+	COptionUI *                             m_opBroadcast;
+	COptionUI *                             m_opAdjustMode;
+	COptionUI *                             m_opTempMode;
+	CEditUI *                               m_edReaderAddr;
+	CButtonUI *                             m_btnOk1;
+
 private:
 	void  OnWindowInit();
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
@@ -99,4 +106,6 @@ private:
 	int   GetComPort();
 	void  SetBusy(BOOL bBusy = TRUE, BOOL bWaitingBar = FALSE);
 	void  OnAdjustAll();
+
+	void  OnSetWorkMode();
 };
