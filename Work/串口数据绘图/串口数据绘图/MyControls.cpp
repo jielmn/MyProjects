@@ -139,10 +139,10 @@ void CMySliderUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
 
 	if ( m_nMoveSource == 1 ) {
 		nMinLeft = rcPos.left + 1 + 1;
-		nMaxLeft = rc2.left - 1 - BUTT_WIDTH;
+		nMaxLeft = rc2.left - BUTT_WIDTH -  BUTT_WIDTH;
 	}
 	else if (m_nMoveSource == 2) {
-		nMinLeft = rc1.right + 1;
+		nMinLeft = rc1.right + BUTT_WIDTH;
 		nMaxLeft = rcPos.right - 1 - 1 - BUTT_WIDTH;
 	}
 
@@ -270,10 +270,10 @@ void CMyVSliderUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
 
 	if (m_nMoveSource == 1) {
 		nMinTop = rcPos.top + 1 + 1;
-		nMaxTop = rc2.top - 1 - BUTT_WIDTH;
+		nMaxTop = rc2.top - BUTT_WIDTH - BUTT_WIDTH;
 	}
 	else if (m_nMoveSource == 2) {
-		nMinTop = rc1.top + 1;
+		nMinTop = rc1.bottom + BUTT_WIDTH;
 		nMaxTop = rcPos.bottom - 1 - 1 - BUTT_WIDTH;
 	}
 
