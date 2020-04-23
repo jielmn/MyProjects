@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>	
+	<VerticalLayout inset="1,1,1,1">
+		<Control height="1" name="ctl_1" />
+		<Control bkimage="buttv.png" height="10" name="butt_1" />
+		<Control bkcolor="#FFD5DBE4" name="ctlBlock" />
+		<Control bkimage="buttv.png" height="10" name="butt_2" />
+		<Control height="1" name="ctl_2" />
+	</VerticalLayout>
+</Window>

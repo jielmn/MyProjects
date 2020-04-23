@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<HorizontalLayout inset="1,1,1,1">
+		<Control width="1" name="ctl_1" />
+		<Control bkimage="butt.png" width="10" name="butt_1" />
+		<Control bkcolor="#FFD5DBE4" name="ctlBlock" />
+		<Control bkimage="butt.png" width="10" name="butt_2" />
+		<Control width="1" name="ctl_2" />
+	</HorizontalLayout>
+</Window>
