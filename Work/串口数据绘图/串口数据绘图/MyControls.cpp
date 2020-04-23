@@ -79,13 +79,14 @@ bool CMySliderUI::OnMySize(void * pParam) {
 		nCtrlWidth_1 = 1;
 	}
 	
-	int nCtrlWidth_2 = (int)((1 - m_fPos - m_fLength) * nLogicWidth);
+	int nCtrlWidth_2 = (int)((1.0f - m_fPos - m_fLength) * nLogicWidth);
 	if (nCtrlWidth_2 <= 0) {
 		nCtrlWidth_2 = 1;
 	}
 
 	m_ctl_1->SetFixedWidth(nCtrlWidth_1);
 	m_ctl_2->SetFixedWidth(nCtrlWidth_2);
+
 	return true;
 }
 
@@ -99,12 +100,14 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 			m_bStartMove = TRUE;
 			m_nMoveSource = 1;    
 			m_nMovePos = event.ptMouse.x;
+			m_rcMove   = m_butt_1->GetPos();
 		}
 		else if (::PtInRect(&r2, event.ptMouse)) {
 			m_pManager->AddPostPaint(this);
 			m_bStartMove = TRUE;
 			m_nMoveSource = 2;
 			m_nMovePos = event.ptMouse.x;
+			m_rcMove = m_butt_2->GetPos();
 		}
 	}
 	else if ( event.Type == UIEVENT_MOUSEMOVE ) {
@@ -115,6 +118,23 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
 		if (m_bStartMove) {
+			int nWidth_1 = 0;
+			int nWidth_2 = 0;
+			if ( m_nMoveSource == 1 ) {
+				nWidth_1 = m_rcMove.left - (m_rcItem.left + 1);
+				if (nWidth_1 <= 0) {
+					nWidth_1 = 1;
+				}
+				m_ctl_1->SetFixedWidth(nWidth_1);
+			}
+			else if (m_nMoveSource == 2) {
+				nWidth_2 = m_rcItem.right - 1  - m_rcMove.right;
+				if (nWidth_2 <= 0) {
+					nWidth_2 = 1;
+				}
+				m_ctl_2->SetFixedWidth(nWidth_2);
+			}
+			CalcData();
 			m_bStartMove = FALSE;
 			m_pManager->RemovePostPaint(this);
 			m_pManager->Invalidate();
@@ -128,7 +148,7 @@ void CMySliderUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
 	RECT rc1   = m_ctl_1->GetPos();
 	RECT rc2   = m_ctl_2->GetPos();
 
-	RECT  rc;
+	RECT & rc = m_rcMove;
 	rc.left   = m_nMovePos - BUTT_WIDTH / 2;
 	// rc.right  = rc.left + BUTT_WIDTH;
 	rc.top    = rcPos.top + 1;
@@ -155,6 +175,14 @@ void CMySliderUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
 	rc.right = rc.left + BUTT_WIDTH;
 
 	CRenderEngine::DrawColor(hDC, rc, 0xAA000000);
+}
+
+void  CMySliderUI::CalcData() {
+	int nWidth      = this->GetWidth();
+	int nLogicWidth = nWidth - 1 * 2 - BUTT_WIDTH * 2;
+
+	m_fPos = (float)(m_ctl_1->GetFixedWidth() - 1) / nLogicWidth;
+	m_fLength =  (float)( nWidth - m_ctl_1->GetFixedWidth() - m_ctl_2->GetFixedWidth() - BUTT_WIDTH * 2 ) / nLogicWidth;
 }
 
 
@@ -211,7 +239,7 @@ bool CMyVSliderUI::OnMySize(void * pParam) {
 		nCtrlHeight_1 = 1;
 	}
 
-	int nCtrlHeight_2 = (int)((1 - m_fPos - m_fLength) * nLogicHeight);
+	int nCtrlHeight_2 = (int)((1.0f - m_fPos - m_fLength) * nLogicHeight);
 	if (nCtrlHeight_2 <= 0) {
 		nCtrlHeight_2 = 1;
 	}
@@ -231,12 +259,14 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 			m_bStartMove = TRUE;
 			m_nMoveSource = 1;
 			m_nMovePos = event.ptMouse.y;
+			m_rcMove = m_butt_1->GetPos();
 		}
 		else if (::PtInRect(&r2, event.ptMouse)) {
 			m_pManager->AddPostPaint(this);
 			m_bStartMove = TRUE;
 			m_nMoveSource = 2;
 			m_nMovePos = event.ptMouse.y;
+			m_rcMove = m_butt_2->GetPos();
 		}
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
@@ -247,6 +277,23 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
 		if (m_bStartMove) {
+			int nHeight_1 = 0;
+			int nHeight_2 = 0;
+			if (m_nMoveSource == 1) {
+				nHeight_1 = m_rcMove.top - (m_rcItem.top + 1);
+				if (nHeight_1 <= 0) {
+					nHeight_1 = 1;
+				}
+				m_ctl_1->SetFixedHeight(nHeight_1);
+			}
+			else if (m_nMoveSource == 2) {
+				nHeight_2 = m_rcItem.bottom - 1 - m_rcMove.bottom;
+				if (nHeight_2 <= 0) {
+					nHeight_2 = 1;
+				}
+				m_ctl_2->SetFixedHeight(nHeight_2);
+			}
+			CalcData();
 			m_bStartMove = FALSE;
 			m_pManager->RemovePostPaint(this);
 			m_pManager->Invalidate();
@@ -260,7 +307,7 @@ void CMyVSliderUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
 	RECT rc1 = m_ctl_1->GetPos();
 	RECT rc2 = m_ctl_2->GetPos();
 
-	RECT  rc;
+	RECT & rc = m_rcMove;
 	rc.top   = m_nMovePos - BUTT_WIDTH / 2;
 	rc.left  = rcPos.left + 1;
 	rc.right = rcPos.right - 1;
@@ -286,4 +333,12 @@ void CMyVSliderUI::DoPostPaint(HDC hDC, const RECT& rcPaint) {
 	rc.bottom = rc.top + BUTT_WIDTH;
 
 	CRenderEngine::DrawColor(hDC, rc, 0xAA000000);
+}
+
+void  CMyVSliderUI::CalcData() {
+	int nHeight = this->GetHeight();
+	int nLogicHeight = nHeight - 1 * 2 - BUTT_WIDTH * 2;
+
+	m_fPos    = (float)(m_ctl_1->GetFixedHeight() - 1) / nLogicHeight;
+	m_fLength = (float)(nHeight - m_ctl_1->GetFixedHeight() - m_ctl_2->GetFixedHeight() - BUTT_WIDTH * 2) / nLogicHeight;
 }

@@ -32,12 +32,14 @@ private:
 	BOOL                            m_bStartMove;
 	int                             m_nMoveSource;
 	int                             m_nMovePos;
+	RECT                            m_rcMove;
 
-	float                           m_fPos;                // 起点
-	float                           m_fLength;             // 长度
+	double                           m_fPos;                // 起点
+	double                           m_fLength;             // 长度
 
 private:
 	bool  OnMySize(void * pParam);
+	void  CalcData();
 };
 
 class CMyVSliderUI : public DuiLib::CContainerUI
@@ -59,11 +61,13 @@ private:
 	CControlUI *                    m_block;
 	BOOL                            m_bStartMove;
 	int                             m_nMoveSource;
-	int                             m_nMovePos;
+	int                             m_nMovePos;	
+	RECT                            m_rcMove;
 
 	float                           m_fPos;                // 起点
 	float                           m_fLength;             // 长度
 
 private:
 	bool  OnMySize(void * pParam);
+	void  CalcData();
 };
