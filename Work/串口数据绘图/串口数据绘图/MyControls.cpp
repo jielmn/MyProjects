@@ -7,7 +7,11 @@ CMyChartUI::CMyChartUI() {
 }
 
 CMyChartUI::~CMyChartUI() {
-
+	std::map<int, std::vector<int>* >::iterator it;
+	for ( it = m_data.begin(); it != m_data.end(); ++it ) {
+		delete it->second;
+	}
+	m_data.clear();
 }
 
 bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {

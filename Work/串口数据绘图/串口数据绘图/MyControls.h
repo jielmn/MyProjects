@@ -10,6 +10,9 @@ public:
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl);
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
+
+private:
+	std::map<int, std::vector<int>* >     m_data;
 };
 
 class CMySliderUI : public DuiLib::CContainerUI

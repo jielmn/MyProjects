@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <map>
+#include <iterator>
 
 #include "LmnCommon.h"
 #include "LmnConfig.h"
