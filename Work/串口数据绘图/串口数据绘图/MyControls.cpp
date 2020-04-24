@@ -63,6 +63,7 @@ CMySliderUI::CMySliderUI() {
 	m_bStartMove = FALSE;
 	m_nMoveSource = 0;
 	m_nMovePos = 0;
+	m_nStartPos = 0;
 
 	this->OnSize += MakeDelegate(this, &CMySliderUI::OnMySize);
 
@@ -120,6 +121,7 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 	if ( event.Type == UIEVENT_BUTTONDOWN ) {
 		RECT r1 = m_butt_1->GetPos();
 		RECT r2 = m_butt_2->GetPos();
+		RECT r3 = m_block->GetPos();
 
 		if (::PtInRect(&r1, event.ptMouse)) {
 			m_bStartMove = TRUE;
@@ -133,12 +135,20 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 			m_nMovePos = event.ptMouse.x;
 			m_rcMove = m_butt_2->GetPos();
 		}
+		else if (::PtInRect(&r3, event.ptMouse)) {
+			m_bStartMove = TRUE;
+			m_nMoveSource = 3;
+			m_nMovePos = event.ptMouse.x;
+			m_rcMove = m_block->GetPos();
+			m_nStartPos = m_nMovePos;
+		}
 	}
 	else if ( event.Type == UIEVENT_MOUSEMOVE ) {
 		if ( m_bStartMove ) {
 			SetCursor();
 			m_nMovePos = event.ptMouse.x;
 			OnMouseMove();
+			m_nStartPos = m_nMovePos;
 			m_pManager->Invalidate();
 		}
 		else {
@@ -250,6 +260,35 @@ void  CMySliderUI::OnMouseMove() {
 		}
 		m_ctl_2->SetFixedWidth(nWidth);
 	}
+	else if ( m_nMoveSource == 3 ) {
+		int nDiff = m_nMovePos - m_nStartPos;
+		int nWidth_1 = m_ctl_1->GetFixedWidth();
+		int nWidth_2 = m_ctl_2->GetFixedWidth();
+		if (nWidth_1 <= 0) {
+			nWidth_1 = 1;
+		}
+		if (nWidth_2 <= 0) {
+			nWidth_2 = 1;
+		}
+
+		int nWidthBlock = m_block->GetWidth();
+		if ( nWidth_2 - nDiff <= 0 ) {
+			nDiff = nWidth_2 - 1;
+			nWidth_2 = 1;
+			nWidth_1 += nDiff;
+		}
+		else if (nWidth_1 + nDiff <= 0) {
+			nDiff = 1 - nWidth_1;
+			nWidth_1 = 1;
+			nWidth_2 -= nDiff;
+		}
+		else {
+			nWidth_1 += nDiff;
+			nWidth_2 -= nDiff;
+		}
+		m_ctl_1->SetFixedWidth(nWidth_1);
+		m_ctl_2->SetFixedWidth(nWidth_2);
+	}
 }
 
 void  CMySliderUI::SetCursor() {
@@ -269,6 +308,7 @@ CMyVSliderUI::CMyVSliderUI() {
 	m_bStartMove = FALSE;
 	m_nMoveSource = 0;
 	m_nMovePos = 0;
+	m_nStartPos = 0;
 
 	this->OnSize += MakeDelegate(this, &CMyVSliderUI::OnMySize);
 
@@ -325,6 +365,7 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 	if (event.Type == UIEVENT_BUTTONDOWN) {
 		RECT r1 = m_butt_1->GetPos();
 		RECT r2 = m_butt_2->GetPos();
+		RECT r3 = m_block->GetPos();
 
 		if (::PtInRect(&r1, event.ptMouse)) {
 			m_bStartMove = TRUE;
@@ -338,12 +379,20 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 			m_nMovePos = event.ptMouse.y;
 			m_rcMove = m_butt_2->GetPos();
 		}
+		else if (::PtInRect(&r3, event.ptMouse)) {
+			m_bStartMove = TRUE;
+			m_nMoveSource = 3;
+			m_nMovePos = event.ptMouse.y;
+			m_rcMove = m_block->GetPos();
+			m_nStartPos = m_nMovePos;
+		}
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
 		if (m_bStartMove) {
 			SetCursor();
 			m_nMovePos = event.ptMouse.y;
 			OnMouseMove();
+			m_nStartPos = m_nMovePos;
 			m_pManager->Invalidate();
 		}
 		else {
@@ -453,6 +502,34 @@ void  CMyVSliderUI::OnMouseMove() {
 			nHeight = 1;
 		}
 		m_ctl_2->SetFixedHeight(nHeight);
+	}
+	else if (m_nMoveSource == 3) {
+		int nDiff = m_nMovePos - m_nStartPos;
+		int nHeight_1 = m_ctl_1->GetFixedHeight();
+		int nHeight_2 = m_ctl_2->GetFixedHeight();
+		if (nHeight_1 <= 0) {
+			nHeight_1 = 1;
+		}
+		if (nHeight_2 <= 0) {
+			nHeight_2 = 1;
+		}
+
+		if (nHeight_2 - nDiff <= 0) {
+			nDiff = nHeight_2 - 1;
+			nHeight_2 = 1;
+			nHeight_1 += nDiff;
+		}
+		else if (nHeight_1 + nDiff <= 0) {
+			nDiff = 1 - nHeight_1;
+			nHeight_1 = 1;
+			nHeight_2 -= nDiff;
+		}
+		else {
+			nHeight_1 += nDiff;
+			nHeight_2 -= nDiff;
+		}
+		m_ctl_1->SetFixedHeight(nHeight_1);
+		m_ctl_2->SetFixedHeight(nHeight_2);
 	}
 }
 

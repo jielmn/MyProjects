@@ -39,6 +39,7 @@ private:
 	int                             m_nMoveSource;
 	int                             m_nMovePos;
 	RECT                            m_rcMove;
+	int                             m_nStartPos;
 
 	double                           m_fPos;                // 起点
 	double                           m_fLength;             // 长度
@@ -71,6 +72,7 @@ private:
 	int                             m_nMoveSource;
 	int                             m_nMovePos;	
 	RECT                            m_rcMove;
+	int                             m_nStartPos;
 
 	float                           m_fPos;                // 起点
 	float                           m_fLength;             // 长度
