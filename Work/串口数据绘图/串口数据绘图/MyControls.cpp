@@ -3,7 +3,13 @@
 #define  BUTT_WIDTH    10
 
 CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ) {
-	
+	m_nMinValue = 0;
+	m_nMaxValue = 10;
+
+	m_rcMargin.left   = 50;
+	m_rcMargin.bottom = 50;
+	m_rcMargin.right  = 20;
+	m_rcMargin.top    = 20;
 }
 
 CMyChartUI::~CMyChartUI() {
@@ -17,6 +23,19 @@ CMyChartUI::~CMyChartUI() {
 bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	Graphics graphics(hDC);
 	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	RECT pos     = GetPos();
+	int  nWidth  = pos.right - pos.left;
+	int  nHeight = pos.bottom - pos.top;
+
+	// »­¿Ì¶ÈÏß
+	Gdiplus::Point  scale_points[2];
+	scale_points[0].X = pos.left   + m_rcMargin.left;
+	scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
+	scale_points[1].X = pos.left   + m_rcMargin.left;
+	scale_points[1].Y = pos.top    + m_rcMargin.top;
+	graphics.DrawLines(&m_scale_pen, scale_points, 2);
+
 
 	std::map<int, CChannel *>::iterator it;
 	for (it = m_data.begin(); it != m_data.end(); ++it) {
@@ -49,6 +68,12 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 		m_data[nChartNo] = pChannel;
 	}
 	pChannel->m_vValues.push_back(nValue);
+	if (nValue < m_nMinValue) {
+		m_nMinValue = nValue;
+	}
+	else if (nValue > m_nMaxValue) {
+		m_nMaxValue = nValue;
+	}
 }
 
 

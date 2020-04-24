@@ -16,6 +16,9 @@ public:
 private:
 	std::map<int, CChannel *>        m_data;
 	Pen                              m_scale_pen;
+	int                              m_nMinValue;
+	int                              m_nMaxValue;
+	RECT                             m_rcMargin;
 };
 
 class CMySliderUI : public DuiLib::CContainerUI
