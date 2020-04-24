@@ -46,6 +46,7 @@ private:
 private:
 	bool  OnMySize(void * pParam);
 	void  CalcData();
+	void  OnMouseMove();
 };
 
 class CMyVSliderUI : public DuiLib::CContainerUI
@@ -76,4 +77,5 @@ private:
 private:
 	bool  OnMySize(void * pParam);
 	void  CalcData();
+	void  OnMouseMove();
 };
