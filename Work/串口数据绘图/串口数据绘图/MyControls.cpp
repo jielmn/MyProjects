@@ -136,9 +136,21 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if ( event.Type == UIEVENT_MOUSEMOVE ) {
 		if ( m_bStartMove ) {
+			SetCursor();
 			m_nMovePos = event.ptMouse.x;
 			OnMouseMove();
 			m_pManager->Invalidate();
+		}
+		else {
+			RECT r1 = m_butt_1->GetPos();
+			RECT r2 = m_butt_2->GetPos();
+
+			if (::PtInRect(&r1, event.ptMouse)) {
+				SetCursor();
+			}
+			else if (::PtInRect(&r2, event.ptMouse)) {
+				SetCursor();
+			}
 		}
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
@@ -240,6 +252,11 @@ void  CMySliderUI::OnMouseMove() {
 	}
 }
 
+void  CMySliderUI::SetCursor() {
+	if (g_data.m_cursor_we != 0)
+		::SetCursor(g_data.m_cursor_we);
+}
+
 
 
 
@@ -324,9 +341,21 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if (event.Type == UIEVENT_MOUSEMOVE) {
 		if (m_bStartMove) {
+			SetCursor();
 			m_nMovePos = event.ptMouse.y;
 			OnMouseMove();
 			m_pManager->Invalidate();
+		}
+		else {
+			RECT r1 = m_butt_1->GetPos();
+			RECT r2 = m_butt_2->GetPos();
+
+			if (::PtInRect(&r1, event.ptMouse)) {
+				SetCursor();
+			}
+			else if (::PtInRect(&r2, event.ptMouse)) {
+				SetCursor();
+			}
 		}
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
@@ -425,4 +454,9 @@ void  CMyVSliderUI::OnMouseMove() {
 		}
 		m_ctl_2->SetFixedHeight(nHeight);
 	}
+}
+
+void  CMyVSliderUI::SetCursor() {
+	if (g_data.m_cursor_ns != 0)
+		::SetCursor(g_data.m_cursor_ns);
 }

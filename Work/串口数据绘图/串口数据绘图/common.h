@@ -27,6 +27,8 @@ public:
 	ILog    *                 m_log;
 	IConfig *                 m_cfg;
 	HWND                      m_hWnd;
+	HCURSOR                   m_cursor_we;
+	HCURSOR                   m_cursor_ns;
 	LmnToolkits::Thread *     m_thrd_db;
 
 public:
@@ -35,6 +37,8 @@ public:
 		m_cfg = 0;
 		m_thrd_db = 0;
 		m_hWnd = 0;
+		m_cursor_we = 0;
+		m_cursor_ns = 0;
 	}
 };
 

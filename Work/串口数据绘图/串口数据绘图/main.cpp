@@ -23,6 +23,9 @@ CDuiFrameWnd::~CDuiFrameWnd() {
 
 void  CDuiFrameWnd::InitWindow() {
 	g_data.m_hWnd = GetHWND();
+	g_data.m_cursor_we = LoadCursor(NULL, IDC_SIZEWE);
+	g_data.m_cursor_ns = LoadCursor(NULL, IDC_SIZENS);
+
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 	m_cmbComPorts = (CComboUI *)m_PaintManager.FindControl("cmComPort");
