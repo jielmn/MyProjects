@@ -41,8 +41,8 @@ private:
 	RECT                            m_rcMove;
 	int                             m_nStartPos;
 
-	double                           m_fPos;                // 起点
-	double                           m_fLength;             // 长度
+	float                           m_fPos;                // 起点
+	float                           m_fLength;             // 长度
 
 private:
 	bool  OnMySize(void * pParam);
