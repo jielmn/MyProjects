@@ -165,7 +165,10 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
 		if (m_bStartMove) {
+			float  fPos = m_fPos;
+			float  fLength = m_fLength;
 			CalcData();
+			SendNotify(fPos, fLength);
 			m_bStartMove = FALSE;
 			m_pManager->Invalidate();
 		}
@@ -296,6 +299,20 @@ void  CMySliderUI::SetCursor() {
 		::SetCursor(g_data.m_cursor_we);
 }
 
+void  CMySliderUI::SendNotify(float fPos, float fLength) {
+	float f1 = fPos - m_fPos;
+	float f2 = fLength - m_fLength;
+	BOOL bNotify = FALSE;
+
+	if ( !(f1 >= -0.001f && f1 <= 0.001f) || !(f2 >= -0.001f && f2 <= 0.001f) ) {
+		bNotify = TRUE ;
+	}
+
+	if (bNotify) {
+		m_pManager->SendNotify(this, "hslider_changed", (int)(m_fPos * 1000.0f), (int)(m_fLength * 1000.0f));
+	}
+}
+
 
 
 
@@ -409,7 +426,10 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 	}
 	else if (event.Type == UIEVENT_BUTTONUP) {
 		if (m_bStartMove) {
+			float  fPos = m_fPos;
+			float  fLength = m_fLength;
 			CalcData();
+			SendNotify(fPos, fLength);
 			m_bStartMove = FALSE;
 			m_pManager->Invalidate();
 		}
@@ -536,4 +556,18 @@ void  CMyVSliderUI::OnMouseMove() {
 void  CMyVSliderUI::SetCursor() {
 	if (g_data.m_cursor_ns != 0)
 		::SetCursor(g_data.m_cursor_ns);
+}
+
+void  CMyVSliderUI::SendNotify(float fPos, float fLength) {
+	float f1 = fPos - m_fPos;
+	float f2 = fLength - m_fLength;
+	BOOL bNotify = FALSE;
+
+	if (!(f1 >= -0.001f && f1 <= 0.001f) || !(f2 >= -0.001f && f2 <= 0.001f)) {
+		bNotify = TRUE;
+	}
+
+	if (bNotify) {
+		m_pManager->SendNotify(this, "vslider_changed", (int)(m_fPos * 1000.0f), (int)(m_fLength * 1000.0f));
+	}
 }

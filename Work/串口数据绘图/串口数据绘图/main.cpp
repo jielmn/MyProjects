@@ -10,6 +10,7 @@
 #include "business.h"
 #include "resource.h"
 #include "LmnSerialPort.h"
+#include "LmnTelSvr.h"
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_cmbComPorts = 0;
@@ -62,6 +63,12 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	if (msg.sType == "hslider_changed") {
+		// JTelSvrPrint("hslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
+	}
+	else if (msg.sType == "vslider_changed") {
+		// JTelSvrPrint("vslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -149,6 +156,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
+	DWORD  dwPort = 2020;
+	JTelSvrStart((unsigned short)dwPort, 3);
+
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");

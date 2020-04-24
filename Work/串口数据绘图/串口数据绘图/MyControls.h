@@ -49,6 +49,7 @@ private:
 	void  CalcData();
 	void  OnMouseMove();
 	void  SetCursor();
+	void  SendNotify(float fPos, float fLength);
 };
 
 class CMyVSliderUI : public DuiLib::CContainerUI
@@ -82,4 +83,5 @@ private:
 	void  CalcData();
 	void  OnMouseMove();
 	void  SetCursor();
+	void  SendNotify(float fPos, float fLength);
 };

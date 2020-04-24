@@ -94,7 +94,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;liblua.dll.a;Advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>duilibd.lib;LmnCommonXD.lib;User32.lib;Setupapi.lib;liblua.dll.a;Advapi32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>xcopy res\compaint_res  ..\Debug\res\compaint_res /dseiy</Command>
