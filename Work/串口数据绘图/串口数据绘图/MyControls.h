@@ -11,8 +11,11 @@ public:
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	virtual LPCTSTR GetClass() const;
 
+	void AddData(int nChartNo, int nValue);
+
 private:
-	std::map<int, std::vector<int>* >     m_data;
+	std::map<int, CChannel *>        m_data;
+	Pen                              m_scale_pen;
 };
 
 class CMySliderUI : public DuiLib::CContainerUI

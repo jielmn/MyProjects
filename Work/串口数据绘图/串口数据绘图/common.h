@@ -38,6 +38,16 @@ public:
 	}
 };
 
+
+class  CChannel {
+public:
+	CChannel(DWORD  dwArgb = 0xFF000000 );
+	~CChannel();
+
+	std::vector<int>   m_vValues;
+	Pen                m_pen;
+};
+
 extern CGlobalData  g_data;
 
 

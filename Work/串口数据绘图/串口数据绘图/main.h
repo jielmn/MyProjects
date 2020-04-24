@@ -43,6 +43,7 @@ public:
 private:
 	CComboUI*                      m_cmbComPorts;
 	CComboUI *                     m_cmbLuaFiles;
+	CMyChartUI *                   m_chart;
 
 private:
 	void  OnDeviceChanged();

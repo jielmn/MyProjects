@@ -2,22 +2,35 @@
 
 #define  BUTT_WIDTH    10
 
-CMyChartUI::CMyChartUI() {
-
+CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ) {
+	
 }
 
 CMyChartUI::~CMyChartUI() {
-	std::map<int, std::vector<int>* >::iterator it;
-	for ( it = m_data.begin(); it != m_data.end(); ++it ) {
+	std::map<int, CChannel *>::iterator it;
+	for (it = m_data.begin(); it != m_data.end(); ++it) {
 		delete it->second;
 	}
 	m_data.clear();
 }
 
 bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
-	CControlUI::DoPaint(hDC, rcPaint, pStopControl);
-	::SetTextColor(hDC, RGB(255, 0, 0));
-	::TextOut(hDC, m_rcItem.left, m_rcItem.top, "111", 3); 
+	Graphics graphics(hDC);
+	graphics.SetSmoothingMode(SmoothingModeHighQuality);
+
+	std::map<int, CChannel *>::iterator it;
+	for (it = m_data.begin(); it != m_data.end(); ++it) {
+		CChannel * pChannel = it->second;
+		DWORD  dwPointsCnt = pChannel->m_vValues.size();
+		Gdiplus::Point * points = new Gdiplus::Point[dwPointsCnt];
+		for (DWORD i = 0; i < dwPointsCnt; i++) {
+			points[i].X = 100 * i + 200;
+			points[i].Y = pChannel->m_vValues[i];
+		}
+		graphics.DrawLines(&pChannel->m_pen, points, dwPointsCnt);
+		delete[] points;
+	}
+
 	return true;
 }
 
@@ -27,6 +40,15 @@ void CMyChartUI::DoEvent(DuiLib::TEventUI& event) {
 
 LPCTSTR CMyChartUI::GetClass() const {
 	return "MyChart";
+}
+
+void CMyChartUI::AddData(int nChartNo, int nValue) {
+	CChannel * pChannel = m_data[nChartNo];
+	if ( 0 == pChannel) {
+		pChannel = new CChannel;
+		m_data[nChartNo] = pChannel;
+	}
+	pChannel->m_vValues.push_back(nValue);
 }
 
 

@@ -13,6 +13,8 @@
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_cmbComPorts = 0;
+	m_cmbLuaFiles = 0;
+	m_chart = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -25,9 +27,20 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_cmbComPorts = (CComboUI *)m_PaintManager.FindControl("cmComPort");
 	m_cmbLuaFiles = static_cast<CComboUI *>(m_PaintManager.FindControl("cmLuaFile"));
+	m_chart       = static_cast<CMyChartUI *>(m_PaintManager.FindControl("cstChart"));
 
 	InitCmbLuaFiles();
 	OnDeviceChanged();
+
+	m_chart->AddData(0, 100);
+	m_chart->AddData(0, 200);
+	m_chart->AddData(0, 250);
+	m_chart->AddData(0, 300);
+
+	m_chart->AddData(1, 200);
+	m_chart->AddData(1, 300);
+	m_chart->AddData(1, 450);
+	m_chart->AddData(1, 500);
 
 	WindowImplBase::InitWindow();
 }
@@ -136,6 +149,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LmnToolkits::ThreadManager::GetInstance();
 	CBusiness::GetInstance()->Init();
 	g_data.m_log->Output(ILog::LOG_SEVERITY_INFO, "main begin.\n");
+
+	CoInitialize(NULL);
+
+	ULONG_PTR gdiplusToken;
+	GdiplusStartupInput gdiplusStartupInput;
+	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 	CPaintManagerUI::SetInstance(hInstance);
 	HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
