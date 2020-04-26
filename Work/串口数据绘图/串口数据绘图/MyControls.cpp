@@ -14,6 +14,10 @@ CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), m_brush(Gd
 	m_fLength = 1.0f;
 	m_fVPos = 0.0f;
 	m_fVLength = 1.0f;
+
+	m_nMinValue = 0;
+	m_nMaxValue = 1;
+	m_nMaxPointsCnt = 0;
 }
 
 CMyChartUI::~CMyChartUI() {
@@ -162,6 +166,16 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 		m_data[nChartNo] = pChannel;
 	}
 	pChannel->m_vValues.push_back(nValue);
+	if (nValue < m_nMinValue) {
+		m_nMinValue = nValue;
+	}
+	else if (nValue > m_nMaxValue) {
+		m_nMaxValue = nValue;
+	}
+
+	if ( (int)pChannel->m_vValues.size() > m_nMaxPointsCnt) {
+		m_nMaxPointsCnt = pChannel->m_vValues.size();
+	}
 }
 
 

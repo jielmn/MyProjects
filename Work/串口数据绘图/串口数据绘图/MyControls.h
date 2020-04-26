@@ -22,6 +22,9 @@ private:
 	float                            m_fLength;
 	float                            m_fVPos;
 	float                            m_fVLength;
+	int                              m_nMinValue;
+	int                              m_nMaxValue;
+	int                              m_nMaxPointsCnt;
 };
 
 class CMySliderUI : public DuiLib::CContainerUI
