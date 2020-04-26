@@ -44,7 +44,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_chart->AddData(1, 200);
 	m_chart->AddData(1, 300);
 	m_chart->AddData(1, 450);
-	m_chart->AddData(1, 500);
+	m_chart->AddData(1, 2500);
 
 	WindowImplBase::InitWindow();
 }

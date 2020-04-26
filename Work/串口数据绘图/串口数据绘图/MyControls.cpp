@@ -1,15 +1,19 @@
 #include "MyControls.h"
 
-#define  BUTT_WIDTH    10
+#define  BUTT_WIDTH             10
+#define  VERTICAL_SCALE_COUNT   10
 
-CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ) {
-	m_nMinValue = 0;
-	m_nMaxValue = 10;
+CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), m_brush(Gdiplus::Color(0xFFC9E2F2)) {
 
 	m_rcMargin.left   = 50;
 	m_rcMargin.bottom = 50;
 	m_rcMargin.right  = 20;
 	m_rcMargin.top    = 20;
+
+	m_fPos = 0.0f;
+	m_fLength = 1.0f;
+	m_fVPos = 0.0f;
+	m_fVLength = 1.0f;
 }
 
 CMyChartUI::~CMyChartUI() {
@@ -27,17 +31,67 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	RECT pos     = GetPos();
 	int  nWidth  = pos.right - pos.left;
 	int  nHeight = pos.bottom - pos.top;
+	int  nRealWidth  = nWidth - m_rcMargin.left - m_rcMargin.right;
+	int  nRealHeight = nHeight - m_rcMargin.top - m_rcMargin.bottom;
 
-	// 画刻度线
-	Gdiplus::Point  scale_points[2];
-	scale_points[0].X = pos.left   + m_rcMargin.left;
-	scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
-	scale_points[1].X = pos.left   + m_rcMargin.left;
-	scale_points[1].Y = pos.top    + m_rcMargin.top;
-	graphics.DrawLines(&m_scale_pen, scale_points, 2);
+	// 画背景
+	graphics.FillRectangle(&m_brush, pos.left, pos.top, nWidth, nHeight);	
 
-
+	int nMaxPointsCnt = 0;
 	std::map<int, CChannel *>::iterator it;
+	for (it = m_data.begin(); it != m_data.end(); ++it) {
+		CChannel * pChannel = it->second;
+		if ( (int)pChannel->m_vValues.size() > nMaxPointsCnt ) {
+			nMaxPointsCnt = pChannel->m_vValues.size();
+		}
+	}
+
+	if (0 == nMaxPointsCnt)
+		return true;
+
+	int nStartIndex     = (int)(nMaxPointsCnt * m_fPos);
+	int nPointsCntRange = (int)(nMaxPointsCnt * m_fLength);
+
+	if (nStartIndex == nMaxPointsCnt) {
+		nStartIndex = nMaxPointsCnt - 1;
+	}
+
+	if ( nPointsCntRange == 0 ) {
+		nPointsCntRange = 1;
+	}
+
+	// 计算最大值和最小值
+	int  nMinValue = 0;
+	int  nMaxValue = 0;
+	BOOL bFirst = TRUE;
+
+	for (it = m_data.begin(); it != m_data.end(); ++it) {
+		CChannel * pChannel = it->second;
+		std::vector<int> & v = pChannel->m_vValues;
+		for (int i = nStartIndex; i < (int)v.size(); i++) {
+			if ( bFirst ) {
+				nMinValue = v[i];
+				nMaxValue = v[i];
+				bFirst = FALSE;
+			}
+			else {
+				if (v[i] < nMinValue) {
+					nMinValue = v[i];
+				}
+				else if (v[i] > nMaxValue) {
+					nMaxValue = v[i];
+				}
+			}			
+		}
+	}
+
+	int  nDiffValue = nMaxValue - nMinValue;
+	if ( nDiffValue == 0 ) {
+
+	}
+
+
+	// 画图
 	for (it = m_data.begin(); it != m_data.end(); ++it) {
 		CChannel * pChannel = it->second;
 		DWORD  dwPointsCnt = pChannel->m_vValues.size();
@@ -49,6 +103,46 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		graphics.DrawLines(&pChannel->m_pen, points, dwPointsCnt);
 		delete[] points;
 	}
+
+	// 填充空白区域
+	Rect r;
+	r.X = pos.left;
+	r.Y = pos.bottom - m_rcMargin.bottom;
+	r.Width = nWidth;
+	r.Height = m_rcMargin.bottom;
+	graphics.FillRectangle(&m_brush, r);
+
+	r.X = pos.left;
+	r.Y = pos.top;
+	r.Width = m_rcMargin.left;
+	r.Height = nHeight;
+	graphics.FillRectangle(&m_brush, r);
+
+	r.X = pos.right - m_rcMargin.right;
+	r.Y = pos.top;
+	r.Width = m_rcMargin.right;
+	r.Height = nHeight;
+	graphics.FillRectangle(&m_brush, r);
+
+	r.X = pos.left;
+	r.Y = pos.top;
+	r.Width = nWidth;
+	r.Height = m_rcMargin.top;
+	graphics.FillRectangle(&m_brush, r);
+
+	// 画刻度线
+	Gdiplus::Point  scale_points[2];
+	scale_points[0].X = pos.left + m_rcMargin.left;
+	scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
+	scale_points[1].X = pos.left + m_rcMargin.left;
+	scale_points[1].Y = pos.top + m_rcMargin.top;
+	graphics.DrawLines(&m_scale_pen, scale_points, 2);
+
+	scale_points[0].X = pos.left + m_rcMargin.left;
+	scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
+	scale_points[1].X = pos.right - m_rcMargin.right;
+	scale_points[1].Y = pos.bottom - m_rcMargin.bottom;
+	graphics.DrawLines(&m_scale_pen, scale_points, 2);
 
 	return true;
 }
@@ -68,12 +162,6 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 		m_data[nChartNo] = pChannel;
 	}
 	pChannel->m_vValues.push_back(nValue);
-	if (nValue < m_nMinValue) {
-		m_nMinValue = nValue;
-	}
-	else if (nValue > m_nMaxValue) {
-		m_nMaxValue = nValue;
-	}
 }
 
 
