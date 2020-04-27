@@ -153,6 +153,18 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 	}
 }
 
+void CMyChartUI::SetPosAndLen(float fPos, float fLength, BOOL bHorizontal /*= TRUE*/) {
+	if (bHorizontal) {
+		m_fPos = fPos;
+		m_fLength = fLength;
+	}
+	else {
+		m_fVPos = fPos;
+		m_fVLength = fLength;
+	}
+	this->Invalidate();
+}
+
 
 
 

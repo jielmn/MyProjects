@@ -41,10 +41,13 @@ void  CDuiFrameWnd::InitWindow() {
 	m_chart->AddData(0, 250);
 	m_chart->AddData(0, 300);
 
-	m_chart->AddData(1, 200);
-	m_chart->AddData(1, 300);
-	m_chart->AddData(1, 450);
-	m_chart->AddData(1, 2500);
+	for (int i = 0; i < 500; i++) {
+		m_chart->AddData(1, 200);
+		m_chart->AddData(1, 300);
+		m_chart->AddData(1, 450);
+		m_chart->AddData(1, 2500);
+	}
+	
 
 	WindowImplBase::InitWindow();
 }
@@ -65,9 +68,11 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == "hslider_changed") {
 		//JTelSvrPrint("hslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
+		m_chart->SetPosAndLen(msg.wParam / 1000.0f, msg.lParam / 1000.0f);
 	}
 	else if (msg.sType == "vslider_changed") {
 		//JTelSvrPrint("vslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
+		m_chart->SetPosAndLen(msg.wParam / 1000.0f, msg.lParam / 1000.0f, FALSE);
 	}
 	WindowImplBase::Notify(msg);
 }
