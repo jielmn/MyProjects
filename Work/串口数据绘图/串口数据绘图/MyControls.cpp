@@ -25,11 +25,20 @@ CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ),
 }
 
 CMyChartUI::~CMyChartUI() {
+	Clear();
+}
+
+void CMyChartUI::Clear() {
 	std::map<int, CChannel *>::iterator it;
 	for (it = m_data.begin(); it != m_data.end(); ++it) {
 		delete it->second;
 	}
 	m_data.clear();
+
+	m_nMinValue = 0;
+	m_nMaxValue = 1;
+	m_bFirstValue = TRUE;
+	m_nMaxPointsCnt = 0;
 }
  
 bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {

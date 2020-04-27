@@ -13,6 +13,7 @@ public:
 
 	void AddData(int nChartNo, int nValue);
 	void SetPosAndLen(float fPos, float fLength, BOOL bHorizontal = TRUE);
+	void Clear();
 
 private:
 	std::map<int, CChannel *>        m_data;

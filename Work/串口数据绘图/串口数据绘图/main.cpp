@@ -250,6 +250,10 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
 	if ( bRet ) {
 		SetBusy(FALSE);
+
+		m_buf.Clear();
+		m_chart->Clear();
+		m_chart->Invalidate();
 	}
 	else {
 		MessageBox(GetHWND(), "´ò¿ª´®¿ÚÊ§°Ü", "´íÎó", 0);

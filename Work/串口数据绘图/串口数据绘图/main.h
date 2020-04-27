@@ -52,6 +52,7 @@ private:
 
 	lua_State*                     m_L;        // lua
 	BOOL                           m_bCorrectLua;
+	CDataBuf                       m_buf;
 
 private:
 	void  OnDeviceChanged();
