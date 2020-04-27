@@ -61,6 +61,8 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_com->Start();
 
+	g_data.m_thrd_com->PostDelayMessage(1000, this, MSG_READ_COM);
+
 	return 0;
 }
 
@@ -95,6 +97,24 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		COpenComParam * pParam = (COpenComParam *)pMessageData;
 		OpenCom(pParam);
+	}
+	break;
+
+	case MSG_READ_COM:
+	{
+		if ( m_com.GetStatus() == CLmnSerialPort::OPEN ) {
+			BYTE  data[8192];
+			DWORD  dwLen = sizeof(data);
+			BOOL bRet = m_com.Read(data, dwLen);
+			while (bRet && dwLen > 0) {
+				BYTE * pData = new BYTE[dwLen];
+				memcpy(pData, data, dwLen);
+				::PostMessage(g_data.m_hWnd, UM_COM_DATA, (WPARAM)pData, dwLen);
+				dwLen = sizeof(data);
+				bRet = m_com.Read(data, dwLen);
+			}
+		}
+		g_data.m_thrd_com->PostDelayMessage(1000, this, MSG_READ_COM);
 	}
 	break;
 

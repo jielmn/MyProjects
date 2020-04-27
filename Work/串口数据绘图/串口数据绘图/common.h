@@ -23,9 +23,11 @@ using namespace DuiLib;
 
 
 #define   MSG_OPEN_COM               1
+#define   MSG_READ_COM               2
 
 #define   UM_OPEN_COM_RET            (WM_USER + 1)
 #define   UM_WRONG_LUA               (WM_USER + 2)
+#define   UM_COM_DATA                (WM_USER + 3)
 
 
 class  CGlobalData {

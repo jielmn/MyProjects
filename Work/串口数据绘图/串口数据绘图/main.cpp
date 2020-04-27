@@ -122,6 +122,14 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	else if (uMsg == UM_WRONG_LUA) {
 		MessageBox(GetHWND(), "lua文件出错或缺少动态链接库文件", "错误", 0);
 	}
+	else if (uMsg == UM_COM_DATA) {
+		const BYTE * pData = (const BYTE *)wParam;
+		DWORD  dwLen = lParam;
+		m_buf.Append(pData, dwLen);
+		delete[] pData;
+
+
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
