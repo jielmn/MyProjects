@@ -31,7 +31,7 @@ CMyChartUI::~CMyChartUI() {
 	}
 	m_data.clear();
 }
-
+ 
 bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
 	Graphics graphics(hDC);
 	graphics.SetSmoothingMode(SmoothingModeHighQuality);
@@ -42,6 +42,7 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int  nRealWidth  = nWidth - m_rcMargin.left - m_rcMargin.right;
 	int  nRealHeight = nHeight - m_rcMargin.top - m_rcMargin.bottom;
 
+
 	// »­±³¾°
 	graphics.FillRectangle(&m_brush, pos.left, pos.top, nWidth, nHeight);	
 
@@ -50,11 +51,11 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		fInterval = MAX_POINTS_INTERVAL;
 	}
 
-	int nDiffValue = m_nMaxValue - m_nMinValue;
-	float  fVInterval = nRealHeight / (nDiffValue * m_fVLength);
+	int nDiffValue    = m_nMaxValue - m_nMinValue;
+	float  fVInterval = nRealHeight / (nDiffValue * 1.02f * m_fVLength);
 
 	float fOriginX = m_nMaxPointsCnt * m_fPos + 0;
-	float fOriginY = nDiffValue * m_fVPos + m_nMinValue;
+	float fOriginY = nDiffValue * 1.02f * m_fVPos + (m_nMinValue - nDiffValue * 0.01f);
 	int nOriginXUi = pos.left + m_rcMargin.left;
 	int nOriginYUi = pos.bottom - m_rcMargin.bottom;
 
@@ -261,7 +262,11 @@ void CMySliderUI::DoEvent(DuiLib::TEventUI& event) {
 		if ( m_bStartMove ) {
 			SetCursor();
 			m_nMovePos = event.ptMouse.x;
+			float  fPos = m_fPos;
+			float  fLength = m_fLength;
 			OnMouseMove();
+			CalcData();
+			SendNotify(fPos, fLength);
 			m_nStartPos = m_nMovePos;
 			m_pManager->Invalidate();
 		}
@@ -522,7 +527,11 @@ void CMyVSliderUI::DoEvent(DuiLib::TEventUI& event) {
 		if (m_bStartMove) {
 			SetCursor();
 			m_nMovePos = event.ptMouse.y;
+			float  fPos = m_fPos;
+			float  fLength = m_fLength;			
 			OnMouseMove();
+			CalcData();
+			SendNotify(fPos, fLength);
 			m_nStartPos = m_nMovePos;
 			m_pManager->Invalidate();
 		}

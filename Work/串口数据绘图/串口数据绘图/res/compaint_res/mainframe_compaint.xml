@@ -43,7 +43,10 @@
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="10,0,10,0">
-				<MyChart bordercolor="#FF768D9B" bordersize="0" name="cstChart" /><MyVSlider width="32" bordercolor="#FF768D9B" bordersize="1" />
+				<HorizontalLayout>
+					<MyChart bordercolor="#FF768D9B" bordersize="0" name="cstChart" />
+				</HorizontalLayout>				
+				<MyVSlider width="32" bordercolor="#FF768D9B" bordersize="1" />
 			</HorizontalLayout>
 			
 			<HorizontalLayout height="32" inset="10,0,10,0">
