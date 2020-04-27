@@ -42,10 +42,10 @@ void  CDuiFrameWnd::InitWindow() {
 	m_chart->AddData(0, 300);
 
 	for (int i = 0; i < 100; i++) {
-		m_chart->AddData(1, 200);
-		m_chart->AddData(1, 300);
-		m_chart->AddData(1, 450);
-		m_chart->AddData(1, 2500);
+		m_chart->AddData(4, 200);
+		m_chart->AddData(4, 300);
+		m_chart->AddData(4, 450);
+		m_chart->AddData(4, 2500);
 	}
 	
 

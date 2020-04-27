@@ -133,6 +133,18 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 	if ( 0 == pChannel) {
 		pChannel = new CChannel;
 		m_data[nChartNo] = pChannel;
+
+		std::map<int, DWORD>::iterator it = g_color.find(nChartNo);
+		if ( it == g_color.end() ) {
+			DWORD dwColor = GetRand(0, 0x00FFFFFF);
+			dwColor |= 0xFF000000;
+			pChannel->m_pen.SetColor(Gdiplus::Color(dwColor));
+			pChannel->m_brush.SetColor(Gdiplus::Color(dwColor));
+		}
+		else {
+			pChannel->m_pen.SetColor(Gdiplus::Color(it->second));
+			pChannel->m_brush.SetColor(Gdiplus::Color(it->second));
+		}
 	}
 	pChannel->m_vValues.push_back(nValue);
 	if (m_bFirstValue) {

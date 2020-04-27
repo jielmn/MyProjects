@@ -54,7 +54,7 @@ public:
 };
 
 extern CGlobalData  g_data;
-
+extern std::map<int, DWORD>        g_color;
 
 // templates
 template <class T>
