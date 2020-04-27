@@ -55,30 +55,50 @@ int CBusiness::Init() {
 	}
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
-	g_data.m_thrd_db = new LmnToolkits::Thread();
-	if (0 == g_data.m_thrd_db) {
+	g_data.m_thrd_com = new LmnToolkits::Thread();
+	if (0 == g_data.m_thrd_com) {
 		return -1;
 	}
-	g_data.m_thrd_db->Start();
+	g_data.m_thrd_com->Start();
 
 	return 0;
 }
 
 int CBusiness::DeInit() {
 
-	if (g_data.m_thrd_db) {
-		g_data.m_thrd_db->Stop();
-		delete g_data.m_thrd_db;
-		g_data.m_thrd_db = 0;
+	if (g_data.m_thrd_com) {
+		g_data.m_thrd_com->Stop();
+		delete g_data.m_thrd_com;
+		g_data.m_thrd_com = 0;
 	}
 
 	Clear();
 	return 0;
 }
 
+void  CBusiness::OpenComAsyn(int nCom, int nBaud) {
+	g_data.m_thrd_com->PostMessage(this, MSG_OPEN_COM, new COpenComParam(nCom, nBaud) );
+}
+
+void  CBusiness::OpenCom(const COpenComParam * pParam) {
+	BOOL bRet = m_com.OpenUartPort(pParam->m_nCom, pParam->m_nBaud);
+	::PostMessage(g_data.m_hWnd, UM_OPEN_COM_RET, bRet, 0);
+}
+
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_OPEN_COM:
+	{
+		COpenComParam * pParam = (COpenComParam *)pMessageData;
+		OpenCom(pParam);
+	}
+	break;
 
+	default:
+		break;
+	}
 }

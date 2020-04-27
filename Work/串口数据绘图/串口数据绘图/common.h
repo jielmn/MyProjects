@@ -22,6 +22,11 @@ using namespace DuiLib;
 #define   SKIN_FOLDER             ("res\\" PROJ_NAME "_res")
 
 
+#define   MSG_OPEN_COM               1
+
+#define   UM_OPEN_COM_RET            (WM_USER + 1)
+
+
 class  CGlobalData {
 public:
 	ILog    *                 m_log;
@@ -29,13 +34,13 @@ public:
 	HWND                      m_hWnd;
 	HCURSOR                   m_cursor_we;
 	HCURSOR                   m_cursor_ns;
-	LmnToolkits::Thread *     m_thrd_db;
+	LmnToolkits::Thread *     m_thrd_com;
 
 public:
 	CGlobalData() {
 		m_log = 0;
 		m_cfg = 0;
-		m_thrd_db = 0;
+		m_thrd_com = 0;
 		m_hWnd = 0;
 		m_cursor_we = 0;
 		m_cursor_ns = 0;
@@ -51,6 +56,17 @@ public:
 	std::vector<int>   m_vValues;
 	Pen                m_pen;
 	SolidBrush         m_brush;
+};
+
+class COpenComParam : public LmnToolkits::MessageData {
+public:
+	COpenComParam(int nCom, int nBaud) {
+		m_nCom = nCom;
+		m_nBaud = nBaud;
+	}
+
+	int       m_nCom;
+	int       m_nBaud;
 };
 
 extern CGlobalData  g_data;

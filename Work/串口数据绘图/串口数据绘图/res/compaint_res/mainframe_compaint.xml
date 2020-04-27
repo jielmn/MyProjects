@@ -31,6 +31,9 @@
 			<HorizontalLayout height="40" inset="10,5,10,5">
 				<Label text="选择串口:" width="120" font="1" textcolor="#FF386382" />
 				<Combo name="cmComPort" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="400" />
+				<Control width="40" />
+				<Label text="选择波特率:" width="120" font="1" textcolor="#FF386382" />
+				<Combo name="cmBaud" normalimage="file='Combo_nor.bmp' corner='2,2,24,2'" hotimage="file='Combo_over.bmp' corner='2,2,24,2'" pushedimage="file='Combo_over.bmp' corner='2,2,24,2'" textpadding="5,1,5,1" itemfont="3" itemtextcolor="#FF386382" itemselectedtextcolor="#FF386382" width="100" />
 			</HorizontalLayout>
 			
 			<HorizontalLayout height="40" inset="10,5,10,5">

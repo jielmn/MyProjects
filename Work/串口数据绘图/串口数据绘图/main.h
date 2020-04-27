@@ -43,10 +43,17 @@ public:
 private:
 	CComboUI*                      m_cmbComPorts;
 	CComboUI *                     m_cmbLuaFiles;
+	CComboUI *                     m_cmbBaud;
 	CMyChartUI *                   m_chart;
+	BOOL                           m_bStartPaint;
+	BOOL                           m_bBusy;
+	CButtonUI *                    m_btnPaint;
 
 private:
 	void  OnDeviceChanged();
 	void  InitCmbLuaFiles();
+	void  OnStartPaint();
+	void  SetBusy(BOOL bBusy = TRUE);
+	void  OnOpenComRet(BOOL bRet);
 
 };

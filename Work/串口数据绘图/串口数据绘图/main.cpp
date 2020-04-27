@@ -15,7 +15,10 @@
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_cmbComPorts = 0;
 	m_cmbLuaFiles = 0;
+	m_cmbBaud = 0;
 	m_chart = 0;
+	m_bStartPaint = FALSE;
+	m_bBusy = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -32,6 +35,19 @@ void  CDuiFrameWnd::InitWindow() {
 	m_cmbComPorts = (CComboUI *)m_PaintManager.FindControl("cmComPort");
 	m_cmbLuaFiles = static_cast<CComboUI *>(m_PaintManager.FindControl("cmLuaFile"));
 	m_chart       = static_cast<CMyChartUI *>(m_PaintManager.FindControl("cstChart"));
+	m_btnPaint    = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPaint"));
+	m_cmbBaud     = static_cast<CComboUI *>(m_PaintManager.FindControl("cmBaud"));
+
+	int arrBauds[5] = { 9600,19200, 38400,57600,115200 };
+	CDuiString  strText;
+	for (int i = 0; i < 5; i++) {
+		CListLabelElementUI * pElement = new CListLabelElementUI;
+		m_cmbBaud->Add(pElement);
+		strText.Format("%d", arrBauds[i]);
+		pElement->SetText(strText);
+		pElement->SetTag(arrBauds[i]);
+	}
+	m_cmbBaud->SelectItem(0);
 
 	InitCmbLuaFiles();
 	OnDeviceChanged();
@@ -66,6 +82,8 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+
 	if (msg.sType == "hslider_changed") {
 		//JTelSvrPrint("hslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
 		m_chart->SetPosAndLen(msg.wParam / 1000.0f, msg.lParam / 1000.0f);
@@ -74,10 +92,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		//JTelSvrPrint("vslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
 		m_chart->SetPosAndLen(msg.wParam / 1000.0f, msg.lParam / 1000.0f, FALSE);
 	}
+	else if ( msg.sType == "click" ) {
+		if (strName == "btnPaint") {
+			OnStartPaint();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if ( uMsg == UM_OPEN_COM_RET ) {
+		OnOpenComRet(wParam);
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -151,6 +177,64 @@ void  CDuiFrameWnd::InitCmbLuaFiles() {
 		m_cmbLuaFiles->SelectItem(0);
 }
 
+void  CDuiFrameWnd::OnStartPaint() {
+	if ( !m_bStartPaint ) {
+		int nSel = m_cmbComPorts->GetCurSel();
+		if ( nSel < 0 ) {
+			MessageBox(GetHWND(), "没有选择串口", "错误", 0);
+			return;
+		}
+
+		int nCom = m_cmbComPorts->GetItemAt(nSel)->GetTag();
+		nSel = m_cmbBaud->GetCurSel();
+		int nBaud = m_cmbBaud->GetItemAt(nSel)->GetTag();
+
+		nSel = m_cmbLuaFiles->GetCurSel();
+		if (nSel < 0) {
+			MessageBox(GetHWND(), "没有选择lua文件", "错误", 0);
+			return;
+		}
+
+		CBusiness::GetInstance()->OpenComAsyn(nCom, nBaud);
+
+		m_btnPaint->SetText("停止绘图");
+		m_bStartPaint = TRUE;
+		SetBusy();
+	}
+	else {
+		m_btnPaint->SetText("开始绘图");
+		m_bStartPaint = FALSE;  
+		SetBusy();
+	}
+}
+
+void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
+	m_bBusy = bBusy;
+	if ( m_bBusy ) {
+		m_btnPaint->SetEnabled(false);
+		m_cmbComPorts->SetEnabled(false);
+		m_cmbBaud->SetEnabled(false);
+		m_cmbLuaFiles->SetEnabled(false);
+	}
+	else {
+		m_btnPaint->SetEnabled(true);
+		m_cmbComPorts->SetEnabled(true);
+		m_cmbBaud->SetEnabled(true);
+		m_cmbLuaFiles->SetEnabled(true);
+	}
+}
+
+void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
+	if ( bRet ) {
+		SetBusy(FALSE);
+	}
+	else {
+		MessageBox(GetHWND(), "打开串口失败", "错误", 0);
+		m_btnPaint->SetText("开始绘图");
+		m_bStartPaint = FALSE;
+		SetBusy(FALSE);
+	}
+}
 
 
 
