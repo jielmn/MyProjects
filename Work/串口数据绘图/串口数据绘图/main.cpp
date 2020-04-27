@@ -64,10 +64,10 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == "hslider_changed") {
-		// JTelSvrPrint("hslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
+		//JTelSvrPrint("hslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
 	}
 	else if (msg.sType == "vslider_changed") {
-		// JTelSvrPrint("vslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
+		//JTelSvrPrint("vslider_changed: %d, %d", (int)msg.wParam, (int)msg.lParam);
 	}
 	WindowImplBase::Notify(msg);
 }

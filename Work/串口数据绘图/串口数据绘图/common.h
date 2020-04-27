@@ -50,6 +50,7 @@ public:
 
 	std::vector<int>   m_vValues;
 	Pen                m_pen;
+	SolidBrush         m_brush;
 };
 
 extern CGlobalData  g_data;

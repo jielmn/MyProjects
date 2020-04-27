@@ -2,8 +2,11 @@
 
 #define  BUTT_WIDTH             10
 #define  VERTICAL_SCALE_COUNT   10
+#define  MAX_POINTS_INTERVAL    20
+#define  POINT_RADIUS           3
 
-CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), m_brush(Gdiplus::Color(0xFFC9E2F2)) {
+CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), 
+                           m_brush(Gdiplus::Color(0xFFC9E2F2))  {
 
 	m_rcMargin.left   = 50;
 	m_rcMargin.bottom = 50;
@@ -17,6 +20,7 @@ CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), m_brush(Gd
 
 	m_nMinValue = 0;
 	m_nMaxValue = 1;
+	m_bFirstValue = TRUE;
 	m_nMaxPointsCnt = 0;
 }
 
@@ -41,68 +45,32 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	// 画背景
 	graphics.FillRectangle(&m_brush, pos.left, pos.top, nWidth, nHeight);	
 
-	int nMaxPointsCnt = 0;
-	std::map<int, CChannel *>::iterator it;
-	for (it = m_data.begin(); it != m_data.end(); ++it) {
-		CChannel * pChannel = it->second;
-		if ( (int)pChannel->m_vValues.size() > nMaxPointsCnt ) {
-			nMaxPointsCnt = pChannel->m_vValues.size();
-		}
+	float  fInterval = nRealWidth / (m_nMaxPointsCnt * m_fLength);
+	if ( fInterval > MAX_POINTS_INTERVAL ) {
+		fInterval = MAX_POINTS_INTERVAL;
 	}
 
-	if (0 == nMaxPointsCnt)
-		return true;
+	int nDiffValue = m_nMaxValue - m_nMinValue;
+	float  fVInterval = nRealHeight / (nDiffValue * m_fVLength);
 
-	int nStartIndex     = (int)(nMaxPointsCnt * m_fPos);
-	int nPointsCntRange = (int)(nMaxPointsCnt * m_fLength);
-
-	if (nStartIndex == nMaxPointsCnt) {
-		nStartIndex = nMaxPointsCnt - 1;
-	}
-
-	if ( nPointsCntRange == 0 ) {
-		nPointsCntRange = 1;
-	}
-
-	// 计算最大值和最小值
-	int  nMinValue = 0;
-	int  nMaxValue = 0;
-	BOOL bFirst = TRUE;
-
-	for (it = m_data.begin(); it != m_data.end(); ++it) {
-		CChannel * pChannel = it->second;
-		std::vector<int> & v = pChannel->m_vValues;
-		for (int i = nStartIndex; i < (int)v.size(); i++) {
-			if ( bFirst ) {
-				nMinValue = v[i];
-				nMaxValue = v[i];
-				bFirst = FALSE;
-			}
-			else {
-				if (v[i] < nMinValue) {
-					nMinValue = v[i];
-				}
-				else if (v[i] > nMaxValue) {
-					nMaxValue = v[i];
-				}
-			}			
-		}
-	}
-
-	int  nDiffValue = nMaxValue - nMinValue;
-	if ( nDiffValue == 0 ) {
-
-	}
-
+	float fOriginX = m_nMaxPointsCnt * m_fPos + 0;
+	float fOriginY = nDiffValue * m_fVPos + m_nMinValue;
+	int nOriginXUi = pos.left + m_rcMargin.left;
+	int nOriginYUi = pos.bottom - m_rcMargin.bottom;
 
 	// 画图
+	std::map<int, CChannel *>::iterator it;
 	for (it = m_data.begin(); it != m_data.end(); ++it) {
 		CChannel * pChannel = it->second;
 		DWORD  dwPointsCnt = pChannel->m_vValues.size();
 		Gdiplus::Point * points = new Gdiplus::Point[dwPointsCnt];
 		for (DWORD i = 0; i < dwPointsCnt; i++) {
-			points[i].X = 100 * i + 200;
-			points[i].Y = pChannel->m_vValues[i];
+			points[i].X = (int)((i - fOriginX) * fInterval + nOriginXUi);
+			points[i].Y = (int)(nOriginYUi - (pChannel->m_vValues[i] - fOriginY) * fVInterval );
+			if ( fInterval > POINT_RADIUS * 2 ) {
+				graphics.FillEllipse(&pChannel->m_brush, points[i].X - POINT_RADIUS, 
+					points[i].Y - POINT_RADIUS, 2 * POINT_RADIUS, 2 * POINT_RADIUS);
+			}			
 		}
 		graphics.DrawLines(&pChannel->m_pen, points, dwPointsCnt);
 		delete[] points;
@@ -134,7 +102,7 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	r.Height = m_rcMargin.top;
 	graphics.FillRectangle(&m_brush, r);
 
-	// 画刻度线
+	//画刻度线
 	Gdiplus::Point  scale_points[2];
 	scale_points[0].X = pos.left + m_rcMargin.left;
 	scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
@@ -166,11 +134,18 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 		m_data[nChartNo] = pChannel;
 	}
 	pChannel->m_vValues.push_back(nValue);
-	if (nValue < m_nMinValue) {
-		m_nMinValue = nValue;
-	}
-	else if (nValue > m_nMaxValue) {
+	if (m_bFirstValue) {
 		m_nMaxValue = nValue;
+		m_nMinValue = nValue;
+		m_bFirstValue = FALSE;
+	}
+	else {
+		if (nValue < m_nMinValue) {
+			m_nMinValue = nValue;
+		}
+		else if (nValue > m_nMaxValue) {
+			m_nMaxValue = nValue;
+		}
 	}
 
 	if ( (int)pChannel->m_vValues.size() > m_nMaxPointsCnt) {
@@ -601,7 +576,7 @@ void  CMyVSliderUI::CalcData() {
 	int nHeight = this->GetHeight();
 	int nLogicHeight = nHeight - 1 * 2 - BUTT_WIDTH * 2;
 
-	m_fPos    = (float)(m_ctl_1->GetFixedHeight() - 1) / nLogicHeight;
+	m_fPos    = (float)(m_ctl_2->GetFixedHeight() - 1) / nLogicHeight;
 	m_fLength = (float)(nHeight - m_ctl_1->GetFixedHeight() - m_ctl_2->GetFixedHeight() - BUTT_WIDTH * 2) / nLogicHeight;
 }
 

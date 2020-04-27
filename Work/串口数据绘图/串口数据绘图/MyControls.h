@@ -24,6 +24,7 @@ private:
 	float                            m_fVLength;
 	int                              m_nMinValue;
 	int                              m_nMaxValue;
+	BOOL                             m_bFirstValue;
 	int                              m_nMaxPointsCnt;
 };
 
