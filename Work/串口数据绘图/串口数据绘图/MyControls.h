@@ -14,6 +14,7 @@ public:
 	void AddData(int nChartNo, int nValue);
 	void SetPosAndLen(float fPos, float fLength, BOOL bHorizontal = TRUE);
 	void Clear();
+	void GetParams(int & nMaxPoints, int & nMaxValue, int & nMinValue);
 
 private:
 	std::map<int, CChannel *>        m_data;
@@ -24,10 +25,6 @@ private:
 	float                            m_fLength;
 	float                            m_fVPos;
 	float                            m_fVLength;
-	int                              m_nMinValue;
-	int                              m_nMaxValue;
-	BOOL                             m_bFirstValue;
-	int                              m_nMaxPointsCnt;
 };
 
 class CMySliderUI : public DuiLib::CContainerUI

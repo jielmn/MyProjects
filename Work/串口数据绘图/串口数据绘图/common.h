@@ -29,6 +29,8 @@ using namespace DuiLib;
 #define   UM_WRONG_LUA               (WM_USER + 2)
 #define   UM_COM_DATA                (WM_USER + 3)
 
+#define   MAX_CHANNEL_COUNT          4
+
 
 class  CGlobalData {
 public:

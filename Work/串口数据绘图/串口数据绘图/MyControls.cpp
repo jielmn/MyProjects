@@ -17,11 +17,6 @@ CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ),
 	m_fLength = 1.0f;
 	m_fVPos = 0.0f;
 	m_fVLength = 1.0f;
-
-	m_nMinValue = 0;
-	m_nMaxValue = 1;
-	m_bFirstValue = TRUE;
-	m_nMaxPointsCnt = 0;
 }
 
 CMyChartUI::~CMyChartUI() {
@@ -34,11 +29,37 @@ void CMyChartUI::Clear() {
 		delete it->second;
 	}
 	m_data.clear();
+}
 
-	m_nMinValue = 0;
-	m_nMaxValue = 1;
-	m_bFirstValue = TRUE;
-	m_nMaxPointsCnt = 0;
+void CMyChartUI::GetParams(int & nMaxPoints, int & nMaxValue, int & nMinValue) {
+	std::map<int, CChannel *>::iterator it;
+	BOOL  bFirst = TRUE;
+	nMaxPoints = 0;
+	nMinValue = nMaxValue = 0;
+
+	for (it = m_data.begin(); it != m_data.end(); ++it) {
+		CChannel * pChannel = it->second;
+		std::vector<int>::iterator ix;		
+		std::vector<int> & v = pChannel->m_vValues;
+		for (ix = v.begin(); ix != v.end(); ++ix) {
+			int nValue = *ix;
+			if (bFirst) {
+				nMaxValue = nMinValue = nValue;
+				bFirst = FALSE;
+			}
+			else {
+				if (nValue > nMaxValue) {
+					nMaxValue = nValue;
+				}
+				else if (nValue < nMinValue) {
+					nMinValue = nValue;
+				}
+			}
+		}
+		if ( (int)v.size() > nMaxPoints ) {
+			nMaxPoints = v.size();
+		}
+	}
 }
  
 bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl) {
@@ -55,16 +76,19 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	// »­±³¾°
 	graphics.FillRectangle(&m_brush, pos.left, pos.top, nWidth, nHeight);	
 
-	float  fInterval = nRealWidth / (m_nMaxPointsCnt * m_fLength);
+	int nMaxPointsCnt, nMaxValue, nMinValue;
+	GetParams(nMaxPointsCnt, nMaxValue, nMinValue);
+
+	float  fInterval = nRealWidth / (nMaxPointsCnt * m_fLength);
 	if ( fInterval > MAX_POINTS_INTERVAL ) {
 		fInterval = MAX_POINTS_INTERVAL;
 	}
 
-	int nDiffValue    = m_nMaxValue - m_nMinValue;
+	int nDiffValue    = nMaxValue - nMinValue;
 	float  fVInterval = nRealHeight / (nDiffValue * 1.02f * m_fVLength);
 
-	float fOriginX = m_nMaxPointsCnt * m_fPos + 0;
-	float fOriginY = nDiffValue * 1.02f * m_fVPos + (m_nMinValue - nDiffValue * 0.01f);
+	float fOriginX = nMaxPointsCnt * m_fPos + 0;
+	float fOriginY = nDiffValue * 1.02f * m_fVPos + (nMinValue - nDiffValue * 0.01f);
 	int nOriginXUi = pos.left + m_rcMargin.left;
 	int nOriginYUi = pos.bottom - m_rcMargin.bottom;
 
@@ -138,6 +162,9 @@ LPCTSTR CMyChartUI::GetClass() const {
 }
 
 void CMyChartUI::AddData(int nChartNo, int nValue) {
+	if (nChartNo > MAX_CHANNEL_COUNT || nChartNo <= 0)
+		return;
+
 	CChannel * pChannel = m_data[nChartNo];
 	if ( 0 == pChannel) {
 		pChannel = new CChannel;
@@ -156,23 +183,6 @@ void CMyChartUI::AddData(int nChartNo, int nValue) {
 		}
 	}
 	pChannel->m_vValues.push_back(nValue);
-	if (m_bFirstValue) {
-		m_nMaxValue = nValue;
-		m_nMinValue = nValue;
-		m_bFirstValue = FALSE;
-	}
-	else {
-		if (nValue < m_nMinValue) {
-			m_nMinValue = nValue;
-		}
-		else if (nValue > m_nMaxValue) {
-			m_nMaxValue = nValue;
-		}
-	}
-
-	if ( (int)pChannel->m_vValues.size() > m_nMaxPointsCnt) {
-		m_nMaxPointsCnt = pChannel->m_vValues.size();
-	}
 }
 
 void CMyChartUI::SetPosAndLen(float fPos, float fLength, BOOL bHorizontal /*= TRUE*/) {

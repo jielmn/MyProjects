@@ -62,16 +62,26 @@ void  CDuiFrameWnd::InitWindow() {
 	InitCmbLuaFiles();
 	OnDeviceChanged();
 
-	m_chart->AddData(0, 100);
-	m_chart->AddData(0, 200);
-	m_chart->AddData(0, 250);
-	m_chart->AddData(0, 300);
+	m_chart->AddData(2, 100);
+	m_chart->AddData(2, 200);
+	m_chart->AddData(2, 250);
+	m_chart->AddData(2, 300);
+
+	m_chart->AddData(3, 1100);
+	m_chart->AddData(3, 2100);
+	m_chart->AddData(3, 2250);
+	m_chart->AddData(3, 1000);	
 
 	for (int i = 0; i < 100; i++) {
-		m_chart->AddData(4, 200);
+		m_chart->AddData(1, 200);
+		m_chart->AddData(1, 300);
+		m_chart->AddData(1, 450);
+		m_chart->AddData(1, 2500);
+
+		m_chart->AddData(4, 100);
+		m_chart->AddData(4, 500);
 		m_chart->AddData(4, 300);
-		m_chart->AddData(4, 450);
-		m_chart->AddData(4, 2500);
+		m_chart->AddData(4, 600);
 	}
 	
 
@@ -128,6 +138,17 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		m_buf.Append(pData, dwLen);
 		delete[] pData;
 
+		//lua_settop(m_L, 0);
+		//lua_getglobal(m_L, "receive");
+		//lua_pushlstring(m_L, (const char *)m_buf.GetData(), m_buf.GetDataLength());
+
+		//int ret = lua_pcall(m_L, 1, 5, 0);
+		//if (0 != ret) {
+		//	size_t err_len = 0;
+		//	const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
+		//	MessageBox(GetHWND(), szErrDescription, "´íÎó", 0);
+		//	lua_settop(m_L, 0);
+		//}
 
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);

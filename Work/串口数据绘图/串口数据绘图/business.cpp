@@ -43,10 +43,10 @@ int CBusiness::Init() {
 	g_data.m_log->Init(LOG_FILE_NAME, 0, ILog::LOG_SEVERITY_INFO, TRUE);
 #endif
 	
-	g_color.insert(std::make_pair(1, 0xFF1b9375));
-	g_color.insert(std::make_pair(2, 0xFFFF0000));
-	g_color.insert(std::make_pair(3, 0xFF51786C));
-	g_color.insert(std::make_pair(4, 0xFFCA5100));
+	g_color.insert(std::make_pair(1, 0xFFCA5100));
+	g_color.insert(std::make_pair(2, 0xFF1b9375));	
+	g_color.insert(std::make_pair(3, 0xFF007ACC));
+	g_color.insert(std::make_pair(4, 0xFF333333));
 
 
 	g_data.m_cfg = new FileConfigEx();
