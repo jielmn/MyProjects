@@ -6,6 +6,7 @@
 using namespace DuiLib;
 
 #include "MyControls.h"
+#include "lua.hpp"
 
 #include "resource.h"
 
@@ -49,11 +50,15 @@ private:
 	BOOL                           m_bBusy;
 	CButtonUI *                    m_btnPaint;
 
+	lua_State*                     m_L;        // lua
+	BOOL                           m_bCorrectLua;
+
 private:
 	void  OnDeviceChanged();
 	void  InitCmbLuaFiles();
 	void  OnStartPaint();
 	void  SetBusy(BOOL bBusy = TRUE);
 	void  OnOpenComRet(BOOL bRet);
+	void  OnLuaFileSelected();
 
 };

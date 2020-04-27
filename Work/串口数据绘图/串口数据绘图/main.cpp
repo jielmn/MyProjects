@@ -12,6 +12,13 @@
 #include "LmnSerialPort.h"
 #include "LmnTelSvr.h"
 
+static lua_State* init_lua() {
+	lua_State* L = luaL_newstate();  //创建Lua栈
+	//lua_checkstack(L, 60);         //修改Lua栈大小为60，防止在C和Lua之间传递大数据时，崩溃
+	luaL_openlibs(L);                //运行Lua虚拟机
+	return L;
+}
+
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_cmbComPorts = 0;
 	m_cmbLuaFiles = 0;
@@ -19,6 +26,9 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_chart = 0;
 	m_bStartPaint = FALSE;
 	m_bBusy = FALSE;
+
+	m_L = init_lua();
+	m_bCorrectLua = FALSE;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -97,12 +107,20 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnStartPaint();
 		}
 	}
+	if (msg.sType == "itemselect") {
+		if (strName == "cmLuaFile") {
+			OnLuaFileSelected();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if ( uMsg == UM_OPEN_COM_RET ) {
 		OnOpenComRet(wParam);
+	}
+	else if (uMsg == UM_WRONG_LUA) {
+		MessageBox(GetHWND(), "lua文件出错或缺少动态链接库文件", "错误", 0);
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -195,6 +213,11 @@ void  CDuiFrameWnd::OnStartPaint() {
 			return;
 		}
 
+		if (!m_bCorrectLua) {
+			MessageBox(GetHWND(), "lua文件出错或者缺少动态链接库", "错误", 0);
+			return;
+		}
+
 		CBusiness::GetInstance()->OpenComAsyn(nCom, nBaud);
 
 		m_btnPaint->SetText("停止绘图");
@@ -234,6 +257,37 @@ void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
 		m_bStartPaint = FALSE;
 		SetBusy(FALSE);
 	}
+}
+
+void  CDuiFrameWnd::OnLuaFileSelected() {
+	m_bCorrectLua = FALSE;
+
+	lua_settop(m_L, 0);
+	const char * szDefault = "function receive(t) \n end \n";
+	luaL_loadstring(m_L, szDefault);
+	int ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
+	if (0 != ret) {
+		return;
+	}
+
+	int nSel = m_cmbLuaFiles->GetCurSel();
+	CDuiString strFile = m_cmbLuaFiles->GetItemAt(nSel)->GetText();
+	char szFilePathName[256];
+	SNPRINTF(szFilePathName, sizeof(szFilePathName), ".\\Lua\\%s", (const char *)strFile);
+
+	ret = luaL_loadfile(m_L, szFilePathName);
+	if (0 != ret) {
+		this->PostMessage(UM_WRONG_LUA);
+		return;
+	}
+
+	ret = lua_pcall(m_L, 0, LUA_MULTRET, 0);
+	if (0 != ret) {
+		this->PostMessage(UM_WRONG_LUA);
+		return;
+	}
+
+	m_bCorrectLua = TRUE;
 }
 
 
