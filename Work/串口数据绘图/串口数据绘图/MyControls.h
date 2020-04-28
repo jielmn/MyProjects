@@ -25,6 +25,9 @@ private:
 	float                            m_fLength;
 	float                            m_fVPos;
 	float                            m_fVLength;
+
+	POINT                            m_pt;
+	BOOL                             m_bMouseDetect;
 };
 
 class CMySliderUI : public DuiLib::CContainerUI

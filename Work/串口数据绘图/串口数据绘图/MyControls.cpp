@@ -23,6 +23,9 @@ CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ),
 	m_fLength = 1.0f;
 	m_fVPos = 0.0f;
 	m_fVLength = 1.0f;
+
+	m_pt.x = m_pt.y = 0;
+	m_bMouseDetect = FALSE;
 }
 
 CMyChartUI::~CMyChartUI() {
@@ -284,12 +287,41 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		}
 	}
 
+	if (m_bMouseDetect) {
+		nX = (int)round(((m_pt.x - nOriginXUi) / fInterval + fOriginX));
+		nY = (int)((nOriginYUi - m_pt.y) / fVInterval + fOriginY);
+
+		RECT rcParams;
+		rcParams.left = pos.left + m_rcMargin.left;
+		rcParams.top  = pos.top + m_rcMargin.top;
+		rcParams.right = pos.right - m_rcMargin.right;
+		rcParams.bottom = pos.bottom - m_rcMargin.bottom;
+
+		if ( PtInRect(&rcParams, m_pt) ) {
+			strText.Format("[%d, %d]", nX, nY);
+			rcScale.left = m_pt.x;
+			rcScale.right = rcScale.left + 100;
+			rcScale.top = m_pt.y;
+			rcScale.bottom = rcScale.top + 30;
+			::DrawText(hDC, strText, -1, &rcScale, DT_CENTER);
+		}
+	}	
 
 
 	return true; 
 }
 
 void CMyChartUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_MOUSEMOVE ) {
+		m_pt.x = event.ptMouse.x;
+		m_pt.y = event.ptMouse.y;
+		m_bMouseDetect = TRUE;
+		this->Invalidate();
+	}
+	else if (event.Type == UIEVENT_MOUSELEAVE)  {
+		m_bMouseDetect = FALSE;
+		this->Invalidate();
+	}
 	CControlUI::DoEvent(event);
 }
 
