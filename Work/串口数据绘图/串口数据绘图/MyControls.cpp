@@ -8,14 +8,16 @@
 #define  SCALE_HEIGHT           10
 #define  HORIZONTAL_SCALE_INTERVAL   80
 #define  SCALE_FONT_HEIGHT      20
+#define  SCALE_WIDTH            10
+#define  VERTICAL_SCALE_INTERVAL   80
 
 CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), 
                            m_brush(Gdiplus::Color(0xFFC9E2F2))  {
 
-	m_rcMargin.left   = 50;
+	m_rcMargin.left   = 80;
 	m_rcMargin.bottom = 50;
-	m_rcMargin.right  = 20;
-	m_rcMargin.top    = 20;
+	m_rcMargin.right  = 30;
+	m_rcMargin.top    = 30;
 
 	m_fPos = 0.0f;
 	m_fLength = 1.0f;
@@ -173,7 +175,7 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	int nX     = (int)ceil(fOriginX);
 	int nLastX = 0;
 	RECT rcScale;
-	CDuiString  strText;
+	CDuiString  strText;	
 
 	::SetBkMode(hDC, TRANSPARENT);
 	::SetTextColor(hDC, RGB(0x44,0x7A,0xA1));
@@ -216,9 +218,75 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 		return true;
 	}
 
+	// 得到 a, ab, abc, abcd,  abcde...形式
+	int nVInterval = (nDiffValue - 1) / VERTICAL_SCALE_COUNT + 1;
+
+	// 获得 a, a0, a00, a000, a0000，等形式
+	int nResume = 0;
+	if ( nVInterval <= 10 ) {
+		// nVInterval = nVInterval;
+	}
+	else if (nVInterval <= 100) {
+		nResume = nVInterval % 10;
+		nVInterval = nVInterval - nResume;
+	}
+	else if (nVInterval <= 1000) {
+		nResume = nVInterval % 100;
+		nVInterval = nVInterval - nResume;
+	}
+	else if (nVInterval <= 10000) {
+		nResume = nVInterval % 1000;
+		nVInterval = nVInterval - nResume;
+	}
+	else {
+		nResume = nVInterval % 10000;
+		nVInterval = nVInterval - nResume;
+	}
+
+	int nY    = (int)ceil(fOriginY);
+	int nPage = (nY - 1) / nVInterval + 1;
+	nY = nPage * nVInterval;
+	BOOL  bFirst = TRUE;
+	int nLastY = 0;
+	
+	for ( int i = nY; i <= nMaxValue; i += nVInterval ) {
+		scale_points[0].X = pos.left + m_rcMargin.left;
+		scale_points[0].Y = (int)(nOriginYUi - (i - fOriginY) * fVInterval);
+		scale_points[1].X = scale_points[0].X - SCALE_WIDTH;
+		scale_points[1].Y = scale_points[0].Y;
+
+		if ( bFirst ) {
+			graphics.DrawLines(&m_scale_pen, scale_points, 2);
+
+			rcScale.left = pos.left;
+			rcScale.right = pos.left + m_rcMargin.left - SCALE_WIDTH - 5;
+			rcScale.top = scale_points[1].Y - 8;
+			rcScale.bottom = rcScale.top + SCALE_FONT_HEIGHT;
+			strText.Format("%d", i);
+			::DrawText(hDC, strText, -1, &rcScale, DT_RIGHT);
+
+			nLastY = scale_points[0].Y;
+			bFirst = FALSE;
+		}
+		else {
+			if ( nLastY - scale_points[0].Y >= VERTICAL_SCALE_INTERVAL ) {
+				graphics.DrawLines(&m_scale_pen, scale_points, 2);
+
+				rcScale.left   = pos.left;
+				rcScale.right  = pos.left + m_rcMargin.left - SCALE_WIDTH - 5;
+				rcScale.top    = scale_points[1].Y - 8;
+				rcScale.bottom = rcScale.top + SCALE_FONT_HEIGHT;
+				strText.Format("%d", i);
+				::DrawText(hDC, strText, -1, &rcScale, DT_RIGHT );
+
+				nLastY = scale_points[0].Y;
+			}
+		}
+	}
 
 
-	return true;
+
+	return true; 
 }
 
 void CMyChartUI::DoEvent(DuiLib::TEventUI& event) {
