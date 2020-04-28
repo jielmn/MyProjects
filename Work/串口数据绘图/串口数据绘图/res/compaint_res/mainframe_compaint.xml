@@ -103,6 +103,16 @@
 				</VerticalLayout>								
 				<Control width="5" />
 				<Label text="通道4" width="80" font="2" textcolor="#FF386382" />
+				
+				
+				<VerticalLayout width="16" >
+					<Control />
+					<Option height="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="false" name="opParams" />
+					<Control />
+				</VerticalLayout>	
+				<Control width="10" />
+				<Label text="鼠标移动时显示参数" width="180" font="2" textcolor="#FF386382" />
+				
 			</HorizontalLayout>
 			
 			<HorizontalLayout inset="10,0,10,0">

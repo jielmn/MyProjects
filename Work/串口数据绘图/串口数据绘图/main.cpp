@@ -34,6 +34,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 
 	memset(m_opChannels, 0, sizeof(m_opChannels));
 	memset(m_Indicators, 0, sizeof(m_Indicators));
+	m_opParams = 0;
+
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -52,6 +54,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_chart       = static_cast<CMyChartUI *>(m_PaintManager.FindControl("cstChart"));
 	m_btnPaint    = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPaint"));
 	m_cmbBaud     = static_cast<CComboUI *>(m_PaintManager.FindControl("cmBaud"));
+	m_opParams    = static_cast<COptionUI *>(m_PaintManager.FindControl("opParams"));
 
 	CDuiString  strText;
 	for (int i = 0; i < MAX_CHANNEL_COUNT; i++) {
@@ -61,7 +64,7 @@ void  CDuiFrameWnd::InitWindow() {
 		strText.Format("indicator_%d", i + 1);
 		m_Indicators[i] = m_PaintManager.FindControl(strText);
 		m_Indicators[i]->SetBkColor(g_color[i+1]);
-	}
+	} 
 
 	int arrBauds[5] = { 9600,19200, 38400,57600,115200 };
 	
@@ -157,6 +160,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (strName == "opChannel_4") {
 			bool b = m_opChannels[3]->IsSelected();
 			SetBit(g_data.m_dwChannels, 4, b);
+			m_chart->Invalidate();
+		}
+		else if (strName == "opParams") {
+			g_data.m_bShowParams = m_opParams->IsSelected()?TRUE:FALSE;
 			m_chart->Invalidate();
 		}
 	}

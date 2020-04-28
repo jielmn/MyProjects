@@ -40,6 +40,7 @@ public:
 	IConfig *                 m_cfg;
 	HWND                      m_hWnd;
 	DWORD                     m_dwChannels;
+	BOOL                      m_bShowParams;
 	HCURSOR                   m_cursor_we;
 	HCURSOR                   m_cursor_ns;
 	LmnToolkits::Thread *     m_thrd_com;
@@ -53,6 +54,7 @@ public:
 		m_cursor_we = 0;
 		m_cursor_ns = 0;
 		m_dwChannels = 0;
+		m_bShowParams = FALSE;
 	}
 };
 
