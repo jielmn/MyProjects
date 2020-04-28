@@ -11,6 +11,7 @@
 #include "resource.h"
 #include "LmnSerialPort.h"
 #include "LmnTelSvr.h"
+#include "LmnTemplates.h"
 
 static lua_State* init_lua() {
 	lua_State* L = luaL_newstate();  //¥¥Ω®Lua’ª
@@ -29,6 +30,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 
 	m_L = init_lua();
 	m_bCorrectLua = FALSE;
+
+	memset(m_opChannels, 0, sizeof(m_opChannels));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -48,8 +51,14 @@ void  CDuiFrameWnd::InitWindow() {
 	m_btnPaint    = static_cast<CButtonUI *>(m_PaintManager.FindControl("btnPaint"));
 	m_cmbBaud     = static_cast<CComboUI *>(m_PaintManager.FindControl("cmBaud"));
 
-	int arrBauds[5] = { 9600,19200, 38400,57600,115200 };
 	CDuiString  strText;
+	for (int i = 0; i < MAX_CHANNEL_COUNT; i++) {
+		strText.Format("opChannel_%d", i + 1);
+		m_opChannels[i] = static_cast<COptionUI *>(m_PaintManager.FindControl(strText));
+	}
+
+	int arrBauds[5] = { 9600,19200, 38400,57600,115200 };
+	
 	for (int i = 0; i < 5; i++) {
 		CListLabelElementUI * pElement = new CListLabelElementUI;
 		m_cmbBaud->Add(pElement);
@@ -76,7 +85,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_chart->AddData(1, 200);
 		m_chart->AddData(1, 300); 
 		m_chart->AddData(1, 450);  
-		m_chart->AddData(1, 2500);
+		m_chart->AddData(1, 2500);     
 
 		m_chart->AddData(4, 100);
 		m_chart->AddData(4, 500);
@@ -120,6 +129,28 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	if (msg.sType == "itemselect") {
 		if (strName == "cmLuaFile") {
 			OnLuaFileSelected();
+		}
+	}
+	else if (msg.sType == "selectchanged") {
+		if (strName == "opChannel_1") {
+			bool b = m_opChannels[0]->IsSelected();
+			SetBit(g_data.m_dwChannels, 1, b);
+			m_chart->Invalidate();
+		}
+		else if (strName == "opChannel_2") {
+			bool b = m_opChannels[1]->IsSelected();
+			SetBit(g_data.m_dwChannels, 2, b);
+			m_chart->Invalidate();
+		}
+		else if (strName == "opChannel_3") {
+			bool b = m_opChannels[2]->IsSelected();
+			SetBit(g_data.m_dwChannels, 3, b);
+			m_chart->Invalidate();
+		}
+		else if (strName == "opChannel_4") {
+			bool b = m_opChannels[3]->IsSelected();
+			SetBit(g_data.m_dwChannels, 4, b);
+			m_chart->Invalidate();
 		}
 	}
 	WindowImplBase::Notify(msg);

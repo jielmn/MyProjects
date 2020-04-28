@@ -1,4 +1,5 @@
 #include "MyControls.h"
+#include "LmnTemplates.h"
 
 #define  BUTT_WIDTH             10
 #define  VERTICAL_SCALE_COUNT   10
@@ -38,6 +39,10 @@ void CMyChartUI::GetParams(int & nMaxPoints, int & nMaxValue, int & nMinValue) {
 	nMinValue = nMaxValue = 0;
 
 	for (it = m_data.begin(); it != m_data.end(); ++it) {
+		int nChannel = it->first;
+		if ( !IfHasBit(g_data.m_dwChannels, nChannel) ) {
+			continue;
+		}
 		CChannel * pChannel = it->second;
 		std::vector<int>::iterator ix;		
 		std::vector<int> & v = pChannel->m_vValues;
@@ -95,6 +100,11 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	// »­Í¼
 	std::map<int, CChannel *>::iterator it;
 	for (it = m_data.begin(); it != m_data.end(); ++it) {
+		int nChannel = it->first;
+		if (!IfHasBit(g_data.m_dwChannels, nChannel)) {
+			continue;
+		}
+
 		CChannel * pChannel = it->second;
 		DWORD  dwPointsCnt = pChannel->m_vValues.size();
 		Gdiplus::Point * points = new Gdiplus::Point[dwPointsCnt];

@@ -54,6 +54,8 @@ private:
 	BOOL                           m_bCorrectLua;
 	CDataBuf                       m_buf;
 
+	COptionUI *                    m_opChannels[MAX_CHANNEL_COUNT];
+
 private:
 	void  OnDeviceChanged();
 	void  InitCmbLuaFiles();

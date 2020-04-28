@@ -1,4 +1,5 @@
 #include "business.h"
+#include "LmnTemplates.h"
 
 CBusiness * CBusiness::pInstance = 0;
 
@@ -47,6 +48,10 @@ int CBusiness::Init() {
 	g_color.insert(std::make_pair(2, 0xFF1b9375));	
 	g_color.insert(std::make_pair(3, 0xFF007ACC));
 	g_color.insert(std::make_pair(4, 0xFF333333));
+
+	for ( int i = 0; i < MAX_CHANNEL_COUNT; i++ ) {
+		SetBit(g_data.m_dwChannels, i+1);
+	}
 
 
 	g_data.m_cfg = new FileConfigEx();
