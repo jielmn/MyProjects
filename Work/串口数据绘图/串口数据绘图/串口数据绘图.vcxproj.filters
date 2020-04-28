@@ -55,4 +55,7 @@
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\compaint_res.zip" />
+  </ItemGroup>
 </Project>
