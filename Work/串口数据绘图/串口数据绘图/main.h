@@ -56,6 +56,7 @@ private:
 	CDataBuf                       m_buf;
 
 	COptionUI *                    m_opChannels[MAX_CHANNEL_COUNT];
+	CControlUI *                   m_Indicators[MAX_CHANNEL_COUNT];
 
 private:
 	void  OnDeviceChanged();

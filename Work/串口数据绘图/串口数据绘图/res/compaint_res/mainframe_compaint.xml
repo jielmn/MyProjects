@@ -50,8 +50,16 @@
 					<Control />
 					<Option height="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" name="opChannel_1" />
 					<Control />
+				</VerticalLayout>												
+				
+				<Control width="5" />
+				<VerticalLayout width="16" >
+					<Control />
+					<Control height="4" bkcolor="#FFFF0000" name="indicator_1" />
+					<Control />
 				</VerticalLayout>								
-				<Control width="10" />
+				<Control width="5" />
+				
 				<Label text="通道1" width="80" font="2" textcolor="#FF386382" />
 				
 				<VerticalLayout width="16" >
@@ -59,7 +67,13 @@
 					<Option height="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" name="opChannel_2" />
 					<Control />
 				</VerticalLayout>								
-				<Control width="10" />
+				<Control width="5" />
+				<VerticalLayout width="16" >
+					<Control />
+					<Control height="4" bkcolor="#FFFF0000" name="indicator_2" />
+					<Control />
+				</VerticalLayout>								
+				<Control width="5" />
 				<Label text="通道2" width="80" font="2" textcolor="#FF386382" />
 				
 				<VerticalLayout width="16" >
@@ -67,7 +81,13 @@
 					<Option height="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" name="opChannel_3" />
 					<Control />
 				</VerticalLayout>								
-				<Control width="10" />
+				<Control width="5" />
+				<VerticalLayout width="16" >
+					<Control />
+					<Control height="4" bkcolor="#FFFF0000" name="indicator_3" />
+					<Control />
+				</VerticalLayout>								
+				<Control width="5" />
 				<Label text="通道3" width="80" font="2" textcolor="#FF386382" />
 				
 				<VerticalLayout width="16" >
@@ -75,7 +95,13 @@
 					<Option height="16" normalimage="checkbox_unchecked.png" selectedimage="checkbox_checked.png" selected="true" name="opChannel_4" />
 					<Control />
 				</VerticalLayout>								
-				<Control width="10" />
+				<Control width="5" />
+				<VerticalLayout width="16" >
+					<Control />
+					<Control height="4" bkcolor="#FFFF0000" name="indicator_4" />
+					<Control />
+				</VerticalLayout>								
+				<Control width="5" />
 				<Label text="通道4" width="80" font="2" textcolor="#FF386382" />
 			</HorizontalLayout>
 			

@@ -33,6 +33,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_bCorrectLua = FALSE;
 
 	memset(m_opChannels, 0, sizeof(m_opChannels));
+	memset(m_Indicators, 0, sizeof(m_Indicators));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -56,6 +57,10 @@ void  CDuiFrameWnd::InitWindow() {
 	for (int i = 0; i < MAX_CHANNEL_COUNT; i++) {
 		strText.Format("opChannel_%d", i + 1);
 		m_opChannels[i] = static_cast<COptionUI *>(m_PaintManager.FindControl(strText));
+
+		strText.Format("indicator_%d", i + 1);
+		m_Indicators[i] = m_PaintManager.FindControl(strText);
+		m_Indicators[i]->SetBkColor(g_color[i+1]);
 	}
 
 	int arrBauds[5] = { 9600,19200, 38400,57600,115200 };
@@ -439,7 +444,7 @@ void  CDuiFrameWnd::OnReceive() {
 		m_chart->Invalidate();
 	}
 }
-
+        
 
 
 
