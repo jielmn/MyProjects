@@ -3,8 +3,11 @@
 
 #define  BUTT_WIDTH             10
 #define  VERTICAL_SCALE_COUNT   10
-#define  MAX_POINTS_INTERVAL    20
+#define  MAX_POINTS_INTERVAL    40
 #define  POINT_RADIUS           3
+#define  SCALE_HEIGHT           10
+#define  HORIZONTAL_SCALE_INTERVAL   40
+#define  SCALE_FONT_HEIGHT      20
 
 CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), 
                            m_brush(Gdiplus::Color(0xFFC9E2F2))  {
@@ -166,6 +169,46 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	scale_points[1].X = pos.right - m_rcMargin.right;
 	scale_points[1].Y = pos.bottom - m_rcMargin.bottom;
 	graphics.DrawLines(&m_scale_pen, scale_points, 2);
+
+	int nX     = (int)ceil(fOriginX);
+	int nLastX = 0;
+	RECT rcScale;
+	CDuiString  strText;
+
+	for ( int i = 0; i < nMaxPointsCnt; i++ ) {
+		scale_points[0].X = (int)((i + nX - fOriginX) * fInterval + nOriginXUi);
+		scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
+		scale_points[1].X = scale_points[0].X;
+		scale_points[1].Y = scale_points[0].Y + SCALE_HEIGHT;
+
+		if ( scale_points[0].X >= pos.left + m_rcMargin.left + nRealWidth ) {
+			break;
+		}
+
+		if (i == 0) {			
+			graphics.DrawLines(&m_scale_pen, scale_points, 2);
+			rcScale.left = scale_points[0].X - HORIZONTAL_SCALE_INTERVAL / 2;
+			rcScale.right = rcScale.left + HORIZONTAL_SCALE_INTERVAL;
+			rcScale.top = scale_points[1].Y;
+			rcScale.bottom = rcScale.top + SCALE_FONT_HEIGHT;
+			strText.Format("%d", i);
+			::DrawText(hDC, strText, -1, &rcScale, DT_CENTER);
+			nLastX = scale_points[0].X;
+		}
+		else {
+			if (scale_points[0].X - nLastX >= HORIZONTAL_SCALE_INTERVAL) {
+				graphics.DrawLines(&m_scale_pen, scale_points, 2);
+				rcScale.left   = scale_points[0].X - HORIZONTAL_SCALE_INTERVAL / 2;
+				rcScale.right  = rcScale.left + HORIZONTAL_SCALE_INTERVAL;
+				rcScale.top    = scale_points[1].Y;
+				rcScale.bottom = rcScale.top + SCALE_FONT_HEIGHT;
+				strText.Format("%d", i);
+				::DrawText(hDC, strText, -1, &rcScale, DT_CENTER);
+				nLastX = scale_points[0].X;
+			}
+		}
+		
+	}
 
 	return true;
 }
