@@ -90,12 +90,19 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	}
 
 	int nDiffValue    = nMaxValue - nMinValue;
-	float  fVInterval = nRealHeight / (nDiffValue * 1.02f * m_fVLength);
+	float  fVInterval = 0.0f;
+	if (nDiffValue > 0) {
+		fVInterval = nRealHeight / (nDiffValue * 1.02f * m_fVLength);
+	}		
 
 	float fOriginX = nMaxPointsCnt * m_fPos + 0;
 	float fOriginY = nDiffValue * 1.02f * m_fVPos + (nMinValue - nDiffValue * 0.01f);
 	int nOriginXUi = pos.left + m_rcMargin.left;
 	int nOriginYUi = pos.bottom - m_rcMargin.bottom;
+
+	if ( nDiffValue == 0 ) {
+		nOriginYUi -= nRealHeight / 2;
+	}
 
 	// »­Í¼
 	std::map<int, CChannel *>::iterator it;
