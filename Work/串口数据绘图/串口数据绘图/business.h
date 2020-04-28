@@ -19,6 +19,9 @@ public:
 	void  OpenComAsyn(int nCom, int nBaud);
 	void  OpenCom(const COpenComParam * pParam);
 
+	void  CloseComAsyn();
+	void  CloseCom();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

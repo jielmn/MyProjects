@@ -65,5 +65,6 @@ private:
 	void  OnOpenComRet(BOOL bRet);
 	void  OnLuaFileSelected();
 	void  OnReceive();
+	void  OnCloseComRet();
 
 };

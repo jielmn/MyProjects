@@ -72,6 +72,7 @@ void  CDuiFrameWnd::InitWindow() {
 	InitCmbLuaFiles();
 	OnDeviceChanged();
 
+#ifdef _DEBUG
 	m_chart->AddData(2, 100);
 	m_chart->AddData(2, 200);
 	m_chart->AddData(2, 250);
@@ -93,7 +94,7 @@ void  CDuiFrameWnd::InitWindow() {
 		m_chart->AddData(4, 300);
 		m_chart->AddData(4, 600); 
 	}
-	
+#endif
 
 	WindowImplBase::InitWindow();
 }
@@ -171,6 +172,9 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		delete[] pData;
 
 		OnReceive();		
+	}
+	else if ( uMsg == UM_CLOSE_COM_RET ) {
+		OnCloseComRet();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -269,14 +273,10 @@ void  CDuiFrameWnd::OnStartPaint() {
 		}
 
 		CBusiness::GetInstance()->OpenComAsyn(nCom, nBaud);
-
-		m_btnPaint->SetText("Í£Ö¹»æÍ¼");
-		m_bStartPaint = TRUE;
 		SetBusy();
 	}
 	else {
-		m_btnPaint->SetText("¿ªÊ¼»æÍ¼");
-		m_bStartPaint = FALSE;  
+		CBusiness::GetInstance()->CloseComAsyn();
 		SetBusy();
 	}
 }
@@ -306,7 +306,9 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 
 void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
 	if ( bRet ) {
+		m_bStartPaint = TRUE;
 		m_bConnected = TRUE;
+		m_btnPaint->SetText("Í£Ö¹»æÍ¼");
 		SetBusy(FALSE);
 
 		m_buf.Clear();
@@ -320,6 +322,13 @@ void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
 		m_bConnected = FALSE;
 		SetBusy(FALSE);
 	}
+}
+
+void  CDuiFrameWnd::OnCloseComRet() {
+	m_btnPaint->SetText("¿ªÊ¼»æÍ¼");
+	m_bStartPaint = FALSE;
+	m_bConnected = FALSE;
+	SetBusy(FALSE);
 }
 
 void  CDuiFrameWnd::OnLuaFileSelected() {

@@ -24,10 +24,12 @@ using namespace DuiLib;
 
 #define   MSG_OPEN_COM               1
 #define   MSG_READ_COM               2
+#define   MSG_CLOSE_COM              3
 
 #define   UM_OPEN_COM_RET            (WM_USER + 1)
 #define   UM_WRONG_LUA               (WM_USER + 2)
 #define   UM_COM_DATA                (WM_USER + 3)
+#define   UM_CLOSE_COM_RET           (WM_USER + 4)
 
 #define   MAX_CHANNEL_COUNT          4
 

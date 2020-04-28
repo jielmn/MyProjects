@@ -66,7 +66,7 @@ int CBusiness::Init() {
 	}
 	g_data.m_thrd_com->Start();
 
-	g_data.m_thrd_com->PostDelayMessage(1000, this, MSG_READ_COM);
+	g_data.m_thrd_com->PostDelayMessage(200, this, MSG_READ_COM);
 
 	return 0;
 }
@@ -90,6 +90,15 @@ void  CBusiness::OpenComAsyn(int nCom, int nBaud) {
 void  CBusiness::OpenCom(const COpenComParam * pParam) {
 	BOOL bRet = m_com.OpenUartPort(pParam->m_nCom, pParam->m_nBaud);
 	::PostMessage(g_data.m_hWnd, UM_OPEN_COM_RET, bRet, 0);
+}
+
+void CBusiness::CloseComAsyn() {
+	g_data.m_thrd_com->PostMessage(this, MSG_CLOSE_COM);
+}
+
+void CBusiness::CloseCom() {
+	m_com.CloseUartPort();
+	::PostMessage(g_data.m_hWnd, UM_CLOSE_COM_RET, 0, 0);
 }
 
 
@@ -119,7 +128,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 				bRet = m_com.Read(data, dwLen);
 			}
 		}
-		g_data.m_thrd_com->PostDelayMessage(1000, this, MSG_READ_COM);
+		g_data.m_thrd_com->PostDelayMessage(200, this, MSG_READ_COM);
+	}
+	break;
+
+	case MSG_CLOSE_COM:
+	{
+		CloseCom();
 	}
 	break;
 
