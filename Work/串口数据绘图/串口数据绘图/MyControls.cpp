@@ -6,7 +6,7 @@
 #define  MAX_POINTS_INTERVAL    40
 #define  POINT_RADIUS           3
 #define  SCALE_HEIGHT           10
-#define  HORIZONTAL_SCALE_INTERVAL   40
+#define  HORIZONTAL_SCALE_INTERVAL   80
 #define  SCALE_FONT_HEIGHT      20
 
 CMyChartUI::CMyChartUI() : m_scale_pen( Gdiplus::Color(0xFF1b9375) ), 
@@ -175,6 +175,9 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 	RECT rcScale;
 	CDuiString  strText;
 
+	::SetBkMode(hDC, TRANSPARENT);
+	::SetTextColor(hDC, RGB(0x44,0x7A,0xA1));
+
 	for ( int i = 0; i < nMaxPointsCnt; i++ ) {
 		scale_points[0].X = (int)((i + nX - fOriginX) * fInterval + nOriginXUi);
 		scale_points[0].Y = pos.bottom - m_rcMargin.bottom;
@@ -206,9 +209,14 @@ bool CMyChartUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl)
 				::DrawText(hDC, strText, -1, &rcScale, DT_CENTER);
 				nLastX = scale_points[0].X;
 			}
-		}
-		
+		}		
 	}
+
+	if ( nDiffValue == 0 ) {
+		return true;
+	}
+
+
 
 	return true;
 }
