@@ -48,6 +48,7 @@ private:
 	CMyChartUI *                   m_chart;
 	BOOL                           m_bStartPaint;
 	BOOL                           m_bBusy;
+	BOOL                           m_bConnected;
 	CButtonUI *                    m_btnPaint;
 
 	lua_State*                     m_L;        // lua
@@ -63,5 +64,6 @@ private:
 	void  SetBusy(BOOL bBusy = TRUE);
 	void  OnOpenComRet(BOOL bRet);
 	void  OnLuaFileSelected();
+	void  OnReceive();
 
 };

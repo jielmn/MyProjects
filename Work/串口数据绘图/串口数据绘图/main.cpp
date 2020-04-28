@@ -27,6 +27,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_chart = 0;
 	m_bStartPaint = FALSE;
 	m_bBusy = FALSE;
+	m_bConnected = FALSE;
 
 	m_L = init_lua();
 	m_bCorrectLua = FALSE;
@@ -169,18 +170,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		m_buf.Append(pData, dwLen);
 		delete[] pData;
 
-		//lua_settop(m_L, 0);
-		//lua_getglobal(m_L, "receive");
-		//lua_pushlstring(m_L, (const char *)m_buf.GetData(), m_buf.GetDataLength());
-
-		//int ret = lua_pcall(m_L, 1, 5, 0);
-		//if (0 != ret) {
-		//	size_t err_len = 0;
-		//	const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
-		//	MessageBox(GetHWND(), szErrDescription, "错误", 0);
-		//	lua_settop(m_L, 0);
-		//}
-
+		OnReceive();		
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -301,14 +291,22 @@ void  CDuiFrameWnd::SetBusy(BOOL bBusy /*= TRUE*/) {
 	}
 	else {
 		m_btnPaint->SetEnabled(true);
-		m_cmbComPorts->SetEnabled(true);
-		m_cmbBaud->SetEnabled(true);
-		m_cmbLuaFiles->SetEnabled(true);
+		if (m_bConnected) {
+			m_cmbComPorts->SetEnabled(false);
+			m_cmbBaud->SetEnabled(false);
+			m_cmbLuaFiles->SetEnabled(false);
+		}
+		else {
+			m_cmbComPorts->SetEnabled(true);
+			m_cmbBaud->SetEnabled(true);
+			m_cmbLuaFiles->SetEnabled(true);
+		}
 	}
 }
 
 void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
 	if ( bRet ) {
+		m_bConnected = TRUE;
 		SetBusy(FALSE);
 
 		m_buf.Clear();
@@ -319,6 +317,7 @@ void  CDuiFrameWnd::OnOpenComRet(BOOL bRet) {
 		MessageBox(GetHWND(), "打开串口失败", "错误", 0);
 		m_btnPaint->SetText("开始绘图");
 		m_bStartPaint = FALSE;
+		m_bConnected = FALSE;
 		SetBusy(FALSE);
 	}
 }
@@ -354,6 +353,83 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	m_bCorrectLua = TRUE;
 }
 
+void  CDuiFrameWnd::OnReceive() {
+	BOOL  bNeedUpdate = FALSE;
+
+	do 
+	{
+		lua_settop(m_L, 0);
+		lua_getglobal(m_L, "receive");
+		lua_pushlstring(m_L, (const char *)m_buf.GetData(), m_buf.GetDataLength());
+
+		int ret = lua_pcall(m_L, 1, 2, 0);
+		if (0 != ret) {
+			size_t err_len = 0;
+			const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
+			MessageBox(GetHWND(), szErrDescription, "错误", 0);
+			break;
+		}
+
+		int nRet = lua_gettop(m_L);
+		if (nRet != 2) {
+			MessageBox(GetHWND(), "receive 函数返回的参数个数不是2", "错误", 0);
+			break;
+		}
+
+		int nType = lua_type(m_L, -2);
+		if (nType != LUA_TNUMBER) {
+			MessageBox(GetHWND(), "receive 函数返回的参数格式错误", "错误", 0);
+			break;
+		}
+
+		int nComsume = (int)lua_tonumber(m_L, -2);
+		if (nComsume <= 0) {
+			break;
+		}
+		m_buf.SetReadPos(m_buf.GetReadPos() + nComsume);
+		m_buf.Reform();
+
+		nType = lua_type(m_L, -1);
+		if (nType != LUA_TTABLE) {
+			MessageBox(GetHWND(), "receive 函数返回的参数格式错误", "错误", 0);
+			break;
+		}
+
+		lua_pushnil(m_L);
+		while (lua_next(m_L, -2) != 0) {
+			nType = lua_type(m_L, -1);
+			if (nType == LUA_TTABLE) {
+				lua_pushnil(m_L);
+				int nIndex = 0;
+				int nChannel = 0;
+				int nValue = 0;
+				while (lua_next(m_L, -2) != 0) {
+					int nSubType = lua_type(m_L, -1);
+					if (nSubType == LUA_TNUMBER) {
+						int n = (int)lua_tonumber(m_L, -1);
+						if (nIndex == 0) {
+							nChannel = n;
+						}
+						else if (nIndex == 1) {
+							nValue = n;
+						}
+						nIndex++;
+					}
+					lua_pop(m_L, 1);
+				}
+				m_chart->AddData(nChannel, nValue);
+				bNeedUpdate = TRUE;
+			}
+			lua_pop(m_L, 1);
+		}
+
+	} while ( TRUE );
+
+	
+	if (bNeedUpdate) {
+		m_chart->Invalidate();
+	}
+}
 
 
 
