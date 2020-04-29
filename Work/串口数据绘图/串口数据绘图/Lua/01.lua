@@ -2,13 +2,19 @@ require("bit")
 
 channels = {{1,"s1"},{2,"s2"}}
 
--- 返回值：消耗的字节数，格式字符串，key值（确定唯一块），背景色，文字颜色
+
+-- 返回值：消耗的字节数，{ {通道号1, 数值1}, {通道号2, 数值2}, {通道号3, 数值3} ... } 
+--     数值用C语言表示法： (( 字节1 & 0x03 ) << 16) | (字节2 << 8) | 字节3
+--                         (( 字节4 & 0x03 ) << 16) | (字节5 << 8) | 字节6
+
 function receive(data)
+  -- 如果字节数不够6，则返回 0, {}，表示未处理数据
   if ( string.len(data) < 6 )
   then
     return 0,{};
   end
   
+  -- 注意下标从1开始,string.byte(data,1)表示第一个字节，和C的从0开始不同。
   local b1  = string.byte(data,1);
   local b2  = string.byte(data,2);
   local b3  = string.byte(data,3);
