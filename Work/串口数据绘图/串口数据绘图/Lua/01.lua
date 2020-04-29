@@ -1,5 +1,7 @@
 require("bit")
 
+channels = {{1,"s1"},{2,"s2"}}
+
 -- 返回值：消耗的字节数，格式字符串，key值（确定唯一块），背景色，文字颜色
 function receive(data)
   if ( string.len(data) < 6 )

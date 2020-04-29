@@ -36,6 +36,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	memset(m_Indicators, 0, sizeof(m_Indicators));
 	m_opParams = 0;
 
+	memset(m_lblChannelNames, 0, sizeof(m_lblChannelNames));
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -64,6 +65,9 @@ void  CDuiFrameWnd::InitWindow() {
 		strText.Format("indicator_%d", i + 1);
 		m_Indicators[i] = m_PaintManager.FindControl(strText);
 		m_Indicators[i]->SetBkColor(g_color[i+1]);
+
+		strText.Format("lblChannelName_%d", i + 1);
+		m_lblChannelNames[i] = static_cast<CLabelUI *>(m_PaintManager.FindControl(strText));
 	} 
 
 	int arrBauds[5] = { 9600,19200, 38400,57600,115200 };
@@ -370,6 +374,40 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 		this->PostMessage(UM_WRONG_LUA);
 		return;
 	}
+
+	CDuiString strText;
+	for ( int i = 0; i < MAX_CHANNEL_COUNT; i++ ) {
+		strText.Format("Í¨µÀ%d", i + 1);
+		m_lblChannelNames[i]->SetText(strText);
+	}
+
+	lua_getglobal(m_L, "channels");
+	lua_pushnil(m_L);
+	while (lua_next(m_L, 1) != 0) {
+		lua_pushnil(m_L);
+
+		int  nChannel = 0;
+		char szChannelName[256] = {0};
+
+		while (lua_next(m_L, 3) != 0) {
+			int nSubType = lua_type(m_L, -1);
+			if (nSubType == LUA_TNUMBER) {
+				nChannel = (int)lua_tonumber(m_L, -1);
+			}
+			else if (nSubType == LUA_TSTRING ) {
+				const char * szName = lua_tolstring(m_L, -1, 0);
+				STRNCPY(szChannelName, szName, sizeof(szChannelName));
+			}
+			lua_pop(m_L, 1);
+		}
+
+		if ( nChannel > 0 && nChannel <= MAX_CHANNEL_COUNT && szChannelName[0] != '\0' ) {
+			m_lblChannelNames[nChannel-1]->SetText(szChannelName);
+		}
+
+		lua_pop(m_L, 1);
+	}
+	lua_settop(m_L, 0);
 
 	m_bCorrectLua = TRUE;
 }

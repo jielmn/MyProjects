@@ -1,5 +1,7 @@
 require("bit")
 
+channels = {{1,"RED"},{2,"IR"}}
+
 local r = 1;
 
 -- 返回值：消耗的字节数，格式字符串，key值（确定唯一块），背景色，文字颜色

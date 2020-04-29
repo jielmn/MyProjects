@@ -59,6 +59,8 @@ private:
 	CControlUI *                   m_Indicators[MAX_CHANNEL_COUNT];
 	COptionUI *                    m_opParams;
 
+	CLabelUI *                     m_lblChannelNames[MAX_CHANNEL_COUNT];
+
 private:
 	void  OnDeviceChanged();
 	void  InitCmbLuaFiles();

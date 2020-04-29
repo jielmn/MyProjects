@@ -60,7 +60,7 @@
 				</VerticalLayout>								
 				<Control width="5" />
 				
-				<Label text="通道1" width="80" font="2" textcolor="#FF386382" />
+				<Label text="通道1" width="80" font="2" textcolor="#FF386382" name="lblChannelName_1" />
 				
 				<VerticalLayout width="16" >
 					<Control />
@@ -74,7 +74,7 @@
 					<Control />
 				</VerticalLayout>								
 				<Control width="5" />
-				<Label text="通道2" width="80" font="2" textcolor="#FF386382" />
+				<Label text="通道2" width="80" font="2" textcolor="#FF386382" name="lblChannelName_2" />
 				
 				<VerticalLayout width="16" >
 					<Control />
@@ -88,7 +88,7 @@
 					<Control />
 				</VerticalLayout>								
 				<Control width="5" />
-				<Label text="通道3" width="80" font="2" textcolor="#FF386382" />
+				<Label text="通道3" width="80" font="2" textcolor="#FF386382" name="lblChannelName_3" />
 				
 				<VerticalLayout width="16" >
 					<Control />
@@ -102,7 +102,7 @@
 					<Control />
 				</VerticalLayout>								
 				<Control width="5" />
-				<Label text="通道4" width="80" font="2" textcolor="#FF386382" />
+				<Label text="通道4" width="80" font="2" textcolor="#FF386382" name="lblChannelName_4" />
 				
 				
 				<VerticalLayout width="16" >
