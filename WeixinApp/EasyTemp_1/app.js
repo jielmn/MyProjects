@@ -387,9 +387,15 @@ App({
     var lastDeviceId = this.lastDeviceId.toLowerCase();
     var foundDevice = null;
 
+    var foundDeviceByName = null;
+    var readerNameLen = this.readerName.length;
+
     devices.forEach(device => {
       if (device.deviceId.toLowerCase() == lastDeviceId) {
         foundDevice = device;
+      }
+      else if ( this.ifNameMatchDeviceId(device.name, lastDeviceId, readerNameLen) ) {
+        foundDeviceByName = device;
       }
     })
     
@@ -397,7 +403,29 @@ App({
     this.log('last device id:' + this.lastDeviceId);
     this.log('foundDevice:', foundDevice);
 
-    return foundDevice;
+    // return foundDevice;
+    if ( foundDevice != null ) {
+      return foundDevice;
+    } else if ( foundDeviceByName != null ) {
+      return foundDeviceByName;
+    } else {
+      return null;
+    }
+  },
+
+  ifNameMatchDeviceId(name, deviceId, readerNameLen ) {
+    var subname = name.substr(readerNameLen);
+    var namenum = parseInt(subname);
+    var idNum = parseInt("0x" + deviceId.substr(9, 2) + deviceId.substr(12, 2) + deviceId.substr(15, 2) );
+    if (namenum == NaN || idNum == NaN ) {
+      return false;      
+    }
+    else if ( namenum == idNum )  {
+      return true;
+    }
+    else{
+      return false;
+    }
   },
 
   createBLEConnection(e) {
