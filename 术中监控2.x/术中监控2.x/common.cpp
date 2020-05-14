@@ -1432,6 +1432,10 @@ void PrintXmlChart( HDC hDC, CXml2ChartFile & xmlChart, int nOffsetX, int nOffse
 			int index = (int)(patient_info.m_in_hospital - tFirstDay) / (3600 * 4);
 			SetGridEvent(events_type2, index, PTYPE_IN_HOSPITAL, patient_info.m_in_hospital);
 		}
+		else if ( (tFirstDay > patient_info.m_in_hospital) && ((tFirstDay - patient_info.m_in_hospital) <= 3600 * 2) ) {
+			int index = 0;
+			SetGridEvent(events_type2, index, PTYPE_IN_HOSPITAL, patient_info.m_in_hospital);
+		}
 	}
 
 	if (patient_info.m_out_hospital > 0) {

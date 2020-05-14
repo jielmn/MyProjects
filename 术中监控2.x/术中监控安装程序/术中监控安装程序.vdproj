@@ -15,13 +15,55 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_017B6802024F408297782BB97F363236"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_04A8764C0E0E4157BBF70ACC36923E28"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
+        "MsmKey" = "8:_0992986D06404ECCAFD2D611A53EC740"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_13705AEC0F31412F8DADA374EC5522C6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_18F0B44F85184ABF8B9AB53FA02F7F59"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1E1A4246F53B445ABD23ED8D4B2B4796"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1E92D9AA686B401FB9834CA92799265A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_220F6D83529C4D41AAD487599EA4E932"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2435C018703047F18C0821BFE70B7188"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -45,6 +87,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3A24217ED4754EB6ADAB7BE9B687D768"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3ECC25EC1A134B788126E04CC1D49762"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_473C5702BCCD49A6B067C1A307623F82"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -63,6 +117,42 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_63295EB2B31D4B469598DE0E135DF795"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_67254C2FC972467DA91C2B9E618A3D13"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6F1629DA05FD40B8BB41DEE6AEBAFD03"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_707AF37359454B8996304211AEE2CE7B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_77FD1EAB386B44AEA9E8705185B40F2E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_7FA1AD6114E740C0B6BCB6D91A182C43"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_897F849D95414201ACF4650664F115FD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -75,19 +165,49 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_AA06974F12814B69BC836E43042E4F3A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_AA567951FA704E8AAC21E49F6AB12C7E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_DBCE63E165F6425E8EC189A388A0B7EC"
+        "MsmKey" = "8:_AC2451FAED214F9B8FBB655A1BABDB84"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B5D6E6C172F349B1AFB505980D9FD917"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C4F8336A948A4CA38F0AF733C918905A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DD4A814EE3CC4B10B8B6B5FA2B4E1161"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_E24C00E61B894A1088667DD147978725"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E7237A2418DE41BD996158B7110A0ABD"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -122,6 +242,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
             }
         }
         "Release"
@@ -176,6 +304,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_017B6802024F408297782BB97F363236"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libswscale_plugin.dll"
+            "TargetName" = "8:libswscale_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_04A8764C0E0E4157BBF70ACC36923E28"
             {
             "SourcePath" = "8:..\\术中监控2.x\\video\\telemed.mp4"
@@ -196,12 +344,132 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0992986D06404ECCAFD2D611A53EC740"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\librv32_plugin.dll"
+            "TargetName" = "8:librv32_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_13705AEC0F31412F8DADA374EC5522C6"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libyuy2_i420_plugin.dll"
+            "TargetName" = "8:libyuy2_i420_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_18F0B44F85184ABF8B9AB53FA02F7F59"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_rgb_sse2_plugin.dll"
+            "TargetName" = "8:libi420_rgb_sse2_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E1A4246F53B445ABD23ED8D4B2B4796"
             {
             "SourcePath" = "8:..\\术中监控2.x\\plugins\\access\\libfilesystem_plugin.dll"
             "TargetName" = "8:libfilesystem_plugin.dll"
             "Tag" = "8:"
             "Folder" = "8:_5743145371E34107AB441BA894529000"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1E92D9AA686B401FB9834CA92799265A"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libyuvp_plugin.dll"
+            "TargetName" = "8:libyuvp_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_220F6D83529C4D41AAD487599EA4E932"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libchain_plugin.dll"
+            "TargetName" = "8:libchain_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2435C018703047F18C0821BFE70B7188"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_10_p010_plugin.dll"
+            "TargetName" = "8:libi420_10_p010_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -242,6 +510,46 @@
             "TargetName" = "8:libavcodec_plugin.dll"
             "Tag" = "8:"
             "Folder" = "8:_2D48020C21DF44709347908F40831C4D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3A24217ED4754EB6ADAB7BE9B687D768"
+            {
+            "SourcePath" = "8:..\\Release\\体温监控护士站.exe"
+            "TargetName" = "8:体温监控护士站.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_CC1E9961BA90461697161ED895DB1D41"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3ECC25EC1A134B788126E04CC1D49762"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\res\\main.ico"
+            "TargetName" = "8:main.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_CC1E9961BA90461697161ED895DB1D41"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -316,6 +624,126 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_63295EB2B31D4B469598DE0E135DF795"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi422_i420_plugin.dll"
+            "TargetName" = "8:libi422_i420_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_67254C2FC972467DA91C2B9E618A3D13"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libgrey_yuv_plugin.dll"
+            "TargetName" = "8:libgrey_yuv_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6F1629DA05FD40B8BB41DEE6AEBAFD03"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_yuy2_mmx_plugin.dll"
+            "TargetName" = "8:libi420_yuy2_mmx_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_707AF37359454B8996304211AEE2CE7B"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libyuy2_i422_plugin.dll"
+            "TargetName" = "8:libyuy2_i422_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_77FD1EAB386B44AEA9E8705185B40F2E"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_rgb_plugin.dll"
+            "TargetName" = "8:libi420_rgb_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7FA1AD6114E740C0B6BCB6D91A182C43"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_nv12_plugin.dll"
+            "TargetName" = "8:libi420_nv12_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_897F849D95414201ACF4650664F115FD"
             {
             "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_output\\libdirect3d9_plugin.dll"
@@ -356,6 +784,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AA06974F12814B69BC836E43042E4F3A"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_yuy2_plugin.dll"
+            "TargetName" = "8:libi420_yuy2_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AA567951FA704E8AAC21E49F6AB12C7E"
             {
             "SourcePath" = "8:libvlccore.dll"
@@ -376,12 +824,112 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AC2451FAED214F9B8FBB655A1BABDB84"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_rgb_mmx_plugin.dll"
+            "TargetName" = "8:libi420_rgb_mmx_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B5D6E6C172F349B1AFB505980D9FD917"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi422_yuy2_sse2_plugin.dll"
+            "TargetName" = "8:libi422_yuy2_sse2_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C4F8336A948A4CA38F0AF733C918905A"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi422_yuy2_plugin.dll"
+            "TargetName" = "8:libi422_yuy2_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DD4A814EE3CC4B10B8B6B5FA2B4E1161"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi422_yuy2_mmx_plugin.dll"
+            "TargetName" = "8:libi422_yuy2_mmx_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E24C00E61B894A1088667DD147978725"
             {
             "SourcePath" = "8:..\\术中监控2.x\\plugins\\audio_filter\\libaudio_format_plugin.dll"
             "TargetName" = "8:libaudio_format_plugin.dll"
             "Tag" = "8:"
             "Folder" = "8:_207A75194E8D4EA1A9B784700C64DCD6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E7237A2418DE41BD996158B7110A0ABD"
+            {
+            "SourcePath" = "8:..\\术中监控2.x\\plugins\\video_chroma\\libi420_yuy2_sse2_plugin.dll"
+            "TargetName" = "8:libi420_yuy2_sse2_plugin.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_3F403EA47235401E851FEDABCABC31C8"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -485,6 +1033,17 @@
                                 {
                                 }
                             }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_3F403EA47235401E851FEDABCABC31C8"
+                            {
+                            "Name" = "8:video_chroma"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_7286474B2B1E4FF4B8CA6984D02E111A"
+                                "Folders"
+                                {
+                                }
+                            }
                             "{9EF0B969-E518-4E46-987F-47570745A589}:_5743145371E34107AB441BA894529000"
                             {
                             "Name" = "8:access"
@@ -548,22 +1107,22 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:术中监控安装程序"
-        "ProductCode" = "8:{FF60F28F-5405-4F57-96C8-71677B0789CD}"
-        "PackageCode" = "8:{5E97C1F5-184D-4903-8A56-C10D166D3978}"
-        "UpgradeCode" = "8:{F5502B66-10B2-4CB1-91A0-3D2EA976573E}"
+        "ProductName" = "8:体温监控护士站安装程序"
+        "ProductCode" = "8:{33235669-0A1B-472E-9566-4738D338548C}"
+        "PackageCode" = "8:{ADB9DD26-61AE-4F4F-A74D-34C9970AD20B}"
+        "UpgradeCode" = "8:{65D2A720-F34C-4A16-90B3-8ED98A09E9FF}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
-        "DetectNewerInstalledVersion" = "11:TRUE"
-        "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Default Company Name"
+        "RemovePreviousVersions" = "11:TRUE"
+        "DetectNewerInstalledVersion" = "11:FALSE"
+        "InstallAllUsers" = "11:TRUE"
+        "ProductVersion" = "8:2.3.1"
+        "Manufacturer" = "8:泰利美信"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:术中监控安装程序"
+        "Title" = "8:体温监控护士站安装程序"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Default Company Name"
+        "ARPCONTACT" = "8:泰利美信"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
@@ -670,6 +1229,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_92F082108CED4717BAB85D967E886DAD"
+            {
+            "Name" = "8:Shortcut to 体温监控护士站.exe"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_3A24217ED4754EB6ADAB7BE9B687D768"
+            "Folder" = "8:_30C98371E5894BD391918B837EEDB4D7"
+            "WorkingFolder" = "8:_CC1E9961BA90461697161ED895DB1D41"
+            "Icon" = "8:_3ECC25EC1A134B788126E04CC1D49762"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
@@ -1083,34 +1656,6 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DBCE63E165F6425E8EC189A388A0B7EC"
-            {
-            "SourcePath" = "8:..\\Release\\术中监控2.x.exe"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CC1E9961BA90461697161ED895DB1D41"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            "ProjectOutputGroupRegister" = "3:1"
-            "OutputConfiguration" = "8:Release|Win32"
-            "OutputGroupCanonicalName" = "8:Built"
-            "OutputProjectGuid" = "8:{66EC914D-3DCE-4B44-9864-DD3B9BA2C462}"
-            "ShowKeyOutput" = "11:TRUE"
-                "ExcludeFilters"
-                {
-                }
-            }
         }
     }
 }
