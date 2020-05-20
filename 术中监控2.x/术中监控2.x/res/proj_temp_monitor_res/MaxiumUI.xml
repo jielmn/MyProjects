@@ -37,7 +37,7 @@
 				<Control width="10" />
 				<Label text="温度曲线" textcolor="#FFCCCCCC" width="150" font="8" />
 				<Control />
-				<Button name="btnPrint" text="打印体温单" font="1" textcolor="#FF386382"   width = "120"hotimage="file='btn_hot.png' corner='2,8,2,2'"  />
+				<Button name="btnPrint" text="打印体温单" font="101" textcolor="#FF386382"   width = "120"hotimage="file='btn_hot.png' corner='2,8,2,2'"  />
 			</HorizontalLayout>
 			<HorizontalLayout height="5" />
 			<VerticalLayout inset="0,0,0,0" hscrollbar="true" vscrollbar="false" sepheight="4" >
