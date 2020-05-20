@@ -23,7 +23,7 @@
 			<HorizontalLayout height="75" inset="10,40,10,0" >
 				<Control bkimage="file='hand.png' dest='0,0,35,35'" width="35" />
 				<Control width="10" />
-				<Label text="连续测温读卡器信息"   textcolor="#FFCCCCCC" width="200" font="8" />
+				<Label text="读卡器读取的数据"   textcolor="#FFCCCCCC" width="200" font="8" />
 			</HorizontalLayout>
 			
 			<VerticalLayout inset="0,0,0,0" name="layReaders" hscrollbar="false" vscrollbar="true" sepheight="4" />

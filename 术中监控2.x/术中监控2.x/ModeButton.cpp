@@ -28,14 +28,14 @@ void CModeButton::SwitchMode() {
 	switch (m_mode)
 	{
 	case CModeButton::Mode_Hand:
-		m_mode = Mode_Single;
-		this->SetBkImage("file='single.png' dest='2,2,28,28'");
-		break;
-	case CModeButton::Mode_Single:
 		m_mode = Mode_Multiple;
 		this->SetBkImage("file='multiple.png' dest='2,2,28,28'");
 		break;
-	case CModeButton::Mode_Multiple:
+	//case CModeButton::Mode_Single:
+	//	m_mode = Mode_Multiple;
+	//	this->SetBkImage("file='multiple.png' dest='2,2,28,28'");
+	//	break;
+	case CModeButton::Mode_Multiple:  
 		m_mode = Mode_Hand;
 		this->SetBkImage("file='hand.png' dest='2,2,28,28'");
 		break;
