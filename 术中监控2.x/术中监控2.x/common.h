@@ -34,10 +34,13 @@ using namespace DuiLib;
 
 #define  HANDLE_WRONG_FORMAT_1     1             // 主要针对连续测温，结束字符不是FF
 
-#define  TRI_TAGS_FLAG             0              // 三联
+#define  TRI_TAGS_FLAG             1              // 三联
 #define  TRI_TAGS_COLOR_0          0xFFFFFFFF
 #define  TRI_TAGS_COLOR_1          0xFF999999
 #define  TRI_TAGS_COLOR_2          0xFF00FF00
+
+// 是否显示住院和出院两个选项块
+#define  SHOW_IN_HOSPITAL_FLAG     0
 
 
 // 窗格温度文字透明度
@@ -71,15 +74,14 @@ using namespace DuiLib;
 #endif
 #define   MAX_TAG_PNAME_LENGTH        20
 
-#define   VERSION                     "2.3.1"
-#define   COMPILE_TIME                "2020-05-15 14:13"
+#define   VERSION                     "2.3.2"
+#define   COMPILE_TIME                "2020-05-20 11:36"
 #ifdef _DEBUG
 #define   MAX_ITEMS_PER_PAGE          2
 #else
 #define   MAX_ITEMS_PER_PAGE          10
 #endif
-// 是否显示住院和出院两个选项块
-#define  SHOW_IN_HOSPITAL_FLAG        1
+
 
 // 控件id
 #define   TABS_ID                  "switch"

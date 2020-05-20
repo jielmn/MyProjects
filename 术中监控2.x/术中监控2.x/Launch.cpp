@@ -167,7 +167,8 @@ int  CLaunch::ReadComData() {
 #else
 
 	const int MIN_DATA_LENGTH = 16;
-	const int BATERRY_TEMP_DATAl_LENGTH = 16;       // 有源tag
+	// const int BATERRY_TEMP_DATAl_LENGTH = 16;       // 有源tag
+	const int TRI_TEMP_DATA_LENGTH = 16;              //  三联
 	const int SURGENCY_TEMP_DATA_LENGTH = 29;
 	const int HAND_TEMP_DATA_LENGTH = 32;
 
@@ -184,9 +185,16 @@ int  CLaunch::ReadComData() {
 	}
 
 	// 如果是有源数据
+	//if (buf[1] == 0x0D) {
+	//	m_recv_buf.Reform();
+	//	ProcBatteryTemp(buf, BATERRY_TEMP_DATAl_LENGTH);
+	//	ProcTail();
+	//}
+
+	// 如果是三联
 	if (buf[1] == 0x0D) {
 		m_recv_buf.Reform();
-		ProcBatteryTemp(buf, BATERRY_TEMP_DATAl_LENGTH);
+		ProcTriTemp(buf, TRI_TEMP_DATA_LENGTH);
 		ProcTail();
 	}
 	// 如果是术中读卡器温度数据
@@ -269,6 +277,48 @@ void   CLaunch::ProcBatteryTemp(const BYTE * pData, DWORD dwDataLen) {
 	if ( wBedNo > 0 )
 		m_sigReaderTemp.emit(wBedNo, temp_item);
 #endif
+}
+
+// 处理三联数据
+void  CLaunch::ProcTriTemp(const BYTE * pData, DWORD dwDataLen) {
+	char debug_buf[8192];
+
+	if (pData[15] != (BYTE)'\xFF') {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(跳过，不处理)：\n%s\n", debug_buf);
+		return;
+	}
+
+	BYTE   byIndex = pData[3];
+	if (byIndex == 0 || byIndex > 3) {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "三联导联号不对：\n%s\n", debug_buf);
+		return;
+	}
+
+	BYTE  byBed = pData[2];
+	if ( byBed >= MAX_GRID_COUNT ) {
+		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
+		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "三联床号不对：\n%s\n", debug_buf);
+		return;
+	}
+
+	DWORD  dwTemp = pData[13] * 100 + pData[14];
+
+	TempItem temp_item;
+	memset(&temp_item, 0, sizeof(temp_item));
+
+	temp_item.m_dwTemp = dwTemp;
+	temp_item.m_time = time(0);
+
+	Bytes2String(temp_item.m_szTagId,    sizeof(temp_item.m_szTagId),    pData + 9, 4);
+	Bytes2String(temp_item.m_szReaderId, sizeof(temp_item.m_szReaderId), pData + 5, 4);
+
+	
+	WORD  wBedNo = byBed * MAX_READERS_PER_GRID + 1;
+
+	if (wBedNo > 0)
+		m_sigReaderTemp.emit(wBedNo, temp_item);
 }
 
 // 术中读卡器温度

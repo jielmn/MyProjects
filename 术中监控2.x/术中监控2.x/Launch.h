@@ -32,6 +32,8 @@ private:
 	void   ProcHandeReader(const BYTE * pData, DWORD dwDataLen);
 	// 处理有源数据
 	void   ProcBatteryTemp(const BYTE * pData, DWORD dwDataLen);
+	// 处理三联数据
+	void   ProcTriTemp(const BYTE * pData, DWORD dwDataLen);
 
 private:
 	CDataBuf   m_recv_buf;
