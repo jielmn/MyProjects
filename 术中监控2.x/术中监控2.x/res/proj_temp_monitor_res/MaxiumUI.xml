@@ -21,7 +21,7 @@
 			</HorizontalLayout>			
 			
 			<HorizontalLayout height="75" inset="10,40,10,0" >
-				<Control bkimage="file='hand.png' dest='0,0,35,35'" width="35" />
+				<Control bkimage="file='temp.png' dest='0,0,35,35'" width="35" />
 				<Control width="10" />
 				<Label text="读卡器读取的数据"   textcolor="#FFCCCCCC" width="200" font="8" />
 			</HorizontalLayout>
