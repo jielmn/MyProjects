@@ -61,14 +61,16 @@ void CModeButton::SetMode(CModeButton::Mode e) {
 		this->SetBkImage("file='hand.png' dest='2,2,28,28'");
 		this->SetToolTip("手持测温模式");
 		break;
-	case CModeButton::Mode_Single:
-		this->SetBkImage("file='single.png' dest='2,2,28,28'");
-		break;
+	//case CModeButton::Mode_Single:
+	//	this->SetBkImage("file='single.png' dest='2,2,28,28'");
+	//	break;
 	case CModeButton::Mode_Multiple:
 		this->SetBkImage("file='multiple.png' dest='2,2,28,28'");
 		this->SetToolTip("多贴连续测温模式");
 		break;
 	default:
+		this->SetBkImage("file='hand.png' dest='2,2,28,28'");
+		this->SetToolTip("手持测温模式");
 		break;
 	}
 }
