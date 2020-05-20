@@ -315,7 +315,7 @@ void  CLaunch::ProcTriTemp(const BYTE * pData, DWORD dwDataLen) {
 	Bytes2String(temp_item.m_szReaderId, sizeof(temp_item.m_szReaderId), pData + 5, 4);
 
 	
-	WORD  wBedNo = byBed * MAX_READERS_PER_GRID + 1;
+	WORD  wBedNo = byBed * MAX_READERS_PER_GRID + byIndex;
 
 	if (wBedNo > 0)
 		m_sigReaderTemp.emit(wBedNo, temp_item);
