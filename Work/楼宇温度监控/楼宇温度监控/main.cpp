@@ -13,6 +13,7 @@
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_lstFloors = 0;
 	m_layDevices = 0;
+	m_pHighlightDevice = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -41,7 +42,7 @@ void  CDuiFrameWnd::InitWindow() {
 	pBtn->SetFont(6); 
 	pBtn->SetBorderColor(0xFFC5C5C5);
 	pBtn->SetTextColor(0xFFC5C5C5);  
-	pBtn->SetBorderSize(2);
+	pBtn->SetBorderSize(1);
 	m_layDevices->Add(pBtn);
 #endif
 
@@ -172,11 +173,19 @@ bool CDuiFrameWnd::OnLayoutDevicesSize(void * pParam) {
 }
 
 void CDuiFrameWnd::OnDeviceHighlight(CDeviceUI * pDevice) {
+	if (m_pHighlightDevice) {
+		m_pHighlightDevice->SetHighlight(FALSE);
+	}
 
+	pDevice->SetHighlight(TRUE);
+	m_pHighlightDevice = pDevice;
 }
 
 void CDuiFrameWnd::OnDeviceUnHighlight(CDeviceUI * pDevice) {
-
+	pDevice->SetHighlight(FALSE);
+	if (pDevice == m_pHighlightDevice) {
+		m_pHighlightDevice = 0;
+	}	
 }
    
 

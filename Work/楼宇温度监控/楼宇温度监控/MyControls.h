@@ -32,6 +32,7 @@ class CDeviceUI : public CContainerUI, INotifyUI
 public:
 	CDeviceUI();
 	~CDeviceUI();
+	void  SetHighlight(BOOL bHighlight);
 
 	static int FIXED_WIDTH;
 	static int FIXED_HEIGHT;

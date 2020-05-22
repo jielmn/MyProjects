@@ -35,6 +35,7 @@ void CDeviceUI::DoInit() {
 	//m_rule->SetBkColor(0xFFFF0000 );    
 
 	m_btnDel = (CButtonUI *)m_pManager->FindControl("btnDel");
+	m_btnDel->SetVisible(false);
 
 	this->SetFixedWidth(FIXED_WIDTH);
 	this->SetFixedHeight(FIXED_HEIGHT);
@@ -64,6 +65,25 @@ void CDeviceUI::DoEvent(DuiLib::TEventUI& event) {
 void CDeviceUI::Notify(TNotifyUI& msg) {
 
 }
+
+void  CDeviceUI::SetHighlight(BOOL bHighlight) {
+	if (bHighlight) {
+		if (!m_bHighlight) {
+			this->SetBkColor(0x30000000);
+			m_btnDel->SetVisible(true);
+			m_bHighlight = TRUE;
+		}
+	}
+	else {
+		if (m_bHighlight) {
+			this->SetBkColor(0x00000000);
+			m_btnDel->SetVisible(false);
+			m_bHighlight = FALSE;
+		}
+	}
+}
+
+
 
 
 int  CTempRuleUI::RULE_WIDTH = 48;

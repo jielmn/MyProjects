@@ -42,6 +42,7 @@ public:
 private:
 	CListUI *                        m_lstFloors;
 	CTileLayoutUI *                  m_layDevices;
+	CDeviceUI *                      m_pHighlightDevice;
 
 private:
 	void   AddFloor(int nFloor);
