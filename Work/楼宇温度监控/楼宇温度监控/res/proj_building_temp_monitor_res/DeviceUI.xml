@@ -3,7 +3,9 @@
 	<HorizontalLayout bordersize="1" bordercolor="#FFC5C5C5" menu="false" inset="20,0,20,20" >	
 		
 		<VerticalLayout width="204" >
-			<HorizontalLayout height="45" />
+			<HorizontalLayout height="45" inset="0,10,0,0" >
+				<Button name="btnDel" width="16" height="16" bordercolor="#FF768D9B" bordersize="0" textcolor="#FF447AA1" foreimage="del.png" normalimage="toolbar_normal.png" pushedimage="toolbar_pushed.png" selectedimage="toolbar_pushed.png" />
+			</HorizontalLayout>
 			
 			<VerticalLayout bordersize="1" bordercolor="#FFC5C5C5" inset="20,10,20,2" >
 				<HorizontalLayout height="24">

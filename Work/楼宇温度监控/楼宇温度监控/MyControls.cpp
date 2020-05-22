@@ -7,6 +7,8 @@ int CDeviceUI::FIXED_HEIGHT = 212;
 
 CDeviceUI::CDeviceUI() : m_callback(m_pManager) {
 	m_rule = 0;
+	m_btnDel = 0;
+	m_bHighlight = FALSE;
 }
 
 CDeviceUI::~CDeviceUI() {
@@ -32,6 +34,8 @@ void CDeviceUI::DoInit() {
 	m_rule = (CTempRuleUI *)m_pManager->FindControl("rule");
 	//m_rule->SetBkColor(0xFFFF0000 );    
 
+	m_btnDel = (CButtonUI *)m_pManager->FindControl("btnDel");
+
 	this->SetFixedWidth(FIXED_WIDTH);
 	this->SetFixedHeight(FIXED_HEIGHT);
 }
@@ -41,6 +45,19 @@ void CDeviceUI::SetAttribute(LPCTSTR pstrName, LPCTSTR pstrValue) {
 }
 
 void CDeviceUI::DoEvent(DuiLib::TEventUI& event) {
+	if (event.Type == UIEVENT_MOUSEENTER) {
+		if (!m_bHighlight) {
+			m_pManager->SendNotify(this, "device_selected");
+		}
+	}
+	else if (event.Type == UIEVENT_MOUSELEAVE) {
+		if (m_bHighlight) {
+			m_pManager->SendNotify(this, "device_unselected");
+		}
+	}
+	else if (event.Type == UIEVENT_DBLCLICK) {
+		m_pManager->SendNotify(this, "device_dbclick");
+	}
 	CContainerUI::DoEvent(event);
 }
 
@@ -113,6 +130,7 @@ bool CTempRuleUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 
 	HFONT  hOldFont = (HFONT)::SelectObject(hDC, m_hFont);
 	::SetTextColor(hDC, RGB(0x44, 0x7A, 0xA1)); 
+	::SetBkMode(hDC, TRANSPARENT);
 
 	for (int i = 0; i <= nSegmentCnt; i++) {
 		int nX = rcPos.left + RULE_WIDTH - 1;
@@ -136,3 +154,4 @@ bool CTempRuleUI::DoPaint(HDC hDC, const RECT& rcPaint, CControlUI* pStopControl
 void CTempRuleUI::DoEvent(DuiLib::TEventUI& event) {
 	CControlUI::DoEvent(event);
 }
+   

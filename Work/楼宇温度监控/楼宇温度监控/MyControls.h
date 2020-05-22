@@ -47,6 +47,11 @@ private:
 	CDialogBuilderCallbackEx                    m_callback;
 
 	CTempRuleUI *                               m_rule;
+	CButtonUI *                                 m_btnDel;
+
+
+private:
+	BOOL                                        m_bHighlight;
 };
 
 

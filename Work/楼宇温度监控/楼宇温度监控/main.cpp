@@ -76,6 +76,15 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 			OnFloorSelected(msg.lParam);
 		}
 	}
+	else if (msg.sType == "device_selected") {
+		OnDeviceHighlight( (CDeviceUI *)msg.pSender );
+	}
+	else if (msg.sType == "device_unselected") {
+		OnDeviceUnHighlight( (CDeviceUI *)msg.pSender );
+	}
+	else if (msg.sType == "device_dbclick") {
+		
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -161,7 +170,14 @@ bool CDuiFrameWnd::OnLayoutDevicesSize(void * pParam) {
 
 	return true;      
 }
-  
+
+void CDuiFrameWnd::OnDeviceHighlight(CDeviceUI * pDevice) {
+
+}
+
+void CDuiFrameWnd::OnDeviceUnHighlight(CDeviceUI * pDevice) {
+
+}
    
 
 

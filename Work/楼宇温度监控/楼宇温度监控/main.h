@@ -47,4 +47,7 @@ private:
 	void   AddFloor(int nFloor);
 	void   OnFloorSelected(int nOldSelected);
 	bool   OnLayoutDevicesSize(void * pParam);
+
+	void   OnDeviceHighlight(CDeviceUI * pDevice);
+	void   OnDeviceUnHighlight(CDeviceUI * pDevice);
 };
