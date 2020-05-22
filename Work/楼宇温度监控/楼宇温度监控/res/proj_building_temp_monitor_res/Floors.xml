@@ -18,8 +18,8 @@
 		</HorizontalLayout>	
 
 		<HorizontalLayout inset="10,20" >
-			<List name="lstFloors" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="false" itemalign="left" itemaltbk="false" menu="true" bordercolor="#FF768D9B" bordersize="0" itemselectedbkcolor="#FF007ACC" >
-				<ListHeader height="24" menu="true" visible="false" >
+			<List name="lstFloors" inset="1,1,1,1" itemshowhtml="true" vscrollbar="true" hscrollbar="false" itemalign="left" itemaltbk="false" bordercolor="#FF768D9B" bordersize="0" itemselectedbkcolor="#FF007ACC" >
+				<ListHeader height="24" visible="false" >
 					<ListHeaderItem text="楼层"      font="2" width="280"  textcolor="#FF386382" hotimage="file='list_header_hot.png'" pushedimage="file='list_header_pushed.png'" sepimage="file='list_header_sep.png'" sepwidth="1"/>
 				</ListHeader>
 			</List>

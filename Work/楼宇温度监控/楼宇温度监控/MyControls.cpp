@@ -10,7 +10,7 @@ CDeviceUI::CDeviceUI() {
 }
 
 CDeviceUI::~CDeviceUI() {
-	m_pManager->RemoveNotifier(this);
+	m_pManager->RemoveNotifier(this);                          
 }
 
 LPCTSTR CDeviceUI::GetClass() const {
