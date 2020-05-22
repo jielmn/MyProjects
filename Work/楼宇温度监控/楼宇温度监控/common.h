@@ -9,6 +9,9 @@
 #include "LmnThread.h"
 #include "LmnString.h"
 
+#include "UIlib.h"
+using namespace DuiLib;
+
 #define   PROJ_NAME               "building_temp_monitor"
 #define   LOG_FILE_NAME           (PROJ_NAME ".log")
 #define   CONFIG_FILE_NAME        (PROJ_NAME ".cfg")
@@ -32,6 +35,21 @@ public:
 		m_hWnd = 0;
 	}
 };
+
+// 创建duilib控件的回调
+class CDialogBuilderCallbackEx : public IDialogBuilderCallback
+{
+public:
+	CDialogBuilderCallbackEx(DuiLib::CPaintManagerUI *pManager) {
+		m_pManager = pManager;
+	}
+	CControlUI* CreateControl(LPCTSTR pstrClass);
+
+public:
+	DuiLib::CPaintManagerUI *  m_pManager;
+};
+
+
 
 extern CGlobalData  g_data;
 

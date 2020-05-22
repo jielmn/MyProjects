@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Window>
-	<HorizontalLayout bordersize="1" bordercolor="#FFC5C5C5" menu="false" inset="20,20,20,20" >	
+	<HorizontalLayout bordersize="1" bordercolor="#FFC5C5C5" menu="false" inset="20,0,20,20" >	
 		
 		<VerticalLayout width="204" >
 			<HorizontalLayout height="45" />
@@ -15,7 +15,7 @@
 				
 				<HorizontalLayout height="40">
 					<Label text="温度：" width="50" font="4" textcolor="#FF447AA1" />
-					<Label text="32.23" font="5" textcolor="#FF447AA1" />
+					<Label text="32.23" font="5" textcolor="#FF14B914" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout />
@@ -24,11 +24,15 @@
 					<Label text="编号：" width="50" font="3" textcolor="#FF447AA1" />
 					<Label text="1" font="3" textcolor="#FF447AA1" />
 				</HorizontalLayout>
-
+				
 			</VerticalLayout>
+			
+			<HorizontalLayout height="6" />
 			
 		</VerticalLayout>
 		
-		<Temprule />
+		<Control width="20" />
+		
+		<TempRule name="rule" />
 	</HorizontalLayout>
 </Window>
