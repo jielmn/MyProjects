@@ -35,6 +35,14 @@ void  CDuiFrameWnd::InitWindow() {
 		CDeviceUI * pDevice = new CDeviceUI;
 		m_layDevices->Add(pDevice);
 	}
+
+	CButtonUI * pBtn = new CButtonUI;
+	pBtn->SetText("+");
+	pBtn->SetFont(6); 
+	pBtn->SetBorderColor(0xFFC5C5C5);
+	pBtn->SetTextColor(0xFFC5C5C5);  
+	pBtn->SetBorderSize(1);
+	m_layDevices->Add(pBtn);
 #endif
 
 	m_layDevices->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnLayoutDevicesSize);

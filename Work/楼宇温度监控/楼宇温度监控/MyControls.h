@@ -49,3 +49,4 @@ private:
 	CTempRuleUI *                               m_rule;
 };
 
+
