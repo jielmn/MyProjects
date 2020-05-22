@@ -5,6 +5,8 @@
 #include "UIlib.h"
 using namespace DuiLib;
 
+#include "MyControls.h"
+
 #include "resource.h"
 
 class CDuiFrameWnd : public WindowImplBase
@@ -39,9 +41,10 @@ public:
 
 private:
 	CListUI *                        m_lstFloors;
+	CTileLayoutUI *                  m_layDevices;
 
 private:
 	void   AddFloor(int nFloor);
 	void   OnFloorSelected(int nOldSelected);
-
+	bool   OnLayoutDevicesSize(void * pParam);
 };

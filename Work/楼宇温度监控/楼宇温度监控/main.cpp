@@ -12,6 +12,7 @@
 
 CDuiFrameWnd::CDuiFrameWnd() {
 	m_lstFloors = 0;
+	m_layDevices = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -23,12 +24,20 @@ void  CDuiFrameWnd::InitWindow() {
 	PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0);
 
 	m_lstFloors = (CListUI *)m_PaintManager.FindControl("lstFloors");
+	m_layDevices = (CTileLayoutUI *)m_PaintManager.FindControl("layDevices");
 
 #ifdef _DEBUG
 	for (int i = 0; i < 10; i++) {
 		AddFloor(i + 1);  
 	}
+
+	for (int i = 0; i < 10; i++) {
+		CDeviceUI * pDevice = new CDeviceUI;
+		m_layDevices->Add(pDevice);
+	}
 #endif
+
+	m_layDevices->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnLayoutDevicesSize);
    
 
 	WindowImplBase::InitWindow();
@@ -64,7 +73,7 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (WM_PAINT == uMsg) {
-		int a = 100; 
+		
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -123,6 +132,26 @@ void CDuiFrameWnd::OnFloorSelected(int nOldSelected) {
 		pLabel = (CLabelUI *)pListContainerElement->FindControl(FindFloorLabel, 0, 0);
 		pLabel->SetTextColor(0xFF447AA1);
 	}
+}
+
+bool CDuiFrameWnd::OnLayoutDevicesSize(void * pParam) {
+	RECT rcDevices = m_layDevices->GetClientPos();
+	int  nDevicesWidth  = rcDevices.right - rcDevices.left;
+	int  nDevicesHeight = rcDevices.bottom - rcDevices.top;	
+
+	int nColumns = nDevicesWidth / CDeviceUI::FIXED_WIDTH;
+	if (nColumns < 1) {
+		nColumns = 1;
+	}
+
+	m_layDevices->SetFixedColumns(nColumns);
+
+	SIZE  sz = { 0 };
+	sz.cx = nDevicesWidth / nColumns;
+	sz.cy = CDeviceUI::FIXED_HEIGHT;
+	m_layDevices->SetItemSize(sz);
+
+	return true;      
 }
   
    

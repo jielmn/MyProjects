@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Window>
+	<VerticalLayout bordersize="1" bordercolor="#FF000000" menu="true" >	
+		<Label text="123" />
+	</VerticalLayout>
+</Window>

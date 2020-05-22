@@ -7,5 +7,12 @@
 			<Label text="#-2 实时数据显示(单位：℃)" textcolor="#FF447AA1" align="center" font="1" />
 		</HorizontalLayout>	
 		
+		<HorizontalLayout height="20" />
+		
+		<HorizontalLayout inset="10,0,10,0" >
+			<TileLayout name="layDevices" vscrollbar="true" hscrollbar="false"  />
+		</HorizontalLayout>
+		
+		
 	</VerticalLayout>
 </Window>
