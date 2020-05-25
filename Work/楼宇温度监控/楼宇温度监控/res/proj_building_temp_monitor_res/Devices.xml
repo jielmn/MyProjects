@@ -4,7 +4,7 @@
 		<HorizontalLayout height="10" />
 		
 		<HorizontalLayout height="30">
-			<Label text="#-2 实时数据显示(单位：℃)" textcolor="#FF447AA1" align="center" font="1" />
+			<Label text="#-2 实时数据显示(单位：℃)" textcolor="#FF447AA1" align="center" font="1" name="lblDevicesTitle" />
 		</HorizontalLayout>	
 		
 		<HorizontalLayout height="20" />

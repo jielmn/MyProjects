@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <iterator>
 
 #include "LmnCommon.h"
 #include "LmnConfig.h"
@@ -19,9 +20,12 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
+
 #define   MSG_ADD_FLOOR             100
+#define   MSG_GET_ALL_CLASSES       101
 
 #define   UM_ADD_FLOOR_RET          (WM_USER + 1)
+#define   UM_GET_ALL_FLOORS_RET     (WM_USER + 2)
 
 
 class  CGlobalData {
@@ -70,7 +74,8 @@ extern CGlobalData  g_data;
 
 extern bool sortInt(int d1, int d2);
 extern CControlUI* CALLBACK FindControlByName(CControlUI* pSubControl, LPVOID pParam);
-
+extern DWORD GetIntFromDb(const char * szValue, int nDefault = 0);
+extern char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue);
 
 // templates
 template <class T>

@@ -84,6 +84,24 @@ void  CBusiness::AddFloor(const CAddFloorParam * pParam) {
 	::PostMessage(pParam->m_hWnd, UM_ADD_FLOOR_RET, bRet, pParam->m_nFloor);
 }
 
+void  CBusiness::GetAllFloorsAsyn() {
+	g_data.m_thrd_db->PostMessage(this, MSG_GET_ALL_CLASSES);
+}
+
+void  CBusiness::GetAllFloors() {
+	std::vector<int> * pvRet = new std::vector<int>;
+	m_db.GetAllFloors(*pvRet);
+	::PostMessage(g_data.m_hWnd, UM_GET_ALL_FLOORS_RET, (WPARAM)pvRet, 0);
+}
+
+void  CBusiness::GetDevicesByFloorAsyn(int nFloor) {
+
+}
+
+void  CBusiness::GetDevicesByFloor() {
+
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -93,6 +111,12 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAddFloorParam * pParam = (CAddFloorParam *)pMessageData;
 		AddFloor(pParam);
+	}
+	break;
+
+	case MSG_GET_ALL_CLASSES:
+	{
+		GetAllFloors();
 	}
 	break;
 

@@ -75,6 +75,8 @@ private:
 	CDeviceUI *                      m_pHighlightDevice;
 	std::vector<int>                 m_vFloors;
 
+	CLabelUI *                       m_lblDevicesTitle;
+
 private:
 	void   AddFloor(int nFloor);
 	void   OnFloorSelected(int nOldSelected);
@@ -88,4 +90,7 @@ private:
 	void   SetFloor(CListContainerElementUI * pItem, int nFloor);
 
 	void   UpdateDevices();
+
+	// 硬件设备变动，可能有串口变动
+	void   CheckDeviceCom();
 };

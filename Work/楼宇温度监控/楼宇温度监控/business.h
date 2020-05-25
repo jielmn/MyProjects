@@ -19,6 +19,12 @@ public:
 	void  AddFloorAsyn(HWND hWnd, int nFloor);
 	void  AddFloor(const CAddFloorParam * pParam);
 
+	void  GetAllFloorsAsyn();
+	void  GetAllFloors();
+
+	void  GetDevicesByFloorAsyn(int nFloor);
+	void  GetDevicesByFloor();
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

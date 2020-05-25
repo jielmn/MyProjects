@@ -14,6 +14,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_lstFloors = 0;
 	m_layDevices = 0;
 	m_pHighlightDevice = 0;
+	m_lblDevicesTitle = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -26,6 +27,9 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_lstFloors = (CListUI *)m_PaintManager.FindControl("lstFloors");
 	m_layDevices = (CTileLayoutUI *)m_PaintManager.FindControl("layDevices");
+	m_lblDevicesTitle = (CLabelUI *)m_PaintManager.FindControl("lblDevicesTitle");
+
+	m_lblDevicesTitle->SetText("");
 
 #ifdef _DEBUG
 	//for (int i = 0; i < 10; i++) {
@@ -48,7 +52,7 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_layDevices->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnLayoutDevicesSize);
    
-
+	CBusiness::GetInstance()->GetAllFloorsAsyn();
 	WindowImplBase::InitWindow();
 }
 
@@ -99,6 +103,18 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (WM_PAINT == uMsg) {
 		
+	}
+	else if (UM_GET_ALL_FLOORS_RET == uMsg) {
+		m_vFloors.clear();
+		std::vector<int> * pvRet = (std::vector<int>*)wParam;
+		std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_vFloors));
+		delete pvRet;
+
+		std::sort(m_vFloors.begin(), m_vFloors.end(), sortInt);
+		UpdateFloors(); 
+
+		// 检查串口
+		CheckDeviceCom();
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -184,6 +200,8 @@ void CDuiFrameWnd::OnFloorSelected(int nOldSelected) {
 		pLabel = (CLabelUI *)pListContainerElement->FindControl(FindFloorLabel, 0, 0);
 		pLabel->SetTextColor(0xFF447AA1);
 	}
+
+	UpdateDevices();
 }
 
 bool CDuiFrameWnd::OnLayoutDevicesSize(void * pParam) {
@@ -308,13 +326,21 @@ void CDuiFrameWnd::UpdateDevices() {
 	int nSel = m_lstFloors->GetCurSel();
 	if ( nSel < 0 ) {
 		m_layDevices->RemoveAll();	
+		m_lblDevicesTitle->SetText("实时数据显示(单位：℃)");
 	}
 	else {
 		int  nFloor = m_lstFloors->GetItemAt(nSel)->GetTag();
-		//CBusiness::GetInstance()->GetRoomDataAsyn(dwNo);
+		CDuiString  strText;
+		strText.Format("#%d 实时数据显示(单位：℃)", nFloor);
+		m_lblDevicesTitle->SetText(strText);
+
+		CBusiness::GetInstance()->GetDevicesByFloorAsyn(nFloor);
 	}
 }
 
+void   CDuiFrameWnd::CheckDeviceCom() {
+
+}
 
 
 
