@@ -127,6 +127,21 @@ void CDuiFrameWnd::AddFloor(int nFloor) {
 	pLabel->SetTextColor(0xFF447AA1);
 	pLabel->SetText(strText);
 	pLayout->Add(pLabel);
+
+	CVerticalLayoutUI * pVLayout = new CVerticalLayoutUI;
+	CControlUI * pHolder = new CControlUI;
+	pVLayout->Add(pHolder);
+
+	CControlUI * pWarning = new CControlUI;
+	pWarning->SetFixedWidth(20);
+	pWarning->SetFixedHeight(20);
+	pWarning->SetBkImage("warning.png"); 
+	pVLayout->Add(pWarning);
+
+	pHolder = new CControlUI;
+	pVLayout->Add(pHolder);
+
+	pLayout->Add(pVLayout);      
 }
 
 CControlUI* CALLBACK FindFloorLabel (CControlUI* pControl, LPVOID) {
