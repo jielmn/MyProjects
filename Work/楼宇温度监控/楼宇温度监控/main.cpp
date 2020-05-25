@@ -116,6 +116,13 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		// 检查串口
 		CheckDeviceCom();
 	}
+	else if (UM_GET_DEVICES_BY_FLOOR_RET == uMsg) {
+		std::vector<DeviceItem*> * pvRet = (std::vector<DeviceItem*> *)wParam;
+		int nFloor = lParam;
+		UpdateDevicesByFloor(*pvRet, nFloor);
+		ClearVector(*pvRet);
+		delete pvRet;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 
@@ -296,6 +303,7 @@ void CDuiFrameWnd::UpdateFloors() {
 		pItem->SetTag(nFloor);
 	}
 
+	BOOL  bUpdated = FALSE;
 	if (nOldSelNo != 0) {
 		int i = 0;
 		for (i = 0; i < nCnt; i++) {
@@ -310,16 +318,19 @@ void CDuiFrameWnd::UpdateFloors() {
 		if (i >= nCnt) {
 			if (nCnt > 0) {
 				m_lstFloors->SelectItem(0);
+				bUpdated = TRUE;
 			}
 		}
 	}
 	else {
 		if (nCnt > 0) {
 			m_lstFloors->SelectItem(0);
+			bUpdated = TRUE;
 		}
 	}
 
-	UpdateDevices();
+	if ( !bUpdated )
+		UpdateDevices();
 }
 
 void CDuiFrameWnd::UpdateDevices() {
@@ -330,12 +341,41 @@ void CDuiFrameWnd::UpdateDevices() {
 	}
 	else {
 		int  nFloor = m_lstFloors->GetItemAt(nSel)->GetTag();
-		CDuiString  strText;
-		strText.Format("#%d 实时数据显示(单位：℃)", nFloor);
-		m_lblDevicesTitle->SetText(strText);
-
 		CBusiness::GetInstance()->GetDevicesByFloorAsyn(nFloor);
 	}
+}
+
+void   CDuiFrameWnd::UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFloor) {
+	int nSel = m_lstFloors->GetCurSel();
+	if (nSel < 0) {
+		return;
+	}
+
+	CDuiString  strText;
+	strText.Format("#%d 实时数据显示(单位：℃)", nFloor);
+	m_lblDevicesTitle->SetText(strText);
+
+	//int nCnt = m_layDevices->GetCount();
+	//std::vector<DeviceItem*>::iterator it;
+
+	//for (int i = 0; i < nCnt; i++) {
+	//	if ( i < nCnt - 1 ) {
+	//		CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt(i);
+	//		DWORD dwPos = pDesk->GetTag();
+	//		it = std::find_if(vRet.begin(), vRet.end(), CFindDeskObj(dwPos));
+	//		if (it == vRet.end()) {
+	//			pDesk->SetValid(FALSE);
+	//			pDesk->UpdateUI();
+	//		}
+	//		else {
+	//			memcpy(&pDesk->m_data, *it, sizeof(DeskItem));
+	//			pDesk->UpdateUI();
+	//		}
+	//	}
+	//	else {
+
+	//	}		
+	//}
 }
 
 void   CDuiFrameWnd::CheckDeviceCom() {

@@ -23,7 +23,7 @@ public:
 	void  GetAllFloors();
 
 	void  GetDevicesByFloorAsyn(int nFloor);
-	void  GetDevicesByFloor();
+	void  GetDevicesByFloor(const CGetDevicesParam * pParam);
 
 private:
 	static CBusiness *  pInstance;

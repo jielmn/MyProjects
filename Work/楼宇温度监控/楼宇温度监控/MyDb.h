@@ -11,6 +11,7 @@ public:
 
 	BOOL  AddFloor(const CAddFloorParam * pParam);
 	void  GetAllFloors(std::vector<int> & vRet);
+	void  GetDevicesByFloor(const CGetDevicesParam * pParam, std::vector<DeviceItem*> & vRet);
 
 private:
 	// szTableName: 要创建的表名

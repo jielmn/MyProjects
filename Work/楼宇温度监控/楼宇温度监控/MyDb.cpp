@@ -95,3 +95,10 @@ void  CMySqliteDatabase::GetAllFloors(std::vector<int> & vRet) {
 	}
 	sqlite3_free_table(azResult);
 }
+
+void  CMySqliteDatabase::GetDevicesByFloor( const CGetDevicesParam * pParam, 
+	                                        std::vector<DeviceItem*> & vRet ) {
+
+
+
+}

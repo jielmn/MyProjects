@@ -90,6 +90,7 @@ private:
 	void   SetFloor(CListContainerElementUI * pItem, int nFloor);
 
 	void   UpdateDevices();
+	void   UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFloor);
 
 	// 硬件设备变动，可能有串口变动
 	void   CheckDeviceCom();

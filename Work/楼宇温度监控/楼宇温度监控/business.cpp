@@ -95,11 +95,13 @@ void  CBusiness::GetAllFloors() {
 }
 
 void  CBusiness::GetDevicesByFloorAsyn(int nFloor) {
-
+	g_data.m_thrd_db->PostMessage(this, MSG_GET_DEVICES_BY_FLOOR, new CGetDevicesParam(nFloor));
 }
 
-void  CBusiness::GetDevicesByFloor() {
-
+void  CBusiness::GetDevicesByFloor(const CGetDevicesParam * pParam) {
+	std::vector<DeviceItem*> * pvRet = new std::vector<DeviceItem*>;
+	m_db.GetDevicesByFloor(pParam, *pvRet);
+	::PostMessage(g_data.m_hWnd, UM_GET_DEVICES_BY_FLOOR_RET, (WPARAM)pvRet, pParam->m_nFloor);
 }
 
 
@@ -117,6 +119,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_GET_ALL_CLASSES:
 	{
 		GetAllFloors();
+	}
+	break;
+
+	case MSG_GET_DEVICES_BY_FLOOR:
+	{
+		CGetDevicesParam * pParam = (CGetDevicesParam *)pMessageData;
+		GetDevicesByFloor(pParam);
 	}
 	break;
 
