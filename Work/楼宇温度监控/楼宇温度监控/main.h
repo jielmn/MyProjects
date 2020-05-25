@@ -6,8 +6,38 @@
 using namespace DuiLib;
 
 #include "MyControls.h"
-
 #include "resource.h"
+
+
+
+class CAddFloorDlg : public DuiLib::WindowImplBase
+{
+public:
+	CAddFloorDlg();
+
+	virtual LPCTSTR    GetWindowClassName() const { return "DUIAddFloorFrame"; }
+	virtual DuiLib::CDuiString GetSkinFile() { return "AddFloorDlg.xml"; }
+	virtual DuiLib::CDuiString GetSkinFolder() { return SKIN_FOLDER; }
+
+	virtual void   Notify(DuiLib::TNotifyUI& msg);
+	virtual void   InitWindow();
+	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
+private:
+	CEditUI *                   m_edFloor;      
+	COptionUI *                 m_opUnderGround;
+
+private:
+	void   OnBtnOk();
+
+public:
+	int                          m_nFloor;
+};
+
+ 
+
+ 
 
 class CDuiFrameWnd : public WindowImplBase
 {
@@ -43,6 +73,7 @@ private:
 	CListUI *                        m_lstFloors;
 	CTileLayoutUI *                  m_layDevices;
 	CDeviceUI *                      m_pHighlightDevice;
+	std::vector<int>                 m_vFloors;
 
 private:
 	void   AddFloor(int nFloor);
@@ -51,4 +82,10 @@ private:
 
 	void   OnDeviceHighlight(CDeviceUI * pDevice);
 	void   OnDeviceUnHighlight(CDeviceUI * pDevice);
+
+	void   OnAddFloor();
+	void   UpdateFloors();
+	void   SetFloor(CListContainerElementUI * pItem, int nFloor);
+
+	void   UpdateDevices();
 };

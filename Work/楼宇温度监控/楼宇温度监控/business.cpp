@@ -43,6 +43,8 @@ int CBusiness::Init() {
 	g_data.m_log->Init(LOG_FILE_NAME, 0, ILog::LOG_SEVERITY_INFO, TRUE);
 #endif
 
+	m_db.InitDb();
+
 	g_data.m_cfg = new FileConfigEx();
 	if (0 == g_data.m_cfg) {
 		return -1;
@@ -67,12 +69,34 @@ int CBusiness::DeInit() {
 	}
 
 	Clear();
+
+	m_db.DeinitDb();
+
 	return 0;
 }
 
+void  CBusiness::AddFloorAsyn(HWND hWnd, int nFloor) {
+	g_data.m_thrd_db->PostMessage(this, MSG_ADD_FLOOR, new CAddFloorParam(hWnd, nFloor));
+}
+
+void  CBusiness::AddFloor(const CAddFloorParam * pParam) {
+	BOOL bRet = m_db.AddFloor(pParam);
+	::PostMessage(pParam->m_hWnd, UM_ADD_FLOOR_RET, bRet, pParam->m_nFloor);
+}
 
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
+	switch (dwMessageId)
+	{
+	case MSG_ADD_FLOOR:
+	{
+		CAddFloorParam * pParam = (CAddFloorParam *)pMessageData;
+		AddFloor(pParam);
+	}
+	break;
 
+	default:
+		break;
+	}
 }

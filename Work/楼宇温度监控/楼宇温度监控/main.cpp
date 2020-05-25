@@ -28,22 +28,22 @@ void  CDuiFrameWnd::InitWindow() {
 	m_layDevices = (CTileLayoutUI *)m_PaintManager.FindControl("layDevices");
 
 #ifdef _DEBUG
-	for (int i = 0; i < 10; i++) {
-		AddFloor(i + 1);  
-	}
+	//for (int i = 0; i < 10; i++) {
+	//	AddFloor(i + 1);  
+	//}
 
-	for (int i = 0; i < 10; i++) {
-		CDeviceUI * pDevice = new CDeviceUI;
-		m_layDevices->Add(pDevice);
-	}
+	//for (int i = 0; i < 10; i++) {
+	//	CDeviceUI * pDevice = new CDeviceUI;
+	//	m_layDevices->Add(pDevice);
+	//}
 
-	CButtonUI * pBtn = new CButtonUI;
-	pBtn->SetText("+");
-	pBtn->SetFont(6); 
-	pBtn->SetBorderColor(0xFFC5C5C5);
-	pBtn->SetTextColor(0xFFC5C5C5);  
-	pBtn->SetBorderSize(1);
-	m_layDevices->Add(pBtn);
+	//CButtonUI * pBtn = new CButtonUI;
+	//pBtn->SetText("+");
+	//pBtn->SetFont(6); 
+	//pBtn->SetBorderColor(0xFFC5C5C5);
+	//pBtn->SetTextColor(0xFFC5C5C5);  
+	//pBtn->SetBorderSize(1);
+	//m_layDevices->Add(pBtn);
 #endif
 
 	m_layDevices->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnLayoutDevicesSize);
@@ -72,6 +72,8 @@ CControlUI * CDuiFrameWnd::CreateControl(LPCTSTR pstrClass) {
 }
 
 void CDuiFrameWnd::Notify(TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+
 	if ( msg.sType == "itemselect" ) {
 		if ( msg.pSender == m_lstFloors ) {
 			OnFloorSelected(msg.lParam);
@@ -86,6 +88,11 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 	else if (msg.sType == "device_dbclick") {
 		
 	}
+	else if (msg.sType == "click") {
+		if (strName == "btnAddFloor") {
+			OnAddFloor();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -99,10 +106,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 void CDuiFrameWnd::AddFloor(int nFloor) {
 	CDuiString  strText;
 
-	if (nFloor == 0)
-		return;
-
-	if ( nFloor > 0 ) {
+	if ( nFloor >= 0 ) {
 		strText.Format("%3d楼", nFloor);
 	}
 	else if (nFloor < 0) {
@@ -122,6 +126,7 @@ void CDuiFrameWnd::AddFloor(int nFloor) {
 	pListContainerElement->Add(pLayout);
 
 	CLabelUI * pLabel = new CLabelUI;
+	pLabel->SetName("lblFloor");
 	pLabel->SetFixedWidth(200);
 	pLabel->SetFont(2);
 	pLabel->SetTextColor(0xFF447AA1);
@@ -135,13 +140,27 @@ void CDuiFrameWnd::AddFloor(int nFloor) {
 	CControlUI * pWarning = new CControlUI;
 	pWarning->SetFixedWidth(20);
 	pWarning->SetFixedHeight(20);
-	pWarning->SetBkImage("warning.png"); 
+	//pWarning->SetBkImage("warning.png"); 
 	pVLayout->Add(pWarning);
 
 	pHolder = new CControlUI;
 	pVLayout->Add(pHolder);
 
 	pLayout->Add(pVLayout);      
+}
+
+void  CDuiFrameWnd::SetFloor(CListContainerElementUI * pItem, int nFloor) {
+	CLabelUI * pLblFloor = (CLabelUI *)pItem->FindControl(FindControlByName, "lblFloor",0);
+	if ( pLblFloor ) {
+		CDuiString strText;
+		if (nFloor >= 0) {
+			strText.Format("%d楼", nFloor);
+		}
+		else if (nFloor < 0) {
+			strText.Format("地下%d楼", -nFloor);
+		}
+		pLblFloor->SetText(strText);
+	}
 }
 
 CControlUI* CALLBACK FindFloorLabel (CControlUI* pControl, LPVOID) {
@@ -201,6 +220,162 @@ void CDuiFrameWnd::OnDeviceUnHighlight(CDeviceUI * pDevice) {
 	if (pDevice == m_pHighlightDevice) {
 		m_pHighlightDevice = 0;
 	}	
+}
+
+void CDuiFrameWnd::OnAddFloor() {
+	RECT rect;
+	::GetWindowRect(GetHWND(), &rect);
+
+	CAddFloorDlg * pDlg = new CAddFloorDlg;
+	pDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	::MoveWindow(pDlg->GetHWND(), rect.left + 50, rect.top + 100, 300, 200, TRUE);
+	int ret = pDlg->ShowModal();
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pDlg;
+		return;   
+	}
+
+	m_vFloors.push_back(pDlg->m_nFloor);
+	std::sort(m_vFloors.begin(), m_vFloors.end(), sortInt);
+	UpdateFloors();
+
+	delete pDlg;
+}
+
+void CDuiFrameWnd::UpdateFloors() {
+	int nCnt   = (int)m_vFloors.size();
+	int nUiCnt = m_lstFloors->GetCount();
+	int nDiff = 0;
+
+	int nOldSelNo = 0;
+	int nOldSel = m_lstFloors->GetCurSel();
+	if (nOldSel >= 0) {
+		nOldSelNo = m_lstFloors->GetItemAt(nOldSel)->GetTag();
+	}
+
+	if (nCnt > nUiCnt) {
+		nDiff = nCnt - nUiCnt;
+		for (int i = 0; i < nDiff; i++) {
+			AddFloor(0);
+		}
+	}
+	else if (nCnt < nUiCnt) {
+		nDiff = nUiCnt - nCnt;
+		for (int i = 0; i < nDiff; i++) {
+			m_lstFloors->RemoveAt(0);
+		}
+	}
+
+	CDuiString strText;
+	for (int i = 0; i < nCnt; i++) {
+		int    nFloor  = m_vFloors[i];
+
+		CListContainerElementUI * pItem = (CListContainerElementUI *)m_lstFloors->GetItemAt(i);
+		SetFloor(pItem, nFloor);
+		pItem->SetTag(nFloor);
+	}
+
+	if (nOldSelNo != 0) {
+		int i = 0;
+		for (i = 0; i < nCnt; i++) {
+			CListContainerElementUI * pItem = (CListContainerElementUI *)m_lstFloors->GetItemAt(i);
+			if (pItem->GetTag() == nOldSelNo) {
+				m_lstFloors->SelectItem(i);
+				break;
+			}
+		}
+
+		// 如果没有找到
+		if (i >= nCnt) {
+			if (nCnt > 0) {
+				m_lstFloors->SelectItem(0);
+			}
+		}
+	}
+	else {
+		if (nCnt > 0) {
+			m_lstFloors->SelectItem(0);
+		}
+	}
+
+	UpdateDevices();
+}
+
+void CDuiFrameWnd::UpdateDevices() {
+	int nSel = m_lstFloors->GetCurSel();
+	if ( nSel < 0 ) {
+		m_layDevices->RemoveAll();	
+	}
+	else {
+		int  nFloor = m_lstFloors->GetItemAt(nSel)->GetTag();
+		//CBusiness::GetInstance()->GetRoomDataAsyn(dwNo);
+	}
+}
+
+
+
+
+
+
+CAddFloorDlg::CAddFloorDlg() {
+	m_edFloor = 0;
+	m_opUnderGround = 0;
+	m_nFloor = 0;
+}
+
+void  CAddFloorDlg::Notify(DuiLib::TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+	if (msg.sType == "click") {
+		if (strName == "btnOK") {
+			OnBtnOk();
+		}
+	}
+	WindowImplBase::Notify(msg);
+}
+
+void  CAddFloorDlg::OnBtnOk() {
+	BOOL bUnderGround = m_opUnderGround->IsSelected() ? TRUE : FALSE;
+
+	CDuiString strText = m_edFloor->GetText();
+	int nFloor = 0;
+	sscanf(strText, "%d", &nFloor);
+	if (nFloor <= 0) {
+		MessageBox(GetHWND(), "楼层输入有误", "错误", 0);
+		return;
+	}
+
+	if (bUnderGround) {
+		nFloor = -nFloor;
+	}
+
+	CBusiness::GetInstance()->AddFloorAsyn(GetHWND(),nFloor);
+}
+
+void  CAddFloorDlg::InitWindow() {
+	m_edFloor = (CEditUI * )m_PaintManager.FindControl("edtFloor");
+	m_opUnderGround = (COptionUI *)m_PaintManager.FindControl("radio2");
+	WindowImplBase::InitWindow();
+}
+
+LRESULT  CAddFloorDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if ( uMsg == UM_ADD_FLOOR_RET ) {
+		BOOL bRet = (BOOL)wParam;
+		if (bRet) {
+			m_nFloor = lParam;			
+			this->PostMessage(WM_CLOSE);
+		}
+		else {
+			MessageBox(GetHWND(), "添加楼层失败！", "错误", 0);
+		}
+	}
+	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+}
+
+DuiLib::CControlUI * CAddFloorDlg::CreateControl(LPCTSTR pstrClass) {
+	return 0;
 }
    
 

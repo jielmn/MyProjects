@@ -19,6 +19,10 @@ using namespace DuiLib;
 #define   SKIN_FILE               ("mainframe_" PROJ_NAME ".xml")
 #define   SKIN_FOLDER             ("res\\proj_" PROJ_NAME "_res")
 
+#define   MSG_ADD_FLOOR             100
+
+#define   UM_ADD_FLOOR_RET          (WM_USER + 1)
+
 
 class  CGlobalData {
 public:
@@ -34,6 +38,17 @@ public:
 		m_thrd_db = 0;
 		m_hWnd = 0;
 	}
+};
+
+class CAddFloorParam : public LmnToolkits::MessageData {
+public:
+	CAddFloorParam(HWND hWnd, int nFloor) {
+		m_hWnd   = hWnd;
+		m_nFloor = nFloor;
+	}
+
+	HWND    m_hWnd;
+	int     m_nFloor;
 };
 
 // 创建duilib控件的回调
@@ -52,6 +67,9 @@ public:
 
 
 extern CGlobalData  g_data;
+
+extern bool sortInt(int d1, int d2);
+extern CControlUI* CALLBACK FindControlByName(CControlUI* pSubControl, LPVOID pParam);
 
 
 // templates
