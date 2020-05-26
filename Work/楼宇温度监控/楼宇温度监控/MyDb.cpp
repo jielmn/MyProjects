@@ -20,12 +20,12 @@ int CMySqliteDatabase::InitDb() {
 		"id         INTEGER        NOT NULL  PRIMARY KEY");             // Â¥²ã
 
 	CreateTable(DEVICES_TABLE,
-		"floor_id     INTEGER        NOT NULL," \
 		"device_id    INTEGER        NOT NULL," \
+		"floor_id     INTEGER        NOT NULL," \
 		"address      VARCHAR(48)    NOT NULL," \
 		"temperature  int            NOT NULL," \
 		"time         int            NOT NULL," \
-		"PRIMARY KEY(floor_id,  device_id)");
+		"PRIMARY KEY(device_id)");
 
 	return 0; 
 }

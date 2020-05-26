@@ -348,34 +348,54 @@ void CDuiFrameWnd::UpdateDevices() {
 void   CDuiFrameWnd::UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFloor) {
 	int nSel = m_lstFloors->GetCurSel();
 	if (nSel < 0) {
+		m_layDevices->RemoveAll();
+		m_lblDevicesTitle->SetText("实时数据显示(单位：℃)");
 		return;
 	}
+
+	int nUiItemCnt = m_layDevices->GetCount();
+	int nDataItemCnt = vRet.size();
+
+	// 如果没有button，则添加button
+	if (nUiItemCnt == 0) {
+		CButtonUI * pBtn = new CButtonUI;
+		pBtn->SetText("+");
+		pBtn->SetFont(6);
+		pBtn->SetBorderColor(0xFFC5C5C5);
+		pBtn->SetTextColor(0xFFC5C5C5);
+		pBtn->SetBorderSize(1);
+		pBtn->SetName("btnAddDevice");
+		m_layDevices->Add(pBtn);
+	}
+	else {
+		nUiItemCnt--;
+	}
+
+	int nDiff = 0;
+	if ( nUiItemCnt < nDataItemCnt ) {
+		nDiff = nDataItemCnt - nUiItemCnt;
+		for ( int i = 0; i < nDiff; i++ ) {
+			CDeviceUI * pDevice = new CDeviceUI;
+			m_layDevices->AddAt(pDevice, nUiItemCnt + i);
+		}
+	}
+	else if (nUiItemCnt > nDataItemCnt) {
+		nDiff = nUiItemCnt - nDataItemCnt;
+		for (int i = 0; i < nDiff; i++) {
+			m_layDevices->RemoveAt(0);
+		}
+	}
+	nUiItemCnt = nDataItemCnt;
 
 	CDuiString  strText;
 	strText.Format("#%d 实时数据显示(单位：℃)", nFloor);
 	m_lblDevicesTitle->SetText(strText);
 
-	//int nCnt = m_layDevices->GetCount();
-	//std::vector<DeviceItem*>::iterator it;
+	std::vector<DeviceItem*>::iterator it;
 
-	//for (int i = 0; i < nCnt; i++) {
-	//	if ( i < nCnt - 1 ) {
-	//		CDeskUI * pDesk = (CDeskUI *)m_layDesks->GetItemAt(i);
-	//		DWORD dwPos = pDesk->GetTag();
-	//		it = std::find_if(vRet.begin(), vRet.end(), CFindDeskObj(dwPos));
-	//		if (it == vRet.end()) {
-	//			pDesk->SetValid(FALSE);
-	//			pDesk->UpdateUI();
-	//		}
-	//		else {
-	//			memcpy(&pDesk->m_data, *it, sizeof(DeskItem));
-	//			pDesk->UpdateUI();
-	//		}
-	//	}
-	//	else {
-
-	//	}		
-	//}
+	for (int i = 0; i < nDataItemCnt; i++) {
+		CDeviceUI * pDevice = (CDeviceUI *)m_layDevices->GetItemAt(i);
+	}
 }
 
 void   CDuiFrameWnd::CheckDeviceCom() {
