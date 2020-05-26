@@ -114,6 +114,7 @@ private:
 	void   OnDeviceUnHighlight(CDeviceUI * pDevice);
 
 	void   OnAddFloor();
+	void   OnDelFloor();
 	void   UpdateFloors();
 	void   SetFloor(CListContainerElementUI * pItem, int nFloor);
 

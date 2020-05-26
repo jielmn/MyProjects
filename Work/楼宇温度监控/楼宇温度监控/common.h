@@ -26,12 +26,14 @@ using namespace DuiLib;
 #define   MSG_GET_DEVICES_BY_FLOOR        102
 #define   MSG_ADD_DEVICE                  103
 #define   MSG_DEL_DEVICE                  104
+#define   MSG_DEL_FLOOR                   105
 
 #define   UM_ADD_FLOOR_RET                (WM_USER + 1)
 #define   UM_GET_ALL_FLOORS_RET           (WM_USER + 2)
 #define   UM_GET_DEVICES_BY_FLOOR_RET     (WM_USER + 3)
 #define   UM_ADD_DEVICE_RET               (WM_USER + 4)
 #define   UM_DEL_DEVICE_RET               (WM_USER + 5)
+#define   UM_DEL_FLOOR_RET                (WM_USER + 6)
 
 class  CGlobalData {
 public:
@@ -97,6 +99,14 @@ public:
 		m_nDeviceId = nDeviceId;
 	}
 	int     m_nDeviceId;
+};
+
+class CDelFloorParam : public LmnToolkits::MessageData {
+public:
+	CDelFloorParam(int nFloor) {
+		m_nFloor = nFloor;
+	}
+	int     m_nFloor;
 };
 
 // 创建duilib控件的回调

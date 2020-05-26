@@ -159,3 +159,17 @@ BOOL  CMySqliteDatabase::DeleteDevice(const CDelDeviceParam * pParam) {
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
 	return TRUE;
 }
+
+BOOL  CMySqliteDatabase::DeleteFloor(const CDelFloorParam * pParam) {
+
+	char  szSql[8192];
+	SNPRINTF( szSql, sizeof(szSql), "DELETE FROM %s WHERE floor_id=%d",
+		      DEVICES_TABLE, pParam->m_nFloor );
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+	SNPRINTF( szSql, sizeof(szSql), "DELETE FROM %s WHERE id=%d",
+		      FLOORS_TABLE, pParam->m_nFloor);
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+	return TRUE;
+}

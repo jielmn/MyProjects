@@ -31,6 +31,9 @@ public:
 	void  DeleteDeviceAsyn(int nDeviceId);
 	void  DeleteDevice(const CDelDeviceParam * pParam);
 
+	void  DeleteFloorAsyn(int nFloor);
+	void  DeleteFloor(const CDelFloorParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

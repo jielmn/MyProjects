@@ -77,6 +77,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (strName == "btnAddFloor") {
 			OnAddFloor();
 		}
+		else if (strName == "btnDelFloor") {
+			OnDelFloor();
+		}
 		else if (strName == "btnAddDevice") {
 			OnAddDevice();
 		}
@@ -132,6 +135,21 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 		else {
 			MessageBox(GetHWND(), "É¾³ýÉè±¸Ê§°Ü!", "´íÎó", 0);
+		}
+	}
+	else if (UM_DEL_FLOOR_RET == uMsg) {
+		BOOL  bRet   = wParam;
+		int   nFloor = lParam;
+
+		if ( bRet ) {
+			std::vector<int>::iterator it = std::find(m_vFloors.begin(), m_vFloors.end(), nFloor);
+			if ( it != m_vFloors.end() ) {
+				m_vFloors.erase(it);
+				UpdateFloors();
+			}			
+		}
+		else {
+			MessageBox(GetHWND(), "É¾³ýÂ¥²ãÊ§°Ü!", "´íÎó", 0);
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
@@ -281,6 +299,18 @@ void CDuiFrameWnd::OnAddFloor() {
 	delete pDlg;
 }
 
+void  CDuiFrameWnd::OnDelFloor() {
+	int nFloor = GetCurrentFloor();
+	if (nFloor == 0) {
+		return;
+	}
+
+	if ( IDYES == MessageBox(GetHWND(), "ÄãÈ·¶¨ÒªÉ¾³ý¸ÃÂ¥²ãÂð£¿", "É¾³ýÂ¥²ã", 
+		 MB_YESNO | MB_DEFBUTTON2) ) {
+		CBusiness::GetInstance()->DeleteFloorAsyn(nFloor);
+	}	
+}
+
 void CDuiFrameWnd::UpdateFloors() {
 	int nCnt   = (int)m_vFloors.size();
 	int nUiCnt = m_lstFloors->GetCount();
@@ -314,7 +344,6 @@ void CDuiFrameWnd::UpdateFloors() {
 		pItem->SetTag(nFloor);
 	}
 
-	BOOL  bUpdated = FALSE;
 	if (nOldSelNo != 0) {
 		int i = 0;
 		for (i = 0; i < nCnt; i++) {
@@ -329,19 +358,16 @@ void CDuiFrameWnd::UpdateFloors() {
 		if (i >= nCnt) {
 			if (nCnt > 0) {
 				m_lstFloors->SelectItem(0);
-				bUpdated = TRUE;
 			}
 		}
 	}
 	else {
 		if (nCnt > 0) {
 			m_lstFloors->SelectItem(0);
-			bUpdated = TRUE;
 		}
 	}
 
-	if ( !bUpdated )
-		UpdateDevices();
+	UpdateDevices();
 }
 
 void CDuiFrameWnd::UpdateDevices() {

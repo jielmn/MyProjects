@@ -14,6 +14,7 @@ public:
 	void  GetDevicesByFloor(const CGetDevicesParam * pParam, std::vector<DeviceItem*> & vRet);
 	BOOL  AddDevice(const CAddDeviceParam * pParam);
 	BOOL  DeleteDevice(const CDelDeviceParam * pParam);
+	BOOL  DeleteFloor(const CDelFloorParam * pParam);
 
 private:
 	// szTableName: 要创建的表名

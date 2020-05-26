@@ -132,6 +132,15 @@ void  CBusiness::DeleteDevice(const CDelDeviceParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_DEL_DEVICE_RET, bRet, pParam->m_nDeviceId);
 }
 
+void CBusiness::DeleteFloorAsyn(int nFloor) {
+	g_data.m_thrd_db->PostMessage(this, MSG_DEL_FLOOR, new CDelFloorParam(nFloor));
+}
+
+void CBusiness::DeleteFloor(const CDelFloorParam * pParam) {
+	BOOL bRet = m_db.DeleteFloor(pParam);
+	::PostMessage(g_data.m_hWnd, UM_DEL_FLOOR_RET, bRet, pParam->m_nFloor);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -168,6 +177,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CDelDeviceParam * pParam = (CDelDeviceParam *)pMessageData;
 		DeleteDevice(pParam);
+	}
+	break;
+
+	case MSG_DEL_FLOOR:
+	{
+		CDelFloorParam * pParam = (CDelFloorParam *)pMessageData;
+		DeleteFloor(pParam);
 	}
 	break;
 
