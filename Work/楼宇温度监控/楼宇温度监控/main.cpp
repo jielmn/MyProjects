@@ -415,6 +415,28 @@ void  CDuiFrameWnd::OnAddDevice() {
 		return;
 	}
 
+	int nUiItemCnt = m_layDevices->GetCount();
+	assert(nUiItemCnt > 0);
+	// 如果没有button，则添加button
+	if (nUiItemCnt == 0) {
+		CButtonUI * pBtn = new CButtonUI;
+		pBtn->SetText("+");
+		pBtn->SetFont(6);
+		pBtn->SetBorderColor(0xFFC5C5C5);
+		pBtn->SetTextColor(0xFFC5C5C5);
+		pBtn->SetBorderSize(1);
+		pBtn->SetName("btnAddDevice");
+		m_layDevices->Add(pBtn);
+	}
+	else {
+		nUiItemCnt--;
+	}
+
+
+	CDeviceUI * pDevice = new CDeviceUI;
+	m_layDevices->AddAt(pDevice, nUiItemCnt);
+
+
 	delete pDlg;
 }
 
@@ -500,6 +522,9 @@ CAddDeviceDlg::CAddDeviceDlg() {
 	m_lblFloor = 0;
 	m_edDeviceId = 0;
 	m_edDeviceAddress = 0;
+
+	m_nDeviceId = 0;
+	memset( m_szDeviceAddr, 0, sizeof(m_szDeviceAddr)) ;
 }
 
 void  CAddDeviceDlg::Notify(DuiLib::TNotifyUI& msg) {
@@ -524,6 +549,22 @@ void  CAddDeviceDlg::InitWindow() {
 }
 
 LRESULT  CAddDeviceDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	if ( uMsg == UM_ADD_DEVICE_RET ) {
+		BOOL  bRet = wParam;
+		DeviceItem * pDevice = (DeviceItem *)lParam;
+
+		if (bRet) {
+			m_nDeviceId = pDevice->nDeviceNo;
+			STRNCPY(m_szDeviceAddr, pDevice->szAddr, sizeof(m_szDeviceAddr));
+			this->PostMessage(WM_CLOSE);
+		}
+		else {
+			MessageBox(GetHWND(), "添加设备失败！", "错误", 0);
+		}
+
+		if (pDevice)
+			delete pDevice;
+	}
 	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
 }
 
@@ -554,7 +595,7 @@ void  CAddDeviceDlg::OnBtnOk() {
 		return;
 	} 
 
-	//CBusiness::GetInstance()->AddFloorAsyn(GetHWND(), nFloor);
+	CBusiness::GetInstance()->AddDeviceAsyn(GetHWND(), m_nFloor, nDeviceId, strAddress);
 }
 
 

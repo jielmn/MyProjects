@@ -24,10 +24,12 @@ using namespace DuiLib;
 #define   MSG_ADD_FLOOR                   100
 #define   MSG_GET_ALL_CLASSES             101
 #define   MSG_GET_DEVICES_BY_FLOOR        102
+#define   MSG_ADD_DEVICE                  103
 
 #define   UM_ADD_FLOOR_RET                (WM_USER + 1)
 #define   UM_GET_ALL_FLOORS_RET           (WM_USER + 2)
 #define   UM_GET_DEVICES_BY_FLOOR_RET     (WM_USER + 3)
+#define   UM_ADD_DEVICE_RET               (WM_USER + 4)
 
 class  CGlobalData {
 public:
@@ -71,6 +73,21 @@ typedef  struct  tagDeviceItem {
 	int     nTemp;
 	time_t  time;
 }DeviceItem;
+
+class CAddDeviceParam : public LmnToolkits::MessageData {
+public:
+	CAddDeviceParam(HWND hWnd, int nFloor, int nDeviceId, const char * szDeviceAddr) {
+		m_hWnd = hWnd;
+		m_nFloor = nFloor;
+		m_nDeviceId = nDeviceId;
+		STRNCPY(m_szDeviceAddr, szDeviceAddr, sizeof(m_szDeviceAddr));
+	}
+
+	HWND    m_hWnd;
+	int     m_nFloor;
+	int     m_nDeviceId;
+	char    m_szDeviceAddr[32];
+};
 
 // 创建duilib控件的回调
 class CDialogBuilderCallbackEx : public IDialogBuilderCallback

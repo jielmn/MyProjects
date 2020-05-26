@@ -59,6 +59,8 @@ private:
 
 public:
 	int     m_nFloor;
+	int     m_nDeviceId;
+	char    m_szDeviceAddr[32];
 };
 
  

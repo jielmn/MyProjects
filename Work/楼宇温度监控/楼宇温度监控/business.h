@@ -25,6 +25,9 @@ public:
 	void  GetDevicesByFloorAsyn(int nFloor);
 	void  GetDevicesByFloor(const CGetDevicesParam * pParam);
 
+	void  AddDeviceAsyn(HWND hWnd, int nFloor, int nDeviceId, const char * szDeviceAddr);
+	void  AddDevice(const CAddDeviceParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

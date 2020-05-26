@@ -104,6 +104,25 @@ void  CBusiness::GetDevicesByFloor(const CGetDevicesParam * pParam) {
 	::PostMessage(g_data.m_hWnd, UM_GET_DEVICES_BY_FLOOR_RET, (WPARAM)pvRet, pParam->m_nFloor);
 }
 
+void  CBusiness::AddDeviceAsyn(HWND hWnd, int nFloor, int nDeviceId, const char * szDeviceAddr) {
+	g_data.m_thrd_db->PostMessage(this, MSG_ADD_DEVICE, new CAddDeviceParam(hWnd, nFloor, nDeviceId, szDeviceAddr));
+}
+
+void  CBusiness::AddDevice(const CAddDeviceParam * pParam) {
+	BOOL bRet = m_db.AddDevice(pParam);
+	
+	DeviceItem * pDevice = 0;
+	if (bRet) {
+		pDevice = new DeviceItem;
+		memset(pDevice, 0, sizeof(DeviceItem));
+		pDevice->nFloor = pParam->m_nFloor;
+		pDevice->nDeviceNo = pParam->m_nDeviceId;
+		STRNCPY(pDevice->szAddr, pParam->m_szDeviceAddr, sizeof(pDevice->szAddr));
+	}	
+
+	::PostMessage( pParam->m_hWnd, UM_ADD_DEVICE_RET, bRet, (LPARAM)pDevice );
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -126,6 +145,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CGetDevicesParam * pParam = (CGetDevicesParam *)pMessageData;
 		GetDevicesByFloor(pParam);
+	}
+	break;
+
+	case MSG_ADD_DEVICE:
+	{
+		CAddDeviceParam * pParam = (CAddDeviceParam *)pMessageData;
+		AddDevice(pParam);
 	}
 	break;
 

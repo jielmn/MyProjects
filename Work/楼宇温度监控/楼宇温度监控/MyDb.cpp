@@ -102,3 +102,7 @@ void  CMySqliteDatabase::GetDevicesByFloor( const CGetDevicesParam * pParam,
 
 
 }
+
+BOOL  CMySqliteDatabase::AddDevice(const CAddDeviceParam * pParam) {
+	return FALSE;
+}
