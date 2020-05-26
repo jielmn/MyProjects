@@ -397,7 +397,12 @@ void   CDuiFrameWnd::UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFl
 	std::vector<DeviceItem*>::iterator it;
 
 	for (int i = 0; i < nDataItemCnt; i++) {
+		DeviceItem * pItem = vRet[i];
 		CDeviceUI * pDevice = (CDeviceUI *)m_layDevices->GetItemAt(i);
+
+		pDevice->SetAddress(pItem->szAddr);
+		pDevice->SetDeviceId(pItem->nDeviceNo);
+		pDevice->SetTemp(pItem->nTemp, pItem->time);         
 	}
 }
 
@@ -436,6 +441,8 @@ void  CDuiFrameWnd::OnAddDevice() {
 	CDeviceUI * pDevice = new CDeviceUI;
 	m_layDevices->AddAt(pDevice, nUiItemCnt);
 
+	pDevice->SetAddress(pDlg->m_szDeviceAddr);
+	pDevice->SetDeviceId(pDlg->m_nDeviceId);
 
 	delete pDlg;
 }

@@ -99,10 +99,55 @@ void  CMySqliteDatabase::GetAllFloors(std::vector<int> & vRet) {
 void  CMySqliteDatabase::GetDevicesByFloor( const CGetDevicesParam * pParam, 
 	                                        std::vector<DeviceItem*> & vRet ) {
 
+	char  szSql[8192];
+	SNPRINTF( szSql, sizeof(szSql), "SELECT * FROM %s WHERE floor_id = %d", 
+		      DEVICES_TABLE, pParam->m_nFloor );
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	char szAddr[256];
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		DeviceItem * pItem = new DeviceItem;
+		memset(pItem, 0, sizeof(DeviceItem));
+
+		pItem->nDeviceNo = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		GetStrFromdDb(szAddr, sizeof(szAddr), azResult[(i + 1)*ncolumn + 2]);
+		Utf8ToAnsi(pItem->szAddr, sizeof(pItem->szAddr), szAddr);
+		pItem->nTemp = GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+		pItem->time  = (time_t)GetIntFromDb(azResult[(i + 1)*ncolumn + 4]);
+
+		vRet.push_back(pItem);
+	}
+	sqlite3_free_table(azResult);
 
 
 }
 
 BOOL  CMySqliteDatabase::AddDevice(const CAddDeviceParam * pParam) {
+
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE device_id=%d",
+		DEVICES_TABLE, pParam->m_nDeviceId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+								  //char *zErrMsg = 0;          // 错误描述
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	sqlite3_free_table(azResult);
+
+	char szAddr[256];
+	char szTemp[256];
+	StrReplaceAll(szTemp, sizeof(szTemp), pParam->m_szDeviceAddr, "'", "''");
+	AnsiToUtf8(szAddr, sizeof(szAddr), szTemp);
+
+	if (0 == nrow) {
+		SNPRINTF( szSql, sizeof(szSql), "INSERT INTO %s VALUES (%d, %d, '%s', 0, 0) ", 
+			      DEVICES_TABLE, pParam->m_nDeviceId, pParam->m_nFloor, szAddr );
+		sqlite3_exec(m_db, szSql, 0, 0, 0);
+		return TRUE;
+	}
+
 	return FALSE;
 }

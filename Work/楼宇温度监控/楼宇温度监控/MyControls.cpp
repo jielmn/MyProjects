@@ -9,6 +9,14 @@ CDeviceUI::CDeviceUI() : m_callback(m_pManager) {
 	m_rule = 0;
 	m_btnDel = 0;
 	m_bHighlight = FALSE;
+
+	m_nDeviceId    = 0;
+	m_nTemperature = 0;
+	m_tTime        = 0;
+
+	m_lblAddress = 0;
+	m_lblDeviceId = 0;
+	m_lblTemp = 0;
 }
 
 CDeviceUI::~CDeviceUI() {
@@ -36,6 +44,16 @@ void CDeviceUI::DoInit() {
 
 	m_btnDel = (CButtonUI *)m_pManager->FindControl("btnDel");
 	m_btnDel->SetVisible(false);
+
+	m_lblAddress = (CLabelUI *)m_pManager->FindControl("lblAddress");
+	m_lblDeviceId = (CLabelUI *)m_pManager->FindControl("lblDeviceId");
+	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp");
+
+	SetTemp();
+	SetAddress();
+	SetDeviceId();
+
+	m_rule->SetTemp(m_nTemperature);
 
 	this->SetFixedWidth(FIXED_WIDTH);
 	this->SetFixedHeight(FIXED_HEIGHT);
@@ -83,6 +101,44 @@ void  CDeviceUI::SetHighlight(BOOL bHighlight) {
 	}
 }
 
+void  CDeviceUI::SetAddress(const char * szAddr) {
+	m_strAddress = szAddr;
+	SetAddress();
+}
+
+void  CDeviceUI::SetTemp(int nTemp, time_t tTime) {
+	m_nTemperature = nTemp;
+	m_tTime = tTime;
+	SetTemp();
+}
+
+void  CDeviceUI::SetDeviceId(int nDeviceId) {
+	m_nDeviceId = nDeviceId;
+	SetDeviceId();
+}
+
+void  CDeviceUI::SetAddress( ) {
+	if ( m_bInitiated ) {
+		m_lblAddress->SetText(m_strAddress);
+	}
+}
+
+void  CDeviceUI::SetTemp( ) {
+	if (m_bInitiated) {
+		CDuiString  strText;
+		strText.Format("%.1f", round(m_nTemperature / 100.0f) );
+		m_lblTemp->SetText(strText);
+	}
+}
+
+void  CDeviceUI::SetDeviceId( ) {
+	if (m_bInitiated) {
+		CDuiString  strText;
+		strText.Format("%d", m_nDeviceId);
+		m_lblDeviceId->SetText(strText);
+	}
+}
+
 
 
 
@@ -109,6 +165,10 @@ CTempRuleUI::~CTempRuleUI() {
 
 LPCTSTR CTempRuleUI::GetClass() const {
 	return "TempRule";
+}
+
+void  CTempRuleUI::SetTemp(int nTemp) {
+	m_nTemp = nTemp;
 }
 
 // scale range: 0 - 120 …„ œ∂»

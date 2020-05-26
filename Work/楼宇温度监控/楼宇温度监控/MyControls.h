@@ -11,6 +11,7 @@ public:
 	CTempRuleUI();
 	~CTempRuleUI();
 	LPCTSTR GetClass() const;
+	void  SetTemp(int nTemp);
 
 	static int  RULE_WIDTH;
 	static int  RULE_HEIGHT;
@@ -33,6 +34,9 @@ public:
 	CDeviceUI();
 	~CDeviceUI();
 	void  SetHighlight(BOOL bHighlight);
+	void  SetAddress(const char * szAddr);
+	void  SetTemp(int nTemp, time_t tTime);
+	void  SetDeviceId(int nDeviceId);
 
 	static int FIXED_WIDTH;
 	static int FIXED_HEIGHT;
@@ -44,15 +48,27 @@ private:
 	virtual void DoEvent(DuiLib::TEventUI& event);
 	void Notify(TNotifyUI& msg);
 
+	void  SetAddress();
+	void  SetTemp();
+	void  SetDeviceId();
+
 private:
 	CDialogBuilderCallbackEx                    m_callback;
 
 	CTempRuleUI *                               m_rule;
 	CButtonUI *                                 m_btnDel;
 
+	CLabelUI *                                  m_lblAddress;
+	CLabelUI *                                  m_lblDeviceId;
+	CLabelUI *                                  m_lblTemp;
+
 
 private:
 	BOOL                                        m_bHighlight;
+	CDuiString                                  m_strAddress;
+	int                                         m_nDeviceId;
+	int                                         m_nTemperature;
+	time_t                                      m_tTime;
 };
 
 
