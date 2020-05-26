@@ -10,26 +10,26 @@
 			<VerticalLayout bordersize="1" bordercolor="#FFC5C5C5" inset="10,10,10,2" >
 				<HorizontalLayout height="24">
 					<Label text="位置：" width="50" font="3" textcolor="#FF447AA1" />
-					<Label text="xxxx" font="3" textcolor="#FF447AA1" name="lblAddress" />
+					<Label text="" font="3" textcolor="#FF447AA1" name="lblAddress" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout height="10" />
 				
 				<HorizontalLayout height="34">
 					<Label text="温度：" width="50" font="3" textcolor="#FF447AA1" />
-					<Label text="32.23" font="5" textcolor="#FF14B914" name="lblTemp" />
+					<Label text="" font="5" textcolor="#FF14B914" name="lblTemp" />
 				</HorizontalLayout>
 								
 				<HorizontalLayout height="20">
 					<Label text="时间：" width="50" font="3" textcolor="#FF447AA1" />
-					<Label text="2020-05-18 09:19:12" font="3" textcolor="#FF447AA1" name="lblTime" />
+					<Label text="" font="3" textcolor="#FF447AA1" name="lblTime" />
 				</HorizontalLayout>
 				
 				<HorizontalLayout />
 				
 				<HorizontalLayout height="20">
 					<Label text="编号：" width="50" font="3" textcolor="#FF447AA1" />
-					<Label text="1" font="3" textcolor="#FF447AA1" name="lblDeviceId" />
+					<Label text="" font="3" textcolor="#FF447AA1" name="lblDeviceId" />
 				</HorizontalLayout>
 				
 			</VerticalLayout>

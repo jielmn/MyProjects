@@ -61,6 +61,7 @@ private:
 	CLabelUI *                                  m_lblAddress;
 	CLabelUI *                                  m_lblDeviceId;
 	CLabelUI *                                  m_lblTemp;
+	CLabelUI *                                  m_lblTempTime;
 
 
 private:

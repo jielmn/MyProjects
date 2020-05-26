@@ -17,6 +17,7 @@ CDeviceUI::CDeviceUI() : m_callback(m_pManager) {
 	m_lblAddress = 0;
 	m_lblDeviceId = 0;
 	m_lblTemp = 0;
+	m_lblTempTime = 0;
 }
 
 CDeviceUI::~CDeviceUI() {
@@ -48,6 +49,7 @@ void CDeviceUI::DoInit() {
 	m_lblAddress = (CLabelUI *)m_pManager->FindControl("lblAddress");
 	m_lblDeviceId = (CLabelUI *)m_pManager->FindControl("lblDeviceId");
 	m_lblTemp = (CLabelUI *)m_pManager->FindControl("lblTemp");
+	m_lblTempTime = (CLabelUI *)m_pManager->FindControl("lblTime");
 
 	SetTemp();
 	SetAddress();
@@ -126,8 +128,19 @@ void  CDeviceUI::SetAddress( ) {
 void  CDeviceUI::SetTemp( ) {
 	if (m_bInitiated) {
 		CDuiString  strText;
-		strText.Format("%.1f", round(m_nTemperature / 100.0f) );
-		m_lblTemp->SetText(strText);
+		char  szTime[256];
+
+		if (m_nTemperature > 0 && m_tTime > 0) {
+			strText.Format("%.1f", round(m_nTemperature / 100.0f));
+			m_lblTemp->SetText(strText);
+
+			LmnFormatTime(szTime, sizeof(szTime), m_tTime, "%Y-%m-%d %H:%M:%S");
+			m_lblTempTime->SetText(szTime);
+		}
+		else {
+			m_lblTemp->SetText("");
+			m_lblTempTime->SetText(""); 
+		}
 	}
 }
 
