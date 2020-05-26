@@ -96,6 +96,9 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		if (strName == "btnAddFloor") {
 			OnAddFloor();
 		}
+		else if (strName == "btnAddDevice") {
+			OnAddDevice();
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -398,10 +401,36 @@ void   CDuiFrameWnd::UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFl
 	}
 }
 
-void   CDuiFrameWnd::CheckDeviceCom() {
+void  CDuiFrameWnd::OnAddDevice() {
+
+	CAddDeviceDlg * pDlg = new CAddDeviceDlg;
+	pDlg->m_nFloor = GetCurrentFloor();
+	pDlg->Create(this->m_hWnd, _T("设置"), UI_WNDSTYLE_FRAME | WS_POPUP, NULL, 0, 0, 0, 0);
+	pDlg->CenterWindow();
+	int ret = pDlg->ShowModal();
+
+	// 如果不是click ok
+	if (0 != ret) {
+		delete pDlg;
+		return;
+	}
+
+	delete pDlg;
+}
+
+void CDuiFrameWnd::CheckDeviceCom() {
 
 }
 
+int CDuiFrameWnd::GetCurrentFloor() {
+	int nSel = m_lstFloors->GetCurSel();
+	if ( nSel < 0 ) {
+		return 0;
+	}
+
+	return m_lstFloors->GetItemAt(nSel)->GetTag();
+}
+        
 
 
 
@@ -464,6 +493,37 @@ DuiLib::CControlUI * CAddFloorDlg::CreateControl(LPCTSTR pstrClass) {
 	return 0;
 }
    
+
+
+
+CAddDeviceDlg::CAddDeviceDlg() {
+	m_lblFloor = 0;
+	m_edDeviceId = 0;
+	m_edDeviceAddress = 0;
+}
+
+void  CAddDeviceDlg::Notify(DuiLib::TNotifyUI& msg) {
+	WindowImplBase::Notify(msg);
+}
+
+void  CAddDeviceDlg::InitWindow() {
+	m_lblFloor         = (CLabelUI *)m_PaintManager.FindControl("lblFloor");
+	m_edDeviceId       = (CEditUI *)m_PaintManager.FindControl("edDeviceNo");
+	m_edDeviceAddress  = (CEditUI *)m_PaintManager.FindControl("edAddress");
+
+	CDuiString  strText;
+	strText.Format("#%d", m_nFloor);
+	m_lblFloor->SetText(strText);
+	WindowImplBase::InitWindow();
+}
+
+LRESULT  CAddDeviceDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
+	return WindowImplBase::HandleMessage(uMsg, wParam, lParam);
+}
+
+DuiLib::CControlUI * CAddDeviceDlg::CreateControl(LPCTSTR pstrClass) {
+	return WindowImplBase::CreateControl(pstrClass);
+}
 
 
 

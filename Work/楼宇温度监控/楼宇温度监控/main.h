@@ -35,6 +35,29 @@ public:
 	int                          m_nFloor;
 };
 
+class CAddDeviceDlg : public DuiLib::WindowImplBase
+{
+public:
+	CAddDeviceDlg();
+
+	virtual LPCTSTR    GetWindowClassName() const { return "DUIAddDeviceFrame"; }
+	virtual DuiLib::CDuiString GetSkinFile() { return "AddDeviceDlg.xml"; }
+	virtual DuiLib::CDuiString GetSkinFolder() { return SKIN_FOLDER; }
+
+	virtual void   Notify(DuiLib::TNotifyUI& msg);
+	virtual void   InitWindow();
+	virtual LRESULT  HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
+
+private:
+	CLabelUI *                    m_lblFloor;
+	CEditUI *                     m_edDeviceId;
+	CEditUI *                     m_edDeviceAddress;
+
+public:
+	int     m_nFloor;
+};
+
  
 
  
@@ -92,6 +115,10 @@ private:
 	void   UpdateDevices();
 	void   UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFloor);
 
+	void   OnAddDevice();
+
 	// 硬件设备变动，可能有串口变动
 	void   CheckDeviceCom();
+
+	int    GetCurrentFloor();
 };
