@@ -7,7 +7,7 @@
 	<!-- 呼吸 -->
 	<Font   id="3" bold="false" italic="false" facename="Times new Roman" height="14" />
 	<!-- 血压 -->
-	<Font   id="4" bold="false" italic="false" facename="宋体" height="12" />
+	<Font   id="4" bold="false" italic="false" facename="宋体" height="10" />
 	
 	<Thread id="5" width="2" color="#ff0000" />
 	<Thread id="6" width="1" color="#000000" />
