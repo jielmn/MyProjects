@@ -151,3 +151,11 @@ BOOL  CMySqliteDatabase::AddDevice(const CAddDeviceParam * pParam) {
 
 	return FALSE;
 }
+
+BOOL  CMySqliteDatabase::DeleteDevice(const CDelDeviceParam * pParam) {
+	char  szSql[8192];
+	SNPRINTF( szSql, sizeof(szSql), "DELETE FROM %s WHERE device_id=%d",
+		      DEVICES_TABLE, pParam->m_nDeviceId);
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+	return TRUE;
+}

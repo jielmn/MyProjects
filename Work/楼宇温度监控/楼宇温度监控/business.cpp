@@ -123,6 +123,15 @@ void  CBusiness::AddDevice(const CAddDeviceParam * pParam) {
 	::PostMessage( pParam->m_hWnd, UM_ADD_DEVICE_RET, bRet, (LPARAM)pDevice );
 }
 
+void  CBusiness::DeleteDeviceAsyn(int nDeviceId) {
+	g_data.m_thrd_db->PostMessage(this, MSG_DEL_DEVICE, new CDelDeviceParam(nDeviceId));
+}
+
+void  CBusiness::DeleteDevice(const CDelDeviceParam * pParam) {
+	BOOL bRet = m_db.DeleteDevice(pParam);
+	::PostMessage(g_data.m_hWnd, UM_DEL_DEVICE_RET, bRet, pParam->m_nDeviceId);
+}
+
 
 // 消息处理
 void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData) {
@@ -152,6 +161,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	{
 		CAddDeviceParam * pParam = (CAddDeviceParam *)pMessageData;
 		AddDevice(pParam);
+	}
+	break;
+
+	case MSG_DEL_DEVICE:
+	{
+		CDelDeviceParam * pParam = (CDelDeviceParam *)pMessageData;
+		DeleteDevice(pParam);
 	}
 	break;
 

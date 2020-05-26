@@ -31,25 +31,6 @@ void  CDuiFrameWnd::InitWindow() {
 
 	m_lblDevicesTitle->SetText("");
 
-#ifdef _DEBUG
-	//for (int i = 0; i < 10; i++) {
-	//	AddFloor(i + 1);  
-	//}
-
-	//for (int i = 0; i < 10; i++) {
-	//	CDeviceUI * pDevice = new CDeviceUI;
-	//	m_layDevices->Add(pDevice);
-	//}
-
-	//CButtonUI * pBtn = new CButtonUI;
-	//pBtn->SetText("+");
-	//pBtn->SetFont(6); 
-	//pBtn->SetBorderColor(0xFFC5C5C5);
-	//pBtn->SetTextColor(0xFFC5C5C5);  
-	//pBtn->SetBorderSize(1);
-	//m_layDevices->Add(pBtn);
-#endif
-
 	m_layDevices->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnLayoutDevicesSize);
    
 	CBusiness::GetInstance()->GetAllFloorsAsyn();
@@ -99,6 +80,10 @@ void CDuiFrameWnd::Notify(TNotifyUI& msg) {
 		else if (strName == "btnAddDevice") {
 			OnAddDevice();
 		}
+		else if (strName == "btnDel") {
+			CControlUI * pParent = msg.pSender->GetParent()->GetParent()->GetParent()->GetParent();
+			OnDelDevice( (CDeviceUI *)pParent );
+		}
 	}
 	WindowImplBase::Notify(msg);
 }
@@ -125,6 +110,29 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		UpdateDevicesByFloor(*pvRet, nFloor);
 		ClearVector(*pvRet);
 		delete pvRet;
+	}
+	else if (UM_DEL_DEVICE_RET == uMsg) {
+		BOOL bRet = wParam;
+		int  nDeviceId = lParam;
+
+		if (bRet) {
+			int nCnt = m_layDevices->GetCount();
+			assert(nCnt > 0);
+			if ( nCnt > 0 ) {
+				nCnt--;
+			}
+
+			for ( int i = 0; i < nCnt; i++ ) {
+				CDeviceUI * pDevice = (CDeviceUI *)m_layDevices->GetItemAt(i);
+				if ( pDevice->GetDeviceId() == nDeviceId ) {
+					m_layDevices->RemoveAt(i); 
+					break;
+				}
+			}
+		}
+		else {
+			MessageBox(GetHWND(), "删除设备失败!", "错误", 0);
+		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -445,6 +453,13 @@ void  CDuiFrameWnd::OnAddDevice() {
 	pDevice->SetDeviceId(pDlg->m_nDeviceId);
 
 	delete pDlg;
+}
+
+void  CDuiFrameWnd::OnDelDevice(CDeviceUI * pDevice) {
+	if ( IDYES == MessageBox(GetHWND(), "你确定要删除该设备吗？", "删除设备", MB_YESNO | MB_DEFBUTTON2)) {
+		int nDeviceId = pDevice->GetDeviceId();
+		CBusiness::GetInstance()->DeleteDeviceAsyn(nDeviceId);
+	}
 }
 
 void CDuiFrameWnd::CheckDeviceCom() {

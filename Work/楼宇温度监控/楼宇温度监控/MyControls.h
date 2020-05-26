@@ -38,6 +38,8 @@ public:
 	void  SetTemp(int nTemp, time_t tTime);
 	void  SetDeviceId(int nDeviceId);
 
+	int   GetDeviceId();
+
 	static int FIXED_WIDTH;
 	static int FIXED_HEIGHT;
 

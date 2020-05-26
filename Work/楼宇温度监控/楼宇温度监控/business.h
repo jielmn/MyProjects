@@ -28,6 +28,9 @@ public:
 	void  AddDeviceAsyn(HWND hWnd, int nFloor, int nDeviceId, const char * szDeviceAddr);
 	void  AddDevice(const CAddDeviceParam * pParam);
 
+	void  DeleteDeviceAsyn(int nDeviceId);
+	void  DeleteDevice(const CDelDeviceParam * pParam);
+
 private:
 	static CBusiness *  pInstance;
 	void Clear();

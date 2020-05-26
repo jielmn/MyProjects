@@ -114,6 +114,10 @@ void  CDeviceUI::SetTemp(int nTemp, time_t tTime) {
 	SetTemp();
 }
 
+int  CDeviceUI::GetDeviceId() {
+	return m_nDeviceId;
+}
+
 void  CDeviceUI::SetDeviceId(int nDeviceId) {
 	m_nDeviceId = nDeviceId;
 	SetDeviceId();

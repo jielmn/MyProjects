@@ -121,6 +121,7 @@ private:
 	void   UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFloor);
 
 	void   OnAddDevice();
+	void   OnDelDevice(CDeviceUI * pDevice);
 
 	// 硬件设备变动，可能有串口变动
 	void   CheckDeviceCom();
