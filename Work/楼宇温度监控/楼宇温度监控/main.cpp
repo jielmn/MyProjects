@@ -503,6 +503,12 @@ CAddDeviceDlg::CAddDeviceDlg() {
 }
 
 void  CAddDeviceDlg::Notify(DuiLib::TNotifyUI& msg) {
+	CDuiString  strName = msg.pSender->GetName();
+	if (msg.sType == "click") {
+		if (strName == "btnOK") {
+			OnBtnOk();
+		}
+	}
 	WindowImplBase::Notify(msg);
 }
 
@@ -523,6 +529,32 @@ LRESULT  CAddDeviceDlg::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
 DuiLib::CControlUI * CAddDeviceDlg::CreateControl(LPCTSTR pstrClass) {
 	return WindowImplBase::CreateControl(pstrClass);
+}
+
+void  CAddDeviceDlg::OnBtnOk() {
+	assert(m_nFloor != 0);
+
+	CDuiString  strAddress;
+	CDuiString  strDeviceId;
+	int         nDeviceId = 0;
+
+	strDeviceId = m_edDeviceId->GetText();
+	strDeviceId.Trim();
+
+	if ( 1 != sscanf(strDeviceId, "%d", &nDeviceId) ) {
+		MessageBox(GetHWND(), "ÇëÊäÈëÉè±¸±àºÅ!", "´íÎó", 0);
+		return;
+	}
+
+	strAddress = m_edDeviceAddress->GetText();
+	strAddress.Trim();
+
+	if (strAddress.GetLength() == 0) {
+		MessageBox(GetHWND(), "ÇëÊäÈëÉè±¸Î»ÖÃ!", "´íÎó", 0);
+		return;
+	} 
+
+	//CBusiness::GetInstance()->AddFloorAsyn(GetHWND(), nFloor);
 }
 
 

@@ -50,6 +50,9 @@ public:
 	virtual DuiLib::CControlUI * CreateControl(LPCTSTR pstrClass);
 
 private:
+	void  OnBtnOk();
+
+private:
 	CLabelUI *                    m_lblFloor;
 	CEditUI *                     m_edDeviceId;
 	CEditUI *                     m_edDeviceAddress;
