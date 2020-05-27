@@ -81,7 +81,7 @@ BOOL  CMySqliteDatabase::AddFloor(const CAddFloorParam * pParam) {
 	return FALSE;
 }
 
-void  CMySqliteDatabase::GetAllFloors(std::vector<int> & vRet) {
+void  CMySqliteDatabase::GetAllFloors(std::vector<FloorStatus *> & vRet) {
 	char  szSql[8192];
 	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s", FLOORS_TABLE);
 
@@ -90,8 +90,10 @@ void  CMySqliteDatabase::GetAllFloors(std::vector<int> & vRet) {
 
 	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
 	for (int i = 0; i < nrow; i++) {
-		int nFloor = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
-		vRet.push_back(nFloor);
+		FloorStatus * pItem = new FloorStatus;
+		pItem->m_nFloor = GetIntFromDb(azResult[(i + 1)*ncolumn + 0]);
+		pItem->m_bWarning = GetFloorWarning(pItem->m_nFloor);
+		vRet.push_back(pItem);
 	}
 	sqlite3_free_table(azResult);
 }
@@ -221,4 +223,27 @@ BOOL  CMySqliteDatabase::SaveTemp(const TempItem * pItem, int & nFloor, BOOL & b
 	sqlite3_free_table(azResult);
 
 	return TRUE;
+}
+
+BOOL  CMySqliteDatabase::GetFloorWarning(int nFloor) {
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+	char  szSql[8192];
+	BOOL bWarning = FALSE;
+
+	// 计算楼层告警
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE floor_id = %d",
+		DEVICES_TABLE, nFloor);
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		int nTemp = GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+		if (nTemp >= g_data.m_nHighTemp) {
+			bWarning = TRUE;
+			break;
+		}
+	}
+	sqlite3_free_table(azResult);
+
+	return bWarning;
 }

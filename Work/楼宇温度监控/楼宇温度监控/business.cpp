@@ -153,7 +153,7 @@ void  CBusiness::GetAllFloorsAsyn() {
 }
 
 void  CBusiness::GetAllFloors() {
-	std::vector<int> * pvRet = new std::vector<int>;
+	std::vector<FloorStatus *> * pvRet = new std::vector<FloorStatus *>;
 	m_db.GetAllFloors(*pvRet);
 	::PostMessage(g_data.m_hWnd, UM_GET_ALL_FLOORS_RET, (WPARAM)pvRet, 0);
 }

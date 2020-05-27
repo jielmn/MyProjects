@@ -61,7 +61,7 @@ private:
 	void OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * pMessageData);
 	BOOL CanBeFreed() { return false; }
 
-	void  OnTempItem(const CTempParam * pParam);
+	void  OnTempItem(const CTempParam * pParam);	
 
 private:
 	CMySqliteDatabase              m_db;

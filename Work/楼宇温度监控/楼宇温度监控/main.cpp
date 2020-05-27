@@ -99,12 +99,33 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	}
 	else if (UM_GET_ALL_FLOORS_RET == uMsg) {
 		m_vFloors.clear();
-		std::vector<int> * pvRet = (std::vector<int>*)wParam;
-		std::copy(pvRet->begin(), pvRet->end(), std::back_inserter(m_vFloors));
-		delete pvRet;
+		std::vector<FloorStatus *> * pvRet = (std::vector<FloorStatus *>*)wParam;
+
+		std::vector<FloorStatus *>::iterator it;
+		for (it = pvRet->begin(); it != pvRet->end(); ++it) {
+			FloorStatus * pFloor = *it;
+			m_vFloors.push_back(pFloor->m_nFloor);
+		}		
 
 		std::sort(m_vFloors.begin(), m_vFloors.end(), sortInt);
 		UpdateFloors(); 
+
+		int nFloorCnt = m_lstFloors->GetCount();
+		for (int i = 0; i < nFloorCnt; i++) {
+			CListContainerElementUI * pElement = (CListContainerElementUI *)m_lstFloors->GetItemAt(i);
+
+			for (it = pvRet->begin(); it != pvRet->end(); ++it) {
+				FloorStatus * pFloor = *it;
+				if (pElement->GetTag() == pFloor->m_nFloor) {
+					SetWarning(pElement, pFloor->m_bWarning);
+					break;
+				}
+			}			
+		}
+
+
+		ClearVector(*pvRet);
+		delete pvRet;
 
 		// ¼ì²é´®¿Ú
 		CheckDeviceCom();
