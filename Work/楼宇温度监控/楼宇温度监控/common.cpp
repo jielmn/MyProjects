@@ -38,3 +38,39 @@ char * GetStrFromdDb(char * buf, DWORD dwSize, const char * szValue) {
 		buf[0] = '\0';
 	return buf;
 }
+
+int  GetCh340Count(char * szComPort, DWORD dwComPortLen) {
+
+	std::map<int, std::string> m;
+	GetAllSerialPorts(m);
+
+	char buf[8192];
+	int nFindCount = 0;
+	std::map<int, std::string>::iterator it;
+	for (it = m.begin(); it != m.end(); it++) {
+		std::string & s = it->second;
+		Str2Lower(s.c_str(), buf, sizeof(buf));
+
+		if (0 != strstr(buf, "usb-serial ch340")) {
+			// 如果是第一次记录 comport
+			if (0 == nFindCount) {
+				int nComPort = 0;
+				const char * pFind = strstr(buf, "com");
+				while (pFind) {
+					if (1 == sscanf(pFind + 3, "%d", &nComPort)) {
+						break;
+					}
+					pFind = strstr(pFind + 3, "com");
+				}
+				assert(nComPort > 0);
+				SNPRINTF(szComPort, dwComPortLen, "com%d", nComPort);
+			}
+			nFindCount++;
+		}
+	}
+	return nFindCount;
+}
+
+void InitComPort(CLmnSerialPort * pPort) {
+
+}

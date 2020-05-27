@@ -104,6 +104,7 @@ private:
 	std::vector<int>                 m_vFloors;
 
 	CLabelUI *                       m_lblDevicesTitle;
+	CLabelUI *                       m_lblBarTips;
 
 private:
 	void   AddFloor(int nFloor);

@@ -15,6 +15,7 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_layDevices = 0;
 	m_pHighlightDevice = 0;
 	m_lblDevicesTitle = 0;
+	m_lblBarTips = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -28,6 +29,7 @@ void  CDuiFrameWnd::InitWindow() {
 	m_lstFloors = (CListUI *)m_PaintManager.FindControl("lstFloors");
 	m_layDevices = (CTileLayoutUI *)m_PaintManager.FindControl("layDevices");
 	m_lblDevicesTitle = (CLabelUI *)m_PaintManager.FindControl("lblDevicesTitle");
+	m_lblBarTips = (CLabelUI *)m_PaintManager.FindControl("lblStatus");
 
 	m_lblDevicesTitle->SetText("");
 
@@ -150,6 +152,33 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 		else {
 			MessageBox(GetHWND(), "删除楼层失败!", "错误", 0);
+		}
+	}
+	else if (uMsg == WM_DEVICECHANGE) {
+		CheckDeviceCom();
+	}
+	else if (uMsg == UM_CHECK_COM_PORTS_RET) {
+		std::vector<int> * pvRet = (std::vector<int> *)wParam;
+		assert(pvRet);
+		if (pvRet->size() == 0) {
+			m_lblBarTips->SetText("没有打开任何接收基站");
+		}
+		else {
+			std::vector<int>::iterator it;
+			CDuiString strText = "打开了";
+			int i = 0;
+			for (it = pvRet->begin(); it != pvRet->end(); ++it, i++) {
+				if (i > 0) {
+					strText += ",";
+				}
+				CDuiString item;
+				item.Format("com%d", *it);
+				strText += item;
+			}
+			m_lblBarTips->SetText(strText);
+		}
+		if (pvRet) {
+			delete pvRet;
 		}
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
@@ -489,7 +518,31 @@ void  CDuiFrameWnd::OnDelDevice(CDeviceUI * pDevice) {
 }
 
 void CDuiFrameWnd::CheckDeviceCom() {
+	char szComPort[16];
+	int nFindCount = GetCh340Count(szComPort, sizeof(szComPort));
 
+	// 单个串口
+	if (!g_data.m_bMultipleComport) {
+		if (nFindCount > 1) {
+			m_lblBarTips->SetText("存在多个USB-SERIAL CH340串口，请只连接一个发射器");
+		}
+		else if (0 == nFindCount) {
+			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+		}
+		else {
+			m_lblBarTips->SetText("");
+		}
+	}
+	else {
+		if (0 == nFindCount) {
+			m_lblBarTips->SetText("没有找到USB-SERIAL CH340串口，请连接发射器的USB线");
+		}
+		else {
+			m_lblBarTips->SetText("");
+		}
+	}
+
+	CBusiness::GetInstance()->CheckLaunchAsyn();
 }
 
 int CDuiFrameWnd::GetCurrentFloor() {
