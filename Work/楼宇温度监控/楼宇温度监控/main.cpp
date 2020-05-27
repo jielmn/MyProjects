@@ -181,6 +181,25 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			delete pvRet;
 		}
 	}
+	else if (UM_TEMPERATURE == uMsg) {
+		TempItem * pItem = (TempItem *)wParam;
+		assert(pItem);
+
+		int nCnt = m_layDevices->GetCount();
+		if (nCnt > 0) {
+			nCnt--;
+		}
+
+		for (int i = 0; i < nCnt; i++) {
+			CDeviceUI * pDevice = (CDeviceUI *)m_layDevices->GetItemAt(i);
+			if (pDevice->GetDeviceId() == pItem->m_nDeviceId) {
+				pDevice->SetTemp(pItem->m_dwTemp, pItem->m_time);
+				break;
+			}
+		}
+
+		delete pItem;
+	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
 

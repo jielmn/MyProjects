@@ -173,3 +173,13 @@ BOOL  CMySqliteDatabase::DeleteFloor(const CDelFloorParam * pParam) {
 
 	return TRUE;
 }
+
+BOOL  CMySqliteDatabase::SaveTemp(const TempItem * pItem) {
+	
+	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET temperature=%d, time=%lu WHERE device_id=%d ",
+		DEVICES_TABLE, pItem->m_dwTemp, (DWORD)pItem->m_time, pItem->m_nDeviceId );
+	sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+	return TRUE;
+}

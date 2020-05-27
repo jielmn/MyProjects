@@ -60,6 +60,8 @@ int CBusiness::Init() {
 	g_data.m_cfg->Init(CONFIG_FILE_NAME);
 
 
+	g_data.m_cfg->GetIntConfig("high temperature", g_data.m_nHighTemp, 4000);
+
 	// 发射器端口
 	char  szComPorts[256];
 	g_data.m_cfg->GetConfig(CFG_LAUNCH_COM_PORT, szComPorts, sizeof(szComPorts), "");
@@ -437,7 +439,7 @@ BOOL CBusiness::ProcHandeReader(CLmnSerialPort * pCom, const BYTE * pData, DWORD
 	memset(&item, 0, sizeof(item));
 	item.m_dwTemp = pData[6] * 100 + pData[7];
 	item.m_time = time(0);
-	item.m_nDeviceId = (pData[2] << 24) | (pData[3] << 16) | (pData[4] << 8) || pData[5];
+	item.m_nDeviceId = (pData[2] << 24) | (pData[3] << 16) | (pData[4] << 8) | pData[5];
 	
 	return TRUE;
 }
@@ -455,6 +457,13 @@ void  CBusiness::ProcTail(CDataBuf * pBuf) {
 			pBuf->ResetReadPos();
 		}
 	}
+}
+
+void  CBusiness::OnTempItem(const CTempParam * pParam) {	
+	m_db.SaveTemp(&pParam->m_item);
+	TempItem * pItem = new TempItem;
+	memcpy(pItem, &pParam->m_item, sizeof(TempItem));
+	::PostMessage(g_data.m_hWnd, UM_TEMPERATURE, (WPARAM)pItem, 0);
 }
 
 // 消息处理
@@ -511,6 +520,13 @@ void CBusiness::OnMessage(DWORD dwMessageId, const  LmnToolkits::MessageData * p
 	case MSG_READ_COM_PORTS:
 	{
 		ReadAllComPorts();
+	}
+	break;
+
+	case MSG_TEMPERATURE_ITEM:
+	{
+		CTempParam * pParam = (CTempParam *)pMessageData;
+		OnTempItem(pParam);
 	}
 	break;
 

@@ -135,11 +135,20 @@ void  CDeviceUI::SetTemp( ) {
 		char  szTime[256];
 
 		if (m_nTemperature > 0 && m_tTime > 0) {
-			strText.Format("%.1f", round(m_nTemperature / 100.0f));
+			strText.Format("%.1f", m_nTemperature / 100.0f);
 			m_lblTemp->SetText(strText);
 
 			LmnFormatTime(szTime, sizeof(szTime), m_tTime, "%Y-%m-%d %H:%M:%S");
 			m_lblTempTime->SetText(szTime);
+
+			m_rule->SetTemp(m_nTemperature);
+
+			if ( m_nTemperature > g_data.m_nHighTemp ) {
+				m_lblTemp->SetTextColor(0xFFFF0000);
+			}
+			else {
+				m_lblTemp->SetTextColor(0xFF14B914);
+			}
 		}
 		else {
 			m_lblTemp->SetText("");
@@ -186,6 +195,7 @@ LPCTSTR CTempRuleUI::GetClass() const {
 
 void  CTempRuleUI::SetTemp(int nTemp) {
 	m_nTemp = nTemp;
+	Invalidate();
 }
 
 // scale range: 0 - 120 …„ œ∂»

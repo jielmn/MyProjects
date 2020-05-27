@@ -39,6 +39,7 @@ using namespace DuiLib;
 #define   UM_DEL_DEVICE_RET               (WM_USER + 5)
 #define   UM_DEL_FLOOR_RET                (WM_USER + 6)
 #define   UM_CHECK_COM_PORTS_RET          (WM_USER + 7)
+#define   UM_TEMPERATURE                  (WM_USER + 8)
 
 #define   CFG_LAUNCH_COM_PORT               "launch com ports"
 #define   MAX_COM_PORTS_CNT            4
@@ -56,6 +57,8 @@ public:
 	int                       m_nComports[MAX_COM_PORTS_CNT];     // 使用哪些指定串口
 	int                       m_nComportsCnt;
 
+	int                       m_nHighTemp;
+
 public:
 	CGlobalData() {
 		m_log = 0;
@@ -67,6 +70,7 @@ public:
 		m_bMultipleComport = FALSE;
 		m_bSpecifiedComports = FALSE;
 		m_nComportsCnt = 0;
+		m_nHighTemp = 0;
 	}
 };
 
