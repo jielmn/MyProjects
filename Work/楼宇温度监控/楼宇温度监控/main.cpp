@@ -564,7 +564,7 @@ DuiLib::CControlUI * CAddFloorDlg::CreateControl(LPCTSTR pstrClass) {
 }
    
 
-
+ 
 
 CAddDeviceDlg::CAddDeviceDlg() {
 	m_lblFloor = 0;
@@ -630,10 +630,26 @@ void  CAddDeviceDlg::OnBtnOk() {
 	strDeviceId = m_edDeviceId->GetText();
 	strDeviceId.Trim();
 
-	if ( 1 != sscanf(strDeviceId, "%d", &nDeviceId) ) {
+	if ( 0 == strDeviceId.GetLength() ) {
 		MessageBox(GetHWND(), "请输入设备编号!", "错误", 0);
 		return;
 	}
+
+	if (8 != strDeviceId.GetLength()) {
+		MessageBox(GetHWND(), "设备编号格式不对", "错误", 0);
+		return;
+	}
+
+	strDeviceId.MakeLower();
+	for ( int i = 0; i < strDeviceId.GetLength(); i++ ) {
+		char ch = strDeviceId.GetAt(i);
+		if ( !((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z')) ) {
+			MessageBox(GetHWND(), "设备编号格式不对", "错误", 0);
+			return;
+		}
+	}
+
+	nDeviceId = (int)strtoll(strDeviceId, 0, 16);
 
 	strAddress = m_edDeviceAddress->GetText();
 	strAddress.Trim();

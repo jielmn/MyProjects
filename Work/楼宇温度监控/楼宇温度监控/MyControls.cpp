@@ -151,7 +151,7 @@ void  CDeviceUI::SetTemp( ) {
 void  CDeviceUI::SetDeviceId( ) {
 	if (m_bInitiated) {
 		CDuiString  strText;
-		strText.Format("%d", m_nDeviceId);
+		strText.Format("%08X", m_nDeviceId);
 		m_lblDeviceId->SetText(strText);
 	}
 }
