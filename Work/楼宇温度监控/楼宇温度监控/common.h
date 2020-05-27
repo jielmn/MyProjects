@@ -152,6 +152,11 @@ typedef struct  tagTempItem {
 	int     m_nDeviceId;
 }TempItem;
 
+typedef struct  tagFloorStatus {
+	int    m_nFloor;
+	BOOL   m_bWarning;
+}FloorStatus;
+
 class CTempParam : public LmnToolkits::MessageData {
 public:
 	CTempParam(TempItem * pItem) {

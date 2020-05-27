@@ -118,6 +118,7 @@ private:
 	void   OnDelFloor();
 	void   UpdateFloors();
 	void   SetFloor(CListContainerElementUI * pItem, int nFloor);
+	void   SetWarning(CListContainerElementUI * pItem, BOOL bWarning);
 
 	void   UpdateDevices();
 	void   UpdateDevicesByFloor(std::vector<DeviceItem*> vRet, int nFloor);

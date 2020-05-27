@@ -185,20 +185,35 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		TempItem * pItem = (TempItem *)wParam;
 		assert(pItem);
 
-		int nCnt = m_layDevices->GetCount();
-		if (nCnt > 0) {
-			nCnt--;
+		FloorStatus * pStatus = (FloorStatus *)lParam;
+		assert(pStatus);
+
+		int nCurFloor = GetCurrentFloor();
+		if (nCurFloor == pStatus->m_nFloor) {
+			int nCnt = m_layDevices->GetCount();
+			if (nCnt > 0) {
+				nCnt--;
+			}
+
+			for (int i = 0; i < nCnt; i++) {
+				CDeviceUI * pDevice = (CDeviceUI *)m_layDevices->GetItemAt(i);
+				if (pDevice->GetDeviceId() == pItem->m_nDeviceId) {
+					pDevice->SetTemp(pItem->m_dwTemp, pItem->m_time);
+					break;
+				}
+			}
 		}
 
-		for (int i = 0; i < nCnt; i++) {
-			CDeviceUI * pDevice = (CDeviceUI *)m_layDevices->GetItemAt(i);
-			if (pDevice->GetDeviceId() == pItem->m_nDeviceId) {
-				pDevice->SetTemp(pItem->m_dwTemp, pItem->m_time);
-				break;
+		int nFloorCnt = m_lstFloors->GetCount();
+		for (int i = 0; i < nFloorCnt; i++) {
+			CListContainerElementUI * pElement = (CListContainerElementUI *)m_lstFloors->GetItemAt(i);
+			if ( pElement->GetTag() == pStatus->m_nFloor ) {
+				SetWarning(pElement, pStatus->m_bWarning);
 			}
 		}
 
 		delete pItem;
+		delete pStatus;
 	}
 	return WindowImplBase::HandleMessage(uMsg,wParam,lParam);
 }
@@ -240,6 +255,7 @@ void CDuiFrameWnd::AddFloor(int nFloor) {
 	CControlUI * pWarning = new CControlUI;
 	pWarning->SetFixedWidth(20);
 	pWarning->SetFixedHeight(20);
+	pWarning->SetName("ctlWarning");
 	//pWarning->SetBkImage("warning.png"); 
 	pVLayout->Add(pWarning);
 
@@ -260,6 +276,16 @@ void  CDuiFrameWnd::SetFloor(CListContainerElementUI * pItem, int nFloor) {
 			strText.Format("µØÏÂ%dÂ¥", -nFloor);
 		}
 		pLblFloor->SetText(strText);
+	}
+}
+
+void  CDuiFrameWnd::SetWarning(CListContainerElementUI * pItem, BOOL bWarning) {
+	CControlUI * pWarning = pItem->FindControl(FindControlByName, "ctlWarning", 0);
+	if (bWarning) {
+		pWarning->SetBkImage("warning.png");
+	}
+	else {
+		pWarning->SetBkImage("");
 	}
 }
 

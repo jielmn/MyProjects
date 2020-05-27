@@ -459,11 +459,19 @@ void  CBusiness::ProcTail(CDataBuf * pBuf) {
 	}
 }
 
-void  CBusiness::OnTempItem(const CTempParam * pParam) {	
-	m_db.SaveTemp(&pParam->m_item);
+void  CBusiness::OnTempItem(const CTempParam * pParam) {
+	int nFloor;
+	BOOL bWarning;
+	m_db.SaveTemp(&pParam->m_item, nFloor, bWarning);
+
 	TempItem * pItem = new TempItem;
 	memcpy(pItem, &pParam->m_item, sizeof(TempItem));
-	::PostMessage(g_data.m_hWnd, UM_TEMPERATURE, (WPARAM)pItem, 0);
+
+	FloorStatus * pStatus = new FloorStatus;
+	pStatus->m_nFloor = nFloor;
+	pStatus->m_bWarning = bWarning;
+
+	::PostMessage(g_data.m_hWnd, UM_TEMPERATURE, (WPARAM)pItem, (LPARAM)pStatus);
 }
 
 // 消息处理

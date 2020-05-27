@@ -174,12 +174,51 @@ BOOL  CMySqliteDatabase::DeleteFloor(const CDelFloorParam * pParam) {
 	return TRUE;
 }
 
-BOOL  CMySqliteDatabase::SaveTemp(const TempItem * pItem) {
-	
+BOOL  CMySqliteDatabase::SaveTemp(const TempItem * pItem, int & nFloor, BOOL & bWarning) {
+
 	char  szSql[8192];
+	SNPRINTF(szSql, sizeof(szSql), "SELECT * FROM %s WHERE device_id=%d",
+		DEVICES_TABLE, pItem->m_nDeviceId);
+
+	int nrow = 0, ncolumn = 0;    // 查询结果集的行数、列数
+	char **azResult = 0;          // 二维数组存放结果
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	if ( nrow > 0 ) {
+		nFloor = GetIntFromDb(azResult[ ncolumn + 1] );
+	}
+	else {
+		nFloor = 0;
+	}
+	sqlite3_free_table(azResult);
+
+	if ( nFloor == 0 ) {
+		return FALSE;
+	}
+
+	// UPDATE
 	SNPRINTF(szSql, sizeof(szSql), "UPDATE %s SET temperature=%d, time=%lu WHERE device_id=%d ",
 		DEVICES_TABLE, pItem->m_dwTemp, (DWORD)pItem->m_time, pItem->m_nDeviceId );
 	sqlite3_exec(m_db, szSql, 0, 0, 0);
+
+	// 计算楼层告警
+	SNPRINTF( szSql, sizeof(szSql), "SELECT * FROM %s WHERE floor_id = %d",
+		      DEVICES_TABLE, nFloor );	
+
+	nrow     = 0;
+	ncolumn  = 0;
+	azResult = 0;
+	bWarning = FALSE;
+
+	sqlite3_get_table(m_db, szSql, &azResult, &nrow, &ncolumn, 0);
+	for (int i = 0; i < nrow; i++) {
+		int nTemp = GetIntFromDb(azResult[(i + 1)*ncolumn + 3]);
+		if (nTemp >= g_data.m_nHighTemp) {
+			bWarning = TRUE;
+			break;
+		}
+	}
+	sqlite3_free_table(azResult);
 
 	return TRUE;
 }

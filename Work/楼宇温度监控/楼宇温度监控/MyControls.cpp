@@ -108,6 +108,10 @@ void  CDeviceUI::SetAddress(const char * szAddr) {
 	SetAddress();
 }
 
+int   CDeviceUI::GetTemp() {
+	return m_nTemperature;
+}
+
 void  CDeviceUI::SetTemp(int nTemp, time_t tTime) {
 	m_nTemperature = nTemp;
 	m_tTime = tTime;
@@ -143,7 +147,7 @@ void  CDeviceUI::SetTemp( ) {
 
 			m_rule->SetTemp(m_nTemperature);
 
-			if ( m_nTemperature > g_data.m_nHighTemp ) {
+			if ( m_nTemperature >= g_data.m_nHighTemp ) {
 				m_lblTemp->SetTextColor(0xFFFF0000);
 			}
 			else {

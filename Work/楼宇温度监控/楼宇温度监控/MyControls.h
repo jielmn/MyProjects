@@ -11,7 +11,7 @@ public:
 	CTempRuleUI();
 	~CTempRuleUI();
 	LPCTSTR GetClass() const;
-	void  SetTemp(int nTemp);
+	void  SetTemp(int nTemp);	
 
 	static int  RULE_WIDTH;
 	static int  RULE_HEIGHT;
@@ -36,6 +36,7 @@ public:
 	void  SetHighlight(BOOL bHighlight);
 	void  SetAddress(const char * szAddr);
 	void  SetTemp(int nTemp, time_t tTime);
+	int   GetTemp();
 	void  SetDeviceId(int nDeviceId);
 
 	int   GetDeviceId();

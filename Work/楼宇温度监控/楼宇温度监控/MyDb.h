@@ -15,7 +15,7 @@ public:
 	BOOL  AddDevice(const CAddDeviceParam * pParam);
 	BOOL  DeleteDevice(const CDelDeviceParam * pParam);
 	BOOL  DeleteFloor(const CDelFloorParam * pParam);
-	BOOL  SaveTemp(const TempItem * pItem);
+	BOOL  SaveTemp(const TempItem * pItem, int & nFloor, BOOL & bWarning );
 
 private:
 	// szTableName: 要创建的表名
