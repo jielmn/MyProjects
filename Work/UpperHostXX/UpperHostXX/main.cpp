@@ -443,29 +443,95 @@ void  CDuiFrameWnd::OnLuaFileSelected() {
 	lua_pushnil(m_L);
 	while ( lua_next(m_L, 1) != 0 ) {		
 
-		int i = 0;
-		char szTemp[2][1024];
-
+		int nIndex = 0;
+		char szParamName[256];
+		char szParamType[256];
+		char szParamValue[256];
+		std::vector<std::string> vComboValues;
+		int nDefaultSel = 0;
+		
 		lua_pushnil(m_L);
-		while (lua_next(m_L, 3) != 0 && i < 2) {
-			size_t n = 0;
-			const char * s = lua_tolstring(m_L, -1, &n);
-			
-			if (s) {
-				if (bUtf8) {
-					Utf8ToAnsi(szTemp[i], sizeof(szTemp[i]), s);
+		while ( lua_next(m_L, 3) != 0 ) {
+			int nType = lua_type(m_L, -1);
+			if ( nType == LUA_TSTRING ) {
+				size_t n = 0;
+				const char * s = lua_tolstring(m_L, -1, &n);
+
+				if (0 == nIndex) {
+					if (bUtf8) {
+						Utf8ToAnsi(szParamName, sizeof(szParamName), s);
+					}
+					else {
+						STRNCPY(szParamName, s, sizeof(szParamName));
+					}
 				}
-				else {
-					STRNCPY(szTemp[i], s, sizeof(szTemp[i]));
+				else if (1 == nIndex) {
+					if (bUtf8) {
+						Utf8ToAnsi(szParamType, sizeof(szParamType), s);
+					}
+					else {
+						STRNCPY(szParamType, s, sizeof(szParamType));
+					}
+				}
+				else if (2 == nIndex) {
+					if (bUtf8) {
+						Utf8ToAnsi(szParamValue, sizeof(szParamValue), s);
+					}
+					else {
+						STRNCPY(szParamValue, s, sizeof(szParamValue));
+					}
 				}
 			}
+			else if (nType == LUA_TTABLE) {
+				lua_pushnil(m_L);
+				while (lua_next(m_L, 5) != 0) {
+					size_t n = 0;
+					const char * s = lua_tolstring(m_L, -1, &n);
+					char buf[256];
+					if (bUtf8) {
+						Utf8ToAnsi(buf, sizeof(buf), s);
+					}
+					else {
+						STRNCPY(buf, s, sizeof(buf));
+					}
+					vComboValues.push_back(buf);
+					lua_pop(m_L, 1);
+				}
+			}
+			else if (nType == LUA_TNUMBER) {
+				if (nIndex == 3) {
+					nDefaultSel = (int)lua_tonumber(m_L, -1);
+				}
+			}
+
 			lua_pop(m_L, 1);
-			i++;			
+			nIndex++;			
 		}
 
-		CEditUI * pEdit = new CEditUI;
-		pEdit->SetText(szTemp[1]);
-		m_params->AddNode(szTemp[0], 0, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+		if (0 == StrICmp(szParamType, "edit")) {
+			CEditUI * pEdit = new CEditUI;
+			pEdit->SetText(szParamValue);
+			m_params->AddNode(szParamName, 0, 0, pEdit, 2, 0xFF386382, 2, 0xFF386382);
+		}
+		else if (0 == StrICmp(szParamType, "combo")) {
+			CComboUI * pCombo = new CComboUI;
+
+			std::vector<std::string>::iterator it;
+			for (it = vComboValues.begin(); it != vComboValues.end(); ++it) {
+				std::string & s = *it;
+
+				CListLabelElementUI * pElement = new CListLabelElementUI;
+				pElement->SetText(s.c_str());
+				pCombo->Add(pElement);
+			}
+
+			if (nDefaultSel < pCombo->GetCount() && nDefaultSel >= 0) {
+				pCombo->SelectItem(nDefaultSel);
+			}		
+
+			m_params->AddNode(szParamName, 0, 0, pCombo, 2, 0xFF386382, 2, 0xFF386382);
+		}
+		
 
 		lua_settop(m_L, 3);
 		lua_pop(m_L, 1);
@@ -546,8 +612,13 @@ void  CDuiFrameWnd::OnSend() {
 	for (int i = 0; i < cnt; i++) {
 		CMyTreeCfgUI::ConfigValue value;
 		m_params->GetConfigValue(i, value);
-		lua_pushstring(m_L, value.m_strEdit);
-		lua_rawseti(m_L, -2, i+1);
+		if (value.m_eConfigType == CMyTreeCfgUI::ConfigType_EDIT) {
+			lua_pushstring(m_L, value.m_strEdit);			
+		}
+		else if (value.m_eConfigType == CMyTreeCfgUI::ConfigType_COMBO) {
+			lua_pushinteger(m_L, value.m_nComboSel);
+		}
+		lua_rawseti(m_L, -2, i + 1);		
 	}
 
 	int ret = lua_pcall(m_L, 1, 1, 0);
