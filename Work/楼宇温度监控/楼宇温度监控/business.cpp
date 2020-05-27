@@ -422,7 +422,7 @@ void CBusiness::ReadAllComPorts() {
 		++it_com;
 	}
 
-	g_data.m_thrd_launch->PostDelayMessage(1000, this, MSG_READ_COM_PORTS);
+	g_data.m_thrd_launch->PostDelayMessage(200, this, MSG_READ_COM_PORTS);
 }
 
 // 处理手持读卡器数据
