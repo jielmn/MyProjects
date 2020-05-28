@@ -322,8 +322,8 @@ void CBusiness::ReadAllComPorts() {
 	std::vector<CMyComPort *>::iterator  it_com;
 	char debug_buf[8192];
 
-	const int MIN_DATA_LENGTH = 10;
-	const int HAND_TEMP_DATA_LENGTH = 10;
+	const int MIN_DATA_LENGTH = 8;
+	const int HAND_TEMP_DATA_LENGTH = 8;
 
 	time_t now = time(0);
 
@@ -427,14 +427,7 @@ void CBusiness::ReadAllComPorts() {
 
 // 处理手持读卡器数据
 BOOL CBusiness::ProcHandeReader(CLmnSerialPort * pCom, const BYTE * pData, DWORD dwDataLen, TempItem & item) {
-	char debug_buf[8192];
-
-	// 如果最后一个字节不是0xFF
-	if (pData[dwDataLen - 1] != 0xAA || pData[dwDataLen - 2] != 0xDD ) {
-		DebugStream(debug_buf, sizeof(debug_buf), pData, dwDataLen);
-		g_data.m_log->Output(ILog::LOG_SEVERITY_ERROR, "错误的数据尾(跳过，不处理)：\n%s\n", debug_buf);
-		return FALSE;
-	}
+	//char debug_buf[8192];
 
 	memset(&item, 0, sizeof(item));
 	item.m_dwTemp = pData[6] * 100 + pData[7];

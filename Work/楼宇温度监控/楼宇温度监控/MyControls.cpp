@@ -174,7 +174,7 @@ void  CDeviceUI::SetDeviceId( ) {
 
 int  CTempRuleUI::RULE_WIDTH = 48;
 int  CTempRuleUI::RULE_HEIGHT = 170;
-int  CTempRuleUI::MAX_TEMP = 12000;
+int  CTempRuleUI::MAX_TEMP = 5000;
 
 CTempRuleUI::CTempRuleUI() {
 	m_hPen   = ::CreatePen(PS_SOLID, 1, RGB(0xCC, 0xCC, 0xCC));
