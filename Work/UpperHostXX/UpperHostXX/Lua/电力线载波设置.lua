@@ -11,10 +11,20 @@ nosend = false;
 
 -- t[1] 是第一个参数: 温度
 -- t[2] 是第二个参数: 测试参数1
+-- 串口发送 55 01 E2 00 00 01 DD AA
+-- 55 起始码
+-- 01 选择带LORA模块的设备配置UID， 02 选择不带LORA模块的设备配置UID
+-- E2 00 00 01  设备唯一性标识UID
+-- DD AA  结束码
+-- 串口返回数据：如果是发送55 01 E2 00 00 01 DD AA,串口返回 01 4F 4B，表示设置成功
+-- 如果是发送55 02 E2 00 00 01 DD AA,串口返回 02 4F 4B，表示设置成功
+
 function send(t)
   -- 参数序号从1开始，不是0
-  local temperature = tonumber(t[1]);			
-  local p2 = t[2];
+  
+  local nLora = t[1];
+  local uid = t[2];
+  
   
   -- 如果温度不是数字，则设为温度0
   if ( temperature == nil )

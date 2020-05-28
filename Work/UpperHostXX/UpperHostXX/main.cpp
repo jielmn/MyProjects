@@ -621,7 +621,7 @@ void  CDuiFrameWnd::OnSend() {
 		lua_rawseti(m_L, -2, i + 1);		
 	}
 
-	int ret = lua_pcall(m_L, 1, 1, 0);
+	int ret = lua_pcall(m_L, 1, 3, 0);
 	if (0 != ret) {
 		size_t err_len = 0;
 		const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
@@ -630,16 +630,46 @@ void  CDuiFrameWnd::OnSend() {
 		return;
 	}
 
-	size_t len = 0;
-	const char * pData = lua_tolstring(m_L, 1, &len);
-	if ( len <= 0 ) {
-		MessageBox(GetHWND(), "待发送的数据长度为0", "错误", 0);
-		lua_settop(m_L, 0);
-		return;
-	}	
+	ret = lua_gettop(m_L);
+	assert(3 == ret);
 
-	CBusiness::GetInstance()->WriteComDataAsyn((const BYTE *)pData, len);
-	m_btnSend->SetEnabled(false);
+	int nTypes[3] = { 0 };
+	for (int i = 0; i < 3; i++) {
+		nTypes[i] = lua_type(m_L, i+1);
+	}
+
+	// 返回 string, 发送字符串
+	if ( (nTypes[0] == LUA_TSTRING) && (nTypes[1] == LUA_TNIL) && (nTypes[2] == LUA_TNIL) ) {
+		size_t len = 0;
+		const char * pData = lua_tolstring(m_L, 1, &len);
+		if (len <= 0) {
+			MessageBox(GetHWND(), "待发送的数据长度为0", "错误", 0);
+			lua_settop(m_L, 0);
+			return;
+		}
+
+		CBusiness::GetInstance()->WriteComDataAsyn((const BYTE *)pData, len);
+		m_btnSend->SetEnabled(false);
+	}
+	// 错误码，错误消息，发送字节流
+	else if ( nTypes[0] == LUA_TNUMBER && nTypes[1] == LUA_TSTRING && nTypes[2] == LUA_TSTRING ) {
+		int nError = (int)lua_tonumber(m_L, 1);
+
+		size_t errLen = 0;
+		const char * pErrMsg = lua_tolstring(m_L, 2, &errLen);
+
+		size_t len = 0;
+		const char * pData = lua_tolstring(m_L, 3, &len);
+
+		if (nError != 0) {
+			MessageBox(GetHWND(), pErrMsg, "错误", 0);
+			lua_settop(m_L, 0);
+			return;
+		}
+
+		CBusiness::GetInstance()->WriteComDataAsyn((const BYTE *)pData, len);
+		m_btnSend->SetEnabled(false);
+	}
 }
 
 void  CDuiFrameWnd::OnOpen() {
