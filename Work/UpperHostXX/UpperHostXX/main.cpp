@@ -36,6 +36,8 @@ CDuiFrameWnd::CDuiFrameWnd() {
 	m_nItemWidth = 0;
 	m_nItemHeight = 0;
 	m_bUtf8 = FALSE;
+
+	m_opFormatData = 0;
 }
 
 CDuiFrameWnd::~CDuiFrameWnd() {
@@ -55,9 +57,13 @@ void  CDuiFrameWnd::InitWindow() {
 	m_rich = static_cast<CRichEditUI *>(m_PaintManager.FindControl("rchData"));
 	m_tabs = static_cast<CTabLayoutUI *>(m_PaintManager.FindControl("data"));
 	m_layFormat = static_cast<CTileLayoutUI *>(m_PaintManager.FindControl("layGrids"));
+	m_opFormatData = static_cast<COptionUI *>(m_PaintManager.FindControl("opn_format_data"));
 
 	m_params->SetSelectedItemBkColor(0xFFFFFFFF);
 	m_params->SetHotItemBkColor(0xFFFFFFFF); 
+
+	m_opFormatData->Selected(true, false);
+	m_tabs->SelectItem(1,false);
 
 	m_layFormat->OnSize += MakeDelegate(this, &CDuiFrameWnd::OnGridsSize);
 
@@ -661,8 +667,16 @@ void  CDuiFrameWnd::OnSend() {
 		size_t len = 0;
 		const char * pData = lua_tolstring(m_L, 3, &len);
 
+		char szErrMsg[256];
+		if (m_bUtf8) {
+			Utf8ToAnsi(szErrMsg, sizeof(szErrMsg), pErrMsg);
+		}
+		else {
+			STRNCPY(szErrMsg, pErrMsg, sizeof(szErrMsg));
+		}
+
 		if (nError != 0) {
-			MessageBox(GetHWND(), pErrMsg, "´íÎó", 0);
+			MessageBox(GetHWND(), szErrMsg, "´íÎó", 0);
 			lua_settop(m_L, 0);
 			return;
 		}

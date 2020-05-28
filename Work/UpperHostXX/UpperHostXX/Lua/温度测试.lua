@@ -11,6 +11,8 @@ nosend = false;
 
 -- t[1] 是第一个参数: 温度
 -- t[2] 是第二个参数: 测试参数1
+-- 返回：错误码，错误消息，待发送的数据
+--   也可以: 待发送的数据
 function send(t)
   -- 参数序号从1开始，不是0
   local temperature = tonumber(t[1]);			
@@ -33,7 +35,9 @@ function send(t)
 								 a1,   b1,   p2,   0x00, 0x00, 0x00, 0xE0, 0x04, 
 								 0x02, 0x8D, 0x5A, 0x6C, 0x4B, 0x3F, 0x00, 0xFF );
   
-  return 0,"a",send_data;
+  return 0,"OK",send_data;
+  -- 或者
+  -- return send_data;
 end
 
 formattype="text";

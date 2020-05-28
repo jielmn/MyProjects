@@ -60,6 +60,7 @@ private:
 	CRichEditUI *          m_rich;
 	CTabLayoutUI *         m_tabs;
 	CTileLayoutUI *        m_layFormat;
+	COptionUI *            m_opFormatData;
 
 private:
 	lua_State*             m_L;        // lua
