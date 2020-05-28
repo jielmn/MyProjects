@@ -25,7 +25,7 @@ nosend = false;
 function send(t)
   -- 参数序号从1开始，不是0
   
-  local nLora = t[1];   -- combo 对应的是整型，第几项被选中
+  local nLora = t[1] + 1;   -- combo 对应的是整型，第几项被选中
   local uid   = string.lower(t[2]);   -- edit 对应的是字符串
   
   -- 检测uid格式
@@ -77,21 +77,31 @@ function str2hex(str)
 end
 
 formattype="text";
-maxitemscnt = 20;
+maxitemscnt = 10;
 itemheight=30;
 
--- 返回值：消耗的字节数，格式字符串，key值（确定唯一块），背景色，文字颜色
+-- 返回值：消耗的字节数，格式字符串，key值（确定唯一块），背景色，文字颜色, 是否忽略(当消耗数大于0时)
 function receive(data)
-  if ( string.len(data) < 3 )
+  local len = string.len(data);
+  if ( len < 3 )
   then
-    return 0,"0",{},0,0;
+    return 0,"0",{},0,0,false;
   end
   
   local nLora = string.byte(data,1);
-  if ( string.byte(data,2) == 79 and string.byte(data,3) == 75 )
-  then
-	return 3, nLora.." OK",{},0,0;
-  else
-    return 3,"ERROR",{},0,0;
+  if ( nLora == 1 or nLora == 2 ) then
+    if ( string.byte(data,2) == 79 and string.byte(data,3) == 75 )
+    then
+	  return 3, nLora.." OK",{},0,0,false;
+    else
+      return 3,"ERROR",{},0,0,false;
+    end
+  elseif (nLora == 0x66) then
+    if ( len >= 8 ) then
+		return 8, "温度数据",{},0,0,true;
+	else
+		return 0, "0",{},0,0,false;
+	end
   end
+  
 end

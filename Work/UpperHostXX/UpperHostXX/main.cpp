@@ -171,7 +171,7 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		lua_getglobal(m_L, "receive");
 		lua_pushlstring(m_L, (const char *)m_buf.GetData(), m_buf.GetDataLength());
 
-		int ret = lua_pcall(m_L, 1, 5, 0);
+		int ret = lua_pcall(m_L, 1, 6, 0);
 		if (0 != ret) {
 			size_t err_len = 0;
 			const char * szErrDescription = lua_tolstring(m_L, -1, &err_len);
@@ -180,64 +180,70 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		}
 		else {
 			int nRet = lua_gettop(m_L);
-			if (nRet != 5) {
-				MessageBox(GetHWND(), "receive 函数返回的参数个数不是5", "错误", 0);
+			if (nRet != 6) {
+				MessageBox(GetHWND(), "receive 函数返回的参数个数不是6", "错误", 0);
 				lua_settop(m_L, 0);
 			}
 			else {
-				int nTextColor = (int)lua_tonumber(m_L, -1);
-				int nBkColor   = (int)lua_tonumber(m_L, -2);
-				const char * szText = lua_tostring(m_L, -4);
-				int nComsume = (int)lua_tonumber(m_L, -5);
+				BOOL bIgnored  = lua_toboolean(m_L, -1);
+				int nTextColor = (int)lua_tonumber(m_L, -2);
+				int nBkColor   = (int)lua_tonumber(m_L, -3);
+				const char * szText = lua_tostring(m_L, -5);
+				int nComsume = (int)lua_tonumber(m_L, -6);
 
 				if (nComsume > 0) {
 					m_buf.SetReadPos(nComsume);
 					m_buf.Reform();
 
-					if (m_nFormatType == FORMAT_TYPE_GRIDS) {
-						std::vector<CMyData *> * pVKey = new std::vector<CMyData *>;
-						lua_pop(m_L, 2);
-						lua_pushnil(m_L);
-						while (lua_next(m_L, -2) != 0) {
-							int nType = lua_type(m_L, -1);
-							if (nType == LUA_TNUMBER) {
-								CMyData * pKey = new CMyData;
-								pKey->m_nDataype = MYDATA_TYPE_INT;
-								pKey->m_nData = (int)lua_tonumber(m_L, -1);
-								pVKey->push_back(pKey);
+					if (!bIgnored) {
+						if (m_nFormatType == FORMAT_TYPE_GRIDS) {
+							std::vector<CMyData *> * pVKey = new std::vector<CMyData *>;
+							lua_pop(m_L, 2);
+							lua_pushnil(m_L);
+							while (lua_next(m_L, -2) != 0) {
+								int nType = lua_type(m_L, -1);
+								if (nType == LUA_TNUMBER) {
+									CMyData * pKey = new CMyData;
+									pKey->m_nDataype = MYDATA_TYPE_INT;
+									pKey->m_nData = (int)lua_tonumber(m_L, -1);
+									pVKey->push_back(pKey);
+								}
+								else if (nType == LUA_TSTRING) {
+									CMyData * pKey = new CMyData;
+									pKey->m_nDataype = MYDATA_TYPE_STRING;
+									pKey->m_strData = lua_tostring(m_L, -1);
+									pVKey->push_back(pKey);
+								}
+								lua_pop(m_L, 1);
 							}
-							else if (nType == LUA_TSTRING) {
-								CMyData * pKey = new CMyData;
-								pKey->m_nDataype = MYDATA_TYPE_STRING;
-								pKey->m_strData = lua_tostring(m_L, -1);
-								pVKey->push_back(pKey);
-							}							
-							lua_pop(m_L, 1); 
-						}
 
-						BOOL  bFoundItem = FALSE;
-						CGridUI * pFoundItemUI = 0;
+							BOOL  bFoundItem = FALSE;
+							CGridUI * pFoundItemUI = 0;
 
-						if ( pVKey->size() > 0 ) {
-							int nItemsCnt = m_layFormat->GetCount();
-							for (int i = 0; i < nItemsCnt; i++) {
-								CGridUI * pItemUI =  (CGridUI *)m_layFormat->GetItemAt(i);
-								std::vector<CMyData *> * pVec = (std::vector<CMyData *> *)pItemUI->GetTag();
-								if ( pVec && pVec->size() == pVKey->size() ) {
-									DWORD j = 0;
-									for ( j = 0; j < pVKey->size(); j++ ) {
-										if ( pVKey->at(j)->m_nDataype == pVec->at(j)->m_nDataype ) {
-											if ( pVKey->at(j)->m_nDataype == MYDATA_TYPE_INT ) {
-												if (pVKey->at(j)->m_nData == pVec->at(j)->m_nData) {
-													continue;
+							if (pVKey->size() > 0) {
+								int nItemsCnt = m_layFormat->GetCount();
+								for (int i = 0; i < nItemsCnt; i++) {
+									CGridUI * pItemUI = (CGridUI *)m_layFormat->GetItemAt(i);
+									std::vector<CMyData *> * pVec = (std::vector<CMyData *> *)pItemUI->GetTag();
+									if (pVec && pVec->size() == pVKey->size()) {
+										DWORD j = 0;
+										for (j = 0; j < pVKey->size(); j++) {
+											if (pVKey->at(j)->m_nDataype == pVec->at(j)->m_nDataype) {
+												if (pVKey->at(j)->m_nDataype == MYDATA_TYPE_INT) {
+													if (pVKey->at(j)->m_nData == pVec->at(j)->m_nData) {
+														continue;
+													}
+													else {
+														break;
+													}
 												}
-												else {
-													break;
-												}
-											}
-											else if (pVKey->at(j)->m_nDataype == MYDATA_TYPE_STRING) {
-												if ( pVKey->at(j)->m_strData == pVec->at(j)->m_strData ) {
-													continue;
+												else if (pVKey->at(j)->m_nDataype == MYDATA_TYPE_STRING) {
+													if (pVKey->at(j)->m_strData == pVec->at(j)->m_strData) {
+														continue;
+													}
+													else {
+														break;
+													}
 												}
 												else {
 													break;
@@ -247,67 +253,64 @@ LRESULT CDuiFrameWnd::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) {
 												break;
 											}
 										}
-										else {
+										if (j >= pVKey->size()) {
+											bFoundItem = TRUE;
+											pFoundItemUI = pItemUI;
 											break;
 										}
 									}
-									if (j >= pVKey->size()) {
-										bFoundItem = TRUE;
-										pFoundItemUI = pItemUI;
-										break;
-									}
 								}
 							}
+
+							if (0 == pFoundItemUI) {
+								pFoundItemUI = new CGridUI;
+								m_layFormat->Add(pFoundItemUI);
+								pFoundItemUI->SetTag((UINT_PTR)pVKey);
+								pFoundItemUI->SetIndex(m_layFormat->GetCount());
+							}
+							else {
+								ClearVector(*pVKey);
+								delete pVKey;
+							}
+
+							if (m_bUtf8) {
+								char szTemp[1024];
+								Utf8ToAnsi(szTemp, sizeof(szTemp), szText);
+								pFoundItemUI->SetText(szTemp);
+							}
+							else {
+								pFoundItemUI->SetText(szText);
+							}
 						}
-						
-						if ( 0 == pFoundItemUI) {
-							pFoundItemUI = new CGridUI;
-							m_layFormat->Add(pFoundItemUI);
-							pFoundItemUI->SetTag((UINT_PTR)pVKey); 
-							pFoundItemUI->SetIndex(m_layFormat->GetCount());     
+						else if (m_nFormatType == FORMAT_TYPE_TEXT) {
+							CTextUI * pItemUI = new CTextUI;
+							int nItemsCnt = m_layFormat->GetCount();
+							if (nItemsCnt >= m_nMaxItemsCnt) {
+								m_layFormat->RemoveAt(0);
+							}
+							m_layFormat->Add(pItemUI);
+							pItemUI->SetShowHtml(true);
+							if (m_bUtf8) {
+								char szTemp[1024];
+								Utf8ToAnsi(szTemp, sizeof(szTemp), szText);
+								pItemUI->SetText(szTemp);
+							}
+							else {
+								pItemUI->SetText(szText);
+							}
+							pItemUI->SetFixedHeight(m_nItemHeight);
+							pItemUI->SetFont(5);
+							if (nBkColor != 0) {
+								pItemUI->SetBkColor(nBkColor);
+							}
+							if (nTextColor == 0) {
+								pItemUI->SetTextColor(0xFF386382);
+							}
+							else {
+								pItemUI->SetTextColor(nTextColor);
+							}
 						}
-						else {
-							ClearVector(*pVKey);
-							delete pVKey;
-						}
-				
-						if (m_bUtf8) {
-							char szTemp[1024];
-							Utf8ToAnsi(szTemp, sizeof(szTemp), szText);
-							pFoundItemUI->SetText(szTemp);
-						}
-						else {
-							pFoundItemUI->SetText(szText);
-						}
-					}
-					else if (m_nFormatType == FORMAT_TYPE_TEXT) {
-						CTextUI * pItemUI = new CTextUI;
-						int nItemsCnt = m_layFormat->GetCount();
-						if (nItemsCnt >= m_nMaxItemsCnt) {
-							m_layFormat->RemoveAt(0);
-						}
-						m_layFormat->Add(pItemUI);
-						pItemUI->SetShowHtml(true);  
-						if (m_bUtf8) {
-							char szTemp[1024];
-							Utf8ToAnsi(szTemp, sizeof(szTemp), szText);
-							pItemUI->SetText(szTemp);
-						}
-						else {
-							pItemUI->SetText(szText);  
-						} 						
-						pItemUI->SetFixedHeight(m_nItemHeight);
-						pItemUI->SetFont(5);
-						if (nBkColor != 0) {
-							pItemUI->SetBkColor(nBkColor);
-						}
-						if (nTextColor == 0) { 
-							pItemUI->SetTextColor(0xFF386382); 
-						}
-						else {
-							pItemUI->SetTextColor(nTextColor);
-						}
-					}
+					}					
 				}
 			}
 		}
