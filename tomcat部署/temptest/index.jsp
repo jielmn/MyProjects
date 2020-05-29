@@ -1,6 +1,53 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="java.sql.*" %>
+<%@ page import="javax.sql.*" %>
+<%@ page import="javax.naming.*" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <% String testman = "何海军"; %>
+
+<%!
+	private Connection getConnection() throws NamingException, SQLException  {
+		Context ctx = new InitialContext();
+		DataSource ds = (DataSource)ctx.lookup("java:comp/env/jdbc/test");
+		Connection con = ds.getConnection();
+		return con;
+	}
+%>
+
+<%
+	
+	
+	String tempStr = request.getParameter("temp");
+	String retStr  = request.getParameter("correct");
+	String omStr   = request.getParameter("om");
+	String sql     = "";
+	
+	if ( tempStr != null && tempStr.length() > 0 ) {
+		Connection con = getConnection();
+		Statement stmt = con.createStatement(); 		
+		ResultSet rs   = stmt.executeQuery("select max(id) from temptest_1" );			
+		int nId=0;
+		if ( rs.next() ) {
+			nId=rs.getInt(1);			
+		} 
+		nId++;
+		rs.close();
+		
+		int nCorrect=0;
+		if ( retStr.equals("true") ) {
+			nCorrect=1;
+		}
+			
+		sql = "insert into temptest_1 values ( " + nId + ", " + tempStr + ",  " + omStr + ", " + nCorrect + ", '" + testman +  "', SYSDATE )";
+		stmt.executeUpdate(sql);
+		stmt.close();
+		con.close();
+	}
+%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -69,25 +116,27 @@
 		var testman='<%=testman%>';
 		var ttval=$("#tt").val();
 		var omval=$("#om").val();
+		var iscorrect= ($("#result").val() == "合格");
 		$.ajax({    
 		     type:'post',    
 		     url:'index.jsp',
-		     async:false,
+		     async:true,
 		     data:{
 		    	 temp:ttval,
-		    	 correct:$("#result").val(),
+		    	 correct:iscorrect,
 		    	 om:omval,
 		    	 testman:testman
 		    	 },    
 		     contentType: "application/x-www-form-urlencoded; charset=utf-8", 
 		     success:function(data){  
-		          if( data =="true" ){    
+				  //console.log(data);
+		          //if( data =="true" ){    
 		        	  	$("#tt").val(ttval);
 						$("#om").val(omval);
 						$("#result").val("");
 						$('#ttiframe').attr('src', $('#ttiframe').attr('src'));
 						$("#tt").focus(); 
-		           }
+		           //}
 		      },    
 		      error:function(){
 		    	  alert("error");
